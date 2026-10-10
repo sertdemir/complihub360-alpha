@@ -11,6 +11,8 @@ import { SiteFooter } from '../components/home';
 import { FaqList } from '../components/home/HomeFaq';
 import { Segment } from '../components/compliance-areas';
 import { SectionEyebrow, GoldWord, Reveal } from '../components/providers/SectionHeading';
+import { InboxAddress, SendFailed } from '../components/contact/SendStates';
+import { CONTACT_INBOX, EMAIL_RE, failureOf, invalidFieldOf, sendContact, type SendFailure } from '../api/contact';
 
 // ─── /contact · Kontakt und Support ──────────────────────────────────────────
 // Built 2026-08-28 (canvas "Kontaktseite": K1 C, K2 A, K3 B on the full-bleed
@@ -20,20 +22,14 @@ import { SectionEyebrow, GoldWord, Reveal } from '../components/providers/Sectio
 //
 // Copy: common.json → contact.* (en/de/es/tr).
 
-// ─── Was noch nicht echt ist ─────────────────────────────────────────────────
-// Der Nutzer hat die Seite ausdrücklich MIT PLATZHALTERN bestellt (Entscheidung
-// 2026-08-28): echte Adressen, Telefonnummer, Servicezeiten und Antwortzeit-
-// Zusagen reicht er nach. Bis dahin steht hier NICHTS Erfundenes — die offenen
-// Stellen tragen denselben gelben Chip wie die Legal-Seiten, damit niemand sie
-// für echt hält, und der Absendeweg sagt selbst, dass er noch nicht angebunden
-// ist, statt einen Versand vorzutäuschen.
+// ─── Senden (Beta-Plan Di 13.10.) ────────────────────────────────────────────
+// POST /api/v1/contact (api/contact.ts): ein Postfach, das Anliegen im Betreff.
+// Canvas „Kontakt und Bewerbung senden", Wahl 10.10.2026: A3 (angekommen, mit
+// den drei Schritten aus K4), B2 (nicht abgeschickt, Text bleibt, Adresse zum
+// Kopieren), C1 (Karten ohne Adresse, eine Zeile unter dem Formular).
+// Figma: Screens-Datei, Seite „Kontakt + Bewerbung senden (Di 13.10.)".
 //
-// TODO(contact-live): drei Dinge machen die Seite echt —
-//   1. CONTACT_ENDPOINT auf die reale Route setzen (unten),
-//   2. die LANE-Adressen aus i18n mit echten Postfächern füllen,
-//   3. contact.placeholders.* (Anschrift, Telefon, Servicezeiten) ersetzen.
-// Danach fällt der Draft-Hinweis am Formular von selbst weg.
-const CONTACT_ENDPOINT: string | null = null;
+// Noch offen (Rechtsseiten-Tag): contact.placeholders.* (Anschrift, Telefon).
 
 /** Wie in LegalPages.tsx: sichtbar offen, nicht heimlich erfunden. */
 function Placeholder({ children }: { children: React.ReactNode }) {
@@ -76,20 +72,55 @@ export function ContactPage() {
   const laneParam = params.get('lane');
   const initialLane: LaneId = LANE_IDS.includes(laneParam as LaneId) ? (laneParam as LaneId) : 'support';
   const [lane, setLane] = useState<LaneId>(initialLane);
-  const [sent, setSent] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [hp, setHp] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
+  const [failure, setFailure] = useState<{ kind: SendFailure; error: unknown } | null>(null);
+  const [acknowledged, setAcknowledged] = useState(true);
+  const [sentTo, setSentTo] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<'name' | 'email' | 'message', string>>>({});
 
   useEffect(() => {
     if (laneParam && LANE_IDS.includes(laneParam as LaneId)) {
       document.getElementById('contact-form')?.scrollIntoView({ block: 'start' });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Solange kein Endpunkt existiert, wird KEIN Versand vorgetäuscht: der
-    // Zustand darunter sagt offen, dass die Nachricht noch nicht abgeht.
-    setSent(true);
+    if (status === 'sending') return;
+    const errs: typeof fieldErrors = {};
+    if (!name.trim()) errs.name = t('contactSend.field.name');
+    if (!EMAIL_RE.test(email.trim())) errs.email = t('contactSend.field.email');
+    if (!message.trim()) errs.message = t('contactSend.field.message');
+    setFieldErrors(errs);
+    if (Object.keys(errs).length) return;
+    setStatus('sending');
+    setFailure(null);
+    try {
+      const r = await sendContact({ lane, locale, name: name.trim(), email: email.trim(), message, hp });
+      setAcknowledged(r.acknowledged);
+      setSentTo(email.trim());
+      setStatus('sent');
+    } catch (err) {
+      // Der Server bemaengelt ein Feld (400): dort anzeigen, nicht als Ausfall.
+      const field = invalidFieldOf(err);
+      if (field === 'name' || field === 'email' || field === 'message') {
+        setFieldErrors({ [field]: t(`contactSend.field.${field}`) });
+        setStatus('idle');
+        return;
+      }
+      setFailure({ kind: failureOf(err), error: err });
+      setStatus('failed');
+    }
+  };
+
+  const writeAnother = () => {
+    setMessage('');
+    setStatus('idle');
+    setFailure(null);
   };
 
   return (
@@ -131,8 +162,8 @@ export function ContactPage() {
 
         {/* ── K2 · Vier Wege (Variante A) ──────────────────────────────────
             Vier Karten, Icons ohne Rahmen und ohne Fläche (Konvention). Der
-            Kartenfuss trägt die Adresse und die Frist — die Adressen sind
-            Platzhalter, die Fristen ebenfalls offen markiert. */}
+            Kartenfuss trägt die Frist. Eine Adresse je Karte gibt es nicht
+            mehr: ein Postfach, eine Zeile unter dem Formular (C1). */}
         <section className="bg-surface pb-20 pt-4 lg:pb-24">
           <Container size="xl">
             <Reveal className="max-w-[660px]">
@@ -158,8 +189,7 @@ export function ContactPage() {
                       <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
                         {t(`contact.lane.${id}.desc`)}
                       </p>
-                      <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2 border-t border-stroke-subtle pt-3">
-                        <Placeholder>{t(`contact.lane.${id}.mailbox`)}</Placeholder>
+                      <div className="mt-4 border-t border-stroke-subtle pt-3">
                         <span className="text-body-2xs text-fg-tertiary">
                           {t(`contact.lane.${id}.sla`)}
                         </span>
@@ -195,67 +225,113 @@ export function ContactPage() {
             </Reveal>
 
             <Reveal delay={0.1} className="mx-auto mt-9 w-full max-w-[760px]">
-              <form
-                onSubmit={onSubmit}
-                className="rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.35)] sm:p-9"
-              >
-                {/* Der Hinweis verschwindet, sobald CONTACT_ENDPOINT steht. */}
-                {!CONTACT_ENDPOINT && (
-                  <div className="mb-7 rounded-lg border border-warning-500/30 bg-warning-bg px-4 py-3 text-body-xs leading-relaxed text-warning-700">
-                    {t('contact.form.draftNote')}
+              <div className="rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.35)] sm:p-9">
+                {status === 'sent' ? (
+                  <div className="flex flex-col gap-5" role="status">
+                    {acknowledged ? (
+                      <div className="flex flex-col gap-2.5 rounded-xl border border-success-500/30 bg-success-bg dark:bg-emerald-500/10 px-[18px] py-[15px]">
+                        <p className="font-serif text-[1.125rem] font-bold text-fg">{t('contact.sent.title')}</p>
+                        <p className="text-body-sm leading-relaxed text-fg-secondary">{t('contact.sent.body', { email: sentTo })}</p>
+                        {/* A3: die Schritte aus K4 — Schritt 1 ist erledigt. */}
+                        <ul className="mt-1 flex flex-col gap-2.5">
+                          {AFTER_STEPS.map((s, i) => (
+                            <li key={s} className="flex items-center gap-2.5 text-body-sm text-fg" data-step={s} data-done={i === 0}>
+                              <span
+                                aria-hidden
+                                className={'grid h-5 w-5 shrink-0 place-items-center rounded-full text-body-4xs font-bold '
+                                  + (i === 0 ? 'bg-brand text-fg-on-brand' : 'border border-stroke bg-surface text-fg-tertiary')}
+                              >
+                                {i === 0 ? '✓' : i + 1}
+                              </span>
+                              <span className="min-w-0 flex-1">{t(`contact.after.${s}.title`)}</span>
+                              <span className={i === 0 ? 'text-body-3xs font-bold uppercase tracking-[0.08em] text-brand' : 'text-body-2xs text-fg-tertiary'}>
+                                {i === 0 ? t('contact.sent.done') : t(`contact.after.${s}.when`)}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      // Angekommen, aber die Bestaetigung ging nicht raus —
+                      // dann steht dort kein Haken, sondern der Hinweis.
+                      <div className="flex flex-col gap-2 rounded-xl border border-warning-500/30 bg-warning-bg dark:bg-amber-500/10 px-[18px] py-[15px]">
+                        <p className="font-serif text-[1.125rem] font-bold text-fg">{t('contact.sent.title')}</p>
+                        <p className="text-body-sm leading-relaxed text-warning-700 dark:text-amber-200">{t('contactSend.ackFailed', { email: sentTo })}</p>
+                      </div>
+                    )}
+                    <div>
+                      <Button type="button" variant="secondary" size="md" onClick={writeAnother}>
+                        {t('contact.sent.again')}
+                      </Button>
+                    </div>
                   </div>
+                ) : (
+                  <form onSubmit={onSubmit} noValidate>
+                    <fieldset>
+                      <legend className="text-body-xs font-bold text-fg">{t('contact.form.lane')}</legend>
+                      {/* Die GETEILTE Segment-Komponente des Pflichten-Explorers —
+                          vier Zustaende EINER Wahl, kein Chip-Nachbau. */}
+                      <div className="mt-2.5 flex flex-wrap gap-2">
+                        {LANE_IDS.map((id) => (
+                          <Segment key={id} selected={lane === id} onClick={() => setLane(id)}>
+                            {t(`contact.lane.${id}.short`)}
+                          </Segment>
+                        ))}
+                      </div>
+                    </fieldset>
+
+                    <div className="mt-7 grid gap-5 sm:grid-cols-2">
+                      <FormField label={t('contact.form.name')} htmlFor="contact-name" error={fieldErrors.name}>
+                        <Input id="contact-name" name="name" autoComplete="name" placeholder={t('contact.form.namePlaceholder')}
+                          value={name} onChange={(e) => setName(e.target.value)} error={!!fieldErrors.name} />
+                      </FormField>
+                      <FormField label={t('contact.form.email')} htmlFor="contact-email" error={fieldErrors.email}>
+                        <Input id="contact-email" name="email" type="email" autoComplete="email" placeholder={t('contact.form.emailPlaceholder')}
+                          value={email} onChange={(e) => setEmail(e.target.value)} error={!!fieldErrors.email} />
+                      </FormField>
+                    </div>
+
+                    <FormField
+                      label={t('contact.form.message')}
+                      htmlFor="contact-message"
+                      className="mt-5"
+                      helper={t('contact.form.messageHelper')}
+                      error={fieldErrors.message}
+                    >
+                      <Textarea id="contact-message" name="message" rows={5} placeholder={t('contact.form.messagePlaceholder')}
+                        value={message} onChange={(e) => setMessage(e.target.value)} error={!!fieldErrors.message} />
+                    </FormField>
+
+                    {/* Honeypot: fuer Menschen unsichtbar und nicht erreichbar. */}
+                    <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                      <label htmlFor="contact-hp">Website</label>
+                      <input id="contact-hp" name="website_hp" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
+                    </div>
+
+                    {status === 'failed' && failure && (
+                      <div className="mt-6">
+                        <SendFailed kind="message" failure={failure.kind} error={failure.error} />
+                      </div>
+                    )}
+
+                    <div className="mt-7 flex flex-col gap-4 border-t border-stroke-subtle pt-6 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="max-w-[400px] text-body-2xs leading-relaxed text-fg-tertiary">
+                        {t('contact.form.privacy')}
+                      </p>
+                      <Button type="submit" variant="primary" size="md" className="shrink-0" loading={status === 'sending'}>
+                        {status === 'sending' ? t('contactSend.sending') : status === 'failed' ? t('contactSend.retry') : t('contact.form.submit')}
+                      </Button>
+                    </div>
+                  </form>
                 )}
-
-                <fieldset>
-                  <legend className="text-body-xs font-bold text-fg">{t('contact.form.lane')}</legend>
-                  {/* Die GETEILTE Segment-Komponente des Pflichten-Explorers —
-                      vier Zustaende EINER Wahl, kein Chip-Nachbau. */}
-                  <div className="mt-2.5 flex flex-wrap gap-2">
-                    {LANE_IDS.map((id) => (
-                      <Segment key={id} selected={lane === id} onClick={() => setLane(id)}>
-                        {t(`contact.lane.${id}.short`)}
-                      </Segment>
-                    ))}
-                  </div>
-                </fieldset>
-
-                <div className="mt-7 grid gap-5 sm:grid-cols-2">
-                  <FormField label={t('contact.form.name')} htmlFor="contact-name">
-                    <Input id="contact-name" name="name" autoComplete="name" placeholder={t('contact.form.namePlaceholder')} />
-                  </FormField>
-                  <FormField label={t('contact.form.email')} htmlFor="contact-email">
-                    <Input id="contact-email" name="email" type="email" autoComplete="email" placeholder={t('contact.form.emailPlaceholder')} />
-                  </FormField>
-                </div>
-
-                <FormField
-                  label={t('contact.form.message')}
-                  htmlFor="contact-message"
-                  className="mt-5"
-                  helper={t('contact.form.messageHelper')}
-                >
-                  <Textarea id="contact-message" name="message" rows={5} placeholder={t('contact.form.messagePlaceholder')} />
-                </FormField>
-
-                <div className="mt-7 flex flex-col gap-4 border-t border-stroke-subtle pt-6 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="max-w-[400px] text-body-2xs leading-relaxed text-fg-tertiary">
-                    {t('contact.form.privacy')}
-                  </p>
-                  <Button type="submit" variant="primary" size="md" className="shrink-0">
-                    {t('contact.form.submit')}
-                  </Button>
-                </div>
-
-                {sent && (
-                  <div
-                    role="status"
-                    className="mt-6 rounded-lg border border-stroke-subtle bg-surface-secondary px-4 py-3.5 text-body-sm leading-relaxed text-fg-secondary"
-                  >
-                    {t('contact.form.notWired')}{' '}
-                    <Placeholder>{t(`contact.lane.${lane}.mailbox`)}</Placeholder>
-                  </div>
-                )}
-              </form>
+              </div>
+              {/* C1: die eine Adresse, an einer Stelle — nur wenn sie feststeht.
+                  Im Fehlerfall steht sie schon im Hinweis (B2), nicht doppelt. */}
+              {CONTACT_INBOX && status !== 'failed' && (
+                <p className="mt-5 flex flex-wrap items-center justify-center gap-2 text-body-sm text-fg-secondary">
+                  {t('contact.form.direct')} <InboxAddress />
+                </p>
+              )}
             </Reveal>
           </Container>
         </section>

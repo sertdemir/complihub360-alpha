@@ -131,6 +131,10 @@ jobs:
           # Leer => das SEO-Plugin ueberspringt Sitemap, robots.txt und die
           # Routen-HTMLs. Ohne Origin waere jedes Canonical geraten.
           VITE_SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+          # Das eine Kontakt-Postfach (Kontaktseite C1, Fehlerhinweis B2).
+          # Leer => auf der Seite steht keine Adresse, das Formular sendet
+          # trotzdem (die API liest CONTACT_INBOX aus der VPS-Env).
+          VITE_CONTACT_INBOX: ${{ vars.CONTACT_INBOX }}
         run: |
           npm run build --workspace apps/vs1-demo/ui
           printf 'User-agent: *\nDisallow: /\n' > apps/vs1-demo/ui/dist/robots.txt

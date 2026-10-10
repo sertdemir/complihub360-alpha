@@ -1825,7 +1825,7 @@
     },
     "facts": {
       "confirm": {
-        "value": "24 sa",
+        "value": "anında",
         "label": "alındı onayı"
       },
       "answer": {
@@ -1839,7 +1839,6 @@
     },
     "formTitle": "Başvurunuz",
     "formLead": "İncelemeyi başlatmak için gereken asgari bilgiler. Gerisini görüşmede netleştiririz.",
-    "draftNote": "Önizleme: Başvuru gönderim yolu henüz bağlı değil. O zamana kadar bu sayfadan hiçbir şey gönderilmez.",
     "firm": "Büro / şirket",
     "contact": "İlgili kişi",
     "email": "E-posta",
@@ -1855,9 +1854,12 @@
     "submit": "Başvuruyu gönder",
     "questions": "Önce gayriresmî sormak mı istersiniz?",
     "questionsLink": "Sağlayıcı iletişimi",
-    "notWiredTitle": "Henüz gönderilmedi",
-    "notWiredBody": "Başvuru gönderim yolu henüz hazır değil. O zamana kadar bize şu adresten ulaşabilirsiniz:",
-    "backToForm": "Forma geri dön"
+    "sent": {
+      "title": "Başvurunuz ulaştı.",
+      "body": "{{email}} adresine bir onay yolda. Bilgilerinizi elle inceliyor ve 3 iş günü içinde size dönüyoruz.",
+      "progress": "devam ediyor · 3 iş günü içinde geri bildirim",
+      "home": "Ana sayfaya dön"
+    }
   },
   "contact": {
     "hero": {
@@ -1865,7 +1867,7 @@
       "titlePre": "Bize ",
       "titleGold": "konunun ne olduğunu",
       "titlePost": " söyleyin.",
-      "lead": "Her şey için tek bir kutu bizim işimize gelir, sizi ise yavaşlatır. Konunuzu seçin — yanıtlayabilecek kişilere ulaşsın.",
+      "lead": "Konunuzu seçin; böylece mesajınızı okuyan kişi neyle ilgili olduğunu hemen bilir. Bir adres aramanıza gerek yok.",
       "facts": {
         "ways": {
           "value": "4 yol",
@@ -1892,29 +1894,25 @@
         "short": "Değerlendirme",
         "title": "Değerlendirmede yardım",
         "desc": "Bir soru takıldı, bir sonuç yanlış görünüyor, hesap açılmıyor.",
-        "sla": "Ertesi iş günü yanıt",
-        "mailbox": "support@…"
+        "sla": "Ertesi iş günü yanıt"
       },
       "sales": {
         "short": "Fiyatlar",
         "title": "Fiyatlar ve planlar",
         "desc": "Hangi plan uyar, bir ekip ne tutar, faturalama nasıl işler.",
-        "sla": "Ertesi iş günü yanıt",
-        "mailbox": "sales@…"
+        "sla": "Ertesi iş günü yanıt"
       },
       "partner": {
         "short": "Sağlayıcı",
         "title": "Sağlayıcı olarak listelenmek",
         "desc": "Ağımıza katılmak isteyen hukuk bürosu, mali müşavir ya da danışmanlık.",
-        "sla": "3 iş günü içinde dönüş",
-        "mailbox": "partner@…"
+        "sla": "3 iş günü içinde dönüş"
       },
       "privacy": {
         "short": "Veri koruma",
         "title": "Veri koruma ve güvenlik",
         "desc": "Bilgi talebi, silme, veri işleme sözleşmesi ya da bir açığın bildirimi.",
-        "sla": "KVKK/GDPR md. 12 süresi",
-        "mailbox": "kvkk@…"
+        "sla": "KVKK/GDPR md. 12 süresi"
       }
     },
     "form": {
@@ -1931,8 +1929,7 @@
       "messageHelper": "Pazar, ürün ve bunun yerine ne beklediğiniz — bu bir tur soru sormaktan kurtarır.",
       "privacy": "Yazdıklarınızı yalnızca size yanıt vermek için kullanırız. İstemediğiniz sürece bülten göndermeyiz.",
       "submit": "Mesajı gönder",
-      "draftNote": "Önizleme: Bu sayfanın gönderim yolu ve posta kutuları henüz bağlanmadı. O zamana kadar buradan hiçbir şey çıkmaz.",
-      "notWired": "Henüz gönderilmedi — gönderim yolu hazır değil. O zamana dek bize şuradan ulaşabilirsiniz:"
+      "direct": "Doğrudan e-posta mı tercih edersiniz?"
     },
     "faster": {
       "eyebrow": "Belki daha hızlı",
@@ -1996,6 +1993,36 @@
       "address": "posta adresi",
       "phone": "telefon numarası",
       "hours": "hizmet saatleri"
+    },
+    "sent": {
+      "title": "Mesajınız ulaştı.",
+      "body": "{{email}} adresine bir onay yolda.",
+      "done": "tamamlandı",
+      "again": "Yeni bir mesaj yazın"
+    }
+  },
+  "contactSend": {
+    "sending": "Gönderiliyor …",
+    "retry": "Tekrar gönder",
+    "failedTitle": "Mesajınız gönderilmedi.",
+    "failedTitleApplication": "Başvurunuz gönderilmedi.",
+    "failed": {
+      "unavailable": "Gönderim şu anda kullanılamıyor. Metniniz burada kalır.",
+      "network": "Posta kutumuzla bağlantı kurulamadı. Metniniz burada kalır.",
+      "rateLimit": "Bağlantınızdan kısa sürede birden fazla mesaj geldi. Lütfen 15 dakika bekleyin. Metniniz burada kalır."
+    },
+    "direct": "Tekrar deneyin ya da bize doğrudan yazın:",
+    "copy": "Kopyala",
+    "ackFailed": "{{email}} adresine onay iletilemedi. Yanıtımız tam olarak bu adrese gider. Adres yanlışsa lütfen bize tekrar yazın.",
+    "field": {
+      "name": "Lütfen adınızı girin.",
+      "email": "Lütfen e-posta adresini kontrol edin.",
+      "message": "Lütfen konuyu kısaca yazın.",
+      "firm": "Lütfen firmanızı girin.",
+      "credentials": "Lütfen ruhsatınızı veya yeterliliğinizi belirtin.",
+      "areas": "Lütfen en az bir alan seçin.",
+      "markets": "Lütfen en az bir pazar seçin.",
+      "website": "Lütfen web sitesi adresini kontrol edin."
     }
   },
   "states": {

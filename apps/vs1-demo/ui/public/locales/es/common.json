@@ -1825,7 +1825,7 @@
     },
     "facts": {
       "confirm": {
-        "value": "24 h",
+        "value": "al instante",
         "label": "recepción confirmada"
       },
       "answer": {
@@ -1839,7 +1839,6 @@
     },
     "formTitle": "Su solicitud",
     "formLead": "Lo mínimo para iniciar la revisión. El resto lo aclaramos en conversación.",
-    "draftNote": "Vista previa: el envío de solicitudes aún no está conectado. Hasta entonces, nada sale de esta página.",
     "firm": "Despacho / empresa",
     "contact": "Persona de contacto",
     "email": "Correo electrónico",
@@ -1855,9 +1854,12 @@
     "submit": "Enviar solicitud",
     "questions": "¿Prefiere preguntar primero sin compromiso?",
     "questionsLink": "Contacto para proveedores",
-    "notWiredTitle": "Aún no enviado",
-    "notWiredBody": "El envío de solicitudes está pendiente. Hasta entonces puede escribirnos a",
-    "backToForm": "Volver al formulario"
+    "sent": {
+      "title": "Su solicitud ha llegado.",
+      "body": "Hay una confirmación en camino a {{email}}. Revisamos sus datos a mano y le respondemos en un plazo de 3 días hábiles.",
+      "progress": "en curso · respuesta en 3 días hábiles",
+      "home": "Ir a la página de inicio"
+    }
   },
   "contact": {
     "hero": {
@@ -1865,7 +1867,7 @@
       "titlePre": "Díganos ",
       "titleGold": "de qué se trata",
       "titlePost": ".",
-      "lead": "Un único buzón para todo sería cómodo para nosotros y lento para usted. Elija su asunto: llegará a las personas que pueden responderlo.",
+      "lead": "Elija su asunto: así quien lea su mensaje sabrá enseguida de qué se trata. No tiene que buscar ninguna dirección.",
       "facts": {
         "ways": {
           "value": "4 vías",
@@ -1892,29 +1894,25 @@
         "short": "Evaluación",
         "title": "Ayuda con la evaluación",
         "desc": "Una pregunta se atasca, un resultado parece erróneo, la cuenta no avanza.",
-        "sla": "Respuesta al siguiente día hábil",
-        "mailbox": "support@…"
+        "sla": "Respuesta al siguiente día hábil"
       },
       "sales": {
         "short": "Precios",
         "title": "Precios y planes",
         "desc": "Qué plan encaja, cuánto cuesta un equipo, cómo funciona la facturación.",
-        "sla": "Respuesta al siguiente día hábil",
-        "mailbox": "sales@…"
+        "sla": "Respuesta al siguiente día hábil"
       },
       "partner": {
         "short": "Proveedores",
         "title": "Figurar como proveedor",
         "desc": "Despacho, asesoría fiscal o consultoría que quiere entrar en la red.",
-        "sla": "Respuesta en 3 días hábiles",
-        "mailbox": "partner@…"
+        "sla": "Respuesta en 3 días hábiles"
       },
       "privacy": {
         "short": "Privacidad",
         "title": "Privacidad y seguridad",
         "desc": "Acceso, supresión, encargo del tratamiento o el aviso de una vulnerabilidad.",
-        "sla": "Plazo del art. 12 RGPD",
-        "mailbox": "privacidad@…"
+        "sla": "Plazo del art. 12 RGPD"
       }
     },
     "form": {
@@ -1931,8 +1929,7 @@
       "messageHelper": "Mercado, producto y qué esperaba en su lugar: eso ahorra una consulta de vuelta.",
       "privacy": "Usamos sus datos solo para responderle. Sin boletín salvo que lo pida.",
       "submit": "Enviar mensaje",
-      "draftNote": "Vista previa: la vía de envío y los buzones de esta página aún no están conectados. Hasta entonces, nada sale de aquí.",
-      "notWired": "Aún no enviado: la vía de envío sigue pendiente. Hasta entonces puede escribirnos a"
+      "direct": "¿Prefiere escribirnos directamente por correo?"
     },
     "faster": {
       "eyebrow": "Quizá más rápido",
@@ -1996,6 +1993,36 @@
       "address": "dirección postal",
       "phone": "número de teléfono",
       "hours": "horario de atención"
+    },
+    "sent": {
+      "title": "Su mensaje ha llegado.",
+      "body": "Hay una confirmación en camino a {{email}}.",
+      "done": "hecho",
+      "again": "Escribir otro mensaje"
+    }
+  },
+  "contactSend": {
+    "sending": "Enviando …",
+    "retry": "Enviar de nuevo",
+    "failedTitle": "Su mensaje no se ha enviado.",
+    "failedTitleApplication": "Su solicitud no se ha enviado.",
+    "failed": {
+      "unavailable": "El envío no está disponible en este momento. Su texto se queda aquí.",
+      "network": "La conexión con nuestro buzón ha fallado. Su texto se queda aquí.",
+      "rateLimit": "Desde su conexión llegaron varios mensajes en poco tiempo. Espere 15 minutos, por favor. Su texto se queda aquí."
+    },
+    "direct": "Inténtelo de nuevo o escríbanos directamente:",
+    "copy": "Copiar",
+    "ackFailed": "No se pudo entregar la confirmación a {{email}}. Nuestra respuesta irá exactamente a esta dirección. Si no es correcta, escríbanos de nuevo, por favor.",
+    "field": {
+      "name": "Indique su nombre, por favor.",
+      "email": "Revise la dirección de correo, por favor.",
+      "message": "Cuéntenos brevemente de qué se trata.",
+      "firm": "Indique su empresa, por favor.",
+      "credentials": "Indique su habilitación o cualificación, por favor.",
+      "areas": "Elija al menos un ámbito, por favor.",
+      "markets": "Elija al menos un mercado, por favor.",
+      "website": "Revise la dirección del sitio web, por favor."
     }
   },
   "states": {

@@ -3442,6 +3442,35 @@ describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
     });
 });
 
+// ─── Kontakt (contact.ts) ────────────────────────────────────────────────────
+// Oeffentlich, eigenes Limit, und ohne CONTACT_INBOX/RESEND_API_KEY ehrlich 503.
+
+describe('POST /api/v1/contact', () => {
+    beforeEach(async () => { (await import('../contact.js')).resetContactLimit(); });
+    const msg = { lane: 'support', locale: 'en', name: 'Jana', email: 'jana@example.com', message: 'Hallo' };
+
+    it('ist ohne Anmeldung erreichbar und sagt 503, solange kein Postfach konfiguriert ist', async () => {
+        const res = await api('/api/v1/contact', { method: 'POST', auth: 'none', body: JSON.stringify(msg) });
+        expect(res.status).toBe(503);
+        expect(res.body.errorCode).toBe('CONTACT_UNAVAILABLE');
+        expect(typeof res.body.correlationId).toBe('string');
+        const ev = (db.event_log ?? []).find((e) => e.type === 'contact_unavailable');
+        expect(JSON.stringify(ev?.payload)).not.toContain('jana');
+    });
+
+    it('prueft vor allem anderen die Eingabe', async () => {
+        const res = await api('/api/v1/contact', { method: 'POST', auth: 'none', body: JSON.stringify({ ...msg, email: 'x' }) });
+        expect(res.status).toBe(400);
+        expect(res.body.field).toBe('email');
+    });
+
+    it('bremst nach fuenf Nachrichten', async () => {
+        for (let i = 0; i < 5; i++) await api('/api/v1/contact', { method: 'POST', auth: 'none', body: JSON.stringify(msg) });
+        const res = await api('/api/v1/contact', { method: 'POST', auth: 'none', body: JSON.stringify(msg) });
+        expect(res.status).toBe(429);
+    });
+});
+
 // ─── Phase 5: Anwesenheit, No-Show, Neubuchung, Guthaben (Spec B, ADR-0007) ──
 describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
     const past = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
