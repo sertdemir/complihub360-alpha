@@ -1432,10 +1432,16 @@ paths:
   /p/{ref}/website:
     get:
       summary: Gezaehlter Klick zur Website — nur nach Offenlegung
+      description: >-
+        Zaehlt den Klick (`provider_website_outclick`) und nennt die Adresse.
+        Kein 302: ein Link im neuen Tab traegt kein Bearer-Token. Die
+        Oberflaeche oeffnet die Website direkt und ruft diesen Endpunkt
+        parallel per apiFetch auf.
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
       responses:
-        '302': { description: Weiterleitung }
+        '200': { description: "`{ url }` — die Website des Anbieters" }
+        '401': { description: Ohne Login }
         '403': { description: Ohne Buchung mit Offenlegung }
         '404': { description: Unbekannter Ref oder keine Website }
 

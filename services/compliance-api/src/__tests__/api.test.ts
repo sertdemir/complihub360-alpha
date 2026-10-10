@@ -4117,6 +4117,22 @@ describe('Privacy Critical Tests (Checklist v1.0)', () => {
         expect(denied()).toEqual([expect.objectContaining({ payload: expect.objectContaining({ resource: 'provider_reveal', userId: USER_ID, status: 403 }) })]);
     });
 
+    it('#2b nach der Buchung: Website-Link zaehlt und nennt die Adresse als JSON (kein 302 — neuer Tab ohne Token)', async () => {
+        seedProvider();
+        const bookingId = randomUUID();
+        (db.scheduling ??= []).push({ id: bookingId, provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: inAWeek(), slot_end: inAWeek(), status: 'confirmed', identity_revealed: true });
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/website`, { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body).toEqual({ url: 'https://testkanzlei-schmidt.example' });
+        expect((db.event_log ?? []).filter((e) => e.type === 'provider_website_outclick')).toEqual([
+            expect.objectContaining({ payload: { providerKey: 'test-kanzlei', userId: USER_ID, bookingId } }),
+        ]);
+        const ohne = await api(`/api/v1/p/${refOf('test-kanzlei')}/website`, { auth: 'none' });
+        expect(ohne.status).toBe(401);
+        await settle();
+        expect(denied()).toEqual([]);
+    });
+
     it('#3 nach der Buchung: der Buchende sieht das Profil offen, ein anderer weiter anonym (A1)', async () => {
         const { invalidateVisibility } = await import('../anonymity.js');
         invalidateVisibility();

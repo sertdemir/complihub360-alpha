@@ -97,12 +97,14 @@ interface ApiBookingRow extends ApiAttendanceFields {
   provider_paused?: boolean;
 }
 
-// Affiliate 1b: the counted outclick URL to a provider's website. The server
-// verifies the caller has booked this provider, logs the click and 302-
-// redirects — so this is a plain <a href>, not an apiFetch.
-export function providerWebsiteHref(publicRef: string): string {
-  const base = (import.meta.env.VITE_API_URL as string | undefined) || '';
-  return `${base}/api/v1/p/${publicRef}/website`;
+// Affiliate 1b: zaehlt den Klick auf die Website eines Anbieters. Der Server
+// prueft die Buchung mit Offenlegung, loggt provider_website_outclick und
+// antwortet { url }. Nur per apiFetch: ein <a href> auf den Endpunkt oeffnete
+// im neuen Tab ohne Bearer-Token und endete auf 401 (wie M6 im Profil, #300).
+// Fire-and-forget — der Link selbst zeigt direkt auf die offengelegte Website,
+// ein Fehler beim Zaehlen haelt niemanden auf.
+export function countWebsiteOutclick(publicRef: string): void {
+  apiFetch<{ url: string }>(`/api/v1/p/${publicRef}/website`).catch(() => { /* Zaehlen ist nachrangig */ });
 }
 
 export async function fetchUserBookings(): Promise<UserBooking[]> {
