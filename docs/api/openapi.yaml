@@ -986,6 +986,8 @@ paths:
           description: provider ist kein Anbieter-Schluessel
         '403':
           description: Kein Server-Key
+        '404':
+          description: "PROVIDER_NOT_FOUND — provider ist gueltig geformt, aber es gibt keinen Anbieter mit diesem Schluessel"
         '503':
           description: Stripe nicht konfiguriert (ausser dry_run)
 
