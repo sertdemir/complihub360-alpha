@@ -228,43 +228,27 @@
   "search": {
     "navGuided": "İhtiyaçlarımı değerlendir",
     "placeholder": "Durumunuzu kendi kelimelerinizle anlatın…",
-    "submit": "Bir uyum sorusu sorun",
-    "answerEyebrow": "Yapay zekâ yanıtı",
+    "submit": "Sor",
     "answerTitleFor": "„{{query}}\" hakkında",
-    "answerTitleDefault": "Uyum yükümlülükleriniz hakkında her şeyi sorun",
-    "answerBody1": "Sizinkine benzer bir durumda büyük olasılıkla geçerli olan budur; her maddenin arkasında kaynağı vardır. Bu yanıt yapay zekâmızdan gelir: genel bilgidir, bireysel hukuki danışmanlık değildir.",
-    "answerBody2": "Sizin işletmeniz farklı olabilir — eşikler, kayıtlar ve süreler pazarlarınıza, iş modelinize ve hacminize bağlıdır. Hangilerinin sizi ilgilendirdiğini aşağıdaki değerlendirme belirler.",
-    "sources": "Kaynaklar",
-    "obligationsTitle": "İlgili yükümlülükler",
-    "sev": {
-      "high": "Yüksek",
-      "medium": "Orta"
-    },
-    "obligations": {
-      "o1": {
-        "title": "KDV / OSS kaydı",
-        "detail": "AB eşiğinin üzerindeki sınır ötesi mesafeli satışlar OSS kaydını ve üç aylık beyanları tetikler."
-      },
-      "o2": {
-        "title": "EPR / ambalaj kaydı",
-        "detail": "Ambalajlı ürünleri piyasaya sürmek, ilk sevkiyattan önce üretici kaydını gerektirir."
-      },
-      "o3": {
-        "title": "Çerez onayı ve gizlilik bildirimi",
-        "detail": "Tüketiciye yönelik izleme, önceden onay ve KVKK/GDPR uyumlu bir gizlilik bildirimi gerektirir."
-      }
-    },
     "guidesTitle": "Nereden devam edebilirsiniz",
     "guideRead": "Aç",
     "bridgeTitle": "İşletmeniz için neyin geçerli olduğunu görmek ister misiniz?",
     "bridgeBody": "Risk haritanız pazarlarınıza ve iş modelinize göre eşleştirilir ve gerçek ihtiyacınıza uyan Verified Provider'ları gösterir.",
     "bridgeCta": "İhtiyaçlarımı değerlendir",
-    "previewBadge": "Önizleme · yanıt motoru henüz bağlı değil",
     "entries": {
       "markets": "Pazarlar ve orada geçerli olanlar",
       "compliance": "Sekiz uyum alanı",
       "howItWorks": "Bir uzmana nasıl ulaşırsınız"
-    }
+    },
+    "noAnswerTitle": "Serbest yazılmış sorulara henüz doğrudan bir yanıt yok.",
+    "noAnswerBody": "İşletmeniz için neyin geçerli olduğu pazarlarınıza, iş modelinize ve hacminize bağlıdır. Değerlendirme tam olarak bunları sorar. Ardından Risk Map'iniz yükümlülükleri, her maddenin arkasındaki kaynakla birlikte gösterir.",
+    "humanPre": "Doğrudan bir kişiye sormayı mı tercih edersiniz?",
+    "humanLink": "Bize yazın.",
+    "humanPost": "Bir sonraki iş günü yanıt veririz.",
+    "areasTitleOne": "Bu alanla ilgili görünüyor",
+    "areasTitleMany": "Bu alanlarla ilgili görünüyor",
+    "areasNote": "Sorunuzdaki anahtar kelimelere göre eşleştirildi; durumunuz incelenmedi.",
+    "areaOpen": "Alanı görüntüle"
   },
   "days_one": "{{count}} gün",
   "days_other": "{{count}} gün",

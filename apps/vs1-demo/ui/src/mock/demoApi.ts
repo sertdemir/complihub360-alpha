@@ -54,10 +54,43 @@ const AREAS: Record<string, string[]> = { 'studio-bianchi': ['product-packaging'
 const REGION: Record<string, string> = { 'studio-bianchi': 'Norditalien', 'schmidt-partner': 'Norddeutschland', 'madrid-tax': 'Spanien', 'lucid-reg': 'Hamburg', 'thames-vat': 'Vereinigtes Königreich', 'costa-legal': 'Spanien', 'datenschutz-nord': 'Hamburg', 'oss-experts': 'Berlin' };
 const keyOfRef = (ref: string) => Object.keys(REF).find((k) => REF[k] === ref) ?? null;
 
+// Phase 5 (ADR-0007): wer fehlte, Widerspruch, Neubuchungsfrist — wie
+// `attendanceFields` beim Server. Veraenderlich, damit Melden, Widersprechen
+// und Neubuchen im Mock sichtbar greifen.
+type Att = { no_show_by: 'user' | 'provider' | 'platform' | null; no_show_reported_at: string | null; dispute_status: 'none' | 'open' | 'upheld' | 'dismissed'; rebook_deadline: string | null; rebooked_from: string | null; reschedule_count: number; credit_decided_at: string | null };
+const ATT_NONE: Att = { no_show_by: null, no_show_reported_at: null, dispute_status: 'none', rebook_deadline: null, rebooked_from: null, reschedule_count: 0, credit_decided_at: null };
+const ATT: Record<string, Att> = {
+  // Nutzer-No-Show, gestern gemeldet: Frist laeuft, Widerspruch noch moeglich.
+  'm0ck-b14': { ...ATT_NONE, no_show_by: 'user', no_show_reported_at: iso(-1, 14), rebook_deadline: dayStart(13).slice(0, 10) },
+  // Plattformfehler: abgesagt, Neubuchung ohne zweite Gebuehr vorgemerkt.
+  'm0ck-b15': { ...ATT_NONE, no_show_by: 'platform', no_show_reported_at: iso(-4, 11), rebook_deadline: dayStart(10).slice(0, 10) },
+  // Anbieter-No-Show (vom Nutzer gemeldet): Vorfall vermerkt, Frist offen.
+  'm0ck-b11': { ...ATT_NONE, no_show_by: 'provider', no_show_reported_at: iso(-21, 12), rebook_deadline: dayStart(-7).slice(0, 10), credit_decided_at: iso(-7) },
+  'pb-4': { ...ATT_NONE, no_show_by: 'user', no_show_reported_at: iso(-17, 16), rebook_deadline: dayStart(-3).slice(0, 10), credit_decided_at: iso(-3, 3) },
+  'pb-6': { ...ATT_NONE, no_show_by: 'user', no_show_reported_at: iso(-2, 15), dispute_status: 'open', rebook_deadline: dayStart(12).slice(0, 10) },
+};
+const DISPUTE_H = 48; const REBOOK_DAYS = 14; const RESCHEDULE_LIMIT = 2;
+function attendanceFields(id: string, status: string, slotEnd: string) {
+  const a = ATT[id] ?? ATT_NONE;
+  const today = new Date().toISOString().slice(0, 10);
+  return {
+    no_show_by: a.no_show_by, no_show_reported_at: a.no_show_reported_at, dispute_status: a.dispute_status,
+    rebook_deadline: a.rebook_deadline, rebooked_from: a.rebooked_from, reschedule_count: a.reschedule_count, reschedule_limit: RESCHEDULE_LIMIT,
+    attendance_reportable: status === 'confirmed' && slotEnd < new Date().toISOString(),
+    dispute_open_until: a.no_show_by === 'user' && a.no_show_reported_at && a.dispute_status === 'none' ? new Date(Date.parse(a.no_show_reported_at) + DISPUTE_H * H).toISOString() : null,
+    rebook_open: !!a.rebook_deadline && !a.credit_decided_at && today <= a.rebook_deadline,
+  };
+}
+// Status-Ueberschreibungen aus Anwesenheits-Meldung und Neubuchung im Mock.
+const STATUS_OVERRIDE: Record<string, string> = {};
+const REBOOKED: Array<{ id: string; from: string; key: string; slot_start: string }> = [];
+
 function bookings() {
   const b = (id: string, key: string, name: string, region: string, web: string | null, start: string, end: string, status: string) =>
-    ({ id, public_ref: REF[key] ?? null, provider_name: name, provider_descriptor: DESCRIPTOR[key] ?? '', provider_area_codes: AREAS[key] ?? [], provider_region: region, provider_website: web, identity_revealed: true, slot_start: start, slot_end: end, status, message: null });
-  return [
+    ({ id, public_ref: REF[key] ?? null, provider_name: name, provider_descriptor: DESCRIPTOR[key] ?? '', provider_area_codes: AREAS[key] ?? [], provider_region: region, provider_website: web, identity_revealed: true, slot_start: start, slot_end: end, status: STATUS_OVERRIDE[id] ?? status, message: null, ...attendanceFields(id, STATUS_OVERRIDE[id] ?? status, end) });
+  const rebooked = REBOOKED.map((r) => { const src = bookings0().find((x) => x.id === r.from); return src ? { ...b(r.id, r.key, src.provider_name, src.provider_region ?? '', src.provider_website, r.slot_start, new Date(new Date(r.slot_start).getTime() + 30 * 60_000).toISOString(), 'confirmed'), rebooked_from: r.from } : null; }).filter((x): x is NonNullable<typeof x> => !!x);
+  return [...rebooked, ...bookings0()];
+  function bookings0() { return [
     b('m0ck-b01', 'studio-bianchi', 'Studio Bianchi & Partner Commercialisti Associati S.r.l.', 'Norditalien', 'https://example.org', iso(0, 16), iso(0, 16, 30), 'confirmed'),
     b('m0ck-b02', 'schmidt-partner', 'Schmidt & Partner Steuerberatungsgesellschaft mbH', 'Norddeutschland', 'https://example.org', iso(1, 9), iso(1, 9, 30), 'confirmed'),
     // Bewusst NICHT 'madrid-tax': von den drei Anbietern, die die Suche zeigt,
@@ -75,9 +108,13 @@ function bookings() {
     b('m0ck-b11', 'datenschutz-nord', 'Datenschutz Nord GmbH', 'Hamburg', null, iso(-21, 11), iso(-21, 11, 30), 'no_show'),
     b('m0ck-b12', 'schmidt-partner', 'Schmidt & Partner Steuerberatungsgesellschaft mbH', 'Norddeutschland', null, iso(-30, 15), iso(-30, 15, 30), 'completed'),
     b('m0ck-b13', 'costa-legal', 'Bufete Costa Legal S.L.P.', 'Barcelona', null, iso(-45, 10), iso(-45, 10, 30), 'completed'),
+    // Phase 5: der Anbieter hat gemeldet, dass der Nutzer nicht kam (Frist
+    // laeuft, Widerspruch offen) — und ein Plattformfehler mit Neubuchung.
+    b('m0ck-b14', 'schmidt-partner', 'Schmidt & Partner Steuerberatungsgesellschaft mbH', 'Norddeutschland', 'https://example.org', iso(-2, 12), iso(-2, 12, 30), 'no_show'),
+    b('m0ck-b15', 'studio-bianchi', 'Studio Bianchi & Partner Commercialisti Associati S.r.l.', 'Norditalien', 'https://example.org', iso(-4, 11), iso(-4, 11, 30), 'cancelled'),
   // Canvas F V1: Datenschutz Nord hat nach einem wesentlichen Ereignis die
   // Leistung pausiert — der kommende Termin traegt das Flag.
-  ].map((x) => ({ ...x, provider_paused: x.id === 'm0ck-b06' }));
+  ].map((x) => ({ ...x, provider_paused: x.id === 'm0ck-b06' })); }
 }
 
 // Anfrage-IDs: die ersten vier Zeichen sind die sichtbare "RQ-XXXX" —
@@ -153,18 +190,70 @@ const PROPOSALS: Record<string, { proposal_issued: boolean; discount_shown: bool
   'm0ck-b02': { proposal_issued: true, discount_shown: true, reported_at: iso(0, 8) },
   'pb-3': { proposal_issued: true, discount_shown: false, reported_at: iso(-8, 9) },
   'pb-4': null,
+  'pb-5': null,
+  'pb-6': null,
   'm0ck-b12': null,
 };
+// Phase 5: der Anbieter meldet die Anwesenheit (PATCH .../attendance).
+function reportAttendance(bookingId: string, body: Record<string, unknown>) {
+  const row = partnerBookings().find((b) => b.id === bookingId);
+  if (!row) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Booking not found' };
+  const outcome = String(body.outcome ?? '');
+  if (!['attended', 'user_no_show', 'platform_failure'].includes(outcome)) return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'outcome must be attended|user_no_show|platform_failure' };
+  if (!row.attendance_reportable) return { __status: 409, errorCode: 'NOT_REPORTABLE', message: 'Attendance can be reported for a confirmed appointment after its end', status: row.status };
+  if (outcome === 'attended') { STATUS_OVERRIDE[bookingId] = 'completed'; return { ok: true, id: bookingId, status: 'completed' }; }
+  const deadline = dayStart(REBOOK_DAYS).slice(0, 10);
+  if (outcome === 'user_no_show') { STATUS_OVERRIDE[bookingId] = 'no_show'; ATT[bookingId] = { ...ATT_NONE, no_show_by: 'user', no_show_reported_at: plus(0), rebook_deadline: deadline }; return { ok: true, id: bookingId, status: 'no_show', no_show_by: 'user', rebook_deadline: deadline, dispute_hours: DISPUTE_H }; }
+  STATUS_OVERRIDE[bookingId] = 'cancelled'; ATT[bookingId] = { ...ATT_NONE, no_show_by: 'platform', no_show_reported_at: plus(0), rebook_deadline: deadline };
+  return { ok: true, id: bookingId, status: 'cancelled', no_show_by: 'platform', rebook_deadline: deadline };
+}
+// Phase 5: der Nutzer widerspricht, verschiebt, bucht neu oder meldet den Anbieter-No-Show.
+let REBOOK_N = 0;
+function patchBooking(bookingId: string, body: Record<string, unknown>) {
+  const row = bookings().find((b) => b.id === bookingId);
+  if (!row) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Booking not found' };
+  if (body.action === 'dispute') {
+    if (row.no_show_by !== 'user') return { __status: 409, errorCode: 'NOT_DISPUTABLE', message: 'Only a reported user no-show can be disputed' };
+    if (row.dispute_status !== 'none') return { __status: 409, errorCode: 'ALREADY_DISPUTED', message: 'Already disputed' };
+    if (!row.dispute_open_until || row.dispute_open_until < plus(0)) return { __status: 409, errorCode: 'DISPUTE_WINDOW_CLOSED', message: 'The dispute window has closed' };
+    ATT[bookingId] = { ...(ATT[bookingId] ?? ATT_NONE), dispute_status: 'open' };
+    return { ok: true, id: bookingId, dispute_status: 'open', dispute_open_until: row.dispute_open_until };
+  }
+  if (typeof body.slot_start === 'string') {
+    const start = body.slot_start;
+    if (row.rebook_open && row.status !== 'confirmed') {
+      const id = `m0ck-rb${++REBOOK_N}`; const key = keyOfRef(row.public_ref ?? '') ?? 'schmidt-partner';
+      REBOOKED.unshift({ id, from: bookingId, key, slot_start: start });
+      ATT[bookingId] = { ...(ATT[bookingId] ?? ATT_NONE), credit_decided_at: plus(0) };
+      return { __status: 201, ok: true, id, status: 'confirmed', slot_start: start, slot_end: new Date(new Date(start).getTime() + 30 * 60_000).toISOString(), rebooked_from: bookingId };
+    }
+    if (row.status !== 'confirmed') return { __status: 409, errorCode: 'CONFLICT', message: 'Only confirmed bookings can be rescheduled' };
+    const a = ATT[bookingId] ?? ATT_NONE;
+    if (a.reschedule_count >= RESCHEDULE_LIMIT) return { __status: 409, errorCode: 'RESCHEDULE_LIMIT', message: 'This appointment has been moved as often as possible', limit: RESCHEDULE_LIMIT };
+    ATT[bookingId] = { ...a, reschedule_count: a.reschedule_count + 1 };
+    return { ok: true, id: bookingId, slot_start: start, slot_end: new Date(new Date(start).getTime() + 30 * 60_000).toISOString() };
+  }
+  const status = String(body.status ?? '');
+  if (status === 'no_show') { STATUS_OVERRIDE[bookingId] = 'no_show'; ATT[bookingId] = { ...ATT_NONE, no_show_by: 'provider', no_show_reported_at: plus(0), rebook_deadline: dayStart(REBOOK_DAYS).slice(0, 10) }; return { ok: true, id: bookingId, status: 'no_show', no_show_by: 'provider' }; }
+  if (status === 'completed' || status === 'cancelled') { STATUS_OVERRIDE[bookingId] = status; return { ok: true, id: bookingId, status }; }
+  return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'status must be cancelled|completed|no_show, or slot_start' };
+}
 function partnerBookings() {
   const lead = (band: number, standard: number, pct: number, seq: number | null) =>
     ({ band, standard_fee_cents: standard, discount_pct: pct, discount_sequence: seq, final_fee_cents: Math.round(standard * (100 - pct) / 100), currency: 'USD', payment_status: 'captured', fee_enabled: true });
   // 2 V1: Firma, Bereich und Markt kommen wie beim Server aus der Anfrage;
   // Hafenkontor hat keine Firma angegeben -> das UI zeigt "nicht angegeben".
-  const k = (id: string, start: string, status: string, email: string, company: string | null, category: string, country: string, message: string, l: ReturnType<typeof lead> | null) =>
-    ({ id, slot_start: start, slot_end: new Date(new Date(start).getTime() + 30 * 60_000).toISOString(), status, lead_charged: true, user_email: email, user_company: company, category, country, message,
-       lead: l, user_discount_pct: l ? 10 : null, proposal: PROPOSALS[id] ?? null, acknowledgement_version: l ? 'booking-ack-v1' : null, price_snapshot: null });
+  const k = (id: string, start: string, status: string, email: string, company: string | null, category: string, country: string, message: string, l: ReturnType<typeof lead> | null) => {
+    const end = new Date(new Date(start).getTime() + 30 * 60_000).toISOString(); const st = STATUS_OVERRIDE[id] ?? status;
+    return { id, slot_start: start, slot_end: end, status: st, lead_charged: true, user_email: email, user_company: company, category, country, message,
+       lead: l, user_discount_pct: l ? 10 : null, proposal: PROPOSALS[id] ?? null, acknowledgement_version: l ? 'booking-ack-v1' : null, price_snapshot: null, ...attendanceFields(id, st, end) };
+  };
   return [
     k('m0ck-b02', iso(1, 9), 'confirmed', 'a.weber@acme-gmbh.example', 'Acme GmbH', 'product-packaging', 'DE', 'LUCID-Registrierung und Mengenmeldung für den Marktplatz-Start.', lead(2, 14900, 10, 3)),
+    // Phase 5: Termin vorbei, Rueckmeldung offen (1B) — und ein No-Show, dem
+    // der Nutzer widersprochen hat.
+    k('pb-5', iso(-1, 12), 'confirmed', 'jana.weber@weber-logistik.example', 'Weber Logistik GmbH', 'tax-vat', 'DE', 'Umstellung auf das OSS-Verfahren für Fernverkäufe nach Italien.', lead(2, 14900, 10, 2)),
+    k('pb-6', iso(-3, 15), 'no_show', 'buchhaltung@nordlicht-moebel.example', 'Nordlicht Möbel GmbH', 'tax-vat', 'DE', 'USt-Voranmeldungen und OSS für den Shop.', lead(1, 9900, 0, null)),
     k('pb-3', iso(-9, 10), 'completed', 'einkauf@moebelwerk-sued.example', 'Möbelwerk Süd GmbH', 'product-packaging', 'DE', 'EPR-Registrierung für Möbelverpackungen.', lead(4, 49900, 10, 2)),
     k('pb-4', iso(-18, 15), 'no_show', 'info@hafenkontor.example', null, 'tax-vat', 'DE', 'Umstellung auf OSS.', lead(2, 14900, 10, 1)),
     // Aus der Zeit vor Phase 4: kein Ledger, nur das Wort „Lead berechnet".
@@ -234,9 +323,14 @@ function partnerBillingPreview() {
     discount: { pct: 10, count: 3, used: 3, remaining: 0, cycle_start: `${monat(0)}-01` },
     leads: { count: leads, standard_cents: standard, discount_cents: discount, final_cents: standard - discount },
     readiness: { ...READINESS },
-    credit_balance_cents: 0,
+    // Phase 5: ein Guthaben aus pb-4 (Nutzer kam nicht, keine Neubuchung in
+    // der Frist): 30 % von 134,10 $ = 40,23 $, verrechnet bis zur Abo-Summe.
+    credit_balance_cents: 4023,
+    credit_applied_cents: 4023,
+    credits: [{ id: uuid(51, 7), amount_cents: 4023, currency: 'USD', reason: 'user_no_rebook_30pct', booking_id: 'pb-4', created_at: iso(-3, 3) }],
     lines: [{ label: `Growth · monthly · ${monat(0)}`, qty: 1, unit_cents: 9900, amount_cents: 9900 }],
     total_cents: 9900 + standard - discount,
+    total_after_credit_cents: 9900 + standard - discount - 4023,
     pricing: {
       plans: [
         { code: 'essential', label: 'Essential', monthly_cents: 5900, annual_cents: 59000, currency: 'USD', category_allowance: 1, lead_discount_pct: 0, lead_discount_count: 0 },
@@ -937,6 +1031,8 @@ export function route(method: string, path: string, body: Record<string, unknown
   }
   if (p[0] === 'scheduling' && p.length === 1 && method === 'POST') return createBooking(body);
   if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'proposal' && method === 'PATCH') return reportProposal(p[3], body);
+  if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'attendance' && method === 'PATCH') return reportAttendance(p[3], body);
+  if (p[0] === 'scheduling' && p.length === 2 && method === 'PATCH') return patchBooking(p[1], body);
   if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'sync' && method === 'POST') return syncReadiness();
   if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'recheck' && method === 'POST') return recheckReadiness();
   if (p[0] === 'assistant' && p[1] === 'chat') return assistantChat(body);

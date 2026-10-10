@@ -916,7 +916,7 @@
       "localSourcesNote": "Motor, {{total}} pazarın {{count}} tanesinde bu alan için en az bir yerel kaynak tutuyor. Diğerlerinde AB düzeyindeki araç geçerlidir ve öyle gösterilir.",
       "marketsRowsNote": "Her satır pazar sayfasına gider.",
       "askTitle": "{{area}} hakkında somut bir sorunuz mu var?",
-      "askLead": "Kendi cümlelerinizle sorun, kaynakları adıyla belirtilmiş bir yanıt alın. Aşağıdaki değerlendirme daha uzun yol — tek bir soruyu yanıtlamak yerine tüm alanı şirketinize göre haritalar.",
+      "askLead": "Kendi kelimelerinizle sorun; size nereden devam edeceğinizi gösteririz ya da doğrudan bir kişiye sorarsınız. Aşağıdaki değerlendirme tüm alanı işletmenize uyarlar.",
       "askQuestion": "Soru sor",
       "askEyebrow": "Sorunuz",
       "askPlaceholder": "Sorunuzu kendi sözcüklerinizle sorun",
@@ -1281,8 +1281,8 @@
       {
         "kicker": "Anlayın",
         "title": "Kendi kelimelerinizle sorun.",
-        "body": "Durumunuzu bir meslektaşınıza anlatır gibi anlatın. Her maddenin arkasındaki kaynakla birlikte bir yanıt alırsınız — özetin özeti değil, mevzuatın kendisi. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok.",
-        "short": "Sorunuzu serbest metin alanına yazın — yanıt, her noktanın arkasındaki kaynağı taşır. Hesap gerekmez."
+        "body": "Durumunuzu bir iş arkadaşınıza anlatır gibi anlatın. Serbest yazılmış sorulara doğrudan yanıtlar betada henüz yok; örnek, nereye gittiğimizi gösteriyor. O zamana kadar sorunuz sizi doğru alana ve değerlendirmeye götürür. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok.",
+        "short": "Sorunuzu kendi kelimelerinizle sorun; betada sizi doğru alana ve değerlendirmeye götürür. Hesap gerekmez."
       },
       {
         "kicker": "Değerlendirin",
@@ -1326,7 +1326,8 @@
             "text": "Çok küçük hacimler için basitleştirilmiş bir götürü ücret bulunur ve…",
             "chip": ""
           }
-        ]
+        ],
+        "example": "Örnek"
       },
       "map": {
         "stats": [
@@ -1918,7 +1919,7 @@
     "form": {
       "eyebrow": "Mesaj",
       "title": "Bize yazın",
-      "lead": "Dört yolun tamamı için tek form. Seçiminiz mesajın nereye düşeceğini belirler — adres aramanıza gerek yok.",
+      "lead": "Dört yolun tamamı için tek form. Seçiminiz sayesinde mesajı hemen doğru şekilde sınıflandırırız.",
       "lane": "Konunuz",
       "name": "Ad",
       "namePlaceholder": "Adınız",

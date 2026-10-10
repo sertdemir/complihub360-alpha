@@ -68,14 +68,26 @@ lokal; Staging nach dem Review des Nutzers).
 
 ### UI
 
-- [ ] Canvas (vier Sektionen × drei Varianten): Anbieter meldet Anwesenheit;
+- [x] Canvas (vier Sektionen × drei Varianten): Anbieter meldet Anwesenheit;
   Nutzer nach No-Show (Frist, Widerspruch) und nach Anbieter-No-Show
   (Neubuchung/Rematch); Guthaben in der Abrechnung; Erinnerungs-Mails.
-- [ ] Figma-Seite nach der Wahl des Nutzers.
-- [ ] Lokal: `api/bookings.ts` (`reportAttendance`, `disputeNoShow`,
-  Felder), LeadsPage (Anwesenheit melden), TerminePage (No-Show-Zustand,
-  Neubuchung, Widerspruch; `noShowNote` ersetzt), BillingPage (Guthaben),
-  Mock, Locales, Screenshots.
+  Wahl des Nutzers 2026-10-10: **1B · 2B · 3A · 4A** (Auswahlkarten mit
+  Folge-Satz und Zehn-Minuten-Frage · neutraler Kasten mit Frist, Neubuchung,
+  anderem Anbieter, Widerspruch bis · Minus-Zeile in der Vorschau mit
+  Herkunfts-Unterzeile · Mails als reiner Text).
+- [x] Figma-Seite „Anwesenheit & Guthaben (Phase 5)" (3641:22627): Anbieter
+  Anwesenheit melden 3643:4080 · Nutzer nach dem No-Show 3644:4326 ·
+  Abrechnung mit Guthaben 3645:441 · Mails 3646:528 · Notiz 3646:572.
+- [x] Lokal: `api/bookings.ts` (`BookingAttendance` an beiden Listen,
+  `reportAttendance`, `disputeNoShow`, `rescheduleBooking` mit Neubuchung
+  und `RESCHEDULE_LIMIT`), LeadsPage (Rückmeldung offen zuoberst, drei
+  Auswahlkarten, Zehn-Minuten-Frage, Zeile nach der Meldung), TerminePage
+  (neutraler Kasten für Nutzer-No-Show, Anbieter-No-Show, Plattformfehler,
+  Widerspruch offen; Widerspruch über ConfirmDrawer; Neubuchung über die
+  RescheduleDrawer im Neubuchungs-Modus; `noShowNote` entfernt), BillingPage
+  (grüne Minus-Zeile, Unterzeile je Guthaben, Rest, „nicht ausgezahlt"),
+  Mock (Zustände, Attendance-PATCH, Widerspruch, Neubuchung, Guthaben),
+  Locales en/de/es/tr, Screenshots.
 - [ ] Review des Nutzers → Staging: Migration per Supabase-MCP, Shadow-Tick,
   Live, Testlauf (No-Show melden, Frist per SQL vorziehen, Guthaben,
   Monatslauf `dry_run`).

@@ -228,43 +228,27 @@
   "search": {
     "navGuided": "Meinen Bedarf ermitteln",
     "placeholder": "Beschreiben Sie Ihr Anliegen in eigenen Worten…",
-    "submit": "Eine Compliance-Frage stellen",
-    "answerEyebrow": "KI-Antwort",
+    "submit": "Frage stellen",
     "answerTitleFor": "Zu „{{query}}“",
-    "answerTitleDefault": "Fragen Sie alles zu Ihren Compliance-Pflichten",
-    "answerBody1": "Das gilt für eine Situation wie Ihre voraussichtlich, mit der Quelle hinter jedem Punkt. Diese Antwort stammt von unserer KI: allgemeine Information, keine individuelle Rechtsberatung.",
-    "answerBody2": "Für Ihr Unternehmen kann anderes gelten — Schwellenwerte, Register und Fristen hängen an Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen. Welche davon Sie betreffen, ermittelt das Assessment unten.",
-    "sources": "Quellen",
-    "obligationsTitle": "Relevante Pflichten",
-    "sev": {
-      "high": "Hoch",
-      "medium": "Mittel"
-    },
-    "obligations": {
-      "o1": {
-        "title": "USt-/OSS-Registrierung",
-        "detail": "Grenzüberschreitende Fernverkäufe über der EU-Schwelle lösen die OSS-Registrierung und Quartalsmeldungen aus."
-      },
-      "o2": {
-        "title": "EPR-/Verpackungsregistrierung",
-        "detail": "Das Inverkehrbringen verpackter Ware erfordert die Herstellerregistrierung vor der ersten Lieferung."
-      },
-      "o3": {
-        "title": "Cookie-Einwilligung & Datenschutzhinweis",
-        "detail": "Tracking gegenüber Verbrauchern erfordert vorherige Einwilligung und einen DSGVO-konformen Datenschutzhinweis."
-      }
-    },
     "guidesTitle": "Wo Sie weiterlesen können",
     "guideRead": "Ansehen",
     "bridgeTitle": "Möchten Sie sehen, was für Ihr Unternehmen gilt?",
     "bridgeBody": "Ihre Risk Map ist auf Ihre Märkte und Ihr Geschäftsmodell abgestimmt und zeigt die Verified Provider, die zu Ihrem tatsächlichen Bedarf passen.",
     "bridgeCta": "Meinen Bedarf ermitteln",
-    "previewBadge": "Vorschau · Antwort-Engine noch nicht angebunden",
     "entries": {
       "markets": "Märkte und was dort gilt",
       "compliance": "Die acht Compliance-Bereiche",
       "howItWorks": "So funktioniert der Weg zum Spezialisten"
-    }
+    },
+    "noAnswerTitle": "Eine direkte Antwort auf frei formulierte Fragen gibt es noch nicht.",
+    "noAnswerBody": "Was für Ihr Unternehmen gilt, hängt an Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen. Das Assessment fragt genau das ab. Danach zeigt Ihre Risk Map die Pflichten mit der Quelle hinter jedem Punkt.",
+    "humanPre": "Lieber direkt einen Menschen fragen?",
+    "humanLink": "Schreiben Sie uns.",
+    "humanPost": "Wir antworten am nächsten Werktag.",
+    "areasTitleOne": "Klingt nach diesem Bereich",
+    "areasTitleMany": "Klingt nach diesen Bereichen",
+    "areasNote": "Zugeordnet über Stichwörter in Ihrer Frage, keine Prüfung Ihres Falls.",
+    "areaOpen": "Bereich ansehen"
   },
   "days_one": "{{count}} Tag",
   "days_other": "{{count}} Tage",

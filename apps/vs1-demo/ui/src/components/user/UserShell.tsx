@@ -3,8 +3,8 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import {
-  LayoutGrid, FolderClosed, Bell, BookOpen, Bookmark, CalendarCheck,
-  TriangleAlert, Calendar, Search, Landmark, Package, ShieldCheck, Megaphone, Building2,
+  LayoutGrid, FolderClosed, Bell, CalendarCheck,
+  Search, Landmark, Package, ShieldCheck, Megaphone, Building2,
   PackageCheck, Truck, Scale,
   Leaf, ChevronRight, Plus,
 } from 'lucide-react';
@@ -51,22 +51,11 @@ const SIDEBAR: { group: string; groupKey: string; badgeKey?: string; items: Side
       { to: 'dashboard/notifications', labelKey: 'navNotifications', icon: Bell },
     ],
   },
-  {
-    // Nutzer-Wahl 2026-09-22 (Dashboard Iteration 2): Bibliothek, Gespeichert
-    // und Monitoring stehen unter EINER Ueberschrift "Neue Funktionen". Alle
-    // vier Flaechen laufen noch auf ComingSoonPage — das "Bald" bleibt, damit
-    // man das vor dem Klick sieht. Exporte entfiel am 2026-09-20: der echte
-    // PDF-Export lebt auf der Ergebnisseite und im Sitzungs-Menue.
-    group: 'NewFeatures',
-    groupKey: 'groupNewFeatures',
-    badgeKey: 'badgeSoon',
-    items: [
-      { to: 'dashboard/library', labelKey: 'navLibrary', icon: BookOpen },
-      { to: 'dashboard/saved-providers', labelKey: 'navSavedProviders', icon: Bookmark },
-      { to: 'dashboard/alerts', labelKey: 'navAlerts', icon: TriangleAlert },
-      { to: 'dashboard/calendar', labelKey: 'navCalendar', icon: Calendar },
-    ],
-  },
+  // Bis 2026-10-10 stand hier die Gruppe „Neue Funktionen · Bald" mit
+  // Bibliothek, Gespeichert, Monitoring und Kalender — vier ComingSoon-Seiten.
+  // Beta-Plan (Mi 14.10.): keine Bald-Seiten in der Navigation der geschlossenen
+  // Beta. Die Routen bleiben, damit alte Links ehrlich „Bald" zeigen statt 404;
+  // badgeKey bleibt fuer die naechste Gruppe, die ein Etikett braucht.
 ];
 
 // Canonical 9 domains (lib/domains.ts) + shell-local presentation (icon, risk dot).

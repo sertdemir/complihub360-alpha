@@ -631,14 +631,13 @@
       "confirmed": "ONAYLANDI",
       "completed": "TAMAMLANDI",
       "cancelled": "İPTAL EDİLDİ",
-      "no_show": "KATILMADI",
+      "no_show": "GERÇEKLEŞMEDİ",
       "outcome_open": "SONUÇ BEKLİYOR"
     },
     "outcomeQuestion": "Bu randevu gerçekleşti mi?",
     "outcomeYes": "Evet, gerçekleşti",
     "outcomeNo": "Sağlayıcı gelmedi",
     "reviewed": "✓ Değerlendirme gönderildi",
-    "noShowNote": "İade yok — sağlayıcı dosyayı rezervasyonda aldı. İsterseniz sizi yeniden eşleştiririz.",
     "website": "Sağlayıcı web sitesi",
     "emptyTitle": "Randevu yok",
     "emptyBody": "Randevular bir talepten doğar: bir sağlayıcı onayladığında görüşme burada görünür ve takviminize eklenebilir.",
@@ -669,6 +668,30 @@
       "short": "Sağlayıcı bu hizmeti şu anda sunamıyor. Ayrıntılar aşağıda.",
       "cancel": "Randevuyu ücretsiz iptal et",
       "talk": "Bizimle konuşun"
+    },
+    "after": {
+      "afterTitleUser": "Sağlayıcıya göre randevu gerçekleşmedi",
+      "afterBodyUser": "{{deadline}} tarihine kadar {{provider}} ile yeni bir randevu seçebilirsiniz. Talebiniz orada açık kalır ve sizden ücret alınmaz.",
+      "afterTitleProvider": "Sağlayıcı gelmedi. Bunu kaydettik.",
+      "afterBodyProvider": "{{deadline}} tarihine kadar {{provider}} ile yeni bir randevu seçebilir veya başka bir sağlayıcıya bakabilirsiniz. Sizden ücret alınmaz.",
+      "afterBodyProviderClosed": "İstediğiniz zaman başka bir sağlayıcıya bakabilirsiniz. Sizden ücret alınmaz.",
+      "afterNoteProvider": "Olay sağlayıcının performans kaydına girer, talebinize değil.",
+      "afterTitlePlatform": "Bizim tarafımızdaki teknik bir sorun bu randevuyu iptal etti",
+      "afterBodyPlatform": "Bu bizim hatamızdı, sizin değil. {{deadline}} tarihine kadar {{provider}} ile yeni bir randevu seçebilirsiniz; sizden ücret alınmaz.",
+      "afterBodyClosed": "{{provider}} ile yeni randevu süresi doldu. İstediğiniz zaman başka bir sağlayıcıya bakabilirsiniz; sizden ücret alınmaz.",
+      "rebook": "Yeni randevu seç",
+      "otherProvider": "Başka sağlayıcıya bak",
+      "disputeHint": "Bu, izleniminizle örtüşmüyor mu? {{until}} tarihine kadar <dispute>itiraz edin</dispute>; durumu inceleriz.",
+      "disputeOpenTitle": "İtirazınız alındı",
+      "disputeOpenBody": "Durumu inceleyip size döneceğiz. O zamana kadar {{provider}} ile yeni randevu süresi açık kalır.",
+      "disputeDismissedNote": "İtirazınızı inceledik; bildirim geçerli kalıyor. Yeni randevu süresi devam ediyor.",
+      "disputeConfirmEyebrow": "Bildirime itiraz",
+      "disputeConfirmTitle": "{{provider}} tarafından yapılan katılmama bildirimine itiraz edilsin mi?",
+      "disputeConfirmBody": "Durumu inceleriz. Karara kadar yeni randevu süresi açık kalır. Hiçbir durumda sizden ücret alınmaz.",
+      "disputeConfirmCta": "İtirazı gönder",
+      "disputeConfirmBack": "Geri",
+      "disputeFailed": "İtiraz gönderilemedi. Lütfen tekrar deneyin veya bizimle konuşun.",
+      "rebookedFrom": "Önceki bir rezervasyon için yeni randevu"
     }
   },
   "review": {
@@ -695,7 +718,14 @@
     "confirm": "Randevuyu taşı",
     "cancel": "Vazgeç",
     "done": "Taşındı ✓",
-    "note": "Randevu taşındığında rezervasyon ve paylaşılan dosya korunur — yeni bir lead ücreti alınmaz. Sağlayıcı yeni saat hakkında bilgilendirilir."
+    "note": "Rezervasyon ve paylaşılan dosya korunur. Sağlayıcı yeni saat hakkında bilgilendirilir.",
+    "rebookEyebrow": "Yeni randevu seç",
+    "rebookConfirm": "Yeni randevu ayırt",
+    "rebookDone": "Ayırtıldı ✓",
+    "rebookNote": "Yeni randevu önceki rezervasyonunuzu sürdürür. Talebiniz bu sağlayıcıda kalır ve sizden ücret alınmaz.",
+    "limit": "Bu randevu mümkün olduğu kadar sık taşındı. Saat artık uymuyorsa lütfen iptal edip yeniden ayırtın.",
+    "slotTaken": "Bu zaman az önce doldu. Lütfen başka bir zaman seçin.",
+    "failed": "Randevu taşınamadı. Lütfen tekrar deneyin."
   },
   "wizardDrawer": {
     "eyebrow": "Yeni arama",

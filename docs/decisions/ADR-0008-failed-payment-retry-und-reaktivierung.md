@@ -1,6 +1,6 @@
 # ADR-0008: Gescheiterte Zahlung und Reaktivierung
 
-**Status:** ACCEPTED (2026-10-10) — **A2 · B2 · C2 · D2**; B2 mit offener Umsetzungsfrage, siehe *Decision*
+**Status:** ACCEPTED — **D1** (umgesetzt in #287) und **A2 · B2a · C2 · D2** (Nutzer, 2026-10-10); `INVOICE_RETRY_ENABLED` wartet auf die Prüfung des Zahlungsmandats
 **Date:** 2026-10-10
 **Bezug:** *Provider Dashboard Pricing & Operations Implementation Specification* v1.0 („Spec B") — „Configurable items requiring final decision": *„Subscription proration, cancellation notice, grace period, failed-payment retry, and reactivation rules."* · *Spec A* §21.1 (Billing Readiness) · [`KN-BRAND-001`](../../.knowledge/memory/nodes/KN-BRAND-001-complihub360-dna.md) · ADR-0003 (Pricing v2) · ADR-0005 (Buchung → Belastung) · ADR-0006 (Kulanzfrist, Wechsel, Kündigung) · `TKT-PROV-11`
 **Was ADR-0006 offen gelassen hat:** Dort wurden drei der fünf Spec-B-Punkte entschieden (A2 · B2 · C2). Die beiden letzten — `failed-payment retry` und `reactivation rules` — blieben ausdrücklich liegen. Diese Vorlage holt sie nach.
@@ -87,22 +87,49 @@ Für **Ende plus Neuanfang** nicht, weil dabei der Zyklus selbst neu beginnt.
 
 ### 3. Die Oberfläche behauptet heute drei Dinge, die nicht stimmen
 
-Auf `/billing` stehen diese Texte (`providerws.billing.*`):
+> **Korrektur vom 2026-10-10, bei der Umsetzung von D1.** Die erste Fassung
+> dieses Abschnitts erklärte die drei Texte mit der Regel für die
+> **Lead-Belastung** („dieselbe Karte bleibt gesperrt"). Das war falsch
+> zugeordnet. Die Texte hängen an **`invoices.status = 'failed'`** — und das
+> macht sie nicht richtiger, sondern falscher. Der Befund unten ist die
+> nachgeprüfte Fassung.
+
+Die drei Texte erscheinen alle am selben Zustand: einer Rechnung mit
+`status = 'failed'`. Diesen Status setzt genau eine Stelle im Code —
+`syncOpenInvoices` (`billing.ts`), und zwar **nur**, wenn Stripe die Rechnung
+als `uncollectible` meldet:
+
+```ts
+const mapped = inv.status === 'paid' ? 'paid'
+    : inv.status === 'void' ? 'void'
+    : inv.status === 'uncollectible' ? 'failed'
+    : null;
+```
+
+`uncollectible` heißt in Stripe nicht „der Einzug ist gerade schiefgegangen",
+sondern „der Einzug wurde aufgegeben". Es ist das Ende einer Einziehung, nicht
+ihre Mitte.
+
+**Und eine solche Rechnung kann gar nichts sperren.** Sowohl
+`syncBillingReadiness` als auch `handleBillingPreview` laden ausschließlich
+`{ status: 'open' }`. Eine Rechnung mit `failed` fällt aus der Zählung heraus
+und kann den Grund `overdue_invoice` nicht auslösen.
 
 | Schlüssel | Text | Warum er falsch ist |
 |---|---|---|
-| `statusFailedGrace` | „fehlgeschlagen · **Kulanzfrist**" | Es gibt keine Kulanzfrist nach gescheiterter Zahlung. Seit ADR-0006 bezeichnet dasselbe Wort auf derselben Seite eine Frist, die es wirklich gibt — für offene Rechnungen. |
-| `paymentFailedBanner` | „… fehlgeschlagen · **Kulanzfrist läuft**" | Dieselbe erfundene Frist, als laufende Uhr formuliert. |
-| `paymentFailedBody` | „Bitte **erneut versuchen** oder die Zahlungsmethode aktualisieren, um eine **Workspace-Sperre** zu vermeiden." | Zwei Fehler: Es gibt **kein** erneutes Versuchen (dieselbe Karte bleibt gesperrt), und es droht **keine Workspace-Sperre** — der Anbieter behält vollen Zugang, nur die kostenpflichtige Buchung ist gesperrt, und die Sichtbarkeit bleibt unberührt (Spec A §14). |
-
-Die Readiness-Box auf derselben Seite sagt es bereits richtig: *„Die letzte
-Lead-Belastung ist gescheitert. Ein anderes Zahlungsmittel hebt die Sperre auf
-— dieselbe Karte nicht."* Die drei Texte oben widersprechen ihr.
+| `statusFailedGrace` | „fehlgeschlagen · **Kulanzfrist**" | Es gibt keine Kulanzfrist nach gescheiterter Zahlung. Seit ADR-0006 bezeichnet dasselbe Wort auf derselben Seite eine Frist, die es wirklich gibt — für **offene** Rechnungen. Diese hier ist nicht offen. |
+| `paymentFailedBanner` | „… fehlgeschlagen · **Kulanzfrist läuft**" | Dieselbe erfundene Frist, als laufende Uhr formuliert. Bei `uncollectible` läuft erst recht nichts mehr. |
+| `paymentFailedBody` | „Bitte **erneut versuchen** oder die Zahlungsmethode aktualisieren, um eine **Workspace-Sperre** zu vermeiden." | Es droht **keine Workspace-Sperre** — der Anbieter behält vollen Zugang, und die Sichtbarkeit bleibt unberührt (Spec A §14). Schärfer noch: **diese Rechnung kann überhaupt nichts sperren**, weil die Readiness nur offene Rechnungen zählt. Der Satz warnt vor einer Folge, die dieser Zustand nicht auslösen kann. |
 
 **Nach dem DNA-Filter sind zwei davon nicht nur ungenau, sondern Verstöße:**
-„Workspace-Sperre" ist eine Drohung mit einer Folge, die nicht eintritt —
-Angst als Antrieb. Und „Kulanzfrist läuft" versteckt Unsicherheit hinter
+„Workspace-Sperre" ist eine Drohung mit einer Folge, die hier nicht eintreten
+kann — Angst als Antrieb. Und „Kulanzfrist läuft" versteckt Unsicherheit hinter
 selbstsicherer Sprache: Es läuft nichts.
+
+**Was die Texte nicht sind:** die Fläche für eine gescheiterte
+**Lead-Belastung**. Die hat ihren eigenen Platz — die Readiness-Box, und die
+sagt es bereits richtig: *„Die letzte Lead-Belastung ist gescheitert. Ein
+anderes Zahlungsmittel hebt die Sperre auf — dieselbe Karte nicht."*
 
 ---
 
@@ -164,6 +191,90 @@ möglich und unabhängig von allem anderen.
 
 ---
 
+## Decision
+
+### D1 · Die Copy wird begradigt (Nutzer, 2026-10-10)
+
+Die Texte sagen, was wirklich passiert. „Kulanzfrist" und „Workspace-Sperre"
+verschwinden; nichts Neues wird versprochen.
+
+**Fünf Stellen, nicht drei.** Beim Umsetzen kamen zwei weitere zum Vorschein,
+die dieselbe Behauptung an anderer Stelle wiederholten:
+
+| Schlüssel | vorher | nachher |
+|---|---|---|
+| `statusFailedGrace` | „fehlgeschlagen · Kulanzfrist" | „nicht eingezogen" |
+| `paymentFailedBanner` | „Zahlung zu {{invoice}} fehlgeschlagen · Kulanzfrist läuft" | „Rechnung {{invoice}} wurde nicht eingezogen" |
+| `paymentFailedBody` | „Bitte erneut versuchen … um eine Workspace-Sperre zu vermeiden." | „Der Einzug dieser Rechnung wurde beendet. Ihre Buchungen sperrt sie nicht, und an Ihrer Sichtbarkeit ändert sie nichts. Im Portal sehen Sie die Rechnung samt Positionen und können sie begleichen." |
+| `kpiPaymentFailed` | „Zahlung FEHLGESCHLAGEN" | „nicht eingezogen" |
+| `rowActionFailed` | „Zahlung aktualisieren · Erneut versuchen" | „Im Portal ansehen" |
+
+**Zwei Dinge daneben, die ohne die Copy widersprüchlich geworden wären:**
+
+- Der Banner stand auf `status="error"` mit einem roten Knopf. Ein roter Alarm
+  neben dem Satz „sperrt Ihre Buchungen nicht" widerspricht sich selbst — jetzt
+  `warning` mit `outline`.
+- Der Knopf hieß „Zahlungsmethode aktualisieren". Eine Zahlungsmethode behebt
+  eine beendete Einziehung nicht. Er trägt jetzt `graceOpenPortal`
+  („Rechnung im Portal öffnen") — **derselbe Handler**, nur ehrlich
+  beschriftet; er öffnet ohnehin das Billing-Portal.
+
+`billing.updatePaymentMethod` bleibt als Schlüssel bestehen, auch wenn ihn
+gerade nichts nutzt: Wird **A2** gewählt, ist er der Text für den Weg zurück.
+
+**Was D1 ausdrücklich NICHT entscheidet:** ob es einen Wiederholungsversuch
+geben soll (A, B) und was ein Neustart mitnimmt (C). Die Texte beschreiben den
+Ist-Zustand und versprechen nichts darüber hinaus — genau deshalb müssen sie
+nach einer Entscheidung zu A oder B noch einmal angefasst werden.
+
+### A2 · B2a · C2 · D2 (Nutzer, 2026-10-10)
+
+
+Zwei Sitzungen haben am selben Tag entschieden: in der einen **D1**
+(umgesetzt in #287, oben), in der anderen **A2 · B2 · C2 · D2**. Kein
+Widerspruch — D2 ist D1 plus die Reservierung des Wortes. Die Copy aus D1
+bleibt, wie #287 sie gesetzt hat; D2 fügt nur den Wächter hinzu.
+
+- **A2 — Prüfung auf Anstoß des Anbieters.** `POST /provider/:key/billing/recheck`
+  legt einen SetupIntent über das gescheiterte Standard-Zahlungsmittel an
+  (`verifyPaymentMethod`, kein Geld). Bestätigt Stripe es, wird
+  `last_payment_failure` geleert und die Bereitschaft neu berechnet
+  (`recheckPaymentMethod`, Ereignisse `payment_method_recheck` und
+  `payment_failure_cleared`). Die offene Frage aus den Optionen („wie oft")
+  ist beantwortet mit **höchstens drei Prüfungen je Anbieter in 24 Stunden**
+  (`RECHECK_LIMIT_PER_DAY`, 429 `RECHECK_LIMIT` mit `retry_after`). Die
+  Oberfläche folgt nach der Canvas-Wahl.
+- **C2 — Rabattzähler wird mitgenommen.** `startSubscription` übernimmt den
+  höchsten Zählerstand eines Zyklus, der heute noch läuft
+  (`carriedDiscountCount`, Ereignis `discount_counter_carried`). Der Zähler
+  ist damit nicht mehr rein am Abo-Zyklus geschlüsselt; vermerkt an
+  `applyMonthlyDiscount` und in `subscriptions.ts`.
+- **D2 — das Wort wird reserviert.** Die Texte stammen aus D1 (#287).
+  Zusätzlich hält `copy:check` „Kulanzfrist"/„grace" (und „Workspace-Sperre")
+  auf `providerws.billing.*` ausschließlich in `grace*`-Schlüsseln; gegen die
+  alten Texte geprüft, der Wächter schlägt an.
+- **B2 — umgesetzt als B2a (Nachwahl 2026-10-10).** Stripes Wiederholungen
+  (Smart Retries) greifen nur bei `collection_method = charge_automatically`;
+  die Abo-Rechnungen laufen als `send_invoice`, dort belastet Stripe nie
+  selbst eine Karte. Die Option, wie sie oben steht, war so nicht baubar.
+  Zur Wahl standen B2a (wir ziehen in der Kulanzfrist selbst ein), B2b
+  (Umstellung auf automatischen Einzug, ohne 14 Tage Zahlungsziel) und B1.
+  Gewählt: **B2a**.
+  - Am Fälligkeitstag erfährt der Anbieter per Mail und Benachrichtigung
+    (`invoice_retry_scheduled`), an welchen Tagen wir die hinterlegte Karte
+    versuchen, dass die Frist bleibt und dass er selbst zahlen kann.
+  - An **Tag 1, 3 und 6** nach Fälligkeit je ein Versuch
+    (`invoices/:id/pay`, off-session, Standard-Zahlungsmittel), je Rechnung
+    und Tag höchstens einmal; versäumte Tage werden nicht nachgeholt. Nur
+    Versuchstage innerhalb der Kulanzfrist zählen.
+  - **`due_at` wird nie angefasst.** Der Stichtag aus ADR-0006 bleibt.
+  - Eingeschaltet erst mit `INVOICE_RETRY_ENABLED=1`: Vorher ist zu prüfen,
+    ob das Zahlungsmandat (`billing_authorization`, Fassung 2026-09) die
+    Belastung von Abo-Rechnungen deckt — der Text liegt nicht im Repo.
+    Ohne den Schalter gilt faktisch B1.
+  - Code: `invoiceRetry.ts` (`retryStage`, `runInvoiceRetryTick`),
+    Watcher-Pass mit Shadow-Markern `invoice_retry_shadow`.
+
 ## Was zusammenhängt
 
 - **A und D hängen zusammen, aber nicht voneinander ab.** Gibt es A2, bekommt
@@ -204,54 +315,3 @@ Was in jedem Fall bleibt: Solange hier nichts entschieden ist, darf keiner
 dieser Punkte im Code beantwortet werden. Das gilt besonders für Texte — ein
 Satz, der eine Frist behauptet, ist eine Regel, auch wenn er nur in einer
 Sprachdatei steht. Genau so ist der heutige Zustand entstanden.
-
----
-
-## Decision (2026-10-10)
-
-Der Nutzer hat gewählt: **A2 · B2 · C2 · D2**. *Context* und *Optionen* oben
-bleiben unverändert stehen.
-
-- **A2 — Prüfung auf Anstoß des Anbieters.** `POST /provider/:key/billing/recheck`
-  legt einen SetupIntent über das gescheiterte Standard-Zahlungsmittel an
-  (`verifyPaymentMethod`, kein Geld). Bestätigt Stripe es, wird
-  `last_payment_failure` geleert und die Bereitschaft neu berechnet
-  (`recheckPaymentMethod`, Ereignisse `payment_method_recheck` und
-  `payment_failure_cleared`). Die offene Frage aus den Optionen („wie oft")
-  ist beantwortet mit **höchstens drei Prüfungen je Anbieter in 24 Stunden**
-  (`RECHECK_LIMIT_PER_DAY`, 429 `RECHECK_LIMIT` mit `retry_after`). Die
-  Oberfläche folgt nach der Canvas-Wahl.
-- **C2 — Rabattzähler wird mitgenommen.** `startSubscription` übernimmt den
-  höchsten Zählerstand eines Zyklus, der heute noch läuft
-  (`carriedDiscountCount`, Ereignis `discount_counter_carried`). Der Zähler
-  ist damit nicht mehr rein am Abo-Zyklus geschlüsselt; vermerkt an
-  `applyMonthlyDiscount` und in `subscriptions.ts`.
-- **D2 — Copy begradigt, Wort reserviert.** `statusFailed` („nicht
-  eingezogen"), `paymentFailedBanner`, `paymentFailedBody` in vier Sprachen;
-  der Hinweis ist jetzt eine Warnung mit dem Weg ins Portal statt eines
-  roten Kartenwechsel-Knopfs. Beim Umsetzen zeigte sich: `failed` ist eine
-  Abo-Rechnung, die Stripe als `uncollectible` führt — sie sperrt nichts
-  (nur offene Rechnungen zählen in `overdueState`). Die neue Copy sagt genau
-  das. `copy:check` hält „Kulanzfrist"/„grace" (und „Workspace-Sperre") auf
-  `providerws.billing.*` ausschließlich in `grace*`-Schlüsseln.
-- **B2 — umgesetzt als B2a (Nachwahl 2026-10-10).** Stripes Wiederholungen
-  (Smart Retries) greifen nur bei `collection_method = charge_automatically`;
-  die Abo-Rechnungen laufen als `send_invoice`, dort belastet Stripe nie
-  selbst eine Karte. Die Option, wie sie oben steht, war so nicht baubar.
-  Zur Wahl standen B2a (wir ziehen in der Kulanzfrist selbst ein), B2b
-  (Umstellung auf automatischen Einzug, ohne 14 Tage Zahlungsziel) und B1.
-  Gewählt: **B2a**.
-  - Am Fälligkeitstag erfährt der Anbieter per Mail und Benachrichtigung
-    (`invoice_retry_scheduled`), an welchen Tagen wir die hinterlegte Karte
-    versuchen, dass die Frist bleibt und dass er selbst zahlen kann.
-  - An **Tag 1, 3 und 6** nach Fälligkeit je ein Versuch
-    (`invoices/:id/pay`, off-session, Standard-Zahlungsmittel), je Rechnung
-    und Tag höchstens einmal; versäumte Tage werden nicht nachgeholt. Nur
-    Versuchstage innerhalb der Kulanzfrist zählen.
-  - **`due_at` wird nie angefasst.** Der Stichtag aus ADR-0006 bleibt.
-  - Eingeschaltet erst mit `INVOICE_RETRY_ENABLED=1`: Vorher ist zu prüfen,
-    ob das Zahlungsmandat (`billing_authorization`, Fassung 2026-09) die
-    Belastung von Abo-Rechnungen deckt — der Text liegt nicht im Repo.
-    Ohne den Schalter gilt faktisch B1.
-  - Code: `invoiceRetry.ts` (`retryStage`, `runInvoiceRetryTick`),
-    Watcher-Pass mit Shadow-Markern `invoice_retry_shadow`.
