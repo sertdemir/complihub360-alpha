@@ -238,6 +238,8 @@ export async function rebookWithoutFee(b: Json, slotStartIso: string, actorUserI
         provider_key: b.provider_key, user_id: b.user_id, slot_start: slotStartIso, slot_end: slotEnd, status: 'confirmed',
         message: b.message ?? null, lead_charged: false, identity_revealed: true, service_id: b.service_id ?? null,
         price_snapshot: b.price_snapshot ?? null, shared_fields: b.shared_fields ?? null, sharing_confirmed_at: b.sharing_confirmed_at ?? nowIso,
+        // Schritt 4 (B1): die Neubuchung teilt dasselbe, was der Nutzer bestaetigt hat.
+        shared_snapshot: b.shared_snapshot ?? null,
         acknowledgement_version: b.acknowledgement_version ?? null, lead_ledger_id: b.lead_ledger_id ?? null,
         user_discount_pct: b.user_discount_pct ?? null, user_discount_policy_version: b.user_discount_policy_version ?? null,
         rebooked_from: b.id,

@@ -3806,12 +3806,15 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
     it('Neubuchung in der Frist: neue Zeile am selben Lead, keine zweite Gebuehr, Frist erledigt', async () => {
         seedProvider(); seedMember();
         const ledger = seedLedger();
-        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13), lead_ledger_id: ledger.id, acknowledgement_version: 'booking-ack-v1', shared_fields: ['email', 'company_name', 'message'] });
+        const snap = { email: 'test@complihub.test', company_name: 'Profilfirma GmbH', message: null, topic: { area_code: 'tax-vat', countries: ['DE'] } };
+        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13), lead_ledger_id: ledger.id, acknowledgement_version: 'booking-ack-v1', shared_fields: ['email', 'company_name', 'message'], shared_snapshot: snap });
         const target = future(3);
         const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: target }) });
         expect(r.status).toBe(201);
         expect(r.body).toMatchObject({ status: 'confirmed', slot_start: target, rebooked_from: b.id });
         const neu = db.scheduling.find((x) => x.id === r.body.id);
+        // Schritt 4 (Pruefung H1): die Neubuchung teilt dasselbe, was bestaetigt wurde.
+        expect(neu.shared_snapshot).toEqual(snap);
         expect(neu).toMatchObject({ status: 'confirmed', lead_ledger_id: ledger.id, rebooked_from: b.id, lead_charged: false, acknowledgement_version: 'booking-ack-v1' });
         expect(db.scheduling[0].credit_decided_at).toBeTruthy();
         expect(db.provider_lead_ledger).toHaveLength(1);
@@ -4089,5 +4092,160 @@ describe('availability = ooo — pausiert', () => {
         expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
         expect(db.provider_lead_ledger ?? []).toHaveLength(0);
         expect(db.scheduling ?? []).toHaveLength(0);
+    });
+});
+
+// ─── Privacy Critical Acceptance Tests (Checklist v1.0, EN-Launch Schritt 4) ─
+// Je Test die Nummer der Checkliste. #1 und #7 belegt "Anonymitaet auf dem
+// Draht" oben, #6 die Fehlerzweige der Buchung, #5 gibt es erst mit dem
+// Feature "Alternative available". Hier: was am 10.10.2026 fehlte.
+describe('Privacy Critical Tests (Checklist v1.0)', () => {
+    const asUser = (jwt: string, path: string, init: RequestInit = {}) =>
+        api(path, { ...init, auth: 'none', headers: { authorization: `Bearer ${jwt}`, ...(init.headers as any) } });
+    const PROFILE_JWT = signJwt({ sub: USER_ID, email: 'test@complihub.test', user_metadata: { company_name: 'Profilfirma GmbH' } });
+    const settle = () => new Promise((r) => setTimeout(r, 20));
+    const denied = () => (db.event_log ?? []).filter((e) => e.type === 'access_denied');
+
+    it('#2 vor der Buchung: Website-Link 403, das Detail anonym — und der Versuch steht im Log', async () => {
+        seedProvider();
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/website`, { auth: 'jwt' });
+        expect(r.status).toBe(403);
+        const d = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'jwt' });
+        expect(d.body.detail.revealed).toBe(false);
+        expect(JSON.stringify(d.body)).not.toMatch(/Testkanzlei|testkanzlei-schmidt|geheim@/);
+        await settle();
+        expect(denied()).toEqual([expect.objectContaining({ payload: expect.objectContaining({ resource: 'provider_reveal', userId: USER_ID, status: 403 }) })]);
+    });
+
+    it('#3 nach der Buchung: der Buchende sieht das Profil offen, ein anderer weiter anonym (A1)', async () => {
+        const { invalidateVisibility } = await import('../anonymity.js');
+        invalidateVisibility();
+        (db.provider_field_visibility ??= []).push(
+            { field_path: 'providers.name', visibility_class: 'revealed' },
+            { field_path: 'providers.website_url', visibility_class: 'revealed' },
+            { field_path: 'providers.contact_email', visibility_class: 'revealed' },
+        );
+        seedProvider({ work_mode: 'Remote, Kontakt: geheim@testkanzlei.example' });
+        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: inAWeek(), slot_end: inAWeek(), status: 'confirmed', identity_revealed: true });
+        const own = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'jwt' });
+        expect(own.body.detail).toMatchObject({ revealed: true, name: 'Testkanzlei Schmidt GmbH', website_url: 'https://testkanzlei-schmidt.example', contact_email: 'geheim@testkanzlei.example', work_mode: 'Remote, Kontakt: geheim@testkanzlei.example' });
+        const fremd = await asUser(signJwt({ sub: randomUUID(), email: 'x@y.example' }), `/api/v1/p/${refOf('test-kanzlei')}/detail`);
+        expect(fremd.body.detail.revealed).toBe(false);
+        expect(JSON.stringify(fremd.body)).not.toMatch(/Testkanzlei|testkanzlei-schmidt|geheim@/);
+        invalidateVisibility();
+    });
+
+    it('#4 mehrere Treffer, eine Buchung: nur der gebuchte Anbieter erfaehrt davon', async () => {
+        const { session } = seedBookable();
+        const OTHER_MEMBER = randomUUID();
+        seedProvider({ provider_key: 'andere-kanzlei', name: 'Andere Kanzlei AG', contact_email: 'andere@kanzlei.example' });
+        seedMember('andere-kanzlei', OTHER_MEMBER);
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(201);
+        await settle();
+        expect(db.scheduling.map((b) => b.provider_key)).toEqual(['test-kanzlei']);
+        expect((db.notifications ?? []).every((n) => n.user_id === MEMBER_ID)).toBe(true);
+        const mails = (db.event_log ?? []).filter((e) => e.type === 'email_outbox');
+        expect(mails.length).toBeGreaterThan(0);
+        expect(JSON.stringify(mails)).not.toMatch(/andere-kanzlei|andere@kanzlei/);
+        expect(JSON.stringify(db.notifications ?? [])).not.toContain(OTHER_MEMBER);
+    });
+
+    it('#6 Belastung abgelehnt: keine Nutzerdaten in Mitteilung, Mail oder Ereignis', async () => {
+        const { session } = seedBookable();
+        stripeMock.createPaymentIntent.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', stripeRef: 'pi_fail', detail: 'generic_decline' });
+        const r = await asUser(PROFILE_JWT, '/api/v1/scheduling', { method: 'POST', body: JSON.stringify(standardBody(session, { message: 'Geheime Nachricht' })) });
+        expect(r.status).toBe(409);
+        await settle();
+        const spur = JSON.stringify({ n: db.notifications ?? [], e: db.event_log ?? [] });
+        expect(spur).not.toMatch(/test@complihub\.test|Profilfirma|Geheime Nachricht/);
+        expect(db.scheduling ?? []).toHaveLength(0);
+    });
+
+    it('#8 fremde Buchung und fremde Sitzung: abgewiesen und protokolliert; eine unbekannte ID nicht', async () => {
+        seedProvider();
+        const fremdeBuchung = randomUUID();
+        (db.scheduling ??= []).push({ id: fremdeBuchung, provider_key: 'test-kanzlei', user_id: randomUUID(), slot_start: inAWeek(), slot_end: inAWeek(), status: 'confirmed', identity_revealed: true });
+        const b = await api(`/api/v1/scheduling/${fremdeBuchung}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'cancelled' }) });
+        expect(b.status).toBe(403);
+        const fremdeSitzung = seedSession({ user_id: randomUUID() });
+        const s = await api(`/api/v1/session/${fremdeSitzung.id}/obligations`, { auth: 'jwt' });
+        expect(s.status).toBe(404);
+        const unbekannt = await api(`/api/v1/session/${randomUUID()}/obligations`, { auth: 'jwt' });
+        expect(unbekannt.status).toBe(404);
+        await settle();
+        const log = denied().map((e) => e.payload);
+        expect(log).toEqual([
+            expect.objectContaining({ resource: 'booking', target: fremdeBuchung, status: 403, userId: USER_ID }),
+            expect.objectContaining({ resource: 'session', target: fremdeSitzung.id, status: 404, userId: USER_ID }),
+        ]);
+        // Keine E-Mail, kein Name im Protokoll.
+        expect(JSON.stringify(log)).not.toMatch(/@|Testkanzlei/);
+    });
+
+    it('#9 Datenminimierung: der Dialog zeigt, die Buchung haelt fest, der Anbieter liest dieselben Werte (B1)', async () => {
+        const { session } = seedBookable();
+        // Eine aeltere Anfrage nennt eine ANDERE Firma — bis B1 hat der Anbieter diese gesehen.
+        (db.engagement_requests ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, category: 'tax-vat', country: 'DE', structured_answers: { company: 'Anfragefirma KG' }, created_at: '2026-09-30T08:00:00Z' });
+        const ack = await asUser(PROFILE_JWT, '/api/v1/acknowledgement?lang=en');
+        expect(ack.body.shared_preview).toEqual({ email: 'test@complihub.test', company_name: 'Profilfirma GmbH' });
+        const r = await asUser(PROFILE_JWT, '/api/v1/scheduling', { method: 'POST', body: JSON.stringify(standardBody(session)) });
+        expect(r.status).toBe(201);
+        const snap = { email: 'test@complihub.test', company_name: 'Profilfirma GmbH', message: 'Erstgespräch', topic: { area_code: 'tax-vat', countries: ['DE'] } };
+        expect(r.body.booking.shared_snapshot).toEqual(snap);
+        expect(db.scheduling[0].shared_snapshot).toEqual(snap);
+        (db.users ??= []).push({ id: USER_ID, email: 'test@complihub.test' });
+        const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+        const p = await asUser(memberJwt, '/api/v1/provider/test-kanzlei/bookings');
+        expect(p.status).toBe(200);
+        expect(p.body.bookings[0]).toMatchObject({ user_email: 'test@complihub.test', user_company: 'Profilfirma GmbH', message: 'Erstgespräch' });
+        expect(JSON.stringify(p.body.bookings[0])).not.toContain('Anfragefirma');
+    });
+
+    it('#8 Anfrage-Thread: nur Ersteller und Anbieter-Mitglieder, und jeder nur als die eigene Seite', async () => {
+        seedProvider(); seedMember();
+        const engId = randomUUID();
+        (db.engagement_requests ??= []).push({ id: engId, provider_key: 'test-kanzlei', user_id: randomUUID(), category: 'tax-vat', country: 'DE', structured_answers: { company: 'Fremde Firma' }, created_at: '2026-10-01T08:00:00Z' });
+        // Ein fremder Nutzer liest nicht und schreibt nicht — auch nicht als "provider".
+        const lesen = await api(`/api/v1/engagement/${engId}`, { auth: 'jwt' });
+        expect(lesen.status).toBe(404);
+        expect(JSON.stringify(lesen.body)).not.toContain('Fremde Firma');
+        const schreiben = await api(`/api/v1/engagement/${engId}/message`, { method: 'POST', auth: 'jwt', body: JSON.stringify({ author: 'provider', body: 'Hallo' }) });
+        expect(schreiben.status).toBe(404);
+        expect(db.engagement_messages ?? []).toHaveLength(0);
+        // Das Mitglied des Anbieters liest und schreibt als Anbieter, nicht als Nutzer.
+        const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}`)).status).toBe(200);
+        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'user', body: 'x' }) })).status).toBe(404);
+        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'provider', body: 'Antwort' }) })).status).toBe(201);
+        await settle();
+        expect(denied().map((e) => e.payload.resource)).toEqual(['engagement', 'engagement', 'engagement']);
+    });
+
+    it('#8 Anbieter-Bereich: protokolliert nur, wenn es den Anbieter gibt', async () => {
+        seedProvider();
+        expect((await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'jwt' })).status).toBe(404);
+        expect((await api('/api/v1/provider/gibt-es-nicht/bookings', { auth: 'jwt' })).status).toBe(404);
+        await settle();
+        expect(denied().map((e) => e.payload.target)).toEqual(['test-kanzlei']);
+    });
+
+    it('#3 Detail mit Server-Key ohne Nutzer: anonym, kein Fehler (Pruefung M1)', async () => {
+        seedProvider();
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'key' });
+        expect(r.status).toBe(200);
+        expect(r.body.detail.revealed).toBe(false);
+    });
+
+    it('#10 Nachweis: Nutzer, Anbieter, Felder, Bestaetigung und Zeit stehen an der Buchung und im Ereignis', async () => {
+        const { session } = seedBookable();
+        const r = await asUser(PROFILE_JWT, '/api/v1/scheduling', { method: 'POST', body: JSON.stringify(standardBody(session)) });
+        expect(r.status).toBe(201);
+        const row = db.scheduling[0];
+        expect(row).toMatchObject({ user_id: USER_ID, provider_key: 'test-kanzlei', shared_fields: ['email', 'company_name', 'message'], acknowledgement_version: 'booking-ack-v1' });
+        expect(Date.parse(row.sharing_confirmed_at)).not.toBeNaN();
+        expect(row.shared_snapshot).toBeTruthy();
+        const ev = db.event_log.find((e) => e.type === 'lead.revealed');
+        expect(ev.payload).toMatchObject({ bookingId: row.id, sharedFields: ['email', 'company_name', 'message'] });
     });
 });

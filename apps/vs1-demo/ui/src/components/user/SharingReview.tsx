@@ -7,7 +7,7 @@ import { Checkbox } from '../ui/Checkbox';
 import { Monogram } from './PartnerCard';
 import { useAuthStore } from '../../store/useAuthStore';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
-import type { BookingAcknowledgement, BookingConfirmation } from '../../api/bookings';
+import type { BookingAcknowledgement, BookingConfirmation, SharedPreview } from '../../api/bookings';
 
 // ─── Pruefen, was geteilt wird (I2) · Buchung bestaetigt (E3) ────────────────
 // Figma: Section 3634:2866 — I2 3634:3519, E3 3634:3117. Abgenommen 09.10.2026.
@@ -54,11 +54,17 @@ export function useSharedRows() {
   };
   /** `topic`: 'unspecified', wo die Flaeche das Thema vorab nicht kennt — die
    *  Zeile steht trotzdem da, denn der Anbieter sieht es. */
-  return (fields: string[], opts: { message: string; topic: SharingTopic | 'unspecified' | null }): SharedRow[] => {
-    const company = (user?.user_metadata?.company_name as string | undefined)?.trim()
-      // Demo-Login ohne echte Sitzung: der Design-Platzhalter wie in der Shell.
-      || (!user && userName ? 'Acme GmbH' : '');
-    const email = user?.email ?? '';
+  /** `preview`: die Werte vom Server (B1, Schritt 4) — was die Buchung
+   *  festhaelt bzw. festgehalten hat. Liegen sie vor, zeigt die Liste NUR sie;
+   *  sonst (Demo, aelterer Server) die Werte aus der Sitzung des Browsers. */
+  return (fields: string[], opts: { message: string; topic: SharingTopic | 'unspecified' | null; preview?: SharedPreview | null }): SharedRow[] => {
+    const fromServer = opts.preview ?? null;
+    const company = fromServer
+      ? (fromServer.company_name ?? '').trim()
+      : (user?.user_metadata?.company_name as string | undefined)?.trim()
+        // Demo-Login ohne echte Sitzung: der Design-Platzhalter wie in der Shell.
+        || (!user && userName ? 'Acme GmbH' : '');
+    const email = fromServer ? (fromServer.email ?? '') : (user?.email ?? '');
     const value = (key: string): { value: string; missing?: boolean } => {
       if (key === 'company_name') return company ? { value: company } : { value: t('results:sharing.notProvided'), missing: true };
       if (key === 'email') return email ? { value: email } : { value: t('results:sharing.notProvided'), missing: true };
