@@ -864,10 +864,16 @@ function p2ReviewDossier(key: string) {
     open_requests: p2Requests(), gate: p2Gate(), history: p2History() };
 }
 
+// Kalender-Zustand des Mocks (siehe Route weiter unten).
+const mockCalendar = { connected: false };
+const calendarStatus = () => ({ configured: true, connected: mockCalendar.connected, email: mockCalendar.connected ? 'kalender@schmidt-partner.example' : null });
+
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
   if (method === 'GET') {
+    // Kalender-Status (nylasAuth.ts) — vor dem allgemeinen GET-Rueckfall unten.
+    if (p[0] === 'provider' && p[2] === 'calendar' && p.length === 3) return calendarStatus();
     if (p[0] === 'dashboard') return dashboard();
     if (p[0] === 'acknowledgement') return acknowledgement((query.get('lang') ?? 'en').slice(0, 2).toLowerCase());
     // Mock-Login = der Demo-Anbieter (echte API: provider_members, 20260922000000)
@@ -914,6 +920,18 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'search') return search(body);
   // Marktanfrage: der Server prueft und schreibt (marketRequests.ts); hier
   // nur die Antwortform. Ein abgedeckter Markt bekaeme dort 409.
+  // Kalender (nylasAuth.ts): lokal ohne Google/Microsoft. „Verbinden" fuehrt
+  // direkt auf den Rueckweg mit ?calendar=connected, damit der Ablauf im Mock
+  // durchspielbar ist; der Zustand lebt bis zum Neustart des Dev-Servers.
+  if (p[0] === 'provider' && p[2] === 'calendar' && p.length === 3 && method === 'DELETE') {
+    mockCalendar.connected = false;
+    return calendarStatus();
+  }
+  if (p[0] === 'provider' && p[2] === 'calendar' && p[3] === 'connect' && method === 'POST') {
+    mockCalendar.connected = true;
+    const loc = typeof body.locale === 'string' ? body.locale : 'de';
+    return { url: `/${loc}/partner-dashboard/settings?calendar=connected` };
+  }
   // Kontakt und Bewerbung: der Server prueft und schickt (contact.ts); der
   // lokale Mock antwortet nur in der Form eines Erfolgs. Auf Staging erreicht
   // der Demo-Login diesen Zweig nicht — api/contact.ts geht am Demo-Datensatz

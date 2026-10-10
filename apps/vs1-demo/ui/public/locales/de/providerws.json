@@ -443,7 +443,27 @@
     "matchmakingSaved": "Gespeichert.",
     "previewTitle": "So erscheinen Sie vor der Buchung",
     "previewAreas": "Ihre freigegebenen Bereiche",
-    "previewNote": "Titel und Beschreibung bildet CompliHub360: ein Buchstabe je Ergebnisliste plus Ihre freigegebenen Bereiche und Region. Nichts davon schreiben Sie selbst — so wird jeder Anbieter gleich verglichen."
+    "previewNote": "Titel und Beschreibung bildet CompliHub360: ein Buchstabe je Ergebnisliste plus Ihre freigegebenen Bereiche und Region. Nichts davon schreiben Sie selbst — so wird jeder Anbieter gleich verglichen.",
+    "calendar": {
+      "title": "Kalender",
+      "body": "Verbinden Sie Ihren Google- oder Microsoft-Kalender. Wir lesen nur, wann Sie belegt sind, keine Titel und keine Teilnehmer, und tragen gebuchte Termine ein. Ohne Verbindung sehen Mandanten Ihre Geschäftszeiten.",
+      "connect": "Kalender verbinden",
+      "nylasNote": "Die Verbindung läuft über unseren Dienstleister Nylas, Rechenzentrum London.",
+      "connectedAs": "Verbunden mit {{email}}",
+      "connectedBody": "Mandanten sehen nur Zeiten, an denen Sie frei sind. Gebuchte Termine stehen in diesem Kalender.",
+      "disconnect": "Trennen",
+      "unavailableTitle": "Noch nicht verfügbar",
+      "unavailableBody": "Die Kalender-Verbindung ist in der Beta noch nicht eingerichtet. Bis dahin sehen Mandanten Ihre Geschäftszeiten.",
+      "loadFailed": "Der Stand Ihres Kalenders ließ sich gerade nicht laden.",
+      "retry": "Erneut versuchen",
+      "returnedOkTitle": "Ihr Kalender ist verbunden.",
+      "returnedOkBody": "Ab jetzt sehen Mandanten nur freie Zeiten.",
+      "returnedFailTitle": "Der Kalender wurde nicht verbunden.",
+      "returnedFailBody": "Es ist nichts gespeichert. Versuchen Sie es erneut oder schreiben Sie uns.",
+      "confirmTitle": "Kalender trennen?",
+      "confirmConsequence": "Danach sehen Mandanten wieder Ihre Geschäftszeiten statt Ihrer freien Zeiten. Bereits eingetragene Termine bleiben in Ihrem Kalender.",
+      "confirmLabel": "Trennen"
+    }
   },
   "termine": {
     "title": "Termine & <accent>Leads</accent>.",
