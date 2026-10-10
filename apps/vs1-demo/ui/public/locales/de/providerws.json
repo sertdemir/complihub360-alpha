@@ -1089,5 +1089,76 @@
       "errSame": "Das ist bereits Ihr laufender Tarif.",
       "errFailed": "Das hat gerade nicht geklappt. Bitte noch einmal versuchen."
     }
+  },
+  "partnerNotif": {
+    "hours_one": "{{count}} Stunde",
+    "hours_other": "{{count}} Stunden",
+    "minutes_one": "{{count}} Minute",
+    "minutes_other": "{{count}} Minuten",
+    "needsYou": "Braucht Sie",
+    "forInfo": "Zur Information",
+    "seeAll": "Alle Benachrichtigungen",
+    "empty": "Noch keine Benachrichtigungen. Buchungen, Abrechnung und Verifizierung erscheinen hier.",
+    "pageSubtitle": "Alles, was CompliHub360 Ihnen geschickt hat: Buchungen, Abrechnung, Verifizierung und Ihr Tarif.",
+    "chipAppointments": "Termine",
+    "chipVerification": "Verifizierung",
+    "chipPlan": "Tarif",
+    "goTo": "Öffnen",
+    "booking_created": {
+      "title": "Neue Buchung",
+      "body": "Ein Mandant hat ein Erstgespräch am {{slot}} gebucht. Das Dossier liegt bereit."
+    },
+    "appointment_reminder": {
+      "title": "Termin in {{offset}}",
+      "body": "Erstgespräch am {{slot}}."
+    },
+    "dispute_opened": {
+      "title": "Ein Mandant widerspricht Ihrer Meldung",
+      "body": "Zum Termin am {{slot}}. CompliHub360 prüft und meldet sich."
+    },
+    "dispute_resolved": {
+      "title": "Entscheidung zu einem Termin",
+      "body": "Termin am {{slot}}: {{label}}."
+    },
+    "performance_incident": {
+      "title": "Nicht wahrgenommener Termin vermerkt",
+      "body": "Für den Termin am {{slot}} ist Ihre Abwesenheit vermerkt. Das fließt in Ihre Performance ein."
+    },
+    "credit_issued": {
+      "title": "Guthaben gutgeschrieben",
+      "body": "{{amount}} aus einem nicht wahrgenommenen Termin. Es wird mit der nächsten Abo-Rechnung verrechnet."
+    },
+    "payment_failed": {
+      "title": "Lead-Belastung gescheitert",
+      "body": "Buchungen pausieren, bis Sie die Karte erneut prüfen oder eine andere hinterlegen. Sie bleiben sichtbar."
+    },
+    "invoice_retry_scheduled": {
+      "title": "Rechnung {{label}} ist fällig",
+      "body": "Ist sie morgen noch offen, versuchen wir die hinterlegte Karte. Ab {{deadline}} pausieren neue Buchungen, solange sie offen ist."
+    },
+    "subscription_scheduled": {
+      "title": "Tarifänderung vorgemerkt",
+      "body": "Gilt ab {{effectiveOn}}. Bis dahin können Sie sie zurücknehmen."
+    },
+    "subscription_schedule_done": {
+      "title": "Tarifänderung wirksam",
+      "body": "Ihr Tarif hat sich heute wie vorgemerkt geändert."
+    },
+    "verification_info_requested": {
+      "title": "Ein Nachweis fehlt noch",
+      "body": "Für die Prüfung brauchen wir einen weiteren Nachweis."
+    },
+    "verification_decided": {
+      "title": "Prüfung entschieden",
+      "body": "Es gibt eine Entscheidung. Unter Verifizierung sehen Sie das Ergebnis."
+    },
+    "verification_activated": {
+      "title": "Ihr Konto ist aktiv",
+      "body": "Unternehmen können Sie jetzt für die freigegebenen Leistungen finden und buchen."
+    },
+    "evidence_expiring": {
+      "title": "Nachweis läuft ab",
+      "body": "{{label}} läuft am {{deadline}} ab."
+    }
   }
 }

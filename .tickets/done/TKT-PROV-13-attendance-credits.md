@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 5 — Anwesenheit, No-Show, Neubuchung, Guthaben, Erinnerungen"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Provider Phase 5 — Anwesenheit, No-Show, Neubuchung, Guthaben, Erinnerungen
@@ -88,9 +88,39 @@ lokal; Staging nach dem Review des Nutzers).
   (grüne Minus-Zeile, Unterzeile je Guthaben, Rest, „nicht ausgezahlt"),
   Mock (Zustände, Attendance-PATCH, Widerspruch, Neubuchung, Guthaben),
   Locales en/de/es/tr, Screenshots.
-- [ ] Review des Nutzers → Staging: Migration per Supabase-MCP, Shadow-Tick,
-  Live, Testlauf (No-Show melden, Frist per SQL vorziehen, Guthaben,
-  Monatslauf `dry_run`).
+- [x] Review des Nutzers → Staging: Migration per Supabase-MCP (9 Stücke,
+  2026-10-10), Watcher live, Testlauf 2026-10-10 01:05–01:07 UTC (unten).
+
+## Staging-Testlauf 2026-10-10
+
+Buchung `f367f0c0…` (dahlmann-cpa, Ledger `cf0bb2b1…` 134,10 USD captured),
+Slot per SQL auf 09.10. 10:00 gelegt, damit der Anbieter melden kann.
+
+- **Mehrfachbuchung (Entscheidung 5) schon vorher bestätigt:** die zweite
+  Buchung des Nutzers (`edb14a50…`, 12.10.) hängt per `rebooked_from` an
+  der ersten, teilt deren Ledger, Event `booking_linked_to_lead`, keine
+  zweite Gebühr. Anbieter-Karte: „Rebooking of an earlier appointment · no
+  second lead fee"; Nutzer-Karte: „New appointment for an earlier booking".
+- **Anbieter meldet (1B):** „Awaiting your report · 1", drei Auswahlkarten,
+  Folge-Satz „until October 24 … 30 % ($40.23)", Zehn-Minuten-Frage, „Yes,
+  report it" → `no_show`, `no_show_by user`, `rebook_deadline 2026-10-24`,
+  Event `booking_user_no_show`, Notification `no_show_reported`, Mail
+  `no_show_user` an den Nutzer **versandt** (Resend, nicht Outbox).
+- **Nutzer-Kasten (2B):** „According to the provider, the appointment did
+  not take place", Widerspruch bis Mo 12.10. (48 h), nach dem Vorziehen der
+  Frist „The window … has passed". Alte Bianchi-Buchung (31.08., `no_show`
+  ohne `no_show_by`) zeigt den Anbieter-No-Show-Kasten — Altdaten-Regel
+  aus ADR-0007 greift.
+- **Guthaben:** Frist per SQL auf 09.10.; Watcher-Tick 01:07:17 UTC →
+  `provider_credits` +4023 USD (`user_no_rebook_30pct`, booking_id,
+  ledger_id), Ledger-Zeile `kind credit` 4023 mit `refers_to` Charge,
+  Event `lead.credit_issued` (pct 30), Mail `credit_issued_provider`
+  versandt (Status 200), `credit_decided_at` gesetzt.
+- **Nicht gelaufen:** Monatslauf `dry_run` (Admin-Key liegt nur in der
+  VPS-`.env`); die Vorschau in der Partner-Abrechnung trägt die Minus-Zeile.
+
+Nebenbefund aus dem Testlauf: Nutzer-Sidebar ohne „Neue Funktionen · Bald"
+— Absicht aus #286 (Beta 14.10.), kein Fehler.
 
 ## Nicht in diesem Ticket
 
