@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { MoreHorizontal, Inbox } from 'lucide-react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { MoreHorizontal, Inbox, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { EmptyState } from '../../components/user/EmptyState';
-import { Button } from '../../components/ui/Button';
+import { Button, outlineBrandClass } from '../../components/ui/Button';
 import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard';
 import { ThreadDrawer } from '../../components/shared/ThreadDrawer';
 import { RequestActionsDrawer, type RequestActionsTarget } from '../../components/user/RequestActionsDrawer';
@@ -32,6 +32,8 @@ import { anonProviderLabel, type UserRequestRow } from '../../api/requests';
 // Seit 1 V3 (2026-10-01) gemeinsam mit der Partnerseite in lib/requestContext.
 export { SLUG_TO_I18N, relZeit } from '../../lib/requestContext';
 
+const KEEP_WAITING_KEY = 'ch360_keep_waiting';
+
 export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
   const { t } = useTranslation('userws');
   const { openWizard } = useWizardDrawer();
@@ -42,6 +44,19 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
   if (deepThread && threadFor !== deepThread) setThreadFor(deepThread);
   const [actionsFor, setActionsFor] = useState<RequestActionsTarget | null>(null);
   const [withdrawnIds, setWithdrawnIds] = useState<Set<string>>(new Set());
+  const navigate = useNavigate();
+  const { locale = 'en' } = useParams();
+  // "Keep Waiting" blendet den Hinweis fuer diese Anfrage aus — je Browser,
+  // die Frist bleibt in der Zeile stehen. Ohne Speicher (privates Fenster)
+  // kommt er beim naechsten Laden wieder; das ist harmlos.
+  const [waiting, setWaiting] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem(KEEP_WAITING_KEY) ?? '[]') as string[]); } catch { return new Set(); }
+  });
+  const keepWaiting = (uuid: string) => setWaiting((prev) => {
+    const next = new Set(prev).add(uuid);
+    try { localStorage.setItem(KEEP_WAITING_KEY, JSON.stringify([...next])); } catch { /* kein Speicher */ }
+    return next;
+  });
 
   const effective = (rows ?? []).map((r) => {
     if (withdrawnIds.has(r.uuid)) {
@@ -51,7 +66,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
     // die Antwortfrist, blieb die Zeile fuer immer "wartet auf den Anbieter".
     // Jetzt wandert sie zu "wartet auf Sie" — Ihre Entscheidung steht an.
     if (r.bucket === 'confirmed' && r.slaDeadline && new Date(r.slaDeadline).getTime() <= Date.now()) {
-      return { ...r, bucket: 'overdue' as const };
+      return { ...r, bucket: 'overdue' as const, replyOverdue: true };
     }
     return r;
   });
@@ -68,10 +83,13 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
     // 2B (2026-09-05): Fristen gehoeren immer dem Anbieter (24 h bestaetigen,
     // 48 h antworten). "verpasst" statt "abgelaufen" — sonst las es sich, als
     // haetten SIE etwas versaeumt.
-    if (r.bucket === 'overdue') return { label: t('requests.slaMissed'), tone: 'err' as const, pct: 0 };
+    // D1 (Canvas 09.10.2026): verpasst in Amber, nicht Rot — Rot las sich wie
+    // ein Fehler des Nutzers. Der Balken bleibt voll, damit die Frist sichtbar
+    // abgelaufen ist und nicht leer wirkt.
+    if (r.bucket === 'overdue') return { label: t('requests.slaMissed'), tone: 'warn' as const, pct: 100 };
     if (!r.slaDeadline) return null;
     const left = new Date(r.slaDeadline).getTime() - Date.now();
-    if (left <= 0) return { label: t('requests.slaMissed'), tone: 'err' as const, pct: 0 };
+    if (left <= 0) return { label: t('requests.slaMissed'), tone: 'warn' as const, pct: 100 };
     const h = Math.floor(left / 3_600_000);
     const m = Math.floor((left % 3_600_000) / 60_000);
     return {
@@ -88,14 +106,16 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
     return <Button size="sm" variant={variant} onClick={() => oeffnen(r)}>{label}</Button>;
   };
 
-  const FRIST_TONE = { ok: 'text-fg-brand', warn: 'text-fg-accent-strong', err: 'text-error-700 dark:text-error-300' };
+  // warn in der Status-Skala, nicht im Gold: Gold traegt Verified Provider (Compass).
+  const FRIST_TONE = { ok: 'text-fg-brand', warn: 'text-warning-text dark:text-warning-300', err: 'text-error-700 dark:text-error-300' };
   const BALKEN_TONE = { ok: 'bg-brand', warn: 'bg-warning-500', err: 'bg-error-500' };
 
-  const karte = (r: UserRequestRow) => {
+  const karte = (r: UserRequestRow & { replyOverdue?: boolean }) => {
     const f = frist(r);
+    const overduePanel = r.replyOverdue && !waiting.has(r.uuid);
     return (
+      <div key={r.uuid}>
       <RequestCard
-        key={r.uuid}
         className="rounded-none border-0 border-t border-stroke-subtle bg-transparent px-5"
         context={kontext({ category: r.category, country: r.country, createdAt: r.createdAt, ref: r.id }) || r.meta}
         status={r.status}
@@ -125,6 +145,28 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
           </div>
         }
       />
+      {/* D1 (Figma 3634:3053): der abgenommene Zustand unter der Anfrage.
+          "See Another Match" zeigt die Anbieter des Bereichs — geteilt wird
+          dabei nichts; das passiert erst bei einer neuen Buchung mit der
+          Pruefung davor (I2). */}
+      {overduePanel && (
+        <div className="px-5 pb-4">
+          <div role="status" className="flex items-start gap-3.5 rounded-xl border border-stroke-subtle bg-surface-secondary px-[18px] py-4">
+            <Clock size={18} className="mt-0.5 shrink-0 text-warning-text dark:text-warning-300" aria-hidden />
+            <div className="min-w-0 flex-1">
+              <p className="text-body-sm font-bold text-fg">{t('common:states.providerResponseOverdue.heading')}</p>
+              <p className="mt-1 text-body-xs leading-relaxed text-fg-secondary">{t('common:states.providerResponseOverdue.message')}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" className={outlineBrandClass} onClick={() => keepWaiting(r.uuid)}>{t('common:states.actions.keepWaiting')}</Button>
+                <Button size="sm" variant="ghost" className="text-fg-brand" onClick={() => navigate(`/${locale}/dashboard/workbench/${r.category ?? ''}`)}>
+                  {t('common:states.actions.seeAnotherMatch')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>
     );
   };
 

@@ -12,7 +12,9 @@
   },
   "stats": {
     "0": {
-      "label": "obligaciones identificadas"
+      "label": "obligaciones identificadas",
+      "label_one": "obligación identificada",
+      "label_other": "obligaciones identificadas"
     },
     "1": {
       "label": "con plazo en 30 días"
@@ -21,7 +23,9 @@
       "label": "plazo mediano"
     },
     "3": {
-      "label": "Verified Providers disponibles"
+      "label": "Verified Providers disponibles",
+      "label_one": "Verified Provider disponible",
+      "label_other": "Verified Providers disponibles"
     }
   },
   "table": {

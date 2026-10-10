@@ -12,7 +12,9 @@
   },
   "stats": {
     "0": {
-      "label": "tespit edilen yükümlülük"
+      "label": "tespit edilen yükümlülük",
+      "label_one": "tespit edilen yükümlülük",
+      "label_other": "tespit edilen yükümlülük"
     },
     "1": {
       "label": "30 gün içinde süresi dolan"
@@ -21,7 +23,9 @@
       "label": "medyan son tarih"
     },
     "3": {
-      "label": "hazır Verified Provider"
+      "label": "hazır Verified Provider",
+      "label_one": "hazır Verified Provider",
+      "label_other": "hazır Verified Provider"
     }
   },
   "table": {

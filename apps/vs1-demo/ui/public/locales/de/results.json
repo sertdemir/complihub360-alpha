@@ -12,7 +12,9 @@
   },
   "stats": {
     "0": {
-      "label": "identifizierte Pflichten"
+      "label": "identifizierte Pflichten",
+      "label_one": "identifizierte Pflicht",
+      "label_other": "identifizierte Pflichten"
     },
     "1": {
       "label": "mit Frist in 30 Tagen"
@@ -21,7 +23,9 @@
       "label": "mediane Frist"
     },
     "3": {
-      "label": "Verified Provider bereit"
+      "label": "Verified Provider bereit",
+      "label_one": "Verified Provider bereit",
+      "label_other": "Verified Provider bereit"
     }
   },
   "table": {

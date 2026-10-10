@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useId } from 'react';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -28,14 +29,23 @@ export interface ModalProps {
 }
 
 export function Modal({ open, onClose, title, description, size = 'md', footer, hideClose, children, className }: ModalProps) {
+  // Fokus wie im Drawer (useFocusTrap): hinein beim Oeffnen, drinnen beim
+  // Tabben, zurueck beim Schliessen. Escape in der Capture-Phase am Fenster —
+  // liegt der Dialog ueber einer Schublade, schliesst er nur sich selbst.
+  const panelRef = useFocusTrap<HTMLDivElement>(open);
+  const titleId = useId();
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    document.addEventListener('keydown', onKey);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      e.stopPropagation();
+      onClose();
+    };
+    window.addEventListener('keydown', onKey, true);
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
-      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('keydown', onKey, true);
       document.body.style.overflow = prev;
     };
   }, [open, onClose]);
@@ -54,8 +64,11 @@ export function Modal({ open, onClose, title, description, size = 'md', footer, 
             exit={{ opacity: 0 }}
           />
           <motion.div
+            ref={panelRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
+            aria-labelledby={title ? titleId : undefined}
             className={cn('relative flex w-full flex-col rounded-[10px] border border-stroke bg-surface shadow-xl', WIDTH[size], className)}
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -65,7 +78,7 @@ export function Modal({ open, onClose, title, description, size = 'md', footer, 
             {(title || description || !hideClose) && (
               <div className="flex items-start justify-between gap-4 px-6 pb-3 pt-5">
                 <div className="min-w-0">
-                  {title && <h2 className="text-[18px] font-semibold leading-snug text-fg">{title}</h2>}
+                  {title && <h2 id={titleId} className="text-[18px] font-semibold leading-snug text-fg">{title}</h2>}
                   {description && <p className="mt-1 text-body-sm text-fg-secondary">{description}</p>}
                 </div>
                 {!hideClose && (

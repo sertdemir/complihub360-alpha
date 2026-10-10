@@ -40,6 +40,19 @@ function renderPage(extra = '') {
 const HEADING = 'common:states.bookingProcessing.heading';
 const MESSAGE = 'common:states.bookingProcessing.message';
 
+// I2 (2026-10-10): der Knopf oeffnet die Pruefung; gebucht wird erst mit
+// Haekchen und "Confirm and Book".
+async function openReview() {
+  const knopf = screen.getByRole('button', { name: /detail\.bookCta/ });
+  await waitFor(() => expect(knopf).toBeEnabled());
+  fireEvent.click(knopf);
+  return knopf;
+}
+function confirmAndBook() {
+  fireEvent.click(screen.getByRole('checkbox', { name: 'common:states.sharingReview.confirmation' }));
+  fireEvent.click(screen.getByRole('button', { name: 'common:states.sharingReview.confirmAndBook' }));
+}
+
 describe('ProviderSchedulePage · Booking processing', () => {
   // Geschweifte Klammern mit Absicht: mockReset() gibt die Mock-Funktion
   // zurueck, und eine Funktion als Rueckgabe eines Hooks nimmt vitest als
@@ -57,25 +70,43 @@ describe('ProviderSchedulePage · Booking processing', () => {
   it('zeigt Ueberschrift und Text der Vorlage als Status und sperrt den Knopf', async () => {
     createBooking.mockReturnValue(new Promise(() => {})); // Anfrage bleibt offen
     renderPage();
-    const knopf = screen.getByRole('button', { name: 'schedule.confirmCta' });
     // Phase 4: der Knopf oeffnet sich erst, wenn die Bestaetigung geladen ist.
-    await waitFor(() => expect(knopf).toBeEnabled());
-    fireEvent.click(knopf);
+    const knopf = await openReview();
+    confirmAndBook();
 
-    const status = await screen.findByRole('status');
-    expect(status).toHaveTextContent(HEADING);
+    const status = (await screen.findAllByRole('status')).find((el) => el.textContent?.includes(HEADING));
     expect(status).toHaveTextContent(MESSAGE);
     expect(knopf).toBeDisabled();
+  });
+
+  it('bucht ohne Haekchen nicht — der Fehler steht am Haekchen, der Fokus auch', async () => {
+    renderPage();
+    await openReview();
+    fireEvent.click(screen.getByRole('button', { name: 'common:states.sharingReview.confirmAndBook' }));
+    expect(createBooking).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('results:sharing.confirmRequired');
+    expect(screen.getByRole('checkbox', { name: 'common:states.sharingReview.confirmation' })).toHaveFocus();
+  });
+
+  it('nennt im Dialog, was geteilt wird — und das Thema, auch wenn die Seite es vorab nicht kennt', async () => {
+    renderPage();
+    await openReview();
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveTextContent('results:sharing.fields.email');
+    expect(dialog).toHaveTextContent('results:sharing.fields.topic');
+    expect(dialog).toHaveTextContent('results:sharing.topicUnspecified');
+    expect(screen.getByRole('checkbox', { name: 'common:states.sharingReview.confirmation' })).not.toBeChecked();
   });
 
   it('nimmt den Zustand nach einem Fehler zurueck und sagt, dass nicht gebucht wurde', async () => {
     createBooking.mockRejectedValue(new Error('500'));
     renderPage();
-    const knopf = screen.getByRole('button', { name: 'schedule.confirmCta' });
-    await waitFor(() => expect(knopf).toBeEnabled());
-    fireEvent.click(knopf);
+    await openReview();
+    confirmAndBook();
 
-    await waitFor(() => expect(screen.getByText('schedule.failed')).toBeInTheDocument());
+    // F3: der abgenommene Zustand und die Liste, was nicht passiert ist.
+    await waitFor(() => expect(screen.getByText('common:states.bookingFailed.heading')).toBeInTheDocument());
+    expect(screen.getByText('schedule.fail.list.nothingShared')).toBeInTheDocument();
     expect(screen.queryByText(HEADING)).not.toBeInTheDocument();
   });
 });
@@ -87,18 +118,16 @@ describe('ProviderSchedulePage · Sitzung', () => {
 
   it('schickt die Sitzung aus ?session= mit', async () => {
     renderPage('&session=s-123');
-    const knopf = screen.getByRole('button', { name: 'schedule.confirmCta' });
-    await waitFor(() => expect(knopf).toBeEnabled());
-    fireEvent.click(knopf);
+    await openReview();
+    confirmAndBook();
     await waitFor(() => expect(createBooking).toHaveBeenCalled());
     expect(createBooking.mock.calls[0][2]).toMatchObject({ sessionId: 's-123', acknowledgementVersion: 'booking-ack-v1' });
   });
 
   it('erfindet keine Sitzung, wenn keine da ist', async () => {
     renderPage();
-    const knopf = screen.getByRole('button', { name: 'schedule.confirmCta' });
-    await waitFor(() => expect(knopf).toBeEnabled());
-    fireEvent.click(knopf);
+    await openReview();
+    confirmAndBook();
     await waitFor(() => expect(createBooking).toHaveBeenCalled());
     expect(createBooking.mock.calls[0][2].sessionId).toBeUndefined();
   });

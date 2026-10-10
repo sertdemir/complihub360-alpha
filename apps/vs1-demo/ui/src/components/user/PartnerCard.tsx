@@ -4,6 +4,7 @@ import { useRequestContext } from '../../lib/requestContext';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { Check } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { usePriceText } from '../results/ProviderStates';
 import type { AnonProvider, RankBasis as RankBasisData } from '../../api/search';
 
 // ─── Partner-Karte des Arbeitsbereichs ───────────────────────────────────────
@@ -68,6 +69,7 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, boo
     ? new Date(booking.slotStart).toLocaleString(locale, { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
     : null;
   const rank = rankBasis ?? (p.rank_basis ? <RankBasis basis={p.rank_basis} /> : null);
+  const priceText = usePriceText();
   return (
     <div className={`${CARD} flex flex-col p-4 ${className}`}>
       <div className="flex items-center gap-2.5">
@@ -98,6 +100,12 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, boo
         {[p.active_since ? t('snapshot.activeSince', { year: p.active_since }) : null,
           p.avg_response_hours != null ? t('snapshot.responseTime', { hours: p.avg_response_hours }) : null,
           t(`snapshot.billing.${p.billing_model}`)].filter(Boolean).join(' · ')}
+      </p>
+      {/* Die Preisspanne (EN-Launch Schritt 2): der abgenommene Satz ueber den
+          Karten nennt "expected price range" — ohne sie waere er hier unwahr.
+          Kein Preis: "Pricing on request.", keine erfundene Zahl. */}
+      <p className="mt-1 text-[10.5px] text-fg-secondary">
+        <span className="text-fg-tertiary">{t('matchStates.factPrice')}: </span>{priceText(p.price_range)}
       </p>
       {/* Die Zahl allein waere eine Behauptung — hier steht, woraus sie
           besteht (DNA-Addendum V2 P1), und darunter, warum der Anbieter an

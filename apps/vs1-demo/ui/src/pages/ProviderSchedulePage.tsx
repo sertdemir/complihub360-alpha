@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { useApiData } from '../lib/useApiData';
-import { fetchSlots, fetchAcknowledgement, createBooking, bookingFailureFrom, type BookingAcknowledgement, type BookingConfirmation, type BookingFailure } from '../api/bookings';
+import { fetchSlots, fetchAcknowledgement, createBooking, bookingFailureFrom, type BookingAcknowledgement, type BookingFailure } from '../api/bookings';
 import { Button } from '../components/ui/Button';
 import { Banner } from '../components/ui/Banner';
-import { AcknowledgementFooterLine, AcknowledgementList, BookingFailureCard } from '../components/user/BookingAcknowledgement';
+import { AcknowledgementList, BookingFailureCard } from '../components/user/BookingAcknowledgement';
+import { SharingReviewDialog, useSharedRows } from '../components/user/SharingReview';
+import { goToBookingConfirmed } from '../lib/bookingConfirmed';
 
 // ─── Native Scheduling (stage 3) — Phase-3 wiring ────────────────────────────
 // Mirrors the Figma "Scheduling — Buchung" screens: slot picker (from
@@ -48,9 +50,10 @@ export function ProviderSchedulePage() {
   // `?session=` kommt von der Detailseite: die Sitzung, aus der die Suche kam.
   const sessionId = params.get('session');
   const [message, setMessage] = useState('');
-  const [state, setState] = useState<'idle' | 'sending' | 'done'>('idle');
+  const [state, setState] = useState<'idle' | 'sending'>('idle');
   const [failure, setFailure] = useState<BookingFailure | null>(null);
-  const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const sharedRows = useSharedRows();
   const [ack, setAck] = useState<BookingAcknowledgement | null>(null);
   const [ackKey, setAckKey] = useState(0);
   useEffect(() => {
@@ -75,55 +78,29 @@ export function ProviderSchedulePage() {
     setState('sending');
     setFailure(null);
     try {
-      setConfirmation(await createBooking(key, selected, { message: message.trim() || undefined, acknowledgementVersion: ack.version, language: locale, sessionId: sessionId ?? undefined }));
-      setState('done');
+      const res = await createBooking(key, selected, { message: message.trim() || undefined, acknowledgementVersion: ack.version, language: locale, sessionId: sessionId ?? undefined });
+      setReviewOpen(false);
+      // E3: dieselbe Bestaetigungsseite wie aus der Schublade. Den Titel des
+      // Anbieters kennt diese Seite nicht — der Buchstabe faellt dann weg,
+      // der Klarname steht ohnehin da.
+      goToBookingConfirmed(navigate, locale, {
+        confirmation: res,
+        provider: { letter: '', title: t('snapshot.verifiedPartner') },
+        sessionLabel: null,
+        message: message.trim(),
+      });
     } catch (err) {
       // Frueher stand hier eine Fixture-Identitaet („Studio Bianchi SRL") fuer
       // JEDEN Schluessel, damit der Trichter vorfuehrbar bleibt. Das ist eine
       // Bestaetigung fuer einen Termin, den es nicht gibt, mit dem Namen eines
       // Anbieters, der nichts davon weiss. Ein Fehler sagt jetzt, dass nicht
       // gebucht wurde — in dem Satz, der zur Lage passt.
+      setReviewOpen(false);
       setFailure(bookingFailureFrom(err));
       setState('idle');
     }
   };
   const slotLine = selected ? `${df.format(new Date(selected))} · ${tf.format(new Date(selected))} · 30 Min` : null;
-
-  if (state === 'done' && confirmation) {
-    return (
-      <div className="min-h-screen bg-surface text-fg">
-        <header className="flex items-center justify-between border-b border-stroke-subtle bg-surface-secondary px-8 py-4">
-          <Logo className="h-[36px] w-auto" />
-        </header>
-        <main className="mx-auto max-w-[640px] px-6 py-16">
-          <div className="rounded-xl border border-brand bg-surface-secondary p-8 text-center">
-            <p className="text-body-2xs font-semibold uppercase tracking-[0.08em] text-fg-brand">{t('schedule.doneEyebrow')}</p>
-            <h1 className="mt-2 font-serif text-[26px] font-bold text-fg">{t('schedule.doneTitle')}</h1>
-            <p className="mt-2 text-body-sm text-fg-secondary">
-              {df.format(new Date(confirmation.booking.slot_start))} · {tf.format(new Date(confirmation.booking.slot_start))}
-            </p>
-            {/* Stage-3 reveal */}
-            <div className="mt-6 rounded-xl border border-stroke-subtle bg-surface px-5 py-4 text-left">
-              <p className="text-body-3xs font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('schedule.revealLabel')}</p>
-              <p className="mt-1 text-body font-semibold text-fg">{confirmation.provider_identity.name}</p>
-              {confirmation.provider_identity.contact_email && (
-                <p className="text-body-xs text-fg-secondary">{confirmation.provider_identity.contact_email}</p>
-              )}
-            </div>
-            <Button
-              size="lg"
-              shape="soft"
-              type="button"
-              onClick={() => navigate(`/${locale}/dashboard/termine`)}
-              className="mt-6"
-            >
-              {t('schedule.toAppointments')} <ArrowRight size={15} />
-            </Button>
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-surface text-fg">
@@ -172,8 +149,8 @@ export function ProviderSchedulePage() {
             />
             {/* Canvas 1B: die Bestaetigung ist der Text selbst, ueber dem Button. */}
             <AcknowledgementList ack={ack} className="border-t border-stroke-subtle pt-4" />
-            {failure && failure.kind !== 'generic' ? (
-              // Canvas 2A: der Kasten steht an der Stelle des Buttons.
+            {failure ? (
+              // F3: der Kasten steht an der Stelle des Buttons, fuer jeden Grund.
               <BookingFailureCard
                 failure={failure}
                 onRetry={() => setFailure(null)}
@@ -188,10 +165,10 @@ export function ProviderSchedulePage() {
                   fullWidth
                   type="button"
                   disabled={!selected || !ack || state === 'sending'}
-                  onClick={book}
+                  onClick={() => setReviewOpen(true)}
                   className="disabled:opacity-50"
                 >
-                  {t('schedule.confirmCta')}
+                  {t('detail.bookCta')} <ArrowRight size={15} />
                 </Button>
                 {/* Abgenommene Zustands-Copy (Checklist v1.0, "Booking processing"). */}
                 {state === 'sending' && (
@@ -199,12 +176,16 @@ export function ProviderSchedulePage() {
                     {t('common:states.bookingProcessing.message')}
                   </Banner>
                 )}
-                {failure?.kind === 'generic' && (
-                  <p className="text-body-3xs leading-relaxed text-error-700 dark:text-error-300">{t('schedule.failed')}</p>
-                )}
-                <AcknowledgementFooterLine ack={ack} slotLine={null} />
               </>
             )}
+            <SharingReviewDialog
+              open={reviewOpen}
+              onGoBack={() => setReviewOpen(false)}
+              onConfirm={book}
+              sending={state === 'sending'}
+              ack={ack}
+              rows={sharedRows(ack?.sharedFields ?? ['email', 'company_name', 'message'], { message, topic: 'unspecified' })}
+            />
           </aside>
         </div>
       </main>

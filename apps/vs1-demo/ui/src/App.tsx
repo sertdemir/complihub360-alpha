@@ -1,3 +1,4 @@
+import { SessionExpiryWatcher } from "./components/auth/SessionExpiryWatcher";
 import { lazy, useEffect } from "react";
 import { trackScrollDepth } from "./lib/analytics";
 import { useSeo } from "./hooks/useSeo";
@@ -49,6 +50,7 @@ const AdminProviderReviewPage = lazy(() => import("./pages/admin/AdminProviderRe
 const UserHomePage = lazy(() => import("./pages/user/UserHomePage").then((m) => ({ default: m.UserHomePage })));
 const SessionsPage = lazy(() => import("./pages/user/SessionsPage").then((m) => ({ default: m.SessionsPage })));
 const TerminePage = lazy(() => import("./pages/user/TerminePage").then((m) => ({ default: m.TerminePage })));
+const BookingConfirmedPage = lazy(() => import("./pages/user/BookingConfirmedPage").then((m) => ({ default: m.BookingConfirmedPage })));
 import { ProviderDetailPage } from "./pages/ProviderDetailPage";
 import { ProviderSchedulePage } from "./pages/ProviderSchedulePage";
 const DomainPage = lazy(() => import("./pages/user/DomainPage").then((m) => ({ default: m.DomainPage })));
@@ -182,6 +184,7 @@ function AppContent() {
                 fokussierbar, ohne ihn in die Tab-Reihenfolge zu haengen. */}
             <SkipToContent />
             <SiteHeader />
+            <SessionExpiryWatcher />
             <div id="main-content" tabIndex={-1} className="outline-none">
             <Routes location={location}>
                 <Route path="/:locale" element={<LocaleLayout />}>
@@ -228,6 +231,8 @@ function AppContent() {
                             hier auf und behalten ihre Parameter (?thread=…). */}
                         <Route path="dashboard/requests" element={<RequestsRedirect />} />
                         <Route path="dashboard/termine" element={<TerminePage />} />
+                        {/* E3 (Canvas 09.10.2026): die Buchungsbestaetigung als eigene Seite. */}
+                        <Route path="dashboard/booking/:id" element={<BookingConfirmedPage />} />
                         {/* Stage-2 detail + native scheduling. Seit Phase 3 (ADR-0004)
                             ueber den opaken public_ref — der Schluessel aus dem
                             Firmennamen erreicht den Browser nicht mehr. */}

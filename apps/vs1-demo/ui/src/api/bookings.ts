@@ -265,6 +265,8 @@ export interface BookingConfirmation {
     id: string; public_ref: string; slot_start: string; slot_end: string; status: string;
     acknowledgement_version?: string; shared_fields?: string[];
     user_discount?: { pct: number; policy_version: number } | null;
+    /** Das Thema des Leads, wie der Anbieter es sieht (Bereich, Maerkte). */
+    topic?: { area_code: string; countries: string[] };
   };
   // Stage-3 reveal — identity becomes visible at booking (spec §5).
   provider_identity: { name: string; website_url: string | null; contact_email: string | null };

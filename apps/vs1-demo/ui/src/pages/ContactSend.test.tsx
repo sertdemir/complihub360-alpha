@@ -137,9 +137,16 @@ describe('Partner-Bewerbung', () => {
     apply();
     expect(screen.queryByText(/draftNote|notWired/)).not.toBeInTheDocument();
     const submit = screen.getByRole('button', { name: /partnerApply\.submit/ });
-    expect(submit).toBeDisabled();
-    fillApply();
+    // H2 (2026-10-10): der Knopf bleibt aktiv. Leer abgeschickt geht nichts
+    // raus; die Zusammenfassung steht am Knopf, der Fokus im ersten Feld.
     expect(submit).toBeEnabled();
+    fireEvent.click(submit);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('common:states.formErrorSummary.heading');
+    expect(screen.getByLabelText('partnerApply.firm')).toHaveFocus();
+    expect(screen.getByLabelText('partnerApply.firm')).toHaveAttribute('aria-invalid', 'true');
+    fillApply();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     fireEvent.click(submit);
     expect(await screen.findByText('partnerApply.sent.title')).toBeInTheDocument();
     expect(sentBody()).toMatchObject({ lane: 'application', locale: 'de', name: 'Max Muster', email: 'max@kanzlei.de', firm: 'Muster Steuerberatung', credentials: 'Steuerberater (DE)', areas: ['tax-vat'], markets: ['DE'] });

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { render, screen, within, fireEvent } from '@testing-library/react';
+import { act, render, screen, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { AnonProvider, SearchLaw } from '../api/search';
@@ -14,6 +14,7 @@ import { ApiError } from '../api/client';
 // "On the radar" headers. vi.mock is hoisted above imports, so the mocks
 // below still apply; the transform cost now lands in the untimed collect phase.
 import { ResultsRiskMap } from './ResultsRiskMap';
+import { saveWizardSession } from '../api/sessions';
 
 // Erster Titel der Design-Fixture, die bis 2026-09-22 auf der Risk Map stand.
 // Die Fixture ist geloescht; der Titel bleibt als Anker, dass sie nicht zurueckkehrt.
@@ -764,5 +765,105 @@ describe('ResultsRiskMap header subtitle', () => {
 
     // The mocked t appends `#count` — `total` would leave it off.
     expect(await screen.findByText('header.subtitleProfile#1')).toBeInTheDocument();
+  });
+});
+
+// ─── EN-Launch Schritt 2 · Treffer-Zustaende (A1 · B3 · C2) ──────────────────
+// Checklist v1.0: "One active provider returns the singular one-match state,
+// not 'Compare your best matches'" und "Limited coverage is distinguishable
+// from broad coverage".
+
+describe('ResultsRiskMap match states', () => {
+  it('B3: one match as a guest — the singular state, the facts, no name', async () => {
+    runSearch.mockResolvedValue({
+      providers: [{ ...prov('a', 82), price_range: null }],
+      laws: [law({ id: 'vat', title: 'VAT return' })],
+    });
+    renderPage();
+
+    expect(await screen.findByText('common:states.oneProviderMatch.heading')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.multipleProviderMatches.heading')).not.toBeInTheDocument();
+    const card = screen.getByTestId('one-match-card');
+    // Kein Preis hinterlegt: das sagt die Karte, statt eine Zahl zu erfinden.
+    expect(within(card).getByText('results:detail.pricingOnRequest')).toBeInTheDocument();
+    expect(within(card).getByText('results:matchStates.guestCaption')).toBeInTheDocument();
+    expect(within(card).queryByText('Verified Provider a')).not.toBeInTheDocument();
+  });
+
+  it('A1: several matches as a guest — the approved heading above the locked cards', async () => {
+    runSearch.mockResolvedValue({ providers: [prov('a', 87), prov('b', 60)], laws: [law({ id: 'vat', title: 'VAT return' })] });
+    renderPage();
+
+    expect(await screen.findByText('common:states.multipleProviderMatches.heading')).toBeInTheDocument();
+    expect(screen.getByText('common:states.multipleProviderMatches.message')).toBeInTheDocument();
+    expect(screen.getAllByTestId('teaser-card')).toHaveLength(2);
+  });
+
+  it('C2: signed in with gaps — the matrix, and Request More Coverage asks per market for the missing areas', async () => {
+    auth.isLoggedIn = true;
+    auth.user = { email: 'alex@acme.example' };
+    runSearch.mockResolvedValue({
+      providers: [prov('a', 58)],
+      laws: [law({ id: 'vat', title: 'VAT return' })],
+      coverage: { markets: ['DE', 'NL'], areas: ['tax-vat', 'data-privacy'], covered: { DE: ['tax-vat', 'data-privacy'], NL: ['tax-vat'] } },
+    });
+    requestMarket.mockResolvedValue(undefined);
+    renderPage();
+
+    expect(await screen.findByRole('heading', { name: 'common:states.limitedCoverage.heading' })).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: 'results:matchStates.matrixLabel' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'common:states.actions.requestMoreCoverage' }));
+    expect(await screen.findByText('common:states.marketRequest.sent')).toBeInTheDocument();
+    expect(requestMarket).toHaveBeenCalledTimes(1);
+    expect(requestMarket.mock.calls[0][0]).toMatchObject({ market: 'NL', domains: ['data-privacy'], reason: 'provider_coverage', asGuest: false });
+  });
+
+  it('A1: signed in, full coverage — no "limited", the plural heading', async () => {
+    auth.isLoggedIn = true;
+    runSearch.mockResolvedValue({
+      providers: [prov('a', 90), prov('b', 80)],
+      laws: [law({ id: 'vat', title: 'VAT return' })],
+      coverage: { markets: ['DE'], areas: ['tax-vat'], covered: { DE: ['tax-vat'] } },
+    });
+    renderPage();
+
+    expect(await screen.findByText('common:states.multipleProviderMatches.heading')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.limitedCoverage.heading')).not.toBeInTheDocument();
+  });
+});
+
+// ─── EN-Launch Schritt 2 · J3 "taking a little longer" ───────────────────────
+// "Your answers are saved" darf nur stehen, wenn das Speichern bestaetigt ist.
+
+describe('ResultsRiskMap delayed (J3)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', markets: [], categories: ['tax-vat'] }));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    localStorage.removeItem('ch360_last_profile');
+  });
+
+  it('switches after ~8 s once the answers are saved', async () => {
+    runSearch.mockReturnValue(new Promise(() => {}));
+    renderPage();
+    await screen.findByRole('heading', { level: 1, name: 'common:states.riskMapLoading.heading' });
+    await act(async () => { vi.advanceTimersByTime(8100); });
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'common:states.riskMapDelayed.heading' })).toBeInTheDocument();
+    expect(screen.getByText('results:delayed.saved')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'common:states.actions.returnToAssessment' })).toBeInTheDocument();
+  });
+
+  it('keeps loading when the save failed — "saved" would be untrue', async () => {
+    vi.mocked(saveWizardSession).mockRejectedValueOnce(new Error('offline'));
+    runSearch.mockReturnValue(new Promise(() => {}));
+    renderPage();
+    await screen.findByRole('heading', { level: 1, name: 'common:states.riskMapLoading.heading' });
+    await act(async () => { vi.advanceTimersByTime(8100); });
+
+    expect(screen.getByRole('heading', { level: 1, name: 'common:states.riskMapLoading.heading' })).toBeInTheDocument();
+    expect(screen.queryByText('common:states.riskMapDelayed.heading')).not.toBeInTheDocument();
   });
 });

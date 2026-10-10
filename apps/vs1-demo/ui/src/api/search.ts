@@ -58,6 +58,26 @@ export interface AnonProvider {
     domains_matched: string[];     // subset this provider actually covers
   };
   rank_basis?: RankBasis;
+  /** Spanne ueber die freigegebenen Leistungen in den angefragten Bereichen
+   *  (Klasse anonymous). null: kein Preis hinterlegt oder mehrere Waehrungen —
+   *  die Oberflaeche sagt dann "Pricing on request.". */
+  price_range?: PriceRange | null;
+  /** Die angefragten Maerkte, in denen dieser Anbieter freigegeben ist. */
+  markets_covered?: string[];
+}
+
+export interface PriceRange {
+  min: number | null;
+  max: number | null;
+  currency: string;
+}
+
+/** Bereich × Markt: deckt mindestens ein freigegebener Anbieter das ab?
+ *  Grundlage fuer "Limited coverage" (Canvas C2). */
+export interface SearchCoverage {
+  markets: string[];
+  areas: string[];
+  covered: Record<string, string[]>;
 }
 
 // Enriched obligation from the engine's editorial map. Older payloads carry
@@ -99,6 +119,9 @@ export interface SearchResult {
   overview_summary: string;
   providers: AnonProvider[];
   laws: SearchLaw[];
+  /** Aeltere Antworten kennen sie nicht — dann gibt es keinen Befund
+   *  "begrenzt", statt einen zu raten. */
+  coverage?: SearchCoverage;
 }
 
 export async function runSearch(profile: Partial<SearchProfile> & { country?: string }): Promise<SearchResult> {

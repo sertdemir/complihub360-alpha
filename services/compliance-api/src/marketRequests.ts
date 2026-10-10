@@ -27,6 +27,9 @@ export type MarketRequestInput = {
     notify?: unknown;
     guest_key?: unknown;
     locale?: unknown;
+    /** 'provider_coverage': der Markt ist geprueft, aber kein freigegebener
+     *  Anbieter deckt die genannten Bereiche dort ab (Canvas C2). */
+    reason?: unknown;
 };
 
 export type MarketRequestRow = {
@@ -51,18 +54,24 @@ export function checkMarketRequest(input: MarketRequestInput, authUserId: string
     if (!MARKET.test(market)) {
         return { ok: false, status: 400, errorCode: 'VALIDATION_ERROR', message: 'market must be a two-letter country code' };
     }
-    // Ein Markt, den die Engine prueft, braucht keine Anfrage. Die Oberflaeche
-    // bietet den Knopf dort nicht an; kommt er trotzdem, sagen wir es, statt
-    // eine Nachfrage zu zaehlen, die es nicht gibt.
-    if (isKnownCountry(market)) {
-        return { ok: false, status: 409, errorCode: 'MARKET_COVERED', message: 'This market is already covered' };
-    }
-
     const domains = Array.isArray(input.domains)
         ? [...new Set(input.domains.filter((d): d is string => typeof d === 'string' && d in SLUG_TO_ENGINE))].slice(0, MAX_DOMAINS)
         : [];
 
-    const notify = input.notify === true;
+    // Ein Markt, den die Engine prueft, braucht keine Laender-Anfrage. Kommt
+    // sie trotzdem, sagen wir es, statt eine Nachfrage zu zaehlen, die es
+    // nicht gibt. Ausnahme seit EN-Launch Schritt 2 (Canvas C2, "Request More
+    // Coverage"): die Engine prueft den Markt, aber kein freigegebener Anbieter
+    // deckt dort die genannten Bereiche ab. Dieselbe Zeile, die Bereiche sagen
+    // was fehlt. Ein Update gibt es dafuer (noch) nicht — der Versand (#231)
+    // meldet einen neuen Laendermarkt, keine neue Anbieter-Abdeckung; ihn hier
+    // zu versprechen hiesse eine Mail zusagen, die nie kommt.
+    const coverageRequest = input.reason === 'provider_coverage';
+    if (isKnownCountry(market) && !(coverageRequest && domains.length)) {
+        return { ok: false, status: 409, errorCode: 'MARKET_COVERED', message: 'This market is already covered' };
+    }
+
+    const notify = input.notify === true && !isKnownCountry(market);
     const rawLocale = typeof input.locale === 'string' ? input.locale.toLowerCase().slice(0, 2) : '';
     const locale = LOCALES.has(rawLocale) ? rawLocale : null;
     if (notify && !authUserId) {

@@ -12,7 +12,9 @@
   },
   "stats": {
     "0": {
-      "label": "obligations identified"
+      "label": "obligations identified",
+      "label_one": "obligation identified",
+      "label_other": "obligations identified"
     },
     "1": {
       "label": "with a deadline in 30 days"
@@ -21,7 +23,9 @@
       "label": "median deadline"
     },
     "3": {
-      "label": "Verified Providers ready"
+      "label": "Verified Providers ready",
+      "label_one": "Verified Provider ready",
+      "label_other": "Verified Providers ready"
     }
   },
   "table": {
@@ -222,7 +226,13 @@
       "retryNow": "Try again",
       "pickOtherSlot": "Pick another slot",
       "reread": "Read the updated terms",
-      "keepNote": "Your message and your selection stay as they are."
+      "keepNote": "Your message and your selection stay as they are.",
+      "reasonProvider": "This is not on your side: a requirement on the provider’s side is missing right now. The provider has been informed.",
+      "list": {
+        "noBooking": "No booking was created",
+        "nothingShared": "Nothing was shared with the provider",
+        "kept": "Your selection and message are kept"
+      }
     }
   },
   "search": {
@@ -396,5 +406,37 @@
     "was": "was {{title}}",
     "wasInSession": "was {{title}} in your session “{{session}}”"
   },
-  "dueLive": "Live"
+  "dueLive": "Live",
+  "matchStates": {
+    "factExpertise": "Expertise",
+    "factCoverage": "Coverage",
+    "factPrice": "Expected price range",
+    "factAvailability": "Availability",
+    "priceFrom": "from {{price}}",
+    "priceUpTo": "up to {{price}}",
+    "nextSlot": "Next free slot: {{when}}",
+    "guestCaption": "With a free account. Name and contact appear after booking.",
+    "matrixLabel": "Coverage by area and market",
+    "legendCovered": "a verified match covers it",
+    "legendGap": "no match yet"
+  },
+  "sharing": {
+    "fields": {
+      "company_name": "Company name",
+      "email": "Email address",
+      "message": "Your message",
+      "topic": "Topic of your request"
+    },
+    "notProvided": "Not provided",
+    "noMessage": "No message",
+    "sharedTitle": "Shared with the provider",
+    "notOthers": "Not shared with any other provider.",
+    "confirmRequired": "Please confirm that you want to continue with this booking.",
+    "termsTitle": "Booking terms (version {{version}})",
+    "topicUnspecified": "The area and markets of this request"
+  },
+  "delayed": {
+    "yourAnswers": "Your answers",
+    "saved": "Saved"
+  }
 }

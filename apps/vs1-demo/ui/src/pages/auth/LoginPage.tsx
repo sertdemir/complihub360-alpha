@@ -7,6 +7,8 @@ import { Logo } from "../../components/ui/Logo";
 import { useAuthStore } from "../../store/useAuthStore";
 import { SystemFooter } from "../../components/auth/SystemFooter";
 import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
+import { clearExpired, readExpired, rememberReturnTo } from "../../lib/sessionExpiry";
+import { Banner } from "../../components/ui/Banner";
 
 // ─── Auth · die Anmeldeseite ─────────────────────────────────────────────────
 // Im hellen Kleid seit 2026-08-28 (Nutzer-Entscheidung, Canvas "Login-Seite":
@@ -183,13 +185,18 @@ export function LoginPage() {
     // aussuchen konnte — ein Schaufenster fuer drei Zustaende, von denen im
     // Ernstfall genau einer zutrifft.
     const errKind: ErrKind = errParam && ERR_KINDS.includes(errParam) ? errParam : "expired";
-    const [email, setEmail] = useState("");
+    // G2 (Canvas 09.10.2026): kam der Nutzer wegen einer abgelaufenen Sitzung,
+    // sagt die Seite das, traegt die Adresse ein und fuehrt danach zurueck.
+    const [expired] = useState(() => readExpired());
+    const [email, setEmail] = useState(expired?.email ?? "");
     const [password, setPassword] = useState("");
     const [showPw, setShowPw] = useState(false);
 
+    const redirectTarget = params.get("redirect") || expired?.returnTo || null;
     const finishLogin = (role: "user" | "partner") => {
         login(role, (email || "you").split("@")[0]);
-        const redirect = params.get("redirect");
+        clearExpired();
+        const redirect = redirectTarget;
         navigate(redirect || `/${lang}/${role === "partner" ? "partner-dashboard" : "dashboard"}`);
     };
 
@@ -225,6 +232,9 @@ export function LoginPage() {
         if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { setView("magic-sent"); return; }
+        // Der Magic Link landet oft in einem neuen Tab — der Ruecksprung
+        // muss dort ankommen (AuthCallbackPage liest ihn).
+        rememberReturnTo(redirectTarget);
         const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: callbackUrl } });
         if (error) { setAuthError(readableError(error.message)); return; }
         setView("magic-sent");
@@ -236,7 +246,8 @@ export function LoginPage() {
         if (!sb) { finishLogin("partner"); return; }
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) { setAuthError(readableError(error.message)); return; }
-        navigate(params.get("redirect") || `/${lang}/partner-dashboard`);
+        clearExpired();
+        navigate(redirectTarget || `/${lang}/partner-dashboard`);
     };
 
     // Dieselbe Bestaetigung, egal ob es das Konto gibt — sonst verraet die Seite,
@@ -255,6 +266,7 @@ export function LoginPage() {
         setAuthError(null);
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { finishLogin(role); return; }
+        rememberReturnTo(redirectTarget);
         const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl } });
         if (error) setAuthError(readableError(error.message));
     };
@@ -320,6 +332,11 @@ export function LoginPage() {
     // ── Das Formular der Split-Ansichten ─────────────────────────────────────
     const formPane = (
         <div className="mx-auto w-full max-w-[400px]">
+            {expired && view === "form" && (
+                <Banner status="info" title={t("common:states.sessionExpired.heading")} className="mb-6">
+                    {t("common:states.sessionExpired.message")}
+                </Banner>
+            )}
             {errorBanner}
             {view === "form" && modeToggle}
 
@@ -341,7 +358,7 @@ export function LoginPage() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="name@kanzlei.de"
+                                placeholder={t("login.placeholders.firm")}
                                 className={FIELD}
                             />
                             <button type="submit" className={CTA}>
@@ -359,7 +376,7 @@ export function LoginPage() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="sie@ihrunternehmen.de"
+                                placeholder={t("login.placeholders.business")}
                                 className={FIELD}
                             />
                             <button type="submit" className={CTA}>
@@ -384,7 +401,7 @@ export function LoginPage() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="sie@kanzlei.de"
+                                placeholder={t("login.placeholders.firm")}
                                 className={FIELD}
                             />
                             <div className="mt-5 flex items-center justify-between">
@@ -426,7 +443,7 @@ export function LoginPage() {
     // ── L3-C / L4-C · Meldungen, zentriert auf Weiss ──────────────────────────
     if (isMessage) {
         const sent = view === "magic-sent" || view === "reset-sent";
-        const shown = email || (view === "reset-sent" ? "sie@kanzlei.de" : "sie@ihrunternehmen.de");
+        const shown = email || (view === "reset-sent" ? t("login.placeholders.firm") : t("login.placeholders.business"));
         return (
             <div className="flex min-h-screen flex-col bg-surface px-6 py-8 lg:px-16 lg:py-10">
                 <Logo lockup="horizontal" href="/" className="h-[36px]" />
@@ -511,7 +528,7 @@ export function LoginPage() {
                                                 type="email"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
-                                                placeholder="sie@ihrunternehmen.de"
+                                                placeholder={t("login.placeholders.business")}
                                                 className={FIELD}
                                             />
                                             <button type="submit" className={CTA}>

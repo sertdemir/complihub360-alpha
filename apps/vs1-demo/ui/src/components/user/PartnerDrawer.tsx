@@ -4,14 +4,16 @@ import { useTranslation } from 'react-i18next';
 import { useRequestContext } from '../../lib/requestContext';
 import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
 import { AnonNotice, Monogram, OriginLine, RankBasis } from './PartnerCard';
-import { AcknowledgementFooterLine, AcknowledgementList, BookingFailureCard } from './BookingAcknowledgement';
+import { AcknowledgementList, BookingFailureCard } from './BookingAcknowledgement';
+import { SharingReviewDialog, useSharedRows, type SharingTopic } from './SharingReview';
+import { goToBookingConfirmed } from '../../lib/bookingConfirmed';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Banner } from '../ui/Banner';
 import { ApiError } from '../../api/client';
 import {
   bookingFailureFrom, createBooking, fetchAcknowledgement, fetchProviderDetail, fetchSlots,
-  type BookingAcknowledgement, type BookingConfirmation, type BookingFailure, type ProviderDetail,
+  type BookingAcknowledgement, type BookingFailure, type ProviderDetail,
 } from '../../api/bookings';
 import type { AnonProvider } from '../../api/search';
 
@@ -26,8 +28,9 @@ import type { AnonProvider } from '../../api/search';
 // aendern und direkt dort gebucht werden"). Drei Schritte in EINEM Panel:
 //
 //   profil   Passung · Leistungen · Qualifikation · Preise
-//   termin   Termine nach Tag, Nachricht, verbindlich buchen
-//   fertig   Bestaetigung — und erst hier Name und Kontakt (Stufe 3)
+//   termin   Termine nach Tag, Nachricht — der Knopf oeffnet die Pruefung (I2)
+//   danach   die Bestaetigung als eigene Seite (E3), erst dort Name und
+//            Kontakt (Stufe 3) — lib/bookingConfirmed
 //
 // Der Kopf und der Fuss wechseln mit dem Schritt; „← Zurueck" fuehrt vom
 // Termin zurueck aufs Profil, ohne die Schublade zu verlassen. Die Hoehe
@@ -47,11 +50,16 @@ import type { AnonProvider } from '../../api/search';
 // Die Buchung traegt die Fassung zurueck. Scheitert die Belastung des
 // Anbieters, gibt es keinen Termin und keinen Namen; der Button weicht einem
 // neutralen Kasten, Slots und Nachricht bleiben stehen.
+//
+// EN-Launch Schritt 2 (2026-10-10): I2 — der Knopf oeffnet die Pruefung
+// mit Haekchen, erst "Confirm and Book" bucht; F3 — der Kasten zeigt den
+// abgenommenen Zustand fuer jeden Grund; E3 — die Bestaetigung ist eine
+// eigene Seite.
 
 type Detail = { kind: 'loading' } | { kind: 'ready'; d: ProviderDetail } | { kind: 'missing' } | { kind: 'error' };
-type Step = 'profil' | 'termin' | 'fertig';
+type Step = 'profil' | 'termin';
 
-export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, opportunity, booking, onBooked }: {
+export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, sessionLabel, requestScope, opportunity, booking, onBooked }: {
   open: boolean;
   onClose: () => void;
   /** Die Sitzung hinter der Suche — Bereich und Maerkte der Opportunity
@@ -67,6 +75,12 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   basisNode?: React.ReactNode;
   /** Vorschlag fuer die Nachricht an den Anbieter, z. B. der Sitzungstitel. */
   sessionMessage?: string;
+  /** Titel der Sitzung — die Bestaetigung sagt, woher der Anbieter kam. */
+  sessionLabel?: string | null;
+  /** Bereiche und Maerkte der Anfrage. Daraus nennt der Pruefdialog (I2) das
+   *  Thema, das der Anbieter mit der Buchung sieht — nach derselben Regel wie
+   *  der Server (leadCharge.deriveOpportunity). */
+  requestScope?: { areas: string[]; markets: string[] } | null;
   /** Ein bereits bestehender Termin bei diesem Anbieter — dann steht sein
    *  Klarname im Kopf, nicht mehr das Pseudonym. */
   booking?: { name: string; slotStart: string } | null;
@@ -87,10 +101,11 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [failure, setFailure] = useState<BookingFailure | null>(null);
-  const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
   const [ack, setAck] = useState<BookingAcknowledgement | null>(null);
   const [ackKey, setAckKey] = useState(0);
   const [slotsKey, setSlotsKey] = useState(0);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const sharedRows = useSharedRows();
 
   // Phase 3: die Schublade spricht den Anbieter nur ueber den opaken Ref an.
   const key = provider?.public_ref ?? '';
@@ -104,7 +119,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
     setMessage(sessionMessage ?? '');
     setSending(false);
     setFailure(null);
-    setConfirmation(null);
+    setReviewOpen(false);
   }, [open, key, sessionMessage]);
 
   // Die Bestaetigung in der Sprache des Nutzers — geladen, sobald der
@@ -167,14 +182,23 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
         areaCode: opportunity?.areaCode,
         countries: opportunity?.countries,
       });
-      setConfirmation(res);
       // Die Liste dahinter erfaehrt es sofort — ohne Neuladen, ohne dass der
       // Mandant die Schublade schliessen und suchen muss.
       onBooked?.(key, { name: res.provider_identity.name, slotStart: res.booking.slot_start });
-      setStep('fertig');
+      setReviewOpen(false);
+      // E3 (Canvas 09.10.2026): die Bestaetigung ist eine eigene Seite.
+      if (provider) {
+        goToBookingConfirmed(navigate, locale, {
+          confirmation: res,
+          provider: { letter: provider.letter, title: provider.title },
+          sessionLabel: sessionLabel ?? null,
+          message: message.trim(),
+        });
+      }
     } catch (err) {
       // Kein erfundener Anbieter als Rueckfall: der Termin ist nicht gebucht,
       // und genau das steht dann da — in dem Satz, der zur Lage passt.
+      setReviewOpen(false);
       setFailure(bookingFailureFrom(err));
     }
     setSending(false);
@@ -183,6 +207,18 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   const slotLine = selected ? `${df.format(new Date(selected))} · ${tf.format(new Date(selected))} · ${t('schedule.duration')}` : null;
 
   if (!provider) return null;
+  // Das Thema, das der Anbieter sieht — dieselbe Regel wie der Server
+  // (deriveOpportunity): der erste angefragte Bereich, den er anbietet, und
+  // die angefragten Maerkte, in denen er freigegeben ist.
+  const topic: SharingTopic | 'unspecified' = opportunity
+    ? { area: opportunity.areaCode, markets: opportunity.countries }
+    : requestScope
+      ? {
+          area: requestScope.areas.find((a) => provider.area_codes?.includes(a)) ?? (provider.area_codes?.length === 1 ? provider.area_codes[0] : null),
+          markets: requestScope.markets.filter((m) => (provider.markets_covered ?? (provider.match_basis?.country ? [provider.match_basis.country] : [])).includes(m)),
+        }
+      : 'unspecified';
+  const reviewRows = sharedRows(ack?.sharedFields ?? ['email', 'company_name', 'message'], { message, topic });
   const d = detail.kind === 'ready' ? detail.d : null;
   const beschreibungText = beschreibung({ areaCodes: provider.area_codes, region: provider.descriptor_region, fallback: provider.descriptor });
   const meta = [
@@ -191,10 +227,8 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
     provider.completed_count ? `${provider.completed_count} ${t('detail.mandates')}` : null,
   ].filter(Boolean).join(' · ');
 
-  const title = step === 'profil' ? (booking?.name ?? provider.title)
-    : step === 'termin' ? t('schedule.title')
-    : t('schedule.doneTitle');
-  const eyebrow = step === 'fertig' ? t('schedule.doneEyebrow') : t('detail.crumbProviders');
+  const title = step === 'profil' ? (booking?.name ?? provider.title) : t('schedule.title');
+  const eyebrow = t('detail.crumbProviders');
 
   return (
     <Drawer
@@ -282,27 +316,23 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
                   {t('common:states.bookingProcessing.message')}
                 </Banner>
               )}
+              {/* I2 (Canvas 09.10.2026): der Knopf oeffnet die Pruefung —
+                  gebucht wird erst dort, mit Haekchen ("Confirm and Book"). */}
               <Button
                 size="lg"
                 shape="soft"
                 fullWidth
                 type="button"
                 disabled={!selected || !ack || sending}
-                onClick={book}
+                onClick={() => setReviewOpen(true)}
                 className="disabled:opacity-50"
               >
-                {t('schedule.confirmCta')}
+                {t('detail.bookCta')} <ArrowRight size={15} />
               </Button>
-              {selected
-                ? <AcknowledgementFooterLine ack={ack} slotLine={slotLine} className="mt-2" />
-                : <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{t('schedule.pickSlotDrawer')}</p>}
+              <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{selected ? slotLine : t('schedule.pickSlotDrawer')}</p>
             </>
           )
-        ) : (
-          <Button size="lg" shape="soft" fullWidth type="button" onClick={() => navigate(`/${locale}/dashboard/termine`)}>
-            {t('schedule.toAppointments')} <ArrowRight size={15} />
-          </Button>
-        )
+        ) : undefined
       }
     >
       {step === 'profil' && (
@@ -363,45 +393,14 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
         </>
       )}
 
-      {step === 'fertig' && confirmation && (
-        <>
-          <p className="text-body-sm text-fg">
-            {df.format(new Date(confirmation.booking.slot_start))} · {tf.format(new Date(confirmation.booking.slot_start))} · {t('schedule.duration')}
-          </p>
-          {/* Stufe 3 — ab hier hat der Anbieter einen Namen. Canvas 4B: die
-              Karte zeigt, was er vorher war, mit Pfeil zum Klarnamen. */}
-          <div className="mt-4 rounded-xl border border-stroke-subtle bg-surface px-5 py-4">
-            <p className="flex items-center gap-2 text-body-3xs text-fg-tertiary">
-              <Monogram letter={provider.letter} size={22} />
-              <span className="line-through decoration-fg-tertiary">{provider.title}</span>
-              <ArrowRight size={13} className="text-fg-brand" aria-hidden />
-            </p>
-            <p className="mt-2 text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-accent-strong">{t('schedule.revealLabel')}</p>
-            <p className="mt-1 text-body font-bold text-fg">{confirmation.provider_identity.name}</p>
-            <p className="mt-0.5 text-body-3xs text-fg-secondary">{beschreibungText}</p>
-            {confirmation.provider_identity.contact_email && (
-              <p className="mt-0.5 text-body-xs text-fg-secondary">{confirmation.provider_identity.contact_email}</p>
-            )}
-            {confirmation.provider_identity.website_url && (
-              <a
-                href={confirmation.provider_identity.website_url}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-1 inline-block text-body-xs font-bold text-brand underline underline-offset-2 hover:text-brand-700"
-              >
-                {confirmation.provider_identity.website_url.replace(/^https?:\/\//, '')}
-              </a>
-            )}
-          </div>
-          {message.trim() && (
-            <div className="mt-4">
-              <p className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-tertiary">{t('schedule.messageLabel')}</p>
-              <p className="mt-1 text-body-xs leading-relaxed text-fg-secondary">{message.trim()}</p>
-            </div>
-          )}
-          <p className="mt-4 text-body-3xs leading-relaxed text-fg-tertiary">{t('schedule.doneNote')}</p>
-        </>
-      )}
+      <SharingReviewDialog
+        open={reviewOpen}
+        onGoBack={() => setReviewOpen(false)}
+        onConfirm={book}
+        sending={sending}
+        ack={ack}
+        rows={reviewRows}
+      />
     </Drawer>
   );
 }

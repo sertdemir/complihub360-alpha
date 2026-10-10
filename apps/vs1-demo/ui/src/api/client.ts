@@ -1,5 +1,6 @@
 import { generateCorrelationId } from '@complihub360/types/src/observability';
 import { getAccessToken, isMockApi } from '../lib/supabase';
+import { reportUnauthorized } from '../lib/sessionExpiry';
 
 // ─── API client ───────────────────────────────────────────────────────────────
 // Shared fetch wrapper for the compliance-api (services/compliance-api): base
@@ -103,6 +104,9 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
   // ersetzt sie aber, wenn sie nicht wie eine ID aussieht — dann zaehlt seine.
   const loggedAs = res.headers.get('x-correlation-id') || correlationId;
   if (!res.ok) {
+    // G2: eine 401 auf einen Aufruf MIT Token heisst, die Sitzung gilt nicht
+    // mehr. Ohne Token (Gast, Demo-Login) ist sie kein Ablauf.
+    if (res.status === 401 && token) reportUnauthorized();
     const data = await res.json().catch(() => ({} as { message?: string; correlationId?: string }));
     throw new ApiError(data.message || `HTTP ${res.status}`, res.status, data.correlationId || loggedAs, undefined, data as Record<string, unknown>);
   }

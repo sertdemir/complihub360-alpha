@@ -323,6 +323,19 @@ const BASIS = (matched: string[]) => ({ country: 'DE', country_covered: true, do
 // kommt aus freigegebenen Bereichen und Region (anonymity.ts).
 const RANK = (verification: 'independent' | 'reviewed' | 'partial' | 'none', verified: number, required: number, hours: number | null, conf: number | null, rating: number | null, reviews: number | null) =>
   ({ verification, verified_count: verified, required_count: required, response_hours: hours, confirmation_rate: conf, rating, reviews_count: reviews });
+// Preisspannen der Mock-Anbieter (Klasse anonymous, Spec A §27). madrid-tax
+// hat keine — so ist "Pricing on request." lokal zu sehen.
+const PRICE_RANGE: Record<string, { min: number | null; max: number | null; currency: string }> = {
+  'studio-bianchi': { min: 180, max: 450, currency: 'EUR' },
+  'schmidt-partner': { min: 290, max: 1600, currency: 'EUR' },
+  'thames-vat': { min: 250, max: 900, currency: 'GBP' },
+  'dahlmann-cpa': { min: 400, max: 2500, currency: 'USD' },
+  'datenschutz-nord': { min: 1200, max: 2400, currency: 'EUR' },
+  'costa-legal': { min: 600, max: 1800, currency: 'EUR' },
+  'oss-experts': { min: 350, max: 900, currency: 'EUR' },
+  'lucid-reg': { min: 600, max: 900, currency: 'EUR' },
+};
+
 const PROVIDERS = [
   { _key: 'studio-bianchi', public_ref: REF['studio-bianchi'], region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.7, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high', match_basis: BASIS(['tax-vat', 'product-packaging', 'data-privacy']), rank_basis: RANK('independent', 5, 5, 3, 0.97, 4.7, 3) },
   { _key: 'schmidt-partner', public_ref: REF['schmidt-partner'], region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong', match_basis: BASIS(['tax-vat', 'product-packaging']), rank_basis: RANK('independent', 4, 4, 5, 0.92, 4.7, 3) },
@@ -350,10 +363,16 @@ function search(body: unknown) {
     : null;
   const requested = (asked as string[] | null) ?? DEFAULT_REQUEST;
   const country = typeof req.country === 'string' && req.country ? req.country.toUpperCase() : 'DE';
+  const marketsAsked = Array.isArray(req.structured_answers?.markets) ? (req.structured_answers.markets as string[]).map((m) => String(m).toUpperCase()) : [];
+  const knownMarkets = [...new Set([country, ...marketsAsked])].filter((c) => isKnownCountry(c));
   const providers = PROVIDERS.map((p, i) => {
     const covers = COVERS[p._key] ?? [];
     return {
       ...titled(p, i),
+      // Wie der Server (searchCoverage.ts): Spanne ueber die angefragten
+      // Bereiche, Maerkte aus der Freigabe.
+      price_range: PRICE_RANGE[p._key] ?? null,
+      markets_covered: knownMarkets.filter((m) => (PROVIDER_DETAIL[p._key]?.markets ?? []).includes(m)),
       match_basis: {
         country,
         country_covered: (PROVIDER_DETAIL[p._key]?.markets ?? []).includes(country),
@@ -367,7 +386,9 @@ function search(body: unknown) {
   // ist der Zustand marketUnavailable lokal erreichbar (Wizard: nur Brasilien).
   const markets = Array.isArray(req.structured_answers?.markets) ? (req.structured_answers.markets as string[]) : [];
   const anyKnown = [country, ...markets].some((c) => isKnownCountry(String(c).toUpperCase()));
-  return { ok: true, providers, laws: anyKnown ? LAWS : [] };
+  const covered: Record<string, string[]> = {};
+  for (const m of knownMarkets) covered[m] = requested.filter((a) => PROVIDERS.some((p) => (COVERS[p._key] ?? []).includes(a) && (PROVIDER_DETAIL[p._key]?.markets ?? []).includes(m)));
+  return { ok: true, providers, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
 }
 
 type MockDetail = {
@@ -516,7 +537,7 @@ function acknowledgement(lang: string) {
 // der Bestaetigung; die 15:30-Termine spielen den Fall durch, dass die Karte
 // des Anbieters nicht belastet werden kann (409 ohne Buchung, Canvas 2A).
 function createBooking(body: unknown) {
-  const d = (body ?? {}) as { public_ref?: unknown; slot_start?: unknown; message?: unknown; acknowledgement_version?: unknown };
+  const d = (body ?? {}) as { public_ref?: unknown; slot_start?: unknown; message?: unknown; acknowledgement_version?: unknown; area_code?: unknown; countries?: unknown };
   const ref = typeof d.public_ref === 'string' ? d.public_ref : '';
   const key = keyOfRef(ref);
   const slot = typeof d.slot_start === 'string' ? d.slot_start : '';
@@ -537,7 +558,9 @@ function createBooking(body: unknown) {
   const end = new Date(at.getTime() + 30 * 60 * 1000).toISOString();
   return {
     ok: true,
-    booking: { id: `m0ck-new-${ref}`, public_ref: ref, slot_start: slot, slot_end: end, status: 'confirmed', acknowledgement_version: ACK_VERSION, shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1 } },
+    booking: { id: `m0ck-new-${ref}`, public_ref: ref, slot_start: slot, slot_end: end, status: 'confirmed', acknowledgement_version: ACK_VERSION, shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1 },
+      // Wie der Server: das Thema des Leads (deriveOpportunity, vereinfacht).
+      topic: { area_code: typeof d.area_code === 'string' && d.area_code ? d.area_code : 'tax-vat', countries: Array.isArray(d.countries) && d.countries.length ? (d.countries as string[]) : ['DE'] } },
     provider_identity: identity,
   };
 }
@@ -921,8 +944,11 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'contact' && method === 'POST') return { ok: true, acknowledged: true };
   if (p[0] === 'market-requests' && method === 'POST') {
     const market = String(body.market ?? '').toUpperCase();
-    if (isKnownCountry(market)) return { __status: 409, errorCode: 'MARKET_COVERED', message: 'This market is already covered' };
-    return { ok: true, market, notify: body.notify === true };
+    // Wie der Server (marketRequests.ts): ein bekannter Markt nur als Anfrage
+    // nach Anbieter-Abdeckung (C2), mit Bereichen und ohne Update.
+    const coverage = body.reason === 'provider_coverage' && Array.isArray(body.domains) && body.domains.length > 0;
+    if (isKnownCountry(market) && !coverage) return { __status: 409, errorCode: 'MARKET_COVERED', message: 'This market is already covered' };
+    return { ok: true, market, notify: body.notify === true && !isKnownCountry(market) };
   }
   if (p[0] === 'scheduling' && p.length === 1 && method === 'POST') return createBooking(body);
   if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'proposal' && method === 'PATCH') return reportProposal(p[3], body);
