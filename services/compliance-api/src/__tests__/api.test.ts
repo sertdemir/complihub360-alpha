@@ -632,7 +632,13 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         const { session } = seedBookable();
         const r = await book(standardBody(session));
         expect(r.status).toBe(201);
-        const text = JSON.stringify(r.body);
+        // Zufaellige IDs (UUID, public_ref) bestehen aus Hex — „fee" ist ein
+        // gueltiges Hex-Wort und traf dort zufaellig (CI rot am 10.10.2026,
+        // ohne Leck). IDs vor der Pruefung ausblenden; ein echtes Feld wie
+        // `fee_cents` bleibt sichtbar.
+        const text = JSON.stringify(r.body)
+            .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '<uuid>')
+            .replace(/\b[0-9a-f]{12,}\b/gi, '<hex>');
         for (const rx of [/fee/i, /band/i, /ledger/i, /stripe/i, /discount_sequence/, /pi_test/, /cus_test/, /provider_key/]) expect(text).not.toMatch(rx);
         expect(r.body.booking.user_discount).toEqual({ pct: 10, policy_version: 1 });
     });
