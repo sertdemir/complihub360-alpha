@@ -206,7 +206,7 @@ export function RelatedAreas({ slug }: Props) {
         entries={entries}
         strongestLabel={t('compliance.area.relatedStrongest', 'Strongest connection')}
         exitTo={`${localePrefix}/compliance`}
-        exitLabel={t('compliance.area.allAreasLink', 'All eight areas at a glance')}
+        exitLabel={t('compliance.area.allAreasLink', 'All nine areas at a glance')}
       />
     </div>
   );

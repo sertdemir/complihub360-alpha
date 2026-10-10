@@ -466,7 +466,27 @@
     "matchmakingSaved": "Saved.",
     "previewTitle": "How you appear before booking",
     "previewAreas": "Your approved areas",
-    "previewNote": "Title and description come from CompliHub360: a letter per result list plus your approved areas and region. Nothing here is written by you, so every provider is compared the same way."
+    "previewNote": "Title and description come from CompliHub360: a letter per result list plus your approved areas and region. Nothing here is written by you, so every provider is compared the same way.",
+    "calendar": {
+      "title": "Calendar",
+      "body": "Connect your Google or Microsoft calendar. We only read when you are busy, no titles and no attendees, and add booked appointments. Without a connection, clients see your business hours.",
+      "connect": "Connect calendar",
+      "nylasNote": "The connection runs through our service provider Nylas, data centre in London.",
+      "connectedAs": "Connected to {{email}}",
+      "connectedBody": "Clients only see times when you are free. Booked appointments appear in this calendar.",
+      "disconnect": "Disconnect",
+      "unavailableTitle": "Not available yet",
+      "unavailableBody": "The calendar connection is not set up in the beta yet. Until then, clients see your business hours.",
+      "loadFailed": "The status of your calendar could not be loaded just now.",
+      "retry": "Try again",
+      "returnedOkTitle": "Your calendar is connected.",
+      "returnedOkBody": "From now on clients only see free times.",
+      "returnedFailTitle": "The calendar was not connected.",
+      "returnedFailBody": "Nothing has been saved. Please try again or write to us.",
+      "confirmTitle": "Disconnect calendar?",
+      "confirmConsequence": "Clients will then see your business hours again instead of your free times. Appointments already added stay in your calendar.",
+      "confirmLabel": "Disconnect"
+    }
   },
   "termine": {
     "title": "Appointments & <accent>leads</accent>.",

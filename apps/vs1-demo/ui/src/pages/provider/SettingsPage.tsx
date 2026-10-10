@@ -7,6 +7,7 @@ import { Tag } from '../../components/ui/Tag';
 import { Banner } from '../../components/ui/Banner';
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 import { ChangeEmailDrawer } from '../../components/provider/ChangeEmailDrawer';
+import { CalendarPanel } from '../../components/provider/CalendarPanel';
 import { fetchCoverage, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
 import { identityHintFrom } from '../../api/client';
 import { Input } from '../../components/ui/Input';
@@ -60,6 +61,8 @@ export function SettingsPage() {
           </div>
 
           <div className="space-y-5">
+            {/* Kalender (Canvas A1): eigene Karte oben — der Rueckweg von Nylas landet hier. */}
+            <CalendarPanel onConfirm={setConfirm} />
             <MatchmakingPanel />
             <div className="flex items-start justify-between gap-4">
               <div>

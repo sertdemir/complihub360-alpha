@@ -466,7 +466,27 @@
     "matchmakingSaved": "Kaydedildi.",
     "previewTitle": "Rezervasyondan önce böyle görünürsünüz",
     "previewAreas": "Onaylı alanlarınız",
-    "previewNote": "Başlığı ve açıklamayı CompliHub360 oluşturur: sonuç listesi başına bir harf artı onaylı alanlarınız ve bölgeniz. Bunları siz yazmazsınız; böylece her sağlayıcı aynı şekilde karşılaştırılır."
+    "previewNote": "Başlığı ve açıklamayı CompliHub360 oluşturur: sonuç listesi başına bir harf artı onaylı alanlarınız ve bölgeniz. Bunları siz yazmazsınız; böylece her sağlayıcı aynı şekilde karşılaştırılır.",
+    "calendar": {
+      "title": "Takvim",
+      "body": "Google veya Microsoft takviminizi bağlayın. Yalnızca ne zaman dolu olduğunuzu okuruz, başlık ve katılımcı okumayız, ve rezerve edilen randevuları ekleriz. Bağlantı olmadan müşteriler çalışma saatlerinizi görür.",
+      "connect": "Takvimi bağla",
+      "nylasNote": "Bağlantı, hizmet sağlayıcımız Nylas üzerinden çalışır; veri merkezi Londra'dadır.",
+      "connectedAs": "{{email}} ile bağlı",
+      "connectedBody": "Müşteriler yalnızca boş olduğunuz saatleri görür. Rezerve edilen randevular bu takvimde yer alır.",
+      "disconnect": "Bağlantıyı kes",
+      "unavailableTitle": "Henüz kullanılamıyor",
+      "unavailableBody": "Takvim bağlantısı betada henüz kurulmadı. O zamana kadar müşteriler çalışma saatlerinizi görür.",
+      "loadFailed": "Takviminizin durumu şu anda yüklenemedi.",
+      "retry": "Tekrar dene",
+      "returnedOkTitle": "Takviminiz bağlandı.",
+      "returnedOkBody": "Artık müşteriler yalnızca boş saatleri görür.",
+      "returnedFailTitle": "Takvim bağlanmadı.",
+      "returnedFailBody": "Hiçbir şey kaydedilmedi. Lütfen tekrar deneyin ya da bize yazın.",
+      "confirmTitle": "Takvim bağlantısı kesilsin mi?",
+      "confirmConsequence": "Ardından müşteriler boş saatleriniz yerine yeniden çalışma saatlerinizi görür. Daha önce eklenen randevular takviminizde kalır.",
+      "confirmLabel": "Bağlantıyı kes"
+    }
   },
   "termine": {
     "title": "Randevular ve <accent>lead'ler</accent>.",

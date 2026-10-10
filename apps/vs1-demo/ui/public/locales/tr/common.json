@@ -408,7 +408,7 @@
       },
       "hubCta": {
         "title": "Sizin için ne geçerli, görmeye hazır mısınız?",
-        "lead": "Değerlendirme, sekiz alanı işletmenize, pazarlarınıza ve ürününüze göre daraltır — beş dakikadan kısa sürede.",
+        "lead": "Değerlendirme, dokuz alanı işletmenize, pazarlarınıza ve ürününüze göre daraltır — beş dakikadan kısa sürede.",
         "btn": "Bir değerlendirme başlatın"
       }
     },
@@ -758,8 +758,8 @@
       ],
       "askPlaceholder": "Örn.: Yalnızca Amazon üzerinden satıyorsam WEEE kaydı gerekir mi?"
     },
-    "areasEyebrow": "Sekiz alan, tek giriş",
-    "areasTitle": "Sekiz uyum alanı",
+    "areasEyebrow": "Dokuz alan, tek giriş",
+    "areasTitle": "Dokuz uyum alanı",
     "areasLead": "Her biri, taşıdığı yükümlülükleri, arkasındaki mevzuatı ve hata yapmanın bedelini gösteren bir sayfa açar.",
     "severity": {
       "critical": "Kritik",
@@ -866,7 +866,7 @@
       "relatedStrongest": "En güçlü bağlantı",
       "sharedTriggers_one": "{{count}} ortak tetikleyici",
       "sharedTriggers_other": "{{count}} ortak tetikleyici",
-      "allAreasLink": "Sekiz alanın tümüne genel bakış",
+      "allAreasLink": "Dokuz alanın tümüne genel bakış",
       "coverageNoteEu_one": "Motor bu alan için {{count}} yükümlülük taşıyor, AB düzeyinde bir kaynağa dayanıyor. Ulusal bir kaynağın nerede eklendiğini görmek için bir pazar seç.",
       "coverageNoteEu_other": "Motor bu alan için {{count}} yükümlülük taşıyor, hepsi AB düzeyinde bir kaynağa dayanıyor. Ulusal bir kaynağın nerede eklendiğini görmek için bir pazar seç.",
       "startShort": "Değerlendirmeyi başlat",
@@ -1750,7 +1750,7 @@
     },
     "compliance": {
       "title": "Uyum alanları · CompliHub360",
-      "description": "Vergi ve KDV'den EPR'ye ve veri gizliliğine sekiz alan: neyin geçerli olduğu, ne kadar acil olduğu ve kimin yardımcı olduğu."
+      "description": "Vergi ve KDV'den EPR'ye ve veri gizliliğine dokuz alan: neyin geçerli olduğu, ne kadar acil olduğu ve kimin yardımcı olduğu."
     },
     "markets": {
       "title": "Pazarlar · CompliHub360",
@@ -1762,7 +1762,7 @@
     },
     "resources": {
       "title": "Kaynaklar · CompliHub360",
-      "description": "Nereden devam edebilirsiniz: pazarlar ve orada geçerli kurallar, sekiz uyum alanı ve sorudan uzmana giden yol."
+      "description": "Nereden devam edebilirsiniz: pazarlar ve orada geçerli kurallar, dokuz uyum alanı ve sorudan uzmana giden yol."
     },
     "about": {
       "title": "Hakkımızda · CompliHub360",

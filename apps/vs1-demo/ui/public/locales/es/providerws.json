@@ -466,7 +466,27 @@
     "matchmakingSaved": "Guardado.",
     "previewTitle": "Así aparece antes de la reserva",
     "previewAreas": "Sus áreas aprobadas",
-    "previewNote": "CompliHub360 forma el título y la descripción: una letra por lista de resultados más sus áreas aprobadas y su región. Nada de esto lo escribe usted, así todos los proveedores se comparan igual."
+    "previewNote": "CompliHub360 forma el título y la descripción: una letra por lista de resultados más sus áreas aprobadas y su región. Nada de esto lo escribe usted, así todos los proveedores se comparan igual.",
+    "calendar": {
+      "title": "Calendario",
+      "body": "Conecte su calendario de Google o Microsoft. Solo leemos cuándo está ocupado, sin títulos ni asistentes, y añadimos las citas reservadas. Sin conexión, los clientes ven su horario de atención.",
+      "connect": "Conectar calendario",
+      "nylasNote": "La conexión pasa por nuestro proveedor de servicios Nylas, centro de datos en Londres.",
+      "connectedAs": "Conectado con {{email}}",
+      "connectedBody": "Los clientes solo ven las horas en que está libre. Las citas reservadas aparecen en este calendario.",
+      "disconnect": "Desconectar",
+      "unavailableTitle": "Todavía no disponible",
+      "unavailableBody": "La conexión de calendario aún no está configurada en la beta. Hasta entonces, los clientes ven su horario de atención.",
+      "loadFailed": "No se pudo cargar el estado de su calendario en este momento.",
+      "retry": "Intentar de nuevo",
+      "returnedOkTitle": "Su calendario está conectado.",
+      "returnedOkBody": "A partir de ahora, los clientes solo ven horas libres.",
+      "returnedFailTitle": "El calendario no se ha conectado.",
+      "returnedFailBody": "No se ha guardado nada. Inténtelo de nuevo o escríbanos.",
+      "confirmTitle": "¿Desconectar el calendario?",
+      "confirmConsequence": "Después, los clientes volverán a ver su horario de atención en lugar de sus horas libres. Las citas ya añadidas se quedan en su calendario.",
+      "confirmLabel": "Desconectar"
+    }
   },
   "termine": {
     "title": "Citas y <accent>leads</accent>.",

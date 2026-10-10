@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { LEAD_FEE_POLICY_VERSION } from '../billing.js';
 import { createHash, createHmac, randomUUID, generateKeyPairSync, sign as cryptoSign } from 'node:crypto';
 import { createServer as createHttpServer } from 'node:http';
@@ -129,6 +129,13 @@ function resetStripe() {
     stripeMock.verifyPaymentMethod.mockReset().mockResolvedValue({ ok: true, setupIntentId: 'seti_test_1' });
     stripeMock.stripeRequest.mockReset().mockImplementation(async (_m: string, path: string) => { throw new Error(`unmocked stripe call: ${path}`); });
 }
+// Nylas Hosted Auth: kein Netz im Test. Nur Tausch und Widerruf sprechen mit
+// Nylas; state und URLs bleiben echt.
+const { nylasAuthMock } = vi.hoisted(() => ({ nylasAuthMock: { exchangeCode: vi.fn(), revokeGrant: vi.fn() } }));
+vi.mock('../nylasAuth.js', async (importOriginal) => {
+    const real = await importOriginal<typeof import('../nylasAuth.js')>();
+    return { ...real, exchangeCode: (...a: any[]) => nylasAuthMock.exchangeCode(...a), revokeGrant: (...a: any[]) => nylasAuthMock.revokeGrant(...a) };
+});
 vi.mock('../storage.js', async (importOriginal) => {
     const real = await importOriginal<typeof import('../storage.js')>();
     return {
@@ -625,7 +632,13 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         const { session } = seedBookable();
         const r = await book(standardBody(session));
         expect(r.status).toBe(201);
-        const text = JSON.stringify(r.body);
+        // Zufaellige IDs (UUID, public_ref) bestehen aus Hex — „fee" ist ein
+        // gueltiges Hex-Wort und traf dort zufaellig (CI rot am 10.10.2026,
+        // ohne Leck). IDs vor der Pruefung ausblenden; ein echtes Feld wie
+        // `fee_cents` bleibt sichtbar.
+        const text = JSON.stringify(r.body)
+            .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '<uuid>')
+            .replace(/\b[0-9a-f]{12,}\b/gi, '<hex>');
         for (const rx of [/fee/i, /band/i, /ledger/i, /stripe/i, /discount_sequence/, /pi_test/, /cus_test/, /provider_key/]) expect(text).not.toMatch(rx);
         expect(r.body.booking.user_discount).toEqual({ pct: 10, policy_version: 1 });
     });
@@ -3846,5 +3859,98 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         expect(prev.body).toMatchObject({ credit_balance_cents: 4023, credit_applied_cents: 4023 });
         expect(prev.body.total_after_credit_cents).toBe(prev.body.total_cents - 4023);
         expect(prev.body.credits).toHaveLength(1);
+    });
+});
+
+// ─── Kalender verbinden (Nylas Hosted Auth, nylasAuth.ts) ────────────────────
+
+describe('Kalender: Nylas Hosted Auth', () => {
+    const member = () => (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
+    const configure = () => {
+        process.env.NYLAS_API_KEY = 'nyk_test';
+        process.env.NYLAS_CLIENT_ID = 'client-123';
+        process.env.NYLAS_CALLBACK_URI = 'https://api.test/api/v1/nylas/callback';
+        process.env.PUBLIC_APP_URL = 'https://app.test';
+    };
+    const unconfigure = () => { delete process.env.NYLAS_CLIENT_ID; delete process.env.NYLAS_CALLBACK_URI; };
+    const callback = (qs: string) => fetch(`${BASE}/api/v1/nylas/callback?${qs}`, { redirect: 'manual' });
+
+    afterAll(() => {
+        for (const k of ['NYLAS_API_KEY', 'NYLAS_CLIENT_ID', 'NYLAS_CALLBACK_URI']) delete process.env[k];
+    });
+
+    beforeEach(() => {
+        nylasAuthMock.exchangeCode.mockReset();
+        nylasAuthMock.revokeGrant.mockReset().mockResolvedValue(true);
+    });
+
+    it('Status ohne Konfiguration und ohne Kalender', async () => {
+        unconfigure();
+        seedProvider(); member();
+        const res = await api('/api/v1/provider/test-kanzlei/calendar', { auth: 'jwt' });
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({ configured: false, connected: false, email: null });
+        const c = await api('/api/v1/provider/test-kanzlei/calendar/connect', { method: 'POST', auth: 'jwt', body: '{}' });
+        expect(c.status).toBe(503);
+        expect(c.body.errorCode).toBe('CALENDAR_NOT_CONFIGURED');
+    });
+
+    it('fremder Anbieter: 404 auf Status und Verbinden', async () => {
+        configure();
+        seedProvider();
+        expect((await api('/api/v1/provider/test-kanzlei/calendar', { auth: 'jwt' })).status).toBe(404);
+        expect((await api('/api/v1/provider/test-kanzlei/calendar/connect', { method: 'POST', auth: 'jwt', body: '{}' })).status).toBe(404);
+    });
+
+    it('verbinden: Auth-URL, Rueckweg speichert Grant und Adresse, Status zeigt sie', async () => {
+        configure();
+        seedProvider(); member();
+        const c = await api('/api/v1/provider/test-kanzlei/calendar/connect', { method: 'POST', auth: 'jwt', body: JSON.stringify({ locale: 'de' }) });
+        expect(c.status).toBe(200);
+        const url = new URL(c.body.url);
+        expect(url.pathname).toBe('/v3/connect/auth');
+        const state = url.searchParams.get('state')!;
+
+        nylasAuthMock.exchangeCode.mockResolvedValue({ grantId: 'grant-1', email: 'kalender@testkanzlei.example' });
+        const back = await callback(`code=abc&state=${encodeURIComponent(state)}`);
+        expect(back.status).toBe(302);
+        expect(back.headers.get('location')).toBe('https://app.test/de/partner-dashboard/settings?calendar=connected');
+        expect(db.providers[0]).toMatchObject({ nylas_grant_id: 'grant-1', nylas_calendar_id: 'kalender@testkanzlei.example' });
+        expect((db.event_log ?? []).some((e) => e.type === 'calendar_connected')).toBe(true);
+
+        const st = await api('/api/v1/provider/test-kanzlei/calendar', { auth: 'jwt' });
+        expect(st.body).toEqual({ configured: true, connected: true, email: 'kalender@testkanzlei.example' });
+    });
+
+    it('Rueckweg ohne gueltigen state oder abgelehnt: nichts gespeichert, zurueck mit failed', async () => {
+        configure();
+        seedProvider();
+        const forged = await callback('code=abc&state=erfunden.signatur');
+        expect(forged.status).toBe(302);
+        expect(forged.headers.get('location')).toContain('calendar=failed');
+        expect(nylasAuthMock.exchangeCode).not.toHaveBeenCalled();
+        const { signState } = await vi.importActual<typeof import('../nylasAuth.js')>('../nylasAuth.js');
+        const denied = await callback(`error=access_denied&state=${encodeURIComponent(signState('test-kanzlei', 'en'))}`);
+        expect(denied.headers.get('location')).toContain('calendar=failed');
+        expect(db.providers[0].nylas_grant_id ?? null).toBeNull();
+    });
+
+    it('Tausch scheitert: failed, nichts gespeichert', async () => {
+        configure();
+        seedProvider();
+        const { signState } = await vi.importActual<typeof import('../nylasAuth.js')>('../nylasAuth.js');
+        nylasAuthMock.exchangeCode.mockResolvedValue(null);
+        const back = await callback(`code=abc&state=${encodeURIComponent(signState('test-kanzlei', 'tr'))}`);
+        expect(back.headers.get('location')).toBe('https://app.test/tr/partner-dashboard/settings?calendar=failed');
+        expect(db.providers[0].nylas_grant_id ?? null).toBeNull();
+    });
+
+    it('trennen: widerruft bei Nylas und leert die Felder', async () => {
+        configure();
+        seedProvider({ nylas_grant_id: 'grant-1', nylas_calendar_id: 'k@x.de' }); member();
+        const res = await api('/api/v1/provider/test-kanzlei/calendar', { method: 'DELETE', auth: 'jwt' });
+        expect(res.status).toBe(200);
+        expect(nylasAuthMock.revokeGrant).toHaveBeenCalledWith('grant-1');
+        expect(db.providers[0]).toMatchObject({ nylas_grant_id: null, nylas_calendar_id: null });
     });
 });
