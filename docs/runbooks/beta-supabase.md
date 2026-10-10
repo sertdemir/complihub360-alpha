@@ -136,5 +136,5 @@ Geprobt am 10.10.2026 lokal (PG 16):
   einen pgTAP-Test. **Staging bleibt offen, bis die Migration dort eingespielt
   ist.**
 - **Bucket `assets` ohne Migration.** Er wurde auf Staging von Hand angelegt.
-  Jetzt legt ihn Migration `20261011000000` an.
+  Jetzt legt ihn Migration `20261011000200` an.
 - **Mail-Logo fest auf Staging.** Es kommt jetzt aus `SUPABASE_URL`.

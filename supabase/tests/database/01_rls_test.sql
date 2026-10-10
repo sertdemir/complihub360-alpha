@@ -42,7 +42,7 @@ select policies_are(
     'public',
     'knowledge_chunks',
     ARRAY[]::name[],
-    'knowledge_chunks: keine Policy (seit 20261011000100) — der Korpus ist intern, nur die API liest ihn, siehe 13_knowledge_private_test'
+    'knowledge_chunks: keine Policy (seit 20261011000100) — der Korpus ist intern, nur die API liest ihn, siehe 14_knowledge_private_test'
 );
 
 select * from finish();
