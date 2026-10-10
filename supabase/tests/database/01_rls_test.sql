@@ -41,10 +41,8 @@ select policies_are(
 select policies_are(
     'public',
     'knowledge_chunks',
-    ARRAY[
-        'Knowledge Chunks are globally readable'
-    ],
-    'RAG chunks should be readable by all'
+    ARRAY[]::name[],
+    'knowledge_chunks: keine Policy (seit 20261011000100) — der Korpus ist intern, nur die API liest ihn, siehe 14_knowledge_private_test'
 );
 
 select * from finish();
