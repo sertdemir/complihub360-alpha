@@ -12,12 +12,20 @@
 // Abrechnung und wuerde doppelt belasten. Dieses Modul schreibt darum nur den
 // Datensatz; die Rechnung stellt weiter der Lauf.
 //
-// Was Spec B ausdruecklich NICHT entschieden hat ("Configurable items requiring
-// final decision"): *"Subscription proration, cancellation notice, grace
-// period, failed-payment retry, and reactivation rules."* Entsprechend gibt es
-// hier keinen Tarifwechsel mit Geldfolge und keine Kuendigungsfrist. Ein
-// Wechsel ist zwei sichtbare Verwaltungsakte — beenden, neu beginnen — damit
-// niemand eine Pro-rata-Regel erfindet, die noch gar nicht beschlossen ist.
+// Spec B fuehrte unter "Configurable items requiring final decision":
+// *"Subscription proration, cancellation notice, grace period, failed-payment
+// retry, and reactivation rules."* Drei davon sind seit dem 2026-10-07
+// entschieden (ADR-0006, Wahl A2/B2/C2) und hier umgesetzt:
+//
+//   - **Tarifwechsel** wird VORGEMERKT und wirkt zum Verlaengerungstermin.
+//     Keine anteilige Abrechnung — die Pro-rata-Frage ist damit nicht
+//     beantwortet, sondern umgangen: es faellt nichts an, was zu teilen waere.
+//   - **Kuendigung** loest der Anbieter selbst aus, das Abo laeuft bis zum
+//     Stichtag, bis dahin ruecknehmbar. Keine Erstattung.
+//   - Die **Kulanzfrist** steht in billing.ts (`overdueState`).
+//
+// Weiterhin offen und deshalb hier NICHT erfunden: `failed-payment retry` und
+// `reactivation rules`.
 //
 // Und was hier erst recht nicht passiert: das Abo beruehrt das Matching nicht.
 // Spec A §14, Spec B "Ranking benefit: Never".
@@ -25,9 +33,10 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import { supabaseApi } from "./supabase.js";
 import { structuredLog } from "@complihub360/types";
-import { getActiveSubscription, loadPricingConfig, type Subscription } from "./billing.js";
+import { categoryAllowanceCheck, getActiveSubscription, loadPricingConfig, type Subscription } from "./billing.js";
 import { syncBillingReadiness } from "./leadCharge.js";
 import { reviewLog } from "./providerApplication.js";
+import { notify } from "./notifications.js";
 import type { Caller } from "./providerAuth.js";
 
 export type Cadence = 'monthly' | 'annual';
@@ -161,8 +170,12 @@ export interface StartInput {
 /**
  * Legt das erste bzw. naechste Abo an. Verweigert, solange ein nicht beendetes
  * Abo besteht — der Partial Unique Index `provider_subscriptions_one_open`
- * sagt dasselbe, aber als Fehlermeldung statt als Datenbankabsturz. Ein
- * WECHSEL ist bewusst kein eigener Vorgang (siehe Kopf dieser Datei).
+ * sagt dasselbe, aber als Fehlermeldung statt als Datenbankabsturz.
+ *
+ * Ein WECHSEL laeuft nicht hierueber, sondern ueber
+ * `scheduleSubscriptionChange`: er wird vorgemerkt und zum
+ * Verlaengerungstermin ausgefuehrt (ADR-0006 B2). Diese Funktion bleibt der
+ * Eintritt — das erste Abo, und das naechste nach einem beendeten.
  */
 export async function startSubscription(
     i: StartInput,
@@ -229,9 +242,12 @@ export async function startSubscription(
  * erst damit ist der Platz fuer ein neues Abo frei.
  *
  * Kein Geld bewegt sich hier: keine Erstattung, keine Pro rata. Die Periode,
- * die schon in Rechnung steht, bleibt in Rechnung — was darueber hinaus gelten
- * soll (Kuendigungsfrist, Erstattung, Reaktivierung), hat Spec B ausdruecklich
- * offen gelassen.
+ * die schon in Rechnung steht, bleibt in Rechnung.
+ *
+ * Das ist der SOFORTIGE Weg und bleibt der Admin-Weg. Die Selbstkuendigung des
+ * Anbieters laeuft ueber `scheduleSubscriptionCancellation` und wirkt erst zum
+ * Verlaengerungstermin (ADR-0006 C2) — wer hier landet, hat einen Grund dafuer.
+ * `reactivation rules` sind weiterhin unentschieden.
  */
 export async function endSubscription(
     i: { providerKey: string; reason?: string | null; actorId?: string | null; source: SubscriptionSource },
@@ -255,6 +271,299 @@ export async function endSubscription(
     return { ok: true, endedPlan: String(row.plan_code) };
 }
 
+// ─── Vormerken: Wechsel und Kuendigung zum Verlaengerungstermin ─────────────
+//
+// ADR-0006, Wahl B2 und C2 (Nutzer, 2026-10-07). Beides wirkt zum Stichtag,
+// nicht sofort: bis dahin laeuft das Abo unveraendert weiter, und die
+// Vormerkung bleibt ruecknehmbar. Keine anteilige Abrechnung, keine Erstattung.
+
+/**
+ * Die Logins des Anbieters. Eine Abo-Nachricht geht an alle Mitglieder: wer
+ * das Konto fuehrt, soll von einer Kuendigung erfahren, auch wenn ein anderer
+ * sie ausgeloest hat. `notify` laesst den Ausloeser selbst aus (Regel 1).
+ */
+async function mitgliederVon(providerKey: string): Promise<string[]> {
+    const rows = (await supabaseApi.select('provider_members', { provider_key: providerKey }, { limit: 20 })
+        .catch(() => [])) as Array<{ user_id: string }>;
+    return rows.map((r) => r.user_id).filter(Boolean);
+}
+
+/** Benachrichtigt alle Mitglieder; schlaegt nie nach aussen durch. */
+async function sagAllen(providerKey: string, actor: string | null | undefined, args: Omit<Parameters<typeof notify>[0], 'to' | 'actor'>): Promise<void> {
+    for (const to of await mitgliederVon(providerKey)) {
+        await notify({ ...args, to, actor: actor ?? null }).catch(() => null);
+    }
+}
+
+export type ScheduleAction = 'plan_change' | 'cancellation';
+
+export interface ScheduledChange {
+    action: ScheduleAction;
+    planCode: string | null;
+    cadence: Cadence | null;
+    effectiveOn: string;
+    requestedAt: string;
+}
+
+export type ScheduleFailure =
+    | 'NO_SUBSCRIPTION' | 'UNKNOWN_PLAN' | 'INVALID_CADENCE'
+    | 'SAME_PLAN' | 'ALREADY_SCHEDULED' | 'ALLOWANCE_TOO_SMALL';
+
+/** Liest den vorgemerkten Zustand aus einer Abo-Zeile; `null` heisst: nichts vorgemerkt. */
+export function scheduledOf(row: any): ScheduledChange | null {
+    if (!row?.scheduled_action || !row.scheduled_effective_on) return null;
+    return {
+        action: row.scheduled_action === 'cancellation' ? 'cancellation' : 'plan_change',
+        planCode: row.scheduled_plan_code ?? null,
+        cadence: row.scheduled_cadence === 'annual' ? 'annual' : row.scheduled_cadence === 'monthly' ? 'monthly' : null,
+        effectiveOn: String(row.scheduled_effective_on).slice(0, 10),
+        requestedAt: String(row.scheduled_requested_at ?? ''),
+    };
+}
+
+/**
+ * Der Stichtag einer Vormerkung: der Verlaengerungstermin.
+ *
+ * **`renewal_date`, nicht `current_period_end`.** Die beiden sind nur bei
+ * monatlicher Zahlweise dasselbe; bei jaehrlicher liegen bis zu elf
+ * Monatszyklen dazwischen. Wer sie verwechselt, beendet ein bezahltes
+ * Jahresabo nach vier Wochen.
+ *
+ * Steht in der Zeile kein Termin oder einer in der Vergangenheit (der
+ * Waechter-Lauf hinkt hinterher, `renewal_date` ist ausserdem nullable), wird
+ * er vom Abo-Beginn neu gerechnet. Ein Stichtag, der schon vorbei ist, waere
+ * eine Vormerkung, die beim naechsten Lauf sofort zuschlaegt — und der
+ * Anbieter haette nie eine Frist gehabt.
+ */
+export function effectiveDateFor(row: any, heute: string): string {
+    const renewal = row?.renewal_date ? String(row.renewal_date).slice(0, 10) : null;
+    if (renewal && renewal > heute) return renewal;
+    const cadence: Cadence = row?.cadence === 'annual' ? 'annual' : 'monthly';
+    return renewalAfter(String(row?.started_at ?? heute), cadence, heute);
+}
+
+export interface ScheduleChangeInput {
+    providerKey: string;
+    planCode: string;
+    cadence: Cadence;
+    source: SubscriptionSource;
+    actorId?: string | null;
+}
+
+/**
+ * Merkt einen Tarifwechsel zum Stichtag vor.
+ *
+ * **Ein Downgrade unter die genutzten Hauptkategorien wird abgelehnt, nicht
+ * vorgemerkt.** `categoryAllowanceCheck` fliesst ueber `verificationRules` in
+ * `missing` ein: Wuerde der kleinere Tarif am Stichtag greifen, waere der
+ * Anbieter nicht mehr aktivierbar — still, Monate nach dem Klick, und ohne
+ * dass jemand den Zusammenhang sieht. Lieber jetzt ein konkreter Grund als
+ * spaeter eine unerklaerliche Deaktivierung.
+ */
+export async function scheduleSubscriptionChange(
+    i: ScheduleChangeInput,
+): Promise<{ ok: true; scheduled: ScheduledChange } | { ok: false; code: ScheduleFailure; allowance?: number; used?: number }> {
+    if (!CADENCES.includes(i.cadence)) return { ok: false, code: 'INVALID_CADENCE' };
+
+    const row = await openRow(i.providerKey);
+    if (!row) return { ok: false, code: 'NO_SUBSCRIPTION' };
+    if (scheduledOf(row)) return { ok: false, code: 'ALREADY_SCHEDULED' };
+
+    const cfg = await loadPricingConfig();
+    const plan = cfg.plans.find((p) => p.code === i.planCode);
+    if (!plan) return { ok: false, code: 'UNKNOWN_PLAN' };
+    if (plan.code === row.plan_code && i.cadence === row.cadence) return { ok: false, code: 'SAME_PLAN' };
+
+    const areas = await releasedAreasOf(i.providerKey);
+    const fit = categoryAllowanceCheck(plan, areas.map((a) => a.code));
+    if (!fit.ok) return { ok: false, code: 'ALLOWANCE_TOO_SMALL', allowance: fit.allowance ?? 0, used: fit.used };
+
+    const heute = today();
+    const effective = effectiveDateFor(row, heute);
+    const requestedAt = new Date().toISOString();
+    await supabaseApi.update('provider_subscriptions', { id: row.id }, {
+        scheduled_action: 'plan_change',
+        scheduled_plan_code: plan.code,
+        scheduled_plan_version: plan.version ?? 1,
+        scheduled_cadence: i.cadence,
+        scheduled_effective_on: effective,
+        scheduled_requested_at: requestedAt,
+    });
+    await reviewLog({
+        providerKey: i.providerKey, subject: 'subscription', subjectId: String(row.id),
+        action: 'subscription_change_scheduled',
+        from: `${row.plan_code}/${row.cadence}`, to: `${plan.code}/${i.cadence}`,
+        reason: `effective ${effective}`, actorId: i.actorId ?? null,
+        actorKind: i.source === 'admin' ? 'reviewer' : 'provider',
+    });
+    await supabaseApi.insert('event_log', {
+        type: 'provider_subscription_change_scheduled',
+        payload: { providerKey: i.providerKey, from: row.plan_code, to: plan.code, cadence: i.cadence, effectiveOn: effective },
+    }).catch(() => { /* Protokoll ist Beiwerk */ });
+    await sagAllen(i.providerKey, i.actorId, {
+        type: 'subscription_scheduled', subject: 'provider', subjectId: i.providerKey,
+        payload: { providerKey: i.providerKey, from: row.plan_code, to: plan.code, label: i.cadence, effectiveOn: effective },
+    });
+
+    return { ok: true, scheduled: { action: 'plan_change', planCode: plan.code, cadence: i.cadence, effectiveOn: effective, requestedAt } };
+}
+
+/**
+ * Merkt die Kuendigung zum Stichtag vor. Das Abo laeuft bis dahin vollstaendig
+ * weiter — Buchbarkeit, Abrechnung, alles.
+ *
+ * **`status` wird NICHT auf 'cancelled' gesetzt.** Im Code ist der Status eine
+ * Aussage ueber das Jetzt: `billingReadiness` setzt bei 'cancelled' den Grund
+ * `inactive_subscription`, `subscriptionChargeForPeriod` liefert dann keine
+ * Abo-Zeile mehr. Der Anbieter verloere die Buchbarkeit in der Sekunde, in der
+ * er kuendigt — fuer eine Periode, die er bezahlt hat.
+ *
+ * **Eine offene Rechnung darf hier nichts blockieren.** Wer nicht kuendigen
+ * kann, solange er im Zahlungsrueckstand ist, sitzt in einer Falle, die mit
+ * jedem Tag teurer wird. Die Sperre gilt der Buchung, nicht dem Ausgang.
+ */
+export async function scheduleSubscriptionCancellation(
+    i: { providerKey: string; reason?: string | null; source: SubscriptionSource; actorId?: string | null },
+): Promise<{ ok: true; scheduled: ScheduledChange } | { ok: false; code: ScheduleFailure }> {
+    const row = await openRow(i.providerKey);
+    if (!row) return { ok: false, code: 'NO_SUBSCRIPTION' };
+    if (scheduledOf(row)) return { ok: false, code: 'ALREADY_SCHEDULED' };
+
+    const effective = effectiveDateFor(row, today());
+    const requestedAt = new Date().toISOString();
+    await supabaseApi.update('provider_subscriptions', { id: row.id }, {
+        scheduled_action: 'cancellation',
+        scheduled_plan_code: null, scheduled_plan_version: null, scheduled_cadence: null,
+        scheduled_effective_on: effective,
+        scheduled_requested_at: requestedAt,
+    });
+    await reviewLog({
+        providerKey: i.providerKey, subject: 'subscription', subjectId: String(row.id),
+        action: 'subscription_cancellation_scheduled',
+        from: `${row.plan_code}/${row.cadence}`, to: `ends ${effective}`,
+        reason: i.reason ?? null, actorId: i.actorId ?? null,
+        actorKind: i.source === 'admin' ? 'reviewer' : 'provider',
+    });
+    await supabaseApi.insert('event_log', {
+        type: 'provider_subscription_cancellation_scheduled',
+        payload: { providerKey: i.providerKey, plan: row.plan_code, effectiveOn: effective },
+    }).catch(() => { /* Protokoll ist Beiwerk */ });
+    await sagAllen(i.providerKey, i.actorId, {
+        type: 'subscription_scheduled', subject: 'provider', subjectId: i.providerKey,
+        payload: { providerKey: i.providerKey, from: row.plan_code, effectiveOn: effective },
+    });
+
+    return { ok: true, scheduled: { action: 'cancellation', planCode: null, cadence: null, effectiveOn: effective, requestedAt } };
+}
+
+/**
+ * Nimmt eine Vormerkung zurueck. Bis zum Stichtag jederzeit — ohne Begruendung
+ * und ohne Rueckfrage. Eine Kuendigung, die man nicht zurueckziehen kann, waere
+ * Reibung ohne Zweck.
+ */
+export async function withdrawScheduled(
+    i: { providerKey: string; source: SubscriptionSource; actorId?: string | null },
+): Promise<{ ok: true; withdrew: ScheduleAction } | { ok: false; code: 'NO_SUBSCRIPTION' | 'NOTHING_SCHEDULED' }> {
+    const row = await openRow(i.providerKey);
+    if (!row) return { ok: false, code: 'NO_SUBSCRIPTION' };
+    const sched = scheduledOf(row);
+    if (!sched) return { ok: false, code: 'NOTHING_SCHEDULED' };
+
+    await supabaseApi.update('provider_subscriptions', { id: row.id }, {
+        scheduled_action: null, scheduled_plan_code: null, scheduled_plan_version: null,
+        scheduled_cadence: null, scheduled_effective_on: null, scheduled_requested_at: null,
+    });
+    await reviewLog({
+        providerKey: i.providerKey, subject: 'subscription', subjectId: String(row.id),
+        action: 'subscription_schedule_withdrawn',
+        from: `${sched.action} ${sched.effectiveOn}`, to: `${row.plan_code}/${row.cadence}`,
+        reason: null, actorId: i.actorId ?? null,
+        actorKind: i.source === 'admin' ? 'reviewer' : 'provider',
+    });
+    await supabaseApi.insert('event_log', {
+        type: 'provider_subscription_schedule_withdrawn',
+        payload: { providerKey: i.providerKey, action: sched.action, effectiveOn: sched.effectiveOn },
+    }).catch(() => { /* Protokoll ist Beiwerk */ });
+
+    return { ok: true, withdrew: sched.action };
+}
+
+/**
+ * Fuehrt eine faellige Vormerkung aus. Laeuft im selben Pass wie das Rollen der
+ * Perioden — beides passiert an derselben Grenze, und zwei Laeufe koennten
+ * auseinanderlaufen.
+ *
+ * Der Wechsel wird als **Ende plus Neuanfang** gebucht, nicht als Umschreiben
+ * der Zeile: so steht beides im Protokoll, der Rabattzyklus beginnt sauber neu,
+ * und `renewal_date` rechnet sich aus der neuen Zahlweise statt aus der alten
+ * fortgeschrieben zu werden.
+ */
+async function executeSchedule(row: any, sched: ScheduledChange, heute: string): Promise<void> {
+    const alt = `${row.plan_code}/${row.cadence}`;
+    await supabaseApi.update('provider_subscriptions', { id: row.id }, {
+        status: 'ended', ended_at: new Date().toISOString(),
+        scheduled_action: null, scheduled_plan_code: null, scheduled_plan_version: null,
+        scheduled_cadence: null, scheduled_effective_on: null, scheduled_requested_at: null,
+    });
+
+    if (sched.action === 'plan_change' && sched.planCode && sched.cadence) {
+        // Der neue Zyklus beginnt am Stichtag, nicht heute: haengt der Lauf
+        // nach, soll das Abo trotzdem ab dem Termin gelten, zu dem es
+        // vorgemerkt war.
+        const start = sched.effectiveOn;
+        const roll = rollCycle(start, cycleEndFor(start), heute);
+        const periode = roll ?? { start, end: cycleEndFor(start) };
+        const cfg = await loadPricingConfig();
+        const plan = cfg.plans.find((p) => p.code === sched.planCode);
+        await supabaseApi.insert('provider_subscriptions', {
+            provider_key: row.provider_key,
+            plan_code: sched.planCode,
+            plan_version: plan?.version ?? row.scheduled_plan_version ?? 1,
+            cadence: sched.cadence,
+            status: 'active',
+            current_period_start: periode.start,
+            current_period_end: periode.end,
+            renewal_date: renewalAfter(start, sched.cadence, heute),
+            source: row.source ?? 'provider_self_serve',
+        });
+        await reviewLog({
+            providerKey: row.provider_key, subject: 'subscription', subjectId: String(row.id),
+            action: 'subscription_change_executed', from: alt, to: `${sched.planCode}/${sched.cadence}`,
+            reason: `scheduled for ${sched.effectiveOn}`, actorId: null, actorKind: 'system',
+        });
+    } else {
+        await reviewLog({
+            providerKey: row.provider_key, subject: 'subscription', subjectId: String(row.id),
+            action: 'subscription_cancellation_executed', from: alt, to: 'ended',
+            reason: `scheduled for ${sched.effectiveOn}`, actorId: null, actorKind: 'system',
+        });
+    }
+
+    await supabaseApi.insert('event_log', {
+        type: sched.action === 'plan_change'
+            ? 'provider_subscription_change_executed'
+            : 'provider_subscription_cancellation_executed',
+        payload: { providerKey: row.provider_key, from: alt, to: sched.planCode ?? null, effectiveOn: sched.effectiveOn },
+    }).catch(() => { /* Protokoll ist Beiwerk */ });
+
+    // Der Stichtag ist da, und niemand hat ihn ausgeloest — der Waechter war
+    // es. Ohne diese Nachricht merkt der Anbieter den Wechsel an der naechsten
+    // Rechnung und die Kuendigung daran, dass keine Anfragen mehr kommen.
+    await sagAllen(row.provider_key, null, {
+        type: 'subscription_schedule_done', subject: 'provider', subjectId: row.provider_key,
+        payload: {
+            providerKey: row.provider_key, from: String(row.plan_code),
+            ...(sched.planCode ? { to: sched.planCode } : {}),
+            ...(sched.cadence ? { label: sched.cadence } : {}),
+            effectiveOn: sched.effectiveOn,
+        },
+    });
+
+    // Buchbarkeit haengt am Abo. Nach einer Kuendigung faellt sie weg, nach
+    // einem Wechsel bleibt sie — beides muss sofort in den Spalten stehen.
+    await syncBillingReadiness(row.provider_key).catch(() => null);
+}
+
 /**
  * Rollt abgelaufene Zyklen weiter und rechnet den Verlaengerungstermin nach.
  * Ohne das bliebe `current_period_end` fuer immer in der Vergangenheit stehen —
@@ -266,13 +575,26 @@ export async function endSubscription(
  */
 export async function runSubscriptionPeriodTick(
     shadow = false, now = new Date(),
-): Promise<{ checked: number; rolled: number }> {
+): Promise<{ checked: number; rolled: number; executed: number }> {
     const day = now.toISOString().slice(0, 10);
     const rows = (await supabaseApi.select('provider_subscriptions', {}, { limit: 5000 })) as any[];
-    let rolled = 0, checked = 0;
+    let rolled = 0, checked = 0, executed = 0;
     for (const row of rows) {
         if (row.ended_at || row.status === 'ended' || row.status === 'cancelled') continue;
         checked++;
+
+        // Faellige Vormerkung zuerst (ADR-0006 B2/C2). Der Stichtag ist
+        // `renewal_date` und faellt bei jaehrlicher Zahlweise NICHT mit dem
+        // Zyklusende zusammen — deshalb eine eigene Pruefung und nicht ein
+        // Anhaengsel am Rollen. Danach ist diese Zeile beendet; die etwaige
+        // Nachfolgezeile traegt frische Daten und braucht kein Rollen mehr.
+        const sched = scheduledOf(row);
+        if (sched && day >= sched.effectiveOn) {
+            if (!shadow) await executeSchedule(row, sched, day);
+            executed++;
+            continue;
+        }
+
         const next = rollCycle(String(row.current_period_start), String(row.current_period_end), day);
         if (!next) continue;
         // Shadow zaehlt, schreibt aber nicht — wie die uebrigen Waechter-Paesse.
@@ -291,7 +613,7 @@ export async function runSubscriptionPeriodTick(
         }).catch(() => { /* Protokoll ist Beiwerk */ });
         rolled++;
     }
-    return { checked, rolled };
+    return { checked, rolled, executed };
 }
 
 // ─── Routen ──────────────────────────────────────────────────────────────────
@@ -348,11 +670,18 @@ export async function releasedAreasOf(providerKey: string): Promise<Array<{ code
  */
 export async function handleSubscriptionGet(res: ServerResponse, correlationId: string, providerKey: string): Promise<void> {
     res.setHeader('x-correlation-id', correlationId);
-    const [sub, cfg, released, prov] = await Promise.all([
+    const [sub, cfg, released, prov, row] = await Promise.all([
         getActiveSubscription(providerKey), loadPricingConfig(), releasedAreasOf(providerKey),
         supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 }) as Promise<any[]>,
+        openRow(providerKey),
     ]);
     const lifecycle = String(prov[0]?.lifecycle_status ?? '');
+    const sched = scheduledOf(row);
+    // Welche Tarife ueberhaupt vorgemerkt werden koennen — die Grenze vor dem
+    // Klick, nicht erst danach als 409. Ein Downgrade unter die genutzten
+    // Hauptkategorien wird abgelehnt, also darf die Oberflaeche ihn auch nicht
+    // als Wahl anbieten, ohne den Grund zu nennen.
+    const used = released.length;
     json(res, 200, {
         ok: true,
         subscription: sub ? {
@@ -385,17 +714,27 @@ export async function handleSubscriptionGet(res: ServerResponse, correlationId: 
             monthly_cents: p.monthlyCents, annual_cents: p.annualCents,
             category_allowance: p.categoryAllowance,
             lead_discount_pct: p.leadDiscountPct, lead_discount_count: p.leadDiscountCount,
+            // `null` heisst "alle Bereiche"; dann passt jede Zahl.
+            fits_released: p.categoryAllowance == null || used <= p.categoryAllowance,
         })),
+        // Was zum Stichtag passiert, falls etwas vorgemerkt ist. Bis dahin
+        // aendert sich nichts — deshalb steht es NEBEN dem laufenden Abo und
+        // ersetzt es nicht.
+        scheduled: sched ? {
+            action: sched.action,
+            plan_code: sched.planCode,
+            cadence: sched.cadence,
+            effective_on: sched.effectiveOn,
+            requested_at: sched.requestedAt,
+        } : null,
         correlationId,
     });
 }
 
 /**
- * Die Tarifwahl des Anbieters. Genau ein Vorgang: das erste Abo beginnen.
- * Wechsel und Kuendigung gehen hier NICHT — die Regeln dafuer (Pro rata,
- * Kuendigungsfrist, Reaktivierung) hat Spec B offen gelassen, und eine
- * stillschweigend erfundene Regel waere genau die Art Entscheidung, die nicht
- * im Code fallen darf.
+ * Die Tarifwahl des Anbieters: das Abo beginnen. Wechsel und Kuendigung haben
+ * eigene Routen (`.../subscription/schedule`), weil sie etwas anderes tun —
+ * sie merken vor, statt sofort zu wirken.
  */
 export async function handleSubscriptionSelect(
     req: IncomingMessage, res: ServerResponse, correlationId: string, caller: Caller, providerKey: string,
@@ -432,7 +771,7 @@ export async function handleSubscriptionSelect(
         }
         json(res, 409, {
             errorCode: 'SUBSCRIPTION_EXISTS',
-            message: 'A subscription is already running. Changing or cancelling a plan is not available yet.',
+            message: 'A subscription is already running. Use the schedule endpoint to change or cancel it.',
             correlationId,
         });
         return;
@@ -445,6 +784,104 @@ export async function handleSubscriptionSelect(
         },
         correlationId,
     });
+}
+
+/**
+ * Vormerken und Zuruecknehmen: `POST .../subscription/schedule` mit
+ * `{action: 'plan_change'|'cancellation'|'withdraw', plan_code?, cadence?}`.
+ *
+ * Eine Route fuer drei Vorgaenge, weil sie denselben Zustand betreffen: es gibt
+ * hoechstens eine Vormerkung, und sie ist entweder gesetzt oder nicht.
+ */
+export async function handleSubscriptionSchedule(
+    req: IncomingMessage, res: ServerResponse, correlationId: string, caller: Caller, providerKey: string,
+): Promise<void> {
+    res.setHeader('x-correlation-id', correlationId);
+    let body: any;
+    try {
+        body = await readJson(req);
+    } catch (err) {
+        const msg = err instanceof Error ? err.message : '';
+        json(res, 400, { errorCode: 'VALIDATION_ERROR', message: msg === 'payload too large' ? 'Body too large' : 'Body must be JSON', correlationId });
+        return;
+    }
+    const action = body.action;
+
+    if (action === 'withdraw') {
+        const r = await withdrawScheduled({ providerKey, source: 'provider_self_serve', actorId: caller.userId });
+        if (!r.ok) {
+            json(res, r.code === 'NO_SUBSCRIPTION' ? 404 : 409, {
+                errorCode: r.code,
+                message: r.code === 'NO_SUBSCRIPTION' ? 'No running subscription' : 'Nothing is scheduled',
+                correlationId,
+            });
+            return;
+        }
+        json(res, 200, { ok: true, withdrew: r.withdrew, correlationId });
+        return;
+    }
+
+    if (action === 'cancellation') {
+        // Bewusst ohne jede Billing-Pruefung: eine offene Rechnung darf den
+        // Ausgang nicht verstellen.
+        const r = await scheduleSubscriptionCancellation({
+            providerKey, source: 'provider_self_serve', actorId: caller.userId,
+            reason: typeof body.reason === 'string' ? body.reason.slice(0, 500) : null,
+        });
+        if (!r.ok) {
+            json(res, r.code === 'NO_SUBSCRIPTION' ? 404 : 409, {
+                errorCode: r.code,
+                message: r.code === 'NO_SUBSCRIPTION' ? 'No running subscription' : 'Something is already scheduled',
+                correlationId,
+            });
+            return;
+        }
+        json(res, 200, { ok: true, scheduled: toWire(r.scheduled), correlationId });
+        return;
+    }
+
+    if (action === 'plan_change') {
+        const planCode = typeof body.plan_code === 'string' ? body.plan_code : '';
+        const cadence = body.cadence === 'annual' ? 'annual' : body.cadence === 'monthly' ? 'monthly' : null;
+        if (!planCode || !cadence) {
+            json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'plan_code and cadence (monthly|annual) are required', correlationId });
+            return;
+        }
+        const r = await scheduleSubscriptionChange({ providerKey, planCode, cadence, source: 'provider_self_serve', actorId: caller.userId });
+        if (!r.ok) {
+            if (r.code === 'NO_SUBSCRIPTION') { json(res, 404, { errorCode: r.code, message: 'No running subscription', correlationId }); return; }
+            if (r.code === 'UNKNOWN_PLAN') { json(res, 400, { errorCode: r.code, message: 'No such plan', correlationId }); return; }
+            if (r.code === 'INVALID_CADENCE') { json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'cadence must be monthly or annual', correlationId }); return; }
+            if (r.code === 'ALLOWANCE_TOO_SMALL') {
+                // Der konkrete Grund, nicht nur die Absage: wie viele Bereiche
+                // freigegeben sind und wie viele der Zieltarif traegt. Ohne die
+                // Zahlen bliebe nur "geht nicht".
+                json(res, 409, {
+                    errorCode: r.code, allowance: r.allowance, used: r.used,
+                    message: `This plan covers ${r.allowance} main categories, but ${r.used} are released for this account.`,
+                    correlationId,
+                });
+                return;
+            }
+            json(res, 409, {
+                errorCode: r.code,
+                message: r.code === 'SAME_PLAN' ? 'This is already the running plan' : 'Something is already scheduled',
+                correlationId,
+            });
+            return;
+        }
+        json(res, 200, { ok: true, scheduled: toWire(r.scheduled), correlationId });
+        return;
+    }
+
+    json(res, 400, { errorCode: 'VALIDATION_ERROR', message: "action must be 'plan_change', 'cancellation' or 'withdraw'", correlationId });
+}
+
+function toWire(s: ScheduledChange) {
+    return {
+        action: s.action, plan_code: s.planCode, cadence: s.cadence,
+        effective_on: s.effectiveOn, requested_at: s.requestedAt,
+    };
 }
 
 /**

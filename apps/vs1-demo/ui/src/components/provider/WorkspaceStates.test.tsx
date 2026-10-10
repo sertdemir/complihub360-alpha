@@ -39,6 +39,9 @@ const SUB: SubscriptionView = {
   plans: [{ code: 'growth', label: 'Growth', currency: 'USD', monthly_cents: 9900, annual_cents: 99000, category_allowance: 5, lead_discount_pct: 10, lead_discount_count: 3 }],
   released_categories: [{ code: 'tax-vat', label: 'Tax & VAT' }],
   eligibility: { can_start: true, reason: null },
+  // Seit ADR-0006 traegt jede Antwort das Feld — `null` heisst "nichts
+  // vorgemerkt", nicht "die API kennt das nicht".
+  scheduled: null,
 };
 
 const markt = (c: string) => `[${c}]`;
