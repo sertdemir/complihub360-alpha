@@ -189,6 +189,38 @@ function mapDecline(code: string | null, declineCode: string | null): ChargeFail
     return 'card_declined';
 }
 
+export type VerifyResult =
+    | { ok: true; setupIntentId: string }
+    | { ok: false; kind: 'card' | 'stripe'; reason: ChargeFailureReason; detail: string };
+
+/**
+ * ADR-0008 A2: das hinterlegte Zahlungsmittel pruefen, ohne Geld zu bewegen —
+ * ein SetupIntent ueber das Mittel, sofort bestaetigt. Bestaetigt Stripe es,
+ * ist die Karte wieder brauchbar; eine echte Belastung kann trotzdem scheitern
+ * (eine Pruefung ist keine Deckungszusage). `requires_action` kann hier
+ * niemand beantworten und zaehlt wie bei der Belastung als
+ * `authentication_required`.
+ */
+export async function verifyPaymentMethod(args: { customerId: string; paymentMethodId: string; idempotencyKey: string }): Promise<VerifyResult> {
+    try {
+        const si = await stripeRequest('POST', 'setup_intents', {
+            customer: args.customerId,
+            payment_method: args.paymentMethodId,
+            'payment_method_types[]': 'card',
+            usage: 'off_session',
+            confirm: 'true',
+            'metadata[purpose]': 'payment_method_recheck',
+        }, { idempotencyKey: args.idempotencyKey });
+        const status = String(si.status || '');
+        if (status === 'succeeded') return { ok: true, setupIntentId: String(si.id) };
+        if (status === 'requires_action' || status === 'requires_confirmation') return { ok: false, kind: 'card', reason: 'authentication_required', detail: status };
+        return { ok: false, kind: 'card', reason: 'card_declined', detail: status || 'unknown_status' };
+    } catch (err) {
+        if (err instanceof StripeError && err.isCardError) return { ok: false, kind: 'card', reason: mapDecline(err.code, err.declineCode), detail: err.declineCode || err.code || err.message };
+        return { ok: false, kind: 'stripe', reason: 'stripe_error', detail: err instanceof Error ? err.message : String(err) };
+    }
+}
+
 /** Erstattung einer Belastung, deren Buchung nach dem Capture nicht zustande kam. */
 export async function refundPaymentIntent(paymentIntentId: string, idempotencyKey: string): Promise<{ refundId: string }> {
     const r = await stripeRequest('POST', 'refunds', { payment_intent: paymentIntentId }, { idempotencyKey });

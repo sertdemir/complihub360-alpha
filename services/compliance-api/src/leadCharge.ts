@@ -6,7 +6,7 @@ import {
     type BillingBlockReason, type LeadFeeQuote, type LeadOpportunity,
 } from "./billing.js";
 import {
-    createPaymentIntent, getCustomerBilling, isStripeConfigured, StripeError, type ChargeResult,
+    createPaymentIntent, getCustomerBilling, isStripeConfigured, StripeError, verifyPaymentMethod, type ChargeResult,
 } from "./stripe.js";
 import { notify } from "./notifications.js";
 import { sendPaymentFailedMail } from "./mailer.js";
@@ -343,6 +343,68 @@ export async function syncBillingReadiness(providerKey: string): Promise<Readine
         }).catch(() => { /* non-blocking */ });
     }
     return { ready, reasons, changed, paymentMethodLabel: pmLabel, syncedAt };
+}
+
+// ─── ADR-0008 A2: Zahlungsmittel erneut pruefen ──────────────────────────────
+//
+// Nach einer gescheiterten Lead-Belastung hebt ein ANDERES Zahlungsmittel die
+// Sperre auf (ADR-0005). Fuer „die Karte war an einem Tag nicht gedeckt" gab es
+// keinen Weg zurueck ausser einem Kartenwechsel. Jetzt stoesst der Anbieter
+// selbst eine Pruefung an; bestaetigt Stripe dasselbe Mittel, faellt
+// `payment_failed` weg. Nachbelastet wird nichts — die Buchung kam nie
+// zustande, es gibt nichts nachzuholen.
+
+/** Hoechstens so viele Pruefungen je Anbieter in 24 Stunden. */
+export const RECHECK_LIMIT_PER_DAY = 3;
+
+export type RecheckOutcome =
+    | { result: 'cleared'; readiness: ReadinessSync | null }
+    | { result: 'declined' | 'needs_action'; reason: string }
+    | { result: 'not_blocked'; readiness: ReadinessSync | null }
+    | { result: 'rate_limited'; retryAfter: string }
+    | { result: 'stripe_error' }
+    | { result: 'not_found' };
+
+/** Rein: wie viele Pruefungen in den letzten 24 h, und ab wann wieder eine geht. */
+export function recheckBudget(timestamps: string[], now: Date, limit = RECHECK_LIMIT_PER_DAY): { left: number; nextAt: string | null } {
+    const since = now.getTime() - 86_400_000;
+    const recent = timestamps.map((t) => Date.parse(t)).filter((t) => !Number.isNaN(t) && t > since).sort((a, b) => a - b);
+    const left = Math.max(0, limit - recent.length);
+    return { left, nextAt: left > 0 ? null : new Date(recent[recent.length - limit] + 86_400_000).toISOString() };
+}
+
+export async function recheckPaymentMethod(providerKey: string, actorId: string | null, now = new Date()): Promise<RecheckOutcome> {
+    const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+    const p = rows[0];
+    if (!p) return { result: 'not_found' };
+    const failure = p.last_payment_failure as { payment_method_id?: string | null } | null;
+    const customerId = p.stripe_customer_id ? String(p.stripe_customer_id) : null;
+    if (!failure || !customerId) return { result: 'not_blocked', readiness: await syncBillingReadiness(providerKey) };
+
+    let pmId: string | null = null;
+    try { pmId = (await getCustomerBilling(customerId)).defaultPaymentMethodId; } catch { return { result: 'stripe_error' }; }
+    // Ein anderes Mittel hebt die Sperre ohnehin auf (ADR-0005) — dann gibt es
+    // nichts zu pruefen, nur neu zu berechnen.
+    if (!pmId || pmId !== failure.payment_method_id) return { result: 'not_blocked', readiness: await syncBillingReadiness(providerKey) };
+
+    const log = (await supabaseApi.select('event_log', { type: 'payment_method_recheck' }, { order: 'timestamp.desc', limit: 200 })) as any[];
+    // Die Zeit steht auch im Ereignis selbst: `timestamp` setzt erst die Datenbank.
+    const mine = log.filter((e) => e.payload?.providerKey === providerKey).map((e) => String(e.payload?.at ?? e.timestamp));
+    const budget = recheckBudget(mine, now);
+    if (budget.left === 0) return { result: 'rate_limited', retryAfter: budget.nextAt! };
+
+    const v = await verifyPaymentMethod({ customerId, paymentMethodId: pmId, idempotencyKey: `recheck:${providerKey}:${now.getTime()}` });
+    await supabaseApi.insert('event_log', {
+        type: 'payment_method_recheck',
+        payload: { providerKey, by: actorId, at: now.toISOString(), ok: v.ok, reason: v.ok ? null : v.reason },
+    }).catch(() => { /* das Limit zaehlt dann eine Pruefung zu wenig — lieber das als eine verlorene Antwort */ });
+    if (!v.ok) {
+        if (v.kind === 'stripe') return { result: 'stripe_error' };
+        return { result: v.reason === 'authentication_required' ? 'needs_action' : 'declined', reason: v.reason };
+    }
+    await supabaseApi.update('providers', { provider_key: providerKey }, { last_payment_failure: null });
+    await supabaseApi.insert('event_log', { type: 'payment_failure_cleared', payload: { providerKey, by: actorId, via: 'recheck', setupIntentId: v.setupIntentId } }).catch(() => {});
+    return { result: 'cleared', readiness: await syncBillingReadiness(providerKey) };
 }
 
 /** Ein Durchlauf des Watchers: die aeltesten Pruefungen zuerst. */

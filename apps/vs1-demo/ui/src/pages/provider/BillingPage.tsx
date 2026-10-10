@@ -10,7 +10,7 @@ import { Tag } from '../../components/ui/Tag';
 import { InvoiceDetailDrawer } from '../../components/provider/InvoiceDetailDrawer';
 import { useWorkspaceData } from '../../lib/useWorkspaceData';
 import { LoadFailedState } from '../../components/provider/WorkspaceStates';
-import { fetchInvoices, fetchBillingPreview, openBillingPortal, syncBillingReadiness, money, type Invoice, type BillingReadiness } from '../../api/billing';
+import { fetchInvoices, fetchBillingPreview, openBillingPortal, recheckPaymentMethod, syncBillingReadiness, money, type Invoice, type BillingReadiness } from '../../api/billing';
 
 // ─── Provider /billing ────────────────────────────────────────────────────────
 // Mirrors "Provider Dashboard v1 · /billing (Desktop · payment-failed)"
@@ -55,6 +55,41 @@ export function BillingPage() {
       setSyncState('idle');
     } catch {
       setSyncState('failed');
+    }
+  };
+  // ADR-0008 A2 (Canvas-Wahl A V2 · B V1, 2026-10-10): dieselbe Karte erneut
+  // pruefen. Das Ergebnis steht als Zeile unter dem Knopf; bestaetigt Stripe
+  // die Karte, wird der Kasten gruen und sagt es dort.
+  type RecheckState = { kind: 'idle' | 'busy' | 'declined' | 'needs_action' | 'rate_limited' | 'failed' | 'not_configured'; retryAfter?: string | null };
+  const [recheck, setRecheck] = useState<RecheckState>({ kind: 'idle' });
+  const [cardConfirmed, setCardConfirmed] = useState(false);
+  const doRecheck = async () => {
+    setRecheck({ kind: 'busy' });
+    try {
+      const r = await recheckPaymentMethod();
+      if (r.kind === 'cleared' || r.kind === 'not_blocked') {
+        if (r.readiness) setSynced(r.readiness); else await sync();
+        setCardConfirmed(r.kind === 'cleared');
+        setRecheck({ kind: 'idle' });
+      } else if (r.kind === 'rate_limited') {
+        setRecheck({ kind: 'rate_limited', retryAfter: r.retryAfter });
+      } else {
+        setRecheck({ kind: r.kind });
+      }
+    } catch {
+      setRecheck({ kind: 'failed' });
+    }
+  };
+  const recheckLine = (): string | null => {
+    switch (recheck.kind) {
+      case 'declined': return t('billing.recheck.declined');
+      case 'needs_action': return t('billing.recheck.needsAction');
+      case 'rate_limited': return recheck.retryAfter
+        ? t('billing.recheck.rateLimited', { when: new Date(recheck.retryAfter).toLocaleString(locale, { weekday: 'short', hour: '2-digit', minute: '2-digit' }) })
+        : t('billing.recheck.rateLimitedNoTime');
+      case 'not_configured': return t('billing.portalNotConfigured');
+      case 'failed': return t('billing.recheck.failed');
+      default: return null;
     }
   };
   // `?from=portal`: der Anbieter kommt aus dem Stripe-Portal zurueck — jetzt
@@ -146,9 +181,10 @@ export function BillingPage() {
         {readiness && (
           readiness.ready ? (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-success-500/40 bg-success-50 px-5 py-3.5 dark:bg-success-950/30">
-              <span className="text-[16px] font-bold text-success-700 dark:text-success-300" aria-hidden>✓</span>
+              <span className="text-[16px] font-bold text-success-700 dark:text-emerald-300" aria-hidden>✓</span>
               <div className="min-w-0 flex-1">
                 <p className="text-[13px] font-semibold text-fg">{t('billing.readyTitle')}</p>
+                {cardConfirmed && <p role="status" className="text-[12px] text-fg">{t('billing.recheck.cleared')}</p>}
                 <p className="text-[12px] text-fg-secondary">
                   {[readiness.payment_method, planLabel, readiness.synced_at ? t('billing.readinessChecked', { when: new Date(readiness.synced_at).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' }) }) : null].filter(Boolean).join(' · ')}
                 </p>
@@ -173,15 +209,37 @@ export function BillingPage() {
                 {readiness.reasons.map((r) => (
                   <li key={r} className="flex items-start gap-2 text-[13px] text-fg">
                     <span className="mt-[1px] font-bold text-warning-700 dark:text-warning-300" aria-hidden>!</span>
-                    <span>{t(`billing.reason.${r}`)}</span>
+                    {/* Bei payment_failed erklaeren die beiden Wege darunter den Rest. */}
+                    <span>{r === 'payment_failed' ? t('billing.recheck.failedLine') : t(`billing.reason.${r}`)}</span>
                   </li>
                 ))}
               </ul>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button size="sm" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.changePaymentInPortal')}</Button>
-                <Button size="sm" variant="secondary" onClick={sync} disabled={syncState === 'busy'}>{syncState === 'busy' ? '…' : t('billing.checkNow')}</Button>
-              </div>
-              <p className="mt-3 text-[12px] text-fg-tertiary">{t('billing.stillVisibleNote')}</p>
+              {cardConfirmed && !readiness.reasons.includes('payment_failed') && (
+                <p role="status" className="mt-3 text-[12px] font-medium text-fg">{t('billing.recheck.clearedStillBlocked')}</p>
+              )}
+              {readiness.reasons.includes('payment_failed') ? (
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  <div className="flex flex-col gap-2 rounded-lg border border-stroke bg-surface px-4 py-3">
+                    <p className="text-[13px] font-semibold text-fg">{t('billing.recheck.sameTitle')}</p>
+                    <p className="text-[12px] leading-relaxed text-fg-secondary">{t('billing.recheck.sameBody')}</p>
+                    <div><Button size="sm" onClick={doRecheck} disabled={recheck.kind === 'busy'}>{recheck.kind === 'busy' ? '…' : t('billing.recheck.sameCta')}</Button></div>
+                    {recheckLine() && (
+                      <p role="status" className="rounded-md border border-stroke bg-surface-secondary px-3 py-2 text-[12px] leading-relaxed text-fg-secondary">{recheckLine()}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2 rounded-lg border border-stroke bg-surface px-4 py-3">
+                    <p className="text-[13px] font-semibold text-fg">{t('billing.recheck.otherTitle')}</p>
+                    <p className="text-[12px] leading-relaxed text-fg-secondary">{t('billing.recheck.otherBody')}</p>
+                    <div><Button size="sm" variant="secondary" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.recheck.otherCta')}</Button></div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button size="sm" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.changePaymentInPortal')}</Button>
+                  <Button size="sm" variant="secondary" onClick={sync} disabled={syncState === 'busy'}>{syncState === 'busy' ? '…' : t('billing.checkNow')}</Button>
+                </div>
+              )}
+              <p className="mt-3 text-[12px] text-fg-tertiary">{readiness.reasons.includes('payment_failed') ? t('billing.recheck.note') : t('billing.stillVisibleNote')}</p>
             </section>
           )
         )}
@@ -255,11 +313,33 @@ export function BillingPage() {
                 <span className="ml-4 shrink-0 tabular-nums text-fg"><s className="text-fg-tertiary">{money(preview.leads.standard_cents, cur)}</s> <span className="font-semibold">{money(preview.leads.final_cents, cur)}</span></span>
               </div>
             )}
+            {/* Phase 5 (ADR-0007, Canvas-Wahl 3A): das Guthaben steht als gruene
+                Minus-Zeile genau dort, wo es auf der Rechnung landet, mit einer
+                Unterzeile je Guthaben (Herkunft, Prozentsatz, Datum). Bleibt ein
+                Rest ueber die Abo-Summe hinaus, sagt eine zweite Unterzeile das.
+                Nie "ausgezahlt": der Satz unter dem Kasten schliesst es aus. */}
+            {(preview.credit_applied_cents ?? 0) > 0 && (
+              <div className="border-b border-stroke px-5 py-3 text-[13px]">
+                <div className="flex items-center justify-between">
+                  <span className="min-w-0 truncate font-semibold text-success-700 dark:text-emerald-300">{t('billing.creditLine', { count: preview.credits?.length ?? 1 })}</span>
+                  <span className="ml-4 shrink-0 font-semibold tabular-nums text-success-700 dark:text-emerald-300">− {money(preview.credit_applied_cents ?? 0, cur)}</span>
+                </div>
+                {(preview.credits ?? []).map((c) => (
+                  <p key={c.id} className="mt-1 pl-4 text-[11.5px] text-fg-tertiary">
+                    ↳ {t('billing.creditOrigin', { pct: 30, date: new Date(c.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short' }) })} · {money(c.amount_cents, c.currency ?? cur)}
+                  </p>
+                ))}
+                {preview.credit_balance_cents > (preview.credit_applied_cents ?? 0) && (
+                  <p className="mt-1 pl-4 text-[11.5px] text-fg-tertiary">↳ {t('billing.creditRemainder', { amount: money(preview.credit_balance_cents - (preview.credit_applied_cents ?? 0), cur) })}</p>
+                )}
+              </div>
+            )}
             <div className="flex items-center justify-between px-5 py-3 text-[13px]">
-              <span className="font-semibold text-fg">{t('billing.currentPeriodTotal')}</span>
-              <span className="font-bold tabular-nums text-fg-accent">{money(preview.total_cents, cur)}</span>
+              <span className="font-semibold text-fg">{t((preview.credit_applied_cents ?? 0) > 0 ? 'billing.currentPeriodTotalAfterCredit' : 'billing.currentPeriodTotal')}</span>
+              <span className="font-bold tabular-nums text-fg-accent">{money(preview.total_after_credit_cents ?? preview.total_cents, cur)}</span>
             </div>
           </div>
+          {(preview.credit_applied_cents ?? 0) > 0 && <p className="text-[12px] text-fg-tertiary">{t('billing.creditNote')}</p>}
         </section>
         )}
 

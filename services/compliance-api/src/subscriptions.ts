@@ -24,8 +24,12 @@
 //     Stichtag, bis dahin ruecknehmbar. Keine Erstattung.
 //   - Die **Kulanzfrist** steht in billing.ts (`overdueState`).
 //
-// Weiterhin offen und deshalb hier NICHT erfunden: `failed-payment retry` und
-// `reactivation rules`.
+// Die letzten beiden entschied ADR-0008 (2026-10-10, A2/B2/C2/D2):
+//
+//   - **Reaktivierung** (C2): jederzeit neu beginnen; der Rabattzaehler des
+//     noch laufenden Zyklus geht mit (`carriedDiscountCount`).
+//   - **Gescheiterte Zahlung**: die Lead-Seite (A2) steht in leadCharge.ts,
+//     die Wiederholung der Abo-Rechnung (B2) in billing.ts.
 //
 // Und was hier erst recht nicht passiert: das Abo beruehrt das Matching nicht.
 // Spec A §14, Spec B "Ranking benefit: Never".
@@ -123,6 +127,32 @@ export function rollCycle(
     return today < e ? { start: s, end: e } : null;
 }
 
+/**
+ * ADR-0008, Wahl C2: Was ein Neustart vom Rabattzaehler mitnimmt.
+ *
+ * Der Zaehler ist auf `(provider_key, cycle_start)` geschluesselt. Ein neues
+ * Abo beginnt seinen Zyklus heute — ohne diese Uebernahme zaehlte es ab null,
+ * und wer mitten im Zyklus beendet und neu beginnt (der sofortige Admin-Weg),
+ * bekaeme die rabattierten Leads im selben Monat ein zweites Mal.
+ *
+ * Mitgenommen wird der hoechste Stand eines Zyklus, der heute noch laeuft
+ * (`cycle_start <= heute < cycleEndFor(cycle_start)`). Ein Zyklus, der heute
+ * beginnt, ist derselbe Schluessel und braucht keine Uebernahme. Der neue Plan
+ * wendet seine eigene Grenze darauf an (applyMonthlyDiscount) — nie von vorn,
+ * genau wie beim Planwechsel. Rein, damit jeder Tag ohne Datenbank pruefbar ist.
+ */
+export function carriedDiscountCount(rows: Array<{ cycle_start: string; used?: number | null }>, todayIso: string): number {
+    const heute = todayIso.slice(0, 10);
+    let carried = 0;
+    for (const r of rows) {
+        const start = String(r.cycle_start).slice(0, 10);
+        if (start >= heute) continue;
+        if (heute >= cycleEndFor(start)) continue;
+        carried = Math.max(carried, Number(r.used) || 0);
+    }
+    return carried;
+}
+
 // ─── Lesen ───────────────────────────────────────────────────────────────────
 
 async function openRow(providerKey: string): Promise<any | null> {
@@ -210,6 +240,20 @@ export async function startSubscription(
     });
     const row = Array.isArray(inserted) ? inserted[0] : inserted;
 
+    // ADR-0008 C2: der Zaehler des noch laufenden Zyklus geht mit.
+    const counters = (await supabaseApi.select('provider_discount_counter', { provider_key: i.providerKey },
+        { order: 'cycle_start.desc', limit: 3 })) as Array<{ cycle_start: string; used?: number | null }>;
+    const carried = carriedDiscountCount(counters, start);
+    if (carried > 0) {
+        await supabaseApi.upsert('provider_discount_counter', 'provider_key,cycle_start', {
+            provider_key: i.providerKey, cycle_start: start, used: carried, updated_at: new Date().toISOString(),
+        });
+        await supabaseApi.insert('event_log', {
+            type: 'discount_counter_carried',
+            payload: { providerKey: i.providerKey, cycleStart: start, used: carried },
+        }).catch(() => { /* Protokoll ist Beiwerk */ });
+    }
+
     await reviewLog({
         providerKey: i.providerKey, subject: 'subscription', subjectId: row?.id ?? null,
         action: 'subscription_started', from: null, to: `${plan.code}/${i.cadence}`,
@@ -247,7 +291,8 @@ export async function startSubscription(
  * Das ist der SOFORTIGE Weg und bleibt der Admin-Weg. Die Selbstkuendigung des
  * Anbieters laeuft ueber `scheduleSubscriptionCancellation` und wirkt erst zum
  * Verlaengerungstermin (ADR-0006 C2) — wer hier landet, hat einen Grund dafuer.
- * `reactivation rules` sind weiterhin unentschieden.
+ * Ein Neustart danach nimmt den Rabattzaehler des laufenden Zyklus mit
+ * (ADR-0008 C2, `carriedDiscountCount`).
  */
 export async function endSubscription(
     i: { providerKey: string; reason?: string | null; actorId?: string | null; source: SubscriptionSource },

@@ -631,14 +631,13 @@
       "confirmed": "CONFIRMADA",
       "completed": "COMPLETADA",
       "cancelled": "CANCELADA",
-      "no_show": "NO ASISTIÓ",
+      "no_show": "NO SE CELEBRÓ",
       "outcome_open": "RESULTADO PENDIENTE"
     },
     "outcomeQuestion": "¿Se celebró esta cita?",
     "outcomeYes": "Sí, se celebró",
     "outcomeNo": "El proveedor no asistió",
     "reviewed": "✓ Valoración enviada",
-    "noShowNote": "Sin reembolso — el proveedor recibió el dossier al reservar. Le reasignamos si lo desea.",
     "website": "Sitio web del proveedor",
     "emptyTitle": "Sin citas",
     "emptyBody": "Las citas nacen de una solicitud: en cuanto un proveedor confirma, la reunión aparece aquí y puede añadirse a su calendario.",
@@ -669,6 +668,30 @@
       "short": "El proveedor no puede ofrecer este servicio en este momento. Detalles abajo.",
       "cancel": "Cancelar la cita sin coste",
       "talk": "Hablar con nosotros"
+    },
+    "after": {
+      "afterTitleUser": "Según el proveedor, la cita no se celebró",
+      "afterBodyUser": "Puede elegir una nueva cita con {{provider}} hasta el {{deadline}}. Su solicitud sigue abierta allí y no se le cobra nada.",
+      "afterTitleProvider": "El proveedor no se presentó. Lo hemos anotado.",
+      "afterBodyProvider": "Puede elegir una nueva cita con {{provider}} hasta el {{deadline}} o ver otro proveedor. No se le cobra nada.",
+      "afterBodyProviderClosed": "Puede ver otro proveedor en cualquier momento. No se le cobra nada.",
+      "afterNoteProvider": "El incidente entra en el historial de rendimiento del proveedor, no en su solicitud.",
+      "afterTitlePlatform": "Un problema técnico por nuestra parte canceló esta cita",
+      "afterBodyPlatform": "Fue un error nuestro, no suyo. Puede elegir una nueva cita con {{provider}} hasta el {{deadline}}; no se le cobra nada.",
+      "afterBodyClosed": "El plazo para una nueva cita con {{provider}} ha vencido. Puede ver otro proveedor en cualquier momento; no se le cobra nada.",
+      "rebook": "Elegir nueva cita",
+      "otherProvider": "Ver otro proveedor",
+      "disputeHint": "¿No coincide con su impresión? <dispute>Impugnar</dispute> hasta el {{until}}: revisaremos el caso.",
+      "disputeOpenTitle": "Hemos recibido su impugnación",
+      "disputeOpenBody": "Revisaremos el caso y le responderemos. Hasta entonces, el plazo para una nueva cita con {{provider}} sigue abierto.",
+      "disputeDismissedNote": "Hemos revisado su impugnación; el informe se mantiene. El plazo para una nueva cita sigue abierto.",
+      "disputeConfirmEyebrow": "Impugnar el informe",
+      "disputeConfirmTitle": "¿Impugnar el informe de no asistencia de {{provider}}?",
+      "disputeConfirmBody": "Revisaremos el caso. Hasta la decisión, el plazo para una nueva cita sigue abierto. En ningún caso se le cobra nada.",
+      "disputeConfirmCta": "Enviar impugnación",
+      "disputeConfirmBack": "Volver",
+      "disputeFailed": "No se pudo enviar la impugnación. Inténtelo de nuevo o hable con nosotros.",
+      "rebookedFrom": "Nueva cita de una reserva anterior"
     }
   },
   "review": {
@@ -695,7 +718,14 @@
     "confirm": "Mover cita",
     "cancel": "Cancelar",
     "done": "Movida ✓",
-    "note": "Al reprogramar se mantienen la reserva y el dossier compartido — no se aplica una nueva tarifa de lead. El proveedor recibe la nueva hora."
+    "note": "La reserva y el dossier compartido se mantienen. El proveedor recibe la nueva hora.",
+    "rebookEyebrow": "Elegir nueva cita",
+    "rebookConfirm": "Reservar nueva cita",
+    "rebookDone": "Reservada ✓",
+    "rebookNote": "La nueva cita continúa su reserva anterior. Su solicitud sigue con este proveedor y no se le cobra nada.",
+    "limit": "Esta cita ya se ha movido tantas veces como es posible. Si la hora ya no le va, cancélela y reserve de nuevo.",
+    "slotTaken": "Este horario se acaba de ocupar. Elija otro, por favor.",
+    "failed": "No se pudo mover la cita. Inténtelo de nuevo."
   },
   "wizardDrawer": {
     "eyebrow": "Nueva búsqueda",

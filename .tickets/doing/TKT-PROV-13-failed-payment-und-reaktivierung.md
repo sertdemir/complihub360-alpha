@@ -7,8 +7,8 @@ status: "doing"
 # Gescheiterte Zahlung und Reaktivierung
 
 [`ADR-0008`](../../docs/decisions/ADR-0008-failed-payment-retry-und-reaktivierung.md)
-liegt als Entscheidungsvorlage vor. **Es ist nichts umgesetzt** — und es darf
-auch nichts umgesetzt werden, bevor der Nutzer gewählt hat.
+ist entschieden (2026-10-10): **D1** (#287) und **A2 · B2a · C2 · D2**. Stand der Umsetzung
+unten unter *Fortschritt*.
 
 Damit sind die letzten beiden der fünf Spec-B-Punkte aufbereitet, die unter
 „Configurable items requiring final decision" standen. Die ersten drei sind
@@ -89,3 +89,29 @@ Auslöser: **Monetarisierung**, **Copy/Microcopy**. `KN-BRAND-001` gelesen.
   Zustand entstanden.
 
 Nicht berührt: Risk Map, Wizard, Ranking, AI-Verhalten.
+
+## Fortschritt (2026-10-10)
+
+- [x] **D2** — die Texte stammen aus D1 (#287, fünf Stellen); D2 ergänzt den
+  Wächter: `copy:check` reserviert „Kulanzfrist"/„grace" auf
+  `providerws.billing.*` für `grace*`-Schlüssel.
+- [x] **C2** — `carriedDiscountCount` + Übernahme in `startSubscription`;
+  Unit- und Routentest.
+- [x] **A2 Backend** — `POST /provider/:key/billing/recheck`
+  (`verifyPaymentMethod` per SetupIntent, `recheckPaymentMethod`, drei
+  Prüfungen in 24 h); fünf Routentests, OpenAPI.
+- [x] **A2 Oberfläche** — Canvas-Wahl **A V2** (zwei Wege zur Wahl) ·
+  **B V1** (Zeile unter dem Knopf). Figma: Seite „Zahlung & Reaktivierung
+  (ADR-0008)“ im Screens-File; lokal in `BillingPage.tsx`, vier
+  Komponententests, Mock mit beiden Ausgängen. Review durch den Nutzer offen.
+- [x] **B2a** (Nachwahl: B2 war mit `send_invoice` nicht baubar) —
+  `invoiceRetry.ts`: Bescheid am Fälligkeitstag (Mail + Benachrichtigung),
+  Versuche an Tag 1/3/6, `due_at` unberührt; sechs Routentests, vier
+  Unit-Tests. Hinter `INVOICE_RETRY_ENABLED=1`.
+- [ ] **Mandat prüfen**, bevor `INVOICE_RETRY_ENABLED=1` gesetzt wird: deckt
+  `billing_authorization` (Fassung 2026-09) die Belastung von
+  Abo-Rechnungen? Der Text liegt nicht im Repo.
+- [ ] Die Benachrichtigung `invoice_retry_scheduled` hat noch keine Darstellung
+  in der Glocke (wie die Phase-5-Typen); die Mail trägt die Nachricht.
+- [ ] Auf Staging prüfen, ob der Stripe-Key SetupIntents anlegen darf
+  (Restricted Key, vgl. Befund 2026-10-04).

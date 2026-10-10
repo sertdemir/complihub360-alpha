@@ -50,7 +50,10 @@ export type NotificationType =
     // beides hiesse: entweder der Anbieter erfaehrt am Stichtag nichts, oder
     // er bekommt sofort eine Nachricht ueber etwas, das noch Wochen weg ist.
     | 'subscription_scheduled'       // Wechsel oder Kuendigung ist vorgemerkt
-    | 'subscription_schedule_done';  // Der Stichtag ist erreicht, es ist geschehen
+    | 'subscription_schedule_done'   // Der Stichtag ist erreicht, es ist geschehen
+    // ADR-0008 B2a: eine Abo-Rechnung ist faellig; wir versuchen an Tag 1/3/6
+    // die hinterlegte Karte. Die Frist bleibt.
+    | 'invoice_retry_scheduled';
 
 /**
  * Die erlaubten Nutzlast-Felder. Bewusst eine geschlossene Liste: alles, was

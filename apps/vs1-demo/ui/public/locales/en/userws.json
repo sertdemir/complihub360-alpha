@@ -631,14 +631,13 @@
       "confirmed": "CONFIRMED",
       "completed": "COMPLETED",
       "cancelled": "CANCELLED",
-      "no_show": "NO-SHOW",
+      "no_show": "DID NOT TAKE PLACE",
       "outcome_open": "OUTCOME OPEN"
     },
     "outcomeQuestion": "Did this appointment take place?",
     "outcomeYes": "Yes, it took place",
     "outcomeNo": "Provider did not show",
     "reviewed": "✓ Review submitted",
-    "noShowNote": "No refund — the provider received the dossier at booking. We re-match you on request.",
     "website": "Provider website",
     "emptyTitle": "No appointments",
     "emptyBody": "Appointments come from a request: once a provider confirms, the meeting appears here and can be added to your calendar.",
@@ -669,6 +668,30 @@
       "short": "The provider cannot offer this service at the moment. Details below.",
       "cancel": "Cancel appointment free of charge",
       "talk": "Talk to us"
+    },
+    "after": {
+      "afterTitleUser": "According to the provider, the appointment did not take place",
+      "afterBodyUser": "You can pick a new appointment with {{provider}} until {{deadline}}. Your request stays open there, and nothing is charged to you.",
+      "afterTitleProvider": "The provider did not show up. We have noted it.",
+      "afterBodyProvider": "You can pick a new appointment with {{provider}} until {{deadline}}, or look at another provider. Nothing is charged to you.",
+      "afterBodyProviderClosed": "You can look at another provider at any time. Nothing is charged to you.",
+      "afterNoteProvider": "The incident goes into the provider’s performance record, not into your request.",
+      "afterTitlePlatform": "A technical problem on our side cancelled this appointment",
+      "afterBodyPlatform": "That was our mistake, not yours. You can pick a new appointment with {{provider}} until {{deadline}}; nothing is charged to you.",
+      "afterBodyClosed": "The window for a new appointment with {{provider}} has passed. You can look at another provider at any time; nothing is charged to you.",
+      "rebook": "Pick a new appointment",
+      "otherProvider": "Look at another provider",
+      "disputeHint": "Does that not match your impression? <dispute>Dispute</dispute> until {{until}} — we will look into it.",
+      "disputeOpenTitle": "Your dispute has been received",
+      "disputeOpenBody": "We will look into it and get back to you. Until then, the window for a new appointment with {{provider}} stays open.",
+      "disputeDismissedNote": "We looked into your dispute; the report stands. The window for a new appointment stays open.",
+      "disputeConfirmEyebrow": "Dispute report",
+      "disputeConfirmTitle": "Dispute the no-show report for {{provider}}?",
+      "disputeConfirmBody": "We will look at the case. Until it is decided, the window for a new appointment stays open. Nothing is charged to you either way.",
+      "disputeConfirmCta": "Send dispute",
+      "disputeConfirmBack": "Back",
+      "disputeFailed": "The dispute could not be sent. Please try again or talk to us.",
+      "rebookedFrom": "New appointment for an earlier booking"
     }
   },
   "review": {
@@ -695,7 +718,14 @@
     "confirm": "Move appointment",
     "cancel": "Cancel",
     "done": "Moved ✓",
-    "note": "Moving the appointment keeps your booking and the shared dossier — no new lead fee applies. The provider is notified of the new time."
+    "note": "Your booking and the shared dossier stay in place. The provider is notified of the new time.",
+    "rebookEyebrow": "Pick a new appointment",
+    "rebookConfirm": "Book new appointment",
+    "rebookDone": "Booked ✓",
+    "rebookNote": "The new appointment continues your earlier booking. Your request stays with this provider, and nothing is charged to you.",
+    "limit": "This appointment has been moved as often as possible. If the time no longer works, please cancel it and book again.",
+    "slotTaken": "This slot has just been taken. Please pick another one.",
+    "failed": "The appointment could not be moved. Please try again."
   },
   "wizardDrawer": {
     "eyebrow": "New search",

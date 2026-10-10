@@ -49,6 +49,17 @@ export async function fetchInvoices(providerKey?: string): Promise<Invoice[]> {
 // Pure computation server-side; nothing here is a ranking input.
 export type PlanCode = 'essential' | 'growth' | 'global';
 
+/** Ein Guthaben an einer Buchung: der Nutzer kam nicht und hat in der Frist
+ *  nicht neu gebucht — 30 % der gezahlten Lead-Gebuehr, nie Bargeld. */
+export interface ProviderCredit {
+  id: string;
+  amount_cents: number;
+  currency: string;
+  reason: 'user_no_rebook_30pct' | string;
+  booking_id: string | null;
+  created_at: string;
+}
+
 export interface BillingPreview {
   period: string;
   currency: string;
@@ -64,6 +75,12 @@ export interface BillingPreview {
    *  Optional, weil aeltere Antworten (und Fixtures) das Feld nicht tragen. */
   readiness?: BillingReadiness;
   credit_balance_cents: number;
+  /** Phase 5 (ADR-0007): was vom Guthaben mit dieser Rechnung verrechnet wird
+   *  (bis zur Abo-Summe), die offenen Guthaben einzeln, und die Summe danach.
+   *  Optional, weil aeltere Antworten die Felder nicht tragen. */
+  credit_applied_cents?: number;
+  credits?: ProviderCredit[];
+  total_after_credit_cents?: number;
   lines: InvoiceLineItem[];
   total_cents: number;
   pricing: {
@@ -116,6 +133,36 @@ export async function syncBillingReadiness(providerKey?: string): Promise<Billin
     return res.readiness;
   } catch (e) {
     if (e && typeof e === 'object' && 'status' in e && (e as { status: number }).status === 503) return 'not-configured';
+    throw e;
+  }
+}
+
+// ─── ADR-0008 A2: dieselbe Karte erneut pruefen ──────────────────────────────
+// Nach einer gescheiterten Lead-Belastung prueft Stripe das Standard-
+// Zahlungsmittel, ohne etwas zu belasten. `cleared` hebt die Sperre auf,
+// `not_blocked` heisst: es gab keine (mehr) — dann zaehlt nur die neue Lage.
+
+export type RecheckResult =
+  | { kind: 'cleared' | 'not_blocked'; readiness: BillingReadiness | null }
+  | { kind: 'declined' | 'needs_action' }
+  | { kind: 'rate_limited'; retryAfter: string | null }
+  | { kind: 'not_configured' };
+
+export async function recheckPaymentMethod(providerKey?: string): Promise<RecheckResult> {
+  try {
+    const res = await apiFetch<{ ok: boolean; result: string; readiness?: BillingReadiness | null }>(`/api/v1/provider/${providerKey ?? await myProviderKey()}/billing/recheck`, {
+      method: 'POST',
+      body: '{}',
+    });
+    if (res.result === 'declined' || res.result === 'needs_action') return { kind: res.result };
+    return { kind: res.result === 'cleared' ? 'cleared' : 'not_blocked', readiness: res.readiness ?? null };
+  } catch (e) {
+    const status = e && typeof e === 'object' && 'status' in e ? (e as { status: number }).status : 0;
+    if (status === 503) return { kind: 'not_configured' };
+    if (status === 429) {
+      const body = (e as { body?: { retry_after?: string } }).body;
+      return { kind: 'rate_limited', retryAfter: body?.retry_after ?? null };
+    }
     throw e;
   }
 }

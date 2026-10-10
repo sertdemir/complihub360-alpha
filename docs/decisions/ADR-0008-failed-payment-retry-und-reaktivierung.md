@@ -1,6 +1,6 @@
 # ADR-0008: Gescheiterte Zahlung und Reaktivierung
 
-**Status:** TEILWEISE ENTSCHIEDEN — **D1 beschlossen und umgesetzt (Nutzer, 2026-10-10)**; A, B und C stehen weiter zur Wahl
+**Status:** ACCEPTED — **D1** (umgesetzt in #287) und **A2 · B2a · C2 · D2** (Nutzer, 2026-10-10); `INVOICE_RETRY_ENABLED` wartet auf die Prüfung des Zahlungsmandats
 **Date:** 2026-10-10
 **Bezug:** *Provider Dashboard Pricing & Operations Implementation Specification* v1.0 („Spec B") — „Configurable items requiring final decision": *„Subscription proration, cancellation notice, grace period, failed-payment retry, and reactivation rules."* · *Spec A* §21.1 (Billing Readiness) · [`KN-BRAND-001`](../../.knowledge/memory/nodes/KN-BRAND-001-complihub360-dna.md) · ADR-0003 (Pricing v2) · ADR-0005 (Buchung → Belastung) · ADR-0006 (Kulanzfrist, Wechsel, Kündigung) · `TKT-PROV-11`
 **Was ADR-0006 offen gelassen hat:** Dort wurden drei der fünf Spec-B-Punkte entschieden (A2 · B2 · C2). Die beiden letzten — `failed-payment retry` und `reactivation rules` — blieben ausdrücklich liegen. Diese Vorlage holt sie nach.
@@ -226,6 +226,54 @@ gerade nichts nutzt: Wird **A2** gewählt, ist er der Text für den Weg zurück.
 geben soll (A, B) und was ein Neustart mitnimmt (C). Die Texte beschreiben den
 Ist-Zustand und versprechen nichts darüber hinaus — genau deshalb müssen sie
 nach einer Entscheidung zu A oder B noch einmal angefasst werden.
+
+### A2 · B2a · C2 · D2 (Nutzer, 2026-10-10)
+
+
+Zwei Sitzungen haben am selben Tag entschieden: in der einen **D1**
+(umgesetzt in #287, oben), in der anderen **A2 · B2 · C2 · D2**. Kein
+Widerspruch — D2 ist D1 plus die Reservierung des Wortes. Die Copy aus D1
+bleibt, wie #287 sie gesetzt hat; D2 fügt nur den Wächter hinzu.
+
+- **A2 — Prüfung auf Anstoß des Anbieters.** `POST /provider/:key/billing/recheck`
+  legt einen SetupIntent über das gescheiterte Standard-Zahlungsmittel an
+  (`verifyPaymentMethod`, kein Geld). Bestätigt Stripe es, wird
+  `last_payment_failure` geleert und die Bereitschaft neu berechnet
+  (`recheckPaymentMethod`, Ereignisse `payment_method_recheck` und
+  `payment_failure_cleared`). Die offene Frage aus den Optionen („wie oft")
+  ist beantwortet mit **höchstens drei Prüfungen je Anbieter in 24 Stunden**
+  (`RECHECK_LIMIT_PER_DAY`, 429 `RECHECK_LIMIT` mit `retry_after`). Die
+  Oberfläche folgt nach der Canvas-Wahl.
+- **C2 — Rabattzähler wird mitgenommen.** `startSubscription` übernimmt den
+  höchsten Zählerstand eines Zyklus, der heute noch läuft
+  (`carriedDiscountCount`, Ereignis `discount_counter_carried`). Der Zähler
+  ist damit nicht mehr rein am Abo-Zyklus geschlüsselt; vermerkt an
+  `applyMonthlyDiscount` und in `subscriptions.ts`.
+- **D2 — das Wort wird reserviert.** Die Texte stammen aus D1 (#287).
+  Zusätzlich hält `copy:check` „Kulanzfrist"/„grace" (und „Workspace-Sperre")
+  auf `providerws.billing.*` ausschließlich in `grace*`-Schlüsseln; gegen die
+  alten Texte geprüft, der Wächter schlägt an.
+- **B2 — umgesetzt als B2a (Nachwahl 2026-10-10).** Stripes Wiederholungen
+  (Smart Retries) greifen nur bei `collection_method = charge_automatically`;
+  die Abo-Rechnungen laufen als `send_invoice`, dort belastet Stripe nie
+  selbst eine Karte. Die Option, wie sie oben steht, war so nicht baubar.
+  Zur Wahl standen B2a (wir ziehen in der Kulanzfrist selbst ein), B2b
+  (Umstellung auf automatischen Einzug, ohne 14 Tage Zahlungsziel) und B1.
+  Gewählt: **B2a**.
+  - Am Fälligkeitstag erfährt der Anbieter per Mail und Benachrichtigung
+    (`invoice_retry_scheduled`), an welchen Tagen wir die hinterlegte Karte
+    versuchen, dass die Frist bleibt und dass er selbst zahlen kann.
+  - An **Tag 1, 3 und 6** nach Fälligkeit je ein Versuch
+    (`invoices/:id/pay`, off-session, Standard-Zahlungsmittel), je Rechnung
+    und Tag höchstens einmal; versäumte Tage werden nicht nachgeholt. Nur
+    Versuchstage innerhalb der Kulanzfrist zählen.
+  - **`due_at` wird nie angefasst.** Der Stichtag aus ADR-0006 bleibt.
+  - Eingeschaltet erst mit `INVOICE_RETRY_ENABLED=1`: Vorher ist zu prüfen,
+    ob das Zahlungsmandat (`billing_authorization`, Fassung 2026-09) die
+    Belastung von Abo-Rechnungen deckt — der Text liegt nicht im Repo.
+    Ohne den Schalter gilt faktisch B1.
+  - Code: `invoiceRetry.ts` (`retryStage`, `runInvoiceRetryTick`),
+    Watcher-Pass mit Shadow-Markern `invoice_retry_shadow`.
 
 ## Was zusammenhängt
 
