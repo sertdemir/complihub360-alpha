@@ -914,6 +914,11 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'search') return search(body);
   // Marktanfrage: der Server prueft und schreibt (marketRequests.ts); hier
   // nur die Antwortform. Ein abgedeckter Markt bekaeme dort 409.
+  // Kontakt und Bewerbung: der Server prueft und schickt (contact.ts); der
+  // lokale Mock antwortet nur in der Form eines Erfolgs. Auf Staging erreicht
+  // der Demo-Login diesen Zweig nicht — api/contact.ts geht am Demo-Datensatz
+  // vorbei, damit dort kein Versand vorgetaeuscht wird.
+  if (p[0] === 'contact' && method === 'POST') return { ok: true, acknowledged: true };
   if (p[0] === 'market-requests' && method === 'POST') {
     const market = String(body.market ?? '').toUpperCase();
     if (isKnownCountry(market)) return { __status: 409, errorCode: 'MARKET_COVERED', message: 'This market is already covered' };

@@ -8,6 +8,8 @@ import { Segment } from '../components/compliance-areas';
 import { SystemFooter } from '../components/auth/SystemFooter';
 import { DOMAINS } from '../lib/domains';
 import { MARKET_CODES } from '../lib/marketProfiles';
+import { SendFailed } from '../components/contact/SendStates';
+import { EMAIL_RE, failureOf, invalidFieldOf, sendContact, type SendFailure } from '../api/contact';
 
 // ─── /partner-apply · die Partner-Bewerbung ──────────────────────────────────
 // Gebaut 2026-08-29 (Nutzer-Entscheidung): "Als Partner bewerben" fuehrt in
@@ -23,20 +25,11 @@ import { MARKET_CODES } from '../lib/marketProfiles';
 // manuelle Pruefung direkt verwenden. Der Anbieter-Weg der Kontaktseite
 // bleibt fuer formlose Fragen bestehen.
 //
-// TODO(partner-apply-live): einen oeffentlichen Bewerbungs-Endpunkt gibt es
-// noch nicht — der echte Intake verlangt einen Einladungs-Token. Bis der
-// Endpunkt steht, sagt das Formular das offen (derselbe ehrliche Weg wie das
-// Kontaktformular) statt einen Versand vorzutaeuschen.
-const APPLY_ENDPOINT: string | null = null;
-
-/** Wie in LegalPages.tsx und auf der Kontaktseite: sichtbar offen statt erfunden. */
-function Placeholder({ children }: { children: React.ReactNode }) {
-    return (
-        <span className="rounded bg-warning-bg px-1.5 py-0.5 font-mono text-[0.85em] text-warning-700 ring-1 ring-inset ring-warning-500/30">
-            [{children}]
-        </span>
-    );
-}
+// Senden (Beta-Plan Di 13.10.): POST /api/v1/contact mit lane 'application'.
+// Die Bewerbung kommt als strukturierte Mail ins Postfach; passt es, laden wir
+// per Intake-Link ein (bestehender Weg). Canvas „Kontakt und Bewerbung
+// senden", Wahl D2 (10.10.2026): links wird die Aussicht zum Stand — Schritt
+// 01 bekommt den Haken. Figma: Screens-Datei, 3638:62.
 
 const FIELD =
     'mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35';
@@ -57,15 +50,41 @@ export function PartnerApplyPage() {
     const [areas, setAreas] = useState<string[]>([]);
     const [markets, setMarkets] = useState<string[]>([]);
     const [message, setMessage] = useState('');
-    const [sent, setSent] = useState(false);
+    const [hp, setHp] = useState('');
+    const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
+    const [failure, setFailure] = useState<{ kind: SendFailure; error: unknown } | null>(null);
+    const [acknowledged, setAcknowledged] = useState(true);
+    const [fieldError, setFieldError] = useState<string | null>(null);
+    const sent = status === 'sent';
 
     const canSubmit =
-        firm.trim() && contact.trim() && /.+@.+\..+/.test(email) && credentials.trim() && areas.length > 0 && markets.length > 0;
+        firm.trim() && contact.trim() && EMAIL_RE.test(email.trim()) && credentials.trim() && areas.length > 0 && markets.length > 0;
 
-    const onSubmit = (e: FormEvent) => {
+    const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        // Solange kein Endpunkt existiert, wird KEIN Versand vorgetaeuscht.
-        setSent(true);
+        if (!canSubmit || status === 'sending') return;
+        setStatus('sending');
+        setFailure(null);
+        setFieldError(null);
+        try {
+            const r = await sendContact({
+                lane: 'application', locale: lang, name: contact.trim(), email: email.trim(), firm: firm.trim(),
+                website: website.trim(), credentials: credentials.trim(), areas, markets, message, hp,
+            });
+            setAcknowledged(r.acknowledged);
+            setStatus('sent');
+        } catch (err) {
+            const field = invalidFieldOf(err);
+            if (field) {
+                // Das Feld, das der Server bemaengelt (die Kontaktperson heisst
+                // dort `name`). Jedes Feld der Route hat einen eigenen Satz.
+                setFieldError(t(`contactSend.field.${field}`));
+                setStatus('idle');
+                return;
+            }
+            setFailure({ kind: failureOf(err), error: err });
+            setStatus('failed');
+        }
     };
 
     const toggle = (list: string[], set: (v: string[]) => void) => (v: string) =>
@@ -90,17 +109,22 @@ export function PartnerApplyPage() {
                     {/* Die Aussicht: was nach dem Absenden passiert — der Kern
                         der Nutzer-Anforderung ("das müssen wir ihm sagen"). */}
                     <div className="mt-7 divide-y divide-[rgba(2,22,17,0.08)] border-y border-[rgba(2,22,17,0.08)]">
-                        {OUTLOOK.map((k, i) => (
-                            <div key={k} className="flex gap-3.5 py-3.5">
-                                <span className="font-serif text-body-md font-bold text-accent-700 dark:text-fg-accent-strong">0{i + 1}</span>
-                                <span className="min-w-0">
-                                    <span className="block text-body-sm font-bold text-fg">{t(`partnerApply.outlook.${k}.title`)}</span>
-                                    <span className="mt-0.5 block text-body-xs leading-relaxed text-fg-secondary">
-                                        {t(`partnerApply.outlook.${k}.desc`)}
+                        {OUTLOOK.map((k, i) => {
+                            const done = sent && i === 0;
+                            return (
+                                <div key={k} className="flex gap-3.5 py-3.5" data-step={k} data-done={done}>
+                                    <span className={'w-5 font-serif text-body-md font-bold ' + (done ? 'text-brand' : 'text-accent-700 dark:text-fg-accent-strong')}>
+                                        {done ? '✓' : `0${i + 1}`}
                                     </span>
-                                </span>
-                            </div>
-                        ))}
+                                    <span className="min-w-0">
+                                        <span className="block text-body-sm font-bold text-fg">{t(`partnerApply.outlook.${k}.title`)}</span>
+                                        <span className={'mt-0.5 block text-body-xs leading-relaxed ' + (done ? 'font-semibold text-brand' : 'text-fg-secondary')}>
+                                            {done ? t('partnerApply.sent.progress') : t(`partnerApply.outlook.${k}.desc`)}
+                                        </span>
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
 
                     <div className="mt-6 grid grid-cols-3 border-y border-stroke-subtle py-4">
@@ -122,31 +146,30 @@ export function PartnerApplyPage() {
             <div className="flex flex-1 flex-col justify-center border-stroke-subtle px-6 pb-10 pt-8 lg:border-l lg:px-14 lg:py-12">
                 <div className="mx-auto w-full max-w-[440px]">
                     {sent ? (
-                        <div className="rounded-xl border border-stroke-subtle bg-surface-secondary p-6">
-                            <h2 className="font-serif text-[1.25rem] font-bold leading-snug text-fg">
-                                {t('partnerApply.notWiredTitle')}
-                            </h2>
-                            <p className="mt-2.5 text-body-sm leading-relaxed text-fg-secondary">
-                                {t('partnerApply.notWiredBody')} <Placeholder>partner@…</Placeholder>
-                            </p>
-                            <button
-                                type="button"
-                                onClick={() => setSent(false)}
-                                className="mt-4 text-body-sm font-semibold text-brand transition-colors hover:text-brand-700"
-                            >
-                                ← {t('partnerApply.backToForm')}
-                            </button>
+                        <div className="flex flex-col gap-4" role="status">
+                            {acknowledged ? (
+                                <div className="flex flex-col gap-2 rounded-xl border border-success-500/30 bg-success-bg p-[22px] dark:bg-emerald-500/10">
+                                    <h2 className="font-serif text-[1.25rem] font-bold leading-snug text-fg">{t('partnerApply.sent.title')}</h2>
+                                    <p className="text-body-sm leading-relaxed text-fg-secondary">{t('partnerApply.sent.body', { email: email.trim() })}</p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-2 rounded-xl border border-warning-500/30 bg-warning-bg p-[22px] dark:bg-amber-500/10">
+                                    <h2 className="font-serif text-[1.25rem] font-bold leading-snug text-fg">{t('partnerApply.sent.title')}</h2>
+                                    <p className="text-body-sm leading-relaxed text-warning-700 dark:text-amber-200">{t('contactSend.ackFailed', { email: email.trim() })}</p>
+                                </div>
+                            )}
+                            {/* Kein „Zurueck zum Formular": eine zweite Bewerbung waere ein Duplikat (D2). */}
+                            <div>
+                                <Button type="button" variant="ghost" size="md" onClick={() => navigate(`/${lang}`)}>
+                                    {t('partnerApply.sent.home')}
+                                </Button>
+                            </div>
                         </div>
                     ) : (
                         <form onSubmit={onSubmit}>
                             <h2 className="font-serif text-[1.5rem] font-bold leading-tight text-fg">{t('partnerApply.formTitle')}</h2>
                             <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{t('partnerApply.formLead')}</p>
 
-                            {!APPLY_ENDPOINT && (
-                                <div className="mt-4 rounded-lg border border-warning-500/30 bg-warning-bg px-4 py-2.5 text-body-2xs leading-relaxed text-warning-700">
-                                    {t('partnerApply.draftNote')}
-                                </div>
-                            )}
 
                             <div className="mt-2 flex flex-col gap-0 sm:flex-row sm:gap-4">
                                 <div className="flex-1">
@@ -192,10 +215,22 @@ export function PartnerApplyPage() {
                             <label htmlFor="pa-msg" className={'mt-5 ' + LABEL}>{t('partnerApply.message')}</label>
                             <textarea id="pa-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder={t('partnerApply.messagePh')} className={FIELD + ' resize-none'} />
 
+                            {/* Honeypot: fuer Menschen unsichtbar und nicht erreichbar. */}
+                            <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                                <label htmlFor="pa-hp">Website</label>
+                                <input id="pa-hp" name="website_hp" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
+                            </div>
+
+                            {fieldError && <p role="alert" className="mt-5 text-body-2xs leading-snug text-error-700 dark:text-red-400">{fieldError}</p>}
+                            {status === 'failed' && failure && (
+                                <div className="mt-5"><SendFailed kind="application" failure={failure.kind} error={failure.error} /></div>
+                            )}
+
                             <div className="mt-6 flex items-center justify-between gap-4 border-t border-stroke-subtle pt-5">
                                 <p className="max-w-[220px] text-body-3xs leading-relaxed text-fg-tertiary">{t('partnerApply.privacy')}</p>
-                                <Button type="submit" variant="primary" shape="soft" size="lg" disabled={!canSubmit} className="shrink-0">
-                                    {t('partnerApply.submit')} <ArrowRight size={16} />
+                                <Button type="submit" variant="primary" shape="soft" size="lg" disabled={!canSubmit} loading={status === 'sending'} className="shrink-0">
+                                    {status === 'sending' ? t('contactSend.sending') : status === 'failed' ? t('contactSend.retry') : t('partnerApply.submit')}
+                                    {status !== 'sending' && <ArrowRight size={16} />}
                                 </Button>
                             </div>
                             <p className="mt-4 text-center text-body-2xs text-fg-tertiary">

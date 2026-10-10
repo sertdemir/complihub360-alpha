@@ -1825,7 +1825,7 @@
     },
     "facts": {
       "confirm": {
-        "value": "24 h",
+        "value": "sofort",
         "label": "Eingang bestätigt"
       },
       "answer": {
@@ -1839,7 +1839,6 @@
     },
     "formTitle": "Ihre Bewerbung",
     "formLead": "Das Minimum, mit dem die Prüfung starten kann. Alles Weitere klären wir im Gespräch.",
-    "draftNote": "Vorschau: Der Versandweg für Bewerbungen ist noch nicht angebunden. Bis dahin geht hier nichts hinaus.",
     "firm": "Kanzlei / Firma",
     "contact": "Ansprechperson",
     "email": "E-Mail",
@@ -1855,9 +1854,12 @@
     "submit": "Bewerbung senden",
     "questions": "Lieber erst formlos fragen?",
     "questionsLink": "Zum Kontakt für Anbieter",
-    "notWiredTitle": "Noch nicht abgeschickt",
-    "notWiredBody": "Der Versandweg für Bewerbungen steht noch aus. Bis dahin erreichen Sie uns unter",
-    "backToForm": "Zurück zum Formular"
+    "sent": {
+      "title": "Ihre Bewerbung ist angekommen.",
+      "body": "Eine Bestätigung ist an {{email}} unterwegs. Wir prüfen Ihre Angaben von Hand und melden uns innerhalb von 3 Werktagen.",
+      "progress": "läuft · Rückmeldung in 3 Werktagen",
+      "home": "Zur Startseite"
+    }
   },
   "contact": {
     "hero": {
@@ -1865,7 +1867,7 @@
       "titlePre": "Sagen Sie uns, ",
       "titleGold": "worum es geht",
       "titlePost": ".",
-      "lead": "Ein Weg für alles wäre bequem für uns und langsam für Sie. Wählen Sie Ihr Anliegen — es landet bei den Menschen, die es beantworten können.",
+      "lead": "Wählen Sie Ihr Anliegen — dann weiß, wer Ihre Nachricht liest, sofort, worum es geht. Eine Adresse müssen Sie nicht suchen.",
       "facts": {
         "ways": {
           "value": "4 Wege",
@@ -1892,29 +1894,25 @@
         "short": "Assessment",
         "title": "Hilfe beim Assessment",
         "desc": "Eine Frage hängt, ein Ergebnis wirkt falsch, das Konto klemmt.",
-        "sla": "Antwort am nächsten Werktag",
-        "mailbox": "support@…"
+        "sla": "Antwort am nächsten Werktag"
       },
       "sales": {
         "short": "Preise",
         "title": "Preise und Pläne",
         "desc": "Welcher Plan passt, was ein Team kostet, wie Rechnungen laufen.",
-        "sla": "Antwort am nächsten Werktag",
-        "mailbox": "sales@…"
+        "sla": "Antwort am nächsten Werktag"
       },
       "partner": {
         "short": "Anbieter",
         "title": "Als Anbieter gelistet werden",
         "desc": "Kanzlei, Steuerberatung oder Beratung, die in unser Netzwerk möchte.",
-        "sla": "Rückmeldung in 3 Werktagen",
-        "mailbox": "partner@…"
+        "sla": "Rückmeldung in 3 Werktagen"
       },
       "privacy": {
         "short": "Datenschutz",
         "title": "Datenschutz und Sicherheit",
         "desc": "Auskunft, Löschung, Auftragsverarbeitung oder die Meldung einer Lücke.",
-        "sla": "Frist nach Art. 12 DSGVO",
-        "mailbox": "datenschutz@…"
+        "sla": "Frist nach Art. 12 DSGVO"
       }
     },
     "form": {
@@ -1931,8 +1929,7 @@
       "messageHelper": "Markt, Produkt und was Sie erwartet hätten — das spart eine Rückfrage.",
       "privacy": "Wir nutzen Ihre Angaben nur zur Beantwortung. Kein Newsletter ohne Ihr Zutun.",
       "submit": "Nachricht senden",
-      "draftNote": "Vorschau: Der Versandweg und die Postfächer dieser Seite sind noch nicht angebunden. Bis dahin geht hier nichts hinaus.",
-      "notWired": "Noch nicht abgeschickt — der Versandweg steht noch aus. Bis dahin erreichen Sie uns unter"
+      "direct": "Lieber direkt per E-Mail?"
     },
     "faster": {
       "eyebrow": "Vielleicht schneller",
@@ -1996,6 +1993,36 @@
       "address": "Anschrift",
       "phone": "Telefonnummer",
       "hours": "Servicezeiten"
+    },
+    "sent": {
+      "title": "Ihre Nachricht ist angekommen.",
+      "body": "Eine Bestätigung ist an {{email}} unterwegs.",
+      "done": "erledigt",
+      "again": "Weitere Nachricht schreiben"
+    }
+  },
+  "contactSend": {
+    "sending": "Wird gesendet …",
+    "retry": "Erneut senden",
+    "failedTitle": "Ihre Nachricht ist nicht abgeschickt.",
+    "failedTitleApplication": "Ihre Bewerbung ist nicht abgeschickt.",
+    "failed": {
+      "unavailable": "Der Versand ist gerade nicht verfügbar. Ihr Text bleibt hier stehen.",
+      "network": "Die Verbindung zu unserem Postfach ist fehlgeschlagen. Ihr Text bleibt hier stehen.",
+      "rateLimit": "Von Ihrem Anschluss kamen in kurzer Zeit mehrere Nachrichten. Bitte warten Sie 15 Minuten. Ihr Text bleibt hier stehen."
+    },
+    "direct": "Versuchen Sie es erneut oder schreiben Sie uns direkt:",
+    "copy": "Kopieren",
+    "ackFailed": "Die Bestätigung an {{email}} ließ sich nicht zustellen. Unsere Antwort geht an genau diese Adresse. Stimmt sie nicht, schreiben Sie uns bitte noch einmal.",
+    "field": {
+      "name": "Bitte geben Sie Ihren Namen an.",
+      "email": "Bitte prüfen Sie die E-Mail-Adresse.",
+      "message": "Bitte schreiben Sie kurz, worum es geht.",
+      "firm": "Bitte nennen Sie Ihre Firma.",
+      "credentials": "Bitte nennen Sie Ihre Zulassung oder Qualifikation.",
+      "areas": "Bitte wählen Sie mindestens einen Bereich.",
+      "markets": "Bitte wählen Sie mindestens einen Markt.",
+      "website": "Bitte prüfen Sie die Website-Adresse."
     }
   },
   "states": {

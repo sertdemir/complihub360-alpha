@@ -1873,7 +1873,7 @@
     },
     "facts": {
       "confirm": {
-        "value": "24 h",
+        "value": "instant",
         "label": "receipt confirmed"
       },
       "answer": {
@@ -1887,7 +1887,6 @@
     },
     "formTitle": "Your application",
     "formLead": "The minimum we need to start the review. Everything else we clarify in conversation.",
-    "draftNote": "Preview: the submission path for applications is not wired up yet. Until it is, nothing leaves this page.",
     "firm": "Firm / company",
     "contact": "Contact person",
     "email": "Email",
@@ -1903,9 +1902,12 @@
     "submit": "Send application",
     "questions": "Prefer to ask informally first?",
     "questionsLink": "Contact for providers",
-    "notWiredTitle": "Not sent yet",
-    "notWiredBody": "The submission path for applications is still pending. Until then, reach us at",
-    "backToForm": "Back to the form"
+    "sent": {
+      "title": "Your application has arrived.",
+      "body": "A confirmation is on its way to {{email}}. We review your details by hand and get back to you within 3 business days.",
+      "progress": "in progress · feedback within 3 business days",
+      "home": "Back to the homepage"
+    }
   },
   "contact": {
     "hero": {
@@ -1913,7 +1915,7 @@
       "titlePre": "Tell us ",
       "titleGold": "what it is about",
       "titlePost": ".",
-      "lead": "One inbox for everything would be convenient for us and slow for you. Pick your topic — it goes to the people who can answer it.",
+      "lead": "Choose your topic — then whoever reads your message knows at once what it is about. No address to look up.",
       "facts": {
         "ways": {
           "value": "4 routes",
@@ -1940,29 +1942,25 @@
         "short": "Assessment",
         "title": "Help with the assessment",
         "desc": "A question is stuck, a result looks wrong, the account will not budge.",
-        "sla": "Reply the next business day",
-        "mailbox": "support@…"
+        "sla": "Reply the next business day"
       },
       "sales": {
         "short": "Pricing",
         "title": "Pricing and plans",
         "desc": "Which plan fits, what a team costs, how invoicing works.",
-        "sla": "Reply the next business day",
-        "mailbox": "sales@…"
+        "sla": "Reply the next business day"
       },
       "partner": {
         "short": "Providers",
         "title": "Getting listed as a provider",
         "desc": "A law firm, tax advisor or consultancy that wants to join the network.",
-        "sla": "Response within 3 business days",
-        "mailbox": "partner@…"
+        "sla": "Response within 3 business days"
       },
       "privacy": {
         "short": "Privacy",
         "title": "Privacy and security",
         "desc": "Access, erasure, data processing agreements, or reporting a vulnerability.",
-        "sla": "Deadline under Art. 12 GDPR",
-        "mailbox": "privacy@…"
+        "sla": "Deadline under Art. 12 GDPR"
       }
     },
     "form": {
@@ -1979,8 +1977,7 @@
       "messageHelper": "Market, product and what you expected instead — that saves a round trip.",
       "privacy": "We use what you write to answer you, nothing else. No newsletter unless you ask for one.",
       "submit": "Send message",
-      "draftNote": "Preview: the sending route and the mailboxes on this page are not connected yet. Nothing leaves here until they are.",
-      "notWired": "Not sent yet — the sending route is still pending. Until then you can reach us at"
+      "direct": "Prefer to email us directly?"
     },
     "faster": {
       "eyebrow": "Possibly faster",
@@ -2044,6 +2041,36 @@
       "address": "postal address",
       "phone": "phone number",
       "hours": "service hours"
+    },
+    "sent": {
+      "title": "Your message has arrived.",
+      "body": "A confirmation is on its way to {{email}}.",
+      "done": "done",
+      "again": "Write another message"
+    }
+  },
+  "contactSend": {
+    "sending": "Sending …",
+    "retry": "Send again",
+    "failedTitle": "Your message was not sent.",
+    "failedTitleApplication": "Your application was not sent.",
+    "failed": {
+      "unavailable": "Sending is not available right now. Your text stays here.",
+      "network": "The connection to our inbox failed. Your text stays here.",
+      "rateLimit": "Several messages came from your connection in a short time. Please wait 15 minutes. Your text stays here."
+    },
+    "direct": "Try again or write to us directly:",
+    "copy": "Copy",
+    "ackFailed": "The confirmation to {{email}} could not be delivered. Our reply goes to exactly this address. If it is wrong, please write to us again.",
+    "field": {
+      "name": "Please enter your name.",
+      "email": "Please check the email address.",
+      "message": "Please tell us briefly what it is about.",
+      "firm": "Please enter your firm.",
+      "credentials": "Please enter your licence or qualification.",
+      "areas": "Please choose at least one area.",
+      "markets": "Please choose at least one market.",
+      "website": "Please check the website address."
     }
   },
   "states": {
