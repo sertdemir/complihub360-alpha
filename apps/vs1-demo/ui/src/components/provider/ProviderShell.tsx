@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CalendarCheck, LineChart, Globe, ShieldCheck, ReceiptEuro, Gauge, Settings, Bell, CircleHelp, Search } from 'lucide-react';
+import { LayoutDashboard, CalendarCheck, LineChart, Globe, ShieldCheck, ReceiptEuro, Gauge, Settings, Bell, CircleHelp, Search } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
 import { Logo } from '../ui/Logo';
@@ -27,6 +27,9 @@ const NAV = [
   {
     groupKey: 'shell.groupPipeline',
     items: [
+      // Phase 6 (ADR-0009 Nr. 5): die Übersicht ist die Startseite — was heute
+      // ansteht, und wo das Konto steht. Die Anfragen-Seite ist abgehängt.
+      { to: 'overview', labelKey: 'shell.navOverview', icon: LayoutDashboard },
       // v2: Termine/Leads (bookings) replace the retired request/confirm pipeline.
       { to: 'termine', labelKey: 'shell.navTermine', icon: CalendarCheck },
       { to: 'performance', labelKey: 'shell.navPerformance', icon: LineChart },

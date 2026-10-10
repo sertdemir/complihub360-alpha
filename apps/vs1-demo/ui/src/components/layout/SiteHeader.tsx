@@ -49,7 +49,8 @@ export function SiteHeader() {
   // ueber die ProviderShell gesetzt — die Seite funktioniert, sieht aber falsch
   // aus, und nichts schlaegt an. Genau das ist mit `subscription` passiert.
   // `SiteHeader.workspace.guard.test.ts` haelt beide Seiten jetzt zusammen.
-  const PROVIDER_WORKSPACE = ['requests', 'termine', 'performance', 'coverage', 'verification', 'application', 'billing', 'subscription', 'settings', 'notifications', 'help'];
+  // Phase 6: 'overview' ist die Startseite des Partner-Dashboards (ADR-0009 Nr. 5).
+  const PROVIDER_WORKSPACE = ['overview', 'requests', 'termine', 'performance', 'coverage', 'verification', 'application', 'billing', 'subscription', 'settings', 'notifications', 'help'];
   if (localeOk && seg[1] === 'partner-dashboard' && PROVIDER_WORKSPACE.includes(seg[2])) {
     return null;
   }

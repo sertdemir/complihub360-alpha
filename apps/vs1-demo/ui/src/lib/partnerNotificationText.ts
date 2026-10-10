@@ -20,6 +20,8 @@ export function partnerNotificationText(t: TFunction, n: PartnerNotification, lo
     label: n.type === 'evidence_expiring' ? t(`application.evidence.type.${p.label}`, { defaultValue: p.label ?? '' }) : (p.label ?? ''),
     deadline: day(p.deadline ?? p.to),
     effectiveOn: day(p.effectiveOn),
+    // Phase 6: Entscheidung ueber den Einspruch steht im label (lifted|upheld).
+    decision: p.label === 'lifted' ? t('partnerNotif.decision.lifted') : p.label === 'upheld' ? t('partnerNotif.decision.upheld') : '',
   };
   return { title: t(`partnerNotif.${n.type}.title`, vars), body: t(`partnerNotif.${n.type}.body`, vars) };
 }

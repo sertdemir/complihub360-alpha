@@ -3,7 +3,6 @@
     "groupPipeline": "Pipeline",
     "groupBusiness": "İş",
     "groupAccount": "Hesap",
-    "navRequests": "Talepler",
     "navTermine": "Randevular",
     "navPerformance": "Performans",
     "navCoverage": "Kapsam",
@@ -34,7 +33,8 @@
     },
     "navSubscription": "Tarife",
     "signOut": "Oturumu kapat",
-    "oooFailed": "Değişiklik şu anda kaydedilemedi. Durumunuz değişmedi."
+    "oooFailed": "Değişiklik şu anda kaydedilemedi. Durumunuz değişmedi.",
+    "navOverview": "Genel bakış"
   },
   "bell": {
     "aria": "Bildirimler",
@@ -116,32 +116,56 @@
     "loading": "Yükleniyor…",
     "noMatches": "“{{query}}” için sonuç bulunamadı."
   },
-  "rankingImpact": {
-    "eyebrow": "SIRALAMA",
-    "title": "Sıralamanızı ne etkiler",
-    "footer": "Haftalık yeniden hesaplanır · reddetmeler sıralamanızı asla düşürmez — yalnızca kaçırılan onaylar düşürür.",
-    "factorResponsiveness": "Yanıt hızı (24 saat içinde onay)",
-    "factorResponsivenessNote": "Ø 6,2 sa — en güçlü kaldıracınız",
-    "factorReplyQuality": "Yanıt kalitesi ve tamamlama",
-    "factorReplyQualityNote": "müşteri tarafından onaylanan görevler",
-    "factorCoverageFit": "Kapsam uyumu (pazarlar · diller)",
-    "factorCoverageFitNote": "2 pazar · 3 dil",
-    "factorVerifiedStanding": "Verified Provider statüsü",
-    "factorVerifiedStandingNote": "aktif · otomatik yenilenir"
-  },
   "helpDrawer": {
     "eyebrow": "DESTEK",
     "title": "Yardım ve destek",
-    "contactSupport": "Destekle iletişime geçin",
-    "topicSlaTitle": "24 saatlik onay SLA'sı nasıl işler",
-    "topicSlaDesc": "Nelerin sayıldığı, neyin duraklattığı ve hatırlatmaların nasıl yükseldiği.",
-    "topicMagicLinksTitle": "Magic-Link'ler ve güvenlik",
-    "topicMagicLinksDesc": "Tek kullanımlık bağlantılar, geçerlilik süresi ve kimliğin neden onaydan sonra açıldığı.",
-    "topicRankingTitle": "Sıralama nasıl hesaplanır",
-    "topicRankingDesc": "Dört faktör ve ağırlıkları.",
-    "topicBillingTitle": "Faturalama ve faturalar",
-    "topicBillingDesc": "Onay başına fiyatlandırma, Stripe faturaları, ödeme yöntemleri.",
-    "medianResponse": "Medyan destek yanıt süresi: iş günlerinde 4 saat."
+    "intro": "Her plan için aynı: panelin dört alanına ilişkin bilgi ve ekibe bir destek talebi.",
+    "topic": {
+      "termine": {
+        "title": "Randevular ve katılım",
+        "desc": "Randevu sonrası bildirim, 14 günlük süre, itiraz, %30 alacak."
+      },
+      "billing": {
+        "title": "Faturalandırma, lead'ler, alacak",
+        "desc": "Bantlar, standart ücret, indirim kontenjanı, faturadan düşme."
+      },
+      "verification": {
+        "title": "Doğrulama ve belgeler",
+        "desc": "Yükleme, son geçerlilik tarihleri, hizmet ve ülke değişiklikleri."
+      },
+      "calendar": {
+        "title": "Takvim ve rezervasyon saatleri",
+        "desc": "Google veya Microsoft bağlama, hafta günü başına aralıklar, ofis dışı."
+      }
+    },
+    "go": {
+      "termine": "Randevular",
+      "billing": "Faturalandırma",
+      "verification": "Doğrulama",
+      "calendar": "Ayarlar"
+    },
+    "ticketTitle": "Ekibe destek talebi",
+    "subjectLabel": "Konu",
+    "subject": {
+      "technical": "Teknik",
+      "billing": "Faturalandırma",
+      "verification": "Doğrulama",
+      "calendar": "Takvim ve saatler",
+      "other": "Diğer"
+    },
+    "messagePlaceholder": "Ne oldu? Sayfa, zaman ve gösterildiyse referans kimliği.",
+    "send": "Gönder",
+    "note": "Yanıt genellikle bir iş günü içinde, her plan için aynı. Bir referans ve e-posta ile onay alırsınız.",
+    "noEmail": "Destek talebi için giriş e-posta adresiniz gerekir. Bu oturumda eksik.",
+    "sentTitle": "Talebiniz ulaştı.",
+    "sentBody": "Referans {{reference}}. Onay giriş adresinize gider; ekip genellikle bir iş günü içinde yanıtlar.",
+    "another": "Yeni talep",
+    "failed": {
+      "unavailable": "Gönderim burada henüz kurulmadı. Lütfen onay e-postanızdaki adresi kullanın.",
+      "network": "Bağlantı yok. Hesabınızda hiçbir şey değişmedi; lütfen tekrar deneyin.",
+      "rateLimit": "Kısa sürede çok fazla mesaj. Lütfen biraz bekleyin."
+    },
+    "scope": "Desteğin kapsamı dışında: şirketlerle pazarlık, mesleki danışmanlık, ücret anlaşmazlıkları. Uzman sizsiniz; biz platformuz."
   },
   "billing": {
     "title": "Faturalama",
@@ -314,36 +338,66 @@
   },
   "performance": {
     "title": "Performans",
-    "range30d": "Aralık: 30 g",
-    "subtitle": "Provider Flows §12'den kanonik KPI'lar + sıralama şeffaflığı. Ön düşürme uyarıları hem burada HEM DE tüm sekmelerde sabit bir banner olarak görünür (§7.2).",
-    "kpiConfirmRateNote": "yönlendirilen taleplerin onaylanma oranı",
-    "kpiReplyRateNote": "onaylandı → yanıt gönderildi",
-    "kpiAvgConfirmNote": "üst çeyrek <2 sa",
-    "kpiAvgReplyNote": "üst çeyrek <12 sa",
-    "kpiSlaBreachNote": "son 30 g · hedef <%5",
-    "rankingTitle": "Sıralama şeffaflığı",
-    "rankingSub": "Nerede durduğunuz · neyin etkilediği · son 7 günlük değişim geçmişi",
-    "whyThisMatters": "Bu neden önemli",
-    "currentRankLabel": "Güncel sıra · DE · KDV",
-    "rankOf": "47 Verified Provider içinde ·",
-    "rankUpFrom": "↑ #5'ten (geçen hafta)",
-    "whatMovesRank": "Sıralamanızı ne etkiler",
-    "factorResponseTime": "Yanıt süresi",
-    "factorResponseTimeNote": "avg_confirm_time 30 günde %18 düştü",
-    "factorAcceptanceRate": "Kabul oranı",
-    "factorAcceptanceRateNote": "confirm_rate önceki döneme göre +%5",
-    "factorMatchQuality": "Eşleşme kalitesi (müşteri değerlendirmeleri)",
-    "factorMatchQualityNote": "12 yeni değerlendirmede 4,7/5",
-    "factorCoverageBreadth": "Kapsam genişliği",
-    "factorCoverageBreadthNote": "2 pazar · 3 alan (DE odaklı)",
-    "movePlus3": "+3 sıra",
-    "movePlus1": "+1 sıra",
-    "moveNoChange": "değişiklik yok",
-    "qualityTitle": "Kalite puanı dökümü",
-    "qualitySub": "5 sinyalin bileşimi · en hızlı yükselmek için en düşüğü iyileştirin",
-    "qualityProfileCompleteness": "Profil eksiksizliği",
-    "qualityProjectCompletion": "Proje tamamlama (iptalsiz)",
-    "qualityClientSatisfaction": "Müşteri memnuniyeti"
+    "subtitle": "Randevularınızdan çıkan sonuçlar. Her sayı dayanağını ve dönemini belirtir; oranlar yalnızca beş randevudan itibaren görünür. Sıralama tam olarak bu verileri görür; her planda aynıdır.",
+    "range": "Son {{days}} gün · {{bookings}} randevu",
+    "policy": "Kural sürümü {{version}}",
+    "of": "/",
+    "fact": {
+      "attended": "Gerçekleşti",
+      "userNoShow": "Kullanıcı gelmedi",
+      "providerNoShow": "Kendi gelmemeleriniz",
+      "cancelled": "İptaller",
+      "rating": "Değerlendirme",
+      "wouldRebook": "Yeniden rezervasyon yapardı"
+    },
+    "attendedSub": "son {{days}} gün",
+    "userNoShowSub": "Ücret kalır; 14 gün içinde yeni rezervasyon olmazsa alacak",
+    "userNoShowDisputes_one": "{{count}} açık itiraz",
+    "userNoShowDisputes_other": "{{count}} açık itiraz",
+    "providerNoShowSub": "{{days}} günde {{count}} olay · {{alert}} olaydan itibaren uyarı, {{pause}} olaydan itibaren itiraz hakkıyla rezervasyon duraklatması",
+    "cancelledValue": "{{count}} sizin tarafınızdan",
+    "cancelledSub": "{{count}} kullanıcılar tarafından",
+    "ratingSub": "randevu sonrası {{count}} değerlendirmeden",
+    "ratingInsufficient": "henüz yeterli veri yok: {{need}} değerlendirmeden {{have}}",
+    "wouldRebookSub": "{{of}} değerlendirmeden {{count}}",
+    "insufficient": "henüz yeterli veri yok: {{need}} randevudan {{have}}",
+    "noBookings": "Bu dönemde henüz randevu yok. Veriler ilk randevuyla dolar; o zamana kadar sıralama sizi tarafsız sayar, daha düşük değil.",
+    "trendsTitle": "Gelişim",
+    "level": {
+      "basic": "Essential",
+      "enhanced": "Growth",
+      "global": "Global",
+      "advanced": "Global"
+    },
+    "trendsBy": {
+      "area": "Alan",
+      "country": "Ülke",
+      "month": "Ay"
+    },
+    "trendsLocked": "Alan, ülke ve aya göre gelişim Growth'tan itibaren dahildir. Yukarıdaki verileriniz her planda aynıdır.",
+    "trendsEmpty": "Bu dönemde henüz gelişim verisi yok.",
+    "csvExport": "CSV dışa aktar",
+    "csvLocked": "CSV dışa aktarma Global'den itibaren",
+    "csvFailed": "Dışa aktarma oluşturulamadı. Lütfen tekrar deneyin.",
+    "trendRow": "{{bookings}} randevu · {{attended}} gerçekleşti · {{noShow}} gelmeme · {{cancelled}} iptal",
+    "rankingNote": "Sıralama aynı verileri görür. Veri eksikse tarafsız sayılır; ne lehinize ne aleyhinize. Daha yüksek bir plan daha fazla gelişim gösterir, asla daha iyi sayılar değil.",
+    "enforcement": {
+      "booking_pause": "Rezervasyon duraklatması",
+      "correction_request": "Düzeltme istendi",
+      "profile_limitation": "Profil kısıtlandı",
+      "reverification": "Yeniden doğrulama",
+      "suspension": "Hesap askıya alındı"
+    },
+    "enforcementBody": "{{date}} itibarıyla, dönemdeki {{count}} olaydan sonra. Profiliniz görünür kalır; ekip karar verene kadar yeni rezervasyonlar duraklatıldı.",
+    "appealLabel": "İtiraz: neyi bilmemiz gerekir?",
+    "appealPlaceholder": "Örneğin: randevularda ne oldu, kanıtlar, koşullar.",
+    "appealSend": "İtiraz et",
+    "appealSent": "{{date}} tarihli itirazınız ekipte.",
+    "appealFailed": "İtiraz gönderilemedi. Lütfen tekrar deneyin.",
+    "appealDecided": {
+      "lifted": "Duraklatma {{date}} tarihinde kaldırıldı. Rezervasyonlar yeniden açık.",
+      "upheld": "Ekip duraklatmayı {{date}} tarihinde onayladı. Ekip kaldırana kadar sürer."
+    }
   },
   "magicAction": {
     "partnerBadge": "Partner",
@@ -487,6 +541,31 @@
       "unavailable": "Gönderim şu anda kullanılamıyor.",
       "network": "Gelen kutumuza bağlantı başarısız oldu.",
       "rateLimit": "Bağlantınızdan kısa sürede birden fazla mesaj geldi. Lütfen 15 dakika bekleyin."
+    },
+    "availability": {
+      "title": "Rezervasyon saatleri",
+      "sub": "Hafta günü başına en fazla üç zaman aralığı, 30 dakikalık adımlarla, kendi saat diliminizde. Bağlı takvimdeki dolu saatler düşülür.",
+      "timezone": "Saat dilimi",
+      "from": "başlangıç",
+      "to": "bitiş",
+      "and": "ve",
+      "addWindow": "+ Aralık",
+      "remove": "Aralığı kaldır",
+      "notBookable": "rezervasyon yok",
+      "note": "Randevular 30 dakika sürer. Aralığı olmayan günde rezervasyon alınmaz. Ofis dışı durumu üst çubuktan açılır.",
+      "save": "Kaydet",
+      "saved": "Kaydedildi",
+      "saveFailed": "Kaydedilemedi. Lütfen tekrar deneyin.",
+      "invalid": "Bir aralık başlamadan önce bitiyor veya başka bir aralıkla çakışıyor.",
+      "weekday": {
+        "mon": "Pzt",
+        "tue": "Sal",
+        "wed": "Çar",
+        "thu": "Per",
+        "fri": "Cum",
+        "sat": "Cmt",
+        "sun": "Paz"
+      }
     }
   },
   "termine": {
@@ -1089,6 +1168,86 @@
       "errAlready": "Hâlihazırda planlanmış bir işlem var. Önce onu geri alın.",
       "errSame": "Bu zaten mevcut planınız.",
       "errFailed": "Bu şu anda işe yaramadı. Lütfen tekrar deneyin."
+    }
+  },
+  "overview": {
+    "title": "Genel bakış",
+    "subtitle": "Bugün sizi bekleyenler ve hesabınızın durumu. Her satır randevularınızdan, belgelerinizden ve faturalandırmadan gelir; hiçbiri tahmin değildir.",
+    "today": "Bugün · {{date}}",
+    "nothingOpen": "Bekleyen yok",
+    "nothingOpenBody": "Bekleyen bildirim, itiraz veya süresi dolan belge yok. Sonraki randevularınız ve hesap durumunuz aşağıda.",
+    "task": {
+      "attendance_report_one": "Bildirim bekliyor: {{count}} randevu",
+      "attendance_report_other": "Bildirim bekliyor: {{count}} randevu",
+      "attendance_reportBody": "Randevu nasıl geçti? Bildiriminiz süreyi ve alacağı belirler.",
+      "dispute_open_one": "Bir gelmeme bildirimine {{count}} itiraz",
+      "dispute_open_other": "Gelmeme bildirimlerine {{count}} itiraz",
+      "dispute_openBody": "Ekip inceliyor. Kararı Randevular altında görürsünüz.",
+      "evidence_expiring": "Belgenin süresi doluyor: {{type}}, {{date}} tarihine kadar",
+      "evidence_expiringBody": "Onayınız kesintisiz devam etsin diye güncel belgeyi yükleyin.",
+      "billing_blocked": "Ödeme hazırlığı yeniden sağlanana kadar rezervasyonlar kapalı",
+      "billing_blockedBody": "Profiliniz görünür kalır. Ödeme yöntemini ve açık faturaları Faturalandırma altında kontrol edin.",
+      "enforcement": "Üç olaydan sonra rezervasyon duraklatması",
+      "enforcementBody": "Profiliniz görünür kalır, rezervasyonlar duraklatıldı. Bir kez itiraz edebilirsiniz.",
+      "enforcementAppealed": "İtirazınız ekipte. Profiliniz görünür kalır."
+    },
+    "go": {
+      "termine": "Randevuları aç",
+      "verification": "Doğrulamayı aç",
+      "billing": "Faturalandırmayı aç",
+      "performance": "Performansı aç",
+      "settings": "Ayarları aç",
+      "subscription": "Planı aç",
+      "overview": "Genel bakışı aç"
+    },
+    "evidenceGeneric": "Belge",
+    "upcomingTitle": "Sonraki randevular",
+    "upcomingEmpty": "Yaklaşan randevu yok.",
+    "upcomingCount_one": "{{count}} yaklaşan",
+    "upcomingCount_other": "{{count}} yaklaşan",
+    "calendarConnected": "takvim bağlı",
+    "calendarNotConnected": "takvim bağlı değil",
+    "allAppointments": "Tüm randevular →",
+    "rebooked": "yeniden alındı",
+    "confirmed": "Onaylandı",
+    "accountTitle": "Hesap",
+    "verified": "Doğrulandı",
+    "inReview": "incelemede",
+    "bookable": "Rezervasyon alınabilir",
+    "bookableNote": "ödeme yöntemi kontrol edildi",
+    "billingNotReady": "ödeme hazır değil",
+    "closedOoo": "ofis dışında",
+    "closedPaused": "rezervasyon duraklatması",
+    "yes": "Evet",
+    "no": "Hayır",
+    "planLeads": "{{plan}} · bu dönemde indirimli lead'ler",
+    "discountUsed": "{{count}} içinden {{used}} kullanıldı",
+    "noDiscount": "indirim kontenjanı yok",
+    "sinceCycle": "{{date}} itibarıyla",
+    "plan": "Plan",
+    "noPlan": "Henüz plan yok",
+    "leadsCycle": "Bu dönemde ücretlendirilen lead'ler",
+    "credit": "Alacak",
+    "creditNote": "bir sonraki faturanızdan düşülür",
+    "evidenceExpiring": "Belge {{type}}",
+    "until": "{{date}} tarihine kadar"
+  },
+  "partnerNotif": {
+    "decision": {
+      "lifted": "kaldırıldı",
+      "upheld": "onaylandı"
+    },
+    "serial_no_show_alert": {
+      "title": "90 günde iki kaçırılan randevu",
+      "body": "Bir tane daha itiraz hakkıyla rezervasyon duraklatmasına yol açar. Profiliniz görünür kalır."
+    },
+    "booking_paused": {
+      "title": "Üç olaydan sonra rezervasyon duraklatması",
+      "body": "Yeni rezervasyonlar duraklatıldı, profiliniz görünür kalır. Performans altında bir kez itiraz edebilirsiniz."
+    },
+    "enforcement_decided": {
+      "title": "İtirazınız karara bağlandı",
+      "body": "Karar: {{decision}}. Ayrıntılar Performans altında."
     }
   }
 }

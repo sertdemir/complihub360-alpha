@@ -187,6 +187,9 @@ const VORLAGE = {
       "performance": "Your performance data couldn’t be loaded",
       "notifications": "Your notifications couldn’t be loaded",
       "coverage": "Your coverage couldn’t be loaded",
+      // Phase 6 (Canvas-Wahl 1B „Heute zuerst", 10.10.2026): die Übersicht als
+      // Startseite, Laden fehlgeschlagen nach demselben Muster.
+      "overview": "Your overview couldn’t be loaded",
       "message": "Nothing in your account has changed. We just can’t show it right now. Please try again. If this keeps happening, contact support."
     },
     "empty": {

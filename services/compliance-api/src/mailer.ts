@@ -13,6 +13,10 @@ import { redactText } from '@complihub360/redaction';
 
 const PUBLIC_APP_URL = (process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '');
 const MAIL_FROM = process.env.MAIL_FROM || 'CompliHub360 <onboarding@resend.dev>';
+// Das Logo liegt im oeffentlichen Bucket `assets` DESSELBEN Projekts, mit dem
+// die API spricht — Beta-Mails haengen so nicht an Staging. Ohne SUPABASE_URL
+// (lokal, Tests) bleibt die Staging-Adresse.
+const MAIL_LOGO_URL = `${(process.env.SUPABASE_URL || 'https://kqylqwogxbiwpnomkzsn.supabase.co').replace(/\/$/, '')}/storage/v1/object/public/assets/logo-lockup-email.png`;
 
 // ─── i18n ─────────────────────────────────────────────────────────────────────
 // Transactional-mail copy in the four product languages (EN/DE/ES/TR), mirroring
@@ -361,7 +365,7 @@ function renderHtml(m: MagicLinkMail, t: MailStrings['magic']): string {
     // URL das alte Logo aus. Danach sind hier keine Aenderungen noetig.
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
-<tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360 — Always on your side" style="display:block;border:0;"/></td></tr>
+<tr><td style="padding:0 8px 24px 8px;"><img src="${MAIL_LOGO_URL}" width="207" height="54" alt="CompliHub360 — Always on your side" style="display:block;border:0;"/></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
 <div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${esc(t.headlinePre)}<span style="color:#C5913B;">${esc(t.headlineGold)}</span>${esc(t.headlinePost)}</div>
 <div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${esc(t.introPre)}<strong style="color:#ffffff;">${esc(t.introStrong)}</strong>${esc(t.introPost)}</div>
@@ -456,7 +460,7 @@ export async function sendEmailChangeMail(p: {
     const escE = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
-<tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360" style="display:block;border:0;"/></td></tr>
+<tr><td style="padding:0 8px 24px 8px;"><img src="${MAIL_LOGO_URL}" width="207" height="54" alt="CompliHub360" style="display:block;border:0;"/></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
 <div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${escE(t.headlinePre)}<span style="color:#C5913B;">${escE(t.headlineGold)}</span>${escE(t.headlinePost)}</div>
 <div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${escE(t.bodyPre)}<strong style="color:#ffffff;">${escE(p.providerName)}</strong>${escE(t.bodyPost)}</div>
@@ -1300,4 +1304,49 @@ export async function sendCreditIssuedMail(p: { to: string | null; providerKey: 
     const amount = new Intl.NumberFormat(loc, { style: 'currency', currency: p.currency }).format(p.amountCents / 100);
     const text = [t.intro.replace('{amount}', amount).replace('{pct}', String(p.pct)), ``, t.note].join('\n');
     await deliverProviderMail({ to: p.to, kind: 'credit_issued_provider', ref: { bookingId: p.bookingId, providerKey: p.providerKey, amountCents: p.amountCents }, subject: t.subject, text, correlationId: p.correlationId });
+}
+
+// ─── Phase 6: Serien-No-Shows (ADR-0009) ─────────────────────────────────────
+//
+// Zwei Stufen, derselbe Ton: Hinweis bei zwei Vorfaellen, Buchungspause bei
+// drei. Kein Vorwurf, der Weg zum Einspruch steht im Text, und die
+// Sichtbarkeit bleibt — das sagt die Mail ausdruecklich.
+
+const SERIAL_NO_SHOW_STRINGS: Record<MailLocale, { alertSubject: string; alertBody: string; pauseSubject: string; pauseBody: string; foot: string }> = {
+    en: {
+        alertSubject: 'Two missed consultations have been recorded for your account',
+        alertBody: 'Within the last {days} days, users reported {count} consultations booked through CompliHub360 at which you did not appear. Each report is recorded as a performance incident; one more within the same period pauses new bookings until the matter is clarified.',
+        pauseSubject: 'New bookings are paused for your account',
+        pauseBody: 'Within the last {days} days, {count} consultations booked through CompliHub360 were reported as missed by you. New bookings are paused for now; your profile stays visible and existing appointments remain in place.',
+        foot: 'If a report is wrong, you can file an objection in your dashboard under Performance; we will look at the case. Incidents count towards performance, never towards your invoice.',
+    },
+    de: {
+        alertSubject: 'Zwei versäumte Beratungstermine sind für Ihr Konto vermerkt',
+        alertBody: 'In den letzten {days} Tagen haben Nutzer {count} über CompliHub360 gebuchte Beratungstermine gemeldet, zu denen Sie nicht erschienen sind. Jede Meldung ist als Leistungsvorfall vermerkt; ein weiterer im selben Zeitraum pausiert neue Buchungen, bis der Fall geklärt ist.',
+        pauseSubject: 'Neue Buchungen sind für Ihr Konto pausiert',
+        pauseBody: 'In den letzten {days} Tagen wurden {count} über CompliHub360 gebuchte Beratungstermine als von Ihnen versäumt gemeldet. Neue Buchungen sind vorerst pausiert; Ihr Profil bleibt sichtbar, bestehende Termine bleiben bestehen.',
+        foot: 'Ist eine Meldung falsch, können Sie in Ihrem Dashboard unter Performance Einspruch einlegen; wir sehen uns den Fall an. Vorfälle zählen in die Leistung, nie in Ihre Rechnung.',
+    },
+    es: {
+        alertSubject: 'Se han registrado dos consultas no atendidas en su cuenta',
+        alertBody: 'En los últimos {days} días, los usuarios informaron {count} consultas reservadas a través de CompliHub360 a las que usted no se presentó. Cada informe queda registrado como incidente de rendimiento; uno más en el mismo periodo pausa las nuevas reservas hasta aclarar el caso.',
+        pauseSubject: 'Las nuevas reservas están pausadas en su cuenta',
+        pauseBody: 'En los últimos {days} días, {count} consultas reservadas a través de CompliHub360 se informaron como no atendidas por usted. Las nuevas reservas quedan pausadas por ahora; su perfil sigue visible y las citas existentes se mantienen.',
+        foot: 'Si un informe es erróneo, puede presentar una objeción en su panel, en Rendimiento; revisaremos el caso. Los incidentes cuentan para el rendimiento, nunca para su factura.',
+    },
+    tr: {
+        alertSubject: 'Hesabınız için kaçırılan iki danışma randevusu kaydedildi',
+        alertBody: 'Son {days} gün içinde kullanıcılar, CompliHub360 üzerinden ayırtılan ve sizin katılmadığınız {count} danışma randevusu bildirdi. Her bildirim performans olayı olarak kaydedilir; aynı dönemde bir tane daha olursa, durum netleşene kadar yeni rezervasyonlar duraklatılır.',
+        pauseSubject: 'Hesabınız için yeni rezervasyonlar duraklatıldı',
+        pauseBody: 'Son {days} gün içinde CompliHub360 üzerinden ayırtılan {count} danışma randevusu sizin tarafınızdan kaçırılmış olarak bildirildi. Yeni rezervasyonlar şimdilik duraklatıldı; profiliniz görünür kalır ve mevcut randevular geçerliliğini korur.',
+        foot: 'Bir bildirim hatalıysa panelinizde Performans altında itiraz edebilirsiniz; durumu inceleriz. Olaylar performansa sayılır, faturanıza asla.',
+    },
+};
+
+export async function sendSerialNoShowMail(p: { to: string | null; providerKey: string; state: 'alert' | 'pause'; count: number; windowDays: number; locale?: string; correlationId?: string }): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = SERIAL_NO_SHOW_STRINGS[loc];
+    const body = (p.state === 'pause' ? t.pauseBody : t.alertBody).replace('{days}', String(p.windowDays)).replace('{count}', String(p.count));
+    const text = [body, ``, t.foot].join('\n');
+    await deliverProviderMail({ to: p.to, kind: p.state === 'pause' ? 'booking_paused_provider' : 'serial_no_show_alert_provider', ref: { providerKey: p.providerKey, count: p.count }, subject: p.state === 'pause' ? t.pauseSubject : t.alertSubject, text, correlationId: p.correlationId });
 }

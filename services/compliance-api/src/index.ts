@@ -25,6 +25,8 @@ import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingCo
 import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
 import { loadAttendancePolicy, findRecentLead } from "./attendance.js";
 import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
+import { handleProviderPerformance, handleProviderOverview, handleEnforcementAppeal, handleAdminEnforcement } from "./performanceRoutes.js";
+import { loadPerformancePolicy, qualityFactor, availabilitySlots, bookingOpen, validateAvailabilityHours, validTimezone, incidentsInWindow } from "./performance.js";
 import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent, StripeError } from "./stripe.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
@@ -1001,7 +1003,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         // KEINEN Buchen-Knopf, statt den Nutzer erst nach der
                         // Terminwahl mit 409 abzuweisen (Nutzer-Entscheidung
                         // 2026-10-01, TKT-PROV-06).
-                        bookable_chargeable: view.some((r: any) => r.bookable_chargeable),
+                        // Phase 6: Buchungspause (§24) und Abwesenheit nehmen den
+                        // Knopf ebenso — dieselbe Regel wie in POST /scheduling.
+                        bookable_chargeable: view.some((r: any) => r.bookable_chargeable) && bookingOpen({ availability: p.availability, booking_paused_at: p.booking_paused_at }).open,
                         rank_basis: rankBasis({
                             required, evidence: usable,
                             avg_response_hours: p.avg_response_hours, confirmation_rate: p.confirmation_rate,
@@ -1034,29 +1038,22 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
                 return;
             }
-            // Pausiert: keine freien Zeiten. Die Seite zeigt ihren Leerzustand.
-            if (isPaused(prov)) {
+            const providerKey = prov.provider_key as string;
+            // Pausiert (C2) oder Buchungspause (Phase 6, ADR-0009): keine Slots,
+            // mit Grund auf dem Draht, damit die Terminseite ehrlich sagt, warum.
+            // `paused` bleibt fuer aeltere Bundles stehen.
+            const gate = bookingOpen({ availability: (prov as any).availability, booking_paused_at: (prov as any).booking_paused_at });
+            if (!gate.open) {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, public_ref: ref, slots: [], paused: true, calendar_checked: false, correlationId }));
+                res.end(JSON.stringify({ ok: true, public_ref: ref, slots: [], paused: true, calendar_checked: false, booking_open: false, reason: gate.reason, correlationId }));
                 return;
             }
-            const providerKey = prov.provider_key as string;
             const booked = (await supabaseApi.select('scheduling', { provider_key: providerKey, status: 'confirmed' }, { limit: 200 })) as any[];
             const bookedSet = new Set(booked.map((b: any) => new Date(b.slot_start).toISOString()));
-            const slots: string[] = [];
-            const d = new Date(); d.setHours(0, 0, 0, 0);
-            let days = 0;
-            while (slots.length < 40 && days < 14) {
-                d.setDate(d.getDate() + 1);
-                const dow = d.getDay();
-                if (dow === 0 || dow === 6) continue;
-                days++;
-                for (const [h, m] of [[9, 0], [9, 30], [10, 0], [10, 30], [11, 0], [14, 0], [14, 30], [15, 0]] as const) {
-                    const s = new Date(d); s.setHours(h, m, 0, 0);
-                    const iso = s.toISOString();
-                    if (!bookedSet.has(iso)) slots.push(iso);
-                }
-            }
+            // Kandidaten aus den Fenstern des Anbieters in seiner Zeitzone
+            // (performance.ts); ohne Fenster gilt die bisherige Vorgabe.
+            const slots = availabilitySlots({ hours: (prov as any).availability_hours ?? null, timezone: (prov as any).timezone ?? 'Europe/Berlin', fromIso: new Date().toISOString(), days: 14, max: 60 })
+                .filter((iso) => !bookedSet.has(iso));
             // Hat der Anbieter seinen Kalender verbunden, zaehlt dessen echte
             // Belegung — der Generator oben liefert nur noch die Kandidaten.
             // Faellt Nylas aus, bleiben die Kandidaten stehen: lieber ein Slot
@@ -1072,7 +1069,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 calendarChecked = true;
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, public_ref: ref, slots: out, calendar_checked: calendarChecked, correlationId }));
+            res.end(JSON.stringify({ ok: true, public_ref: ref, slots: out, calendar_checked: calendarChecked, booking_open: true, reason: null, correlationId }));
         } catch {
             structuredLog('error', 'Slots fetch failed', { correlationId, errorCode: 'ERR_SLOTS', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -1174,8 +1171,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         identity_revealed: !!b.identity_revealed,
                         // Affiliate 1b: the provider's website is a POST-BOOKING
                         // reveal only — never before, to preserve stage-1/2 anonymity.
-                        // The outclick is routed through /p/:ref/website so it can
-                        // be counted (future affiliate revenue line).
+                        // The UI links here directly and counts the click in
+                        // parallel via /p/:ref/website (future affiliate line).
                         provider_website: b.identity_revealed ? (p.website_url ?? null) : null,
                         slot_start: b.slot_start,
                         slot_end: b.slot_end,
@@ -1197,7 +1194,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         // Affiliate 1b: counted outclick to the provider website. Only a user
         // who has ALREADY booked this provider may follow it (post-booking
         // reveal) — this is the tracking hook for the later affiliate revenue
-        // line, not yet monetised. Logs provider_website_outclick, 302-redirects.
+        // line, not yet monetised. Logs provider_website_outclick and answers
+        // 200 { url } — no 302: the UI calls this via apiFetch (Bearer), a
+        // browser navigation in a new tab carries no token and got 401.
         const ref = (req.url || '').split('/')[4];
         res.setHeader('x-correlation-id', correlationId);
         if (!authUserId) {
@@ -1226,13 +1225,34 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
                 await supabaseApi.insert('event_log', { type: 'provider_website_outclick', payload: { providerKey, userId: authUserId, bookingId: booked[0].id } }).catch(() => { /* non-blocking */ });
-                res.writeHead(302, { Location: url });
-                res.end();
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ url }));
             } catch {
                 structuredLog('error', 'Website outclick failed', { correlationId, errorCode: 'ERR_OUTCLICK', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Website outclick failed', correlationId }));
             }
+        }
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/performance(\?.*)?$/.test(req.url || '')) {
+        // Phase 6 (ADR-0009): Performance aus Buchungs-Fakten je Anbieter; Tiefe je
+        // Tarif (Verlauf ab enhanced, CSV ab advanced), Fakten fuer alle gleich.
+        await handleProviderPerformance(req, res, correlationId, (req.url || '').split('/')[4].split('?')[0]);
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/overview$/.test(req.url || '')) {
+        // Phase 6: Startseite des Partner-Dashboards (Spec B "Overview").
+        await handleProviderOverview(req, res, correlationId, (req.url || '').split('/')[4]);
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/enforcement\/[0-9a-f-]+\/appeal$/.test(req.url || '')) {
+        // Phase 6 (§24): Einspruch gegen eine Massnahme, z. B. die Buchungspause.
+        const parts = (req.url || '').split('/');
+        await handleEnforcementAppeal(req, res, correlationId, authUserId, parts[4], parts[6]);
+    } else if (req.method === 'PATCH' && /^\/api\/v1\/admin\/providers\/[a-z0-9-]+\/enforcement\/[0-9a-f-]+$/.test(req.url || '')) {
+        // Phase 6 (§24): Admin entscheidet — aufheben oder bestaetigen. Server-Key only.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authViaApiKey) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Admin only', correlationId }));
+        } else {
+            const parts = (req.url || '').split('/');
+            await handleAdminEnforcement(req, res, correlationId, parts[5], parts[7]);
         }
     } else if (req.method === 'PATCH' && /^\/api\/v1\/provider\/[a-z0-9-]+\/bookings\/[0-9a-f-]+\/attendance$/.test(req.url || '')) {
         // Phase 5 (Spec B "Booking attendance", ADR-0007): der Anbieter meldet,
@@ -1688,6 +1708,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // Pausiert (C2): etwa aus einem alten Tab. Fuer den Nutzer dieselbe
                     // neutrale Lage wie BILLING_NOT_READY — mit anderen Anbietern.
                     if (isPaused(p)) { fail(409, 'PROVIDER_PAUSED', 'This provider is not taking new bookings right now'); return; }
+                    // Phase 6: Buchungspause (§24) sperrt die Buchung — nie das
+                    // Matching. Derselbe neutrale Fehler: der Nutzer erfaehrt keinen Grund.
+                    const gate = bookingOpen({ availability: (p as any).availability, booking_paused_at: (p as any).booking_paused_at });
+                    if (!gate.open) { fail(409, gate.reason === 'paused' ? 'BOOKING_PAUSED' : 'PROVIDER_UNAVAILABLE', 'This provider cannot take bookings at the moment'); return; }
                     const providerKey = p.provider_key as string;
 
                     // Die Fassung, die der Nutzer gesehen hat, muss die gueltige sein.
@@ -2209,16 +2233,34 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         req.on('end', async () => {
             try {
                 const d = JSON.parse(availBody || '{}');
-                if (!['available', 'ooo'].includes(d.status)) {
+                // Phase 6 (ADR-0009): derselbe Aufruf traegt jetzt auch die
+                // Verfuegbarkeitsfenster und die Zeitzone. Jeder Teil ist optional;
+                // was fehlt, bleibt wie es ist.
+                const hasStatus = d.status !== undefined;
+                const hasHours = d.hours !== undefined;
+                const hasTz = d.timezone !== undefined;
+                if (!hasStatus && !hasHours && !hasTz) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: "status, hours or timezone required", correlationId }));
+                    return;
+                }
+                if (hasStatus && !['available', 'ooo'].includes(d.status)) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: "status must be 'available' or 'ooo'", correlationId }));
                     return;
                 }
-                const updated = (await supabaseApi.update('providers', { provider_key: providerKey }, {
-                    availability: d.status,
-                    ooo_until: d.status === 'ooo' ? (d.until ?? null) : null,
-                    updated_at: new Date().toISOString(),
-                })) as unknown[];
+                const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+                if (hasStatus) { patch.availability = d.status; patch.ooo_until = d.status === 'ooo' ? (d.until ?? null) : null; }
+                if (hasHours) {
+                    const v = validateAvailabilityHours(d.hours);
+                    if (!v.ok) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: v.message, correlationId })); return; }
+                    patch.availability_hours = Object.keys(v.hours).length ? v.hours : null;
+                }
+                if (hasTz) {
+                    if (!validTimezone(d.timezone)) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'timezone must be an IANA time zone', correlationId })); return; }
+                    patch.timezone = d.timezone;
+                }
+                const updated = (await supabaseApi.update('providers', { provider_key: providerKey }, patch)) as any[];
                 if (!updated.length) {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
@@ -2226,11 +2268,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 }
                 await supabaseApi.insert('event_log', {
                     type: 'provider_availability_changed',
-                    payload: { providerKey, status: d.status, until: d.until ?? null },
+                    payload: { providerKey, status: hasStatus ? d.status : undefined, until: hasStatus ? (d.until ?? null) : undefined, hours: hasHours ? patch.availability_hours : undefined, timezone: hasTz ? d.timezone : undefined },
                 });
+                const row = updated[0] ?? {};
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, providerKey, availability: d.status, ooo_until: d.status === 'ooo' ? (d.until ?? null) : null }));
+                res.end(JSON.stringify({ ok: true, providerKey, availability: row.availability ?? (hasStatus ? d.status : undefined), ooo_until: row.ooo_until ?? null,
+                    hours: row.availability_hours ?? null, timezone: row.timezone ?? 'Europe/Berlin', booking_paused_at: row.booking_paused_at ?? null }));
             } catch {
                 structuredLog('error', 'Availability patch failed', { correlationId, errorCode: 'ERR_AVAILABILITY', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -3413,6 +3457,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     ? ((await supabaseApi.select('reviews', { from_role: 'user' }, { limit: 5000 })) as any[])
                         .filter((r: any) => r.verified !== false && r.booking_id && r.rating != null)
                     : [];
+                // Phase 6 (ADR-0009): Qualitaet aus Buchungen und Vorfaellen, neutral
+                // ohne Daten. Die Spalten confirmation_rate, avg_response_hours und
+                // breach_count der alten Pipeline liest das Ranking nicht mehr.
+                const perfPolicy = await loadPerformancePolicy();
+                const perfNow = new Date().toISOString();
+                const perfFrom = Date.parse(perfNow) - perfPolicy.windowDays * 86_400_000;
+                const bookingsAll = eligible.length ? ((await supabaseApi.select('scheduling', {}, { limit: 5000 })) as any[]) : [];
+                const incidentsAll = eligible.length ? ((await supabaseApi.select('provider_performance_incidents', {}, { limit: 5000 })) as any[]) : [];
                 const viewByKey = new Map<string, any[]>();
                 for (const row of matchable) {
                     if (!viewByKey.has(row.provider_key)) viewByKey.set(row.provider_key, []);
@@ -3441,12 +3493,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const ownReviews = reviewsAll.filter((r: any) => r.provider_key === p.provider_key);
                     const ratingFromBookings = ownReviews.length
                         ? ownReviews.reduce((sum: number, r: any) => sum + Number(r.rating), 0) / ownReviews.length : null;
-                    const ratingN = (ratingFromBookings ?? (p.rating != null ? Number(p.rating) : 4.5)) / 5;
-                    const confN = p.confirmation_rate != null ? Number(p.confirmation_rate) : 0.8;
-                    const respN = p.avg_response_hours != null
-                        ? Math.max(0, 1 - Number(p.avg_response_hours) / 24) : 0.7;
-                    const breachN = Math.max(0, 1 - (p.breach_count || 0) * 0.1);
-                    const quality = 0.4 * ratingN + 0.3 * confN + 0.2 * respN + 0.1 * breachN;
+                    const ownBookings = bookingsAll.filter((b: any) => b.provider_key === p.provider_key && Date.parse(b.slot_start) >= perfFrom && Date.parse(b.slot_start) <= Date.parse(perfNow));
+                    const ownIncidents = incidentsInWindow(incidentsAll.filter((i: any) => i.provider_key === p.provider_key).map((i: any) => ({ id: String(i.id), kind: String(i.kind), recorded_at: String(i.recorded_at) })), perfPolicy, perfNow);
+                    const completed = ownBookings.filter((b: any) => b.status === 'completed').length;
+                    const q = qualityFactor({
+                        rating: ratingFromBookings, reviews_count: ownReviews.length,
+                        completed, bookings: ownBookings.length,
+                        incidents: ownIncidents.length, incident_window_days: perfPolicy.incidentWindowDays, min_sample: perfPolicy.rateMinBookings,
+                    });
+                    const quality = q.value;
 
                     const rows = viewByKey.get(p.provider_key) ?? [];
                     const { required, usable, depth } = depthFor(rows, evidenceAll.filter((e: any) => e.provider_key === p.provider_key));
@@ -3454,8 +3509,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const total = 0.6 * relevance + 0.3 * quality + 0.1 * priority;
                     const basis = rankBasis({
                         required, evidence: usable,
-                        avg_response_hours: p.avg_response_hours, confirmation_rate: p.confirmation_rate,
                         rating: ratingFromBookings != null ? Math.round(ratingFromBookings * 10) / 10 : null, reviews_count: ownReviews.length,
+                        completed, bookings: ownBookings.length, incidents: ownIncidents.length, window_days: perfPolicy.windowDays, neutral: q.neutral,
                     });
                     return { relevance, total, countryMatch, coveredIdx, basis };
                 };

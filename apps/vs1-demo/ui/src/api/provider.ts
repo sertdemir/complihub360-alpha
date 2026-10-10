@@ -1,5 +1,8 @@
 import { apiFetch } from './client';
 import { getAccessToken } from '../lib/supabase';
+import type { AvailabilityHours, AvailabilityResponse, Weekday, AvailabilityWindow } from '@complihub360/types/src/provider';
+
+export type { AvailabilityHours, Weekday, AvailabilityWindow, AvailabilityResponse };
 
 // ─── Provider profile API (wiring map B5) ────────────────────────────────────
 // Coverage read + market add.
@@ -58,6 +61,10 @@ export interface ProviderCoverage {
   pricing_table?: PricingRow[] | null;
   region?: string | null;
   active_since?: number | null;
+  // Phase 6 (ADR-0009): buchbare Fenster je Wochentag, Zeitzone, Buchungspause.
+  availability_hours?: AvailabilityHours | null;
+  timezone?: string | null;
+  booking_paused_at?: string | null;
 }
 
 // C2: cross-component sync — the shell pill and the requests banner both
@@ -76,6 +83,18 @@ export async function setAvailability(status: 'available' | 'ooo', providerKey?:
   });
   broadcastAvailability(status);
 }
+
+/** Phase 6: Fenster je Wochentag und Zeitzone — derselbe Aufruf wie „Abwesend".
+ *  `hours: {}` oder null stellt die Vorgabe (Mo–Fr 9–11:30, 14–15 Uhr) wieder her. */
+export async function updateAvailabilityHours(hours: AvailabilityHours | null, timezone: string, providerKey?: string): Promise<AvailabilityResponse> {
+  const key = providerKey ?? await myProviderKey();
+  return apiFetch<AvailabilityResponse>(`/api/v1/provider/${key}/availability`, {
+    method: 'PATCH',
+    body: JSON.stringify({ hours, timezone }),
+  });
+}
+
+export const WEEKDAYS: Weekday[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 export async function fetchCoverage(providerKey?: string): Promise<ProviderCoverage> {
   const key = providerKey ?? await myProviderKey();

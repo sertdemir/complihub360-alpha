@@ -34,7 +34,7 @@ import type { IncomingMessage, ServerResponse } from "http";
 // Kalender (Nylas Hosted Auth, nylasAuth.ts): calendar, calendar/connect —
 //   ebenso ausgeschrieben, die laengere zuerst.
 const OWN_PROVIDER_ROUTE =
-    /^\/api\/v1\/provider\/([a-z0-9-]+)\/(bookings(?:\/[0-9a-f-]+\/(?:proposal|attendance))?|coverage|profile|invoices|availability|billing-portal|change-email|billing\/preview|billing\/sync|billing\/recheck|subscription\/schedule|subscription|application|services(?:\/[^/?]+(?:\/coverage)?)?|evidence\/(?:upload-url|registry|[^/?]+\/confirm)|agreements|submit|verification|changes(?:\/[0-9a-f-]+)?|material-event|calendar\/connect|calendar)(\?.*)?$/;
+    /^\/api\/v1\/provider\/([a-z0-9-]+)\/(bookings(?:\/[0-9a-f-]+\/(?:proposal|attendance))?|coverage|profile|invoices|availability|billing-portal|change-email|billing\/preview|billing\/sync|billing\/recheck|subscription\/schedule|subscription|application|services(?:\/[^/?]+(?:\/coverage)?)?|evidence\/(?:upload-url|registry|[^/?]+\/confirm)|agreements|submit|verification|changes(?:\/[0-9a-f-]+)?|material-event|calendar\/connect|calendar|performance|overview|enforcement\/[0-9a-f-]+\/appeal)(\?.*)?$/;
 
 /** Liefert den provider_key, wenn die URL eine Anbieter-eigene Route ist. */
 export function ownProviderRouteKey(url: string | undefined): string | null {
