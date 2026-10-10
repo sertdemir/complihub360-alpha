@@ -685,6 +685,61 @@ paths:
         '400': { description: Rabatt gezeigt ohne Angebot, oder Felder fehlen }
         '404': { description: Buchung gehoert nicht diesem Anbieter }
 
+  /provider/{key}/bookings/{id}/attendance:
+    patch:
+      summary: Anwesenheit melden (Phase 5)
+      description: >-
+        Spec B "Booking attendance, cancellation and credits", ADR-0007. Nach
+        dem Slot meldet der Anbieter: `attended` (→ completed), `user_no_show`
+        (→ no_show, no_show_by user, 14-Tage-Neubuchungsfrist, Nutzer wird
+        neutral informiert und kann 48 h widersprechen) oder `platform_failure`
+        (→ cancelled by system, Neubuchung ohne zweite Gebuehr, kein Vorfall,
+        kein Guthaben). Geld fliesst hier nie; das Guthaben entsteht im
+        Waechter, wenn die Frist ohne Neubuchung ablaeuft.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outcome]
+              properties:
+                outcome: { type: string, enum: [attended, user_no_show, platform_failure] }
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200': { description: "`{ status, no_show_by?, rebook_deadline?, dispute_hours? }`" }
+        '400': { description: outcome fehlt oder unbekannt }
+        '404': { description: Buchung gehoert nicht diesem Anbieter }
+        '409': { description: "`NOT_REPORTABLE` — nur bestaetigte Termine nach ihrem Ende" }
+
+  /admin/bookings/{id}/dispute:
+    patch:
+      summary: Widerspruch gegen einen Nutzer-No-Show entscheiden (nur Server-Key)
+      description: >-
+        `upheld`: der Nutzer hatte recht — no_show_by wird provider, ein
+        Performance-Vorfall entsteht, kein Guthaben. `dismissed`: die Meldung
+        bleibt, die Frist laeuft weiter. Beide Seiten werden benachrichtigt.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resolution]
+              properties:
+                resolution: { type: string, enum: [upheld, dismissed] }
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200': { description: "`{ dispute_status, no_show_by }`" }
+        '403': { description: Kein Server-Key }
+        '409': { description: "`NO_OPEN_DISPUTE`" }
+
   /admin/billing/run:
     post:
       summary: Abo-Rechnungen einer Periode ausstellen (nur Server-Key)
@@ -1134,7 +1189,11 @@ paths:
         (dieselben Bereiche als Codes, das UI uebersetzt sie), `provider_website`
         erst nach Offenlegung. `provider_paused`: der kommende Termin liegt in
         einem Bereich, den der Anbieter nach einem wesentlichen Ereignis
-        pausiert hat (Change-Control, Canvas F V1).
+        pausiert hat (Change-Control, Canvas F V1). Phase 5: `no_show_by`,
+        `no_show_reported_at`, `dispute_status`, `dispute_open_until`,
+        `rebook_deadline`, `rebook_open`, `rebooked_from`, `reschedule_count`,
+        `reschedule_limit`, `attendance_reportable` — nie Band, Gebuehr oder
+        Guthaben.
       security: [ { bearerAuth: [] } ]
       responses:
         '200': { description: Termine }
