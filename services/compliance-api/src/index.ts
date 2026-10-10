@@ -16,6 +16,7 @@ import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { checkMarketRequest } from "./marketRequests.js";
 import { handleContact, resendSender, contactRateLimited } from "./contact.js";
+import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, revokeGrant, settingsUrl } from "./nylasAuth.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
 import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
@@ -234,7 +235,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         ['POST', /^\/api\/v1\/search$/],                   // guest risk map
         ['POST', /^\/api\/v1\/session$/],                  // guest wizard-session save (guest_key)
         ['POST', /^\/api\/v1\/market-requests$/],          // „Request This Market“ (guest_key or JWT)
-        ['POST', /^\/api\/v1\/contact$/],                  // Kontaktseite + Partner-Bewerbung (eigenes Limit)
+        ['POST', /^\/api\/v1\/contact$/],
+        ['GET', /^\/api\/v1\/nylas\/callback(\?|$)/],      // Nylas Hosted Auth: der signierte state ist das Credential                  // Kontaktseite + Partner-Bewerbung (eigenes Limit)
         ['GET', /^\/api\/v1\/acknowledgement(\?|$)/],       // booking acknowledgement text (public legal copy)
         ['GET', /^\/api\/v1\/sessions(\?|$)/],             // guest session list (guest_key = bearer)
         ['POST', /^\/api\/v1\/provider\/intake$/],         // intake token checked in-handler
@@ -2278,6 +2280,87 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Alert prefs save failed', correlationId }));
             }
         });
+    } else if (/^\/api\/v1\/provider\/[a-z0-9-]+\/calendar$/.test(req.url || '') && (req.method === 'GET' || req.method === 'DELETE')) {
+        // Kalender-Status und Trennen (nylasAuth.ts). Ownership prueft der
+        // Guard oben (calendar steht in OWN_PROVIDER_ROUTE).
+        res.setHeader('x-correlation-id', correlationId);
+        const key = (req.url || '').split('/')[4];
+        try {
+            const rows = (await supabaseApi.select('providers', { provider_key: key }, { limit: 1 })) as any[];
+            const prov = rows[0];
+            if (!prov) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                return;
+            }
+            if (req.method === 'DELETE') {
+                if (prov.nylas_grant_id) {
+                    const revoked = await revokeGrant(prov.nylas_grant_id);
+                    await supabaseApi.update('providers', { provider_key: key }, { nylas_grant_id: null, nylas_calendar_id: null });
+                    await supabaseApi.insert('event_log', { type: 'calendar_disconnected', payload: { provider_key: key, revoked, correlationId } });
+                }
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, connected: false, configured: hostedAuthConfigured() }));
+                return;
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                configured: hostedAuthConfigured(),
+                connected: !!prov.nylas_grant_id,
+                email: prov.nylas_grant_id ? (prov.nylas_calendar_id || null) : null,
+            }));
+        } catch {
+            structuredLog('error', 'Calendar status failed', { correlationId, errorCode: 'ERR_CALENDAR', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Calendar status failed', correlationId }));
+        }
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/calendar\/connect$/.test(req.url || '')) {
+        // Schritt 1: Auth-URL mit signiertem state. Ohne Konfiguration 503 —
+        // die Oberflaeche sagt dann, dass die Verbindung noch nicht moeglich ist.
+        res.setHeader('x-correlation-id', correlationId);
+        const key = (req.url || '').split('/')[4];
+        let body = '';
+        req.on('data', (chunk: any) => { body += chunk.toString(); if (body.length > 2000) body = body.slice(0, 2000); });
+        req.on('end', () => {
+            if (!hostedAuthConfigured()) {
+                res.writeHead(503, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'CALENDAR_NOT_CONFIGURED', message: 'Calendar connection is not configured', correlationId }));
+                return;
+            }
+            let locale = 'en';
+            try { const d = JSON.parse(body || '{}'); if (typeof d.locale === 'string') locale = d.locale.toLowerCase().slice(0, 2); } catch { /* Standard */ }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ url: authUrl(signState(key, locale)) }));
+        });
+    } else if (req.method === 'GET' && /^\/api\/v1\/nylas\/callback(\?|$)/.test(req.url || '')) {
+        // Schritt 3: Rueckweg von Nylas. Ohne gueltigen state wird nichts
+        // gespeichert; der Browser landet in jedem Fall in den Einstellungen.
+        const params = new URL(req.url || '', 'http://local').searchParams;
+        const state = verifyState(params.get('state'));
+        const code = params.get('code');
+        const back = (result: 'connected' | 'failed') => {
+            res.writeHead(302, { Location: settingsUrl(state?.l ?? 'en', result), 'x-correlation-id': correlationId });
+            res.end();
+        };
+        if (!state || !code || params.get('error')) {
+            await supabaseApi.insert('event_log', { type: 'calendar_connect_failed', payload: { reason: !state ? 'state' : !code ? 'code' : 'denied', correlationId } }).catch(() => {});
+            back('failed');
+            return;
+        }
+        const grant = await exchangeCode(code);
+        if (!grant) {
+            await supabaseApi.insert('event_log', { type: 'calendar_connect_failed', payload: { provider_key: state.p, reason: 'exchange', correlationId } }).catch(() => {});
+            back('failed');
+            return;
+        }
+        try {
+            await supabaseApi.update('providers', { provider_key: state.p }, { nylas_grant_id: grant.grantId, nylas_calendar_id: grant.email });
+            await supabaseApi.insert('event_log', { type: 'calendar_connected', payload: { provider_key: state.p, correlationId } });
+            back('connected');
+        } catch {
+            structuredLog('error', 'Calendar grant save failed', { correlationId, errorCode: 'ERR_CALENDAR', severity: 'error', route: '/api/v1/nylas/callback' });
+            back('failed');
+        }
     } else if (req.method === 'POST' && req.url === '/api/v1/contact') {
         // Kontaktseite und /partner-apply (contact.ts). Ein Postfach, die
         // Nachricht geht dorthin und nicht in die Datenbank.

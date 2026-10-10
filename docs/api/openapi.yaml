@@ -72,6 +72,73 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /provider/{providerKey}/calendar:
+    get:
+      summary: Calendar connection status (Nylas)
+      description: >-
+        Nur Mitglieder des Anbieters (Ownership-Guard). `configured` sagt, ob
+        Hosted Auth eingerichtet ist (NYLAS_API_KEY, NYLAS_CLIENT_ID,
+        NYLAS_CALLBACK_URI); `email` ist die Adresse des verbundenen Kontos.
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+        - { name: providerKey, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  configured: { type: boolean }
+                  connected: { type: boolean }
+                  email: { type: string, nullable: true }
+        '404': { description: Kein Mitglied oder unbekannter Anbieter }
+    delete:
+      summary: Disconnect the calendar
+      description: Widerruft den Grant bei Nylas (best effort) und leert nylas_grant_id und nylas_calendar_id.
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+        - { name: providerKey, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Getrennt }
+        '404': { description: Kein Mitglied oder unbekannter Anbieter }
+  /provider/{providerKey}/calendar/connect:
+    post:
+      summary: Start Nylas Hosted Auth
+      description: >-
+        Liefert die Auth-URL (Region EU) mit einem HMAC-signierten state
+        (Anbieter, Sprache, 15 Minuten gueltig). Ohne Konfiguration 503
+        CALENDAR_NOT_CONFIGURED.
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+        - { name: providerKey, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object, properties: { locale: { type: string } } }
+      responses:
+        '200':
+          description: Auth-URL
+          content:
+            application/json:
+              schema: { type: object, properties: { url: { type: string } } }
+        '404': { description: Kein Mitglied oder unbekannter Anbieter }
+        '503': { description: Hosted Auth nicht eingerichtet }
+  /nylas/callback:
+    get:
+      summary: Nylas Hosted Auth callback
+      description: >-
+        Oeffentlich; der signierte state ist das Credential. Tauscht den Code
+        gegen den Grant, speichert grant_id und Adresse am Anbieter und leitet
+        mit 302 in die Partner-Einstellungen (?calendar=connected|failed).
+        Ohne gueltigen state wird nichts gespeichert.
+      parameters:
+        - { name: code, in: query, schema: { type: string } }
+        - { name: state, in: query, schema: { type: string } }
+        - { name: error, in: query, schema: { type: string } }
+      responses:
+        '302': { description: Zurueck in die Einstellungen }
   /contact:
     post:
       summary: Send a message from the contact page or a partner application
