@@ -36,6 +36,14 @@ export type NotificationType =
     | 'verification_decided'         // Eine Zelle Leistung x Land wurde entschieden
     | 'verification_activated'       // Das Konto ist aktiv oder eingeschraenkt aktiv
     | 'evidence_expiring'            // Ein Nachweis laeuft in den naechsten 30 Tagen ab
+    // Phase 5: Anwesenheit, Neubuchung, Guthaben (Spec B, ADR-0007).
+    | 'appointment_reminder'    // Termin in 24 h bzw. 1 h — an beide Seiten
+    | 'no_show_reported'        // Die andere Seite hat gemeldet, dass jemand fehlte
+    | 'rebook_reminder'         // Neubuchung ohne zweite Gebuehr noch moeglich bis …
+    | 'dispute_opened'          // Der Nutzer widerspricht der No-Show-Meldung (Admin, Anbieter)
+    | 'dispute_resolved'        // Der Admin hat entschieden
+    | 'credit_issued'           // 30 % Guthaben fuer den Anbieter
+    | 'performance_incident'    // Der Anbieter fehlte — Vorfall protokolliert
     // Abo: Wechsel und Kuendigung zum Verlaengerungstermin (ADR-0006 B2/C2).
     // Zwei Zeitpunkte, zwei Nachrichten — die Vormerkung ist eine Zusage auf
     // spaeter, die Ausfuehrung ein Vorgang von heute. Eine Nachricht fuer
@@ -71,9 +79,15 @@ export interface PayloadFelder {
     effectiveOn?: string;
     /** Gebuchter Termin (ISO) — Phase 4, an den Anbieter. */
     slot?: string;
+    /** Frist (YYYY-MM-DD) — Phase 5, Neubuchung ohne zweite Gebuehr. */
+    deadline?: string;
+    /** Betrag in Cent als Zeichenkette — Phase 5, Guthaben an den Anbieter. */
+    amount?: string;
+    /** Erinnerungsstufe in Minuten vor dem Termin — Phase 5. */
+    offset?: string;
 }
 
-const PAYLOAD_KEYS: Array<keyof PayloadFelder> = ['providerRef', 'providerKey', 'providerName', 'from', 'to', 'label', 'slot', 'effectiveOn'];
+const PAYLOAD_KEYS: Array<keyof PayloadFelder> = ['providerRef', 'providerKey', 'providerName', 'from', 'to', 'label', 'slot', 'deadline', 'amount', 'offset', 'effectiveOn'];
 
 function nutzlast(roh: PayloadFelder): Record<string, string> {
     const out: Record<string, string> = {};

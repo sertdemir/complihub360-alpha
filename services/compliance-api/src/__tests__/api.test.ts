@@ -3441,3 +3441,224 @@ describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
         expect(db.provider_subscriptions[0].current_period_end).toBe('2026-02-01');
     });
 });
+
+// ─── Phase 5: Anwesenheit, No-Show, Neubuchung, Guthaben (Spec B, ADR-0007) ──
+describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
+    const past = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
+    const future = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString();
+    const dayStr = (offsetDays: number) => new Date(Date.now() + offsetDays * 86_400_000).toISOString().slice(0, 10);
+    const attendance = (id: string, body: Record<string, unknown>) => api(`/api/v1/provider/test-kanzlei/bookings/${id}/attendance`, { method: 'PATCH', auth: 'key', body: JSON.stringify(body) });
+    const tick = (shadow = false) => { process.env.WATCHERS_SHADOW = shadow ? 'true' : 'false'; return api('/api/v1/admin/watchers/tick', { method: 'POST', body: '{}', auth: 'key' }).finally(() => { delete process.env.WATCHERS_SHADOW; }); };
+
+    function seedLedger(over: Record<string, any> = {}) {
+        const row = { id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', user_id: USER_ID, booking_id: null, area_code: 'tax-vat', subcategories: [], countries: ['DE'], computed_band: 2, band_version: 1, standard_fee_cents: 14900, plan_code_at_charge: 'growth', plan_version_at_charge: 1, discount_sequence: 1, discount_pct: 10, final_fee_cents: 13410, currency: 'USD', payment_status: 'pending', policy_version: 'lead-fee-policy-v1', created_at: past(48), ...over };
+        (db.provider_lead_ledger ??= []).push(row);
+        (db.provider_lead_ledger_payment_events ??= []).push({ ledger_id: row.id, status: 'captured', stripe_ref: 'pi_x', created_at: past(48) });
+        return row;
+    }
+    function seedBooking(over: Record<string, any> = {}) {
+        const row = { id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: past(3), slot_end: past(2.5), status: 'confirmed', lead_charged: true, identity_revealed: true, message: null, reschedule_count: 0, dispute_status: 'none', created_at: past(72), ...over };
+        (db.scheduling ??= []).push(row);
+        return row;
+    }
+    function seedUsers() { (db.users ??= []).push({ id: USER_ID, email: 'jana@example.com', language: 'de' }); }
+
+    it('Anbieter meldet attended → completed, Zaehler, Event', async () => {
+        const p = seedProvider({ completed_count: 3 }); seedMember();
+        const b = seedBooking();
+        const r = await attendance(b.id, { outcome: 'attended' });
+        expect(r.status).toBe(200);
+        expect(db.scheduling[0].status).toBe('completed');
+        expect(p.completed_count).toBe(4);
+        expect(db.event_log.some((e) => e.type === 'attendance_reported')).toBe(true);
+    });
+
+    it('Anbieter meldet Nutzer-No-Show → no_show_by user, 14-Tage-Frist, Nutzer informiert (neutral, ohne Gebuehr)', async () => {
+        seedProvider(); seedMember(); seedUsers();
+        const b = seedBooking();
+        const r = await attendance(b.id, { outcome: 'user_no_show' });
+        expect(r.status).toBe(200);
+        expect(r.body).toMatchObject({ status: 'no_show', no_show_by: 'user', rebook_deadline: dayStr(14), dispute_hours: 48 });
+        expect(db.scheduling[0]).toMatchObject({ status: 'no_show', no_show_by: 'user', rebook_deadline: dayStr(14), dispute_status: 'none' });
+        expect(db.scheduling[0].lead_charged).toBe(true);
+        expect(db.event_log.some((e) => e.type === 'booking_user_no_show')).toBe(true);
+        expect(db.notifications).toEqual([expect.objectContaining({ user_id: USER_ID, type: 'no_show_reported' })]);
+        const mail = db.event_log.find((e) => e.type === 'email_outbox' && e.payload?.kind === 'no_show_user');
+        expect(mail?.payload?.to).toBe('jana@example.com');
+        expect(String(mail?.payload?.text)).not.toMatch(/\$|USD|Gebühr|fee/i);
+    });
+
+    it('Anwesenheit nur nach dem Slot und nur fuer bestaetigte Termine', async () => {
+        seedProvider();
+        const b = seedBooking({ slot_start: future(1), slot_end: future(1) });
+        expect((await attendance(b.id, { outcome: 'attended' })).status).toBe(409);
+        expect((await attendance(b.id, { outcome: 'nonsense' })).status).toBe(400);
+    });
+
+    it('Plattformfehler → cancelled by system, Frist ohne Guthaben, kein Vorfall', async () => {
+        seedProvider(); seedMember();
+        const b = seedBooking();
+        const r = await attendance(b.id, { outcome: 'platform_failure', note: 'Video-Link tot' });
+        expect(r.status).toBe(200);
+        expect(db.scheduling[0]).toMatchObject({ status: 'cancelled', cancelled_by: 'system', no_show_by: 'platform', rebook_deadline: dayStr(14) });
+        expect(db.provider_performance_incidents ?? []).toHaveLength(0);
+    });
+
+    it('Nutzer meldet Anbieter-No-Show → Vorfall, Anbieter informiert, kein Guthaben', async () => {
+        seedProvider(); seedMember();
+        const b = seedBooking();
+        const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'no_show' }) });
+        expect(r.status).toBe(200);
+        expect(db.scheduling[0]).toMatchObject({ status: 'no_show', no_show_by: 'provider' });
+        expect(db.provider_performance_incidents).toEqual([expect.objectContaining({ provider_key: 'test-kanzlei', booking_id: b.id, kind: 'no_show', source: 'user_report' })]);
+        expect(db.notifications).toEqual([expect.objectContaining({ user_id: MEMBER_ID, type: 'performance_incident' })]);
+        expect(db.scheduling[0].rebook_deadline).toBeUndefined();
+    });
+
+    it('Widerspruch binnen 48 h → open; danach 409; Admin entscheidet upheld → Vorfall statt Guthaben', async () => {
+        seedProvider(); seedMember();
+        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13) });
+        const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ action: 'dispute', note: 'Ich war da, der Link ging nicht' }) });
+        expect(r.status).toBe(200);
+        expect(db.scheduling[0].dispute_status).toBe('open');
+        expect(db.notifications).toEqual([expect.objectContaining({ user_id: MEMBER_ID, type: 'dispute_opened' })]);
+        expect((await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ action: 'dispute' }) })).body.errorCode).toBe('ALREADY_DISPUTED');
+
+        const late = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(50), rebook_deadline: dayStr(12) });
+        expect((await api(`/api/v1/scheduling/${late.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ action: 'dispute' }) })).body.errorCode).toBe('DISPUTE_WINDOW_CLOSED');
+
+        expect((await api(`/api/v1/admin/bookings/${b.id}/dispute`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ resolution: 'upheld' }) })).status).toBe(403);
+        const adm = await api(`/api/v1/admin/bookings/${b.id}/dispute`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ resolution: 'upheld', note: 'Link nachweislich defekt' }) });
+        expect(adm.status).toBe(200);
+        expect(db.scheduling[0]).toMatchObject({ dispute_status: 'upheld', no_show_by: 'provider' });
+        expect(db.scheduling[0].credit_decided_at).toBeTruthy();
+        expect(db.provider_performance_incidents).toEqual([expect.objectContaining({ booking_id: b.id, source: 'admin' })]);
+    });
+
+    it('Neubuchung in der Frist: neue Zeile am selben Lead, keine zweite Gebuehr, Frist erledigt', async () => {
+        seedProvider(); seedMember();
+        const ledger = seedLedger();
+        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13), lead_ledger_id: ledger.id, acknowledgement_version: 'booking-ack-v1', shared_fields: ['email', 'company_name', 'message'] });
+        const target = future(3);
+        const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: target }) });
+        expect(r.status).toBe(201);
+        expect(r.body).toMatchObject({ status: 'confirmed', slot_start: target, rebooked_from: b.id });
+        const neu = db.scheduling.find((x) => x.id === r.body.id);
+        expect(neu).toMatchObject({ status: 'confirmed', lead_ledger_id: ledger.id, rebooked_from: b.id, lead_charged: false, acknowledgement_version: 'booking-ack-v1' });
+        expect(db.scheduling[0].credit_decided_at).toBeTruthy();
+        expect(db.provider_lead_ledger).toHaveLength(1);
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+        expect(db.event_log.some((e) => e.type === 'booking_rebooked')).toBe(true);
+        expect(db.notifications).toEqual([expect.objectContaining({ user_id: MEMBER_ID, type: 'booking_created' })]);
+    });
+
+    it('Umbuchung: zweimal ja, das dritte Mal 409 RESCHEDULE_LIMIT', async () => {
+        seedProvider();
+        const b = seedBooking({ slot_start: future(1), slot_end: future(1), reschedule_count: 1 });
+        expect((await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: future(2) }) })).status).toBe(200);
+        expect(db.scheduling[0].reschedule_count).toBe(2);
+        const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: future(3) }) });
+        expect(r.status).toBe(409);
+        expect(r.body).toMatchObject({ errorCode: 'RESCHEDULE_LIMIT', limit: 2 });
+    });
+
+    it('Mehrfachbuchung: derselbe Nutzer beim selben Anbieter binnen 30 Tagen zahlt keine zweite Gebuehr', async () => {
+        const { session } = seedBookable();
+        const first = await book(standardBody(session));
+        expect(first.status).toBe(201);
+        expect(db.provider_lead_ledger).toHaveLength(1);
+        stripeMock.createPaymentIntent.mockClear();
+        const second = await book(standardBody(session, { slot_start: new Date(Date.now() + 9 * 86_400_000).toISOString() }));
+        expect(second.status).toBe(201);
+        expect(second.body.booking.rebooked_from).toBe(first.body.booking.id);
+        expect(db.provider_lead_ledger).toHaveLength(1);
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+        const zweite = db.scheduling.find((x) => x.id === second.body.booking.id);
+        expect(zweite).toMatchObject({ lead_ledger_id: db.provider_lead_ledger[0].id, rebooked_from: first.body.booking.id, lead_charged: true });
+        expect(db.event_log.some((e) => e.type === 'booking_linked_to_lead')).toBe(true);
+        expect(db.event_log.filter((e) => e.type === 'provider_lead_charged')).toHaveLength(1);
+        // Der Zaehler steht weiter auf dem Stand der ersten Buchung.
+        expect(db.provider_discount_counter[0].used).toBe(1);
+    });
+
+    it('Frist abgelaufen ohne Neubuchung → 30 % Guthaben, Ledger-Credit, Event, Anbieter informiert — und nur einmal', async () => {
+        seedProvider(); seedMember(); seedUsers();
+        const ledger = seedLedger();
+        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(15 * 24), rebook_deadline: dayStr(-1), lead_ledger_id: ledger.id });
+        // Shadow: nur Marker.
+        const sh = await tick(true);
+        expect(sh.body.summary).toMatchObject({ creditsIssued: 1, rebookDeadlinesClosed: 1 });
+        expect(db.provider_credits ?? []).toHaveLength(0);
+        expect(db.event_log.some((e) => e.type === 'rebook_deadline_closed_shadow')).toBe(true);
+        // Live.
+        const live = await tick(false);
+        expect(live.body.summary).toMatchObject({ creditsIssued: 1, rebookDeadlinesClosed: 1 });
+        expect(db.provider_credits).toEqual([expect.objectContaining({ provider_key: 'test-kanzlei', amount_cents: 4023, reason: 'user_no_rebook_30pct', ledger_id: ledger.id, booking_id: b.id })]);
+        expect(db.provider_lead_ledger.find((l) => l.kind === 'credit')).toMatchObject({ refers_to: ledger.id, final_fee_cents: 4023, booking_id: b.id });
+        expect(db.event_log.find((e) => e.type === 'lead.credit_issued')?.payload).toMatchObject({ bookingId: b.id, creditCents: 4023, pct: 30 });
+        expect(db.notifications.some((n) => n.user_id === MEMBER_ID && n.type === 'credit_issued')).toBe(true);
+        expect(db.event_log.some((e) => e.type === 'email_outbox' && e.payload?.kind === 'credit_issued_provider')).toBe(true);
+        expect(db.scheduling[0].credit_decided_at).toBeTruthy();
+        // Zweiter Lauf: nichts mehr.
+        const again = await tick(false);
+        expect(again.body.summary).toMatchObject({ creditsIssued: 0, rebookDeadlinesClosed: 0 });
+        expect(db.provider_credits).toHaveLength(1);
+    });
+
+    it('Frist abgelaufen nach Plattformfehler oder offenem Widerspruch → kein Guthaben', async () => {
+        seedProvider(); seedMember();
+        const l1 = seedLedger(); const l2 = seedLedger();
+        seedBooking({ status: 'cancelled', no_show_by: 'platform', no_show_reported_at: past(15 * 24), rebook_deadline: dayStr(-1), lead_ledger_id: l1.id });
+        seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(15 * 24), rebook_deadline: dayStr(-1), lead_ledger_id: l2.id, dispute_status: 'open' });
+        const live = await tick(false);
+        expect(live.body.summary).toMatchObject({ creditsIssued: 0, rebookDeadlinesClosed: 1 });
+        expect(db.provider_credits ?? []).toHaveLength(0);
+        expect(db.scheduling[0].credit_decided_at).toBeTruthy();
+        expect(db.scheduling[1].credit_decided_at).toBeUndefined();
+    });
+
+    it('Neubuchungs-Erinnerung an Tag 1, je einmal; Terminerinnerung T-24h und T-1h an beide Seiten', async () => {
+        seedProvider(); seedMember(); seedUsers();
+        seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(26), rebook_deadline: dayStr(13), rebook_reminders_sent: 0 });
+        const soon = seedBooking({ slot_start: new Date(Date.now() + 23 * 3_600_000).toISOString(), slot_end: new Date(Date.now() + 23.5 * 3_600_000).toISOString(), reminder_24h_sent: false, reminder_1h_sent: false });
+        const r1 = await tick(false);
+        expect(r1.body.summary).toMatchObject({ rebookReminders: 1, appointmentReminders: 1 });
+        expect(db.scheduling[0].rebook_reminders_sent).toBe(1);
+        expect(db.scheduling[1]).toMatchObject({ reminder_24h_sent: true, reminder_1h_sent: false });
+        expect(db.notifications.filter((n) => n.type === 'appointment_reminder').map((n) => n.user_id).sort()).toEqual([MEMBER_ID, USER_ID].sort());
+        expect(db.event_log.filter((e) => e.type === 'email_outbox' && String(e.payload?.kind).startsWith('appointment_reminder')).map((e) => e.payload?.kind).sort()).toEqual(['appointment_reminder_provider', 'appointment_reminder_user']);
+        const r2 = await tick(false);
+        expect(r2.body.summary).toMatchObject({ rebookReminders: 0, appointmentReminders: 0 });
+        // Eine Stunde vorher: die zweite Stufe.
+        soon.slot_start = new Date(Date.now() + 50 * 60_000).toISOString(); soon.slot_end = new Date(Date.now() + 80 * 60_000).toISOString();
+        const r3 = await tick(false);
+        expect(r3.body.summary.appointmentReminders).toBe(1);
+        expect(db.scheduling[1].reminder_1h_sent).toBe(true);
+    });
+
+    it('Buchungslisten tragen die Phase-5-Felder, nie Geld auf dem Nutzer-Draht', async () => {
+        seedProvider(); seedMember();
+        seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13) });
+        const prov = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'key' });
+        expect(prov.body.bookings[0]).toMatchObject({ no_show_by: 'user', dispute_status: 'none', rebook_deadline: dayStr(13), reschedule_limit: 2, attendance_reportable: false, rebook_open: true });
+        const user = await api('/api/v1/bookings', { auth: 'jwt' });
+        expect(user.body.bookings[0]).toMatchObject({ no_show_by: 'user', dispute_status: 'none', rebook_deadline: dayStr(13), rebook_open: true });
+        expect(user.body.bookings[0].dispute_open_until).toBeTruthy();
+        expect(JSON.stringify(user.body)).not.toMatch(/fee|band|ledger|credit/i);
+    });
+
+    it('Monatslauf verrechnet Guthaben bis zur Rechnungssumme (dry_run) und zeigt es in der Vorschau', async () => {
+        seedProvider({ billing_ready: true }); seedPricing(); seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        (db.provider_credits ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', amount_cents: 4023, currency: 'USD', reason: 'user_no_rebook_30pct', created_at: past(1) });
+        const run = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: JSON.stringify({ period: new Date().toISOString().slice(0, 7), dry_run: true }) });
+        expect(run.status).toBe(200);
+        const r0 = run.body.results.find((x: any) => x.provider === 'test-kanzlei');
+        expect(r0).toMatchObject({ dry_run: true, credit_applied_cents: 4023, total_cents: 9900 - 4023 });
+        expect(r0.lines).toHaveLength(2);
+        expect(r0.lines[1].amount_cents).toBe(-4023);
+        const prev = await api('/api/v1/provider/test-kanzlei/billing/preview', { auth: 'key' });
+        expect(prev.body).toMatchObject({ credit_balance_cents: 4023, credit_applied_cents: 4023 });
+        expect(prev.body.total_after_credit_cents).toBe(prev.body.total_cents - 4023);
+        expect(prev.body.credits).toHaveLength(1);
+    });
+});

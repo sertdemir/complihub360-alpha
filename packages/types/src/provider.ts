@@ -572,8 +572,62 @@ export interface BookingCreateResponse {
         acknowledgement_version: string;
         shared_fields: string[];
         user_discount: { pct: number; policy_version: number } | null;
+        /** Phase 5: gesetzt, wenn die Buchung ohne zweite Gebuehr an einem bestehenden Lead haengt. */
+        rebooked_from: string | null;
     };
     provider_identity: { name: string; website_url: string | null; contact_email: string | null };
+}
+
+// ─── Phase 5: Anwesenheit, No-Show, Neubuchung, Guthaben (Spec B, ADR-0007) ──
+
+/** Wer zum Termin fehlte. `platform` = technischer Plattformfehler, Neubuchung ohne zweite Gebuehr. */
+export type NoShowBy = 'user' | 'provider' | 'platform';
+export type DisputeStatus = 'none' | 'open' | 'upheld' | 'dismissed';
+/** Was der Anbieter nach dem Termin meldet. */
+export type AttendanceOutcomeReport = 'attended' | 'user_no_show' | 'platform_failure';
+
+/** Felder, die beide Buchungslisten seit Phase 5 tragen. Nie Geld. */
+export interface BookingAttendanceFields {
+    no_show_by: NoShowBy | null;
+    no_show_reported_at: string | null;
+    dispute_status: DisputeStatus;
+    /** Bis wann (YYYY-MM-DD) ohne zweite Gebuehr neu gebucht werden kann. */
+    rebook_deadline: string | null;
+    /** Die Buchung, an deren Lead diese haengt (Neubuchung oder 30-Tage-Fenster). */
+    rebooked_from: string | null;
+    reschedule_count: number;
+    reschedule_limit: number;
+    /** Bestaetigt und Slot vorbei: der Anbieter kann die Anwesenheit melden. */
+    attendance_reportable: boolean;
+    /** Nur beim Nutzer-No-Show ohne Widerspruch: bis wann (ISO) der Nutzer widersprechen kann. */
+    dispute_open_until: string | null;
+    /** Frist laeuft noch und ist nicht erledigt. */
+    rebook_open: boolean;
+}
+
+/** Konfiguration aus attendance_policy (Spec B: configurable, not hard-coded). */
+export interface AttendancePolicy {
+    version: number;
+    provider_wait_minutes: number;
+    rebook_days: number;
+    credit_pct: number;
+    dispute_hours: number;
+    same_user_window_days: number;
+    reschedule_limit: number;
+    reminder_offsets_min: number[];
+    rebook_reminder_days: number[];
+}
+
+export type ProviderCreditReason = 'user_no_rebook_30pct' | 'platform_failure' | 'admin' | 'consumed';
+
+/** Ein Guthaben-Posten des Anbieters (provider_credits). Positiv = gutgeschrieben, negativ = verbraucht. */
+export interface ProviderCredit {
+    id: string;
+    amount_cents: number;
+    currency: string;
+    reason: ProviderCreditReason;
+    booking_id: string | null;
+    created_at: string;
 }
 
 /** Fehlercodes der Buchung, die eine Oberflaeche unterscheiden muss. */
@@ -583,4 +637,8 @@ export type BookingErrorCode =
     | 'SLOT_TAKEN'                 // Termin gerade vergeben
     | 'BOOKING_NOT_COMPLETED'      // Belastung gescheitert — keine Buchung, Grund `provider_billing`
     | 'BILLING_ERROR'              // Zahlungsdienst nicht erreichbar (502)
-    | 'OPPORTUNITY_REQUIRED' | 'AREA_NOT_OFFERED' | 'SERVICE_NOT_FOUND';
+    | 'OPPORTUNITY_REQUIRED' | 'AREA_NOT_OFFERED' | 'SERVICE_NOT_FOUND'
+    // Phase 5
+    | 'RESCHEDULE_LIMIT'           // zu oft verschoben — absagen und neu buchen
+    | 'NOT_REPORTABLE'             // Anwesenheit nur nach dem Slot, nur bei bestaetigt
+    | 'NOT_DISPUTABLE' | 'ALREADY_DISPUTED' | 'DISPUTE_WINDOW_CLOSED';
