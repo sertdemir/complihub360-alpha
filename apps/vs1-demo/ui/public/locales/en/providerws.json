@@ -156,7 +156,7 @@
     "messagePlaceholder": "What happened? Page, time and the reference ID if one was shown.",
     "send": "Send",
     "note": "Reply usually within one business day, the same for every plan. You receive a reference and a confirmation by email.",
-    "noEmail": "The ticket needs the email address of your login. It is missing in this session.",
+    "noEmail": "The ticket needs the email address of your login. It is not available right now.",
     "sentTitle": "Your ticket has arrived.",
     "sentBody": "Reference {{reference}}. The confirmation goes to your login address; the team usually replies within one business day.",
     "another": "Another ticket",
