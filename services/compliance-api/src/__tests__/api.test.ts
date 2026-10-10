@@ -3927,6 +3927,10 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         expect(einer.body.results.map((r: any) => r.provider)).toEqual(['test-kanzlei']);
         const kaputt = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: body({ provider: 'DROP TABLE' }) });
         expect(kaputt.status).toBe(400);
+        // Vertippt (dahlman statt dahlmann): rot statt „0 Anbieter, nichts abgerechnet".
+        const vertippt = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: body({ provider: 'test-kanzle' }) });
+        expect(vertippt.status).toBe(404);
+        expect(vertippt.body.errorCode).toBe('PROVIDER_NOT_FOUND');
     });
 
     it('Monatslauf verrechnet Guthaben bis zur Rechnungssumme (dry_run) und zeigt es in der Vorschau', async () => {
