@@ -347,9 +347,54 @@ for (const [sprache, muster] of Object.entries(RESERVIERT)) {
   }
 }
 
+// 5. Auth-Mails (Canvas „Auth-Mails ehrlich", Wahl 10.10.2026: A1 · B1 · C1 ·
+//    D1 · E1). Die Supabase-Vorlagen unter docs/email-templates/ tragen die
+//    abgenommenen Saetze; Betreff und Ablaufzeit stehen in supabase-auth.json.
+//    Verboten, was die Abnahme ersetzt hat: das Versprechen „partner matches
+//    are waiting" (galt nicht fuer jede Registrierung), die vage Laufzeit,
+//    die Positionierungszeile im Fuss und „securely" als Behauptung.
+const MAIL_DIR = resolve(ROOT, 'docs/email-templates');
+const ENTITIES = { '&rsquo;': '’', '&mdash;': '—', '&nbsp;': ' ', '&rarr;': '→', '&amp;': '&' };
+const klartext = (html) => html
+  .replace(/<!--[\s\S]*?-->/g, ' ')
+  .replace(/<[^>]+>/g, '')
+  .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+  .replace(/&[a-z]+;/g, (e) => ENTITIES[e] ?? e)
+  .replace(/\s+/g, ' ')
+  .trim();
+const MAIL_FUSS = 'CompliHub360 — Always on your side.';
+const MAIL_HINWEIS = 'This link works once and expires after 30 minutes.';
+const MAILS = {
+  confirmation: {
+    subject: 'Confirm your email for CompliHub360',
+    saetze: ['Confirm your email.', 'Welcome to CompliHub360. Confirm your email address to activate your account. If you started a Risk Map before signing up, you’ll find it in your workspace.', 'Confirm email →', MAIL_HINWEIS, 'Open it in the same browser you signed up in.', 'Didn’t sign up? Ignore this email. No account will be activated.', MAIL_FUSS, 'You received this email because an account was created with this address on complihub360.com.'],
+  },
+  magic_link: {
+    subject: 'Your CompliHub360 sign-in link',
+    saetze: ['Your sign-in link.', 'Use the button below to sign in to CompliHub360. No password needed. This link is your key, so please don’t forward it.', 'Sign in to CompliHub360 →', MAIL_HINWEIS, 'Open it in the same browser you requested it from.', 'Didn’t request this? Ignore this email. Nobody can sign in without the link.', MAIL_FUSS, 'You received this email because a sign-in link was requested for this address on complihub360.com.'],
+  },
+  recovery: {
+    subject: 'Reset your CompliHub360 password',
+    saetze: ['Reset your password.', 'We received a request to reset the password for your CompliHub360 account. Choose a new one with the button below.', 'Set a new password →', MAIL_HINWEIS, 'Open it in the same browser you requested it from.', 'Didn’t request this? Ignore this email. Your password stays as it is.', MAIL_FUSS, 'You received this email because a password reset was requested for this address on complihub360.com.'],
+  },
+};
+const MAIL_VERBOTEN = [/partner matches are waiting/i, /orchestration layer/i, /e-mail/i, /short time/i, /securely/i];
+const authCfg = JSON.parse(readFileSync(resolve(MAIL_DIR, 'supabase-auth.json'), 'utf8'));
+if (authCfg.otp_expiry_seconds !== 1800) fehler.push(`Auth-Mails: otp_expiry_seconds ist ${authCfg.otp_expiry_seconds}, die Mails sagen „30 minutes" (Wahl D1)`);
+for (const [art, soll] of Object.entries(MAILS)) {
+  const eintrag = authCfg.templates?.[art];
+  if (!eintrag) { fehler.push(`Auth-Mails: ${art} fehlt in supabase-auth.json`); continue; }
+  if (eintrag.subject !== soll.subject) fehler.push(`Auth-Mails: Betreff ${art}\n      Vorlage: ${soll.subject}\n      Datei:   ${eintrag.subject}`);
+  let text;
+  try { text = klartext(readFileSync(resolve(MAIL_DIR, eintrag.file), 'utf8')); } catch { fehler.push(`Auth-Mails: ${eintrag.file} fehlt`); continue; }
+  for (const satz of soll.saetze) if (!text.includes(satz)) fehler.push(`Auth-Mails: ${eintrag.file} — fehlt wortgleich: „${satz}"`);
+  for (const m of MAIL_VERBOTEN) if (m.test(text)) fehler.push(`Auth-Mails: ${eintrag.file} — ersetzt und nicht mehr erlaubt: ${m}`);
+  if (!/\{\{ \.ConfirmationURL \}\}/.test(readFileSync(resolve(MAIL_DIR, eintrag.file), 'utf8'))) fehler.push(`Auth-Mails: ${eintrag.file} — {{ .ConfirmationURL }} fehlt`);
+}
+
 if (fehler.length === 0) {
   const n = Object.keys(AKTIONEN_JE_ZUSTAND).length;
-  console.log(`Abgenommene Zustands-Copy wortgleich (${n} Zustaende, ${Object.keys(VORLAGE.actions).length} Aktionen, Sharing-Dialog, Umfang und Technical details; reserviertes Wort auf /billing).`);
+  console.log(`Abgenommene Zustands-Copy wortgleich (${n} Zustaende, ${Object.keys(VORLAGE.actions).length} Aktionen, Sharing-Dialog, Umfang und Technical details; reserviertes Wort auf /billing; drei Auth-Mails mit Betreff und Ablaufzeit).`);
   process.exit(0);
 }
 

@@ -1,10 +1,18 @@
-<!-- CompliHub360 · Supabase auth mail (Magic Link / Confirm signup)
+<!-- CompliHub360 · Supabase auth mail · Confirm signup (A1)
+     Canvas „Auth-Mails ehrlich", Wahl 10.10.2026: A1 · B1 · C1 · D1 · E1.
+     Figma: Screens-Datei, Seite „Auth-Mails (A1 · B1 · C1 · D1 · E1)" (3675:2).
+     Copy wortgleich abgenommen; der Waechter scripts/check-approved-copy.mjs
+     prueft sie (Abschnitt 5). Betreff und Ablaufzeit: supabase-auth.json.
+
      Brand: dark slate shell, serif headline with ONE gold word, gold CTA.
      Ein Goldwert: #C5913B, der Ton der Wortmarken-"360" — Wort UND Knopf
      (Nutzer-Festlegung 2026-09-20). Knopflabel #101411 darauf 6,62:1, die
-     Flaeche gegen die Karte 5,23:1. Die App trennt weiter Text und Flaeche;
-     in der Mail steht die Marke fuer sich.
-     Table-based + inline styles (email-client-safe), no external images. -->
+     Flaeche gegen die Karte 5,23:1.
+     Table-based + inline styles (email-client-safe).
+
+     LOGO: Die URL zeigt auf den Bucket `assets` von Staging. Beim Einfuegen in
+     ein anderes Projekt (Beta) die Projekt-Referenz in der URL ersetzen —
+     docs/runbooks/beta-supabase.md, Abschnitt „Auth". -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;">
   <tr>
     <td align="center">
@@ -12,8 +20,6 @@
 
         <!-- Brand -->
         <tr>
-          <!-- Logo: assets/logo-lockup-email.png im Supabase-Bucket.
-     Quelle liegt unter docs/email-templates/assets/ im Repo. -->
           <td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360 — Always on your side" style="display:block;border:0;"/></td>
         </tr>
 
@@ -23,31 +29,31 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td style="font-family:Georgia,'Times New Roman',serif;font-size:28px;line-height:1.2;font-weight:bold;color:#ffffff;">
-                  Activate your <span style="color:#C5913B;">workspace</span>.
+                  Confirm your <span style="color:#C5913B;">email</span>.
                 </td>
               </tr>
               <tr>
                 <td style="padding-top:14px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">
-                  Welcome to CompliHub360. Confirm your e-mail to activate your workspace &mdash;
-                  your saved risk map and partner matches are waiting.
+                  Welcome to CompliHub360. Confirm your email address to activate your account.
+                  If you started a Risk Map before signing up, you&rsquo;ll find it in your workspace.
                 </td>
               </tr>
               <tr>
                 <td style="padding-top:28px;">
                   <a href="{{ .ConfirmationURL }}"
                      style="display:block;background-color:#C5913B;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">
-                    Activate workspace &rarr;
+                    Confirm email &rarr;
                   </a>
                 </td>
               </tr>
               <tr>
-                <td style="padding-top:22px;border-top:1px solid rgba(255,255,255,0.08);margin-top:22px;">
+                <td style="padding-top:22px;border-top:1px solid rgba(255,255,255,0.08);">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:22px;">
                     <tr>
                       <td style="font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">
-                        &#128274;&nbsp; This link works <strong style="color:#aeb8c4;">once</strong> and expires after a short time.<br/>
-                        &#127760;&nbsp; Open it in the <strong style="color:#aeb8c4;">same browser</strong> you requested it from.<br/>
-                        &#128737;&nbsp; Didn&rsquo;t request this? You can safely ignore this e-mail.
+                        &#128274;&nbsp; This link works <strong style="color:#aeb8c4;">once</strong> and expires after <strong style="color:#aeb8c4;">30 minutes</strong>.<br/>
+                        &#127760;&nbsp; Open it in the <strong style="color:#aeb8c4;">same browser</strong> you signed up in.<br/>
+                        &#128737;&nbsp; Didn&rsquo;t sign up? Ignore this email. No account will be activated.
                       </td>
                     </tr>
                   </table>
@@ -60,8 +66,8 @@
         <!-- Footer -->
         <tr>
           <td style="padding:24px 8px 0 8px;font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:1.7;color:#5b6673;">
-            CompliHub360 &mdash; the orchestration layer between compliance complexity and operational reality.<br/>
-            You received this e-mail because a sign-in was requested for your address on
+            CompliHub360 &mdash; Always on your side.<br/>
+            You received this email because an account was created with this address on
             <a href="{{ .SiteURL }}" style="color:#8b96a5;">complihub360.com</a>.
           </td>
         </tr>
