@@ -1301,3 +1301,48 @@ export async function sendCreditIssuedMail(p: { to: string | null; providerKey: 
     const text = [t.intro.replace('{amount}', amount).replace('{pct}', String(p.pct)), ``, t.note].join('\n');
     await deliverProviderMail({ to: p.to, kind: 'credit_issued_provider', ref: { bookingId: p.bookingId, providerKey: p.providerKey, amountCents: p.amountCents }, subject: t.subject, text, correlationId: p.correlationId });
 }
+
+// ─── Phase 6: Serien-No-Shows (ADR-0009) ─────────────────────────────────────
+//
+// Zwei Stufen, derselbe Ton: Hinweis bei zwei Vorfaellen, Buchungspause bei
+// drei. Kein Vorwurf, der Weg zum Einspruch steht im Text, und die
+// Sichtbarkeit bleibt — das sagt die Mail ausdruecklich.
+
+const SERIAL_NO_SHOW_STRINGS: Record<MailLocale, { alertSubject: string; alertBody: string; pauseSubject: string; pauseBody: string; foot: string }> = {
+    en: {
+        alertSubject: 'Two missed consultations have been recorded for your account',
+        alertBody: 'Within the last {days} days, users reported {count} consultations booked through CompliHub360 at which you did not appear. Each report is recorded as a performance incident; one more within the same period pauses new bookings until the matter is clarified.',
+        pauseSubject: 'New bookings are paused for your account',
+        pauseBody: 'Within the last {days} days, {count} consultations booked through CompliHub360 were reported as missed by you. New bookings are paused for now; your profile stays visible and existing appointments remain in place.',
+        foot: 'If a report is wrong, you can file an objection in your dashboard under Performance; we will look at the case. Incidents count towards performance, never towards your invoice.',
+    },
+    de: {
+        alertSubject: 'Zwei versäumte Beratungstermine sind für Ihr Konto vermerkt',
+        alertBody: 'In den letzten {days} Tagen haben Nutzer {count} über CompliHub360 gebuchte Beratungstermine gemeldet, zu denen Sie nicht erschienen sind. Jede Meldung ist als Leistungsvorfall vermerkt; ein weiterer im selben Zeitraum pausiert neue Buchungen, bis der Fall geklärt ist.',
+        pauseSubject: 'Neue Buchungen sind für Ihr Konto pausiert',
+        pauseBody: 'In den letzten {days} Tagen wurden {count} über CompliHub360 gebuchte Beratungstermine als von Ihnen versäumt gemeldet. Neue Buchungen sind vorerst pausiert; Ihr Profil bleibt sichtbar, bestehende Termine bleiben bestehen.',
+        foot: 'Ist eine Meldung falsch, können Sie in Ihrem Dashboard unter Performance Einspruch einlegen; wir sehen uns den Fall an. Vorfälle zählen in die Leistung, nie in Ihre Rechnung.',
+    },
+    es: {
+        alertSubject: 'Se han registrado dos consultas no atendidas en su cuenta',
+        alertBody: 'En los últimos {days} días, los usuarios informaron {count} consultas reservadas a través de CompliHub360 a las que usted no se presentó. Cada informe queda registrado como incidente de rendimiento; uno más en el mismo periodo pausa las nuevas reservas hasta aclarar el caso.',
+        pauseSubject: 'Las nuevas reservas están pausadas en su cuenta',
+        pauseBody: 'En los últimos {days} días, {count} consultas reservadas a través de CompliHub360 se informaron como no atendidas por usted. Las nuevas reservas quedan pausadas por ahora; su perfil sigue visible y las citas existentes se mantienen.',
+        foot: 'Si un informe es erróneo, puede presentar una objeción en su panel, en Rendimiento; revisaremos el caso. Los incidentes cuentan para el rendimiento, nunca para su factura.',
+    },
+    tr: {
+        alertSubject: 'Hesabınız için kaçırılan iki danışma randevusu kaydedildi',
+        alertBody: 'Son {days} gün içinde kullanıcılar, CompliHub360 üzerinden ayırtılan ve sizin katılmadığınız {count} danışma randevusu bildirdi. Her bildirim performans olayı olarak kaydedilir; aynı dönemde bir tane daha olursa, durum netleşene kadar yeni rezervasyonlar duraklatılır.',
+        pauseSubject: 'Hesabınız için yeni rezervasyonlar duraklatıldı',
+        pauseBody: 'Son {days} gün içinde CompliHub360 üzerinden ayırtılan {count} danışma randevusu sizin tarafınızdan kaçırılmış olarak bildirildi. Yeni rezervasyonlar şimdilik duraklatıldı; profiliniz görünür kalır ve mevcut randevular geçerliliğini korur.',
+        foot: 'Bir bildirim hatalıysa panelinizde Performans altında itiraz edebilirsiniz; durumu inceleriz. Olaylar performansa sayılır, faturanıza asla.',
+    },
+};
+
+export async function sendSerialNoShowMail(p: { to: string | null; providerKey: string; state: 'alert' | 'pause'; count: number; windowDays: number; locale?: string; correlationId?: string }): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = SERIAL_NO_SHOW_STRINGS[loc];
+    const body = (p.state === 'pause' ? t.pauseBody : t.alertBody).replace('{days}', String(p.windowDays)).replace('{count}', String(p.count));
+    const text = [body, ``, t.foot].join('\n');
+    await deliverProviderMail({ to: p.to, kind: p.state === 'pause' ? 'booking_paused_provider' : 'serial_no_show_alert_provider', ref: { providerKey: p.providerKey, count: p.count }, subject: p.state === 'pause' ? t.pauseSubject : t.alertSubject, text, correlationId: p.correlationId });
+}

@@ -43,6 +43,10 @@ export type NotificationType =
     | 'dispute_opened'          // Der Nutzer widerspricht der No-Show-Meldung (Admin, Anbieter)
     | 'dispute_resolved'        // Der Admin hat entschieden
     | 'credit_issued'           // 30 % Guthaben fuer den Anbieter
+    // Phase 6 (ADR-0009): Serien-No-Shows und Durchsetzung — an den Anbieter.
+    | 'serial_no_show_alert'    // Zwei Vorfaelle im Fenster — Hinweis
+    | 'booking_paused'          // Drei Vorfaelle — Buchungspause mit Einspruch
+    | 'enforcement_decided'     // Einspruch entschieden (label: lifted|upheld)
     | 'performance_incident'    // Der Anbieter fehlte — Vorfall protokolliert
     // Abo: Wechsel und Kuendigung zum Verlaengerungstermin (ADR-0006 B2/C2).
     // Zwei Zeitpunkte, zwei Nachrichten — die Vormerkung ist eine Zusage auf

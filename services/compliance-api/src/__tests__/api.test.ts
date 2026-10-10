@@ -3864,6 +3864,182 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
 
 // ─── Kalender verbinden (Nylas Hosted Auth, nylasAuth.ts) ────────────────────
 
+describe('Phase 6 — Performance aus Fakten, Ranking ohne Annahmen, Serien-No-Shows, Verfuegbarkeit', () => {
+    const past = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
+    const future = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString();
+    function bk(over: Record<string, any> = {}) {
+        const row = { id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: past(72), slot_end: past(71.5), status: 'completed', lead_charged: true, identity_revealed: true, dispute_status: 'none', created_at: past(100), ...over };
+        (db.scheduling ??= []).push(row);
+        return row;
+    }
+    function review(rating: number, categories: string[] = []) {
+        (db.reviews ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', from_role: 'user', to_role: 'provider', verified: true, booking_id: randomUUID(), rating, categories, created_at: past(1) });
+    }
+    const perf = (q = '') => api(`/api/v1/provider/test-kanzlei/performance${q}`, { auth: 'key' });
+
+    it('GET performance: Fakten je Anbieter, Quoten ab 5, Verlauf ab enhanced, CSV erst ab advanced', async () => {
+        seedProvider(); seedPricing(); seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        bk(); bk(); bk(); bk({ status: 'no_show', no_show_by: 'user' }); bk({ status: 'no_show', no_show_by: 'provider' }); bk({ status: 'cancelled', cancelled_by: 'provider' });
+        bk({ status: 'confirmed', slot_start: future(2), slot_end: future(2) });
+        (db.provider_performance_incidents ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', booking_id: randomUUID(), kind: 'no_show', source: 'user_report', recorded_at: past(5) });
+        review(5, ['would_use_again']); review(4);
+        const r = await perf();
+        expect(r.status).toBe(200);
+        expect(r.body.performance).toMatchObject({ bookings: 6, rates_shown: true, attended: { count: 3, rate: 0.5, of: 6 }, user_no_show: { count: 1 }, provider_no_show: { count: 1 }, cancelled_by_provider: { count: 1 }, upcoming: 1 });
+        expect(r.body.performance.incidents).toMatchObject({ count: 1, alert_at: 2, pause_at: 3 });
+        expect(r.body.performance.rating).toEqual({ average: 4.5, count: 2, min_count: 5 });
+        expect(r.body.analytics).toEqual({ level: 'enhanced', trends: true, export: false });
+        expect(r.body.trends.area[0]).toMatchObject({ key: 'unknown', bookings: 6 });
+        expect(JSON.stringify(r.body)).not.toMatch(/trust|score/i);
+        expect((await perf('?format=csv')).status).toBe(403);
+    });
+
+    it('Essential sieht dieselben Fakten ohne Verlauf; Global bekommt den CSV-Export ohne Nutzerdaten', async () => {
+        seedProvider(); seedPricing(); seedSubscription('test-kanzlei', 'essential', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        bk(); bk({ status: 'no_show', no_show_by: 'user' });
+        const basic = await perf();
+        expect(basic.body.analytics.level).toBe('basic');
+        expect(basic.body.trends).toBeUndefined();
+        expect(basic.body.performance.bookings).toBe(2);
+        db.provider_subscriptions[0].plan_code = 'global';
+        const adv = await perf();
+        expect(adv.body.analytics).toEqual({ level: 'advanced', trends: true, export: true });
+        expect(adv.body.performance.bookings).toBe(2);
+        const res = await fetch(`${BASE}/api/v1/provider/test-kanzlei/performance?format=csv`, { headers: { 'x-api-key': API_KEY } });
+        expect(res.status).toBe(200);
+        expect(res.headers.get('content-type')).toContain('text/csv');
+        const csv = await res.text();
+        expect(csv.split('\n')[0]).toBe('booking_id,slot_start,status,no_show_by,cancelled_by,dispute_status,area_code,country');
+        expect(csv).not.toContain(USER_ID);
+    });
+
+    it('GET overview: Zustand, naechste Termine, Kontingent, Belastungen, Guthaben, Aufgaben', async () => {
+        seedProvider({ billing_ready: true, nylas_grant_id: 'g1', lifecycle_status: 'active' }); seedPricing();
+        seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        (db.provider_discount_counter ??= []).push({ provider_key: 'test-kanzlei', cycle_start: '2020-01-01', used: 2 });
+        const l = { id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', final_fee_cents: 13410, currency: 'USD', payment_status: 'pending', created_at: past(48) };
+        (db.provider_lead_ledger ??= []).push(l);
+        (db.provider_lead_ledger_payment_events ??= []).push({ ledger_id: l.id, status: 'captured', created_at: past(48) });
+        (db.provider_credits ??= []).push({ provider_key: 'test-kanzlei', amount_cents: 4023, currency: 'USD', reason: 'user_no_rebook_30pct' });
+        bk({ status: 'confirmed', slot_start: past(3), slot_end: past(2.5) });
+        bk({ status: 'confirmed', slot_start: future(2), slot_end: future(2) });
+        bk({ status: 'no_show', no_show_by: 'user', dispute_status: 'open' });
+        (db.provider_evidence ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', evidence_type: 'insurance', expires_at: future(20) });
+        const r = await api('/api/v1/provider/test-kanzlei/overview', { auth: 'key' });
+        expect(r.status).toBe(200);
+        expect(r.body.status).toMatchObject({ verified: true, billing_ready: true, booking_open: true, calendar_connected: true });
+        expect(r.body.plan).toMatchObject({ code: 'growth', analytics_level: 'enhanced', discount: { count: 3, used: 2, remaining: 1 } });
+        expect(r.body.leads).toMatchObject({ count: 1, final_cents: 13410 });
+        expect(r.body.credit_balance_cents).toBe(4023);
+        expect(r.body.upcoming).toHaveLength(1);
+        expect(r.body.report_open).toBe(1);
+        expect(r.body.tasks.map((t: any) => t.kind)).toEqual(['attendance_report', 'dispute_open', 'evidence_expiring']);
+    });
+
+    it('Serien-No-Shows: zwei Vorfaelle → Hinweis, drei → Buchungspause mit Einspruch; Sichtbarkeit bleibt', async () => {
+        seedProvider({ depth: 'independent' }); seedMember();
+        const report = async () => { const b = bk({ status: 'confirmed' }); return api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'no_show' }) }); };
+        expect((await report()).status).toBe(200);
+        expect(db.event_log.filter((e) => e.type === 'provider_serial_no_show')).toHaveLength(0);
+        expect((await report()).status).toBe(200);
+        expect(db.event_log.filter((e) => e.type === 'provider_serial_no_show')).toEqual([expect.objectContaining({ payload: expect.objectContaining({ state: 'alert', count: 2 }) })]);
+        expect(db.notifications.some((n) => n.type === 'serial_no_show_alert' && n.user_id === MEMBER_ID)).toBe(true);
+        expect(db.event_log.some((e) => e.type === 'email_outbox' && e.payload?.kind === 'serial_no_show_alert_provider')).toBe(true);
+        expect(db.providers[0].booking_paused_at ?? null).toBeNull();
+
+        expect((await report()).status).toBe(200);
+        expect(db.providers[0].booking_paused_at).toBeTruthy();
+        expect(db.provider_enforcement_actions).toEqual([expect.objectContaining({ provider_key: 'test-kanzlei', action: 'booking_pause', source: 'auto_no_show' })]);
+        expect(db.notifications.some((n) => n.type === 'booking_paused')).toBe(true);
+        expect(db.event_log.some((e) => e.type === 'admin_alert' && e.payload?.kind === 'provider_serial_no_show')).toBe(true);
+
+        // Sichtbar bleibt er; nur Slots und Buchung sind zu.
+        const search = await api('/api/v1/search', { method: 'POST', auth: 'none', body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }) });
+        expect(search.body.providers).toHaveLength(1);
+        const slots = await api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' });
+        expect(slots.body).toMatchObject({ slots: [], booking_open: false, reason: 'paused' });
+        const detail = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'jwt' });
+        expect(detail.body.detail.bookable_chargeable).toBe(false);
+        const perfR = await perf();
+        expect(perfR.body.enforcement).toMatchObject({ action: 'booking_pause', incident_count: 3 });
+
+        // Einspruch: einmal ja, zweimal 409; ohne Text 400.
+        const actionId = db.provider_enforcement_actions[0].id;
+        expect((await api(`/api/v1/provider/test-kanzlei/enforcement/${actionId}/appeal`, { method: 'POST', auth: 'key', body: JSON.stringify({}) })).status).toBe(400);
+        expect((await api(`/api/v1/provider/test-kanzlei/enforcement/${actionId}/appeal`, { method: 'POST', auth: 'key', body: JSON.stringify({ note: 'Zwei der drei Nutzer waren im falschen Raum' }) })).status).toBe(200);
+        expect((await api(`/api/v1/provider/test-kanzlei/enforcement/${actionId}/appeal`, { method: 'POST', auth: 'key', body: JSON.stringify({ note: 'nochmal' }) })).body.errorCode).toBe('ALREADY_APPEALED');
+        expect(db.event_log.some((e) => e.type === 'admin_alert' && e.payload?.kind === 'enforcement_appeal')).toBe(true);
+
+        // Admin hebt auf: Pause weg, Anbieter informiert; JWT darf das nicht.
+        expect((await api(`/api/v1/admin/providers/test-kanzlei/enforcement/${actionId}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ decision: 'lifted' }) })).status).toBe(403);
+        const adm = await api(`/api/v1/admin/providers/test-kanzlei/enforcement/${actionId}`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ decision: 'lifted', note: 'Einspruch berechtigt' }) });
+        expect(adm.status).toBe(200);
+        expect(db.providers[0].booking_paused_at ?? null).toBeNull();
+        expect(db.provider_enforcement_actions[0]).toMatchObject({ decision: 'lifted' });
+        expect(db.notifications.some((n) => n.type === 'enforcement_decided')).toBe(true);
+        expect((await api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' })).body.booking_open).toBe(true);
+    });
+
+    it('Buchung waehrend der Pause: 409 BOOKING_PAUSED ohne Grund auf dem Nutzer-Draht, kein Stripe-Aufruf', async () => {
+        const { session } = seedBookable({ booking_paused_at: past(1) });
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(409);
+        expect(r.body.errorCode).toBe('BOOKING_PAUSED');
+        expect(JSON.stringify(r.body)).not.toMatch(/no.?show|incident|Vorfall/i);
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+    });
+
+    it('Nutzer mit zwei gemeldeten No-Shows: ein Admin-Hinweis, kein Gate', async () => {
+        seedProvider(); seedMember(); (db.users ??= []).push({ id: USER_ID, email: 'jana@example.com', language: 'de' });
+        const attendance = (id: string) => api(`/api/v1/provider/test-kanzlei/bookings/${id}/attendance`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ outcome: 'user_no_show' }) });
+        const a = bk({ status: 'confirmed' }); const b = bk({ status: 'confirmed' });
+        expect((await attendance(a.id)).status).toBe(200);
+        await new Promise((r) => setTimeout(r, 20));
+        expect(db.event_log.filter((e) => e.type === 'admin_alert' && e.payload?.kind === 'user_serial_no_show')).toHaveLength(0);
+        expect((await attendance(b.id)).status).toBe(200);
+        await new Promise((r) => setTimeout(r, 20));
+        expect(db.event_log.filter((e) => e.type === 'admin_alert' && e.payload?.kind === 'user_serial_no_show')).toEqual([expect.objectContaining({ payload: expect.objectContaining({ userId: USER_ID, count: 2 }) })]);
+        // Der Nutzer kann weiter buchen — kein Gate.
+        expect(db.users[0].blocked ?? null).toBeNull();
+    });
+
+    it('Verfuegbarkeit: Fenster und Zeitzone, Slots folgen ihnen; Abwesend sperrt die Slots', async () => {
+        seedProvider(); seedMember('test-kanzlei', USER_ID);
+        const patch = (body: Record<string, unknown>) => api('/api/v1/provider/test-kanzlei/availability', { method: 'PATCH', auth: 'jwt', body: JSON.stringify(body) });
+        expect((await patch({ hours: { mon: [{ from: '09:15', to: '12:00' }] } })).status).toBe(400);
+        expect((await patch({ timezone: 'Mars/Olympus' })).status).toBe(400);
+        const r = await patch({ hours: { mon: [{ from: '09:00', to: '10:00' }], tue: [{ from: '09:00', to: '10:00' }], wed: [{ from: '09:00', to: '10:00' }], thu: [{ from: '09:00', to: '10:00' }], fri: [{ from: '09:00', to: '10:00' }] }, timezone: 'Europe/Madrid' });
+        expect(r.status).toBe(200);
+        expect(r.body).toMatchObject({ timezone: 'Europe/Madrid', booking_paused_at: null });
+        expect(db.providers[0].availability_hours.mon).toEqual([{ from: '09:00', to: '10:00' }]);
+        const slots = await api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' });
+        expect(slots.body.booking_open).toBe(true);
+        // Zwei Slots je Werktag ueber 14 Tage, nie mehr als 10 Werktage.
+        expect(slots.body.slots.length).toBeGreaterThanOrEqual(18);
+        expect(slots.body.slots.length).toBeLessThanOrEqual(20);
+        for (const iso of slots.body.slots) {
+            const local = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(iso));
+            expect(['09:00', '09:30']).toContain(local);
+        }
+        expect((await patch({ status: 'ooo', until: future(5) })).status).toBe(200);
+        expect((await api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' })).body).toMatchObject({ slots: [], booking_open: false, reason: 'ooo' });
+    });
+
+    it('Ranking ohne Annahmen: der Anbieter ohne Daten steht neutral, nicht vor dem mit Fakten; rank_basis nennt es', async () => {
+        seedProvider({ depth: 'independent', provider_key: 'ohne-daten', rating: null, completed_count: 0 });
+        seedProvider({ depth: 'independent', provider_key: 'mit-fakten', rating: null, completed_count: 0 });
+        for (let i = 0; i < 6; i++) bk({ provider_key: 'mit-fakten' });
+        for (const rt of [5, 4, 5]) (db.reviews ??= []).push({ id: randomUUID(), provider_key: 'mit-fakten', from_role: 'user', to_role: 'provider', verified: true, booking_id: randomUUID(), rating: rt, created_at: past(1) });
+        const r = await api('/api/v1/search', { method: 'POST', auth: 'none', body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }) });
+        expect(r.status).toBe(200);
+        expect(r.body.providers).toHaveLength(2);
+        const first = r.body.providers[0]; const second = r.body.providers[1];
+        expect(first.rank_basis).toMatchObject({ completed: 6, bookings: 6, incidents: 0, neutral: [] });
+        expect(second.rank_basis).toMatchObject({ completed: 0, bookings: 0, neutral: ['rating', 'completion'] });
+        expect(JSON.stringify(r.body)).not.toMatch(/confirmation_rate":0\.8|response_hours":7/);
+    });
+});
+
 describe('Kalender: Nylas Hosted Auth', () => {
     const member = () => (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
     const configure = () => {

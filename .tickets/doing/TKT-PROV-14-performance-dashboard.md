@@ -39,27 +39,27 @@ nur Erinnerung, keine Herabstufung (Spec A §17).
 
 ### Backend
 
-- [ ] Migration: `performance_policy` (v1: rate_min_bookings 5,
+- [x] Migration: `performance_policy` (v1: rate_min_bookings 5,
   incident_window_days 90, incident_alert_count 2, incident_pause_count 3,
   user_no_show_alert_count 2), `providers.availability_hours jsonb`,
   `providers.timezone`, `providers.booking_paused_at`,
   `provider_enforcement_actions` (§24: Aktion, Grund, Quelle, Entscheider,
   Einspruch, Aufhebung). pgTAP.
-- [ ] `performance.ts`: `computePerformance`, `qualityFactor` (neutral ohne
+- [x] `performance.ts`: `computePerformance`, `qualityFactor` (neutral ohne
   Daten), `serialNoShowState`, `availabilitySlots`, `analyticsDepth`,
   `trendsBy`. Unit-Tests.
-- [ ] Routen: `GET /provider/:key/performance` (Fakten; enhanced: Verlauf;
+- [x] Routen: `GET /provider/:key/performance` (Fakten; enhanced: Verlauf;
   advanced: `?format=csv`), `GET /provider/:key/overview`,
   `PATCH /provider/:key/availability` (+ hours, timezone), Slots mit
   Regeln/OOO/Pause, `POST /scheduling` 409 `BOOKING_PAUSED`,
   `POST /provider/:key/enforcement/:id/appeal`,
   `PATCH /admin/providers/:key/enforcement/:id` (aufheben/bestätigen).
-- [ ] Ranking: Vorfälle + `completed_count` im Qualitätsfaktor, neutrale
+- [x] Ranking: Vorfälle + `completed_count` im Qualitätsfaktor, neutrale
   Behandlung ohne Daten; `rank_basis` ergänzt.
-- [ ] Serien-No-Shows direkt beim Vorfall ausgewertet (Anbieter: Hinweis,
+- [x] Serien-No-Shows direkt beim Vorfall ausgewertet (Anbieter: Hinweis,
   Pause; Nutzer: Hinweis). Notifications, Mails (4 Sprachen).
 - [ ] `/api/v1/metrics` nicht mehr vom Partner-Dashboard genutzt.
-- [ ] Typen, OpenAPI, ADR-0009, API-Tests.
+- [x] Typen, OpenAPI, ADR-0009, API-Tests (8 Blöcke: Performance je Tarif, CSV, Übersicht, Serien-No-Shows mit Pause, Einspruch und Aufhebung, Buchung in der Pause, Nutzer-Serie, Verfügbarkeit, Ranking ohne Annahmen).
 
 ### UI
 
