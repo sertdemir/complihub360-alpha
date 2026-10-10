@@ -8,6 +8,7 @@ import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
 import { Stat } from '../ui/Stat';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 import { Badge } from '../ui/Badge';
+import { priorityOf } from '../../lib/priority';
 
 // ─── S2 — Risk Map example (User LP) · Figma 2470:1774 ───────────────────────
 // "Here's what applies to you." — an anonymized full risk-map result inline on
@@ -21,7 +22,7 @@ const STAT_INDICES = [0, 1, 2, 3] as const;
 export type StateKind = 'confirmed' | 'likely' | 'action';
 
 // Display strings come from riskMap.rows.<index>.*; severity + state labels
-// derive from risk.severity.* / risk.state.*.
+// derive from risk.priority.* / risk.state.*.
 const ROWS: { level: RiskLevel; state: StateKind }[] = [
   { level: 'critical', state: 'confirmed' },
   { level: 'critical', state: 'likely' },
@@ -101,7 +102,7 @@ export function RiskMapSection() {
           className="mt-8 overflow-hidden rounded-xl border border-stroke bg-surface shadow-[0_50px_110px_-28px_rgba(2,22,17,0.36)]"
         >
           <div className={`hidden px-5 py-3 text-body-4xs font-semibold uppercase tracking-wide text-fg-tertiary sm:px-6 ${COLS} sm:bg-surface-secondary`}>
-            <span>{t('risk.table.severity')}</span>
+            <span>{t('risk.table.priority')}</span>
             <span>{t('risk.table.obligation')}</span>
             <span>{t('risk.table.market')}</span>
             <span>{t('risk.table.due')}</span>
@@ -110,7 +111,7 @@ export function RiskMapSection() {
           {ROWS.map((r, i) => (
             <div key={i} className={`border-t border-stroke px-5 py-4 first:border-t-0 sm:border-t sm:px-6 ${COLS}`}>
               <span className="mb-2 inline-block sm:mb-0">
-                <RiskBadge level={r.level} size="sm">{t(`risk.severity.${r.level}`)}</RiskBadge>
+                <RiskBadge level={r.level} size="sm">{t(`risk.priority.${priorityOf(r.level)}`)}</RiskBadge>
               </span>
               <div className="min-w-0">
                 <p className="text-body-sm font-semibold text-fg">{t(`riskMap.rows.${i}.title`)}</p>

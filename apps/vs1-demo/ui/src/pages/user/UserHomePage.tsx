@@ -216,7 +216,7 @@ export function UserHomePage() {
     ];
   };
   const sitzungName = (x: DashboardSession) => x.label || x.categories.map(domainLabel).join(', ') || '—';
-  const sitzungUnter = (x: DashboardSession) => (x.label ? x.categories.map(domainLabel).join(' · ') : t('home.sessionUnnamed'));
+  const sitzungUnter = (x: DashboardSession) => (x.label ? x.categories.map(domainLabel).join(' · ') : t('home.riskMapUnnamed'));
   const sitzungMaerkte = (x: DashboardSession) => (x.markets?.length ? x.markets : [x.country].filter((c): c is string => !!c));
   const sitzungHoch = (x: DashboardSession) => (x.by_severity ? (x.by_severity.critical ?? 0) + (x.by_severity.high ?? 0) : null);
   // Anfragen: wartet auf Sie (Antwort/Frist) · beim Anbieter (unbestaetigt) · laeuft.
@@ -403,12 +403,12 @@ export function UserHomePage() {
             </div>
             <div>
                 <div className="flex items-baseline gap-3">
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.kpiSessions')}</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.kpiRiskMaps')}</p>
                   <CountUp value={dash.sessions.total} on={entered} className="font-serif text-[30px] font-bold leading-none text-fg" />
                 </div>
                 {maerkte.length > 0 && (
                   <p className="mt-2 flex flex-wrap items-center gap-1.5 text-body-2xs text-fg-secondary">
-                    {t('home.kpiSessionsIn')}
+                    {t('home.kpiRiskMapsIn')}
                     {maerkte.map((m) => (
                       <span key={m} className="rounded-full border border-stroke bg-surface px-2 py-[1px] text-[11px] font-extrabold tracking-[0.04em] text-fg">{m}</span>
                     ))}
@@ -564,12 +564,12 @@ export function UserHomePage() {
                   ab md eine Liste in der Hauptspalte, mobil Karten zum Wischen. */}
               {sitzungen.length > 0 && (
                 <div className="md:rounded-xl md:border md:border-stroke-subtle md:bg-surface md:px-6 md:py-5 md:shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]">
-                  <SectionHead title={t('home.savedSessions')} count={String(dash.sessions.total)} to="dashboard/sessions" />
+                  <SectionHead title={t('home.savedRiskMaps')} count={String(dash.sessions.total)} to="dashboard/sessions" />
 
                   {/* S3: Liste */}
                   <div className="hidden md:block">
                     <div aria-hidden="true" className={SESS_GRID + ' pb-2 text-[10.5px] font-extrabold uppercase tracking-[0.07em] text-fg-tertiary'}>
-                      <span>{t('home.colSession')}</span><span>{t('home.colMarkets')}</span><span>{t('home.colDuties')}</span><span>{t('home.colEdited')}</span><span />
+                      <span>{t('home.colRiskMap')}</span><span>{t('home.colMarkets')}</span><span>{t('home.colDuties')}</span><span>{t('home.colEdited')}</span><span />
                     </div>
                     <ul>
                       {sitzungen.map((x, i) => (
@@ -583,7 +583,7 @@ export function UserHomePage() {
                             <span className="min-w-0">
                               <UnitGrid parts={sitzungTeile(x)} on={entered} fluid size={9} gap={3} perUnit={sitzungProKaestchen} delayOffset={i * 4} />
                               <span className="mt-1 block text-body-3xs text-fg-tertiary">
-                                <Trans t={t} i18nKey="home.sessionDone" values={{ done: x.total - x.open, total: x.total }} components={{ b: <b className="text-fg" /> }} />
+                                <Trans t={t} i18nKey="home.riskMapDone" values={{ done: x.total - x.open, total: x.total }} components={{ b: <b className="text-fg" /> }} />
                               </span>
                             </span>
                             <span className="text-body-3xs text-fg-tertiary">{relZeit(x.updated_at, locale)}</span>
@@ -611,8 +611,8 @@ export function UserHomePage() {
                             <UnitGrid parts={sitzungTeile(x)} on={entered} fluid size={11} gap={3} perUnit={sitzungProKaestchen} delayOffset={i * 4} />
                             <span className="mt-auto flex justify-between gap-2 text-body-3xs text-fg-tertiary">
                               <span>
-                                <Trans t={t} i18nKey="home.sessionDone" values={{ done: x.total - x.open, total: x.total }} components={{ b: <b className="text-fg" /> }} />
-                                {hochN !== null && <> · {hochN > 0 ? <b className="text-risk-high">{t('home.dutiesHigh', { count: hochN })}</b> : t('home.sessionNoHigh')}</>}
+                                <Trans t={t} i18nKey="home.riskMapDone" values={{ done: x.total - x.open, total: x.total }} components={{ b: <b className="text-fg" /> }} />
+                                {hochN !== null && <> · {hochN > 0 ? <b className="text-risk-high">{t('home.dutiesHigh', { count: hochN })}</b> : t('home.riskMapNoHigh')}</>}
                               </span>
                               <span className="whitespace-nowrap">{relZeit(x.updated_at, locale)}</span>
                             </span>

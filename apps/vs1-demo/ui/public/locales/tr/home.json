@@ -3,11 +3,11 @@
     "verified": "Doğrulanmış"
   },
   "risk": {
-    "severity": {
+    "priority": {
       "low": "Düşük",
       "medium": "Orta",
       "high": "Yüksek",
-      "critical": "Acil"
+      "immediate": "Acil"
     },
     "state": {
       "confirmed": "Onaylandı",
@@ -15,7 +15,7 @@
       "action": "2 soruyu yanıtlayın"
     },
     "table": {
-      "severity": "Önem",
+      "priority": "Önem",
       "obligation": "Yükümlülük",
       "market": "Pazar",
       "due": "Vade",

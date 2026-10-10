@@ -145,7 +145,7 @@ export function OriginLine({ letter, title, session, className = '' }: { letter?
     <p className={`mt-0.5 flex items-center gap-1.5 text-[10.5px] text-fg-tertiary ${className}`}>
       {letter && <Monogram letter={letter} size={18} />}
       <span>
-        {session ? t('reveal.wasInSession', { title: label, session }) : t('reveal.was', { title: label })}
+        {session ? t('reveal.wasInRiskMap', { title: label, riskMap: session }) : t('reveal.was', { title: label })}
       </span>
     </p>
   );

@@ -127,7 +127,7 @@ export function DomainKnowledge({ slug, markets, sessions }: {
                   )}
                 </p>
               </div>
-              {e.own.length > 0 && <span className={TAG}>{t('domainPage.knowledgeInSession')}</span>}
+              {e.own.length > 0 && <span className={TAG}>{t('domainPage.knowledgeInRiskMap')}</span>}
             </div>
 
             <p className="mt-2.5 text-body-3xs leading-relaxed text-fg-secondary">{ob.description(e.id, e.primary.description)}</p>
@@ -159,7 +159,7 @@ export function DomainKnowledge({ slug, markets, sessions }: {
               <div className="mt-3 flex flex-col gap-1.5">
                 {e.own.map((o) => (
                   <div key={o.session.id} className="rounded-lg bg-brand-light px-3 py-2 text-body-3xs text-fg">
-                    <b>{t('domainPage.dossierOwn', { session: sessionTitle(o.session) })}</b> {statusLabel(o)} ·{' '}
+                    <b>{t('domainPage.dossierOwn', { riskMap: sessionTitle(o.session) })}</b> {statusLabel(o)} ·{' '}
                     <button type="button" onClick={() => navigate(`/${locale}/results?session=${o.session.id}`)} className="font-bold text-brand underline underline-offset-2 hover:text-brand-700">
                       {t('domainPage.dossierToDuty')}
                     </button>

@@ -199,7 +199,7 @@ export function BookingConfirmedView({ confirmation, provider, sessionLabel, row
               <p className="text-body font-bold text-fg">{id.name}</p>
               <p className="flex items-center gap-1.5 text-body-3xs text-fg-tertiary">
                 <Monogram letter={provider.letter} size={18} />
-                {sessionLabel ? t('results:reveal.wasInSession', { title: provider.title, session: sessionLabel }) : t('results:reveal.was', { title: provider.title })}
+                {sessionLabel ? t('results:reveal.wasInRiskMap', { title: provider.title, riskMap: sessionLabel }) : t('results:reveal.was', { title: provider.title })}
               </p>
             </div>
           </div>

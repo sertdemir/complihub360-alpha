@@ -58,7 +58,7 @@ const CASES: Case[] = [
   c('results', 'detail.reviewsCount', (n) => ({ count: n }), '1 review', '1 Bewertung'),
   c('results', 'detail.mandatesCount', (n) => ({ count: n }), '1 mandate', '1 Mandat'),
   c('results', 'rankBasis.reviews', (n) => ({ rating: '4.8', count: n }), '4.8 from 1 review after an appointment', '4.8 aus 1 Bewertung nach einem Termin'),
-  c('userws', 'sessions.kpiStaleSub', (n) => ({ count: n }), 'oldest 1 month ago', 'älteste vor 1 Monat'),
+  c('userws', 'riskMaps.kpiStaleSub', (n) => ({ count: n }), 'oldest 1 month ago', 'älteste vor 1 Monat'),
 ];
 
 describe('plural forms agree with a single item', () => {

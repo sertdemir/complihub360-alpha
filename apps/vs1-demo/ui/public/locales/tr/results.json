@@ -29,7 +29,7 @@
     }
   },
   "table": {
-    "severity": "Öncelik",
+    "priority": "Öncelik",
     "obligation": "Yükümlülük",
     "market": "Pazar",
     "due": "Son Tarih",
@@ -41,8 +41,8 @@
     "now": "Şimdi",
     "radar": "Radarda"
   },
-  "severity": {
-    "critical": "Acil",
+  "priority": {
+    "immediate": "Acil",
     "high": "Yüksek",
     "medium": "Orta",
     "low": "Düşük"
@@ -112,9 +112,9 @@
     "errorBody": "Lütfen birazdan tekrar deneyin.",
     "crumbProviders": "Sağlayıcılar",
     "backToArea": "Alana dön",
-    "backToSession": "Oturuma dön",
+    "backToRiskMap": "Oturuma dön",
     "lageAreasArea": "{{total}} alanın {{matched}} tanesini kapsıyor ({{area}})",
-    "lageAreasSession": "„{{session}}“ oturumunuzdaki {{total}} alanın {{matched}} tanesine uyuyor",
+    "lageAreasRiskMap": "„{{riskMap}}“ oturumunuzdaki {{total}} alanın {{matched}} tanesine uyuyor",
     "lageMarketsAll_one": "{{count}} pazar kapsanıyor",
     "lageMarketsAll_other": "{{count}} pazarın tamamı kapsanıyor",
     "lageMarketsPartial_one": "{{total}} pazarın {{covered}} tanesi kapsanıyor · {{missing}} kapsanmıyor",
@@ -128,7 +128,7 @@
     "matrixTitle": "Yükümlülükleriniz ve bu sağlayıcının pazarları",
     "matrixCovered_one": "{{total}} pazarın {{covered}} tanesi",
     "matrixCovered_other": "{{total}} pazarın {{covered}} tanesi",
-    "matrixSession": "Oturum",
+    "matrixRiskMap": "Oturum",
     "matrixNone": "Bu bağlamda şu anda açık bir şey yok.",
     "matrixNotCovered": "Bu sağlayıcı bu pazarı kapsamıyor.",
     "matrixEuWide": "AB genelinde",
@@ -195,7 +195,7 @@
     "toAppointments": "Randevularınıza",
     "pickSlotDrawer": "Yukarıdan bir saat seçin.",
     "messageLabel": "Konunuz",
-    "messageFromSession": "Konu: „{{session}}“ oturumum.",
+    "messageFromRiskMap": "Konu: „{{riskMap}}“ oturumum.",
     "duration": "30 dk",
     "noSlots": "Bu sağlayıcının şu anda boş randevusu yok. Birkaç gün sonra tekrar deneyin.",
     "failed": "Randevu alınamadı. Lütfen birazdan tekrar deneyin.",
@@ -382,7 +382,7 @@
   },
   "reveal": {
     "was": "{{title}} idi",
-    "wasInSession": "„{{session}}“ oturumunuzda {{title}} idi"
+    "wasInRiskMap": "„{{riskMap}}“ oturumunuzda {{title}} idi"
   },
   "dueLive": "Yürürlükte"
 }
