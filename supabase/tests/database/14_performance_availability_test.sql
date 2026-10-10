@@ -1,6 +1,6 @@
 -- ─── Phase 6: halten Policy, Verfuegbarkeit und Durchsetzung zusammen? ──────
 --
--- Gehoert zu 20261011000000_performance_availability.sql:
+-- Gehoert zu 20261011010000_performance_availability.sql:
 --
 --   1. Die Policy v1 traegt die Nutzer-Entscheidungen vom 2026-10-10.
 --   2. Pause-Schwelle liegt nie unter der Hinweis-Schwelle.

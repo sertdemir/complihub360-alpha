@@ -148,12 +148,12 @@
       "card1Problem": "Information on advertising restrictions, EPR, and tax laws is fragmented across unstructured government sites.",
       "card1Solution": "Our Knowledge Hub aggregates source-backed laws, tutorials, and guides — all tailored to your exact search profile.",
       "card2Title": "Loss of Continuity",
-      "card2Problem": "Tracking provider requests, saved sessions, and legal updates is chaotic without a unified system.",
-      "card2Solution": "The Dashboard Control Center lets you save sessions, track engagement statuses in real-time, and monitor tasks.",
+      "card2Problem": "Tracking provider requests, saved risk maps, and legal updates is chaotic without a unified system.",
+      "card2Solution": "The Dashboard Control Center lets you save risk maps, track engagement statuses in real-time, and monitor tasks.",
       "card3Title": "Reporting Friction",
       "card3Problem": "Summarizing regulatory exposure for stakeholders is manual, time-consuming work.",
       "card3Solution": "One-click PDF export: Risk Snapshot, Action Plan, and Source Index — ready for internal circulation.",
-      "panel1Title": "Session Grid",
+      "panel1Title": "Risk Map Grid",
       "panel1Desc": "Saved risk profiles by country",
       "panel2Title": "Active Requests",
       "panel2Desc": "Provider engagement status",
@@ -167,7 +167,7 @@
       "item3": "Source Index",
       "stat1Label": "Engagement lifecycle visibility",
       "stat2Label": "PDF report export",
-      "stat3Label": "Saved compliance sessions",
+      "stat3Label": "Saved risk maps",
       "railSub": "One control centre instead of email threads"
     },
     "counsel": {
@@ -765,8 +765,8 @@
     "areasEyebrow": "Nine areas, one way in",
     "areasTitle": "The nine compliance areas",
     "areasLead": "Each opens a page with the duties it carries, the statute behind each one, and what it costs to get wrong.",
-    "severity": {
-      "critical": "Critical",
+    "priority": {
+      "immediate": "Immediate",
       "high": "High",
       "medium": "Medium",
       "low": "Low"
@@ -1348,7 +1348,7 @@
         ],
         "rows": [
           {
-            "level": "critical",
+            "level": "immediate",
             "title": "OSS quarterly return",
             "meta": "DE · NL · Due 30 Apr"
           },

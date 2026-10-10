@@ -280,6 +280,12 @@ export interface ProviderDetail {
   credentials?: Array<{ label: string; note?: string | null }> | null;
   excluded_services?: string[] | null;
   work_mode?: string | null;
+  /** A1 (Schritt 4): true, wenn DIESER Nutzer bei diesem Anbieter gebucht hat —
+   *  dann kommen Name, Website und Kontakt mit und das Dossier ohne Maske. */
+  revealed?: boolean;
+  name?: string | null;
+  website_url?: string | null;
+  contact_email?: string | null;
 }
 
 /** Eine Bewertung, die an einer echten Buchung haengt. Der Server gibt nur
@@ -320,10 +326,21 @@ export interface BookingAcknowledgement {
   userDiscount: { pct: number; policyVersion: number } | null;
   /** Die Absaetze des Textes — die Oberflaeche zeigt je Absatz eine Zeile. */
   lines: string[];
+  /** B1 (Schritt 4): mit Login die Werte, die die Buchung festhalten wird —
+   *  der Pruefdialog zeigt genau diese. null ohne Login oder bei aelterem Server. */
+  sharedPreview: SharedPreview | null;
+}
+
+export interface SharedPreview { email: string | null; company_name: string | null }
+
+/** Was mit der Buchung geteilt wurde, Wert fuer Wert (scheduling.shared_snapshot). */
+export interface SharedSnapshot extends SharedPreview {
+  message: string | null;
+  topic: { area_code: string; countries: string[] } | null;
 }
 
 export async function fetchAcknowledgement(lang: string): Promise<BookingAcknowledgement> {
-  const res = await apiFetch<{ ok: boolean; version: string; language: string; body: string; shared_fields: string[]; user_discount: { pct: number; policy_version: number } | null }>(`/api/v1/acknowledgement?lang=${encodeURIComponent(lang.slice(0, 2))}`);
+  const res = await apiFetch<{ ok: boolean; version: string; language: string; body: string; shared_fields: string[]; user_discount: { pct: number; policy_version: number } | null; shared_preview?: SharedPreview | null }>(`/api/v1/acknowledgement?lang=${encodeURIComponent(lang.slice(0, 2))}`);
   return {
     version: res.version,
     language: res.language,
@@ -331,6 +348,7 @@ export async function fetchAcknowledgement(lang: string): Promise<BookingAcknowl
     sharedFields: res.shared_fields ?? [],
     userDiscount: res.user_discount ? { pct: res.user_discount.pct, policyVersion: res.user_discount.policy_version } : null,
     lines: String(res.body ?? '').split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean),
+    sharedPreview: res.shared_preview ?? null,
   };
 }
 
@@ -341,6 +359,8 @@ export interface BookingConfirmation {
     user_discount?: { pct: number; policy_version: number } | null;
     /** Das Thema des Leads, wie der Anbieter es sieht (Bereich, Maerkte). */
     topic?: { area_code: string; countries: string[] };
+    /** B1: genau die Werte, die geteilt wurden. Aeltere Server liefern sie nicht. */
+    shared_snapshot?: SharedSnapshot | null;
   };
   // Stage-3 reveal — identity becomes visible at booking (spec §5).
   provider_identity: { name: string; website_url: string | null; contact_email: string | null };
@@ -375,7 +395,8 @@ export async function createBooking(publicRef: string, slotStart: string, opts: 
 /** Die Faelle, die eine Oberflaeche unterscheiden muss — alles andere ist
  *  „nicht gebucht, bitte spaeter erneut". `not_completed` ist die Belastung
  *  des Anbieters, die scheiterte (409 BOOKING_NOT_COMPLETED) oder ein
- *  Anbieter, der gerade keine Buchung annehmen kann (409 BILLING_NOT_READY):
+ *  Anbieter, der gerade keine Buchung annehmen kann (409 BILLING_NOT_READY,
+ *  409 PROVIDER_PAUSED — pausiert, etwa aus einem alten Tab):
  *  fuer den Nutzer dieselbe Lage, dieselbe neutrale Antwort, kein Grund. */
 export type BookingFailure =
   | { kind: 'not_completed' }
@@ -386,7 +407,7 @@ export type BookingFailure =
 export function bookingFailureFrom(err: unknown): BookingFailure {
   if (!(err instanceof ApiError)) return { kind: 'generic' };
   const code = String(err.body.errorCode ?? '');
-  if (code === 'BOOKING_NOT_COMPLETED' || code === 'BILLING_NOT_READY') return { kind: 'not_completed' };
+  if (code === 'BOOKING_NOT_COMPLETED' || code === 'BILLING_NOT_READY' || code === 'PROVIDER_PAUSED') return { kind: 'not_completed' };
   if (code === 'SLOT_TAKEN') return { kind: 'slot_taken' };
   if (code === 'ACKNOWLEDGEMENT_OUTDATED') return { kind: 'acknowledgement_outdated', currentVersion: typeof err.body.current_version === 'string' ? err.body.current_version : null };
   return { kind: 'generic' };

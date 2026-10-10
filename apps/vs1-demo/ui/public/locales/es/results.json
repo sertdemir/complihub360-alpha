@@ -29,7 +29,7 @@
     }
   },
   "table": {
-    "severity": "Prioridad",
+    "priority": "Prioridad",
     "obligation": "Obligación",
     "market": "Mercado",
     "due": "Vence",
@@ -41,8 +41,8 @@
     "now": "Ahora",
     "radar": "En el radar"
   },
-  "severity": {
-    "critical": "Inmediata",
+  "priority": {
+    "immediate": "Inmediata",
     "high": "Alta",
     "medium": "Media",
     "low": "Baja"
@@ -112,9 +112,9 @@
     "errorBody": "Inténtelo de nuevo en un momento.",
     "crumbProviders": "Proveedores",
     "backToArea": "Volver al área",
-    "backToSession": "Volver a la sesión",
+    "backToRiskMap": "Volver a la sesión",
     "lageAreasArea": "Cubre {{matched}} de {{total}} áreas ({{area}})",
-    "lageAreasSession": "Coincide con {{matched}} de {{total}} áreas de su sesión «{{session}}»",
+    "lageAreasRiskMap": "Coincide con {{matched}} de {{total}} áreas de su sesión «{{riskMap}}»",
     "lageMarketsAll_one": "{{count}} mercado cubierto",
     "lageMarketsAll_other": "los {{count}} mercados cubiertos",
     "lageMarketsPartial_one": "{{covered}} de {{total}} mercado cubierto · {{missing}} no",
@@ -128,7 +128,7 @@
     "matrixTitle": "Sus obligaciones y los mercados de este proveedor",
     "matrixCovered_one": "{{covered}} de {{total}} mercado",
     "matrixCovered_other": "{{covered}} de {{total}} mercados",
-    "matrixSession": "Sesión",
+    "matrixRiskMap": "Sesión",
     "matrixNone": "En este contexto no hay nada abierto ahora mismo.",
     "matrixNotCovered": "Este proveedor no cubre este mercado.",
     "matrixEuWide": "toda la UE",
@@ -195,7 +195,7 @@
     "toAppointments": "A sus citas",
     "pickSlotDrawer": "Elija una hora arriba.",
     "messageLabel": "Su consulta",
-    "messageFromSession": "Se trata de mi sesión «{{session}}».",
+    "messageFromRiskMap": "Se trata de mi sesión «{{riskMap}}».",
     "duration": "30 min",
     "noSlots": "Este proveedor no tiene horas libres ahora mismo. Inténtelo de nuevo en unos días.",
     "failed": "No se pudo reservar la cita. Inténtelo de nuevo en un momento.",
@@ -382,7 +382,7 @@
   },
   "reveal": {
     "was": "era {{title}}",
-    "wasInSession": "era {{title}} en su sesión «{{session}}»"
+    "wasInRiskMap": "era {{title}} en su sesión «{{riskMap}}»"
   },
   "dueLive": "Vigente"
 }

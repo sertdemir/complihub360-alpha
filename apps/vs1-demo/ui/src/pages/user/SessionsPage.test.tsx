@@ -60,9 +60,9 @@ const result = (laws: SearchLaw[]): SearchResult => ({ overview_summary: '', pro
 
 /** Oeffnet das ···-Menue der n-ten Kachel und waehlt "PDF exportieren". */
 async function exportTile(n: number) {
-  const menus = await screen.findAllByRole('button', { name: 'sessions.moreActions' });
+  const menus = await screen.findAllByRole('button', { name: 'riskMaps.moreActions' });
   fireEvent.click(menus[n]);
-  fireEvent.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: 'sessions.exportPdf' }));
+  fireEvent.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: 'riskMaps.exportPdf' }));
 }
 
 const renderPage = () => render(<MemoryRouter><SessionsPage /></MemoryRouter>);

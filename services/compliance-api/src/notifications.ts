@@ -162,6 +162,51 @@ interface NotificationRow {
     read_at: string | null;
 }
 
+/**
+ * Partner-Glocke (Canvas-Wahl A V2, 2026-10-10): „Needs you" zeigt, was noch
+ * eine Handlung braucht — und zwar solange die SACHE offen ist, nicht bis zum
+ * Lesen. Rein: die Lage kommt von aussen, damit jeder Fall ohne Netz pruefbar
+ * ist. Nicht-handlungsbeduerftige Arten sind nie offen.
+ *
+ *   payment_failed               solange `payment_failed` die Buchung sperrt
+ *   invoice_retry_scheduled      solange die Rechnung offen ist
+ *   verification_info_requested  solange der Status `more_info_required` ist
+ *   evidence_expiring            bis gelesen (ob ein neuer Nachweis vorliegt,
+ *                                weiss die Zeile nicht)
+ */
+export const ACTION_TYPES = new Set(['payment_failed', 'invoice_retry_scheduled', 'verification_info_requested', 'evidence_expiring']);
+
+export function needsAction(
+    row: { type: string; subject_id: string | null; payload: Record<string, string> | null; read_at: string | null },
+    lage: { providers: Record<string, { billing_block_reasons?: string[] | null; lifecycle_status?: string | null }>; openInvoices: Set<string> },
+): boolean {
+    if (!ACTION_TYPES.has(row.type)) return false;
+    const key = row.payload?.providerKey ?? row.subject_id ?? '';
+    const p = lage.providers[key];
+    switch (row.type) {
+        case 'payment_failed': return !!p?.billing_block_reasons?.includes('payment_failed');
+        case 'invoice_retry_scheduled': return lage.openInvoices.has(`${key}:${row.payload?.label ?? ''}`);
+        case 'verification_info_requested': return p?.lifecycle_status === 'more_info_required';
+        case 'evidence_expiring': return !row.read_at;
+        default: return false;
+    }
+}
+
+async function loadLage(rows: NotificationRow[]): Promise<Parameters<typeof needsAction>[1]> {
+    const keys = [...new Set(rows.filter((r) => ACTION_TYPES.has(r.type)).map((r) => r.payload?.providerKey ?? r.subject_id).filter(Boolean) as string[])];
+    const providers: Parameters<typeof needsAction>[1]['providers'] = {};
+    const openInvoices = new Set<string>();
+    for (const k of keys) {
+        const [p] = (await supabaseApi.select('providers', { provider_key: k }, { limit: 1 })) as any[];
+        if (p) providers[k] = { billing_block_reasons: p.billing_block_reasons ?? [], lifecycle_status: p.lifecycle_status ?? null };
+        if (rows.some((r) => r.type === 'invoice_retry_scheduled')) {
+            const inv = (await supabaseApi.select('invoices', { provider_key: k, status: 'open' }, { limit: 50 })) as any[];
+            for (const i of inv) openInvoices.add(`${k}:${i.invoice_number}`);
+        }
+    }
+    return { providers, openInvoices };
+}
+
 /** GET /api/v1/notifications — ausschliesslich die Zeilen des Aufrufers. */
 export async function handleNotificationsList(
     res: ServerResponse, correlationId: string, userId: string | null,
@@ -178,6 +223,7 @@ export async function handleNotificationsList(
         const rows = (await supabaseApi.select(
             'notifications', { user_id: userId }, { order: 'created_at.desc', limit: 50 },
         )) as NotificationRow[];
+        const lage = rows.some((r) => ACTION_TYPES.has(r.type)) ? await loadLage(rows) : null;
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             ok: true,
@@ -189,6 +235,7 @@ export async function handleNotificationsList(
                 payload: r.payload ?? {},
                 created_at: r.created_at,
                 read_at: r.read_at,
+                needs_action: lage ? needsAction(r, lage) : false,
             })),
             unread: rows.filter(r => !r.read_at).length,
             correlationId,

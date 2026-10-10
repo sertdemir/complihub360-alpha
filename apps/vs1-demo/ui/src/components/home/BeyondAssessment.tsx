@@ -117,7 +117,7 @@ function DashboardWindow() {
       </div>
       <div className="px-5 pb-5 pt-2">
         <motion.p variants={winItem} className="mb-2 text-body-2xs font-bold text-[#f5f6f8]">
-          {t('home.savedSessions')} <span className="text-[#14a89a]">4</span>
+          {t('home.savedRiskMaps')} <span className="text-[#14a89a]">4</span>
         </motion.p>
         <motion.div variants={winItem} className="grid gap-1.5 sm:grid-cols-2">
           <div className="rounded-[9px] border border-white/10 bg-[#1f2937] px-3 py-2">

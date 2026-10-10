@@ -49,6 +49,7 @@ import {
   unavailableMarketsOf,
   useMarketRequests,
 } from '../components/results/MarketRequest';
+import { PRIORITY_EN, priorityOf } from '../lib/priority';
 
 /** J3: ab hier gilt das Laden als "laenger als erwartet" (Entscheidung 2026-10-09). */
 const DELAYED_AFTER_MS = 8000;
@@ -639,7 +640,7 @@ export function ResultsRiskMap() {
             provider={partnerOpen}
             basisNode={partnerOpen?.match_basis ? <MatchBasis basis={partnerOpen.match_basis} /> : undefined}
             sessionId={sessionId}
-            sessionMessage={session?.label ? t('schedule.messageFromSession', { session: session.label }) : undefined}
+            sessionMessage={session?.label ? t('schedule.messageFromRiskMap', { riskMap: session.label }) : undefined}
             sessionLabel={session?.label ?? null}
             requestScope={scopeProfile ? scopeOf(scopeProfile, 'checked') : null}
             booking={partnerOpen ? booked[partnerOpen.public_ref] ?? null : null}
@@ -856,7 +857,7 @@ export function ResultsRiskMap() {
             rund 100 px, die Titel brachen dort genauso. */}
           <div className={`${partial.length > 0 ? 'mt-5' : 'mt-12'} flex flex-col gap-3 lg:block lg:overflow-hidden lg:rounded-xl lg:border lg:border-stroke-subtle`}>
             <div className="hidden grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary lg:grid">
-              <span>{t('table.severity')}</span>
+              <span>{t('table.priority')}</span>
               <span>{t('table.obligation')}</span>
               <span>{t('table.market')}</span>
               <span>{t('table.due')}</span>
@@ -878,7 +879,7 @@ export function ResultsRiskMap() {
               >
                 <span className="col-start-1 row-start-1 self-center lg:col-start-auto lg:row-start-auto">
                   <RiskBadge level={o.severity as RiskLevel} styleVariant="soft" size="sm">
-                    {t(`severity.${o.severity}`, { defaultValue: o.severity.charAt(0).toUpperCase() + o.severity.slice(1) })}
+                    {t(`priority.${priorityOf(o.severity)}`, { defaultValue: PRIORITY_EN[priorityOf(o.severity)] })}
                   </RiskBadge>
                 </span>
                 <span className="col-span-2 row-start-2 min-w-0 lg:col-span-1 lg:row-start-auto">

@@ -5,6 +5,7 @@ import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 import { StateCell, type StateKind } from './RiskMapSection';
 import { useInViewOnce } from '../../lib/useInViewOnce';
+import { priorityOf } from '../../lib/priority';
 
 // ─── S2 — Risk Map showcase (canvas "Das gilt für Sie" · Split, 2026-08-25) ───
 // Replaces RiskMapSection's centred layout ON THE HOMEPAGE ONLY —
@@ -87,7 +88,7 @@ export function RiskMapShowcase() {
               {SHOWCASE_ROWS.map((r) => (
                 <div key={r.row} className="grid grid-cols-[88px_1fr] items-center gap-3.5 border-t border-stroke px-5 py-3.5 sm:grid-cols-[88px_1fr_auto]">
                   <span>
-                    <RiskBadge level={r.level} size="sm">{t(`risk.severity.${r.level}`)}</RiskBadge>
+                    <RiskBadge level={r.level} size="sm">{t(`risk.priority.${priorityOf(r.level)}`)}</RiskBadge>
                   </span>
                   <div className="min-w-0">
                     <p className="text-body-xs font-bold text-fg">{t(`riskMap.rows.${r.row}.title`)}</p>

@@ -11,7 +11,7 @@ import { BellPopover } from './BellPopover';
 import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
 import { ApplicationStatusBanner } from './ApplicationStatusBanner';
 import { fetchProviderBookings } from '../../api/bookings';
-import { fetchProviderNotifications } from '../../api/notifications';
+import { fetchPartnerNotifications } from '../../api/partnerNotifications';
 import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, fetchMyProvider } from '../../api/provider';
 import { useAuthStore } from '../../store/useAuthStore';
 import { cn } from '../../lib/utils';
@@ -93,9 +93,10 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
     fetchProviderBookings()
       .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
       .catch(() => {});
-    // Phase 6: die eigene Post des Anbieters (provider_members → notifications).
-    fetchProviderNotifications()
-      .then((f) => setCounts((c) => ({ ...c, unread: f.unread })))
+    // Die eigene Post des Partners (provider_members → public.notifications).
+    // Vorher das Betriebsprotokoll, das Partnern mit 403 antwortet.
+    fetchPartnerNotifications()
+      .then((ns) => setCounts((c) => ({ ...c, unread: ns.filter((n) => n.unread).length })))
       .catch(() => {});
   }, []);
   const badgeFor = (to: string): string | undefined => {
@@ -103,7 +104,8 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
     return n ? String(n) : undefined;
   };
 
-  // C2: live availability — the pill toggles OOO via a confirm step.
+  // C2: live availability — the pill toggles OOO via a confirm step. 'ooo'
+  // heisst pausiert: nicht in neuen Ergebnissen, nicht buchbar (Server).
   const [availability, setAvail] = useState<'available' | 'ooo'>('available');
   const [confirm, setConfirm] = useState<ConfirmSpec | null>(null);
   // v2 vetting (§10): the badge reflects partner_status instead of a hardcoded
@@ -124,14 +126,18 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
         title: t('shell.oooStartTitle'),
         consequence: t('shell.oooStartConsequence'),
         confirmLabel: t('shell.oooStartConfirm'),
-        onConfirm: async () => { await setAvailability('ooo').catch(() => {}); },
+        // Scheitert das Speichern, bleibt der Drawer offen und sagt es (C2) —
+        // vorher schloss er sich still, und der Schalter stand wie vorher.
+        onConfirm: () => setAvailability('ooo'),
+        failure: t('shell.oooFailed'),
       });
     } else {
       setConfirm({
         title: t('shell.oooEndTitle'),
         consequence: t('shell.oooEndConsequence'),
         confirmLabel: t('shell.oooEndConfirm'),
-        onConfirm: async () => { await setAvailability('available').catch(() => {}); },
+        onConfirm: () => setAvailability('available'),
+        failure: t('shell.oooFailed'),
       });
     }
   };

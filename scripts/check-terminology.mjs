@@ -21,20 +21,24 @@
 // darunter, damit eine Umbenennung nicht auf halbem Weg stehen bleibt —
 // ein deutscher "Verifizierter Partner" ist derselbe Fehler.
 //
-// ─── Was ABSICHTLICH nicht drinsteht ────────────────────────────────────────
+// ─── Drei Paare, die lange ausgesetzt waren (bis 2026-10-10) ────────────────
 //
-// Severity → Priority und Critical/Immediate → Urgent. Beide stehen in der
-// Tabelle der Checklist, und beide sind hier bewusst ausgesetzt (Stand
-// 2026-09-20). Der Grund ist nicht Bequemlichkeit, sondern dass sie keine
-// Begriffe sind, sondern Datenwerte: `severity` kommt 344-mal im Projekt vor
-// — als Feld der Compliance-Engine, als Feld der API, in `packages/types`,
-// als RiskBadge-Prop und als Design-Token `--color-risk-critical`.
+// Severity → Priority, Immediate/Critical → Urgent und Saved Sessions → Saved
+// Risk Maps standen hier vom 20./22.09. bis 10.10.2026 unter AUSGESETZT: Es
+// waren keine Woerter, sondern Datenwerte und ein Konzept. EN-Launch Schritt 3
+// hat sie entschieden (Immediate · 1A · 3A):
 //
-// Nur das Label zu aendern baut genau den Zustand, vor dem dieselbe Checkliste
-// warnt: "do not keep risk.severity.critical while displaying Urgent". Die
-// Umbenennung gehoert deshalb in einen eigenen Schritt mit eigener
-// Entscheidung — bis dahin steht sie hier namentlich unter AUSGESETZT, damit
-// niemand sie fuer erledigt oder fuer vergessen haelt.
+//   - Sichtbar heisst die Stufe "Priority", die oberste "Immediate". Die
+//     Engine fuehrt intern weiter `severity`/'critical'; die EINE Uebersetzung
+//     steht in apps/vs1-demo/ui/src/lib/priority.ts, die Schluessel heissen
+//     `*.priority.<Stufe>` — die Checklist-Regel "do not keep
+//     risk.severity.critical while displaying …" ist damit erfuellt.
+//   - ABWEICHUNG von der Checklist: nicht "Urgent". Die DNA hat die Stufe in
+//     #54 bewusst von "Kritisch" auf "Sofort/Immediate" gestellt ("Prioritize
+//     without panic": ein Zeitwort statt eines Druckworts). Der Nutzer hat das
+//     am 10.10.2026 bestaetigt; die Checklist ist an dieser Stelle korrigiert.
+//   - Die gespeicherte Karte heisst ueberall "risk map". "Session" bleibt nur
+//     dort, wo die Anmeldung gemeint ist — namentlich unten am Muster.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -65,6 +69,22 @@ const VERBOTEN = [
   // Internet-Domain bleiben Domains, ein Fachbereich heisst Area.
   { muster: /\b(?:Compliance )?Domains?\b(?!\s*(?:name|Name|-))/g, statt: 'Area(s)',
     ausser: /\b(?:email|e-mail|web|internet|domain name|supported-domain)\b/i },
+  // Schritt 3 (2026-10-10): die Stufe heisst Priority, die oberste Immediate.
+  { muster: /\bSeverit(?:y|ies)\b/gi,      statt: 'Priority' },
+  // "routing-critical" ist keine Stufe, sondern sagt, dass Anfragen an diese
+  // Adresse gehen.
+  { muster: /\bCritical\b/gi,             statt: 'Immediate (Stufe)',
+    ausser: /\brouting-critical\b/i },
+  // Die gespeicherte Karte ist eine Risk Map. "Session" heisst nur noch die
+  // Anmeldung — und genau diese Schluessel duerfen es tragen.
+  { muster: /\bsessions?\b/gi,            statt: 'risk map(s)',
+    schluessel: new Map([
+      ['common:states.sessionExpired.heading', 'Anmelde-Sitzung abgelaufen (G2)'],
+      ['auth:login.left.forgot.note', 'Browser-Sitzung beim Zuruecksetzen'],
+      ['auth:login.left.resetSent.body', 'Browser-Sitzung beim Zuruecksetzen'],
+      ['auth:login.resetSent.fineprint', 'Browser-Sitzung beim Zuruecksetzen'],
+      ['providerws:settings.sectionSecuritySub', 'aktive Anmeldungen in den Sicherheitseinstellungen'],
+    ]) },
 
 ];
 
@@ -97,24 +117,8 @@ const AUSNAHMEN = new Map([
 ]);
 
 /** In der Checklist gefordert, hier bewusst noch nicht erzwungen.
- *  Siehe Kopfkommentar — jede Zeile mit Datum und Grund. */
-const AUSGESETZT = [
-  ['Severity → Priority',
-   '2026-09-20: `severity` ist ein Datenwert (Engine, API, packages/types, ' +
-   'RiskBadge-Prop, Design-Token --color-risk-critical), 344 Vorkommen. ' +
-   'Eigener Schritt, eigene Entscheidung.'],
-  ['Immediate / Critical → Urgent',
-   '2026-09-20: dieselbe Kette wie Severity. Nur das Label zu aendern ergaebe ' +
-   'genau das von der Checklist verbotene "risk.severity.critical zeigt Urgent".'],
-  ['Saved Sessions → Saved Risk Maps',
-   '2026-09-22: kein Wort, sondern ein Konzept. 71 EN-Werte tragen "session", ' +
-   'die meisten meinen eine gespeicherte Risk Map (Seitentitel "Your compliance ' +
-   'sessions", "No session saved yet", Suchhinweis), einige die Anmeldung ' +
-   '("Your session has expired" — die bleibt). Nur die sechs woertlichen ' +
-   '"saved sessions" zu tauschen gaebe eine Navigation mit "Saved Risk Maps" ' +
-   'ueber einer Seite mit "sessions". Dazu haengen Tabelle `sessions`, ' +
-   'Parameter `?session=` und die Sitzungs-Kachel dran.'],
-];
+ *  Jede Zeile mit Datum und Grund. Seit 2026-10-10 leer. */
+const AUSGESETZT = [];
 
 function* blaetter(o, pfad = '') {
   if (o && typeof o === 'object') {
@@ -135,8 +139,9 @@ function pruefe(sprache) {
     for (const [pfad, wert] of blaetter(daten)) {
       const schluessel = `${ns}:${pfad}`;
       if (AUSNAHMEN.has(schluessel)) continue;
-      for (const { muster, statt, ausser } of VERBOTEN) {
+      for (const { muster, statt, ausser, schluessel: erlaubt } of VERBOTEN) {
         if (ausser && ausser.test(wert)) continue;
+        if (erlaubt?.has(schluessel)) continue;
         for (const m of wert.matchAll(muster)) {
           treffer.push({ schluessel, gefunden: m[0], statt, wert });
         }

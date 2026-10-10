@@ -3,11 +3,11 @@
     "verified": "Verifiziert"
   },
   "risk": {
-    "severity": {
+    "priority": {
       "low": "Niedrig",
       "medium": "Mittel",
       "high": "Hoch",
-      "critical": "Sofort"
+      "immediate": "Sofort"
     },
     "state": {
       "confirmed": "Bestätigt",
@@ -15,7 +15,7 @@
       "action": "2 Fragen beantworten"
     },
     "table": {
-      "severity": "Schweregrad",
+      "priority": "Schweregrad",
       "obligation": "Pflicht",
       "market": "Markt",
       "due": "Fällig",

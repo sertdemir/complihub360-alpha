@@ -3,6 +3,7 @@ import { Lock, Check, Info, ArrowRight } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
 import { Badge } from '../ui/Badge';
+import { priorityOf } from '../../lib/priority';
 
 // Risk-map result preview (Figma 1694:1789) at the SAME 760×588 footprint as the
 // AnimatedWizard, so the hero can cross-fade wizard → result without any reflow.
@@ -14,7 +15,7 @@ const STAT_INDICES = [0, 1, 2, 3] as const;
 type StateKind = 'confirmed' | 'likely' | 'action';
 
 // Display strings come from riskMapPreview.rows.<index>.*; severity + state
-// labels derive from risk.severity.* / risk.state.*.
+// labels derive from risk.priority.* / risk.state.*.
 const ROWS: { level: RiskLevel; state: StateKind }[] = [
   { level: 'critical', state: 'confirmed' },
   { level: 'critical', state: 'likely' },
@@ -81,7 +82,7 @@ export function RiskMapPreview() {
       <div className="mt-3 flex-1 overflow-hidden px-7 pb-2">
         <div className="overflow-hidden rounded-xl border border-stroke">
           <div className={`${COLS} bg-surface-secondary px-4 py-2 text-body-5xs font-semibold uppercase tracking-wide text-fg-tertiary`}>
-            <span>{t('risk.table.severity')}</span>
+            <span>{t('risk.table.priority')}</span>
             <span>{t('risk.table.obligation')}</span>
             <span>{t('risk.table.market')}</span>
             <span>{t('risk.table.due')}</span>
@@ -90,7 +91,7 @@ export function RiskMapPreview() {
           {ROWS.map((r, i) => (
             <div key={i} className={`${COLS} border-t border-stroke px-4 py-2.5`}>
               <span>
-                <RiskBadge level={r.level} size="sm">{t(`risk.severity.${r.level}`)}</RiskBadge>
+                <RiskBadge level={r.level} size="sm">{t(`risk.priority.${priorityOf(r.level)}`)}</RiskBadge>
               </span>
               <div className="min-w-0">
                 <p className="truncate text-body-2xs font-semibold text-fg">{t(`riskMapPreview.rows.${i}.title`)}</p>

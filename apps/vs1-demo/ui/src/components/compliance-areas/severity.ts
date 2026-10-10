@@ -1,4 +1,5 @@
 import type { ObligationSeverity } from '@complihub/compliance-engine';
+import { PRIORITY_EN, priorityOf } from '../../lib/priority';
 
 // ─── Severity → Compass risk tokens ──────────────────────────────────────────
 // What this file does NOT do any more: the badge itself. That belongs to
@@ -54,14 +55,15 @@ export const SEVERITY_STYLE: Record<ObligationSeverity, SeverityStyle> = {
   },
 };
 
-/** i18n key for a severity label, e.g. compliance.severity.high. */
+/** i18n key for the visible label of a level, e.g. compliance.priority.high.
+ *  The engine's 'critical' shows as Immediate (lib/priority). */
 export function severityKey(severity: ObligationSeverity): string {
-  return `compliance.severity.${severity}`;
+  return `compliance.priority.${priorityOf(severity)}`;
 }
 
 export const SEVERITY_FALLBACK: Record<ObligationSeverity, string> = {
-  critical: 'Critical',
-  high: 'High',
-  medium: 'Medium',
-  low: 'Low',
+  critical: PRIORITY_EN.immediate,
+  high: PRIORITY_EN.high,
+  medium: PRIORITY_EN.medium,
+  low: PRIORITY_EN.low,
 };

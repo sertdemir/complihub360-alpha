@@ -13,13 +13,13 @@
     "partnerBadge": "Partner",
     "searchAria": "Search",
     "availabilityAria": "Toggle availability",
-    "outOfOffice": "Out of office",
-    "oooStartTitle": "Go out of office?",
-    "oooStartConsequence": "New requests are paused and re-routed to other partners. Your ranking is frozen while away — SLA timers resume on return. End it early anytime.",
-    "oooStartConfirm": "Set out of office",
-    "oooEndTitle": "End out of office?",
-    "oooEndConsequence": "You go back to Available — new requests route to you again and SLA timers resume immediately.",
-    "oooEndConfirm": "End out of office",
+    "outOfOffice": "Paused",
+    "oooStartTitle": "Pause new requests?",
+    "oooStartConsequence": "While you are paused, you do not appear in new results and cannot be booked. Your ranking stays as it is. Existing appointments stay in place. You can resume at any time.",
+    "oooStartConfirm": "Pause requests",
+    "oooEndTitle": "Become available again?",
+    "oooEndConsequence": "You appear in new results again and can be booked.",
+    "oooEndConfirm": "Resume",
     "switchTo": "Go to",
     "navVerification": "Verification",
     "applicationBanner": {
@@ -33,6 +33,7 @@
     },
     "navSubscription": "Plan",
     "signOut": "Sign out",
+    "oooFailed": "The change could not be saved just now. Your status is unchanged.",
     "navOverview": "Overview"
   },
   "bell": {
@@ -308,81 +309,32 @@
   },
   "notifications": {
     "title": "Notifications",
-    "subtitle": "What happened without you: bookings, reports, credit, evidence, incidents. Only what concerns your firm.",
+    "subtitle": "Aggregated event feed from canonical event model. New requests · SLA reminders · downgrade warnings · payment events · attachment processing. Configure per-channel delivery (email + in-app) in Settings → Notifications.",
     "markAllRead": "Mark all read",
+    "preferences": "Preferences",
     "chipAll": "All",
     "chipUnread": "Unread",
+    "chipRequests": "Requests",
+    "chipSla": "SLA",
+    "chipBilling": "Billing",
+    "chipReviews": "Reviews",
+    "chipSystem": "System",
     "emptyFilter": "Nothing here — try another filter.",
     "dayToday": "Today",
     "dayYesterday": "Yesterday",
-    "chip": {
-      "termine": "Appointments",
-      "performance": "Performance",
-      "billing": "Billing",
-      "verification": "Verification"
-    },
-    "open": {
-      "termine": "Open appointments",
-      "performance": "Open performance",
-      "billing": "Open billing",
-      "subscription": "Open plan",
-      "verification": "Open verification",
-      "overview": "Open overview"
-    },
-    "decision": {
-      "lifted": "lifted",
-      "upheld": "upheld"
-    },
-    "type": {
-      "booking_created": "New booking",
-      "booking_rescheduled": "Appointment moved",
-      "booking_cancelled": "Appointment cancelled",
-      "appointment_reminder": "Appointment coming up",
-      "no_show_reported": "The user reported that you did not show",
-      "rebook_reminder": "Rebooking without a second fee still possible",
-      "dispute_opened": "Dispute on your no-show report",
-      "dispute_resolved": "Dispute decided",
-      "credit_issued": "Credit issued",
-      "performance_incident": "Incident recorded",
-      "serial_no_show_alert": "Two incidents in 90 days",
-      "booking_paused": "Booking pause after three incidents",
-      "enforcement_decided": "Your appeal was decided",
-      "payment_failed": "Lead charge failed",
-      "invoice_retry_scheduled": "Invoice open — retry scheduled",
-      "subscription_scheduled": "Plan change scheduled",
-      "subscription_schedule_done": "Plan change applied",
-      "verification_info_requested": "The review team needs another document",
-      "verification_decided": "Approval decided",
-      "verification_activated": "Your account is active",
-      "evidence_expiring": "Evidence expiring"
-    },
-    "desc": {
-      "booking_created": "Appointment on {{from}}. The dossier is under Appointments.",
-      "booking_rescheduled": "{{from}} → {{to}}",
-      "booking_cancelled": "The appointment on {{from}} will not take place.",
-      "appointment_reminder": "Appointment on {{from}}.",
-      "no_show_reported": "You can dispute the report under Appointments.",
-      "rebook_reminder": "The user can rebook without a second fee until {{to}}.",
-      "dispute_opened": "The team is reviewing. The fee stays until the decision.",
-      "dispute_resolved": "The decision is shown on the appointment.",
-      "credit_issued": "{{label}} will be applied to your next invoice.",
-      "performance_incident": "From two incidents in 90 days you receive a notice, from three a booking pause with appeal.",
-      "serial_no_show_alert": "Another incident in the period leads to a booking pause. Your profile stays visible.",
-      "booking_paused": "New bookings are paused, your profile stays visible. You can appeal once.",
-      "enforcement_decided": "Decision: {{decision}}.",
-      "payment_failed": "Bookings are closed until the payment method works again. Your profile stays visible.",
-      "invoice_retry_scheduled": "We will retry the card on file. The deadline stays.",
-      "subscription_scheduled": "Applies from the renewal date.",
-      "subscription_schedule_done": "The new plan is running.",
-      "verification_info_requested": "Your application keeps its place while you upload it.",
-      "verification_decided": "{{label}}",
-      "verification_activated": "You appear in the results.",
-      "evidence_expiring": "{{type}} expires on {{to}}."
-    },
-    "agoMinutes_one": "{{count}} min ago",
-    "agoMinutes_other": "{{count}} min ago",
-    "agoHours_one": "{{count}} h ago",
-    "agoHours_other": "{{count}} h ago"
+    "itemNewRequest": "New request",
+    "itemSlaReminder": "SLA reminder",
+    "itemEngagementClosed": "Engagement closed",
+    "itemNewReview": "New 5-star review",
+    "timeMinAgo_one": "{{count}} min ago",
+    "timeMinAgo_other": "{{count}} min ago",
+    "timeHoursAgo_one": "{{count}}h ago",
+    "timeHoursAgo_other": "{{count}}h ago",
+    "descRq0234": "EPR setup for DE marketplace launch · €4.2M revenue · 91% match score · SLA 24h from now",
+    "descRq0233": "VAT review for DE+AT · €1.8M revenue · OSS expansion · 84% match score",
+    "descRq0232": "Reminder #1 (T+24h) sent · 14h 12m remaining before reroute · DPIA workshop for SaaS company",
+    "descEngagementClosed": "Client marked engagement complete · 5-star rating · €3,600 invoiced · quality_score +2",
+    "actionOpenRq": "Open {{id}} →"
   },
   "performance": {
     "title": "Performance",
@@ -503,51 +455,24 @@
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Workspace · profile · security · notifications · integrations · team. Changes apply within 60 seconds; sensitive changes trigger email confirmation.",
-    "sectionProfile": "Profile",
-    "sectionProfileSub": "Public identity + bio",
-    "sectionSecurity": "Security",
-    "sectionSecuritySub": "2FA · password · sessions",
-    "sectionNotifications": "Notifications",
-    "sectionNotificationsSub": "Email + in-app preferences",
-    "sectionIntegrations": "Integrations",
-    "sectionIntegrationsSub": "Stripe · Cal.com",
-    "sectionTeam": "Team & Routing",
-    "sectionTeamSub": "Coming WK3 · single-user v1",
-    "sectionWorkspace": "Workspace",
-    "sectionWorkspaceSub": "Plan · sign-out · delete",
-    "publicIdentityTitle": "Public identity",
-    "publicIdentitySub": "How clients see you in search",
-    "preview": "Preview",
-    "avatarTitle": "Logo / avatar · 48×48",
-    "avatarSpec": "PNG / SVG · square · min 256×256 · displayed at 48px in search",
-    "replace": "Replace",
+    "subtitle": "What clients see and how requests reach you.",
     "legalName": "Legal name",
-    "lockedTag": "locked",
-    "bioLabel": "Bio · 280 chars max · used in search results",
-    "contactEmailTitle": "Contact email · routing-critical",
-    "contactEmailBody": "This is where new request magic-links arrive. If this email bounces, your visibility pauses until fixed (§11.2).",
+    "contactEmailTitle": "Contact email",
+    "contactEmailBody": "This is where the magic links for new requests arrive.",
     "changeEmail": "Change email",
-    "workspaceTitle": "Workspace",
-    "workspaceSub": "Destructive actions — each asks for explicit confirmation",
     "pausedBannerTitle": "New requests paused",
-    "pausedBannerBody": "Incoming requests are re-routed to other partners · your ranking is frozen while paused.",
+    "pausedBannerBody": "You do not appear in new results. Existing appointments stay in place.",
     "resume": "Resume",
-    "pauseTitle": "Pause new requests",
-    "pauseSub": "Re-routes incoming requests · ranking frozen · resume anytime",
-    "pauseButton": "Pause",
-    "pausedButton": "Paused",
+    "pauseButton": "Pause new requests",
     "pauseConfirmTitle": "Pause new requests?",
-    "pauseConfirmConsequence": "Incoming requests will be re-routed to other partners while paused. Your ranking is frozen — it neither drops nor improves. You can resume anytime.",
+    "pauseConfirmConsequence": "While you are paused, you do not appear in new results and cannot be booked. Your ranking stays as it is. Existing appointments stay in place. You can resume at any time.",
     "pauseConfirmLabel": "Pause requests",
     "deleteTitle": "Delete workspace",
-    "deleteSub": "Removes your public profile + all data after a 30-day grace period",
-    "deleteButton": "Delete…",
-    "deleteConfirmTitle": "Delete workspace?",
-    "deleteConfirmConsequence": "Your public profile goes offline immediately. All engagement data is removed after a 30-day grace period — active engagements must be completed or handed over first. This cannot be undone after the grace period.",
-    "deleteConfirmLabel": "Delete workspace",
+    "deleteButton": "Request deletion",
+    "deleteConfirmTitle": "Request deletion?",
+    "deleteConfirmConsequence": "We will get back to you within 3 business days and settle ongoing appointments and open invoices with you. Until then, your workspace stays unchanged.",
+    "deleteConfirmLabel": "Request deletion",
     "sectionMatchmaking": "Matchmaking",
-    "sectionMatchmakingSub": "Billing model, pricing table, anonymous card",
     "matchmakingTitle": "Matchmaking profile",
     "matchmakingSub": "What users see pre-booking (anonymous card) and on your detail page. Editable any time.",
     "billingModelLabel": "Billing model — shown on your anonymous card",
@@ -590,6 +515,33 @@
       "confirmConsequence": "Clients will then see your business hours again instead of your free times. Appointments already added stay in your calendar.",
       "confirmLabel": "Disconnect"
     },
+    "navLabel": "Sections",
+    "navCalendar": "Calendar",
+    "navMatchmaking": "Matchmaking",
+    "navAfterBooking": "After booking",
+    "navContactEmail": "Contact email",
+    "navAvailability": "Availability",
+    "navWorkspace": "Workspace",
+    "afterBookingTitle": "Visible after booking",
+    "afterBookingBody": "Clients only see these details once they have booked an appointment. They come from your application.",
+    "websiteLabel": "Website",
+    "changeViaApplication": "Change via your application",
+    "afterBookingFailed": "The details from your application are not available right now.",
+    "contactEmailLabel": "Address",
+    "availabilityTitle": "Availability",
+    "availabilityBody": "While you are paused, you do not appear in new results and cannot be booked. Your ranking stays as it is. Existing appointments stay in place.",
+    "resumeConfirmTitle": "Become available again?",
+    "resumeConfirmConsequence": "You appear in new results again and can be booked.",
+    "resumeConfirmLabel": "Resume",
+    "availabilityFailed": "The change could not be saved just now. Your status is unchanged.",
+    "deleteBody": "We delete your workspace on request. We settle ongoing appointments and open invoices with you first.",
+    "deleteSent": "We have your request. We will get back to you within 3 business days.",
+    "deleteFailedTitle": "Your request was not sent.",
+    "deleteFailed": {
+      "unavailable": "Sending is not available right now.",
+      "network": "The connection to our inbox failed.",
+      "rateLimit": "Several messages came from your connection in a short time. Please wait 15 minutes."
+    },
     "availability": {
       "title": "Bookable hours",
       "sub": "Up to three windows per weekday in 30-minute steps, in your time zone. Busy times from the connected calendar are subtracted.",
@@ -614,9 +566,7 @@
         "sat": "Sat",
         "sun": "Sun"
       }
-    },
-    "activeSinceLine": "since {{year}}",
-    "bioEmpty": "No profile details yet. Region and year are entered under Matchmaking."
+    }
   },
   "termine": {
     "title": "Appointments & <accent>leads</accent>.",
@@ -1218,6 +1168,93 @@
       "errAlready": "Something is already scheduled. Withdraw that first.",
       "errSame": "That is already your running plan.",
       "errFailed": "That did not work just now. Please try again."
+    }
+  },
+  "partnerNotif": {
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "needsYou": "Needs you",
+    "forInfo": "For your information",
+    "seeAll": "See all notifications",
+    "empty": "No notifications yet. Bookings, billing and verification updates appear here.",
+    "pageSubtitle": "Everything CompliHub360 has sent you: bookings, billing, verification and your plan.",
+    "chipAppointments": "Appointments",
+    "chipVerification": "Verification",
+    "chipPlan": "Plan",
+    "goTo": "Open",
+    "booking_created": {
+      "title": "New booking",
+      "body": "A client booked an intro call for {{slot}}. The dossier is ready."
+    },
+    "appointment_reminder": {
+      "title": "Appointment in {{offset}}",
+      "body": "Intro call on {{slot}}."
+    },
+    "dispute_opened": {
+      "title": "A client disagrees with your report",
+      "body": "About the appointment on {{slot}}. CompliHub360 will review it and let you know."
+    },
+    "dispute_resolved": {
+      "title": "Decision on a disputed appointment",
+      "body": "The appointment on {{slot}}: {{label}}."
+    },
+    "performance_incident": {
+      "title": "Missed appointment recorded",
+      "body": "You were recorded as absent for {{slot}}. This is part of your performance figures."
+    },
+    "credit_issued": {
+      "title": "Credit added",
+      "body": "{{amount}} from a missed appointment. It is applied to your next subscription invoice."
+    },
+    "payment_failed": {
+      "title": "Lead charge did not go through",
+      "body": "Bookings are paused until you check the card again or add another one. You stay visible."
+    },
+    "invoice_retry_scheduled": {
+      "title": "Invoice {{label}} is due",
+      "body": "If it is still open tomorrow, we will try your card on file. From {{deadline}}, new bookings pause while it stays open."
+    },
+    "subscription_scheduled": {
+      "title": "Plan change scheduled",
+      "body": "Takes effect on {{effectiveOn}}. You can withdraw it until then."
+    },
+    "subscription_schedule_done": {
+      "title": "Plan change in effect",
+      "body": "Your plan changed today as scheduled."
+    },
+    "verification_info_requested": {
+      "title": "One more document needed",
+      "body": "Our review needs one more piece of evidence."
+    },
+    "verification_decided": {
+      "title": "Review decided",
+      "body": "A review decision was made. Open Verification to see the result."
+    },
+    "verification_activated": {
+      "title": "Your account is active",
+      "body": "Companies can now find and book you for the approved services."
+    },
+    "evidence_expiring": {
+      "title": "Evidence expires soon",
+      "body": "{{label}} expires on {{deadline}}."
+    },
+    "decision": {
+      "lifted": "lifted",
+      "upheld": "upheld"
+    },
+    "serial_no_show_alert": {
+      "title": "Two missed appointments in 90 days",
+      "body": "One more leads to a booking pause with appeal. Your profile stays visible."
+    },
+    "booking_paused": {
+      "title": "Booking pause after three incidents",
+      "body": "New bookings are paused, your profile stays visible. You can appeal once — under Performance."
+    },
+    "enforcement_decided": {
+      "title": "Your appeal was decided",
+      "body": "Decision: {{decision}}. Details are under Performance."
     }
   },
   "overview": {

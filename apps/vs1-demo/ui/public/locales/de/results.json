@@ -29,7 +29,7 @@
     }
   },
   "table": {
-    "severity": "Priorität",
+    "priority": "Priorität",
     "obligation": "Pflicht",
     "market": "Markt",
     "due": "Fällig",
@@ -41,8 +41,8 @@
     "now": "Jetzt",
     "radar": "Auf dem Radar"
   },
-  "severity": {
-    "critical": "Sofort",
+  "priority": {
+    "immediate": "Sofort",
     "high": "Hoch",
     "medium": "Mittel",
     "low": "Niedrig"
@@ -112,9 +112,9 @@
     "errorBody": "Bitte versuchen Sie es in einem Moment erneut.",
     "crumbProviders": "Anbieter",
     "backToArea": "Zur Bereichsseite",
-    "backToSession": "Zur Sitzung",
+    "backToRiskMap": "Zur Sitzung",
     "lageAreasArea": "Deckt {{matched}} von {{total}} Bereichen ab ({{area}})",
-    "lageAreasSession": "Passt zu {{matched}} von {{total}} Bereichen Ihrer Sitzung „{{session}}“",
+    "lageAreasRiskMap": "Passt zu {{matched}} von {{total}} Bereichen Ihrer Sitzung „{{riskMap}}“",
     "lageMarketsAll_one": "{{count}} Markt abgedeckt",
     "lageMarketsAll_other": "alle {{count}} Märkte abgedeckt",
     "lageMarketsPartial_one": "{{covered}} von {{total}} Markt abgedeckt · {{missing}} nicht",
@@ -128,7 +128,7 @@
     "matrixTitle": "Ihre Pflichten und die Märkte dieses Anbieters",
     "matrixCovered_one": "{{covered}} von {{total}} Markt",
     "matrixCovered_other": "{{covered}} von {{total}} Märkten",
-    "matrixSession": "Sitzung",
+    "matrixRiskMap": "Sitzung",
     "matrixNone": "In diesem Bezug ist gerade nichts offen.",
     "matrixNotCovered": "Diesen Markt deckt der Anbieter nicht ab.",
     "matrixEuWide": "EU-weit",
@@ -195,7 +195,7 @@
     "toAppointments": "Zu Ihren Terminen",
     "pickSlotDrawer": "Wählen Sie oben einen Termin.",
     "messageLabel": "Ihr Anliegen",
-    "messageFromSession": "Es geht um meine Sitzung „{{session}}“.",
+    "messageFromRiskMap": "Es geht um meine Sitzung „{{riskMap}}“.",
     "duration": "30 Min",
     "noSlots": "Dieser Anbieter hat gerade keine freien Termine. Versuchen Sie es in ein paar Tagen erneut.",
     "failed": "Der Termin konnte nicht gebucht werden. Bitte versuchen Sie es in einem Moment erneut.",
@@ -382,7 +382,7 @@
   },
   "reveal": {
     "was": "war {{title}}",
-    "wasInSession": "war {{title}} in Ihrer Sitzung „{{session}}“"
+    "wasInRiskMap": "war {{title}} in Ihrer Sitzung „{{riskMap}}“"
   },
   "dueLive": "Gilt jetzt"
 }

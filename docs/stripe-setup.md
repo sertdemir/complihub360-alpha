@@ -42,6 +42,36 @@ Billing Portal write, Checkout Sessions write):
 | Refunds | **write** | Kompensation, wenn der Buchungs-Insert nach dem Capture scheitert |
 | Payment Methods | **read** | der Kunden-Aufruf expandiert `invoice_settings.default_payment_method`, und `billing/sync` listet die angehängten Karten (`GET payment_methods?customer=…`), weil das Portal eine neue Karte anhängt, aber nicht als Standard setzt — der Sync macht sie dann dazu (`POST customers/:id`, Customers write; Befund Staging 2026-10-05); ein Restricted Key darf nur expandieren, worauf er selbst Leserecht hat — ohne dieses Recht antwortet Stripe `permission_error`, und `billing/sync` meldet 502 (Befund Staging 2026-10-04) |
 
+## ADR-0008 A2 (2026-10-10): „Karte erneut prüfen" — ein Recht mehr
+
+`POST /provider/:key/billing/recheck` fragt bei der Bank nach, ob das
+hinterlegte Mittel wieder taugt. Das geht über einen **SetupIntent** (ohne
+Betrag, `usage=off_session`, `confirm=true`), nicht über einen PaymentIntent:
+Stripe nimmt den Betrag 0 nicht an, und ein Cent-Betrag wäre eine echte
+Belastung ohne Gegenleistung.
+
+| Ressource | Recht | Wofür |
+|---|---|---|
+| SetupIntents | **write** | die Nachfrage bei der Bank (`POST setup_intents`, `confirm=true`) |
+
+✅ **Auf Staging gesetzt (2026-10-10).** Nachgewiesen mit einem Lese-Aufruf
+gegen `GET /v1/setup_intents?limit=1` aus dem API-Container (200). Bewusst ein
+GET: „write" schließt das Lesen ein, also belegt die Liste das Recht, ohne
+einen SetupIntent anzulegen oder einen Anbieter zu berühren.
+
+Ein Neustart war dafür nicht nötig und ist es auch künftig nicht: Eine
+geänderte BERECHTIGUNG lässt den Key-String unberührt, und Stripe prüft die
+Rechte bei jeder Anfrage. Der Hinweis auf
+`docker compose up -d --force-recreate` weiter oben gilt nur, wenn der Key
+ERSETZT wird.
+
+Fehlt es, antwortet Stripe `permission_error` und die Route meldet 502
+`STRIPE_ERROR`. **Dieser Fall verbraucht keine der drei Prüfungen** — die
+Ereigniszeile entsteht erst, wenn die Bank geantwortet hat. Ein fehlendes
+Recht darf beim Anbieter nie als „Ihre Bank hat abgelehnt" ankommen, sonst
+wechselt er eine Karte, mit der nichts ist (dasselbe Fehlermuster wie bei
+`billing/sync`, Befund Staging 2026-10-04).
+
 Ohne diese Rechte antwortet die erste Buchung 502 `BILLING_ERROR` (ehrlich,
 aber rot) und `billing/sync` 502 `STRIPE_ERROR`. Der Schlüssel bleibt in der
 VPS-`.env`; Änderung über das Stripe-Dashboard (Sandbox → Developers → API

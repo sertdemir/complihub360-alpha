@@ -285,8 +285,10 @@ function recheckReadiness() {
   READINESS = { ...READINESS, reasons, ready: reasons.length === 0, synced_at: plus(0) };
   return { ok: true, result: 'cleared', readiness: { ...READINESS } };
 }
+// Pausieren (Canvas C2): Kopfzeile und Einstellungen schalten denselben Wert.
+let MOCK_AVAILABILITY: 'available' | 'ooo' = 'available';
 function partnerCoverage() {
-  return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: 'available', ooo_until: null, partner_status: 'active', contact_email: 'kanzlei@schmidt-partner.example', billing_model: 'mixed', region: 'Norddeutschland', active_since: 2009, pricing_table: [{ service: 'USt-Voranmeldung (monatlich)', price: 'ab 180 € / Monat' }, { service: 'OSS-Registrierung', price: 'ab 450 € einmalig' }] } };
+  return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: MOCK_AVAILABILITY, ooo_until: null, partner_status: 'active', contact_email: 'kanzlei@schmidt-partner.example', billing_model: 'mixed', region: 'Norddeutschland', active_since: 2009, pricing_table: [{ service: 'USt-Voranmeldung (monatlich)', price: 'ab 180 € / Monat' }, { service: 'OSS-Registrierung', price: 'ab 450 € einmalig' }] } };
 }
 const monat = (offset: number) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + offset); return d.toISOString().slice(0, 7); };
 // Pricing v2 (ADR-0003): Tarif + Leads nach Band, Rabatt auf die ersten Leads
@@ -581,7 +583,11 @@ function providerDetail(ref: string) {
   // ProviderDetailPage.guard.test.ts.
   // D V2: nur Freigegebenes wird angekuendigt — die EPR-Anpassung zum Jahreswechsel.
   const planned_prices = key === PARTNER_KEY ? [{ service_name: 'EPR & Verpackung', effective_at: NEW_YEAR, currency: 'EUR', price_min: 600, price_max: 950 }] : [];
-  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], area_codes: AREAS[key] ?? [], descriptor_region: REGION[key] ?? null, ...d, planned_prices, availability: 'available', bookable_chargeable: true }, detail_open_charged: false };
+  // A1 (Schritt 4): wer gebucht hat, sieht den Anbieter offen — wie der Server.
+  const revealed = bookings().some((b) => b.public_ref === ref && b.identity_revealed);
+  const id = revealed ? PROVIDER_IDENTITY[key] : undefined;
+  const open = id ? { revealed: true, name: id.name, website_url: id.website_url, contact_email: id.contact_email } : { revealed: false };
+  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], area_codes: AREAS[key] ?? [], descriptor_region: REGION[key] ?? null, ...d, planned_prices, availability: 'available', bookable_chargeable: true, ...open }, detail_open_charged: false };
 }
 
 // Bewertungen: nur, was an einer Buchung haengt (so wie der Server filtert).
@@ -632,9 +638,14 @@ const ACK_BODY: Record<string, string> = {
   es: 'Con esta reserva, el nombre y los datos de contacto del proveedor pasan a ser visibles para usted, y el proveedor recibe el nombre de su empresa, su dirección de correo electrónico y su mensaje.\n\nEl proveedor puede contactarle sobre esta solicitud — citas, una propuesta y consultas razonables — aunque usted cancele, no asista o deje de responder. La publicidad sobre otros temas requiere su permiso por separado.\n\nUsted recibe un 10 % de descuento sobre los honorarios del proveedor para esta solicitud porque reserva a través de CompliHub360. La reserva en sí no le cuesta nada.',
   tr: 'Bu rezervasyonla sağlayıcının adı ve iletişim bilgileri sizin için görünür olur; sağlayıcı şirket adınızı, e-posta adresinizi ve mesajınızı alır.\n\nSağlayıcı bu talep hakkında sizinle iletişime geçebilir — randevular, bir teklif ve makul takip soruları dahil — iptal etseniz, katılmasanız veya yanıt vermeyi kesseniz bile. Başka konulardaki reklamlar için ayrı izniniz gerekir.\n\nCompliHub360 üzerinden rezervasyon yaptığınız için bu talep için sağlayıcının ücretlerinde % 10 indirim alırsınız. Rezervasyonun kendisi size hiçbir şey maliyet getirmez.',
 };
+/** Die Demo-Firma wie in der Shell; die Adresse ist eine Beispieladresse. */
+const DEMO_SHARED_PREVIEW = { email: 'alex.weber@acme.example', company_name: 'Acme GmbH' };
+
 function acknowledgement(lang: string) {
   const l = ACK_BODY[lang] ? lang : 'en';
-  return { ok: true, version: ACK_VERSION, language: l, body: ACK_BODY[l], shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1, recurring_treatment: 'undecided' } };
+  return { ok: true, version: ACK_VERSION, language: l, body: ACK_BODY[l], shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1, recurring_treatment: 'undecided' },
+    // B1 (Schritt 4): wie der Server mit Login — die Werte, die die Buchung festhaelt.
+    shared_preview: DEMO_SHARED_PREVIEW };
 }
 
 // POST /scheduling — die Buchung ist der bezahlte Lead UND der Moment, in dem
@@ -661,11 +672,14 @@ function createBooking(body: unknown) {
     return { __status: 409, errorCode: 'BOOKING_NOT_COMPLETED', message: 'The booking could not be completed. This is not on your side — the provider has been informed.', reason: 'provider_billing' };
   }
   const end = new Date(at.getTime() + 30 * 60 * 1000).toISOString();
+  const mockTopic = { area_code: typeof d.area_code === 'string' && d.area_code ? d.area_code : 'tax-vat', countries: Array.isArray(d.countries) && d.countries.length ? (d.countries as string[]) : ['DE'] };
   return {
     ok: true,
     booking: { id: `m0ck-new-${ref}`, public_ref: ref, slot_start: slot, slot_end: end, status: 'confirmed', acknowledgement_version: ACK_VERSION, shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1 },
       // Wie der Server: das Thema des Leads (deriveOpportunity, vereinfacht).
-      topic: { area_code: typeof d.area_code === 'string' && d.area_code ? d.area_code : 'tax-vat', countries: Array.isArray(d.countries) && d.countries.length ? (d.countries as string[]) : ['DE'] } },
+      topic: mockTopic,
+      // B1: was geteilt wurde, Wert fuer Wert.
+      shared_snapshot: { ...DEMO_SHARED_PREVIEW, message: typeof d.message === 'string' && d.message.trim() ? d.message.trim() : null, topic: mockTopic } },
     provider_identity: identity,
   };
 }
@@ -712,6 +726,23 @@ function notifications() {
     n(4, 'provider_declined', 'engagement', rid(10), { providerRef: REF['madrid-tax'], providerName: 'Verified tax specialist · Spain' }, 30, true),
     n(5, 'booking_cancelled', 'booking', 'm0ck-b10', { providerName: 'Thames VAT Partners LLP', from: iso(-17, 16) }, 60, true),
     n(6, 'provider_replied', 'engagement', rid(1), { providerRef: REF['schmidt-partner'], providerName: 'Verified tax advisory · Northern Germany' }, 70, true),
+  ];
+}
+
+// Partner-Post (Canvas A V2 · B V1): was der Server an `provider_members`
+// schreibt. `needs_action` folgt der Demo-Lage — die Lead-Belastung ist
+// gescheitert (READINESS), die Rechnung offen.
+function partnerNotifications() {
+  const n = (i: number, type: string, payload: Record<string, unknown>, hoursAgo: number, read: boolean, needs = false) =>
+    ({ id: uuid(i, 5), type, subject: type.startsWith('booking') || type === 'appointment_reminder' ? 'booking' : 'provider', subject_id: PARTNER_KEY, payload, created_at: plus(-hoursAgo * H), read_at: read ? plus(-(hoursAgo - 1) * H) : null, needs_action: needs });
+  return [
+    n(1, 'booking_created', { providerKey: PARTNER_KEY, slot: iso(2, 11) }, 0.05, false),
+    n(2, 'payment_failed', { providerKey: PARTNER_KEY }, 1, false, READINESS.reasons.includes('payment_failed')),
+    n(3, 'invoice_retry_scheduled', { providerKey: PARTNER_KEY, label: 'INV-2026-009', deadline: iso(7).slice(0, 10) }, 2, false, true),
+    n(4, 'appointment_reminder', { providerKey: PARTNER_KEY, slot: iso(1, 12), offset: '1440' }, 26, true),
+    n(5, 'evidence_expiring', { providerKey: PARTNER_KEY, label: 'insurance', to: iso(23).slice(0, 10) }, 30, true),
+    n(6, 'subscription_scheduled', { providerKey: PARTNER_KEY, effectiveOn: iso(25).slice(0, 10) }, 31, true),
+    n(7, 'credit_issued', { providerKey: PARTNER_KEY, amount: '4470' }, 75, true),
   ];
 }
 
@@ -1047,21 +1078,6 @@ function partnerOverview() {
     upcoming, report_open: reportOpen, disputes_open: disputesOpen, expiring_evidence: expiring, enforcement: null, tasks,
   };
 }
-// Die Post des Anbieters (provider_members → notifications): andere Anlaesse
-// als beim Nutzer, dieselbe Route.
-function partnerNotifications() {
-  const n = (i: number, type: string, subject: string, subjectId: string, payload: Record<string, unknown>, hoursAgo: number, read: boolean) =>
-    ({ id: uuid(i, 5), type, subject, subject_id: subjectId, payload, created_at: plus(-hoursAgo * H), read_at: read ? plus(-(hoursAgo - 1) * H) : null });
-  return [
-    n(1, 'booking_created', 'booking', 'm0ck-b02', { from: iso(1, 9) }, 3, false),
-    n(2, 'rebook_reminder', 'booking', 'pb-4', { to: iso(-4, 0) }, 8, false),
-    n(3, 'dispute_opened', 'booking', 'pb-6', {}, 26, false),
-    n(4, 'credit_issued', 'booking', 'pb-4', { label: '40,23 $' }, 70, true),
-    n(5, 'performance_incident', 'booking', 'pb-7', {}, 96, true),
-    n(6, 'evidence_expiring', null as unknown as string, uuid(77, 7), { evidence_type: 'Berufshaftpflicht', to: iso(20, 0) }, 120, true),
-    n(7, 'verification_decided', null as unknown as string, uuid(3, 7), { label: 'EPR & Verpackung · AT' }, 200, true),
-  ];
-}
 
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
@@ -1139,9 +1155,10 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'contact' && method === 'POST') return { ok: true, acknowledged: true, correlationId: `mock-${Date.now().toString(36)}` };
   // Phase 6: Verfuegbarkeit — Status (Abwesend) und Fenster/Zeitzone ueber denselben Aufruf.
   if (p[0] === 'provider' && p[2] === 'availability' && method === 'PATCH') {
+    if (typeof body.status === 'string') MOCK_AVAILABILITY = body.status === 'ooo' ? 'ooo' : 'available';
     if ('hours' in body) AVAIL.hours = body.hours && Object.keys(body.hours as object).length ? (body.hours as typeof AVAIL.hours) : null;
     if (typeof body.timezone === 'string') AVAIL.timezone = body.timezone;
-    return { ok: true, providerKey: p[1], availability: typeof body.status === 'string' ? body.status : 'available', ooo_until: null, hours: AVAIL.hours, timezone: AVAIL.timezone, booking_paused_at: null };
+    return { ok: true, providerKey: p[1], availability: MOCK_AVAILABILITY, ooo_until: null, hours: AVAIL.hours, timezone: AVAIL.timezone, booking_paused_at: null };
   }
   if (p[0] === 'provider' && p[2] === 'enforcement' && p[4] === 'appeal' && method === 'POST') return { ok: true, enforcement: { id: p[3], action: 'booking_pause', source: 'auto_no_show', reason: 'three incidents', created_at: iso(-2), appeal_at: plus(0), decision: null, decided_at: null, lifted_at: null, incident_count: 3 } };
   if (p[0] === 'market-requests' && method === 'POST') {

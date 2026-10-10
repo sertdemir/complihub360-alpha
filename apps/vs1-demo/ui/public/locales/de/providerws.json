@@ -13,13 +13,13 @@
     "partnerBadge": "Partner",
     "searchAria": "Suche",
     "availabilityAria": "Verfügbarkeit umschalten",
-    "outOfOffice": "Abwesend",
-    "oooStartTitle": "Abwesenheit aktivieren?",
-    "oooStartConsequence": "Neue Anfragen werden pausiert und an andere Partner umgeleitet. Ihr Ranking ist während der Abwesenheit eingefroren — SLA-Timer laufen bei Rückkehr weiter. Sie können jederzeit vorzeitig beenden.",
-    "oooStartConfirm": "Abwesenheit aktivieren",
-    "oooEndTitle": "Abwesenheit beenden?",
-    "oooEndConsequence": "Sie sind wieder verfügbar — neue Anfragen werden Ihnen wieder zugeleitet und SLA-Timer laufen sofort weiter.",
-    "oooEndConfirm": "Abwesenheit beenden",
+    "outOfOffice": "Pausiert",
+    "oooStartTitle": "Neue Anfragen pausieren?",
+    "oooStartConsequence": "Solange Sie pausieren, erscheinen Sie nicht in neuen Ergebnissen und sind nicht buchbar. Ihr Ranking bleibt, wie es ist. Bestehende Termine bleiben bestehen. Sie können jederzeit fortsetzen.",
+    "oooStartConfirm": "Anfragen pausieren",
+    "oooEndTitle": "Wieder verfügbar sein?",
+    "oooEndConsequence": "Sie erscheinen wieder in neuen Ergebnissen und sind buchbar.",
+    "oooEndConfirm": "Fortsetzen",
     "switchTo": "Wechseln zu",
     "navVerification": "Verifizierung",
     "applicationBanner": {
@@ -33,6 +33,7 @@
     },
     "navSubscription": "Tarif",
     "signOut": "Abmelden",
+    "oooFailed": "Die Änderung ließ sich gerade nicht speichern. Ihr Status ist unverändert.",
     "navOverview": "Übersicht"
   },
   "bell": {
@@ -308,81 +309,32 @@
   },
   "notifications": {
     "title": "Benachrichtigungen",
-    "subtitle": "Was ohne Sie passiert ist: Buchungen, Rückmeldungen, Guthaben, Nachweise, Vorfälle. Nur, was Ihren Anbieter betrifft.",
+    "subtitle": "Aggregierter Ereignis-Feed aus dem kanonischen Ereignismodell. Neue Anfragen · SLA-Erinnerungen · Downgrade-Warnungen · Zahlungsereignisse · Anhang-Verarbeitung. Konfigurieren Sie die Zustellung pro Kanal (E-Mail + In-App) unter Einstellungen → Benachrichtigungen.",
     "markAllRead": "Alle als gelesen markieren",
+    "preferences": "Einstellungen",
     "chipAll": "Alle",
     "chipUnread": "Ungelesen",
+    "chipRequests": "Anfragen",
+    "chipSla": "SLA",
+    "chipBilling": "Abrechnung",
+    "chipReviews": "Bewertungen",
+    "chipSystem": "System",
     "emptyFilter": "Nichts zu sehen — probieren Sie einen anderen Filter.",
     "dayToday": "Heute",
     "dayYesterday": "Gestern",
-    "chip": {
-      "termine": "Termine",
-      "performance": "Performance",
-      "billing": "Abrechnung",
-      "verification": "Verifizierung"
-    },
-    "open": {
-      "termine": "Termine öffnen",
-      "performance": "Performance öffnen",
-      "billing": "Abrechnung öffnen",
-      "subscription": "Tarif öffnen",
-      "verification": "Verifizierung öffnen",
-      "overview": "Übersicht öffnen"
-    },
-    "decision": {
-      "lifted": "aufgehoben",
-      "upheld": "bestätigt"
-    },
-    "type": {
-      "booking_created": "Neue Buchung",
-      "booking_rescheduled": "Termin verschoben",
-      "booking_cancelled": "Termin abgesagt",
-      "appointment_reminder": "Termin steht an",
-      "no_show_reported": "Der Nutzer hat gemeldet, dass Sie fehlten",
-      "rebook_reminder": "Neubuchung ohne zweite Gebühr noch möglich",
-      "dispute_opened": "Widerspruch zu Ihrer No-Show-Meldung",
-      "dispute_resolved": "Widerspruch entschieden",
-      "credit_issued": "Guthaben gutgeschrieben",
-      "performance_incident": "Vorfall protokolliert",
-      "serial_no_show_alert": "Zwei Vorfälle in 90 Tagen",
-      "booking_paused": "Buchungspause nach drei Vorfällen",
-      "enforcement_decided": "Ihr Einspruch wurde entschieden",
-      "payment_failed": "Lead-Belastung gescheitert",
-      "invoice_retry_scheduled": "Rechnung offen — erneuter Versuch geplant",
-      "subscription_scheduled": "Tarifwechsel vorgemerkt",
-      "subscription_schedule_done": "Tarifwechsel ausgeführt",
-      "verification_info_requested": "Das Prüfteam braucht einen weiteren Nachweis",
-      "verification_decided": "Freigabe entschieden",
-      "verification_activated": "Ihr Konto ist aktiv",
-      "evidence_expiring": "Nachweis läuft ab"
-    },
-    "desc": {
-      "booking_created": "Termin am {{from}}. Das Dossier steht unter Termine.",
-      "booking_rescheduled": "{{from}} → {{to}}",
-      "booking_cancelled": "Der Termin am {{from}} findet nicht statt.",
-      "appointment_reminder": "Termin am {{from}}.",
-      "no_show_reported": "Sie können der Meldung unter Termine widersprechen.",
-      "rebook_reminder": "Der Nutzer kann bis {{to}} ohne zweite Gebühr neu buchen.",
-      "dispute_opened": "Das Team prüft. Die Gebühr bleibt bis zur Entscheidung.",
-      "dispute_resolved": "Die Entscheidung steht am Termin.",
-      "credit_issued": "{{label}} werden mit der nächsten Rechnung verrechnet.",
-      "performance_incident": "Ab zwei Vorfällen in 90 Tagen bekommen Sie einen Hinweis, ab drei eine Buchungspause mit Einspruch.",
-      "serial_no_show_alert": "Ein weiterer Vorfall im Zeitraum führt zu einer Buchungspause. Ihr Profil bleibt sichtbar.",
-      "booking_paused": "Neue Buchungen sind pausiert, Ihr Profil bleibt sichtbar. Sie können einmal Einspruch einlegen.",
-      "enforcement_decided": "Entscheidung: {{decision}}.",
-      "payment_failed": "Buchungen sind gesperrt, bis das Zahlungsmittel wieder geht. Ihr Profil bleibt sichtbar.",
-      "invoice_retry_scheduled": "Wir versuchen die hinterlegte Karte erneut. Die Frist bleibt.",
-      "subscription_scheduled": "Gilt ab dem Verlängerungstermin.",
-      "subscription_schedule_done": "Der neue Tarif läuft.",
-      "verification_info_requested": "Ihre Bewerbung behält ihren Platz, während Sie ihn hochladen.",
-      "verification_decided": "{{label}}",
-      "verification_activated": "Sie erscheinen in den Ergebnissen.",
-      "evidence_expiring": "{{type}} läuft am {{to}} ab."
-    },
-    "agoMinutes_one": "vor {{count}} Min.",
-    "agoMinutes_other": "vor {{count}} Min.",
-    "agoHours_one": "vor {{count}} Std.",
-    "agoHours_other": "vor {{count}} Std."
+    "itemNewRequest": "Neue Anfrage",
+    "itemSlaReminder": "SLA-Erinnerung",
+    "itemEngagementClosed": "Mandat abgeschlossen",
+    "itemNewReview": "Neue 5-Sterne-Bewertung",
+    "timeMinAgo_one": "vor {{count}} Min.",
+    "timeMinAgo_other": "vor {{count}} Min.",
+    "timeHoursAgo_one": "vor {{count}} Std.",
+    "timeHoursAgo_other": "vor {{count}} Std.",
+    "descRq0234": "EPR-Setup für DE-Marktplatz-Launch · 4,2 M € Umsatz · 91 % Match-Score · SLA 24 h ab jetzt",
+    "descRq0233": "USt-Prüfung für DE+AT · 1,8 M € Umsatz · OSS-Expansion · 84 % Match-Score",
+    "descRq0232": "Erinnerung #1 (T+24 h) gesendet · 14 h 12 m bis zur Umleitung · DPIA-Workshop für SaaS-Unternehmen",
+    "descEngagementClosed": "Mandant hat das Mandat als abgeschlossen markiert · 5-Sterne-Bewertung · 3.600 € abgerechnet · quality_score +2",
+    "actionOpenRq": "{{id}} öffnen →"
   },
   "performance": {
     "title": "Performance",
@@ -503,51 +455,24 @@
   },
   "settings": {
     "title": "Einstellungen",
-    "subtitle": "Workspace · Profil · Sicherheit · Benachrichtigungen · Integrationen · Team. Änderungen greifen innerhalb von 60 Sekunden; sensible Änderungen lösen eine E-Mail-Bestätigung aus.",
-    "sectionProfile": "Profil",
-    "sectionProfileSub": "Öffentliche Identität + Bio",
-    "sectionSecurity": "Sicherheit",
-    "sectionSecuritySub": "2FA · Passwort · Sitzungen",
-    "sectionNotifications": "Benachrichtigungen",
-    "sectionNotificationsSub": "E-Mail- + In-App-Einstellungen",
-    "sectionIntegrations": "Integrationen",
-    "sectionIntegrationsSub": "Stripe · Cal.com",
-    "sectionTeam": "Team & Routing",
-    "sectionTeamSub": "Kommt in WK3 · Einzelnutzer-v1",
-    "sectionWorkspace": "Workspace",
-    "sectionWorkspaceSub": "Plan · Abmelden · Löschen",
-    "publicIdentityTitle": "Öffentliche Identität",
-    "publicIdentitySub": "So sehen Mandanten Sie in der Suche",
-    "preview": "Vorschau",
-    "avatarTitle": "Logo / Avatar · 48×48",
-    "avatarSpec": "PNG / SVG · quadratisch · min. 256×256 · in der Suche mit 48 px angezeigt",
-    "replace": "Ersetzen",
+    "subtitle": "Was Mandanten sehen und wie Anfragen Sie erreichen.",
     "legalName": "Firmierung",
-    "lockedTag": "gesperrt",
-    "bioLabel": "Bio · max. 280 Zeichen · wird in Suchergebnissen verwendet",
-    "contactEmailTitle": "Kontakt-E-Mail · routing-kritisch",
-    "contactEmailBody": "Hier kommen die Magic-Links neuer Anfragen an. Wenn diese E-Mail bounct, pausiert Ihre Sichtbarkeit bis zur Behebung (§11.2).",
+    "contactEmailTitle": "Kontakt-E-Mail",
+    "contactEmailBody": "Hier kommen die Magic-Links neuer Anfragen an.",
     "changeEmail": "E-Mail ändern",
-    "workspaceTitle": "Workspace",
-    "workspaceSub": "Destruktive Aktionen — jede erfordert eine explizite Bestätigung",
     "pausedBannerTitle": "Neue Anfragen pausiert",
-    "pausedBannerBody": "Eingehende Anfragen werden an andere Partner umgeleitet · Ihr Ranking ist während der Pause eingefroren.",
+    "pausedBannerBody": "Sie erscheinen nicht in neuen Ergebnissen. Bestehende Termine bleiben bestehen.",
     "resume": "Fortsetzen",
-    "pauseTitle": "Neue Anfragen pausieren",
-    "pauseSub": "Leitet eingehende Anfragen um · Ranking eingefroren · jederzeit fortsetzbar",
-    "pauseButton": "Pausieren",
-    "pausedButton": "Pausiert",
+    "pauseButton": "Neue Anfragen pausieren",
     "pauseConfirmTitle": "Neue Anfragen pausieren?",
-    "pauseConfirmConsequence": "Eingehende Anfragen werden während der Pause an andere Partner umgeleitet. Ihr Ranking ist eingefroren — es sinkt nicht und steigt nicht. Sie können jederzeit fortsetzen.",
+    "pauseConfirmConsequence": "Solange Sie pausieren, erscheinen Sie nicht in neuen Ergebnissen und sind nicht buchbar. Ihr Ranking bleibt, wie es ist. Bestehende Termine bleiben bestehen. Sie können jederzeit fortsetzen.",
     "pauseConfirmLabel": "Anfragen pausieren",
     "deleteTitle": "Workspace löschen",
-    "deleteSub": "Entfernt Ihr öffentliches Profil + alle Daten nach einer Kulanzfrist von 30 Tagen",
-    "deleteButton": "Löschen…",
-    "deleteConfirmTitle": "Workspace löschen?",
-    "deleteConfirmConsequence": "Ihr öffentliches Profil geht sofort offline. Alle Mandatsdaten werden nach einer Kulanzfrist von 30 Tagen entfernt — aktive Mandate müssen zuvor abgeschlossen oder übergeben werden. Nach Ablauf der Frist ist dies nicht mehr rückgängig zu machen.",
-    "deleteConfirmLabel": "Workspace löschen",
+    "deleteButton": "Löschung anfragen",
+    "deleteConfirmTitle": "Löschung anfragen?",
+    "deleteConfirmConsequence": "Wir melden uns innerhalb von 3 Werktagen und klären laufende Termine und offene Rechnungen mit Ihnen. Bis dahin bleibt Ihr Workspace unverändert.",
+    "deleteConfirmLabel": "Löschung anfragen",
     "sectionMatchmaking": "Matchmaking",
-    "sectionMatchmakingSub": "Abrechnungs-Modell, Preistabelle, anonyme Card",
     "matchmakingTitle": "Matchmaking-Profil",
     "matchmakingSub": "Was User vor der Buchung sehen (anonyme Card) und auf deiner Detail-Seite. Jederzeit änderbar.",
     "billingModelLabel": "Abrechnungs-Modell — erscheint auf deiner anonymen Card",
@@ -590,6 +515,33 @@
       "confirmConsequence": "Danach sehen Mandanten wieder Ihre Geschäftszeiten statt Ihrer freien Zeiten. Bereits eingetragene Termine bleiben in Ihrem Kalender.",
       "confirmLabel": "Trennen"
     },
+    "navLabel": "Abschnitte",
+    "navCalendar": "Kalender",
+    "navMatchmaking": "Matchmaking",
+    "navAfterBooking": "Nach der Buchung",
+    "navContactEmail": "Kontakt-E-Mail",
+    "navAvailability": "Verfügbarkeit",
+    "navWorkspace": "Workspace",
+    "afterBookingTitle": "Nach der Buchung sichtbar",
+    "afterBookingBody": "Diese Angaben sehen Mandanten erst, wenn sie einen Termin gebucht haben. Sie stammen aus Ihrer Bewerbung.",
+    "websiteLabel": "Website",
+    "changeViaApplication": "Über die Bewerbung ändern",
+    "afterBookingFailed": "Die Angaben aus Ihrer Bewerbung sind gerade nicht erreichbar.",
+    "contactEmailLabel": "Adresse",
+    "availabilityTitle": "Verfügbarkeit",
+    "availabilityBody": "Wenn Sie pausieren, erscheinen Sie nicht in neuen Ergebnissen und sind nicht buchbar. Ihr Ranking bleibt, wie es ist. Bestehende Termine bleiben bestehen.",
+    "resumeConfirmTitle": "Wieder verfügbar sein?",
+    "resumeConfirmConsequence": "Sie erscheinen wieder in neuen Ergebnissen und sind buchbar.",
+    "resumeConfirmLabel": "Fortsetzen",
+    "availabilityFailed": "Die Änderung ließ sich gerade nicht speichern. Ihr Status ist unverändert.",
+    "deleteBody": "Wir löschen Ihren Workspace auf Anfrage. Laufende Termine und offene Rechnungen klären wir vorher mit Ihnen.",
+    "deleteSent": "Ihre Anfrage ist bei uns. Wir melden uns innerhalb von 3 Werktagen.",
+    "deleteFailedTitle": "Ihre Anfrage ist nicht abgeschickt.",
+    "deleteFailed": {
+      "unavailable": "Der Versand ist gerade nicht verfügbar.",
+      "network": "Die Verbindung zu unserem Postfach ist fehlgeschlagen.",
+      "rateLimit": "Von Ihrem Anschluss kamen in kurzer Zeit mehrere Nachrichten. Bitte warten Sie 15 Minuten."
+    },
     "availability": {
       "title": "Buchbare Zeiten",
       "sub": "Je Wochentag bis zu drei Fenster im 30-Minuten-Raster, in Ihrer Zeitzone. Belegte Zeiten aus dem verbundenen Kalender werden abgezogen.",
@@ -614,9 +566,7 @@
         "sat": "Sa",
         "sun": "So"
       }
-    },
-    "activeSinceLine": "seit {{year}}",
-    "bioEmpty": "Noch keine Profilangaben. Region und Jahr tragen Sie unter Matchmaking ein."
+    }
   },
   "termine": {
     "title": "Termine & <accent>Leads</accent>.",
@@ -1218,6 +1168,93 @@
       "errAlready": "Es ist bereits etwas vorgemerkt. Nehmen Sie das zuerst zurück.",
       "errSame": "Das ist bereits Ihr laufender Tarif.",
       "errFailed": "Das hat gerade nicht geklappt. Bitte noch einmal versuchen."
+    }
+  },
+  "partnerNotif": {
+    "hours_one": "{{count}} Stunde",
+    "hours_other": "{{count}} Stunden",
+    "minutes_one": "{{count}} Minute",
+    "minutes_other": "{{count}} Minuten",
+    "needsYou": "Braucht Sie",
+    "forInfo": "Zur Information",
+    "seeAll": "Alle Benachrichtigungen",
+    "empty": "Noch keine Benachrichtigungen. Buchungen, Abrechnung und Verifizierung erscheinen hier.",
+    "pageSubtitle": "Alles, was CompliHub360 Ihnen geschickt hat: Buchungen, Abrechnung, Verifizierung und Ihr Tarif.",
+    "chipAppointments": "Termine",
+    "chipVerification": "Verifizierung",
+    "chipPlan": "Tarif",
+    "goTo": "Öffnen",
+    "booking_created": {
+      "title": "Neue Buchung",
+      "body": "Ein Mandant hat ein Erstgespräch am {{slot}} gebucht. Das Dossier liegt bereit."
+    },
+    "appointment_reminder": {
+      "title": "Termin in {{offset}}",
+      "body": "Erstgespräch am {{slot}}."
+    },
+    "dispute_opened": {
+      "title": "Ein Mandant widerspricht Ihrer Meldung",
+      "body": "Zum Termin am {{slot}}. CompliHub360 prüft und meldet sich."
+    },
+    "dispute_resolved": {
+      "title": "Entscheidung zu einem Termin",
+      "body": "Termin am {{slot}}: {{label}}."
+    },
+    "performance_incident": {
+      "title": "Nicht wahrgenommener Termin vermerkt",
+      "body": "Für den Termin am {{slot}} ist Ihre Abwesenheit vermerkt. Das fließt in Ihre Performance ein."
+    },
+    "credit_issued": {
+      "title": "Guthaben gutgeschrieben",
+      "body": "{{amount}} aus einem nicht wahrgenommenen Termin. Es wird mit der nächsten Abo-Rechnung verrechnet."
+    },
+    "payment_failed": {
+      "title": "Lead-Belastung gescheitert",
+      "body": "Buchungen pausieren, bis Sie die Karte erneut prüfen oder eine andere hinterlegen. Sie bleiben sichtbar."
+    },
+    "invoice_retry_scheduled": {
+      "title": "Rechnung {{label}} ist fällig",
+      "body": "Ist sie morgen noch offen, versuchen wir die hinterlegte Karte. Ab {{deadline}} pausieren neue Buchungen, solange sie offen ist."
+    },
+    "subscription_scheduled": {
+      "title": "Tarifänderung vorgemerkt",
+      "body": "Gilt ab {{effectiveOn}}. Bis dahin können Sie sie zurücknehmen."
+    },
+    "subscription_schedule_done": {
+      "title": "Tarifänderung wirksam",
+      "body": "Ihr Tarif hat sich heute wie vorgemerkt geändert."
+    },
+    "verification_info_requested": {
+      "title": "Ein Nachweis fehlt noch",
+      "body": "Für die Prüfung brauchen wir einen weiteren Nachweis."
+    },
+    "verification_decided": {
+      "title": "Prüfung entschieden",
+      "body": "Es gibt eine Entscheidung. Unter Verifizierung sehen Sie das Ergebnis."
+    },
+    "verification_activated": {
+      "title": "Ihr Konto ist aktiv",
+      "body": "Unternehmen können Sie jetzt für die freigegebenen Leistungen finden und buchen."
+    },
+    "evidence_expiring": {
+      "title": "Nachweis läuft ab",
+      "body": "{{label}} läuft am {{deadline}} ab."
+    },
+    "decision": {
+      "lifted": "aufgehoben",
+      "upheld": "bestätigt"
+    },
+    "serial_no_show_alert": {
+      "title": "Zwei nicht wahrgenommene Termine in 90 Tagen",
+      "body": "Ein weiterer führt zu einer Buchungspause mit Einspruch. Ihr Profil bleibt sichtbar."
+    },
+    "booking_paused": {
+      "title": "Buchungspause nach drei Vorfällen",
+      "body": "Neue Buchungen sind pausiert, Ihr Profil bleibt sichtbar. Sie können einmal Einspruch einlegen — unter Performance."
+    },
+    "enforcement_decided": {
+      "title": "Ihr Einspruch wurde entschieden",
+      "body": "Entscheidung: {{decision}}. Die Einzelheiten stehen unter Performance."
     }
   },
   "overview": {

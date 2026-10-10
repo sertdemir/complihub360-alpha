@@ -18,7 +18,14 @@ const { db, resetDb } = vi.hoisted(() => {
 vi.mock('../supabase.js', () => ({
     supabaseApi: {
         async select(table: string, match: Record<string, any> = {}, opts: { order?: string; limit?: number } = {}) {
-            let rows = (db[table] ?? []).filter((r) => Object.entries(match).every(([k, v]) => r[k] === v));
+            // `spalte->>schluessel` ist der PostgREST-Weg in ein jsonb-Feld.
+            // Ohne das hier haette der Test den Filter still ignoriert — die
+            // Abfrage haette alles geliefert und die Pruefung nichts bewiesen.
+            let rows = (db[table] ?? []).filter((r) => Object.entries(match).every(([k, v]) => {
+                const json = /^([a-z_]+)->>(.+)$/.exec(k);
+                if (json) return (r[json[1]] ?? {})[json[2]] === v;
+                return r[k] === v;
+            }));
             if (opts.order) {
                 const [col, dir] = opts.order.split('.');
                 rows = [...rows].sort((a, b) => (a[col] < b[col] ? -1 : 1) * (dir === 'desc' ? -1 : 1));
@@ -927,6 +934,48 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(r.body.errorCode).toBe('RECHECK_LIMIT');
         expect(r.body.retry_after).toBeTruthy();
         expect(stripeMock.verifyPaymentMethod).toHaveBeenCalledTimes(3);
+    });
+
+    it('A2: eine Stripe-Stoerung verbraucht keine der drei Pruefungen', async () => {
+        // Nicht die Bank hat geantwortet, sondern unsere Seite ist ausgefallen
+        // (Netz, oder `setup_intents: write` fehlt am Restricted Key). Wer das
+        // mitzaehlt, laesst den Anbieter fuer einen Ausfall bezahlen, fuer den
+        // er nichts kann — und im schlimmsten Fall mit allen drei auf einmal.
+        gesperrt();
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'stripe', reason: 'stripe_error', detail: 'network down' });
+        for (let i = 0; i < 3; i++) expect((await recheck()).status).toBe(502);
+        expect((db.event_log ?? []).filter((e: any) => e.type === 'payment_method_recheck')).toHaveLength(0);
+        expect(db.providers[0].last_payment_failure).toBeTruthy();
+
+        // Und danach stehen alle drei noch zur Verfuegung.
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', detail: 'x' });
+        for (let i = 0; i < 3; i++) expect((await recheck()).status).toBe(200);
+        expect((await recheck()).status).toBe(429);
+    });
+
+    it('A2: die Pruefungen FREMDER Anbieter zaehlen nicht auf das eigene Kontingent', async () => {
+        // Gezaehlt wurde ueber die juengsten 200 Zeilen dieses Typs — ueber ALLE
+        // Anbieter. Liegen mehr als 200 neuere im Fenster, fallen die eigenen aus
+        // der Sicht und die Grenze greift nicht mehr. Der Fehler zeigt nach OBEN,
+        // also ins Offene: genau die Richtung, die man nie bemerkt.
+        gesperrt();
+        const vorStunden = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+        db.event_log ??= [];
+        // Die drei eigenen Versuche: im Fenster, aber AELTER als alles andere.
+        for (let i = 0; i < 3; i++) {
+            const t = vorStunden(5 + i);
+            db.event_log.push({ id: randomUUID(), type: 'payment_method_recheck', timestamp: t, payload: { providerKey: 'test-kanzlei', at: t, ok: false, reason: 'card_declined' } });
+        }
+        // 250 fremde, alle juenger — sie schieben die eigenen aus den ersten 200.
+        for (let i = 0; i < 250; i++) {
+            const t = vorStunden(1 + i / 3600);
+            db.event_log.push({ id: randomUUID(), type: 'payment_method_recheck', timestamp: t, payload: { providerKey: `fremde-kanzlei-${i}`, at: t, ok: false, reason: 'card_declined' } });
+        }
+        const r = await recheck();
+        expect(r.status).toBe(429);
+        expect(r.body.errorCode).toBe('RECHECK_LIMIT');
+        // Nichts gefragt: das Kontingent war aufgebraucht, bevor Stripe drankam.
+        expect(stripeMock.verifyPaymentMethod).not.toHaveBeenCalled();
     });
 
     it('A2: ohne Sperre oder mit anderem Mittel wird nichts geprueft, nur neu berechnet', async () => {
@@ -2144,6 +2193,26 @@ describe('GET /api/v1/notifications', () => {
         const r = await api('/api/v1/notifications', { auth: 'jwt' });
         expect(r.body.notifications).toHaveLength(1);
         expect(r.body.unread).toBe(1);
+    });
+
+    it('Partner-Glocke: needs_action folgt der Lage, nicht dem Lesen', async () => {
+        seedProvider({ billing_block_reasons: ['payment_failed'], lifecycle_status: 'active' });
+        (db.invoices ??= []).push({ id: 'inv-x', provider_key: 'test-kanzlei', invoice_number: 'INV-0012', status: 'open' });
+        const pf = seedNotification({ type: 'payment_failed', subject: 'provider', subject_id: 'test-kanzlei', payload: { providerKey: 'test-kanzlei' }, read_at: new Date().toISOString() });
+        const ir = seedNotification({ type: 'invoice_retry_scheduled', subject: 'provider', subject_id: 'test-kanzlei', payload: { providerKey: 'test-kanzlei', label: 'INV-0012' } });
+        const vi = seedNotification({ type: 'verification_info_requested', subject: 'provider', subject_id: 'test-kanzlei', payload: { providerKey: 'test-kanzlei' } });
+        const bc = seedNotification({ type: 'booking_created', subject: 'booking', payload: { providerKey: 'test-kanzlei' } });
+        const byId = async () => Object.fromEntries((await api('/api/v1/notifications', { auth: 'jwt' })).body.notifications.map((n: any) => [n.id, n.needs_action]));
+        let m = await byId();
+        expect(m[pf.id]).toBe(true);           // gelesen, aber die Sperre steht noch
+        expect(m[ir.id]).toBe(true);
+        expect(m[vi.id]).toBe(false);          // Status ist nicht more_info_required
+        expect(m[bc.id]).toBe(false);          // Information, nie handlungsbeduerftig
+        db.providers[0].billing_block_reasons = [];
+        db.invoices.find((i: any) => i.id === 'inv-x').status = 'paid';
+        m = await byId();
+        expect(m[pf.id]).toBe(false);
+        expect(m[ir.id]).toBe(false);
     });
 
     it('gibt ohne Anmeldung nichts heraus — auch nicht dem Server-Key', async () => {
@@ -3737,12 +3806,15 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
     it('Neubuchung in der Frist: neue Zeile am selben Lead, keine zweite Gebuehr, Frist erledigt', async () => {
         seedProvider(); seedMember();
         const ledger = seedLedger();
-        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13), lead_ledger_id: ledger.id, acknowledgement_version: 'booking-ack-v1', shared_fields: ['email', 'company_name', 'message'] });
+        const snap = { email: 'test@complihub.test', company_name: 'Profilfirma GmbH', message: null, topic: { area_code: 'tax-vat', countries: ['DE'] } };
+        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13), lead_ledger_id: ledger.id, acknowledgement_version: 'booking-ack-v1', shared_fields: ['email', 'company_name', 'message'], shared_snapshot: snap });
         const target = future(3);
         const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: target }) });
         expect(r.status).toBe(201);
         expect(r.body).toMatchObject({ status: 'confirmed', slot_start: target, rebooked_from: b.id });
         const neu = db.scheduling.find((x) => x.id === r.body.id);
+        // Schritt 4 (Pruefung H1): die Neubuchung teilt dasselbe, was bestaetigt wurde.
+        expect(neu.shared_snapshot).toEqual(snap);
         expect(neu).toMatchObject({ status: 'confirmed', lead_ledger_id: ledger.id, rebooked_from: b.id, lead_charged: false, acknowledgement_version: 'booking-ack-v1' });
         expect(db.scheduling[0].credit_decided_at).toBeTruthy();
         expect(db.provider_lead_ledger).toHaveLength(1);
@@ -3844,6 +3916,24 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         expect(user.body.bookings[0]).toMatchObject({ no_show_by: 'user', dispute_status: 'none', rebook_deadline: dayStr(13), rebook_open: true });
         expect(user.body.bookings[0].dispute_open_until).toBeTruthy();
         expect(JSON.stringify(user.body)).not.toMatch(/fee|band|ledger|credit/i);
+    });
+
+    it('Monatslauf mit provider-Filter rechnet nur diesen Anbieter ab', async () => {
+        seedProvider({ billing_ready: true }); seedPricing();
+        seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        seedSubscription('andere-kanzlei', 'essential', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        const body = (extra: object) => JSON.stringify({ period: new Date().toISOString().slice(0, 7), dry_run: true, ...extra });
+        const alle = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: body({}) });
+        expect(alle.body.results.map((r: any) => r.provider).sort()).toEqual(['andere-kanzlei', 'test-kanzlei']);
+        const einer = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: body({ provider: 'test-kanzlei' }) });
+        expect(einer.body).toMatchObject({ only_provider: 'test-kanzlei', providers: 1 });
+        expect(einer.body.results.map((r: any) => r.provider)).toEqual(['test-kanzlei']);
+        const kaputt = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: body({ provider: 'DROP TABLE' }) });
+        expect(kaputt.status).toBe(400);
+        // Vertippt (dahlman statt dahlmann): rot statt „0 Anbieter, nichts abgerechnet".
+        const vertippt = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: body({ provider: 'test-kanzle' }) });
+        expect(vertippt.status).toBe(404);
+        expect(vertippt.body.errorCode).toBe('PROVIDER_NOT_FOUND');
     });
 
     it('Monatslauf verrechnet Guthaben bis zur Rechnungssumme (dry_run) und zeigt es in der Vorschau', async () => {
@@ -4128,5 +4218,218 @@ describe('Kalender: Nylas Hosted Auth', () => {
         expect(res.status).toBe(200);
         expect(nylasAuthMock.revokeGrant).toHaveBeenCalledWith('grant-1');
         expect(db.providers[0]).toMatchObject({ nylas_grant_id: null, nylas_calendar_id: null });
+    });
+});
+
+// ─── Pausiert = nicht in neuen Ergebnissen, nicht buchbar (Canvas C2, 10.10.2026)
+// Bis hierher versprach die Oberflaeche „umgeleitet, Ranking eingefroren",
+// der Server liess den Anbieter sichtbar und buchbar und halbierte seinen Rang.
+// Jetzt gilt das Versprechen: raus aus Suche, Slots und Buchung — ohne Abzug.
+describe('availability = ooo — pausiert', () => {
+    const suche = () => api('/api/v1/search', {
+        method: 'POST',
+        body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+    });
+
+    it('fehlt in /search; die Gegenprobe ohne Pause erscheint', async () => {
+        seedProvider({ provider_key: 'pausiert', availability: 'ooo' });
+        seedProvider({ provider_key: 'da', availability: 'available' });
+        const r = await suche();
+        expect(r.status).toBe(200);
+        expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('da')]);
+    });
+
+    it('kommt nach dem Fortsetzen mit unveraendertem Rang zurueck — kein Abzug', async () => {
+        // Phase 6 (ADR-0009): das Ranking liest die Bewertung aus verifizierten
+        // Reviews nach Buchung, nicht aus der Spalte — und erst ab fuenf. Der
+        // Unterschied steht deshalb in den Reviews, nicht in `rating`.
+        seedProvider({ provider_key: 'schwaecher', rating: null });
+        const staerker = seedProvider({ provider_key: 'staerker', rating: null, availability: 'ooo' });
+        const gestern = new Date(Date.now() - 86_400_000).toISOString();
+        for (let i = 0; i < 5; i++) {
+            (db.reviews ??= []).push({ id: randomUUID(), provider_key: 'staerker', from_role: 'user', to_role: 'provider', verified: true, booking_id: randomUUID(), rating: 5, created_at: gestern });
+            db.reviews.push({ id: randomUUID(), provider_key: 'schwaecher', from_role: 'user', to_role: 'provider', verified: true, booking_id: randomUUID(), rating: 3, created_at: gestern });
+        }
+        expect((await suche()).body.providers).toHaveLength(1);
+        staerker.availability = 'available';
+        const r = await suche();
+        expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('staerker'), refOf('schwaecher')]);
+    });
+
+    it('liefert keine Slots, die Gegenprobe ohne Pause schon', async () => {
+        seedProvider({ availability: 'ooo' });
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body).toMatchObject({ slots: [], paused: true });
+        db.providers[0].availability = 'available';
+        const frei = await api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' });
+        expect(frei.body.slots.length).toBeGreaterThan(0);
+        expect(frei.body.paused).toBeUndefined();
+    });
+
+    it('Buchung: 409 PROVIDER_PAUSED, keine Belastung, keine Buchung', async () => {
+        const { session } = seedBookable({ availability: 'ooo' });
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(409);
+        expect(r.body.errorCode).toBe('PROVIDER_PAUSED');
+        expect(JSON.stringify(r.body)).not.toMatch(/Testkanzlei|provider_key/);
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+        expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+        expect(db.scheduling ?? []).toHaveLength(0);
+    });
+});
+
+// ─── Privacy Critical Acceptance Tests (Checklist v1.0, EN-Launch Schritt 4) ─
+// Je Test die Nummer der Checkliste. #1 und #7 belegt "Anonymitaet auf dem
+// Draht" oben, #6 die Fehlerzweige der Buchung, #5 gibt es erst mit dem
+// Feature "Alternative available". Hier: was am 10.10.2026 fehlte.
+describe('Privacy Critical Tests (Checklist v1.0)', () => {
+    const asUser = (jwt: string, path: string, init: RequestInit = {}) =>
+        api(path, { ...init, auth: 'none', headers: { authorization: `Bearer ${jwt}`, ...(init.headers as any) } });
+    const PROFILE_JWT = signJwt({ sub: USER_ID, email: 'test@complihub.test', user_metadata: { company_name: 'Profilfirma GmbH' } });
+    const settle = () => new Promise((r) => setTimeout(r, 20));
+    const denied = () => (db.event_log ?? []).filter((e) => e.type === 'access_denied');
+
+    it('#2 vor der Buchung: Website-Link 403, das Detail anonym — und der Versuch steht im Log', async () => {
+        seedProvider();
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/website`, { auth: 'jwt' });
+        expect(r.status).toBe(403);
+        const d = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'jwt' });
+        expect(d.body.detail.revealed).toBe(false);
+        expect(JSON.stringify(d.body)).not.toMatch(/Testkanzlei|testkanzlei-schmidt|geheim@/);
+        await settle();
+        expect(denied()).toEqual([expect.objectContaining({ payload: expect.objectContaining({ resource: 'provider_reveal', userId: USER_ID, status: 403 }) })]);
+    });
+
+    it('#3 nach der Buchung: der Buchende sieht das Profil offen, ein anderer weiter anonym (A1)', async () => {
+        const { invalidateVisibility } = await import('../anonymity.js');
+        invalidateVisibility();
+        (db.provider_field_visibility ??= []).push(
+            { field_path: 'providers.name', visibility_class: 'revealed' },
+            { field_path: 'providers.website_url', visibility_class: 'revealed' },
+            { field_path: 'providers.contact_email', visibility_class: 'revealed' },
+        );
+        seedProvider({ work_mode: 'Remote, Kontakt: geheim@testkanzlei.example' });
+        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: inAWeek(), slot_end: inAWeek(), status: 'confirmed', identity_revealed: true });
+        const own = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'jwt' });
+        expect(own.body.detail).toMatchObject({ revealed: true, name: 'Testkanzlei Schmidt GmbH', website_url: 'https://testkanzlei-schmidt.example', contact_email: 'geheim@testkanzlei.example', work_mode: 'Remote, Kontakt: geheim@testkanzlei.example' });
+        const fremd = await asUser(signJwt({ sub: randomUUID(), email: 'x@y.example' }), `/api/v1/p/${refOf('test-kanzlei')}/detail`);
+        expect(fremd.body.detail.revealed).toBe(false);
+        expect(JSON.stringify(fremd.body)).not.toMatch(/Testkanzlei|testkanzlei-schmidt|geheim@/);
+        invalidateVisibility();
+    });
+
+    it('#4 mehrere Treffer, eine Buchung: nur der gebuchte Anbieter erfaehrt davon', async () => {
+        const { session } = seedBookable();
+        const OTHER_MEMBER = randomUUID();
+        seedProvider({ provider_key: 'andere-kanzlei', name: 'Andere Kanzlei AG', contact_email: 'andere@kanzlei.example' });
+        seedMember('andere-kanzlei', OTHER_MEMBER);
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(201);
+        await settle();
+        expect(db.scheduling.map((b) => b.provider_key)).toEqual(['test-kanzlei']);
+        expect((db.notifications ?? []).every((n) => n.user_id === MEMBER_ID)).toBe(true);
+        const mails = (db.event_log ?? []).filter((e) => e.type === 'email_outbox');
+        expect(mails.length).toBeGreaterThan(0);
+        expect(JSON.stringify(mails)).not.toMatch(/andere-kanzlei|andere@kanzlei/);
+        expect(JSON.stringify(db.notifications ?? [])).not.toContain(OTHER_MEMBER);
+    });
+
+    it('#6 Belastung abgelehnt: keine Nutzerdaten in Mitteilung, Mail oder Ereignis', async () => {
+        const { session } = seedBookable();
+        stripeMock.createPaymentIntent.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', stripeRef: 'pi_fail', detail: 'generic_decline' });
+        const r = await asUser(PROFILE_JWT, '/api/v1/scheduling', { method: 'POST', body: JSON.stringify(standardBody(session, { message: 'Geheime Nachricht' })) });
+        expect(r.status).toBe(409);
+        await settle();
+        const spur = JSON.stringify({ n: db.notifications ?? [], e: db.event_log ?? [] });
+        expect(spur).not.toMatch(/test@complihub\.test|Profilfirma|Geheime Nachricht/);
+        expect(db.scheduling ?? []).toHaveLength(0);
+    });
+
+    it('#8 fremde Buchung und fremde Sitzung: abgewiesen und protokolliert; eine unbekannte ID nicht', async () => {
+        seedProvider();
+        const fremdeBuchung = randomUUID();
+        (db.scheduling ??= []).push({ id: fremdeBuchung, provider_key: 'test-kanzlei', user_id: randomUUID(), slot_start: inAWeek(), slot_end: inAWeek(), status: 'confirmed', identity_revealed: true });
+        const b = await api(`/api/v1/scheduling/${fremdeBuchung}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'cancelled' }) });
+        expect(b.status).toBe(403);
+        const fremdeSitzung = seedSession({ user_id: randomUUID() });
+        const s = await api(`/api/v1/session/${fremdeSitzung.id}/obligations`, { auth: 'jwt' });
+        expect(s.status).toBe(404);
+        const unbekannt = await api(`/api/v1/session/${randomUUID()}/obligations`, { auth: 'jwt' });
+        expect(unbekannt.status).toBe(404);
+        await settle();
+        const log = denied().map((e) => e.payload);
+        expect(log).toEqual([
+            expect.objectContaining({ resource: 'booking', target: fremdeBuchung, status: 403, userId: USER_ID }),
+            expect.objectContaining({ resource: 'session', target: fremdeSitzung.id, status: 404, userId: USER_ID }),
+        ]);
+        // Keine E-Mail, kein Name im Protokoll.
+        expect(JSON.stringify(log)).not.toMatch(/@|Testkanzlei/);
+    });
+
+    it('#9 Datenminimierung: der Dialog zeigt, die Buchung haelt fest, der Anbieter liest dieselben Werte (B1)', async () => {
+        const { session } = seedBookable();
+        // Eine aeltere Anfrage nennt eine ANDERE Firma — bis B1 hat der Anbieter diese gesehen.
+        (db.engagement_requests ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, category: 'tax-vat', country: 'DE', structured_answers: { company: 'Anfragefirma KG' }, created_at: '2026-09-30T08:00:00Z' });
+        const ack = await asUser(PROFILE_JWT, '/api/v1/acknowledgement?lang=en');
+        expect(ack.body.shared_preview).toEqual({ email: 'test@complihub.test', company_name: 'Profilfirma GmbH' });
+        const r = await asUser(PROFILE_JWT, '/api/v1/scheduling', { method: 'POST', body: JSON.stringify(standardBody(session)) });
+        expect(r.status).toBe(201);
+        const snap = { email: 'test@complihub.test', company_name: 'Profilfirma GmbH', message: 'Erstgespräch', topic: { area_code: 'tax-vat', countries: ['DE'] } };
+        expect(r.body.booking.shared_snapshot).toEqual(snap);
+        expect(db.scheduling[0].shared_snapshot).toEqual(snap);
+        (db.users ??= []).push({ id: USER_ID, email: 'test@complihub.test' });
+        const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+        const p = await asUser(memberJwt, '/api/v1/provider/test-kanzlei/bookings');
+        expect(p.status).toBe(200);
+        expect(p.body.bookings[0]).toMatchObject({ user_email: 'test@complihub.test', user_company: 'Profilfirma GmbH', message: 'Erstgespräch' });
+        expect(JSON.stringify(p.body.bookings[0])).not.toContain('Anfragefirma');
+    });
+
+    it('#8 Anfrage-Thread: nur Ersteller und Anbieter-Mitglieder, und jeder nur als die eigene Seite', async () => {
+        seedProvider(); seedMember();
+        const engId = randomUUID();
+        (db.engagement_requests ??= []).push({ id: engId, provider_key: 'test-kanzlei', user_id: randomUUID(), category: 'tax-vat', country: 'DE', structured_answers: { company: 'Fremde Firma' }, created_at: '2026-10-01T08:00:00Z' });
+        // Ein fremder Nutzer liest nicht und schreibt nicht — auch nicht als "provider".
+        const lesen = await api(`/api/v1/engagement/${engId}`, { auth: 'jwt' });
+        expect(lesen.status).toBe(404);
+        expect(JSON.stringify(lesen.body)).not.toContain('Fremde Firma');
+        const schreiben = await api(`/api/v1/engagement/${engId}/message`, { method: 'POST', auth: 'jwt', body: JSON.stringify({ author: 'provider', body: 'Hallo' }) });
+        expect(schreiben.status).toBe(404);
+        expect(db.engagement_messages ?? []).toHaveLength(0);
+        // Das Mitglied des Anbieters liest und schreibt als Anbieter, nicht als Nutzer.
+        const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}`)).status).toBe(200);
+        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'user', body: 'x' }) })).status).toBe(404);
+        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'provider', body: 'Antwort' }) })).status).toBe(201);
+        await settle();
+        expect(denied().map((e) => e.payload.resource)).toEqual(['engagement', 'engagement', 'engagement']);
+    });
+
+    it('#8 Anbieter-Bereich: protokolliert nur, wenn es den Anbieter gibt', async () => {
+        seedProvider();
+        expect((await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'jwt' })).status).toBe(404);
+        expect((await api('/api/v1/provider/gibt-es-nicht/bookings', { auth: 'jwt' })).status).toBe(404);
+        await settle();
+        expect(denied().map((e) => e.payload.target)).toEqual(['test-kanzlei']);
+    });
+
+    it('#3 Detail mit Server-Key ohne Nutzer: anonym, kein Fehler (Pruefung M1)', async () => {
+        seedProvider();
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'key' });
+        expect(r.status).toBe(200);
+        expect(r.body.detail.revealed).toBe(false);
+    });
+
+    it('#10 Nachweis: Nutzer, Anbieter, Felder, Bestaetigung und Zeit stehen an der Buchung und im Ereignis', async () => {
+        const { session } = seedBookable();
+        const r = await asUser(PROFILE_JWT, '/api/v1/scheduling', { method: 'POST', body: JSON.stringify(standardBody(session)) });
+        expect(r.status).toBe(201);
+        const row = db.scheduling[0];
+        expect(row).toMatchObject({ user_id: USER_ID, provider_key: 'test-kanzlei', shared_fields: ['email', 'company_name', 'message'], acknowledgement_version: 'booking-ack-v1' });
+        expect(Date.parse(row.sharing_confirmed_at)).not.toBeNaN();
+        expect(row.shared_snapshot).toBeTruthy();
+        const ev = db.event_log.find((e) => e.type === 'lead.revealed');
+        expect(ev.payload).toMatchObject({ bookingId: row.id, sharedFields: ['email', 'company_name', 'message'] });
     });
 });

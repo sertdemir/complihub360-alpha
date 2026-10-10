@@ -1,172 +1,243 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Tag } from '../../components/ui/Tag';
 import { Banner } from '../../components/ui/Banner';
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 import { ChangeEmailDrawer } from '../../components/provider/ChangeEmailDrawer';
 import { CalendarPanel } from '../../components/provider/CalendarPanel';
 import { AvailabilityPanel } from '../../components/provider/AvailabilityPanel';
-import { fetchCoverage, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
+import { InboxAddress } from '../../components/contact/SendStates';
+import { AVAILABILITY_EVENT, fetchCoverage, setAvailability, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
+import { fetchApplication } from '../../api/application';
+import { CONTACT_INBOX, failureOf, sendContact, type SendFailure } from '../../api/contact';
 import { identityHintFrom } from '../../api/client';
 import { Input } from '../../components/ui/Input';
 import { FilterChip } from '../../components/ui/Badge';
 
 // ─── Provider /settings ───────────────────────────────────────────────────────
-// Mirrors "Provider · /settings (Desktop)": settings section list (Profile
-// active) + the Profile → Public-identity detail panel. Fixture data.
+// Canvas „Partner-Einstellungen ehrlich", Wahl 10.10.2026: A1 · B2 · C2 · D1.
+// Figma: Screens-Datei, Seite „Partner-Einstellungen ehrlich (A1 · B2 · C2 · D1)",
+// 3662:561. Bis hierher stand hier, was nicht stimmte: Firmierung, Bio und
+// Avatar fest im Code, ein Menue mit vier Abschnitten, die es nicht gab,
+// „Pausieren" nur im Browser und „Loeschen", nach dem nichts geschah.
+//
+// A1 · das Menue springt nur auf Abschnitte, die es gibt.
+// B2 · „Nach der Buchung sichtbar": Firmierung und Website aus der Bewerbung —
+//      vor der Buchung ist der Anbieter anonym (Matchmaking-Vorschau).
+// C2 · Pausieren schaltet denselben Zustand wie die Kopfzeile (availability).
+//      Der Server nimmt Pausierte aus Suche, Slots und Buchung, ohne Rangabzug.
+// D1 · „Loeschung anfragen" geht als Nachricht an unser Postfach.
 
 const SECTIONS = [
-  { key: 'matchmaking', titleKey: 'settings.sectionMatchmaking', subKey: 'settings.sectionMatchmakingSub' },
-  { key: 'profile', titleKey: 'settings.sectionProfile', subKey: 'settings.sectionProfileSub' },
-  { key: 'security', titleKey: 'settings.sectionSecurity', subKey: 'settings.sectionSecuritySub' },
-  { key: 'notifications', titleKey: 'settings.sectionNotifications', subKey: 'settings.sectionNotificationsSub' },
-  { key: 'integrations', titleKey: 'settings.sectionIntegrations', subKey: 'settings.sectionIntegrationsSub' },
-  { key: 'team', titleKey: 'settings.sectionTeam', subKey: 'settings.sectionTeamSub' },
-  { key: 'workspace', titleKey: 'settings.sectionWorkspace', subKey: 'settings.sectionWorkspaceSub' },
-];
+  { id: 'calendar', labelKey: 'settings.navCalendar' },
+  { id: 'matchmaking', labelKey: 'settings.navMatchmaking' },
+  { id: 'after-booking', labelKey: 'settings.navAfterBooking' },
+  { id: 'contact-email', labelKey: 'settings.navContactEmail' },
+  { id: 'availability', labelKey: 'settings.navAvailability' },
+  { id: 'workspace', labelKey: 'settings.navWorkspace' },
+] as const;
+
+const anchor = (id: string) => `settings-${id}`;
+
+function SectionCard({ id, title, body, children }: { id: string; title: string; body?: string; children?: ReactNode }) {
+  return (
+    <Card id={anchor(id)} styleVariant="filled" className="scroll-mt-6 space-y-3 p-5">
+      <div>
+        <h2 className="text-[15px] font-semibold text-fg">{title}</h2>
+        {body && <p className="mt-1 max-w-2xl text-body-sm leading-relaxed text-fg-secondary">{body}</p>}
+      </div>
+      {children}
+    </Card>
+  );
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5">
+      <span className="w-28 shrink-0 text-[12px] text-fg-tertiary">{label}</span>
+      <span className="min-w-0 break-words text-body-sm text-fg">{value || '—'}</span>
+    </div>
+  );
+}
 
 export function SettingsPage() {
-  const { t } = useTranslation('providerws');
-  // B9: destructive workspace actions run through the Confirm drawer.
+  const { t, i18n } = useTranslation('providerws');
+  const locale = i18n.resolvedLanguage || 'en';
+  const navigate = useNavigate();
   const [confirm, setConfirm] = useState<ConfirmSpec | null>(null);
-  const [paused, setPaused] = useState(false);
-  // B8: live contact address + change drawer (verify-first).
+  const [active, setActive] = useState<string>('calendar');
   const [emailOpen, setEmailOpen] = useState(false);
   // Kein Platzhalter: bis die API antwortet, steht hier ein Strich — nie die
   // Adresse eines anderen Anbieters (bis 09.10.2026 die Fixture-Adresse).
   const [contactEmail, setContactEmail] = useState('');
-  // Phase 6: der Name und die Profilzeile kommen aus der Anbieter-Zeile — bis
-  // 10.10.2026 stand hier fest „Schmidt & Partner" mit erfundener Kurzbeschreibung,
-  // egal wer angemeldet war. Ohne Antwort steht ein Strich, nie ein fremder Name.
-  const [profile, setProfile] = useState<{ name: string | null; region: string | null; activeSince: number | null; languages: string[] }>({ name: null, region: null, activeSince: null, languages: [] });
+  const [availability, setAvail] = useState<'available' | 'ooo' | null>(null);
+  const [availFailed, setAvailFailed] = useState(false);
+  const [identity, setIdentity] = useState<{ key: string; name: string; website: string } | null>(null);
+  const [identityFailed, setIdentityFailed] = useState(false);
+  const [identityAttempt, setIdentityAttempt] = useState(0);
+  const [deletion, setDeletion] = useState<'idle' | 'sent' | SendFailure>('idle');
+
   useEffect(() => {
     fetchCoverage().then((c) => {
       if (c.contact_email) setContactEmail(c.contact_email);
-      setProfile({ name: c.name ?? null, region: c.region ?? null, activeSince: c.active_since ?? null, languages: c.languages ?? [] });
+      setAvail(c.availability ?? 'available');
     }).catch(() => {});
+    // Die Kopfzeile schaltet denselben Zustand — beide Stellen zeigen dasselbe.
+    const onSync = (e: Event) => setAvail((e as CustomEvent<'available' | 'ooo'>).detail);
+    window.addEventListener(AVAILABILITY_EVENT, onSync);
+    return () => window.removeEventListener(AVAILABILITY_EVENT, onSync);
   }, []);
-  const initials = (profile.name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join('') || '·';
-  const profileLine = [profile.region, profile.activeSince ? t('settings.activeSinceLine', { year: profile.activeSince }) : null, profile.languages.length ? profile.languages.map((l) => l.toUpperCase()).join(', ') : null].filter(Boolean).join(' · ');
+
+  useEffect(() => {
+    let cancelled = false;
+    setIdentityFailed(false);
+    fetchApplication()
+      .then((a) => { if (!cancelled) setIdentity({ key: a.provider.provider_key, name: a.provider.name ?? '', website: a.provider.website_url ?? '' }); })
+      .catch(() => { if (!cancelled) setIdentityFailed(true); });
+    return () => { cancelled = true; };
+  }, [identityAttempt]);
+
+  const jump = (id: string) => {
+    setActive(id);
+    document.getElementById(anchor(id))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const switchAvailability = (next: 'available' | 'ooo') => {
+    const pausing = next === 'ooo';
+    setConfirm({
+      title: t(pausing ? 'settings.pauseConfirmTitle' : 'settings.resumeConfirmTitle'),
+      consequence: t(pausing ? 'settings.pauseConfirmConsequence' : 'settings.resumeConfirmConsequence'),
+      confirmLabel: t(pausing ? 'settings.pauseConfirmLabel' : 'settings.resumeConfirmLabel'),
+      onConfirm: async () => {
+        setAvailFailed(false);
+        try {
+          await setAvailability(next);
+          setAvail(next);
+        } catch {
+          // Kein stilles Zuruecksetzen: der Status bleibt, und das steht da.
+          setAvailFailed(true);
+        }
+      },
+    });
+  };
+
+  const requestDeletion = () => setConfirm({
+    title: t('settings.deleteConfirmTitle'),
+    consequence: t('settings.deleteConfirmConsequence'),
+    confirmLabel: t('settings.deleteConfirmLabel'),
+    onConfirm: async () => {
+      try {
+        await sendContact({
+          lane: 'privacy',
+          locale,
+          name: identity?.name || identity?.key || '—',
+          email: contactEmail,
+          message: `Workspace-Loeschung angefragt (Partner-Einstellungen). Anbieter-Schluessel: ${identity?.key ?? 'unbekannt'}`,
+        });
+        setDeletion('sent');
+      } catch (err) {
+        setDeletion(failureOf(err));
+      }
+    },
+  });
+
+  const paused = availability === 'ooo';
+  const deletionFailed = deletion !== 'idle' && deletion !== 'sent';
+
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-6">
         <div>
           <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">{t('settings.title')}</h1>
-          <p className="mt-1 max-w-3xl text-body-sm leading-relaxed text-fg-secondary">
-            {t('settings.subtitle')}
-          </p>
+          <p className="mt-1 max-w-3xl text-body-sm leading-relaxed text-fg-secondary">{t('settings.subtitle')}</p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[300px,1fr]">
-          <div className="space-y-2">
-            {SECTIONS.map((s, i) => (
-              <Card key={s.key} styleVariant={i === 0 ? 'outlined' : 'filled'} interactive selected={i === 0} className="px-4 py-3">
-                <p className={i === 0 ? 'text-[13px] font-semibold text-fg-brand' : 'text-[13px] font-semibold text-fg'}>{t(s.titleKey)}</p>
-                <p className="mt-0.5 text-[11px] text-fg-tertiary">{t(s.subKey)}</p>
-              </Card>
-            ))}
-          </div>
+        <div className="grid gap-6 lg:grid-cols-[200px,1fr]">
+          <nav aria-label={t('settings.navLabel')} className="lg:sticky lg:top-6 lg:self-start">
+            <ul className="flex flex-wrap gap-1 lg:flex-col lg:gap-0.5">
+              {SECTIONS.map((s) => (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    onClick={() => jump(s.id)}
+                    aria-current={active === s.id ? 'true' : undefined}
+                    className={active === s.id
+                      ? 'w-full rounded-lg bg-brand-light px-3 py-2 text-left text-body-sm font-semibold text-fg'
+                      : 'w-full rounded-lg px-3 py-2 text-left text-body-sm text-fg-secondary hover:bg-elevate/5 hover:text-fg'}
+                  >
+                    {t(s.labelKey)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-          <div className="space-y-5">
+          <div className="min-w-0 max-w-[760px] space-y-5">
             {/* Kalender (Canvas A1): eigene Karte oben — der Rueckweg von Nylas landet hier. */}
-            <CalendarPanel onConfirm={setConfirm} />
-            {/* Phase 6 (Canvas 3B): buchbare Fenster je Wochentag, Zeitzone. */}
-            <AvailabilityPanel />
-            <MatchmakingPanel />
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-[15px] font-semibold text-fg">{t('settings.publicIdentityTitle')}</h2>
-                <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('settings.publicIdentitySub')}</p>
-              </div>
-            </div>
+            <div id={anchor('calendar')} className="scroll-mt-6"><CalendarPanel onConfirm={setConfirm} /></div>
+            <div id={anchor('matchmaking')} className="scroll-mt-6"><MatchmakingPanel /></div>
 
-            <Card styleVariant="filled" className="flex items-center gap-4 p-4">
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-accent text-[13px] font-bold text-fg-on-accent">{initials}</span>
-              <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-medium text-fg">{t('settings.avatarTitle')}</p>
-                <p className="mt-0.5 text-[11px] text-fg-tertiary">{t('settings.avatarSpec')}</p>
-              </div>
-              <Button size="sm" variant="secondary">{t('settings.replace')}</Button>
-            </Card>
-
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('settings.legalName')}</p>
-              <div className="mt-1.5 flex items-center gap-2.5">
-                <p className="text-[14px] font-medium text-fg" data-testid="legal-name">{profile.name ?? '—'}</p>
-                <Tag tone="neutral">{t('settings.lockedTag')}</Tag>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('settings.bioLabel')}</p>
-              <Card styleVariant="filled" className="mt-1.5 p-4">
-                <p className="text-[13px] leading-relaxed text-fg-secondary">{profileLine || t('settings.bioEmpty')}</p>
-              </Card>
-            </div>
-
-            <div className="space-y-2">
-              <div>
-                <h3 className="text-[14px] font-semibold text-fg">{t('settings.contactEmailTitle')}</h3>
-                <p className="mt-0.5 max-w-xl text-[12px] leading-relaxed text-fg-tertiary">
-                  {t('settings.contactEmailBody')}
-                </p>
-              </div>
-              <Card styleVariant="filled" className="flex items-center gap-3 p-4">
-                <p className="text-[13px] font-medium text-fg">{contactEmail || '—'}</p>
-                <div className="ml-auto">
-                  <Button size="sm" variant="secondary" onClick={() => setEmailOpen(true)}>{t('settings.changeEmail')}</Button>
+            {/* B2: erst nach der Buchung sichtbar, aus der Bewerbung. */}
+            <SectionCard id="after-booking" title={t('settings.afterBookingTitle')} body={t('settings.afterBookingBody')}>
+              {identityFailed ? (
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-body-sm text-fg-secondary">{t('settings.afterBookingFailed')}</span>
+                  <Button size="sm" variant="ghost" onClick={() => setIdentityAttempt((n) => n + 1)}>{t('common:states.actions.tryAgain')}</Button>
                 </div>
-              </Card>
-            </div>
-
-            {/* B9: Workspace danger zone — every action guarded by ConfirmDrawer */}
-            <div className="space-y-3">
-              <div>
-                <h2 className="text-[15px] font-semibold text-fg">{t('settings.workspaceTitle')}</h2>
-                <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('settings.workspaceSub')}</p>
-              </div>
-              {paused && (
-                <Banner status="brand" title={t('settings.pausedBannerTitle')} action={<Button size="sm" variant="secondary" onClick={() => setPaused(false)}>{t('settings.resume')}</Button>}>
-                  {t('settings.pausedBannerBody')}
-                </Banner>
+              ) : (
+                <div className="space-y-1.5">
+                  <Field label={t('settings.legalName')} value={identity?.name ?? ''} />
+                  <Field label={t('settings.websiteLabel')} value={identity?.website ?? ''} />
+                </div>
               )}
-              <Card styleVariant="filled" className="divide-y divide-elevate/5 p-0">
-                <div className="flex items-center gap-3 px-4 py-3.5">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-fg">{t('settings.pauseTitle')}</p>
-                    <p className="mt-0.5 text-[11px] text-fg-tertiary">{t('settings.pauseSub')}</p>
-                  </div>
-                  <Button size="sm" variant="secondary" disabled={paused}
-                    onClick={() => setConfirm({
-                      title: t('settings.pauseConfirmTitle'),
-                      consequence: t('settings.pauseConfirmConsequence'),
-                      confirmLabel: t('settings.pauseConfirmLabel'),
-                      onConfirm: () => setPaused(true),
-                    })}>
-                    {paused ? t('settings.pausedButton') : t('settings.pauseButton')}
-                  </Button>
+              <button type="button" className="text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline"
+                onClick={() => navigate(`/${locale}/partner-dashboard/application`)}>
+                {t('settings.changeViaApplication')}
+              </button>
+            </SectionCard>
+
+            <SectionCard id="contact-email" title={t('settings.contactEmailTitle')} body={t('settings.contactEmailBody')}>
+              <Field label={t('settings.contactEmailLabel')} value={contactEmail} />
+              <Button size="sm" variant="secondary" onClick={() => setEmailOpen(true)}>{t('settings.changeEmail')}</Button>
+            </SectionCard>
+
+            {/* C2: derselbe Zustand wie der Schalter in der Kopfzeile. */}
+            <SectionCard id="availability" title={t('settings.availabilityTitle')} body={paused ? undefined : t('settings.availabilityBody')}>
+              {availFailed && <Banner status="error" title={t('settings.availabilityFailed')} />}
+              {paused && (
+                <Banner status="brand" title={t('settings.pausedBannerTitle')}>{t('settings.pausedBannerBody')}</Banner>
+              )}
+              <Button size="sm" variant="secondary" disabled={availability === null}
+                onClick={() => switchAvailability(paused ? 'available' : 'ooo')}>
+                {paused ? t('settings.resume') : t('settings.pauseButton')}
+              </Button>
+            </SectionCard>
+            {/* Phase 6 (Canvas 3B): buchbare Fenster je Wochentag und Zeitzone —
+                derselbe Aufruf wie Pausieren, andere Felder. */}
+            <AvailabilityPanel />
+
+            {/* D1: Loeschung als Anfrage an unser Postfach, keine vorgetaeuschte Loeschung. */}
+            <SectionCard id="workspace" title={t('settings.deleteTitle')} body={t('settings.deleteBody')}>
+              {deletion === 'sent' && <Banner status="success" title={t('settings.deleteSent')} />}
+              {deletionFailed && (
+                <div role="alert" className="flex flex-col gap-2 rounded-xl border border-error-500/30 bg-error-bg px-[18px] py-[15px]">
+                  <p className="text-body-md font-bold text-fg">{t('settings.deleteFailedTitle')}</p>
+                  <p className="text-body-sm leading-relaxed text-error-700 dark:text-red-300">
+                    {t(`settings.deleteFailed.${deletion}`)}
+                    {CONTACT_INBOX && <> {t('common:contactSend.direct')}</>}
+                  </p>
+                  <InboxAddress />
                 </div>
-                <div className="flex items-center gap-3 px-4 py-3.5">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-error-500">{t('settings.deleteTitle')}</p>
-                    <p className="mt-0.5 text-[11px] text-fg-tertiary">{t('settings.deleteSub')}</p>
-                  </div>
-                  <Button size="sm" variant="ghost"
-                    onClick={() => setConfirm({
-                      title: t('settings.deleteConfirmTitle'),
-                      consequence: t('settings.deleteConfirmConsequence'),
-                      confirmLabel: t('settings.deleteConfirmLabel'),
-                      keyword: 'DELETE',
-                      onConfirm: () => { /* deletion request lands with CS until provider auth (B8) */ },
-                    })}>
-                    {t('settings.deleteButton')}
-                  </Button>
-                </div>
-              </Card>
-            </div>
+              )}
+              {deletion !== 'sent' && (
+                <Button size="sm" variant="secondary" disabled={!contactEmail} onClick={requestDeletion}>
+                  {deletionFailed ? t('common:contactSend.retry') : t('settings.deleteButton')}
+                </Button>
+              )}
+            </SectionCard>
           </div>
         </div>
       </div>
