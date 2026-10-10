@@ -509,7 +509,16 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                 res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Billing runs are admin-only', correlationId }));
                 return;
             }
-            const d = JSON.parse(raw || '{}') as { period?: unknown; dry_run?: unknown };
+            const d = JSON.parse(raw || '{}') as { period?: unknown; dry_run?: unknown; provider?: unknown };
+            // Optional ein einzelner Anbieter — fuer gezielte Tests auf Staging
+            // (B2a, 2026-10-10): eine Testrechnung, ohne alle anderen Abos mit
+            // abzurechnen. Ohne Angabe wie bisher alle.
+            const onlyProvider = typeof d.provider === 'string' && /^[a-z0-9-]{1,80}$/.test(d.provider) ? d.provider : null;
+            if (d.provider !== undefined && d.provider !== '' && !onlyProvider) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'provider must be a provider key', correlationId }));
+                return;
+            }
             const period = typeof d.period === 'string' && /^\d{4}-\d{2}$/.test(d.period)
                 ? d.period : new Date().toISOString().slice(0, 7);
             const dryRun = d.dry_run === true;
@@ -520,7 +529,7 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
             }
 
             const cfg = await loadPricingConfig();
-            const subs = (await supabaseApi.select('provider_subscriptions', {}, { limit: 5000 })) as any[];
+            const subs = (await supabaseApi.select('provider_subscriptions', onlyProvider ? { provider_key: onlyProvider } : {}, { limit: 5000 })) as any[];
             const results: Array<Record<string, unknown>> = [];
             for (const row of subs) {
                 if (row.ended_at) continue;
@@ -617,7 +626,7 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                 results.push({ provider: providerKey, invoice: finalized.number || invoiceId, total_cents: finalized.total ?? totalCents, credit_applied_cents: creditApplied });
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, period, providers: results.length, results, correlationId }));
+            res.end(JSON.stringify({ ok: true, period, only_provider: onlyProvider, providers: results.length, results, correlationId }));
         } catch {
             structuredLog('error', 'Billing run failed', { correlationId, errorCode: 'ERR_BILLING_RUN', severity: 'error', route: '/api/v1/admin/billing/run' });
             res.writeHead(502, { 'Content-Type': 'application/json' });

@@ -3915,6 +3915,20 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         expect(JSON.stringify(user.body)).not.toMatch(/fee|band|ledger|credit/i);
     });
 
+    it('Monatslauf mit provider-Filter rechnet nur diesen Anbieter ab', async () => {
+        seedProvider({ billing_ready: true }); seedPricing();
+        seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        seedSubscription('andere-kanzlei', 'essential', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        const body = (extra: object) => JSON.stringify({ period: new Date().toISOString().slice(0, 7), dry_run: true, ...extra });
+        const alle = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: body({}) });
+        expect(alle.body.results.map((r: any) => r.provider).sort()).toEqual(['andere-kanzlei', 'test-kanzlei']);
+        const einer = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: body({ provider: 'test-kanzlei' }) });
+        expect(einer.body).toMatchObject({ only_provider: 'test-kanzlei', providers: 1 });
+        expect(einer.body.results.map((r: any) => r.provider)).toEqual(['test-kanzlei']);
+        const kaputt = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: body({ provider: 'DROP TABLE' }) });
+        expect(kaputt.status).toBe(400);
+    });
+
     it('Monatslauf verrechnet Guthaben bis zur Rechnungssumme (dry_run) und zeigt es in der Vorschau', async () => {
         seedProvider({ billing_ready: true }); seedPricing(); seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
         (db.provider_credits ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', amount_cents: 4023, currency: 'USD', reason: 'user_no_rebook_30pct', created_at: past(1) });

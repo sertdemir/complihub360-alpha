@@ -1,0 +1,90 @@
+# ─── Abrechnungslauf von Hand (Staging) ─────────────────────────────────────
+#
+# Ruft POST /api/v1/admin/billing/run auf — den Monatslauf, der die
+# ABO-Rechnungen einer Periode in Stripe ausstellt (billing.ts). Gebaut fuer
+# den gezielten Test des Einzugs in der Kulanzfrist (ADR-0008 B2a): eine
+# Testrechnung fuer GENAU einen Anbieter, ohne alle anderen Abos mitzurechnen.
+#
+# Sicher per Voreinstellung:
+#   - `provider` ist Pflicht. Ein Lauf ueber alle Anbieter geht hier nicht.
+#   - `dry_run` ist an. Dann wird nur gerechnet und gezeigt, nichts in Stripe
+#     ausgestellt. Erst `dry_run: false` stellt die Rechnung aus und schickt
+#     sie an die Kontaktadresse des Anbieters.
+#   - Eine Periode, fuer die der Anbieter schon eine Rechnung hat, wird
+#     uebersprungen (`already invoiced`) — ein zweiter Klick stellt nichts doppelt aus.
+#
+# Wie der Watcher-Tick: kein checkout, nur curl auf ubuntu-latest. Secrets
+# STAGING_API_URL und STAGING_API_KEY (Settings → Secrets → Actions). Die
+# Ausgabe nennt je Anbieter Rechnungsnummer und Summe, keine Kontaktdaten.
+
+name: Billing Run (Staging)
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: Anbieter-Schluessel (z. B. dahlmann-cpa) — nur dieser wird abgerechnet
+        required: true
+        type: string
+      dry_run:
+        description: Nur rechnen, nichts ausstellen
+        required: true
+        type: boolean
+        default: true
+      period:
+        description: Periode YYYY-MM (leer = laufender Monat)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: billing-run
+  cancel-in-progress: false
+
+jobs:
+  run:
+    name: Abrechnungslauf auf Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: POST /api/v1/admin/billing/run
+        env:
+          API_URL: ${{ secrets.STAGING_API_URL }}
+          API_KEY: ${{ secrets.STAGING_API_KEY }}
+          PROVIDER: ${{ inputs.provider }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          PERIOD: ${{ inputs.period }}
+        run: |
+          set -uo pipefail
+          if [ -z "${API_URL:-}" ] || [ -z "${API_KEY:-}" ]; then
+            echo "::error::STAGING_API_URL oder STAGING_API_KEY fehlt"
+            exit 1
+          fi
+          if ! printf '%s' "$PROVIDER" | grep -Eq '^[a-z0-9-]{1,80}$'; then
+            echo "::error::provider muss ein Anbieter-Schluessel sein (a-z, 0-9, -)"
+            exit 1
+          fi
+          if [ -n "${PERIOD:-}" ] && ! printf '%s' "$PERIOD" | grep -Eq '^[0-9]{4}-[0-9]{2}$'; then
+            echo "::error::period muss YYYY-MM sein"
+            exit 1
+          fi
+          payload=$(jq -nc --arg p "$PROVIDER" --arg per "${PERIOD:-}" --argjson dry "$DRY_RUN" \
+            '{provider: $p, dry_run: $dry} + (if $per == "" then {} else {period: $per} end)')
+          body=$(mktemp)
+          code=$(curl -sS --max-time 120 -o "$body" -w '%{http_code}' \
+            -X POST "${API_URL%/}/api/v1/admin/billing/run" \
+            -H "x-api-key: ${API_KEY}" -H 'content-type: application/json' -d "$payload") || {
+            echo "::error::Staging-API war nicht erreichbar"
+            exit 1
+          }
+          if [ "$code" != "200" ]; then
+            echo "::error::Status $code: $(jq -r '.errorCode // "?"' "$body" 2>/dev/null)"
+            exit 1
+          fi
+          echo "Periode: $(jq -r '.period' "$body") · Anbieter: $(jq -r '.only_provider' "$body") · dry_run: $DRY_RUN"
+          jq -r '.results[] | "  \(.provider): \(if .skipped then "übersprungen (\(.skipped))" elif .dry_run then "Probelauf, Summe \(.total_cents) Cent" else "Rechnung \(.invoice), Summe \(.total_cents) Cent" end)"' "$body"
+          if [ "$(jq '.providers' "$body")" = "0" ]; then
+            echo "::warning::Kein laufendes Abo fuer diesen Anbieter in dieser Periode — nichts abgerechnet"
+          fi
