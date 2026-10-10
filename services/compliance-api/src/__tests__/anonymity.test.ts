@@ -147,7 +147,7 @@ describe('verificationDepth und rankBasis — Verifikation statt partner_status'
     });
     it('rankBasis nennt Stufe und Zaehler, keine Gewichte', () => {
         const b = rankBasis({ required, evidence: required.map((r) => ev(r.type, 'independently_verified')), avg_response_hours: 6, confirmation_rate: 0.96, rating: 4.8, reviews_count: 12 });
-        expect(b).toEqual({ verification: 'independent', verified_count: 4, required_count: 4, response_hours: 6, confirmation_rate: 0.96, rating: 4.8, reviews_count: 12 });
+        expect(b).toEqual({ verification: 'independent', verified_count: 4, required_count: 4, response_hours: 6, confirmation_rate: 0.96, rating: 4.8, reviews_count: 12, completed: null, bookings: null, incidents: null, window_days: null, neutral: [] });
         expect(rankBasis({ required, evidence: [ev('vat_id', 'reviewed')] }).verification).toBe('partial');
         expect(rankBasis({ required, evidence: required.map((r) => ev(r.type, 'reviewed')) }).verification).toBe('reviewed');
         expect(rankBasis({ required, evidence: [] }).verification).toBe('none');

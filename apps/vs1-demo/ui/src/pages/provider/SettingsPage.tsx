@@ -8,6 +8,7 @@ import { Banner } from '../../components/ui/Banner';
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 import { ChangeEmailDrawer } from '../../components/provider/ChangeEmailDrawer';
 import { CalendarPanel } from '../../components/provider/CalendarPanel';
+import { AvailabilityPanel } from '../../components/provider/AvailabilityPanel';
 import { InboxAddress } from '../../components/contact/SendStates';
 import { AVAILABILITY_EVENT, fetchCoverage, setAvailability, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
 import { fetchApplication } from '../../api/application';
@@ -214,6 +215,9 @@ export function SettingsPage() {
                 {paused ? t('settings.resume') : t('settings.pauseButton')}
               </Button>
             </SectionCard>
+            {/* Phase 6 (Canvas 3B): buchbare Fenster je Wochentag und Zeitzone —
+                derselbe Aufruf wie Pausieren, andere Felder. */}
+            <AvailabilityPanel />
 
             {/* D1: Loeschung als Anfrage an unser Postfach, keine vorgetaeuschte Loeschung. */}
             <SectionCard id="workspace" title={t('settings.deleteTitle')} body={t('settings.deleteBody')}>

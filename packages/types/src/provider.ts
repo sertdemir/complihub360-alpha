@@ -633,6 +633,8 @@ export interface ProviderCredit {
 /** Fehlercodes der Buchung, die eine Oberflaeche unterscheiden muss. */
 export type BookingErrorCode =
     | 'BILLING_NOT_READY'          // Anbieter nicht zahlungsbereit — nichts versucht
+    | 'BOOKING_PAUSED'             // Phase 6: Buchungspause nach §24 — kein Grund auf dem Nutzer-Draht
+    | 'PROVIDER_UNAVAILABLE'       // Phase 6: Anbieter abwesend
     | 'ACKNOWLEDGEMENT_OUTDATED'   // Fassung hat sich geaendert, `current_version` in der Antwort
     | 'SLOT_TAKEN'                 // Termin gerade vergeben
     | 'BOOKING_NOT_COMPLETED'      // Belastung gescheitert — keine Buchung, Grund `provider_billing`
@@ -642,3 +644,128 @@ export type BookingErrorCode =
     | 'RESCHEDULE_LIMIT'           // zu oft verschoben — absagen und neu buchen
     | 'NOT_REPORTABLE'             // Anwesenheit nur nach dem Slot, nur bei bestaetigt
     | 'NOT_DISPUTABLE' | 'ALREADY_DISPUTED' | 'DISPUTE_WINDOW_CLOSED';
+
+// ─── Phase 6 (ADR-0009): Performance aus Fakten, Durchsetzung, Verfuegbarkeit ─
+
+export type AnalyticsLevel = 'basic' | 'enhanced' | 'advanced';
+
+/** Eine Zahl mit ihrer Basis; `rate` nur, wenn die Stichprobe reicht (Spec A §17). */
+export interface PerformanceCounted {
+    count: number;
+    rate: number | null;
+    of: number;
+}
+
+export interface PerformanceFacts {
+    policy_version: number;
+    window_days: number;
+    from: string;
+    to: string;
+    bookings: number;
+    rate_min_bookings: number;
+    rates_shown: boolean;
+    attended: PerformanceCounted;
+    user_no_show: PerformanceCounted;
+    provider_no_show: PerformanceCounted;
+    cancelled_by_provider: PerformanceCounted;
+    cancelled_by_user: PerformanceCounted;
+    disputes_open: number;
+    incidents: { count: number; window_days: number; alert_at: number; pause_at: number };
+    rating: { average: number | null; count: number; min_count: number };
+    would_use_again: PerformanceCounted;
+    upcoming: number;
+}
+
+export interface PerformanceTrendRow {
+    key: string;
+    bookings: number;
+    attended: number;
+    user_no_show: number;
+    provider_no_show: number;
+    cancelled: number;
+}
+
+export type EnforcementAction = 'booking_pause' | 'correction_request' | 'profile_limitation' | 'reverification' | 'suspension';
+
+/** Eine Massnahme nach Spec A §24 mit Einspruch; `lifted_at` gesetzt = nicht mehr in Kraft. */
+export interface ProviderEnforcement {
+    id: string;
+    action: EnforcementAction;
+    source: 'auto_no_show' | 'admin';
+    reason: string;
+    created_at: string;
+    appeal_at: string | null;
+    decision: 'upheld' | 'lifted' | null;
+    decided_at: string | null;
+    lifted_at: string | null;
+    incident_count: number | null;
+}
+
+export interface ProviderPerformanceResponse {
+    ok: true;
+    providerKey: string;
+    performance: PerformanceFacts;
+    analytics: { level: AnalyticsLevel; trends: boolean; export: boolean };
+    trends?: { area: PerformanceTrendRow[]; country: PerformanceTrendRow[]; month: PerformanceTrendRow[] };
+    enforcement: ProviderEnforcement | null;
+}
+
+export type OverviewTask =
+    | { kind: 'attendance_report'; count: number; to: 'termine' }
+    | { kind: 'dispute_open'; count: number; to: 'termine' }
+    | { kind: 'evidence_expiring'; evidence_type: string | null; expires_at: string; to: 'verification' }
+    | { kind: 'billing_blocked'; reasons: BillingBlockReason[]; to: 'billing' }
+    | { kind: 'enforcement'; action: EnforcementAction; appeal_at: string | null; to: 'performance' };
+
+export interface ProviderOverviewResponse {
+    ok: true;
+    providerKey: string;
+    status: {
+        lifecycle: string | null; verified: boolean;
+        billing_ready: boolean; billing_block_reasons: BillingBlockReason[];
+        availability: 'available' | 'ooo'; ooo_until: string | null;
+        booking_open: boolean; booking_closed_reason: 'ooo' | 'paused' | null;
+        calendar_connected: boolean;
+    };
+    plan: { code: 'essential' | 'growth' | 'global'; label: string; analytics_level: AnalyticsLevel; cadence: 'monthly' | 'annual' | null; discount: { pct: number; count: number; used: number; remaining: number; cycle_start: string } } | null;
+    leads: { count: number; final_cents: number; currency: string; cycle_start: string };
+    credit_balance_cents: number;
+    upcoming: Array<{ id: string; slot_start: string; slot_end: string | null; rebooked_from: string | null }>;
+    report_open: number;
+    disputes_open: number;
+    expiring_evidence: Array<{ id: string; evidence_type: string | null; expires_at: string }>;
+    enforcement: ProviderEnforcement | null;
+    tasks: OverviewTask[];
+}
+
+export type Weekday = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+export interface AvailabilityWindow { from: string; to: string }
+/** Buchbare Fenster je Wochentag in der Zeitzone des Anbieters; 30-Minuten-Raster, max. drei je Tag. */
+export type AvailabilityHours = Partial<Record<Weekday, AvailabilityWindow[]>>;
+
+export interface AvailabilityPatchRequest {
+    status?: 'available' | 'ooo';
+    until?: string | null;
+    hours?: AvailabilityHours | null;
+    timezone?: string;
+}
+
+export interface AvailabilityResponse {
+    ok: true;
+    providerKey: string;
+    availability: 'available' | 'ooo';
+    ooo_until: string | null;
+    hours: AvailabilityHours | null;
+    timezone: string;
+    booking_paused_at: string | null;
+}
+
+/** Slots-Antwort seit Phase 6: ohne Slots sagt `reason`, warum. */
+export interface SlotsResponse {
+    ok: true;
+    public_ref: string;
+    slots: string[];
+    calendar_checked: boolean;
+    booking_open: boolean;
+    reason: 'ooo' | 'paused' | null;
+}

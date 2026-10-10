@@ -3,7 +3,6 @@
     "groupPipeline": "Pipeline",
     "groupBusiness": "Geschäft",
     "groupAccount": "Konto",
-    "navRequests": "Anfragen",
     "navTermine": "Termine",
     "navPerformance": "Performance",
     "navCoverage": "Abdeckung",
@@ -34,7 +33,8 @@
     },
     "navSubscription": "Tarif",
     "signOut": "Abmelden",
-    "oooFailed": "Die Änderung ließ sich gerade nicht speichern. Ihr Status ist unverändert."
+    "oooFailed": "Die Änderung ließ sich gerade nicht speichern. Ihr Status ist unverändert.",
+    "navOverview": "Übersicht"
   },
   "bell": {
     "aria": "Benachrichtigungen",
@@ -116,32 +116,56 @@
     "loading": "Wird geladen…",
     "noMatches": "Keine Treffer für „{{query}}“."
   },
-  "rankingImpact": {
-    "eyebrow": "RANKING",
-    "title": "Was Ihr Ranking bewegt",
-    "footer": "Wöchentlich neu berechnet · Ablehnungen senken Ihr Ranking nie — nur verpasste Bestätigungen.",
-    "factorResponsiveness": "Reaktionsgeschwindigkeit (Bestätigung < 24 h)",
-    "factorResponsivenessNote": "Ø 6,2 h — Ihr stärkster Hebel",
-    "factorReplyQuality": "Antwortqualität & Abschluss",
-    "factorReplyQualityNote": "vom Mandanten bestätigte Mandate",
-    "factorCoverageFit": "Abdeckungs-Fit (Märkte · Sprachen)",
-    "factorCoverageFitNote": "2 Märkte · 3 Sprachen",
-    "factorVerifiedStanding": "Verified-Partner-Status",
-    "factorVerifiedStandingNote": "aktiv · verlängert sich automatisch"
-  },
   "helpDrawer": {
     "eyebrow": "SUPPORT",
     "title": "Hilfe & Support",
-    "contactSupport": "Support kontaktieren",
-    "topicSlaTitle": "So funktioniert das 24h-Bestätigungs-SLA",
-    "topicSlaDesc": "Was zählt, was es pausiert und wie Erinnerungen eskalieren.",
-    "topicMagicLinksTitle": "Magic-Links & Sicherheit",
-    "topicMagicLinksDesc": "Einmal-Links, Ablauf und warum die Identität erst nach Bestätigung freigeschaltet wird.",
-    "topicRankingTitle": "So wird das Ranking berechnet",
-    "topicRankingDesc": "Die vier Faktoren und ihre Gewichte.",
-    "topicBillingTitle": "Abrechnung & Rechnungen",
-    "topicBillingDesc": "Preis pro Bestätigung, Stripe-Rechnungen, Zahlungsmethoden.",
-    "medianResponse": "Mediane Support-Antwortzeit: 4 h an Werktagen."
+    "intro": "Für alle Tarife gleich: Wissen zu den vier Bereichen des Dashboards, und ein Ticket an das Team.",
+    "topic": {
+      "termine": {
+        "title": "Termine und Anwesenheit",
+        "desc": "Rückmeldung nach dem Termin, 14-Tage-Frist, Widerspruch, 30 % Guthaben."
+      },
+      "billing": {
+        "title": "Abrechnung, Leads, Guthaben",
+        "desc": "Bänder, Standardgebühr, Rabattkontingent, Verrechnung mit der Rechnung."
+      },
+      "verification": {
+        "title": "Verifizierung und Nachweise",
+        "desc": "Upload, Ablaufdaten, Änderungen an Leistungen und Ländern."
+      },
+      "calendar": {
+        "title": "Kalender und buchbare Zeiten",
+        "desc": "Google oder Microsoft verbinden, Fenster je Wochentag, Abwesend."
+      }
+    },
+    "go": {
+      "termine": "Termine",
+      "billing": "Abrechnung",
+      "verification": "Verifizierung",
+      "calendar": "Einstellungen"
+    },
+    "ticketTitle": "Ticket an das Team",
+    "subjectLabel": "Anliegen",
+    "subject": {
+      "technical": "Technik",
+      "billing": "Abrechnung",
+      "verification": "Verifizierung",
+      "calendar": "Kalender und Zeiten",
+      "other": "Sonstiges"
+    },
+    "messagePlaceholder": "Was ist passiert? Seite, Zeitpunkt und die Referenz-ID, falls eine angezeigt wurde.",
+    "send": "Senden",
+    "note": "Antwort in der Regel binnen einem Werktag, für alle Tarife gleich. Sie bekommen eine Referenz und eine Bestätigung per Mail.",
+    "noEmail": "Für das Ticket brauchen wir die Adresse Ihres Logins. Sie fehlt in dieser Sitzung.",
+    "sentTitle": "Ihr Ticket ist angekommen.",
+    "sentBody": "Referenz {{reference}}. Die Bestätigung geht an die Adresse Ihres Logins; das Team meldet sich in der Regel binnen einem Werktag.",
+    "another": "Weiteres Ticket",
+    "failed": {
+      "unavailable": "Der Versand ist hier noch nicht eingerichtet. Bitte wenden Sie sich an die Adresse in der Bestätigungsmail.",
+      "network": "Keine Verbindung. An Ihrem Konto hat sich nichts geändert — bitte versuchen Sie es erneut.",
+      "rateLimit": "Zu viele Nachrichten in kurzer Zeit. Bitte warten Sie einen Moment."
+    },
+    "scope": "Nicht Teil des Supports: Verhandlungen mit Unternehmen, fachliche Beratung, Streit über Honorare. Dafür sind Sie die Fachperson — wir sind die Plattform."
   },
   "billing": {
     "title": "Abrechnung",
@@ -314,36 +338,66 @@
   },
   "performance": {
     "title": "Performance",
-    "range30d": "Zeitraum: 30 T",
-    "subtitle": "Kanonische KPIs aus Provider Flows §12 + Ranking-Transparenz. Pre-Downgrade-Warnungen erscheinen hier UND als Sticky-Banner über allen Tabs (§7.2).",
-    "kpiConfirmRateNote": "der zugeleiteten Anfragen bestätigt",
-    "kpiReplyRateNote": "bestätigt → Antwort gesendet",
-    "kpiAvgConfirmNote": "Top-Quartil <2 h",
-    "kpiAvgReplyNote": "Top-Quartil <12 h",
-    "kpiSlaBreachNote": "letzte 30 T · Ziel <5 %",
-    "rankingTitle": "Ranking-Transparenz",
-    "rankingSub": "Wo Sie stehen · was es beeinflusst · Änderungshistorie der letzten 7 Tage",
-    "whyThisMatters": "Warum das wichtig ist",
-    "currentRankLabel": "Aktueller Rang · DE · USt",
-    "rankOf": "von 47 Verified Providern ·",
-    "rankUpFrom": "↑ von #5 (letzte Woche)",
-    "whatMovesRank": "Was Ihr Ranking bewegt",
-    "factorResponseTime": "Reaktionszeit",
-    "factorResponseTimeNote": "avg_confirm_time sank in 30 T um 18 %",
-    "factorAcceptanceRate": "Annahmequote",
-    "factorAcceptanceRateNote": "confirm_rate +5 % ggü. Vorperiode",
-    "factorMatchQuality": "Match-Qualität (Mandantenbewertungen)",
-    "factorMatchQualityNote": "4,7/5 über 12 neue Bewertungen",
-    "factorCoverageBreadth": "Abdeckungsbreite",
-    "factorCoverageBreadthNote": "2 Märkte · 3 Domänen (DE-Fokus)",
-    "movePlus3": "+3 Positionen",
-    "movePlus1": "+1 Position",
-    "moveNoChange": "unverändert",
-    "qualityTitle": "Qualitäts-Score-Aufschlüsselung",
-    "qualitySub": "Zusammensetzung aus 5 Signalen · verbessern Sie das schwächste, um am schnellsten zu steigen",
-    "qualityProfileCompleteness": "Profil-Vollständigkeit",
-    "qualityProjectCompletion": "Projektabschluss (ohne Abbrüche)",
-    "qualityClientSatisfaction": "Mandantenzufriedenheit"
+    "subtitle": "Was aus Ihren Buchungen folgt. Jede Zahl nennt ihre Basis und ihren Zeitraum; eine Quote steht erst ab fünf Buchungen. Das Ranking sieht genau diese Fakten — in jedem Tarif dieselben.",
+    "range": "Letzte {{days}} Tage · {{bookings}} Buchungen",
+    "policy": "Regel-Fassung {{version}}",
+    "of": "von",
+    "fact": {
+      "attended": "Stattgefunden",
+      "userNoShow": "Nutzer nicht erschienen",
+      "providerNoShow": "Eigene No-Shows",
+      "cancelled": "Absagen",
+      "rating": "Bewertung",
+      "wouldRebook": "Würden wieder buchen"
+    },
+    "attendedSub": "letzte {{days}} Tage",
+    "userNoShowSub": "Gebühr bleibt, Guthaben nach 14 Tagen ohne Neubuchung",
+    "userNoShowDisputes_one": "{{count}} Widerspruch offen",
+    "userNoShowDisputes_other": "{{count}} Widersprüche offen",
+    "providerNoShowSub": "{{count}} Vorfall in {{days}} Tagen · Hinweis ab {{alert}}, Buchungspause ab {{pause}} — mit Einspruch",
+    "cancelledValue": "{{count}} durch Sie",
+    "cancelledSub": "{{count}} durch Nutzer",
+    "ratingSub": "aus {{count}} Bewertungen nach Buchung",
+    "ratingInsufficient": "noch zu wenig Daten: {{have}} von {{need}} Bewertungen",
+    "wouldRebookSub": "{{count}} von {{of}} Bewertungen",
+    "insufficient": "noch zu wenig Daten: {{have}} von {{need}} Buchungen",
+    "noBookings": "Noch keine Buchungen im Zeitraum. Die Fakten füllen sich mit dem ersten Termin; bis dahin zählt das Ranking Sie neutral, nicht schlechter.",
+    "trendsTitle": "Verlauf",
+    "level": {
+      "basic": "Essential",
+      "enhanced": "Growth",
+      "global": "Global",
+      "advanced": "Global"
+    },
+    "trendsBy": {
+      "area": "Bereich",
+      "country": "Land",
+      "month": "Monat"
+    },
+    "trendsLocked": "Der Verlauf nach Bereich, Land und Monat ist ab Growth enthalten. Ihre Fakten oben sind in jedem Tarif dieselben.",
+    "trendsEmpty": "Noch kein Verlauf im Zeitraum.",
+    "csvExport": "CSV-Export",
+    "csvLocked": "CSV-Export ab Global",
+    "csvFailed": "Der Export konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+    "trendRow": "{{bookings}} Buchungen · {{attended}} stattgefunden · {{noShow}} No-Show · {{cancelled}} abgesagt",
+    "rankingNote": "Das Ranking sieht dieselben Fakten. Fehlen Daten, zählen sie neutral — weder für noch gegen Sie. Ein höherer Tarif zeigt mehr Verlauf, nie bessere Zahlen.",
+    "enforcement": {
+      "booking_pause": "Buchungspause",
+      "correction_request": "Korrektur angefordert",
+      "profile_limitation": "Profil eingeschränkt",
+      "reverification": "Erneute Prüfung",
+      "suspension": "Konto ausgesetzt"
+    },
+    "enforcementBody": "Seit {{date}}, nach {{count}} Vorfällen im Zeitraum. Ihr Profil bleibt sichtbar; neue Buchungen sind pausiert, bis das Team entschieden hat.",
+    "appealLabel": "Einspruch — was sollten wir wissen?",
+    "appealPlaceholder": "Zum Beispiel: was an den Terminen passiert ist, Belege, Umstände.",
+    "appealSend": "Einspruch einlegen",
+    "appealSent": "Ihr Einspruch vom {{date}} liegt beim Team.",
+    "appealFailed": "Der Einspruch konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "appealDecided": {
+      "lifted": "Die Pause wurde am {{date}} aufgehoben. Buchungen sind wieder möglich.",
+      "upheld": "Das Team hat die Pause am {{date}} bestätigt. Sie bleibt bis zur Aufhebung durch das Team."
+    }
   },
   "magicAction": {
     "partnerBadge": "Partner",
@@ -487,6 +541,31 @@
       "unavailable": "Der Versand ist gerade nicht verfügbar.",
       "network": "Die Verbindung zu unserem Postfach ist fehlgeschlagen.",
       "rateLimit": "Von Ihrem Anschluss kamen in kurzer Zeit mehrere Nachrichten. Bitte warten Sie 15 Minuten."
+    },
+    "availability": {
+      "title": "Buchbare Zeiten",
+      "sub": "Je Wochentag bis zu drei Fenster im 30-Minuten-Raster, in Ihrer Zeitzone. Belegte Zeiten aus dem verbundenen Kalender werden abgezogen.",
+      "timezone": "Zeitzone",
+      "from": "von",
+      "to": "bis",
+      "and": "und",
+      "addWindow": "+ Fenster",
+      "remove": "Fenster entfernen",
+      "notBookable": "nicht buchbar",
+      "note": "Termine dauern 30 Minuten. Ohne Fenster an einem Tag gibt es dort keine Buchung. Abwesenheit schalten Sie oben in der Leiste.",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "saveFailed": "Konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+      "invalid": "Ein Fenster endet vor seinem Beginn oder überschneidet sich.",
+      "weekday": {
+        "mon": "Mo",
+        "tue": "Di",
+        "wed": "Mi",
+        "thu": "Do",
+        "fri": "Fr",
+        "sat": "Sa",
+        "sun": "So"
+      }
     }
   },
   "termine": {
@@ -1160,6 +1239,84 @@
     "evidence_expiring": {
       "title": "Nachweis läuft ab",
       "body": "{{label}} läuft am {{deadline}} ab."
+    },
+    "decision": {
+      "lifted": "aufgehoben",
+      "upheld": "bestätigt"
+    },
+    "serial_no_show_alert": {
+      "title": "Zwei nicht wahrgenommene Termine in 90 Tagen",
+      "body": "Ein weiterer führt zu einer Buchungspause mit Einspruch. Ihr Profil bleibt sichtbar."
+    },
+    "booking_paused": {
+      "title": "Buchungspause nach drei Vorfällen",
+      "body": "Neue Buchungen sind pausiert, Ihr Profil bleibt sichtbar. Sie können einmal Einspruch einlegen — unter Performance."
+    },
+    "enforcement_decided": {
+      "title": "Ihr Einspruch wurde entschieden",
+      "body": "Entscheidung: {{decision}}. Die Einzelheiten stehen unter Performance."
     }
+  },
+  "overview": {
+    "title": "Übersicht",
+    "subtitle": "Was heute ansteht, und wo Ihr Konto steht. Jede Zeile kommt aus Ihren Buchungen, Nachweisen und der Abrechnung — nichts davon ist geschätzt.",
+    "today": "Heute · {{date}}",
+    "nothingOpen": "Nichts offen",
+    "nothingOpenBody": "Keine Rückmeldung, kein Widerspruch, kein auslaufender Nachweis. Ihre nächsten Termine und Ihr Kontostand stehen unten.",
+    "task": {
+      "attendance_report_one": "Rückmeldung offen: {{count}} Termin",
+      "attendance_report_other": "Rückmeldung offen: {{count}} Termine",
+      "attendance_reportBody": "Wie ist der Termin verlaufen? Ihre Meldung entscheidet über Frist und Guthaben.",
+      "dispute_open_one": "{{count}} Widerspruch zu einer No-Show-Meldung",
+      "dispute_open_other": "{{count}} Widersprüche zu No-Show-Meldungen",
+      "dispute_openBody": "Das Team prüft. Sie sehen die Entscheidung unter Termine.",
+      "evidence_expiring": "Nachweis läuft ab: {{type}} bis {{date}}",
+      "evidence_expiringBody": "Laden Sie den aktuellen Nachweis hoch, damit Ihre Freigabe ohne Lücke weiterläuft.",
+      "billing_blocked": "Buchungen sind gesperrt, bis die Zahlungsbereitschaft wieder stimmt",
+      "billing_blockedBody": "Ihr Profil bleibt sichtbar. Prüfen Sie Zahlungsmittel und offene Rechnungen unter Abrechnung.",
+      "enforcement": "Buchungspause nach drei Vorfällen",
+      "enforcementBody": "Ihr Profil bleibt sichtbar, Buchungen sind pausiert. Sie können einmal Einspruch einlegen.",
+      "enforcementAppealed": "Ihr Einspruch liegt beim Team. Ihr Profil bleibt sichtbar."
+    },
+    "go": {
+      "termine": "Zu den Terminen",
+      "verification": "Zur Verifizierung",
+      "billing": "Zur Abrechnung",
+      "performance": "Zur Performance",
+      "settings": "Zu den Einstellungen",
+      "subscription": "Zum Tarif",
+      "overview": "Zur Übersicht"
+    },
+    "evidenceGeneric": "Nachweis",
+    "upcomingTitle": "Nächste Termine",
+    "upcomingEmpty": "Keine kommenden Termine.",
+    "upcomingCount_one": "{{count}} kommender",
+    "upcomingCount_other": "{{count}} kommende",
+    "calendarConnected": "Kalender verbunden",
+    "calendarNotConnected": "kein Kalender verbunden",
+    "allAppointments": "Alle Termine →",
+    "rebooked": "neu gebucht",
+    "confirmed": "Bestätigt",
+    "accountTitle": "Konto",
+    "verified": "Verifiziert",
+    "inReview": "in Prüfung",
+    "bookable": "Buchbar",
+    "bookableNote": "Zahlungsmittel geprüft",
+    "billingNotReady": "Zahlungsbereitschaft fehlt",
+    "closedOoo": "abwesend",
+    "closedPaused": "Buchungspause",
+    "yes": "Ja",
+    "no": "Nein",
+    "planLeads": "{{plan}} · rabattierte Leads im Zyklus",
+    "discountUsed": "{{used}} von {{count}} genutzt",
+    "noDiscount": "kein Rabattkontingent",
+    "sinceCycle": "seit {{date}}",
+    "plan": "Tarif",
+    "noPlan": "Noch kein Tarif",
+    "leadsCycle": "Belastete Leads im Zyklus",
+    "credit": "Guthaben",
+    "creditNote": "wird mit der nächsten Rechnung verrechnet",
+    "evidenceExpiring": "Nachweis {{type}}",
+    "until": "bis {{date}}"
   }
 }

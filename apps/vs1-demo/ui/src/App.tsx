@@ -35,7 +35,7 @@ const AdminEventsPage = lazy(() => import("./pages/admin/AdminEventsPage").then(
 const AdminComingSoonPage = lazy(() => import("./pages/admin/AdminComingSoonPage").then((m) => ({ default: m.AdminComingSoonPage })));
 const ProviderMagicActionPage = lazy(() => import("./pages/provider/ProviderMagicActionPage").then((m) => ({ default: m.ProviderMagicActionPage })));
 const ConfirmEmailPage = lazy(() => import("./pages/provider/ConfirmEmailPage").then((m) => ({ default: m.ConfirmEmailPage })));
-const RequestsPage = lazy(() => import("./pages/provider/RequestsPage").then((m) => ({ default: m.RequestsPage })));
+const OverviewPage = lazy(() => import("./pages/provider/OverviewPage").then((m) => ({ default: m.OverviewPage })));
 const LeadsPage = lazy(() => import("./pages/provider/LeadsPage").then((m) => ({ default: m.LeadsPage })));
 const PerformancePage = lazy(() => import("./pages/provider/PerformancePage").then((m) => ({ default: m.PerformancePage })));
 const CoveragePage = lazy(() => import("./pages/provider/CoveragePage").then((m) => ({ default: m.CoveragePage })));
@@ -249,10 +249,12 @@ function AppContent() {
                     
                     {/* Partner Dashboard Routes (Auth Guarded) */}
                     <Route element={<AuthGuard requiredRole="partner" />}>
-                        {/* Post-login landing = the new provider workspace. The legacy
-                            Partner Hub stays reachable at /partner-dashboard/home-old. */}
-                        <Route path="partner-dashboard" element={<Navigate to="requests" replace />} />
-                        <Route path="partner-dashboard/requests" element={<RequestsPage />} />
+                        {/* Phase 6 (ADR-0009 Nr. 5): die Übersicht ist die Landung nach dem
+                            Login. Die Anfragen-Seite der stillgelegten Pipeline ist abgehängt;
+                            ihr alter Pfad landet ebenfalls auf der Übersicht. */}
+                        <Route path="partner-dashboard" element={<Navigate to="overview" replace />} />
+                        <Route path="partner-dashboard/overview" element={<OverviewPage />} />
+                        <Route path="partner-dashboard/requests" element={<LocaleRedirect to="partner-dashboard/overview" />} />
                         <Route path="partner-dashboard/termine" element={<LeadsPage />} />
                         <Route path="partner-dashboard/performance" element={<PerformancePage />} />
                         <Route path="partner-dashboard/coverage" element={<CoveragePage />} />
@@ -263,7 +265,7 @@ function AppContent() {
                         {/* Phase 2 Onboarding: Dossier + Verification Center */}
                         <Route path="partner-dashboard/application" element={<ApplicationPage />} />
                         <Route path="partner-dashboard/verification" element={<VerificationPage />} />
-                        <Route path="partner-dashboard/*" element={<LocaleRedirect to="partner-dashboard/requests" />} />
+                        <Route path="partner-dashboard/*" element={<LocaleRedirect to="partner-dashboard/overview" />} />
                     </Route>
 
                     {/* Admin Control Center (Auth Guarded · dev entry: /login?as=admin) */}

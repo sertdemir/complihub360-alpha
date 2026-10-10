@@ -2157,7 +2157,8 @@
         "performance": "Ihre Leistungswerte konnten nicht geladen werden",
         "notifications": "Ihre Benachrichtigungen konnten nicht geladen werden",
         "coverage": "Ihre Abdeckung konnte nicht geladen werden",
-        "message": "An Ihrem Konto hat sich nichts geändert. Wir können es gerade nur nicht anzeigen. Bitte versuchen Sie es erneut. Wenn es so bleibt, wenden Sie sich an den Support."
+        "message": "An Ihrem Konto hat sich nichts geändert. Wir können es gerade nur nicht anzeigen. Bitte versuchen Sie es erneut. Wenn es so bleibt, wenden Sie sich an den Support.",
+        "overview": "Ihre Übersicht konnte nicht geladen werden"
       },
       "empty": {
         "appointments": "Noch keine Termine",

@@ -1020,6 +1020,128 @@ paths:
         '404': { description: Buchung gehoert nicht diesem Anbieter }
         '409': { description: "`NOT_REPORTABLE` — nur bestaetigte Termine nach ihrem Ende" }
 
+  /provider/{key}/availability:
+    patch:
+      summary: Verfuegbarkeit — Abwesend, Fenster je Wochentag, Zeitzone (Phase 6)
+      description: >-
+        Jeder Teil ist optional; was fehlt, bleibt. `status` available|ooo
+        (mit `until`); `hours` als Fenster je Wochentag (`mon`..`sun`, je
+        Fenster `{from, to}` HH:MM, 30-Minuten-Raster, max. drei je Tag,
+        `null` = Vorgabe); `timezone` als IANA-Name. Die Slots entstehen aus
+        den Fenstern in dieser Zeitzone; Abwesend und Buchungspause sperren
+        sie.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [available, ooo] }
+                until: { type: string, format: date-time, nullable: true }
+                hours: { type: object, nullable: true, additionalProperties: { type: array, items: { type: object, properties: { from: { type: string }, to: { type: string } } } } }
+                timezone: { type: string }
+      responses:
+        '200': { description: "`{ availability, ooo_until, hours, timezone, booking_paused_at }`" }
+        '400': { description: Ungueltige Fenster oder Zeitzone }
+        '404': { description: Anbieter unbekannt }
+
+  /provider/{key}/performance:
+    get:
+      summary: Performance aus Buchungs-Fakten (Phase 6)
+      description: >-
+        ADR-0009, Spec A §17, Spec B "Analytics and performance separation".
+        Je Anbieter aus `scheduling`, `provider_performance_incidents` und
+        `reviews` gerechnet: Buchungen, stattgefunden, No-Shows beider Seiten,
+        Absagen, Bewertung aus Buchungen, offene Widersprueche, Vorfaelle im
+        Fenster. Quoten (`rate`) erst ab `rate_min_bookings`, sonst null.
+        `analytics.level` kommt aus dem Tarif: `enhanced` liefert `trends`
+        (Bereich, Land, Monat), `advanced` zusaetzlich `?format=csv` (eine
+        Zeile je Buchung, ohne Nutzerdaten). Die Fakten sind in jedem Tarif
+        dieselben. `enforcement` traegt eine offene Massnahme (§24), z. B. die
+        Buchungspause nach Serien-No-Shows.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: format, in: query, required: false, schema: { type: string, enum: [csv] } }
+      responses:
+        '200': { description: "`{ performance, analytics, trends?, enforcement }` oder text/csv" }
+        '403': { description: "`ANALYTICS_LEVEL` — CSV nur ab advanced" }
+
+  /provider/{key}/overview:
+    get:
+      summary: Startseite des Partner-Dashboards (Phase 6)
+      description: >-
+        Spec B "Overview": Kontostatus (verifiziert, zahlungsbereit,
+        Verfuegbarkeit, Buchung offen/geschlossen mit Grund, Kalender
+        verbunden), Tarif mit Rabattkontingent, belastete Leads des Zyklus,
+        Guthaben, die naechsten drei Termine, offene Rueckmeldungen und
+        Widersprueche, auslaufende Nachweise (30 Tage), offene Massnahme und
+        eine Aufgabenliste mit Sprungziel.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: "`{ status, plan, leads, credit_balance_cents, upcoming[], report_open, disputes_open, expiring_evidence[], enforcement, tasks[] }`" }
+        '404': { description: Anbieter unbekannt }
+
+  /provider/{key}/enforcement/{id}/appeal:
+    post:
+      summary: Einspruch gegen eine Massnahme (Spec A §24, Phase 6)
+      description: >-
+        Der Anbieter widerspricht einer Massnahme, z. B. der automatischen
+        Buchungspause nach drei Vorfaellen in 90 Tagen. Einmal je Massnahme,
+        mit Begruendung; der Admin entscheidet. Die Sichtbarkeit war nie
+        betroffen.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [note]
+              properties:
+                note: { type: string, maxLength: 2000 }
+      responses:
+        '200': { description: "`{ id, appeal_at }`" }
+        '400': { description: note fehlt }
+        '404': { description: Massnahme gehoert nicht diesem Anbieter }
+        '409': { description: "`ALREADY_APPEALED` oder `ALREADY_LIFTED`" }
+
+  /admin/providers/{key}/enforcement/{id}:
+    patch:
+      summary: Massnahme entscheiden — aufheben oder bestaetigen (nur Server-Key)
+      description: >-
+        `lifted` hebt die Massnahme auf (bei `booking_pause` wird
+        `providers.booking_paused_at` geleert); `upheld` bestaetigt sie. Der
+        Anbieter wird benachrichtigt; Grund, Entscheider und Datum bleiben in
+        `provider_enforcement_actions`.
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [lifted, upheld] }
+                note: { type: string, maxLength: 2000 }
+      responses:
+        '200': { description: "`{ id, decision, lifted }`" }
+        '403': { description: Nur Server-Key }
+        '404': { description: Massnahme unbekannt }
+        '409': { description: "`ALREADY_LIFTED`" }
+
   /admin/bookings/{id}/dispute:
     patch:
       summary: Widerspruch gegen einen Nutzer-No-Show entscheiden (nur Server-Key)
@@ -1417,7 +1539,7 @@ paths:
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
       responses:
-        '200': { description: "`{ public_ref, slots[] }`" }
+        '200': { description: "`{ public_ref, slots[], calendar_checked, booking_open, reason }` — Phase 6: Slots aus den Verfuegbarkeitsfenstern des Anbieters in seiner Zeitzone (30 Minuten), minus Buchungen und Kalender-Belegung; bei Abwesenheit oder Buchungspause leer mit `reason: ooo|paused`" }
         '404': { description: Unbekannter Ref }
 
   /p/{ref}/reviews:

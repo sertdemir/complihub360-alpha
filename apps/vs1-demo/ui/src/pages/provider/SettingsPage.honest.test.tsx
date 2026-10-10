@@ -20,6 +20,9 @@ vi.mock('../../api/provider', () => ({
   fetchCoverage: () => api.fetchCoverage(),
   setAvailability: (s: string) => api.setAvailability(s),
   updateMatchmakingProfile: vi.fn(),
+  // Phase 6: AvailabilityPanel (buchbare Zeiten) liest dieselbe Anbieter-Zeile.
+  WEEKDAYS: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+  updateAvailabilityHours: vi.fn(),
 }));
 vi.mock('../../api/application', () => ({ fetchApplication: () => api.fetchApplication() }));
 vi.mock('../../api/contact', () => ({

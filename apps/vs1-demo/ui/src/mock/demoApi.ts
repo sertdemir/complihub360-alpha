@@ -1027,6 +1027,58 @@ function p2ReviewDossier(key: string) {
 const mockCalendar = { connected: false };
 const calendarStatus = () => ({ configured: true, connected: mockCalendar.connected, email: mockCalendar.connected ? 'kalender@schmidt-partner.example' : null });
 
+
+// ─── Phase 6 (ADR-0009): Performance aus Fakten, Übersicht, buchbare Zeiten ──
+// Dieselben Zahlen wie die Partner-Termine oben: 12 Buchungen in 90 Tagen,
+// davon 9 stattgefunden, 2 Nutzer-No-Shows (einer mit offenem Widerspruch),
+// 1 eigener No-Show (= 1 Vorfall). Growth → Verlauf ja, CSV nein.
+const AVAIL = { hours: null as Record<string, Array<{ from: string; to: string }>> | null, timezone: 'Europe/Berlin' };
+function partnerPerformance() {
+  const counted = (count: number, of: number) => ({ count, of, rate: of >= 5 ? Math.round((count / of) * 100) / 100 : null });
+  return {
+    ok: true, providerKey: PARTNER_KEY,
+    performance: {
+      policy_version: 1, window_days: 90, from: iso(-90), to: iso(0), bookings: 12, rate_min_bookings: 5, rates_shown: true,
+      attended: counted(9, 12), user_no_show: counted(2, 12), provider_no_show: counted(1, 12),
+      cancelled_by_provider: counted(0, 12), cancelled_by_user: counted(1, 12),
+      disputes_open: 1, incidents: { count: 1, window_days: 90, alert_at: 2, pause_at: 3 },
+      rating: { average: 4.6, count: 7, min_count: 5 }, would_use_again: counted(6, 7), upcoming: 1,
+    },
+    analytics: { level: 'enhanced', trends: true, export: false },
+    trends: {
+      area: [
+        { key: 'tax-vat', bookings: 8, attended: 6, user_no_show: 1, provider_no_show: 1, cancelled: 0 },
+        { key: 'product-packaging', bookings: 4, attended: 3, user_no_show: 1, provider_no_show: 0, cancelled: 1 },
+      ],
+      country: [{ key: 'DE', bookings: 11, attended: 8, user_no_show: 2, provider_no_show: 1, cancelled: 1 }, { key: 'AT', bookings: 1, attended: 1, user_no_show: 0, provider_no_show: 0, cancelled: 0 }],
+      month: [monat(-2), monat(-1), monat(0)].map((m, i) => ({ key: m, bookings: [3, 5, 4][i]!, attended: [2, 4, 3][i]!, user_no_show: [1, 1, 0][i]!, provider_no_show: [0, 0, 1][i]!, cancelled: [0, 1, 0][i]! })),
+    },
+    enforcement: null,
+  };
+}
+function partnerOverview() {
+  const bookings = partnerBookings();
+  const now = Date.now();
+  const upcoming = bookings.filter((b) => b.status === 'confirmed' && Date.parse(b.slot_start) > now).map((b) => ({ id: b.id, slot_start: b.slot_start, slot_end: b.slot_end, rebooked_from: null }));
+  const reportOpen = bookings.filter((b) => b.status === 'confirmed' && Date.parse(b.slot_end) < now).length;
+  const disputesOpen = bookings.filter((b) => (b as { dispute_status?: string }).dispute_status === 'open').length;
+  const expiring = [{ id: uuid(77, 7), evidence_type: 'Berufshaftpflicht', expires_at: iso(20, 0) }];
+  const pre = partnerBillingPreview();
+  const tasks: Array<Record<string, unknown>> = [];
+  if (reportOpen) tasks.push({ kind: 'attendance_report', count: reportOpen, to: 'termine' });
+  if (disputesOpen) tasks.push({ kind: 'dispute_open', count: disputesOpen, to: 'termine' });
+  for (const e of expiring) tasks.push({ kind: 'evidence_expiring', evidence_type: e.evidence_type, expires_at: e.expires_at, to: 'verification' });
+  if (!READINESS.ready) tasks.push({ kind: 'billing_blocked', reasons: READINESS.reasons, to: 'billing' });
+  return {
+    ok: true, providerKey: PARTNER_KEY,
+    status: { lifecycle: 'active', verified: true, billing_ready: READINESS.ready, billing_block_reasons: READINESS.reasons, availability: 'available', ooo_until: null, booking_open: true, booking_closed_reason: null, calendar_connected: mockCalendar.connected },
+    plan: { code: 'growth', label: 'Growth', analytics_level: 'enhanced', cadence: 'monthly', discount: { pct: 10, count: 3, used: 2, remaining: 1, cycle_start: `${monat(0)}-01` } },
+    leads: { count: pre.leads.count, final_cents: pre.leads.final_cents, currency: 'USD', cycle_start: `${monat(0)}-01` },
+    credit_balance_cents: pre.credit_balance_cents,
+    upcoming, report_open: reportOpen, disputes_open: disputesOpen, expiring_evidence: expiring, enforcement: null, tasks,
+  };
+}
+
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
@@ -1043,7 +1095,12 @@ export function route(method: string, path: string, body: Record<string, unknown
     // hier die Demo-Rolle aus dem Header x-demo-role.
     if (p[0] === 'requests') return { ok: true, requests: role === 'partner' ? partnerRequests() : requests() };
     if (p[0] === 'provider' && p[2] === 'bookings') return { ok: true, bookings: partnerBookings() };
-    if (p[0] === 'provider' && p[2] === 'coverage') return partnerCoverage();
+    // Phase 6: Performance aus Fakten (CSV hier als JSON-Feld — der Mock antwortet immer JSON) und Übersicht.
+    if (p[0] === 'provider' && p[2] === 'performance') return query.get('format') === 'csv'
+      ? { __status: 403, errorCode: 'ANALYTICS_LEVEL', message: 'CSV export needs the advanced analytics level' }
+      : partnerPerformance();
+    if (p[0] === 'provider' && p[2] === 'overview') return partnerOverview();
+    if (p[0] === 'provider' && p[2] === 'coverage') { const c = partnerCoverage(); return { ...c, coverage: { ...c.coverage, availability_hours: AVAIL.hours, timezone: AVAIL.timezone, booking_paused_at: null } }; }
     if (p[0] === 'provider' && p[2] === 'invoices') return partnerInvoices();
     if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'preview') return partnerBillingPreview();
     // Tarif wie der Server (GET /provider/:key/subscription): laufendes Growth,
@@ -1095,11 +1152,15 @@ export function route(method: string, path: string, body: Record<string, unknown
   // lokale Mock antwortet nur in der Form eines Erfolgs. Auf Staging erreicht
   // der Demo-Login diesen Zweig nicht — api/contact.ts geht am Demo-Datensatz
   // vorbei, damit dort kein Versand vorgetaeuscht wird.
-  if (p[0] === 'contact' && method === 'POST') return { ok: true, acknowledged: true };
+  if (p[0] === 'contact' && method === 'POST') return { ok: true, acknowledged: true, correlationId: `mock-${Date.now().toString(36)}` };
+  // Phase 6: Verfuegbarkeit — Status (Abwesend) und Fenster/Zeitzone ueber denselben Aufruf.
   if (p[0] === 'provider' && p[2] === 'availability' && method === 'PATCH') {
-    MOCK_AVAILABILITY = body.status === 'ooo' ? 'ooo' : 'available';
-    return { ok: true, providerKey: p[1], availability: MOCK_AVAILABILITY, ooo_until: null };
+    if (typeof body.status === 'string') MOCK_AVAILABILITY = body.status === 'ooo' ? 'ooo' : 'available';
+    if ('hours' in body) AVAIL.hours = body.hours && Object.keys(body.hours as object).length ? (body.hours as typeof AVAIL.hours) : null;
+    if (typeof body.timezone === 'string') AVAIL.timezone = body.timezone;
+    return { ok: true, providerKey: p[1], availability: MOCK_AVAILABILITY, ooo_until: null, hours: AVAIL.hours, timezone: AVAIL.timezone, booking_paused_at: null };
   }
+  if (p[0] === 'provider' && p[2] === 'enforcement' && p[4] === 'appeal' && method === 'POST') return { ok: true, enforcement: { id: p[3], action: 'booking_pause', source: 'auto_no_show', reason: 'three incidents', created_at: iso(-2), appeal_at: plus(0), decision: null, decided_at: null, lifted_at: null, incident_count: 3 } };
   if (p[0] === 'market-requests' && method === 'POST') {
     const market = String(body.market ?? '').toUpperCase();
     // Wie der Server (marketRequests.ts): ein bekannter Markt nur als Anfrage

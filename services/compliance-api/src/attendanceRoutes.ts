@@ -3,6 +3,7 @@ import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
 import { notify } from "./notifications.js";
 import { sendNoShowMail } from "./mailer.js";
+import { evaluateProviderIncidents, evaluateUserNoShows } from "./performanceRoutes.js";
 import {
     attendanceReportable, disputeOpen, loadAttendancePolicy, rebookDeadline, canReschedule,
     type AttendancePolicy,
@@ -116,6 +117,8 @@ export async function handleProviderAttendance(
                 const users = (await supabaseApi.select('users', userId ? { id: userId } : { id: '' }, { limit: 1 })) as Array<{ email?: string | null; language?: string | null }>;
                 await sendNoShowMail({ to: users[0]?.email ?? null, bookingId, providerKey, deadline, disputeHours: policy.disputeHours, locale: users[0]?.language ?? undefined, correlationId });
             })().catch(() => { /* im Mailer protokolliert */ });
+            // Phase 6: mehrere gemeldete No-Shows desselben Nutzers → nur ein Admin-Hinweis.
+            evaluateUserNoShows(userId).catch(() => { /* protokolliert */ });
             json(res, 200, { ok: true, id: bookingId, status: 'no_show', no_show_by: 'user', rebook_deadline: deadline, dispute_hours: policy.disputeHours, correlationId });
             return;
         }
@@ -156,6 +159,8 @@ export async function recordProviderNoShow(b: Json, actorUserId: string | null, 
         await supabaseApi.insert('provider_performance_incidents', { provider_key: providerKey, booking_id: bookingId, kind: 'no_show', source: 'user_report', recorded_at: nowIso });
     }
     await supabaseApi.insert('event_log', { type: 'provider_performance_incident', payload: { bookingId, providerKey, kind: 'no_show', source: 'user_report', by: actorUserId } });
+    // Phase 6: Serien-No-Shows — Hinweis bei zwei, Buchungspause bei drei (ADR-0009).
+    await evaluateProviderIncidents(providerKey, correlationId).catch(() => { /* protokolliert */ });
     (async () => {
         for (const m of await membersOf(providerKey)) {
             await notify({ to: m, actor: actorUserId, type: 'performance_incident', subject: 'booking', subjectId: bookingId,
@@ -204,6 +209,7 @@ export async function handleAdminDispute(req: IncomingMessage, res: ServerRespon
             await supabaseApi.update('scheduling', { id: bookingId }, { dispute_status: 'upheld', no_show_by: 'provider', credit_decided_at: nowIso, dispute_note: note ?? b.dispute_note ?? null, updated_at: nowIso });
             const existing = (await supabaseApi.select('provider_performance_incidents', { booking_id: bookingId }, { limit: 1 })) as Json[];
             if (!existing.length) await supabaseApi.insert('provider_performance_incidents', { provider_key: providerKey, booking_id: bookingId, kind: 'no_show', source: 'admin', note, recorded_at: nowIso });
+            await evaluateProviderIncidents(providerKey, correlationId).catch(() => { /* protokolliert */ });
         } else {
             await supabaseApi.update('scheduling', { id: bookingId }, { dispute_status: 'dismissed', dispute_note: note ?? b.dispute_note ?? null, updated_at: nowIso });
         }

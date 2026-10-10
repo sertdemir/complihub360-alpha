@@ -2157,7 +2157,8 @@
         "performance": "Performans verileriniz yüklenemedi",
         "notifications": "Bildirimleriniz yüklenemedi",
         "coverage": "Kapsamınız yüklenemedi",
-        "message": "Hesabınızda hiçbir şey değişmedi. Yalnızca şu anda gösteremiyoruz. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
+        "message": "Hesabınızda hiçbir şey değişmedi. Yalnızca şu anda gösteremiyoruz. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin.",
+        "overview": "Genel bakışınız yüklenemedi"
       },
       "empty": {
         "appointments": "Henüz randevu yok",

@@ -262,17 +262,26 @@ export interface RankBasis {
     verification: VerificationLevel;
     verified_count: number;
     required_count: number;
+    /** Seit Phase 6 nicht mehr aus der alten Pipeline; bleibt im Vertrag, steht auf null. */
     response_hours: number | null;
-    /** 0..1 */
+    /** 0..1 — seit Phase 6 null (die Anfrage-Pipeline ist stillgelegt). */
     confirmation_rate: number | null;
     /** Nur Bewertungen aus Buchungen. */
     rating: number | null;
     reviews_count: number | null;
+    /** Phase 6 (ADR-0009): Buchungs-Fakten im Fenster — abgeschlossen, gesamt, Vorfaelle. */
+    completed: number | null;
+    bookings: number | null;
+    incidents: number | null;
+    window_days: number | null;
+    /** Welche Teile der Qualitaet mangels Daten neutral standen — weder Bonus noch Strafe. */
+    neutral: string[];
 }
 
 export function rankBasis(input: {
     required: RequiredEvidence[]; evidence: EvidenceLike[];
     avg_response_hours?: number | null; confirmation_rate?: number | null; rating?: number | null; reviews_count?: number | null;
+    completed?: number | null; bookings?: number | null; incidents?: number | null; window_days?: number | null; neutral?: string[];
 }): RankBasis {
     const required = input.required;
     let independent = 0, reviewed = 0;
@@ -290,6 +299,8 @@ export function rankBasis(input: {
         verification, verified_count: verified, required_count: required.length,
         response_hours: num(input.avg_response_hours), confirmation_rate: num(input.confirmation_rate),
         rating: num(input.rating), reviews_count: num(input.reviews_count),
+        completed: num(input.completed), bookings: num(input.bookings), incidents: num(input.incidents), window_days: num(input.window_days),
+        neutral: Array.isArray(input.neutral) ? [...input.neutral] : [],
     };
 }
 
