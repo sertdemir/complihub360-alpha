@@ -408,7 +408,7 @@
       },
       "hubCta": {
         "title": "¿Listo para ver qué le aplica?",
-        "lead": "El assessment acota las ocho áreas a su empresa, sus mercados y su producto — en menos de cinco minutos.",
+        "lead": "El assessment acota las nueve áreas a su empresa, sus mercados y su producto — en menos de cinco minutos.",
         "btn": "Iniciar un assessment"
       }
     },
@@ -758,8 +758,8 @@
       ],
       "askPlaceholder": "P. ej.: ¿Necesito registro RAEE si solo vendo por Amazon?"
     },
-    "areasEyebrow": "Ocho áreas, una puerta de entrada",
-    "areasTitle": "Las ocho áreas de cumplimiento",
+    "areasEyebrow": "Nueve áreas, una puerta de entrada",
+    "areasTitle": "Las nueve áreas de cumplimiento",
     "areasLead": "Cada una abre una página con las obligaciones que conlleva, la norma que hay detrás y lo que cuesta equivocarse.",
     "severity": {
       "critical": "Crítico",
@@ -866,7 +866,7 @@
       "relatedStrongest": "Conexión más fuerte",
       "sharedTriggers_one": "{{count}} disparador compartido",
       "sharedTriggers_other": "{{count}} disparadores compartidos",
-      "allAreasLink": "Las ocho áreas de un vistazo",
+      "allAreasLink": "Las nueve áreas de un vistazo",
       "coverageNoteEu_one": "El motor recoge {{count}} obligación para este ámbito, con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional.",
       "coverageNoteEu_other": "El motor recoge {{count}} obligaciones para este ámbito, todas con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional.",
       "startShort": "Iniciar la evaluación",
@@ -1750,7 +1750,7 @@
     },
     "compliance": {
       "title": "Áreas de compliance · CompliHub360",
-      "description": "Ocho áreas, del IVA y los impuestos al EPR y la protección de datos: qué se aplica, con qué urgencia y quién ayuda a resolverlo."
+      "description": "Nueve áreas, del IVA y los impuestos al EPR y la protección de datos: qué se aplica, con qué urgencia y quién ayuda a resolverlo."
     },
     "markets": {
       "title": "Mercados · CompliHub360",
@@ -1762,7 +1762,7 @@
     },
     "resources": {
       "title": "Recursos · CompliHub360",
-      "description": "Dónde seguir leyendo: los mercados y sus normas, las ocho áreas de compliance y el camino de la pregunta al profesional."
+      "description": "Dónde seguir leyendo: los mercados y sus normas, las nueve áreas de compliance y el camino de la pregunta al profesional."
     },
     "about": {
       "title": "Quiénes somos · CompliHub360",

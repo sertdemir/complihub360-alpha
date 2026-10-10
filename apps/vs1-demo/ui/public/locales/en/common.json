@@ -412,7 +412,7 @@
       },
       "hubCta": {
         "title": "Ready to see what applies to you?",
-        "lead": "The assessment narrows the eight areas down to your business, your markets and your product — in under five minutes.",
+        "lead": "The assessment narrows the nine areas down to your business, your markets and your product — in under five minutes.",
         "btn": "Start an assessment"
       }
     },
@@ -762,8 +762,8 @@
       ],
       "askPlaceholder": "E.g.: Do I need a WEEE registration if I only sell through Amazon?"
     },
-    "areasEyebrow": "Eight areas, one way in",
-    "areasTitle": "The eight compliance areas",
+    "areasEyebrow": "Nine areas, one way in",
+    "areasTitle": "The nine compliance areas",
     "areasLead": "Each opens a page with the duties it carries, the statute behind each one, and what it costs to get wrong.",
     "severity": {
       "critical": "Critical",
@@ -870,7 +870,7 @@
       "relatedStrongest": "Strongest connection",
       "sharedTriggers_one": "{{count}} shared trigger",
       "sharedTriggers_other": "{{count}} shared triggers",
-      "allAreasLink": "All eight areas at a glance",
+      "allAreasLink": "All nine areas at a glance",
       "coverageNoteEu_one": "The engine carries {{count}} duty for this area, on an EU-level source. Pick a market to see where a national source adds to it.",
       "coverageNoteEu_other": "The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.",
       "startShort": "Start the assessment",
@@ -1798,7 +1798,7 @@
     },
     "compliance": {
       "title": "Compliance areas · CompliHub360",
-      "description": "Eight areas from tax and VAT through EPR to data privacy: what applies, how urgent it is and who helps you act on it."
+      "description": "Nine areas from tax and VAT through EPR to data privacy: what applies, how urgent it is and who helps you act on it."
     },
     "markets": {
       "title": "Markets · CompliHub360",
@@ -1810,7 +1810,7 @@
     },
     "resources": {
       "title": "Resources · CompliHub360",
-      "description": "Where to read on: markets and the rules that apply there, the eight compliance areas, and the path from a question to a professional."
+      "description": "Where to read on: markets and the rules that apply there, the nine compliance areas, and the path from a question to a professional."
     },
     "about": {
       "title": "About us · CompliHub360",

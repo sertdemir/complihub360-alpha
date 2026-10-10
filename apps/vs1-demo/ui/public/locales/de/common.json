@@ -408,7 +408,7 @@
       },
       "hubCta": {
         "title": "Bereit zu sehen, was für Sie gilt?",
-        "lead": "Das Assessment grenzt die acht Bereiche auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in unter fünf Minuten.",
+        "lead": "Das Assessment grenzt die neun Bereiche auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in unter fünf Minuten.",
         "btn": "Ein Assessment starten"
       }
     },
@@ -758,8 +758,8 @@
       ],
       "askPlaceholder": "Z. B.: Brauche ich eine WEEE-Registrierung, wenn ich nur über Amazon verkaufe?"
     },
-    "areasEyebrow": "Acht Bereiche, ein Einstieg",
-    "areasTitle": "Die acht Compliance-Bereiche",
+    "areasEyebrow": "Neun Bereiche, ein Einstieg",
+    "areasTitle": "Die neun Compliance-Bereiche",
     "areasLead": "Jeder öffnet eine Seite mit den Pflichten, die er trägt, der Rechtsgrundlage dahinter und dem, was ein Fehler kostet.",
     "severity": {
       "critical": "Kritisch",
@@ -866,7 +866,7 @@
       "relatedStrongest": "Stärkste Verbindung",
       "sharedTriggers_one": "{{count}} gemeinsamer Auslöser",
       "sharedTriggers_other": "{{count}} gemeinsame Auslöser",
-      "allAreasLink": "Alle acht Bereiche im Überblick",
+      "allAreasLink": "Alle neun Bereiche im Überblick",
       "coverageNoteEu_one": "Die Engine trägt {{count}} Pflicht für diesen Bereich, mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt.",
       "coverageNoteEu_other": "Die Engine trägt {{count}} Pflichten für diesen Bereich, alle mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt.",
       "startShort": "Assessment jetzt starten",
@@ -1750,7 +1750,7 @@
     },
     "compliance": {
       "title": "Compliance-Bereiche · CompliHub360",
-      "description": "Acht Bereiche von Steuern und USt über EPR bis Datenschutz: was jeweils gilt, wie dringend es ist und wer bei der Umsetzung hilft."
+      "description": "Neun Bereiche von Steuern und USt über EPR bis Datenschutz: was jeweils gilt, wie dringend es ist und wer bei der Umsetzung hilft."
     },
     "markets": {
       "title": "Märkte · CompliHub360",
@@ -1762,7 +1762,7 @@
     },
     "resources": {
       "title": "Ressourcen · CompliHub360",
-      "description": "Wo Sie weiterlesen können: Märkte und die dort geltenden Regeln, die acht Compliance-Bereiche und der Weg von der Frage zur Fachperson."
+      "description": "Wo Sie weiterlesen können: Märkte und die dort geltenden Regeln, die neun Compliance-Bereiche und der Weg von der Frage zur Fachperson."
     },
     "about": {
       "title": "Über uns · CompliHub360",
