@@ -145,7 +145,7 @@ type AckStrings = {
     reply: string;
 };
 
-// ENTWURF — Copy zur Abnahme (Canvas „Kontakt und Bewerbung", 2026-10-09).
+// Copy abgenommen 10.10.2026 (Canvas „Kontakt und Bewerbung senden", Board E V1).
 // Ansprache wie in allen Produkt-Mails: DE Sie, ES usted, TR siz.
 const ACK: Record<Locale, AckStrings> = {
     en: {
