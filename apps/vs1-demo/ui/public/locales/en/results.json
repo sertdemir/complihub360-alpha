@@ -29,7 +29,7 @@
     }
   },
   "table": {
-    "severity": "Priority",
+    "priority": "Priority",
     "obligation": "Obligation",
     "market": "Market",
     "due": "Due",
@@ -41,8 +41,8 @@
     "now": "Now",
     "radar": "On the radar"
   },
-  "severity": {
-    "critical": "Immediate",
+  "priority": {
+    "immediate": "Immediate",
     "high": "High",
     "medium": "Medium",
     "low": "Low"
@@ -112,9 +112,9 @@
     "errorBody": "Please try again in a moment.",
     "crumbProviders": "Providers",
     "backToArea": "Back to the area",
-    "backToSession": "Back to the session",
+    "backToRiskMap": "Back to the risk map",
     "lageAreasArea": "Covers {{matched}} of {{total}} areas ({{area}})",
-    "lageAreasSession": "Matches {{matched}} of {{total}} areas in your session “{{session}}”",
+    "lageAreasRiskMap": "Matches {{matched}} of {{total}} areas in your risk map “{{riskMap}}”",
     "lageMarketsAll_one": "{{count}} market covered",
     "lageMarketsAll_other": "all {{count}} markets covered",
     "lageMarketsPartial_one": "{{covered}} of {{total}} market covered · not {{missing}}",
@@ -128,12 +128,12 @@
     "matrixTitle": "Your obligations and this provider's markets",
     "matrixCovered_one": "{{covered}} of {{total}} market",
     "matrixCovered_other": "{{covered}} of {{total}} markets",
-    "matrixSession": "Session",
+    "matrixRiskMap": "Risk map",
     "matrixNone": "Nothing is open in this context right now.",
     "matrixNotCovered": "This provider does not cover this market.",
     "matrixEuWide": "EU-wide",
     "matrixFoot": "Struck-through markets are not covered by this provider. The matrix shows markets, not areas of expertise — the dossier says which areas he covers.",
-    "matrixNoContext": "Open a provider from an area or a session and this shows which of your open obligations he can take on, in which market.",
+    "matrixNoContext": "Open a provider from an area or a risk map and this shows which of your open obligations the provider can take on, in which market.",
     "dossierTitle": "Dossier",
     "servicesTitle": "Services",
     "servicesCoarse": "The provider has not detailed his services yet — these are the areas of expertise from his application.",
@@ -195,7 +195,7 @@
     "toAppointments": "To your appointments",
     "pickSlotDrawer": "Pick a slot above.",
     "messageLabel": "What it is about",
-    "messageFromSession": "This is about my session “{{session}}”.",
+    "messageFromRiskMap": "This is about my risk map “{{riskMap}}”.",
     "duration": "30 min",
     "noSlots": "This provider has no free slots right now. Try again in a few days.",
     "failed": "The appointment could not be booked. Please try again in a moment.",
@@ -311,14 +311,14 @@
       "later_one": "{{count}} obligation",
       "later_other": "{{count}} obligations"
     },
-    "historyTitle": "History of this session",
+    "historyTitle": "History of this risk map",
     "historyCurrent": "Current state",
-    "historyStart": "Session created",
+    "historyStart": "Risk map created",
     "historyCreated": "Your answers as first given",
     "copyVariant": "Copy as a variant",
     "copyHint": "Creates a copy — try variants without losing the original.",
     "copyDone": "Copy created",
-    "copyOpenList": "Open in sessions",
+    "copyOpenList": "Open in Risk Maps",
     "copyError": "The copy could not be created.",
     "copyUnavailable": "Save first, then you can create a variant.",
     "verifiedPartner": "Verified Provider",
@@ -388,7 +388,7 @@
   },
   "reveal": {
     "was": "was {{title}}",
-    "wasInSession": "was {{title}} in your session “{{session}}”"
+    "wasInRiskMap": "was {{title}} in your risk map “{{riskMap}}”"
   },
   "dueLive": "Live",
   "matchStates": {

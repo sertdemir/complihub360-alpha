@@ -519,6 +519,17 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                 res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'provider must be a provider key', correlationId }));
                 return;
             }
+            // Ein vertippter Schluessel ist kein „Anbieter ohne Abo": ohne diese
+            // Pruefung lief der Lauf gruen mit 0 Anbietern durch und sah aus wie
+            // „nichts faellig" (zweimal passiert beim B2a-Test, 2026-10-10).
+            if (onlyProvider) {
+                const known = (await supabaseApi.select('providers', { provider_key: onlyProvider }, { limit: 1 })) as unknown[];
+                if (!known.length) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'PROVIDER_NOT_FOUND', message: `No provider with key ${onlyProvider}`, correlationId }));
+                    return;
+                }
+            }
             const period = typeof d.period === 'string' && /^\d{4}-\d{2}$/.test(d.period)
                 ? d.period : new Date().toISOString().slice(0, 7);
             const dryRun = d.dry_run === true;

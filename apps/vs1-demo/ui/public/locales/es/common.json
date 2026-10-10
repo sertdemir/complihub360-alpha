@@ -761,8 +761,8 @@
     "areasEyebrow": "Nueve áreas, una puerta de entrada",
     "areasTitle": "Las nueve áreas de cumplimiento",
     "areasLead": "Cada una abre una página con las obligaciones que conlleva, la norma que hay detrás y lo que cuesta equivocarse.",
-    "severity": {
-      "critical": "Crítico",
+    "priority": {
+      "immediate": "Inmediata",
       "high": "Alto",
       "medium": "Medio",
       "low": "Bajo"
@@ -1342,7 +1342,7 @@
         ],
         "rows": [
           {
-            "level": "critical",
+            "level": "immediate",
             "title": "Declaración trimestral OSS",
             "meta": "DE · NL · Vence 30 abr"
           },

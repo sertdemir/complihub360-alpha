@@ -54,6 +54,17 @@ Belastung ohne Gegenleistung.
 |---|---|---|
 | SetupIntents | **write** | die Nachfrage bei der Bank (`POST setup_intents`, `confirm=true`) |
 
+✅ **Auf Staging gesetzt (2026-10-10).** Nachgewiesen mit einem Lese-Aufruf
+gegen `GET /v1/setup_intents?limit=1` aus dem API-Container (200). Bewusst ein
+GET: „write" schließt das Lesen ein, also belegt die Liste das Recht, ohne
+einen SetupIntent anzulegen oder einen Anbieter zu berühren.
+
+Ein Neustart war dafür nicht nötig und ist es auch künftig nicht: Eine
+geänderte BERECHTIGUNG lässt den Key-String unberührt, und Stripe prüft die
+Rechte bei jeder Anfrage. Der Hinweis auf
+`docker compose up -d --force-recreate` weiter oben gilt nur, wenn der Key
+ERSETZT wird.
+
 Fehlt es, antwortet Stripe `permission_error` und die Route meldet 502
 `STRIPE_ERROR`. **Dieser Fall verbraucht keine der drei Prüfungen** — die
 Ereigniszeile entsteht erst, wenn die Bank geantwortet hat. Ein fehlendes

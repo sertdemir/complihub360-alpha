@@ -1,4 +1,6 @@
 import { searchCoverage, priceRangeOf } from './searchCoverage.js';
+import { buildSharedSnapshot, providerSharedView, sharedPreview } from './sharedSnapshot.js';
+import { logAccessDenied } from './accessDenied.js';
 import { createServer, IncomingMessage, ServerResponse } from "http";
 import * as crypto from "node:crypto";
 import { Orchestrator } from "@complihub/task-orchestrator";
@@ -126,6 +128,19 @@ function deepMask(v: unknown, ctx: IdentityContext): unknown {
     if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, deepMask(x, ctx)]));
     return v ?? null;
 }
+/** A1 (Schritt 4): das Dossier, wie der Anbieter es freigegeben hat — nur
+ *  fuer jemanden, der bei ihm gebucht hat (identity_revealed). */
+function openDossier(p: any) {
+    return {
+        services: p.services ?? null,
+        credentials: p.credentials ?? null,
+        excluded_services: p.excluded_services ?? null,
+        work_mode: p.work_mode ?? null,
+        region: p.region ?? null,
+        pricing_table: p.pricing_table ?? null,
+    };
+}
+
 function maskDossier(p: any) {
     const ctx = identityCtx(p);
     return {
@@ -225,6 +240,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     // Caller identity from a valid Supabase JWT (phase ③ subscription gate).
     let authUserId: string | null = null;
     let authEmail: string | null = null;
+    // Firma aus dem Profil (user_metadata.company_name) — die Quelle, die der
+    // Pruefdialog zeigt und die Buchung festhaelt (Schritt 4, B1).
+    let authCompany: string | null = null;
     // True only for the server-to-server API key — gates admin-only routes.
     let authViaApiKey = false;
     // True when the verified JWT carries the app-level admin role (app_metadata
@@ -274,6 +292,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     isAuthenticated = true;
                     if (typeof payload.sub === 'string') authUserId = payload.sub;
                     if (typeof payload.email === 'string') authEmail = payload.email;
+                    if (payload.user_metadata && typeof payload.user_metadata.company_name === 'string') authCompany = payload.user_metadata.company_name;
                     // App-level role lives in app_metadata.role (authoritative),
                     // user_metadata.role as fallback — same precedence as the FE.
                     const appRole = (payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined)
@@ -339,16 +358,38 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         return;
     }
 
+    /** Schritt 4 (#8): welche Seite der Aufrufer an einer Anfrage ist —
+     *  'user' (Ersteller), 'provider' (Mitglied des Anbieters), 'server'
+     *  (Server-Key oder Admin) oder null (fremd). */
+    const engagementSide = async (eng: Record<string, unknown>): Promise<'user' | 'provider' | 'server' | null> => {
+        if (authViaApiKey || authIsAdmin) return 'server';
+        if (authUserId && eng.user_id === authUserId) return 'user';
+        if (typeof eng.provider_key === 'string' && await canAccessProvider({ userId: authUserId, isAdmin: authIsAdmin, viaApiKey: authViaApiKey }, eng.provider_key).catch(() => false)) return 'provider';
+        return null;
+    };
+
     // Ownership: Anbieter-eigene Routen nur fuer Mitglieder (providerAuth.ts).
     // Einmal hier statt in jedem Handler — eine neue Route unter dem Pfad ist
     // damit von Anfang an geschuetzt. 404 statt 403 fuer Fremde, damit die
     // Antwort nicht verraet, welche Anbieter-Schluessel es gibt.
     const ownKey = ownProviderRouteKey(req.url);
     if (ownKey) {
+        let guardFailed = false;
         const allowed = await canAccessProvider(
             { userId: authUserId, isAdmin: authIsAdmin, viaApiKey: authViaApiKey }, ownKey,
-        ).catch(() => false);
+        ).catch(() => { guardFailed = true; return false; });
         if (!allowed) {
+            // C1 (Schritt 4): ein angemeldeter Fremder bei einem Anbieter, den es
+            // gibt, ist ein Zugriffsversuch. Ein Datenbankfehler ist keiner, und
+            // ein Tippfehler im Schluessel auch nicht.
+            if (guardFailed) {
+                structuredLog('error', 'Provider ownership check failed', { correlationId, errorCode: 'ERR_OWNERSHIP', severity: 'error', route: req.url });
+            } else if (authUserId) {
+                void (async () => {
+                    const exists = (await supabaseApi.select('providers', { provider_key: ownKey }, { limit: 1 }).catch(() => [])) as unknown[];
+                    if (exists.length) await logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'provider', target: ownKey, status: 404, correlationId });
+                })();
+            }
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
@@ -704,6 +745,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             try {
                 const own = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as Array<{ user_id: string | null }>;
                 if (!own.length || !(authViaApiKey || (authUserId && own[0].user_id === authUserId))) {
+                    if (own.length) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'session', target: String(sessionId), status: 404, correlationId });
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
                     return;
@@ -748,6 +790,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         try {
             const own = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as Array<Record<string, unknown>>;
             if (!own.length || !(authViaApiKey || (authUserId && own[0].user_id === authUserId))) {
+                if (own.length) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'session', target: String(sessionId), status: 404, correlationId });
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
                 return;
@@ -790,6 +833,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 // Wie beim Lesen: nur der Eigentümer (oder der Server-Key)
                 // darf Stände setzen — fremde Sitzungen bleiben ein 404.
                 if (!owner.length || !(authViaApiKey || (authUserId && owner[0].user_id === authUserId))) {
+                    if (owner.length) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'session', target: String(sessionId), status: 404, correlationId });
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
                     return;
@@ -839,6 +883,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         try {
             const rows = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as Array<Record<string, unknown>>;
             if (!rows[0] || !(authViaApiKey || (authUserId && rows[0].user_id === authUserId))) {
+                if (rows[0]) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'session', target: String(sessionId), status: 404, correlationId });
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
                 return;
@@ -905,6 +950,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     }
                 } catch { /* event logging must never break the read */ }
 
+                // A1 (Schritt 4, Checklist "Identity reveal after booking"): wer bei
+                // DIESEM Anbieter gebucht hat, sieht ihn offen — Name, Website,
+                // Kontakt und das Dossier ohne Maske. Alle anderen bleiben anonym,
+                // auch wer ihn nur ausgewaehlt hat.
+                // Server-Key ohne Nutzer: niemand hat gebucht, nichts nachzuschlagen.
+                const ownBookings = authUserId
+                    ? (await supabaseApi.select('scheduling', { user_id: authUserId, provider_key: providerKey }, { limit: 50 })) as any[]
+                    : [];
+                const revealed = ownBookings.some((b: any) => b.identity_revealed === true);
                 const reg = await visibilityRegister();
                 const { areas, services: specializations } = approvedNamesOf(view);
                 const labels = await areaLabels(areas);
@@ -921,8 +975,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({
                     ok: true,
                     detail: {
-                        ...serializeProvider(p, reg, 'anonymous'),
-                        ...maskDossier(p),
+                        ...serializeProvider(p, reg, revealed ? 'revealed' : 'anonymous'),
+                        ...(revealed ? openDossier(p) : maskDossier(p)),
+                        revealed,
                         descriptor: title.descriptor,
                         // 3 V3 (2026-10-01): die Bereiche als Codes, damit das UI
                         // sie in der Sprache des Nutzers zeigt — `descriptor`
@@ -1159,6 +1214,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const providerKey = prov.provider_key as string;
                 const booked = (await supabaseApi.select('scheduling', { user_id: authUserId, provider_key: providerKey }, { limit: 1 })) as any[];
                 if (!booked[0] || !booked[0].identity_revealed) {
+                    void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'provider_reveal', target: String(ref), status: 403, correlationId });
                     res.writeHead(403, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Website is revealed after booking only', correlationId }));
                     return;
@@ -1328,8 +1384,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     slot_end: b.slot_end,
                     status: b.status,
                     lead_charged: !!b.lead_charged,
-                    user_email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null,
-                    user_company: company || null,
+                    // B1: nur, was der Nutzer bestaetigt hat (shared_snapshot); aeltere
+                    // Buchungen ohne Schnappschuss nur nach shared_fields.
+                    ...providerSharedView(b, { email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null, company: company || null }),
                     // Thema des Leads: was gebucht und berechnet wurde (Ledger), nicht
                     // die juengste Anfrage des Nutzers an diesen Anbieter — die kann
                     // ein ganz anderes Thema sein (Testlauf Phase 4, 2026-10-09:
@@ -1337,7 +1394,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     category: l?.area_code ?? anfrage?.category ?? null,
                     country: (Array.isArray(l?.countries) && l.countries[0]) || anfrage?.country || null,
                     countries: Array.isArray(l?.countries) && l.countries.length ? l.countries : null,
-                    message: b.message ?? null,
                     acknowledgement_version: b.acknowledgement_version ?? null,
                     price_snapshot: b.price_snapshot ?? null,
                     lead: l ? {
@@ -1384,6 +1440,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
                 if (!authViaApiKey && (!authUserId || b.user_id !== authUserId)) {
+                    void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'booking', target: String(b.id), status: 403, correlationId });
                     res.writeHead(403, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Not your booking', correlationId }));
                     return;
@@ -1579,6 +1636,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.end(JSON.stringify({
                 ok: true, version: ack.version, language: ack.language, body: ack.body, shared_fields: ack.shared_fields,
                 user_discount: policy ? { pct: policy.pct, policy_version: policy.version, recurring_treatment: policy.recurring_treatment } : null,
+                // B1 (Schritt 4): mit Login die Werte, die beim Buchen festgehalten
+                // werden — der Dialog zeigt genau diese, nicht eine eigene Quelle.
+                shared_preview: authUserId ? sharedPreview(ack.shared_fields ?? [], { email: authEmail, company: authCompany }) : null,
                 correlationId,
             }));
         } catch {
@@ -1655,7 +1715,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     let session: { country?: string | null; categories?: string[] | null; markets?: string[] | null } | null = null;
                     if (typeof d.session_id === 'string' && d.session_id) {
                         const own = (await supabaseApi.select('sessions', { id: d.session_id }, { limit: 1 })) as any[];
-                        if (!own[0] || own[0].user_id !== authUserId) { fail(404, 'NOT_FOUND', 'Session not found'); return; }
+                        if (!own[0] || own[0].user_id !== authUserId) {
+                            if (own[0]) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'session', target: String(d.session_id), status: 404, correlationId });
+                            fail(404, 'NOT_FOUND', 'Session not found'); return;
+                        }
                         session = own[0];
                     }
                     const opp = deriveOpportunity(view, session, d);
@@ -1712,6 +1775,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                     const slotEnd = new Date(Date.parse(slotStart) + 30 * 60 * 1000).toISOString();
                     const sharingAt = now.toISOString();
+                    // B1: genau die Werte, die der Pruefdialog gezeigt hat — aus
+                    // derselben Quelle (sharedSnapshot.ts). Der Anbieter liest nur sie.
+                    // Dieselbe Feldliste wie der Dialog (ack.shared_fields) — sonst
+                    // haelt der Schnappschuss fest, was der Dialog nie zeigte.
+                    const sharedFields: string[] = Array.isArray(ack.shared_fields) && ack.shared_fields.length ? [...ack.shared_fields] : [...SHARED_FIELDS_V1];
+                    const sharedSnapshot = buildSharedSnapshot(sharedFields, {
+                        email: authEmail, company: authCompany,
+                        message: typeof d.message === 'string' ? d.message : null,
+                        topic: opp.opp.areaCode ? { area_code: opp.opp.areaCode, countries: opp.opp.countries } : null,
+                    });
                     let booking: any;
                     try {
                         const inserted = (await supabaseApi.insert('scheduling', {
@@ -1726,7 +1799,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             rebooked_from: linkedRoot?.id ?? null,
                             service_id: opp.serviceRow.service_id ?? null,
                             price_snapshot: snapshot,
-                            shared_fields: [...SHARED_FIELDS_V1],
+                            shared_fields: sharedFields,
+                            shared_snapshot: sharedSnapshot,
                             sharing_confirmed_at: sharingAt,
                             acknowledgement_version: ack.version,
                             lead_ledger_id: charge.ledgerId,
@@ -1807,7 +1881,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         ok: true,
                         booking: {
                             id: booking.id, public_ref: ref, slot_start: slotStart, slot_end: slotEnd, status: 'confirmed',
-                            acknowledgement_version: ack.version, shared_fields: [...SHARED_FIELDS_V1],
+                            acknowledgement_version: ack.version, shared_fields: sharedFields,
                             user_discount: policy ? { pct: policy.pct, policy_version: policy.version } : null,
                             rebooked_from: linkedRoot?.id ?? null,
                             // Das Thema, das der Anbieter mit der Buchung sieht
@@ -1817,6 +1891,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             // confirmation" (Checklist v1.0) gilt nur, wenn es
                             // dort steht.
                             topic: { area_code: opp.opp.areaCode, countries: opp.opp.countries },
+                            // B1: was geteilt wurde, Wert fuer Wert — die Bestaetigung zeigt es.
+                            shared_snapshot: sharedSnapshot,
                         },
                         // Offenlegung erst jetzt (Spec B Schritt 5): Name und Kontakt nach der Belastung.
                         provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
@@ -1863,6 +1939,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         ? (authViaApiKey || booking.user_id === authUserId)
                         : await canAccessProvider({ userId: authUserId, isAdmin: authIsAdmin, viaApiKey: authViaApiKey }, booking.provider_key));
                     if (!booking || !beteiligt) {
+                        if (booking) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'booking', target: String(booking?.id), status: 404, correlationId });
                         res.writeHead(404, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Booking not found', correlationId }));
                         return;
@@ -2543,7 +2620,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const engagementId = (req.url || '').split('/').pop() as string;
         try {
             const eng = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as Array<Record<string, unknown>>;
-            if (!eng[0]) {
+            // Schritt 4 (#8): nur der Ersteller, ein Mitglied des Anbieters oder
+            // der Server-Key. Vorher bekam jeder Angemeldete mit der UUID die
+            // Anfrage samt structured_answers und Thread.
+            const seite = eng[0] ? await engagementSide(eng[0]) : null;
+            if (!eng[0] || !seite) {
+                if (eng[0]) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'engagement', target: engagementId, status: 404, correlationId });
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
                 return;
@@ -2569,6 +2651,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 if (!d.body || typeof d.body !== 'string' || !['user', 'provider'].includes(d.author)) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'author (user|provider) and body required', correlationId }));
+                    return;
+                }
+                // Schritt 4 (#8): schreiben darf nur, wer an der Anfrage beteiligt
+                // ist — und nur als die eigene Seite. Vorher konnte jeder
+                // Angemeldete als "provider" in eine fremde Anfrage schreiben.
+                const engRow = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as Array<Record<string, unknown>>;
+                const seite = engRow[0] ? await engagementSide(engRow[0]) : null;
+                if (!engRow[0] || !seite || (seite !== 'server' && seite !== d.author)) {
+                    if (engRow[0]) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'engagement', target: engagementId, status: 404, correlationId });
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
                     return;
                 }
                 // B1 (Provider Flows §5): optional structured proposal on a reply.
@@ -2631,6 +2724,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const own = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
             Array<{ id: string; user_id?: string | null }>;
         if (!own[0] || !(authViaApiKey || (authUserId && own[0].user_id === authUserId))) {
+            if (own[0]) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'engagement', target: String(own[0]?.id), status: 404, correlationId });
             res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
             return;
@@ -2659,6 +2753,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 Array<{ id: string; status: string; user_id?: string | null }>;
             // Eigentuemer-Bindung (2026-09-05): fremde Anfragen sind ein 404.
             if (!eng[0] || !(authViaApiKey || (authUserId && eng[0].user_id === authUserId))) {
+                if (eng[0]) void logAccessDenied({ route: `${req.method} ${req.url}`, userId: authUserId, resource: 'engagement', target: String(eng[0]?.id), status: 404, correlationId });
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
                 return;

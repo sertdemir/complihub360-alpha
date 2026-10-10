@@ -48,15 +48,15 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
       onChanged();
       setTimeout(onClose, 900);
     } catch {
-      setError(t('sessionActions.actionError'));
+      setError(t('riskMapActions.actionError'));
     }
     setBusy(false);
   };
 
-  const title = target?.action === 'archive' ? t('sessionActions.archiveTitle') : t('sessionActions.renameTitle');
+  const title = target?.action === 'archive' ? t('riskMapActions.archiveTitle') : t('riskMapActions.renameTitle');
 
   return (
-    <Drawer open={!!target} onClose={onClose} side="right" size="md" eyebrow={t('sessionActions.eyebrow')} title={title}>
+    <Drawer open={!!target} onClose={onClose} side="right" size="md" eyebrow={t('riskMapActions.eyebrow')} title={title}>
       {target && (
         <div className="space-y-4">
           <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] px-4 py-3">
@@ -71,7 +71,7 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
             <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
               <div className="flex items-center gap-2.5">
                 <PencilLine size={15} className="shrink-0 text-fg-accent" />
-                <p className="text-[13px] font-semibold text-fg">{t('sessionActions.renameTitle')}</p>
+                <p className="text-[13px] font-semibold text-fg">{t('riskMapActions.renameTitle')}</p>
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <input
@@ -80,17 +80,17 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
                   onChange={(e) => setName(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !busy && name.trim().length >= 2 && name.trim() !== target.title) {
-                      void run(() => patchSession(target.id, { label: name.trim() }), t('sessionActions.renamed'));
+                      void run(() => patchSession(target.id, { label: name.trim() }), t('riskMapActions.renamed'));
                     }
                   }}
                   className="w-full rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-fg-brand"
-                  placeholder={t('sessionActions.namePlaceholder')}
+                  placeholder={t('riskMapActions.namePlaceholder')}
                 />
                 <Button
                   size="sm"
                   variant="secondary"
                   disabled={busy || name.trim().length < 2 || name.trim() === target.title}
-                  onClick={() => run(() => patchSession(target.id, { label: name.trim() }), t('sessionActions.renamed'))}
+                  onClick={() => run(() => patchSession(target.id, { label: name.trim() }), t('riskMapActions.renamed'))}
                 >
                   {busy ? '…' : t('shared.save')}
                 </Button>
@@ -103,15 +103,15 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
               <div className="flex items-start gap-3">
                 <Archive size={15} className="mt-0.5 shrink-0 text-fg-tertiary" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-semibold text-fg">{t('sessionActions.archiveQuestion')}</p>
-                  <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">{t('sessionActions.archiveDesc')}</p>
+                  <p className="text-[13px] font-semibold text-fg">{t('riskMapActions.archiveQuestion')}</p>
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">{t('riskMapActions.archiveDesc')}</p>
                 </div>
               </div>
               <div className="mt-3 flex justify-end gap-2">
                 <Button size="sm" variant="ghost" disabled={busy} onClick={onClose}>{t('shared.cancel')}</Button>
                 <Button size="sm" variant="secondary" disabled={busy}
-                  onClick={() => run(() => patchSession(target.id, { status: 'archived' }), t('sessionActions.archived'))}>
-                  {busy ? '…' : t('sessionActions.archiveTitle')}
+                  onClick={() => run(() => patchSession(target.id, { status: 'archived' }), t('riskMapActions.archived'))}>
+                  {busy ? '…' : t('riskMapActions.archiveTitle')}
                 </Button>
               </div>
             </div>

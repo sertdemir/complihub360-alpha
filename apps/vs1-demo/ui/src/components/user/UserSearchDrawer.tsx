@@ -87,7 +87,7 @@ export function UserSearchDrawer({ open, onClose }: { open: boolean; onClose: ()
 
         {sessionHits.length > 0 && (
           <div className="space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('userSearch.sectionSessions')}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('userSearch.sectionRiskMaps')}</p>
             {sessionHits.map((s) => (
               <button
                 key={s.id}
@@ -103,7 +103,7 @@ export function UserSearchDrawer({ open, onClose }: { open: boolean; onClose: ()
                     {(s.country ?? '—').toUpperCase()} · {(s.categories ?? []).join(', ') || 'compliance'}
                   </span>
                 </span>
-                <Tag tone="neutral">{t('userSearch.sessionTag')}</Tag>
+                <Tag tone="neutral">{t('userSearch.riskMapTag')}</Tag>
               </button>
             ))}
           </div>

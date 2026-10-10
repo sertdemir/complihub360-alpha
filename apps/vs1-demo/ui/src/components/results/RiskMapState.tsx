@@ -72,7 +72,7 @@ export function RiskMapTableSkeleton({ rows = 4 }: { rows?: number }) {
   return (
     <div aria-hidden className="w-full max-w-[1120px] overflow-hidden rounded-xl border border-stroke-subtle opacity-55">
       <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
-        <span>{t('table.severity')}</span>
+        <span>{t('table.priority')}</span>
         <span>{t('table.obligation')}</span>
         <span>{t('table.market')}</span>
         <span>{t('table.due')}</span>

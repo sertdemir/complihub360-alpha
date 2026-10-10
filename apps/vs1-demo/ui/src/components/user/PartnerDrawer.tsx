@@ -218,7 +218,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
           markets: requestScope.markets.filter((m) => (provider.markets_covered ?? (provider.match_basis?.country ? [provider.match_basis.country] : [])).includes(m)),
         }
       : 'unspecified';
-  const reviewRows = sharedRows(ack?.sharedFields ?? ['email', 'company_name', 'message'], { message, topic });
+  const reviewRows = sharedRows(ack?.sharedFields ?? ['email', 'company_name', 'message'], { message, topic, preview: ack?.sharedPreview });
   const d = detail.kind === 'ready' ? detail.d : null;
   const beschreibungText = beschreibung({ areaCodes: provider.area_codes, region: provider.descriptor_region, fallback: provider.descriptor });
   const meta = [

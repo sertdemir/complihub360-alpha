@@ -338,6 +338,12 @@ paths:
   /engagement/{id}:
     get:
       summary: Get engagement status
+      description: >-
+        Nur fuer den Ersteller, Mitglieder des angefragten Anbieters oder den
+        Server-Key (Schritt 4, Checklist "Authorization"); allen anderen 404,
+        und der Versuch steht als `access_denied` im Ereignislog.
+        `POST /engagement/{id}/message` gilt dasselbe, und jeder schreibt nur
+        als die eigene Seite (`author`).
       parameters:
         - in: path
           name: id
@@ -425,6 +431,77 @@ paths:
           description: Kein Login
         '404':
           description: Login gehoert zu keinem Anbieter (errorCode NOT_A_PROVIDER)
+
+  # ─── Benachrichtigungen (Glocke) ──────────────────────────────────────────
+  # Die Post des ANGEMELDETEN Kontos aus der Tabelle `notifications` — fuer
+  # Nutzer wie Partner dieselbe Route. Das Betriebsprotokoll (event_log) liegt
+  # bewusst nicht hier, sondern admin-only unter /admin/events.
+
+  /notifications:
+    get:
+      summary: Benachrichtigungen des eingeloggten Kontos (neueste 50)
+      description: Nur die eigenen Zeilen. Ohne Login kein Fehler, sondern ein leeres Fach.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste plus Zahl der ungelesenen
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  unread: { type: integer }
+                  notifications:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string, format: uuid }
+                        type: { type: string, description: 'z. B. invoice_retry_scheduled, booking_created' }
+                        subject: { type: string, nullable: true }
+                        subject_id: { type: string, nullable: true }
+                        payload: { type: object, additionalProperties: true }
+                        created_at: { type: string, format: date-time }
+                        read_at: { type: string, format: date-time, nullable: true }
+                        needs_action:
+                          type: boolean
+                          description: Folgt der aktuellen Lage (z. B. Rechnung noch offen), nicht dem Gelesen-Status
+        '500':
+          description: Laden fehlgeschlagen
+
+  /notifications/read:
+    post:
+      summary: Benachrichtigungen als gelesen markieren
+      description: Der Filter traegt immer die user_id des Aufrufers — eine fremde id markiert nichts.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: id fuer eine Zeile oder all fuer alle ungelesenen
+              properties:
+                id: { type: string, format: uuid }
+                all: { type: boolean }
+      responses:
+        '200':
+          description: Markiert
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  marked: { type: integer }
+                  read_at: { type: string, format: date-time }
+        '400':
+          description: Weder id noch all (VALIDATION_ERROR)
+        '401':
+          description: Kein Login
 
   /admin/provider/{key}/member:
     post:
@@ -867,7 +944,11 @@ paths:
         final_fee_cents, currency, payment_status, fee_enabled } | null`,
         `user_discount_pct`, `proposal { proposal_issued, discount_shown,
         reported_at } | null`, `acknowledgement_version`, `price_snapshot`.
-        Dazu aus der Anfrage des Nutzers an DIESEN Anbieter `user_company`
+        `user_email`, `user_company` und `message` kommen seit Schritt 4 (B1)
+        aus `scheduling.shared_snapshot` — genau den Werten, die der Nutzer im
+        Pruefdialog bestaetigt hat. Aeltere Buchungen ohne Schnappschuss nur
+        nach `shared_fields`; Buchungen von vor Phase 4 (ohne Feldliste)
+        unveraendert: `user_company` aus der Anfrage an DIESEN Anbieter
         (structured_answers.company, sonst null). `category`, `country` und
         `countries` (roh, das UI uebersetzt) beschreiben den Lead: Bereich
         und Maerkte aus dem Ledger, also was gebucht und berechnet wurde;
@@ -986,6 +1067,8 @@ paths:
           description: provider ist kein Anbieter-Schluessel
         '403':
           description: Kein Server-Key
+        '404':
+          description: "PROVIDER_NOT_FOUND — provider ist gueltig geformt, aber es gibt keinen Anbieter mit diesem Schluessel"
         '503':
           description: Stripe nicht konfiguriert (ausser dry_run)
 
@@ -1365,7 +1448,7 @@ paths:
         Oeffentlich — er steht ohnehin auf dem Bildschirm. `?lang=de|en|es|tr`,
         Rueckfall Englisch.
       responses:
-        '200': { description: "`{ version, language, body, shared_fields[], user_discount: { pct, policy_version, recurring_treatment } | null }`" }
+        '200': { description: "`{ version, language, body, shared_fields[], user_discount: { pct, policy_version, recurring_treatment } | null, shared_preview: { email, company_name } | null }` — `shared_preview` nur mit Login (Schritt 4, B1): die Werte, die die Buchung festhalten wird; E-Mail aus dem Login, Firma aus `user_metadata.company_name`. Der Pruefdialog zeigt genau diese." }
         '503': { description: Keine Fassung konfiguriert (`ACKNOWLEDGEMENT_MISSING`) }
 
   /scheduling:
@@ -1399,7 +1482,7 @@ paths:
                 countries: { type: array, items: { type: string } }
                 service_id: { type: string, format: uuid }
       responses:
-        '201': { description: "`{ booking: { id, public_ref, slot_start, slot_end, status, acknowledgement_version, shared_fields[], user_discount: { pct, policy_version } | null, rebooked_from, topic: { area_code, countries[] } }, provider_identity: { name, website_url, contact_email } }` — `topic` ist das Thema, das der Anbieter mit dem Lead sieht; die Bestaetigung nennt es neben den shared_fields." }
+        '201': { description: "`{ booking: { id, public_ref, slot_start, slot_end, status, acknowledgement_version, shared_fields[], user_discount: { pct, policy_version } | null, rebooked_from, topic: { area_code, countries[] }, shared_snapshot: { email, company_name, message, topic } }, provider_identity: { name, website_url, contact_email } }` — `topic` ist das Thema, das der Anbieter mit dem Lead sieht; die Bestaetigung nennt es neben den shared_fields. `shared_snapshot` (Schritt 4, B1) ist Wert fuer Wert, was geteilt wurde (`scheduling.shared_snapshot`); ein Feld ausserhalb von `shared_fields` ist null." }
         '400': { description: "Eingabe (`VALIDATION_ERROR`) oder Opportunity fehlt (`OPPORTUNITY_REQUIRED`, `AREA_NOT_OFFERED`, `SERVICE_NOT_FOUND`)" }
         '404': { description: Unbekannter Ref, nicht matchbar oder fremde Sitzung }
         '409': { description: "`BILLING_NOT_READY` (nicht zahlungsbereit, nichts versucht) · `ACKNOWLEDGEMENT_OUTDATED` (mit `current_version`) · `SLOT_TAKEN` · `BOOKING_NOT_COMPLETED` (Belastung gescheitert, Grund `provider_billing`, keine Buchung)" }
@@ -1701,6 +1784,16 @@ components:
             work_mode: { type: string, nullable: true }
             pricing_table: { type: array, items: { type: object }, nullable: true }
             availability: { type: string, enum: [available, ooo] }
+            revealed:
+              type: boolean
+              description: >-
+                Schritt 4 (A1, Checklist "Identity reveal after booking"): true, wenn DIESER Nutzer bei diesem
+                Anbieter gebucht hat. Dann tragen `name`, `website_url` und `contact_email` die Felder der
+                Register-Klasse `revealed`, und das Dossier kommt ohne Maske. Sonst fehlen sie, und Freitexte
+                sind maskiert.
+            name: { type: string, nullable: true, description: Nur bei `revealed` }
+            website_url: { type: string, nullable: true, description: Nur bei `revealed` }
+            contact_email: { type: string, nullable: true, description: Nur bei `revealed` }
     IdentityFinding:
       type: object
       description: Ein Fund des Identitaets-Scans in einem Freitext (422 `IDENTITY_IN_TEXT`).

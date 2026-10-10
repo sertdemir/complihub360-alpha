@@ -21,7 +21,14 @@ export function BookingConfirmedPage() {
   const topic = confirmation.booking.topic
     ? { area: confirmation.booking.topic.area_code, markets: confirmation.booking.topic.countries }
     : null;
-  const rows = sharedRows(confirmation.booking.shared_fields ?? ['email', 'company_name', 'message'], { message, topic });
+  // B1: die Bestaetigung zeigt, was die Buchung festgehalten hat — den
+  // Schnappschuss vom Server, nicht eine neue Lesung im Browser.
+  const snap = confirmation.booking.shared_snapshot ?? null;
+  const rows = sharedRows(confirmation.booking.shared_fields ?? ['email', 'company_name', 'message'], {
+    message: snap ? snap.message ?? '' : message,
+    topic: snap?.topic ? { area: snap.topic.area_code, markets: snap.topic.countries } : topic,
+    preview: snap,
+  });
   return (
     <UserShell>
     <div className="mx-auto w-full max-w-[1104px] py-6 lg:py-10">

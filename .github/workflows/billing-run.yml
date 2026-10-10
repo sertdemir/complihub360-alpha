@@ -10,6 +10,8 @@
 #   - `dry_run` ist an. Dann wird nur gerechnet und gezeigt, nichts in Stripe
 #     ausgestellt. Erst `dry_run: false` stellt die Rechnung aus und schickt
 #     sie an die Kontaktadresse des Anbieters.
+#   - Ein unbekannter Schluessel (vertippt) bricht rot ab (404), statt still
+#     „0 Anbieter" zu melden.
 #   - Eine Periode, fuer die der Anbieter schon eine Rechnung hat, wird
 #     uebersprungen (`already invoiced`) — ein zweiter Klick stellt nichts doppelt aus.
 #
@@ -79,6 +81,10 @@ jobs:
             echo "::error::Staging-API war nicht erreichbar"
             exit 1
           }
+          if [ "$code" = "404" ]; then
+            echo "::error::Anbieter ${PROVIDER} existiert nicht — Schluessel pruefen (z. B. dahlmann-cpa)"
+            exit 1
+          fi
           if [ "$code" != "200" ]; then
             echo "::error::Status $code: $(jq -r '.errorCode // "?"' "$body" 2>/dev/null)"
             exit 1

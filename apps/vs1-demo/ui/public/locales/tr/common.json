@@ -761,8 +761,8 @@
     "areasEyebrow": "Dokuz alan, tek giriş",
     "areasTitle": "Dokuz uyum alanı",
     "areasLead": "Her biri, taşıdığı yükümlülükleri, arkasındaki mevzuatı ve hata yapmanın bedelini gösteren bir sayfa açar.",
-    "severity": {
-      "critical": "Kritik",
+    "priority": {
+      "immediate": "Acil",
       "high": "Yüksek",
       "medium": "Orta",
       "low": "Düşük"
@@ -1342,7 +1342,7 @@
         ],
         "rows": [
           {
-            "level": "critical",
+            "level": "immediate",
             "title": "OSS üç aylık beyanı",
             "meta": "DE · NL · Son tarih 30 Nis"
           },

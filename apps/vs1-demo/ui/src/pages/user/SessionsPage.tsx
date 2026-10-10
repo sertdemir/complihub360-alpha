@@ -74,10 +74,10 @@ const HIGH = new Set<SessionSeverity>(['critical', 'high']);
 function relTime(daysAgo: number, t: TFunction): string {
   if (daysAgo < 1) {
     const h = Math.max(1, Math.round(daysAgo * 24));
-    return t('sessions.agoHours', { count: h });
+    return t('riskMaps.agoHours', { count: h });
   }
-  if (daysAgo < 31) return t('sessions.agoDays', { count: Math.round(daysAgo) });
-  return t('sessions.agoMonths', { count: Math.round(daysAgo / 30) });
+  if (daysAgo < 31) return t('riskMaps.agoDays', { count: Math.round(daysAgo) });
+  return t('riskMaps.agoMonths', { count: Math.round(daysAgo / 30) });
 }
 
 type DashSession = DashboardData['sessions']['items'][number];
@@ -210,23 +210,23 @@ export function SessionsPage() {
       {r.status === 'archived' ? (
         <ActionMenu
           align="start"
-          label={t('sessions.moreActions')}
-          items={[{ label: t('sessions.restore'), onClick: () => { void restore(r); } }]}
+          label={t('riskMaps.moreActions')}
+          items={[{ label: t('riskMaps.restore'), onClick: () => { void restore(r); } }]}
         />
       ) : (
         <ActionMenu
           align="start"
-          label={t('sessions.moreActions')}
+          label={t('riskMaps.moreActions')}
           items={[
-            { label: t('sessions.exportPdf'), onClick: () => { void exportPdf(r); } },
-            { label: t('sessions.rename'), onClick: () => setActionsFor(target(r, 'rename')) },
-            { label: t('sessions.archive'), danger: true, onClick: () => setActionsFor(target(r, 'archive')) },
+            { label: t('riskMaps.exportPdf'), onClick: () => { void exportPdf(r); } },
+            { label: t('riskMaps.rename'), onClick: () => setActionsFor(target(r, 'rename')) },
+            { label: t('riskMaps.archive'), danger: true, onClick: () => setActionsFor(target(r, 'archive')) },
           ]}
         />
       )}
       <span className="flex items-center gap-2">
         {r.status === 'active' && isStale(r) && (
-          <Button size="sm" onClick={() => setAnswersFor(r)}>{t('sessions.checkAnswers')}</Button>
+          <Button size="sm" onClick={() => setAnswersFor(r)}>{t('riskMaps.checkAnswers')}</Button>
         )}
         <Button size="sm" variant="secondary" onClick={() => openSession(r)}>{t('shared.open')}</Button>
       </span>
@@ -257,18 +257,18 @@ export function SessionsPage() {
         <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
           <div className="mx-auto max-w-[1240px]">
             <h1 className="font-serif text-[23px] font-bold leading-tight text-fg">
-              <Trans t={t} i18nKey="sessions.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
+              <Trans t={t} i18nKey="riskMaps.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
             </h1>
             <EmptyState
               icon={FolderOpen}
-              title={t('sessions.emptyTitle')}
-              body={t('sessions.emptyBody')}
-              cta={{ label: t('sessions.emptyCta'), onClick: () => openWizard() }}
-              hint={t('sessions.emptyHint')}
+              title={t('riskMaps.emptyTitle')}
+              body={t('riskMaps.emptyBody')}
+              cta={{ label: t('riskMaps.emptyCta'), onClick: () => openWizard() }}
+              hint={t('riskMaps.emptyHint')}
               steps={[
-                { title: t('sessions.emptyStep1Title'), body: t('sessions.emptyStep1Body') },
-                { title: t('sessions.emptyStep2Title'), body: t('sessions.emptyStep2Body') },
-                { title: t('sessions.emptyStep3Title'), body: t('sessions.emptyStep3Body') },
+                { title: t('riskMaps.emptyStep1Title'), body: t('riskMaps.emptyStep1Body') },
+                { title: t('riskMaps.emptyStep2Title'), body: t('riskMaps.emptyStep2Body') },
+                { title: t('riskMaps.emptyStep3Title'), body: t('riskMaps.emptyStep3Body') },
               ]}
             />
           </div>
@@ -278,10 +278,10 @@ export function SessionsPage() {
   }
 
   // 1B: der Lage-Satz — nur Teile, die es gibt.
-  const lage: ReactNode[] = [<span key="n">{t('sessions.lageSessions', { count: active.length })}</span>];
-  if (byRisk.high > 0) lage.push(<strong key="h" className="text-risk-high">{t('sessions.lageHigh', { count: byRisk.high })}</strong>);
-  if (openDuties !== null && openDuties > 0) lage.push(<span key="o">{t('sessions.lageOpen', { count: openDuties })}</span>);
-  if (stale.length > 0) lage.push(<strong key="s" className="text-fg-accent-strong">{t('sessions.lageStale', { count: stale.length, months: staleMonths })}</strong>);
+  const lage: ReactNode[] = [<span key="n">{t('riskMaps.lageRiskMaps', { count: active.length })}</span>];
+  if (byRisk.high > 0) lage.push(<strong key="h" className="text-risk-high">{t('riskMaps.lageHigh', { count: byRisk.high })}</strong>);
+  if (openDuties !== null && openDuties > 0) lage.push(<span key="o">{t('riskMaps.lageOpen', { count: openDuties })}</span>);
+  if (stale.length > 0) lage.push(<strong key="s" className="text-fg-accent-strong">{t('riskMaps.lageStale', { count: stale.length, months: staleMonths })}</strong>);
 
   return (
     <UserShell>
@@ -291,7 +291,7 @@ export function SessionsPage() {
           <div className="flex items-start justify-between gap-6">
             <div className="min-w-0">
               <h1 className="font-serif text-[23px] font-bold leading-tight text-fg">
-                <Trans t={t} i18nKey="sessions.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
+                <Trans t={t} i18nKey="riskMaps.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
               </h1>
               <p className="mt-1.5 text-body-sm text-fg">
                 {lage.map((part, i) => (
@@ -306,9 +306,9 @@ export function SessionsPage() {
           <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-3">
             <KpiRing
               on={entered}
-              title={t('sessions.kpiSaved')}
+              title={t('riskMaps.kpiSaved')}
               value={active.length}
-              sub={t('sessions.kpiSavedSub', { count: marketCount })}
+              sub={t('riskMaps.kpiSavedSub', { count: marketCount })}
               segs={active.length ? [
                 { frac: byRisk.high / active.length, cls: 'text-risk-high' },
                 { frac: byRisk.medium / active.length, cls: 'text-risk-medium' },
@@ -317,16 +317,16 @@ export function SessionsPage() {
             />
             <KpiRing
               on={entered}
-              title={t('sessions.kpiRisk')}
+              title={t('riskMaps.kpiRisk')}
               value={byRisk.high}
-              sub={`${t('sessions.kpiRiskValue', { count: byRisk.high })} · ${t('sessions.kpiRiskSub', { medium: byRisk.medium, low: byRisk.low })}`}
+              sub={`${t('riskMaps.kpiRiskValue', { count: byRisk.high })} · ${t('riskMaps.kpiRiskSub', { medium: byRisk.medium, low: byRisk.low })}`}
               segs={active.length ? [{ frac: byRisk.high / active.length, cls: 'text-risk-high' }] : []}
             />
             <KpiRing
               on={entered}
-              title={t('sessions.kpiStale')}
+              title={t('riskMaps.kpiStale')}
               value={stale.length}
-              sub={stale.length ? t('sessions.kpiStaleSub', { count: Math.round(Math.max(...stale.map((s) => s.daysAgo)) / 30) }) : t('sessions.kpiStaleNone')}
+              sub={stale.length ? t('riskMaps.kpiStaleSub', { count: Math.round(Math.max(...stale.map((s) => s.daysAgo)) / 30) }) : t('riskMaps.kpiStaleNone')}
               segs={active.length ? [{ frac: stale.length / active.length, cls: 'text-fg-accent' }] : []}
             />
           </div>
@@ -359,13 +359,13 @@ export function SessionsPage() {
           {/* 2C · Gruppen statt Filter */}
           {attention.length > 0 && (
             <section className="mt-7">
-              <GroupHead label={t('sessions.groupAttention')} count={attention.length} tone="text-risk-high" />
+              <GroupHead label={t('riskMaps.groupAttention')} count={attention.length} tone="text-risk-high" />
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{attention.map(tile)}</div>
             </section>
           )}
           {current.length > 0 && (
             <section className="mt-7">
-              <GroupHead label={t('sessions.groupCurrent')} count={current.length} tone="text-fg-secondary" />
+              <GroupHead label={t('riskMaps.groupCurrent')} count={current.length} tone="text-fg-secondary" />
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{current.map((r, i) => tile(r, attention.length + i))}</div>
             </section>
           )}
@@ -378,7 +378,7 @@ export function SessionsPage() {
                 className="mb-2.5 flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.05em] text-fg-tertiary transition-colors hover:text-fg-secondary"
               >
                 <ChevronRight size={13} strokeWidth={2.5} className={`transition-transform ${archivedOpen ? 'rotate-90' : ''}`} />
-                {t('sessions.groupArchived')} · {archived.length}
+                {t('riskMaps.groupArchived')} · {archived.length}
               </button>
               {archivedOpen && (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{[...archived].sort(byRecent).map((r, i) => tile(r, i))}</div>

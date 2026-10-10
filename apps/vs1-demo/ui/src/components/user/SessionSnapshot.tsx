@@ -414,7 +414,7 @@ export function SessionSnapshot({
               <div className="min-w-0">
                 <p className="text-body-3xs text-fg-tertiary">
                   <Link to={`/${locale}/dashboard/sessions`} className="font-semibold text-brand underline underline-offset-2">
-                    {tw('nav.navSessions', { defaultValue: 'Sitzungen' })}
+                    {tw('shell.navRiskMaps')}
                   </Link>
                   {' › '}{title}
                 </p>

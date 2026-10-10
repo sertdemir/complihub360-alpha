@@ -1,4 +1,5 @@
 import type { SearchProfile } from '../components/wizard/WizardContext';
+import { PRIORITY_EN, priorityOf } from './priority';
 
 // ─── Risk-map PDF export (User Flows §9 · wiring map A6) ─────────────────────
 // Guest-allowed snapshot of the results overview. PII policy: only the
@@ -151,7 +152,7 @@ export async function generateRiskMapPdf(opts: {
   doc.setFont('helvetica', 'bold').setFontSize(8).setTextColor(MUTED);
   const cols = { sev: M, title: M + 78, market: M + 320, due: M + 396, state: M + 460 };
   [
-    L('table.severity', 'Severity'),
+    L('table.priority', 'Priority'),
     L('table.obligation', 'Obligation'),
     L('table.market', 'Market'),
     L('table.due', 'Due'),
@@ -163,9 +164,6 @@ export async function generateRiskMapPdf(opts: {
   doc.setDrawColor(LINE).line(M, y, W - M, y);
   y += 16;
 
-  const SEVERITY_EN: Record<PdfObligation['severity'], string> = {
-    critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low',
-  };
   let openGroup: string | undefined;
   for (const raw of opts.obligations) {
     if (raw.groupLabel && raw.groupLabel !== openGroup) {
@@ -192,7 +190,7 @@ export async function generateRiskMapPdf(opts: {
     doc.setFillColor(SEVERITY_FILL[o.severity]);
     doc.roundedRect(cols.sev, y - 8, 58, 14, 7, 7, 'F');
     doc.setFont('helvetica', 'bold').setFontSize(7).setTextColor('#FFFFFF');
-    doc.text(L(`severity.${o.severity}`, SEVERITY_EN[o.severity]).toUpperCase(), cols.sev + 29, y + 1.5, { align: 'center' });
+    doc.text(L(`priority.${priorityOf(o.severity)}`, PRIORITY_EN[priorityOf(o.severity)]).toUpperCase(), cols.sev + 29, y + 1.5, { align: 'center' });
 
     doc.setFont('helvetica', 'bold').setFontSize(9).setTextColor(INK);
     doc.text(o.title, cols.title, y);

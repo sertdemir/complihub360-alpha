@@ -77,7 +77,7 @@ export function DomainAssistant({ slug, areaLabel, sessions, markets, openDuties
 
   const sourceLabel = (s: AssistantSource) =>
     s.kind === 'area' ? t('domainPage.sourceArea', { area: areaLabel })
-    : s.kind === 'session' ? t('domainPage.sourceSession', { name: s.name ?? '' })
+    : s.kind === 'session' ? t('domainPage.sourceRiskMap', { name: s.name ?? '' })
     : s.label;
 
   return (
@@ -91,7 +91,7 @@ export function DomainAssistant({ slug, areaLabel, sessions, markets, openDuties
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-body-3xs text-fg-secondary">
         <span className="font-bold">{t('domainPage.askScope')}</span>
         <span className={TAG}>{t('domainPage.askScopeArea', { area: areaLabel })}</span>
-        <span className={TAG}>{sessions.length ? t('domainPage.askScopeSessions', { count: sessions.length }) : t('domainPage.askScopeNoSession')}</span>
+        <span className={TAG}>{sessions.length ? t('domainPage.askScopeRiskMaps', { count: sessions.length }) : t('domainPage.askScopeNoRiskMap')}</span>
         {markets.length > 0 && <span className={TAG}>{markets.join(' · ')}</span>}
       </div>
 

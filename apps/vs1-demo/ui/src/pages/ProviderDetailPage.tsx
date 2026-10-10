@@ -171,7 +171,7 @@ export function ProviderDetailPage() {
                   „zurueck" allein landet sonst wieder auf dieser Seite, wenn
                   sie aus einer Benachrichtigung heraus geoeffnet wurde. */}
               <Button className="mt-5" type="button" onClick={() => (ctx ? navigate(ctx.backTo) : navigate(-1))}>
-                {ctx ? (ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToSession')) : t('detail.back')}
+                {ctx ? (ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToRiskMap')) : t('detail.back')}
               </Button>
             </section>
           )}
@@ -228,8 +228,12 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
   // Marken unter der Ueberschrift, statt als englische Goldzeile in ihr.
   // 4 V1: nach der Offenlegung der Klarname aus der Buchung.
   const { bereich } = useRequestContext();
-  const revealed = !!booking?.identityRevealed;
-  const title = revealed ? booking!.providerName : (ctx?.self?.title ?? t('snapshot.verifiedPartner'));
+  // A1 (Schritt 4): das Profil selbst sagt, ob es offen ist; die Buchungsliste
+  // bleibt der Rueckweg fuer einen aelteren Server.
+  const revealed = !!p.revealed || !!booking?.identityRevealed;
+  const title = revealed
+    ? (p.name || booking?.providerName || t('snapshot.verifiedPartner'))
+    : (ctx?.self?.title ?? t('snapshot.verifiedPartner'));
   const areaCodes = p.area_codes ?? ctx?.self?.area_codes ?? [];
   const areaNames = areaCodes.map((c) => bereich(c)).filter(Boolean);
   const region = p.descriptor_region ?? p.region ?? null;
@@ -247,7 +251,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
           {one
             ? t(domainsMatched === 1 ? 'detail.lageAreaYes' : 'detail.lageAreaNo', { area: areaLabel ?? ctx.label })
             : ctx.kind === 'session'
-              ? t('detail.lageAreasSession', { matched: domainsMatched, total: domainsRequested, session: ctx.label })
+              ? t('detail.lageAreasRiskMap', { matched: domainsMatched, total: domainsRequested, riskMap: ctx.label })
               : t('detail.lageAreasArea', { matched: domainsMatched, total: domainsRequested, area: areaLabel ?? '' })}
         </span>,
       );
@@ -326,12 +330,26 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
                 ))}
               </p>
             )}
+            {/* A1: "Name and contact are now visible" — dann steht der Kontakt auch da. */}
+            {revealed && (p.contact_email || p.website_url) && (
+              <p className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-fg-secondary">
+                {p.contact_email && <span>{p.contact_email}</span>}
+                {p.website_url && (
+                  // Direkt, nicht ueber /p/:ref/website: ein Link im neuen Tab
+                  // traegt kein Bearer-Token, die gezaehlte Weiterleitung
+                  // antwortet ihm mit 401 (Pruefung Schritt 4, M6).
+                  <a href={p.website_url} target="_blank" rel="noreferrer" className="font-semibold text-fg-brand underline underline-offset-2">
+                    {p.website_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                  </a>
+                )}
+              </p>
+            )}
           </div>
         </div>
         {ctx && (
           <div className="mt-0.5 flex shrink-0 items-center">
             <Button variant="secondary" onClick={onBack}>
-              {ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToSession')}
+              {ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToRiskMap')}
             </Button>
           </div>
         )}
@@ -395,7 +413,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
           <Packages p={p} />
           <Reviews data={reviews} p={p} confirm={confirm} locale={locale} />
         </div>
-        {booking ? <AppointmentRail booking={booking} locale={locale} onBook={onBook} /> : <BookingRail p={p} slots={slots} locale={locale} onBook={onBook} ctx={ctx} />}
+        {booking ? <AppointmentRail booking={booking} locale={locale} onBook={onBook} /> : <BookingRail p={p} slots={slots} locale={locale} onBook={onBook} ctx={ctx} revealed={revealed} />}
       </div>
     </>
   );
@@ -441,7 +459,7 @@ function Matrix({ ctx, covered }: { ctx: ProviderContext | null; covered: Set<st
                 {m}
               </span>
             ))}
-            <span className="text-body-4xs font-extrabold text-fg-secondary">{t('detail.matrixSession')}</span>
+            <span className="text-body-4xs font-extrabold text-fg-secondary">{t('detail.matrixRiskMap')}</span>
           </div>
           {duties.length === 0 && <p className="py-4 text-body-xs text-fg-tertiary">{t('detail.matrixNone')}</p>}
           {duties.map((d, i) => (
@@ -706,8 +724,10 @@ function Reviews({ data, p, confirm, locale }: {
 // Verfuegbarkeit begruendet ihn, sie fuehrt ihn nicht ein. Ein Klick auf einen
 // Termin belegt den Slot auf der Buchungsseite vor, sonst waehlt der Nutzer
 // zweimal.
-function BookingRail({ p, slots, locale, onBook, ctx }: {
+function BookingRail({ p, slots, locale, onBook, ctx, revealed = false }: {
   p: ProviderDetail;
+  /** A1: schon offen — dann stimmt "Identity becomes visible after booking" nicht mehr. */
+  revealed?: boolean;
   slots: string[] | null;
   locale: string;
   onBook: (slot?: string) => void;
@@ -744,7 +764,7 @@ function BookingRail({ p, slots, locale, onBook, ctx }: {
       <Button size="lg" shape="soft" fullWidth type="button" onClick={() => onBook()} className="mt-4">
         {t('detail.bookCta')} <ArrowRight size={15} />
       </Button>
-      <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{t('detail.revealNote')}</p>
+      {!revealed && <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{t('detail.revealNote')}</p>}
 
       <div className="mt-4 border-t border-stroke-subtle pt-4">
         <p className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('detail.slotsTitle')}</p>
@@ -785,7 +805,7 @@ function BookingRail({ p, slots, locale, onBook, ctx }: {
       {ctx && (
         <div className="mt-3 border-t border-stroke-subtle pt-3">
           <Link to={ctx.backTo} className="text-body-3xs font-bold text-brand underline underline-offset-2 hover:text-brand-700">
-            {ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToSession')}
+            {ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToRiskMap')}
           </Link>
         </div>
       )}
