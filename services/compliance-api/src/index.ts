@@ -1174,8 +1174,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         identity_revealed: !!b.identity_revealed,
                         // Affiliate 1b: the provider's website is a POST-BOOKING
                         // reveal only — never before, to preserve stage-1/2 anonymity.
-                        // The outclick is routed through /p/:ref/website so it can
-                        // be counted (future affiliate revenue line).
+                        // The UI links here directly and counts the click in
+                        // parallel via /p/:ref/website (future affiliate line).
                         provider_website: b.identity_revealed ? (p.website_url ?? null) : null,
                         slot_start: b.slot_start,
                         slot_end: b.slot_end,
@@ -1197,7 +1197,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         // Affiliate 1b: counted outclick to the provider website. Only a user
         // who has ALREADY booked this provider may follow it (post-booking
         // reveal) — this is the tracking hook for the later affiliate revenue
-        // line, not yet monetised. Logs provider_website_outclick, 302-redirects.
+        // line, not yet monetised. Logs provider_website_outclick and answers
+        // 200 { url } — no 302: the UI calls this via apiFetch (Bearer), a
+        // browser navigation in a new tab carries no token and got 401.
         const ref = (req.url || '').split('/')[4];
         res.setHeader('x-correlation-id', correlationId);
         if (!authUserId) {
@@ -1226,8 +1228,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
                 await supabaseApi.insert('event_log', { type: 'provider_website_outclick', payload: { providerKey, userId: authUserId, bookingId: booked[0].id } }).catch(() => { /* non-blocking */ });
-                res.writeHead(302, { Location: url });
-                res.end();
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ url }));
             } catch {
                 structuredLog('error', 'Website outclick failed', { correlationId, errorCode: 'ERR_OUTCLICK', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });

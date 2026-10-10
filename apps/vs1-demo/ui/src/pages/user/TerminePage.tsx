@@ -6,7 +6,7 @@ import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
 import { ActionMenu } from '../../components/ui/ActionMenu';
-import { fetchUserBookings, cancelBooking, markOutcome, disputeNoShow, providerWebsiteHref, type UserBooking, type BookingStatus, type BookingAttendance } from '../../api/bookings';
+import { fetchUserBookings, cancelBooking, markOutcome, disputeNoShow, countWebsiteOutclick, type UserBooking, type BookingStatus, type BookingAttendance } from '../../api/bookings';
 import { ReviewDrawer, type ReviewTarget } from '../../components/user/ReviewDrawer';
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
@@ -89,6 +89,29 @@ function Herkunft({ r }: { r: Pick<Row, 'descriptor' | 'areaCodes' | 'region' | 
     <p className="truncate text-[11.5px] text-fg-tertiary">
       {r.revealed ? t('termine.origin', { descriptor: text }) : text}
     </p>
+  );
+}
+
+// Affiliate 1b: die Website des Anbieters, offengelegt erst nach der Buchung.
+// Der Link zeigt DIREKT auf die Website — bis 10.10.2026 zeigte er auf
+// /api/v1/p/:ref/website; ein neuer Tab traegt kein Bearer-Token, also endete
+// jeder Klick auf einer 401 (wie M6 im Profil, #300). Gezaehlt wird parallel
+// per apiFetch; die Navigation wartet nicht darauf (window.open nach einem
+// await faengt der Popup-Blocker ab). Mittelklick zaehlt ueber onAuxClick.
+function WebsiteLink({ r, label }: { r: Pick<Row, 'website' | 'publicRef'>; label: string }) {
+  if (!r.website) return null;
+  const count = () => { if (r.publicRef) countWebsiteOutclick(r.publicRef); };
+  return (
+    <a
+      href={r.website}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={count}
+      onAuxClick={(e) => { if (e.button === 1) count(); }}
+      className="mt-0.5 inline-flex items-center gap-1 text-[12px] font-medium text-fg-brand hover:underline"
+    >
+      {label} ↗
+    </a>
   );
 }
 
@@ -374,15 +397,7 @@ export function TerminePage() {
         <p className="truncate text-[12px] text-fg-tertiary">{r.dateLine} · {r.timeLine}{r.meta !== '—' ? ` · ${r.meta}` : ''}</p>
         {r.website && !r.needsOutcome && (
           // Affiliate 1b: provider website, revealed only post-booking.
-          // Routed through the counted outclick endpoint.
-          <a
-            href={providerWebsiteHref(r.publicRef ?? '')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-0.5 inline-flex items-center gap-1 text-[12px] font-medium text-fg-brand hover:underline"
-          >
-            {t('termine.website')} ↗
-          </a>
+          <WebsiteLink r={r} label={t('termine.website')} />
         )}
       </div>
       <div className="flex shrink-0 items-center gap-2.5">
@@ -444,16 +459,7 @@ export function TerminePage() {
         <p className="truncate text-[15px] font-semibold text-fg">{r.provider}</p>
         <Herkunft r={r} />
         <p className="text-[12px] text-fg-tertiary">{r.dateLine} · {r.timeLine}{r.meta !== '—' ? ` · ${r.meta}` : ''}</p>
-        {r.website && (
-          <a
-            href={providerWebsiteHref(r.publicRef ?? '')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-0.5 inline-flex items-center gap-1 text-[12px] font-medium text-fg-brand hover:underline"
-          >
-            {t('termine.website')} ↗
-          </a>
-        )}
+        {r.website && <WebsiteLink r={r} label={t('termine.website')} />}
       </div>
       {pausedNotice(r)}
       {afterCard(r)}
