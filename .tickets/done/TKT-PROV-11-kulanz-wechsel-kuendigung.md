@@ -1,7 +1,7 @@
 ---
 title: "Kulanzfrist, Tarifwechsel und Kündigung umsetzen (ADR-0006)"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Kulanzfrist, Tarifwechsel und Kündigung
@@ -12,6 +12,20 @@ Entscheidung des Nutzers vom 2026-10-07: **A2 · B2 · C2**.
 Spec B führte die drei unter „Configurable items requiring final decision". Sie
 waren nie Lücken, sondern wirksame Defaults, die niemand beschlossen hatte —
 null Kulanz, kein Wechsel, keine Selbstkündigung. Jetzt sind sie beschlossen.
+
+## Erledigt
+
+| Stufe | PR | Squash |
+| --- | --- | --- |
+| 1 · Kulanzfrist | #268 | `4cc2dd29` |
+| 2 · Wechsel und Kündigung | #273 | `8a786a2d` |
+
+Beide Migrationen liegen auf Staging und sind nachgemessen; der Auto-Deploy ist
+auf beiden Merges grün gelaufen. Die Oberfläche hat der Nutzer über den Canvas
+abgenommen (1·V2 · 2·V3 · 3·V1 · 4·V3) und in Figma gesehen.
+
+**Offen bleibt, was A2/B2/C2 nicht mitentscheiden:** `failed-payment retry` und
+`reactivation rules` — und daran hängt der Copy-Befund weiter unten.
 
 ## Die drei Regeln
 
