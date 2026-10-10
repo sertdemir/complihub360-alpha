@@ -205,7 +205,24 @@
     "graceBody": "Due since {{since}}. From {{until}}, bookings pause until the invoice is paid.",
     "graceStillVisible": "Your visibility in search results is not affected by this.",
     "graceOpenPortal": "Open the invoice in the portal",
-    "changePaymentMethod": "Change payment method"
+    "changePaymentMethod": "Change payment method",
+    "recheck": {
+      "failedLine": "The last lead charge did not go through.",
+      "sameTitle": "The card was only briefly short",
+      "sameBody": "Have the same card checked. If your bank confirms it, bookings are possible again right away.",
+      "sameCta": "Check card again",
+      "otherTitle": "Use a different card",
+      "otherBody": "A new payment method always lifts the pause.",
+      "otherCta": "Add it in the portal",
+      "note": "Nothing is charged. The check shows whether the card is valid; a later charge can still fail. You remain visible in search results.",
+      "cleared": "Your card was confirmed. Bookings are possible again.",
+      "declined": "Your bank did not confirm the card. Add a different payment method in the portal.",
+      "needsAction": "Your bank asks for a confirmation that is not possible here. Add the card again in the portal, where your bank can ask you directly.",
+      "rateLimited": "Three checks in 24 hours have been used. The next one is possible from {{when}}.",
+      "rateLimitedNoTime": "Three checks in 24 hours have been used. Please try again later.",
+      "failed": "The check did not complete. Please try again in a moment.",
+      "clearedStillBlocked": "Your card was confirmed. The points above are still open."
+    }
   },
   "confirmEmail": {
     "working": "Confirming your new address…",

@@ -205,7 +205,24 @@
     "graceBody": "Vencida desde el {{since}}. A partir del {{until}}, las reservas se pausan hasta que la factura esté pagada.",
     "graceStillVisible": "Su visibilidad en los resultados de búsqueda no se ve afectada.",
     "graceOpenPortal": "Abrir la factura en el portal",
-    "changePaymentMethod": "Cambiar el método de pago"
+    "changePaymentMethod": "Cambiar el método de pago",
+    "recheck": {
+      "failedLine": "El último cargo de lead no se ha realizado.",
+      "sameTitle": "La tarjeta solo tuvo saldo insuficiente un momento",
+      "sameBody": "Haga comprobar la misma tarjeta. Si su banco la confirma, las reservas vuelven a ser posibles de inmediato.",
+      "sameCta": "Comprobar la tarjeta de nuevo",
+      "otherTitle": "Usar otra tarjeta",
+      "otherBody": "Un nuevo método de pago siempre levanta la pausa.",
+      "otherCta": "Añadirla en el portal",
+      "note": "No se cobra nada. La comprobación muestra si la tarjeta es válida; un cargo posterior puede fallar igualmente. Sigue siendo visible en los resultados de búsqueda.",
+      "cleared": "Su tarjeta se ha confirmado. Las reservas vuelven a ser posibles.",
+      "declined": "Su banco no ha confirmado la tarjeta. Añada otro método de pago en el portal.",
+      "needsAction": "Su banco pide una confirmación que aquí no es posible. Vuelva a añadir la tarjeta en el portal, donde su banco puede preguntarle directamente.",
+      "rateLimited": "Se han usado tres comprobaciones en 24 horas. La siguiente es posible a partir de las {{when}}.",
+      "rateLimitedNoTime": "Se han usado tres comprobaciones en 24 horas. Inténtelo de nuevo más tarde.",
+      "failed": "La comprobación no se ha completado. Inténtelo de nuevo en un momento.",
+      "clearedStillBlocked": "Su tarjeta se ha confirmado. Siguen pendientes los puntos de arriba."
+    }
   },
   "confirmEmail": {
     "working": "Confirmando su nueva dirección…",

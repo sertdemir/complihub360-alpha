@@ -205,7 +205,24 @@
     "graceBody": "Fällig seit {{since}}. Ab {{until}} pausiert die Buchung, bis die Rechnung bezahlt ist.",
     "graceStillVisible": "Ihre Sichtbarkeit in den Ergebnissen ändert sich dadurch nicht.",
     "graceOpenPortal": "Rechnung im Portal öffnen",
-    "changePaymentMethod": "Zahlungsmittel ändern"
+    "changePaymentMethod": "Zahlungsmittel ändern",
+    "recheck": {
+      "failedLine": "Die letzte Lead-Belastung ist gescheitert.",
+      "sameTitle": "Karte war nur kurz nicht gedeckt",
+      "sameBody": "Lassen Sie dieselbe Karte prüfen. Bestätigt die Bank sie, sind Buchungen sofort wieder möglich.",
+      "sameCta": "Karte erneut prüfen",
+      "otherTitle": "Andere Karte verwenden",
+      "otherBody": "Ein neues Zahlungsmittel hebt die Sperre immer auf.",
+      "otherCta": "Im Portal hinterlegen",
+      "note": "Es wird nichts belastet. Die Prüfung zeigt, ob die Karte gültig ist; eine spätere Belastung kann trotzdem scheitern. Sie bleiben in den Ergebnissen sichtbar.",
+      "cleared": "Ihre Karte wurde bestätigt. Buchungen sind wieder möglich.",
+      "declined": "Die Bank hat die Karte nicht bestätigt. Hinterlegen Sie ein anderes Zahlungsmittel im Portal.",
+      "needsAction": "Ihre Bank verlangt eine Bestätigung, die hier nicht möglich ist. Hinterlegen Sie die Karte im Portal neu, dort fragt die Bank direkt nach.",
+      "rateLimited": "Drei Prüfungen in 24 Stunden sind erreicht. Die nächste ist ab {{when}} möglich.",
+      "rateLimitedNoTime": "Drei Prüfungen in 24 Stunden sind erreicht. Bitte versuchen Sie es später erneut.",
+      "failed": "Die Prüfung ist nicht durchgelaufen. Bitte versuchen Sie es in einem Moment erneut.",
+      "clearedStillBlocked": "Ihre Karte wurde bestätigt. Offen sind noch die Punkte oben."
+    }
   },
   "confirmEmail": {
     "working": "Ihre neue Adresse wird bestätigt…",

@@ -83,8 +83,10 @@ Nicht berührt: Risk Map, Wizard, Ranking, AI-Verhalten.
 - [x] **A2 Backend** — `POST /provider/:key/billing/recheck`
   (`verifyPaymentMethod` per SetupIntent, `recheckPaymentMethod`, drei
   Prüfungen in 24 h); fünf Routentests, OpenAPI.
-- [ ] **A2 Oberfläche** — Canvas-Wahl **A V2** (zwei Wege zur Wahl) ·
-  **B V1** (Zeile unter dem Knopf); Figma → lokal → Review.
+- [x] **A2 Oberfläche** — Canvas-Wahl **A V2** (zwei Wege zur Wahl) ·
+  **B V1** (Zeile unter dem Knopf). Figma: Seite „Zahlung & Reaktivierung
+  (ADR-0008)“ im Screens-File; lokal in `BillingPage.tsx`, vier
+  Komponententests, Mock mit beiden Ausgängen. Review durch den Nutzer offen.
 - [x] **B2a** (Nachwahl: B2 war mit `send_invoice` nicht baubar) —
   `invoiceRetry.ts`: Bescheid am Fälligkeitstag (Mail + Benachrichtigung),
   Versuche an Tag 1/3/6, `due_at` unberührt; sechs Routentests, vier
