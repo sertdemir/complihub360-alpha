@@ -1,0 +1,18 @@
+{
+  "_": "Supabase Auth: Betreff, Vorlage, Ablaufzeit. Canvas „Auth-Mails ehrlich“ 10.10.2026 (A1 · B1 · C1 · D1 · E1). Eintragen: Dashboard → Authentication → Email Templates; Ablaufzeit: Authentication → Providers → Email → „Email OTP Expiration“.",
+  "otp_expiry_seconds": 1800,
+  "templates": {
+    "confirmation": {
+      "subject": "Confirm your email for CompliHub360",
+      "file": "supabase-confirm-signup.html"
+    },
+    "magic_link": {
+      "subject": "Your CompliHub360 sign-in link",
+      "file": "supabase-magic-link.html"
+    },
+    "recovery": {
+      "subject": "Reset your CompliHub360 password",
+      "file": "supabase-reset-password.html"
+    }
+  }
+}
