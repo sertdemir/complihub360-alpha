@@ -17,7 +17,9 @@ export type PartnerNotificationType =
   | 'subscription_scheduled' | 'subscription_schedule_done'
   | 'verification_info_requested' | 'verification_decided' | 'verification_activated' | 'evidence_expiring'
   // Phase 6 (ADR-0009): Serien-No-Shows und Durchsetzung.
-  | 'serial_no_show_alert' | 'booking_paused' | 'enforcement_decided';
+  | 'serial_no_show_alert' | 'booking_paused' | 'enforcement_decided'
+  // Phase 7 (ADR-0010): Enterprise-API — Entscheidung des Teams.
+  | 'api_access_decided' | 'api_access_suspended';
 
 export type PartnerTopic = 'appointments' | 'billing' | 'verification' | 'plan';
 
@@ -42,6 +44,8 @@ export const PARTNER_TYPES: Record<PartnerNotificationType, { topic: PartnerTopi
   serial_no_show_alert: { topic: 'appointments', to: 'performance' },
   booking_paused: { topic: 'appointments', to: 'performance' },
   enforcement_decided: { topic: 'appointments', to: 'performance' },
+  api_access_decided: { topic: 'plan', to: 'settings' },
+  api_access_suspended: { topic: 'plan', to: 'settings' },
 };
 
 export interface PartnerNotification {

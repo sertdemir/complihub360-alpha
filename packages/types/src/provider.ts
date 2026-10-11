@@ -769,3 +769,98 @@ export interface SlotsResponse {
     booking_open: boolean;
     reason: 'ooo' | 'paused' | null;
 }
+
+// ─── Phase 7: Enterprise-API (ADR-0010) ──────────────────────────────────────
+
+export type ApiScope = 'leads:read' | 'leads:write' | 'events:read' | 'billing:read' | 'availability:write';
+export type ApiClientStatus = 'requested' | 'approved' | 'active' | 'suspended' | 'revoked' | 'rejected';
+/** Vertriebsstatus eines Leads, den das CRM des Anbieters setzt — nie die Plattform. */
+export type LeadExtStatus = 'new' | 'contacted' | 'proposal_sent' | 'won' | 'lost' | 'closed';
+
+/** Was der Anbieter ueber seinen API-Client sieht — nie der Hash, der Klartext nur einmal beim Erzeugen. */
+export interface ApiClientView {
+    id: string;
+    name: string;
+    status: ApiClientStatus;
+    use_case: string | null;
+    contact_name: string | null;
+    contact_email: string | null;
+    requested_scopes: ApiScope[];
+    scopes: ApiScope[];
+    rate_limit_per_minute: number;
+    key_prefix: string | null;
+    key_created_at: string | null;
+    previous_key_valid_until: string | null;
+    last_used_at: string | null;
+    approved_at: string | null;
+    suspended_at: string | null;
+    suspended_reason: string | null;
+    revoked_at: string | null;
+    decision_note: string | null;
+    terms_version: string | null;
+    created_at: string | null;
+}
+
+export interface ApiAccessResponse {
+    ok: true;
+    /** Tarif erlaubt die API (plan_catalog.api_eligible). Essential und Growth sehen die Funktion nicht. */
+    eligible: boolean;
+    plan_code: string | null;
+    terms_version: string;
+    requestable_scopes: ApiScope[];
+    client: ApiClientView | null;
+}
+
+export interface ApiAccessRequest {
+    name: string;
+    use_case: string;
+    contact_name?: string;
+    contact_email: string;
+    requested_scopes: ApiScope[];
+    /** Die Nutzungsbedingungen der API (terms_version) wurden gelesen und angenommen. */
+    accept_terms: true;
+}
+
+/** Antwort auf POST …/api-access/key: der Klartext steht hier und sonst nirgends. */
+export interface ApiKeyIssuedResponse {
+    ok: true;
+    key: string;
+    shown_once: true;
+    previous_key_valid_until: string | null;
+    client: ApiClientView;
+}
+
+export type AdminApiClientAction = 'approve' | 'reject' | 'suspend' | 'reinstate' | 'revoke' | 'update';
+
+export interface AdminApiClientPatch {
+    action: AdminApiClientAction;
+    scopes?: ApiScope[];
+    rate_limit_per_minute?: number;
+    /** Pflicht bei reject — der Anbieter liest sie. */
+    decision_note?: string;
+    /** Pflicht bei suspend — der Anbieter liest ihn. */
+    reason?: string;
+    /** Nur Notiz: Gebuehren werden manuell vereinbart, nichts wird berechnet. */
+    fee_note?: string;
+}
+
+export interface AdminApiClientRow extends ApiClientView {
+    provider_key: string;
+    provider_name: string | null;
+    plan_code: string | null;
+    eligible: boolean;
+    fee_note: string | null;
+    approved_by: string | null;
+    last_used_ip: string | null;
+}
+
+/** Spec B "API events" — die Namen auf dem Draht der Enterprise-API. */
+export type ApiEventType =
+    | 'booking.created' | 'booking.rescheduled' | 'booking.cancelled'
+    | 'meeting.completed' | 'user.no_show' | 'provider.no_show'
+    | 'lead.revealed' | 'lead.credit_issued' | 'verification.expiring' | 'payment.failed';
+
+export type ApiErrorCode =
+    | 'INVALID_API_KEY' | 'API_CLIENT_SUSPENDED' | 'API_CLIENT_REVOKED' | 'API_CLIENT_NOT_ACTIVE' | 'API_NOT_ELIGIBLE'
+    | 'API_ROUTE_FORBIDDEN' | 'API_SCOPE_FORBIDDEN' | 'RATE_LIMIT_EXCEEDED'
+    | 'API_CLIENT_EXISTS' | 'API_CLIENT_NOT_APPROVED' | 'TERMS_NOT_ACCEPTED';

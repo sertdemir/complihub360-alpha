@@ -57,7 +57,10 @@ export type NotificationType =
     | 'subscription_schedule_done'   // Der Stichtag ist erreicht, es ist geschehen
     // ADR-0008 B2a: eine Abo-Rechnung ist faellig; wir versuchen an Tag 1/3/6
     // die hinterlegte Karte. Die Frist bleibt.
-    | 'invoice_retry_scheduled';
+    | 'invoice_retry_scheduled'
+    // Phase 7 (ADR-0010): Enterprise-API — Entscheidung des Teams an den Anbieter.
+    | 'api_access_decided'          // Zugang freigegeben oder abgelehnt (label: approved|rejected)
+    | 'api_access_suspended';       // Zugang ausgesetzt — mit Grund
 
 /**
  * Die erlaubten Nutzlast-Felder. Bewusst eine geschlossene Liste: alles, was
