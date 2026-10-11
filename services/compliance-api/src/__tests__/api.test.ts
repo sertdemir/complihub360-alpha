@@ -4449,3 +4449,277 @@ describe('Privacy Critical Tests (Checklist v1.0)', () => {
         expect(ev.payload).toMatchObject({ bookingId: row.id, sharedFields: ['email', 'company_name', 'message'] });
     });
 });
+
+// ─── Phase 7 — Enterprise-API (ADR-0010) ─────────────────────────────────────
+//
+// Was hier bewiesen wird: ein Schluessel sieht nur den eigenen Anbieter und
+// nur Buchungen nach der Offenlegung; ohne Scope 403; ueber dem Limit 429;
+// unter Global 403 API_NOT_ELIGIBLE; der Klartext steht nirgends in der
+// Datenbank; die alte Fassung gilt nach der Rotation 24 h weiter.
+describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Limit', () => {
+    const MEMBER_JWT = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+    const asJwt = (jwt: string, path: string, init: RequestInit = {}) =>
+        api(path, { ...init, auth: 'none', headers: { authorization: `Bearer ${jwt}`, ...(init.headers as any) } });
+    const asKey = async (key: string, path: string, init: RequestInit = {}) => {
+        const res = await fetch(`${BASE}${path}`, { ...init, headers: { 'content-type': 'application/json', authorization: `Bearer ${key}`, ...(init.headers as any) } });
+        return { status: res.status, body: await res.json().catch(() => ({})), headers: res.headers };
+    };
+    const settle = () => new Promise((r) => setTimeout(r, 30));
+
+    function seedGlobal(planCode = 'global') {
+        const p = seedProvider(); seedMember(); seedPricing(); seedSubscription('test-kanzlei', planCode);
+        return p;
+    }
+    const requestBody = () => JSON.stringify({ name: 'CRM-Sync', use_case: 'Leads in unser CRM spiegeln', contact_email: 'it@kanzlei.example', requested_scopes: ['leads:read', 'leads:write', 'events:read', 'billing:read'], accept_terms: true });
+
+    /** Antrag → Freigabe → Schluessel. Liefert Klartext und Client-Zeile. */
+    async function activeKey(scopes = ['leads:read', 'leads:write', 'events:read', 'billing:read'], limit?: number) {
+        const req = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: requestBody() });
+        expect(req.status).toBe(201);
+        const id = req.body.client.id;
+        const ok = await api(`/api/v1/admin/api-clients/${id}`, { method: 'PATCH', body: JSON.stringify({ action: 'approve', scopes, rate_limit_per_minute: limit }) });
+        expect(ok.status).toBe(200);
+        const k = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access/key', { method: 'POST', body: '{}' });
+        expect(k.status).toBe(201);
+        return { key: k.body.key as string, client: db.api_clients.find((c) => c.id === id) };
+    }
+
+    function seedLead(over: Record<string, any> = {}) {
+        const row = { id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: '2026-11-02T09:00:00Z', slot_end: '2026-11-02T09:30:00Z', status: 'confirmed', lead_charged: true, identity_revealed: true, shared_fields: ['email', 'company_name', 'message'], message: 'Bitte USt-Registrierung NL', created_at: '2026-10-01T10:00:00Z', ...over };
+        (db.scheduling ??= []).push(row);
+        return row;
+    }
+
+    it('Essential sieht die Funktion als nicht berechtigt und bekommt beim Antrag 403 ohne Angebot', async () => {
+        seedGlobal('essential');
+        const g = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access');
+        expect(g.status).toBe(200);
+        expect(g.body).toMatchObject({ eligible: false, plan_code: 'essential', client: null });
+        const r = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: requestBody() });
+        expect(r.status).toBe(403);
+        expect(r.body.errorCode).toBe('API_NOT_ELIGIBLE');
+        expect(JSON.stringify(r.body).toLowerCase()).not.toMatch(/upgrade|global|jetzt/);
+        expect(db.api_clients ?? []).toHaveLength(0);
+    });
+
+    it('Antrag: Pflichtfelder, Nutzungsbedingungen, nur beantragbare Scopes — availability:write nicht', async () => {
+        seedGlobal();
+        const ohne = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: JSON.stringify({ name: 'x', use_case: 'y', contact_email: 'it@kanzlei.example', requested_scopes: ['leads:read'] }) });
+        expect(ohne.status).toBe(400); expect(ohne.body.errorCode).toBe('TERMS_NOT_ACCEPTED');
+        const falsch = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: JSON.stringify({ name: 'x', use_case: 'y', contact_email: 'it@kanzlei.example', requested_scopes: ['availability:write'], accept_terms: true }) });
+        expect(falsch.status).toBe(400);
+        const ok = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: requestBody() });
+        expect(ok.status).toBe(201);
+        expect(ok.body.client).toMatchObject({ status: 'requested', requested_scopes: ['leads:read', 'leads:write', 'events:read', 'billing:read'], scopes: [], terms_version: 'api-terms-v1' });
+        expect(db.event_log.some((e) => e.type === 'api_access_requested')).toBe(true);
+        expect(db.event_log.some((e) => e.type === 'admin_alert' && e.payload.kind === 'api_access_requested')).toBe(true);
+        const zweit = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: requestBody() });
+        expect(zweit.status).toBe(409);
+        // Vor der Freigabe gibt es keinen Schluessel.
+        const k = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access/key', { method: 'POST', body: '{}' });
+        expect(k.status).toBe(409); expect(k.body.errorCode).toBe('API_CLIENT_NOT_APPROVED');
+    });
+
+    it('Fremder Login sieht den Antrag eines anderen Anbieters nicht (404), Admin-Routen nur mit Admin', async () => {
+        seedGlobal();
+        const fremd = await asJwt(USER_JWT, '/api/v1/provider/test-kanzlei/api-access');
+        expect(fremd.status).toBe(404);
+        const liste = await asJwt(USER_JWT, '/api/v1/admin/api-access');
+        expect(liste.status).toBe(403);
+    });
+
+    it('Freigabe: Team vergibt Scopes und Limit, Anbieter wird benachrichtigt; Schluessel einmal im Klartext, gespeichert nur der Hash', async () => {
+        seedGlobal();
+        const { key, client } = await activeKey(['leads:read', 'events:read'], 30);
+        await settle();
+        expect(key).toMatch(/^chk_live_[0-9a-f]{48}$/);
+        expect(client).toMatchObject({ status: 'active', scopes: ['leads:read', 'events:read'], rate_limit_per_minute: 30 });
+        expect(client.key_prefix).toMatch(/^chk_live_[0-9a-f]{4}…$/);
+        expect(JSON.stringify(db)).not.toContain(key);
+        expect((db.notifications ?? []).some((n) => n.type === 'api_access_decided' && n.user_id === MEMBER_ID)).toBe(true);
+        const g = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access');
+        expect(g.body.client.key_prefix).toBe(client.key_prefix);
+        expect(JSON.stringify(g.body)).not.toContain('key_hash');
+        // Admin-Liste traegt Tarif und Anbieter, aber ebenfalls keinen Hash.
+        const liste = await api('/api/v1/admin/api-access');
+        expect(liste.status).toBe(200);
+        expect(liste.body.clients[0]).toMatchObject({ provider_key: 'test-kanzlei', plan_code: 'global', eligible: true, status: 'active' });
+        expect(JSON.stringify(liste.body)).not.toContain(client.key_hash);
+    });
+
+    it('/ext/me antwortet dem Schluessel; ein Schluessel darf keine anderen Routen rufen; ein falscher bekommt 401', async () => {
+        seedGlobal();
+        const { key } = await activeKey();
+        const me = await asKey(key, '/api/v1/ext/me');
+        expect(me.status).toBe(200);
+        expect(me.body).toMatchObject({ client: { name: 'CRM-Sync' }, provider: { provider_key: 'test-kanzlei' }, plan_code: 'global' });
+        expect(me.headers.get('x-ratelimit-limit')).toBe('120');
+        const fremd = await asKey(key, '/api/v1/provider/test-kanzlei/bookings');
+        expect(fremd.status).toBe(403); expect(fremd.body.errorCode).toBe('API_ROUTE_FORBIDDEN');
+        const falsch = await asKey('chk_live_' + '0'.repeat(48), '/api/v1/ext/me');
+        expect(falsch.status).toBe(401); expect(falsch.body.errorCode).toBe('INVALID_API_KEY');
+        await settle();
+        expect((db.api_request_log ?? []).length).toBeGreaterThanOrEqual(2);
+        expect(db.api_request_log[0]).toMatchObject({ provider_key: 'test-kanzlei', method: 'GET', route: '/api/v1/ext/me', status: 200 });
+    });
+
+    it('Leads: nur nach Offenlegung, nur freigegebene Felder, nie der fremde Anbieter', async () => {
+        seedGlobal();
+        (db.users ??= []).push({ id: USER_ID, email: 'jana@example.com' });
+        (db.engagement_requests ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, created_at: '2026-09-30T00:00:00Z', structured_answers: { company: 'Jana Trading GmbH' } });
+        const offen = seedLead();
+        seedLead({ id: randomUUID(), identity_revealed: false, status: 'pending' });          // vor der Offenlegung
+        seedLead({ id: randomUUID(), shared_fields: ['company_name'], message: 'geheim', created_at: '2026-10-02T10:00:00Z' }); // nur Firma freigegeben
+        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'andere-kanzlei', user_id: USER_ID, slot_start: '2026-11-03T09:00:00Z', status: 'confirmed', identity_revealed: true, shared_fields: ['email'], created_at: '2026-10-03T00:00:00Z' });
+        const { key } = await activeKey();
+        const r = await asKey(key, '/api/v1/ext/leads');
+        expect(r.status).toBe(200);
+        expect(r.body.leads).toHaveLength(2);
+        expect(r.body.leads[0]).toMatchObject({ id: offen.id, contact: { email: 'jana@example.com', company: 'Jana Trading GmbH', message: 'Bitte USt-Registrierung NL' }, ext_status: null });
+        expect(r.body.leads[1].contact).toEqual({ email: null, company: 'Jana Trading GmbH', message: null });
+        const text = JSON.stringify(r.body);
+        expect(text).not.toContain('geheim');
+        expect(text).not.toContain('andere-kanzlei');
+        expect(text).not.toMatch(/fee|band|ledger|stripe/i);
+        // since-Filter und Seite
+        const seit = await asKey(key, '/api/v1/ext/leads?since=2026-10-02T00:00:00Z');
+        expect(seit.body.leads).toHaveLength(1);
+        const seite = await asKey(key, '/api/v1/ext/leads?limit=1');
+        expect(seite.body.leads).toHaveLength(1); expect(seite.body.next_since).toBe('2026-10-01T10:00:00Z');
+        const falsch = await asKey(key, '/api/v1/ext/leads?since=gestern');
+        expect(falsch.status).toBe(400);
+    });
+
+    it('Lead-Status setzen braucht leads:write; fremde oder nicht offengelegte Buchung 404', async () => {
+        seedGlobal();
+        const offen = seedLead();
+        const verdeckt = seedLead({ id: randomUUID(), identity_revealed: false });
+        const { key } = await activeKey(['leads:read']);
+        const ohne = await asKey(key, `/api/v1/ext/leads/${offen.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'contacted' }) });
+        expect(ohne.status).toBe(403); expect(ohne.body).toMatchObject({ errorCode: 'API_SCOPE_FORBIDDEN', required_scope: 'leads:write' });
+        await api(`/api/v1/admin/api-clients/${db.api_clients[0].id}`, { method: 'PATCH', body: JSON.stringify({ action: 'update', scopes: ['leads:read', 'leads:write'] }) });
+        const ok = await asKey(key, `/api/v1/ext/leads/${offen.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'contacted' }) });
+        expect(ok.status).toBe(200);
+        expect(db.scheduling.find((b) => b.id === offen.id).ext_status).toBe('contacted');
+        expect(db.event_log.some((e) => e.type === 'lead_ext_status_set')).toBe(true);
+        const nein = await asKey(key, `/api/v1/ext/leads/${verdeckt.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'won' }) });
+        expect(nein.status).toBe(404);
+        const falsch = await asKey(key, `/api/v1/ext/leads/${offen.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'hot' }) });
+        expect(falsch.status).toBe(400);
+        const gefiltert = await asKey(key, '/api/v1/ext/leads?status=contacted');
+        expect(gefiltert.body.leads.map((l: any) => l.id)).toEqual([offen.id]);
+    });
+
+    it('Ereignisse: Spec-B-Namen, nur der eigene Anbieter, nie Kontaktdaten aus der Nutzlast, since-Cursor', async () => {
+        seedGlobal();
+        const bid = randomUUID();
+        (db.event_log ??= []).push(
+            { id: randomUUID(), type: 'scheduling_confirmed', payload: { bookingId: bid, providerKey: 'test-kanzlei', userId: USER_ID, slot_start: '2026-11-02T09:00:00Z', email: 'jana@example.com' }, timestamp: '2026-10-01T10:00:00Z' },
+            { id: randomUUID(), type: 'lead.revealed', payload: { bookingId: bid, providerKey: 'test-kanzlei', sharedFields: ['email'], acknowledgementVersion: 'booking-ack-v1' }, timestamp: '2026-10-01T10:00:01Z' },
+            { id: randomUUID(), type: 'attendance_reported', payload: { bookingId: bid, providerKey: 'test-kanzlei', outcome: 'user_no_show', by: 'provider' }, timestamp: '2026-11-02T10:00:00Z' },
+            { id: randomUUID(), type: 'lead.credit_issued', payload: { bookingId: bid, provider_key: 'test-kanzlei', creditCents: 4470, currency: 'USD', pct: 30 }, timestamp: '2026-11-17T00:00:00Z' },
+            { id: randomUUID(), type: 'scheduling_confirmed', payload: { bookingId: randomUUID(), providerKey: 'andere-kanzlei' }, timestamp: '2026-11-18T00:00:00Z' },
+            { id: randomUUID(), type: 'session_updated', payload: { providerKey: 'test-kanzlei' }, timestamp: '2026-11-19T00:00:00Z' },
+        );
+        const { key } = await activeKey();
+        const r = await asKey(key, '/api/v1/ext/events');
+        expect(r.status).toBe(200);
+        expect(r.body.events.map((e: any) => e.type)).toEqual(['booking.created', 'lead.revealed', 'user.no_show', 'lead.credit_issued']);
+        expect(r.body.events[0]).toMatchObject({ booking_id: bid, data: { slot_start: '2026-11-02T09:00:00Z' } });
+        expect(r.body.events[1].data).toEqual({ shared_fields: ['email'], acknowledgement_version: 'booking-ack-v1' });
+        const text = JSON.stringify(r.body);
+        expect(text).not.toContain('jana@example.com');
+        expect(text).not.toContain(USER_ID);
+        expect(text).not.toContain('andere-kanzlei');
+        const seit = await asKey(key, '/api/v1/ext/events?since=2026-11-01T00:00:00Z&limit=1');
+        expect(seit.body.events.map((e: any) => e.type)).toEqual(['user.no_show']);
+        expect(seit.body.next_since).toBe('2026-11-02T10:00:00Z');
+    });
+
+    it('Rechnungen und Guthaben nur mit billing:read; Antwort traegt nur Betraege und Status', async () => {
+        seedGlobal();
+        (db.invoices ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', invoice_number: 'CH-2026-09-0001', period: '2026-09', amount_cents: 18900, currency: 'USD', status: 'paid', line_items: [{ secret: 'intern' }], issued_at: '2026-10-01T00:00:00Z', paid_at: '2026-10-02T00:00:00Z' });
+        (db.provider_credits ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', amount_cents: 4470, currency: 'USD', reason: 'user_no_rebook_30pct', created_at: '2026-11-17T00:00:00Z' });
+        const { key } = await activeKey(['leads:read']);
+        expect((await asKey(key, '/api/v1/ext/invoices')).status).toBe(403);
+        await api(`/api/v1/admin/api-clients/${db.api_clients[0].id}`, { method: 'PATCH', body: JSON.stringify({ action: 'update', scopes: ['billing:read'] }) });
+        const inv = await asKey(key, '/api/v1/ext/invoices');
+        expect(inv.status).toBe(200);
+        expect(inv.body.invoices[0]).toMatchObject({ invoice_number: 'CH-2026-09-0001', amount_cents: 18900, status: 'paid' });
+        expect(JSON.stringify(inv.body)).not.toContain('intern');
+        const cr = await asKey(key, '/api/v1/ext/credits');
+        expect(cr.body).toMatchObject({ balance_cents: 4470, currency: 'USD' });
+        expect(cr.body.credits[0]).toMatchObject({ amount_cents: 4470, reason: 'user_no_rebook_30pct' });
+    });
+
+    it('Limit je Client: ueber dem Limit 429 mit Retry-After und X-RateLimit-Headern', async () => {
+        seedGlobal();
+        const { key } = await activeKey(['leads:read'], 3);
+        for (let i = 0; i < 3; i++) expect((await asKey(key, '/api/v1/ext/me')).status).toBe(200);
+        const zuviel = await asKey(key, '/api/v1/ext/me');
+        expect(zuviel.status).toBe(429);
+        expect(zuviel.body.errorCode).toBe('RATE_LIMIT_EXCEEDED');
+        expect(Number(zuviel.headers.get('retry-after'))).toBeGreaterThan(0);
+        expect(zuviel.headers.get('x-ratelimit-remaining')).toBe('0');
+    });
+
+    it('Rotation: neuer Schluessel sofort, alter noch 24 h; Widerruf durch den Anbieter beendet beide', async () => {
+        seedGlobal();
+        const { key: alt } = await activeKey();
+        const rot = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access/key', { method: 'POST', body: '{}' });
+        expect(rot.status).toBe(201);
+        const neu = rot.body.key as string;
+        expect(neu).not.toBe(alt);
+        expect(Date.parse(rot.body.previous_key_valid_until) - Date.now()).toBeGreaterThan(23 * 3600 * 1000);
+        expect((await asKey(alt, '/api/v1/ext/me')).status).toBe(200);
+        expect((await asKey(neu, '/api/v1/ext/me')).status).toBe(200);
+        expect(db.event_log.some((e) => e.type === 'api_key_rotated')).toBe(true);
+        // Ablauf der Ueberlappung: alter Schluessel 401
+        db.api_clients[0].previous_key_valid_until = new Date(Date.now() - 1000).toISOString();
+        expect((await asKey(alt, '/api/v1/ext/me')).status).toBe(401);
+        const weg = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'DELETE' });
+        expect(weg.status).toBe(200);
+        expect(db.api_clients[0]).toMatchObject({ status: 'revoked', revoked_by: 'provider', key_hash: null });
+        expect((await asKey(neu, '/api/v1/ext/me')).status).toBe(401);
+        // Nach dem Widerruf darf der Anbieter neu beantragen.
+        const wieder = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: requestBody() });
+        expect(wieder.status).toBe(201);
+    });
+
+    it('Aussetzen braucht einen Grund und antwortet 403 API_CLIENT_SUSPENDED; Wiedereinsetzen oeffnet wieder', async () => {
+        seedGlobal();
+        const { key, client } = await activeKey();
+        const ohne = await api(`/api/v1/admin/api-clients/${client.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'suspend' }) });
+        expect(ohne.status).toBe(400);
+        const aus = await api(`/api/v1/admin/api-clients/${client.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'suspend', reason: 'Abruf weit ueber dem vereinbarten Zweck' }) });
+        expect(aus.status).toBe(200);
+        await settle();
+        expect((db.notifications ?? []).some((n) => n.type === 'api_access_suspended' && n.payload?.label === 'Abruf weit ueber dem vereinbarten Zweck')).toBe(true);
+        const r = await asKey(key, '/api/v1/ext/me');
+        expect(r.status).toBe(403); expect(r.body.errorCode).toBe('API_CLIENT_SUSPENDED');
+        await api(`/api/v1/admin/api-clients/${client.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'reinstate' }) });
+        expect((await asKey(key, '/api/v1/ext/me')).status).toBe(200);
+    });
+
+    it('Faellt das Abo unter Global, bleibt der Client gespeichert und antwortet 403 API_NOT_ELIGIBLE', async () => {
+        seedGlobal();
+        const { key } = await activeKey();
+        db.provider_subscriptions.forEach((s: any) => { if (s.provider_key === 'test-kanzlei') s.plan_code = 'growth'; });
+        const r = await asKey(key, '/api/v1/ext/me');
+        expect(r.status).toBe(403); expect(r.body.errorCode).toBe('API_NOT_ELIGIBLE');
+        expect(db.api_clients[0].status).toBe('active');
+    });
+
+    it('Ablehnung braucht eine Begruendung, die der Anbieter sieht', async () => {
+        seedGlobal();
+        const req = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: requestBody() });
+        const ohne = await api(`/api/v1/admin/api-clients/${req.body.client.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'reject' }) });
+        expect(ohne.status).toBe(400);
+        const nein = await api(`/api/v1/admin/api-clients/${req.body.client.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'reject', decision_note: 'Der Zweck ist mit den Nutzungsbedingungen nicht vereinbar.' }) });
+        expect(nein.status).toBe(200);
+        const g = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access');
+        // Abgelehnt zaehlt nicht mehr als laufender Client — ein neuer Antrag ist moeglich.
+        expect(g.body.client).toBeNull();
+        expect(db.api_clients[0]).toMatchObject({ status: 'rejected', decision_note: 'Der Zweck ist mit den Nutzungsbedingungen nicht vereinbar.' });
+    });
+});

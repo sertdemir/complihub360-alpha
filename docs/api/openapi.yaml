@@ -1799,6 +1799,205 @@ paths:
         '400': { description: Entscheidung passt nicht zum effect, oder note fehlt }
         '409': { description: ALREADY_DECIDED oder STALE_CHANGE }
 
+  # ─── Phase 7: Enterprise-API (ADR-0010) ─────────────────────────────────────
+  # Zwei Welten: /provider/{key}/api-access (Login des Anbieters, Antrag und
+  # Schluessel) und /ext/* (der Schluessel selbst, `Authorization: Bearer
+  # chk_live_…`). Ein Schluessel sieht nur den eigenen Anbieter, nur Buchungen
+  # nach der Offenlegung und nur die Felder, die der Nutzer freigegeben hat.
+  # Tarif ohne api_eligible: die Funktion erscheint nicht; ein Client, dessen
+  # Abo unter Global faellt, bekommt 403 API_NOT_ELIGIBLE.
+
+  /provider/{key}/api-access:
+    get:
+      summary: Stand des API-Zugangs (Phase 7)
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: "`{ eligible, plan_code, terms_version, requestable_scopes[], client | null }` — der Client ohne Hash" }
+        '404': { description: Anbieter unbekannt oder fremd }
+    post:
+      summary: API-Zugang beantragen
+      description: >-
+        Name der Integration, Zweck, Kontakt, gewuenschte Scopes (ohne
+        availability:write — das vergibt nur das Team) und die Annahme der
+        API-Nutzungsbedingungen. Das Team entscheidet; der Anbieter wird
+        benachrichtigt. Ein laufender Antrag oder Client blockiert einen zweiten.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, use_case, contact_email, requested_scopes, accept_terms]
+              properties:
+                name: { type: string, maxLength: 120 }
+                use_case: { type: string, maxLength: 2000 }
+                contact_name: { type: string, maxLength: 120 }
+                contact_email: { type: string, format: email }
+                requested_scopes: { type: array, items: { type: string, enum: [leads:read, leads:write, events:read, billing:read] } }
+                accept_terms: { type: boolean, enum: [true] }
+      responses:
+        '201': { description: "`{ client }` mit status requested" }
+        '400': { description: VALIDATION_ERROR oder TERMS_NOT_ACCEPTED }
+        '403': { description: "API_NOT_ELIGIBLE — der Tarif enthaelt die API nicht (sachlich, ohne Angebot)" }
+        '409': { description: API_CLIENT_EXISTS }
+    delete:
+      summary: API-Zugang widerrufen
+      description: Beendet den aktuellen und den vorigen Schluessel sofort. Ein neuer Antrag ist danach moeglich.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: "`{ client }` mit status revoked" }
+        '404': { description: Kein Zugang vorhanden }
+
+  /provider/{key}/api-access/key:
+    post:
+      summary: Schluessel erzeugen oder rotieren
+      description: >-
+        Nach der Freigabe erzeugt der Anbieter den Schluessel selbst; er steht
+        EINMAL im Klartext in dieser Antwort, gespeichert wird nur der SHA-256-
+        Hash. Ein zweiter Aufruf rotiert: der neue gilt sofort, der alte noch
+        24 Stunden (`previous_key_valid_until`).
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      responses:
+        '201': { description: "`{ key, shown_once: true, previous_key_valid_until, client }`" }
+        '403': { description: API_NOT_ELIGIBLE }
+        '409': { description: API_CLIENT_NOT_APPROVED — noch keine Freigabe }
+
+  /admin/api-access:
+    get:
+      summary: Alle API-Clients (Admin)
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: status, in: query, required: false, schema: { type: string, enum: [requested, approved, active, suspended, revoked, rejected] } }
+      responses:
+        '200': { description: "`{ clients[] }` mit provider_key, provider_name, plan_code, eligible, fee_note — nie der Hash" }
+        '403': { description: Nur Admin oder Server-Key }
+
+  /admin/api-clients/{id}:
+    patch:
+      summary: Ueber einen API-Client entscheiden (Admin)
+      description: >-
+        approve (Scopes, Limit je Minute 1–10000, Gebuehren-Notiz) · reject
+        (decision_note Pflicht) · suspend (reason Pflicht, der Anbieter liest
+        ihn) · reinstate · revoke · update (Scopes, Limit, fee_note). Gebuehren
+        sind nur Notiz — nichts wird automatisch berechnet.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [approve, reject, suspend, reinstate, revoke, update] }
+                scopes: { type: array, items: { type: string, enum: [leads:read, leads:write, events:read, billing:read, availability:write] } }
+                rate_limit_per_minute: { type: integer, minimum: 1, maximum: 10000 }
+                decision_note: { type: string, maxLength: 2000 }
+                reason: { type: string, maxLength: 500 }
+                fee_note: { type: string, maxLength: 500 }
+      responses:
+        '200': { description: "`{ client }`" }
+        '400': { description: "VALIDATION_ERROR — fehlende Begruendung, unbekannter Scope, Limit ausserhalb 1–10000" }
+        '404': { description: Client unbekannt }
+        '409': { description: INVALID_STATE — die Aktion passt nicht zum Zustand }
+
+  /ext/me:
+    get:
+      summary: Wer bin ich (Enterprise-API)
+      description: >-
+        Alle /ext/*-Routen: `Authorization: Bearer chk_live_…`. Jede Antwort
+        traegt X-RateLimit-Limit, -Remaining, -Reset; ueber dem Limit 429 mit
+        Retry-After. Jeder Aufruf steht 90 Tage im Protokoll (Route, Status,
+        Dauer — kein Body, kein Schluessel). Fehler: 401 INVALID_API_KEY,
+        403 API_CLIENT_SUSPENDED / API_CLIENT_NOT_ACTIVE / API_NOT_ELIGIBLE /
+        API_ROUTE_FORBIDDEN / API_SCOPE_FORBIDDEN.
+      security: [ { apiKeyAuth: [] } ]
+      responses:
+        '200': { description: "`{ client: { id, name, scopes, rate_limit_per_minute, key_prefix }, provider: { provider_key, name }, plan_code, terms_version }`" }
+
+  /ext/leads:
+    get:
+      summary: Leads des Anbieters (Scope leads:read)
+      description: >-
+        Buchungen NACH der Offenlegung, aelteste zuerst; `contact` traegt nur
+        die Felder, die der Nutzer in der Buchungsbestaetigung freigegeben hat
+        (sonst null). Keine Gebuehr, kein Band, kein Ledger. Hoechstens 100 je
+        Seite; `next_since` fuer die naechste.
+      security: [ { apiKeyAuth: [] } ]
+      parameters:
+        - { name: since, in: query, required: false, schema: { type: string, format: date-time } }
+        - { name: status, in: query, required: false, schema: { type: string, enum: [new, contacted, proposal_sent, won, lost, closed] } }
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+      responses:
+        '200': { description: "`{ leads[], next_since }` — Lead: id, status, slot_start, slot_end, created_at, area_code, country, contact { email, company, message }, attendance { outcome, no_show_by, dispute_status }, ext_status, ext_status_at, rebooked_from" }
+        '400': { description: since kein Zeitstempel oder status unbekannt }
+        '403': { description: API_SCOPE_FORBIDDEN }
+
+  /ext/leads/{id}:
+    patch:
+      summary: Vertriebsstatus eines Leads setzen (Scope leads:write)
+      description: Der Status gehoert dem CRM des Anbieters; die Plattform liest ihn nur. Fremde oder nicht offengelegte Buchung → 404.
+      security: [ { apiKeyAuth: [] } ]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [new, contacted, proposal_sent, won, lost, closed] }
+      responses:
+        '200': { description: "`{ lead: { id, ext_status, ext_status_at } }`" }
+        '403': { description: API_SCOPE_FORBIDDEN }
+        '404': { description: Lead unbekannt }
+
+  /ext/events:
+    get:
+      summary: Ereignisse des Anbieters, Pull-Feed (Scope events:read)
+      description: >-
+        Spec B "API events": booking.created, booking.rescheduled,
+        booking.cancelled, meeting.completed, user.no_show, provider.no_show,
+        lead.revealed, lead.credit_issued, verification.expiring,
+        payment.failed. `data` traegt je Typ eine feste Feldliste — nie
+        Kontaktdaten. Aufsteigend nach Zeit; `since` ist exklusiv.
+      security: [ { apiKeyAuth: [] } ]
+      parameters:
+        - { name: since, in: query, required: false, schema: { type: string, format: date-time } }
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+      responses:
+        '200': { description: "`{ events[]: { id, type, at, booking_id, data }, next_since }`" }
+        '403': { description: API_SCOPE_FORBIDDEN }
+
+  /ext/invoices:
+    get:
+      summary: Rechnungen (Scope billing:read)
+      security: [ { apiKeyAuth: [] } ]
+      responses:
+        '200': { description: "`{ invoices[]: { id, invoice_number, period, amount_cents, currency, status, issued_at, due_at, paid_at } }` — ohne Positionen" }
+        '403': { description: API_SCOPE_FORBIDDEN }
+
+  /ext/credits:
+    get:
+      summary: Guthaben (Scope billing:read)
+      security: [ { apiKeyAuth: [] } ]
+      responses:
+        '200': { description: "`{ balance_cents, currency, credits[]: { id, amount_cents, currency, reason, ledger_id, created_at } }`" }
+        '403': { description: API_SCOPE_FORBIDDEN }
+
 components:
   parameters:
     CorrelationId:
@@ -1948,3 +2147,10 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Supabase-Access-Token des Nutzers
+    apiKeyAuth:
+      type: http
+      scheme: bearer
+      description: >-
+        Enterprise-API (Phase 7, ADR-0010): `Authorization: Bearer chk_live_…`.
+        Der Schluessel gilt nur fuer /ext/*; gespeichert ist allein sein
+        SHA-256-Hash.
