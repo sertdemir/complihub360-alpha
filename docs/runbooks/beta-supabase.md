@@ -70,9 +70,22 @@ API spricht. Mit der Beta-Env zeigen die Mails damit auf den Beta-Bucket.
   Host `smtp.resend.com`, Port 465, User `resend`, Passwort = Resend-API-Key.
   Ohne eigenes SMTP drosselt Supabase den Versand stark (wenige Mails pro
   Stunde). Für eine Beta reicht das nicht.
-- **Vorlagen:**
-  - „Confirm signup" und „Magic Link": `docs/email-templates/supabase-confirm-signup.html` und `docs/email-templates/supabase-magic-link.html`. Vor dem Einfügen in beiden Dateien die Logo-URL auf `https://<beta-ref>.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png` ändern.
-  - **„Reset password" fehlt im Repo.** Ohne Vorlage verschickt Supabase seinen englischen Standardtext. Die Copy geht über den Canvas zur Abnahme.
+- **Vorlagen und Betreff:** `docs/email-templates/supabase-auth.json` nennt je Mail den Betreff und die Datei.
+
+  | Supabase-Vorlage | Betreff | Datei |
+  |---|---|---|
+  | Confirm signup | Confirm your email for CompliHub360 | `supabase-confirm-signup.html` |
+  | Magic Link | Your CompliHub360 sign-in link | `supabase-magic-link.html` |
+  | Reset Password | Reset your CompliHub360 password | `supabase-reset-password.html` |
+
+  Vor dem Einfügen in jeder Datei die Logo-URL auf
+  `https://<beta-ref>.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png`
+  ändern (Projekt-Referenz tauschen). Die Texte sind abgenommen (Canvas
+  „Auth-Mails ehrlich“, 10.10.2026), und `npm run copy:check` prüft sie
+  wortgleich.
+- **Ablaufzeit:** Authentication → Providers → Email → „Email OTP Expiration“
+  = **1800** Sekunden. Mails und App sagen „30 minutes“. Der Standard von
+  3600 Sekunden würde beides falsch machen.
 - **Google-Login:** Die Login-Seite bietet ihn an. Für das Beta-Projekt einen eigenen OAuth-Client in Google anlegen, mit der Callback-URL des Beta-Projekts. Bis dahin den Knopf ausblenden oder den Provider aus lassen.
 - **JWT:** `SUPABASE_JWT_SECRET` der Beta in die API-Env. Die API prüft Tokens damit und über JWKS.
 
