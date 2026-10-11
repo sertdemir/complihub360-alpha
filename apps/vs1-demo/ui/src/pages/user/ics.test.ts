@@ -54,3 +54,12 @@ describe('icsEsc', () => {
     expect(icsEsc('a\\b;c,d\ne')).toBe('a\\\\b\\;c\\,d\\ne');
   });
 });
+
+describe('icsHref Titel (Schritt 5)', () => {
+  it('ist ohne Angabe englisch', () => {
+    expect(dekodiert(icsHref(beispiel))).toContain(`SUMMARY:Consultation with ${beispiel.provider} · CompliHub360`);
+  });
+  it('uebernimmt den uebersetzten Titel', () => {
+    expect(dekodiert(icsHref(beispiel, 'Erstgespräch, Test'))).toContain('SUMMARY:Erstgespräch\\, Test');
+  });
+});

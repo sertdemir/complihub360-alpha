@@ -21,6 +21,7 @@ import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { SectionEyebrow, GoldWord, Reveal } from '../providers/SectionHeading';
 import { DOMAINS, type DomainSlug } from '../../lib/domains';
+import { areaReachLine } from '../../lib/coverage';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 
 // ─── S4 — The domain atlas (canvas "Was wir wissen" · Atlas, 2026-08-25) ─────
@@ -125,7 +126,7 @@ export function DomainsAtlas() {
                       <span className="block text-body font-bold text-fg">{t(`${base}.title`)}</span>
                       <span className="mt-1 block text-body-xs leading-snug text-fg-secondary">{t(`${base}.desc`)}</span>
                       <span className="mt-2 block text-body-4xs font-semibold uppercase tracking-[0.1em] text-fg-accent-emphasis">
-                        {t(`${base}.markets`)}
+                        {areaReachLine(DOMAINS[active].slug, t('domains.euWide'))}
                       </span>
                     </motion.span>
                   ) : (
@@ -155,7 +156,7 @@ export function DomainsAtlas() {
                     <p className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t('domains.drawerEyebrow')}</p>
                     <h3 className="mt-2.5 font-serif text-[1.75rem] font-bold leading-tight text-fg">{t(`${base}.title`)}</h3>
                     <p className="mt-2 text-body-xs font-semibold text-fg-brand">
-                      {t('domains.activeIn')} <span className="font-medium text-fg-secondary">{t(`${base}.markets`)}</span>
+                      {t('domains.activeIn')} <span className="font-medium text-fg-secondary">{areaReachLine(DOMAINS[active].slug, t('domains.euWide'))}</span>
                     </p>
                   </div>
                   {(() => {

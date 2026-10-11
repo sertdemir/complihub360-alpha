@@ -21,6 +21,14 @@ const ACTION_KEYS: Record<string, { title: string; gold: string; button: string;
   decline: { title: 'magicAction.declineTitle', gold: 'magicAction.declineGold', button: 'magicAction.declineButton', done: 'magicAction.declineDone' },
 };
 
+/** Felder des anonymisierten Dossiers, die ein Label tragen
+ *  (providerws:magicAction.fields). Identitaet (company, requester_email)
+ *  gehoert nie hierher. */
+export const DOSSIER_FIELDS = [
+  'country', 'markets', 'domain', 'categories', 'timeline', 'businessType', 'businessTypeNote',
+  'marketScope', 'riskSignals', 'revenueBand', 'intent', 'urgency', 'note', 'existingProvider',
+] as const;
+
 export function ProviderMagicActionPage() {
   const { t } = useTranslation('providerws');
   const params = new URLSearchParams(useLocation().search);
@@ -54,7 +62,12 @@ export function ProviderMagicActionPage() {
     }
   };
 
-  const answers = dossier ? Object.entries(dossier.structured_answers).filter(([k]) => k !== 'source') : [];
+  // Schritt 5: nur bekannte Felder, mit Label statt Rohschluessel. Ein
+  // unbekannter Schluessel bleibt weg — der Dossier zeigt nichts, was keine
+  // Bezeichnung hat, und die Liste ist eine zweite Sperre hinter dem Server.
+  const answers = dossier
+    ? Object.entries(dossier.structured_answers).filter(([k]) => (DOSSIER_FIELDS as readonly string[]).includes(k))
+    : [];
 
   const [pre, post] = copy.title.split(copy.gold);
 
@@ -94,7 +107,7 @@ export function ProviderMagicActionPage() {
                   <dl className="mt-2 space-y-1">
                     {answers.map(([k, v]) => (
                       <div key={k} className="flex gap-2 text-[12px]">
-                        <dt className="min-w-[110px] capitalize text-fg-tertiary">{k.replace(/_/g, ' ')}</dt>
+                        <dt className="min-w-[110px] text-fg-tertiary">{t(`magicAction.fields.${k}`)}</dt>
                         <dd className="text-fg-secondary">{Array.isArray(v) ? v.join(', ') : String(v)}</dd>
                       </div>
                     ))}

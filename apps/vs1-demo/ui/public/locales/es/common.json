@@ -5,44 +5,6 @@
     "complianceAreas": "Áreas de Cumplimiento",
     "resources": "Recursos",
     "signup": "Regístrate gratis",
-    "items": {
-      "aiEngine": {
-        "title": "El Motor de IA",
-        "desc": "Extracción y mapeo de datos seguros"
-      },
-      "partnerMatching": {
-        "title": "Emparejamiento de Socios",
-        "desc": "Del riesgo a la ejecución local"
-      },
-      "globalCoverage": {
-        "title": "Cobertura Global",
-        "desc": "Reino Unido, UE, Alemania y EE. UU."
-      },
-      "forPartners": {
-        "title": "Para Firmas Asociadas",
-        "desc": "Generación de leads para asesores"
-      },
-      "founders": {
-        "title": "Fundadores y CEOs",
-        "desc": "Minimiza riesgos y escala más rápido"
-      },
-      "operations": {
-        "title": "Equipos de Operaciones",
-        "desc": "Automatiza el cumplimiento diario"
-      },
-      "counsel": {
-        "title": "Abogados Internos",
-        "desc": "Reduce un 90% el tiempo de investigación"
-      },
-      "stories": {
-        "title": "Historias de Clientes",
-        "desc": "Resultados reales de cumplimiento"
-      },
-      "guides": {
-        "title": "Guías y Reportes",
-        "desc": "Análisis profundo de los mercados"
-      }
-    },
     "aiGovernance": "Gobernanza de IA",
     "aiGovDesc": "Nuestro marco para una IA transparente y conforme a la ley.",
     "dashboard": "Mi panel",
@@ -368,7 +330,6 @@
     },
     "risk": {
       "subtitle": "Ponderado para {{market}} por el motor de cumplimiento.",
-      "hintEu": "Promediado entre los ocho mercados que el motor perfila. Elija un mercado para ver su propia ponderación.",
       "hintMarket": "{{market}} pondera estas áreas como se muestra — la más fuerte primero."
     },
     "matrix": {

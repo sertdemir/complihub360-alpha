@@ -669,7 +669,7 @@ export function UserHomePage() {
                               </p>
                             </div>
                             <Button size="sm" variant="outline" iconOnly aria-label={t('termine.addToCalendar')} title={t('termine.addToCalendar')}
-                              onClick={() => ladeIcs({ id: a.id, slotStartIso: a.slotStart, slotEndIso: a.slotEnd, provider, meta: a.message || '—' })}>
+                              onClick={() => ladeIcs({ id: a.id, slotStartIso: a.slotStart, slotEndIso: a.slotEnd, provider, meta: a.message || '—' }, t('userws:termine.icsSummary', { provider }))}>
                               <CalendarPlus size={14} />
                             </Button>
                           </li>

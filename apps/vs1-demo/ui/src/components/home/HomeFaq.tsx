@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { GoldWord } from '../providers/SectionHeading';
 import { Tabs, TabList, Tab } from '../ui/Tabs';
+import { COVERAGE_COUNTS } from '../../lib/coverage';
 
 // ─── S8 — FAQ (canvas "Was Sie sich fragen" · Tabs, 2026-08-25) ──────────────
 // "What you're probably wondering." The single six-question list grew into
@@ -133,7 +134,7 @@ export function HomeFaq() {
               <FaqList
                 items={Array.from({ length: GROUP_COUNTS[group] }, (_, i) => ({
                   q: t(`faq.groups.${group}.items.${i}.q`),
-                  a: t(`faq.groups.${group}.items.${i}.a`),
+                  a: t(`faq.groups.${group}.items.${i}.a`, COVERAGE_COUNTS),
                 }))}
               />
             </motion.div>

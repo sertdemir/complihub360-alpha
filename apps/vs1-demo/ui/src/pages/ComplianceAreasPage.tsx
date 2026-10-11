@@ -16,6 +16,7 @@ import { SiteFooter } from '../components/home';
 import { Button } from '../components/ui/Button';
 import { Container } from '../components/ui/Container';
 import { SectionEyebrow, GoldWord, Reveal } from '../components/providers/SectionHeading';
+import { COVERAGE_COUNTS } from '../lib/coverage';
 
 // ─── /compliance · the hub ───────────────────────────────────────────────────
 // Until 2026-08-21 this page was the whole story: five areas, each one an
@@ -188,9 +189,9 @@ export function ComplianceAreasPage() {
               Variante B, on white): four across squeezed the long German
               titles against the icon tiles. Twice the card width gives the
               serif title, badge and headline one calm line each. */}
-          <SectionEyebrow tone="brand">{t('compliance.areasEyebrow', 'Eight areas, one way in')}</SectionEyebrow>
+          <SectionEyebrow tone="brand">{t('compliance.areasEyebrow', { ...COVERAGE_COUNTS, defaultValue: '{{areas}} areas, one way in' })}</SectionEyebrow>
           <h2 className="mt-2.5 font-serif text-[1.75rem] font-bold leading-tight tracking-tight text-fg lg:text-[2rem]">
-            {t('compliance.areasTitle', 'The eight compliance areas')}
+            {t('compliance.areasTitle', { ...COVERAGE_COUNTS, defaultValue: 'The {{areas}} compliance areas' })}
           </h2>
           <p className="mt-3.5 max-w-2xl text-body leading-relaxed text-fg-secondary">
             {t('compliance.areasLead', {
@@ -234,10 +235,10 @@ export function ComplianceAreasPage() {
                     {t('compliance.howItWorks.hubCta.title', 'Ready to see what applies to you?')}
                   </h3>
                   <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
-                    {t(
-                      'compliance.howItWorks.hubCta.lead',
-                      'The assessment narrows the eight areas down to your business, your markets and your product — in under five minutes.',
-                    )}
+                    {t('compliance.howItWorks.hubCta.lead', {
+                      ...COVERAGE_COUNTS,
+                      defaultValue: 'The assessment narrows the {{areas}} areas down to your business, your markets and your product — in under five minutes.',
+                    })}
                   </p>
                 </div>
                 <Button

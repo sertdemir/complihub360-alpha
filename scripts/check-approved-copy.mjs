@@ -22,7 +22,7 @@
 //
 //   node scripts/check-approved-copy.mjs      pruefen (Exit 1 bei Abweichung)
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
@@ -395,9 +395,47 @@ for (const [art, soll] of Object.entries(MAILS)) {
   if (!/\{\{ \.ConfirmationURL \}\}/.test(readFileSync(resolve(MAIL_DIR, eintrag.file), 'utf8'))) fehler.push(`Auth-Mails: ${eintrag.file} — {{ .ConfirmationURL }} fehlt`);
 }
 
+// 6. Verfuegbarkeit (Checklist v1.0, Schritt 5, Wording-Abnahme 10.10.2026):
+//    Englische Copy verspricht keine Reichweite, die die Engine nicht hat.
+//    Zahlen der Maerkte und Bereiche kommen aus {{markets}}/{{areas}}
+//    (lib/publicRoutes COVERAGE_COUNTS), nie als Wort oder Ziffer im Text —
+//    sonst stimmt der Satz nach dem naechsten Markt nicht mehr.
+const VERFUEGBARKEIT = [
+  /\beverywhere\b/i,
+  /\bworldwide\b/i,
+  /\bavailable globally\b/i,
+  /\bglobal coverage\b/i,
+  /\b(in|for|across) (every|any) (market|country)\b/i,
+  /\b(through|until|by) 20\d\d\b/i,
+  /\b(\d+|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+(markets|countries|(compliance )?areas)\b/i,
+];
+/** Begruendete Ausnahmen — Schluessel, kein Muster. */
+const VERFUEGBARKEIT_AUSNAHMEN = {
+  'common:about.mission.body': 'Mission, wortgleich aus .knowledge/vault/brand/CompliHub360_DNA_V1.md — keine Reichweitenaussage',
+  'common:compliance.area.ceiling.turnover': 'Rechtsbegriff (Art. 83 DSGVO: weltweiter Jahresumsatz)',
+  'common:compliance.area.ceiling.turnoverOr': 'Rechtsbegriff (Art. 83 DSGVO: weltweiter Jahresumsatz)',
+  'providerws:helpDrawer.intro': 'Bereiche des Dashboards, nicht Compliance-Bereiche',
+};
+const EN_DIR = resolve(ROOT, 'apps/vs1-demo/ui/public/locales/en');
+const genutzt = new Set();
+for (const datei of readdirSync(EN_DIR).filter((f) => f.endsWith('.json'))) {
+  const ns = datei.replace(/\.json$/, '');
+  for (const [pfad, wert] of blaetter(JSON.parse(readFileSync(resolve(EN_DIR, datei), 'utf8')))) {
+    if (typeof wert !== 'string') continue;
+    const schluessel = `${ns}:${pfad}`;
+    const treffer = VERFUEGBARKEIT.find((m) => m.test(wert));
+    if (!treffer) continue;
+    if (VERFUEGBARKEIT_AUSNAHMEN[schluessel]) { genutzt.add(schluessel); continue; }
+    fehler.push(`Reichweite en/${schluessel}: „${wert}" — ${treffer} (Zahl ueber {{markets}}/{{areas}}, Reichweite nur, wo sie stimmt)`);
+  }
+}
+for (const s of Object.keys(VERFUEGBARKEIT_AUSNAHMEN)) {
+  if (!genutzt.has(s)) fehler.push(`Ausnahme ohne Treffer: ${s} — aus VERFUEGBARKEIT_AUSNAHMEN streichen`);
+}
+
 if (fehler.length === 0) {
   const n = Object.keys(AKTIONEN_JE_ZUSTAND).length;
-  console.log(`Abgenommene Zustands-Copy wortgleich (${n} Zustaende, ${Object.keys(VORLAGE.actions).length} Aktionen, Sharing-Dialog, Umfang und Technical details; reserviertes Wort auf /billing; drei Auth-Mails mit Betreff und Ablaufzeit).`);
+  console.log(`Abgenommene Zustands-Copy wortgleich (${n} Zustaende, ${Object.keys(VORLAGE.actions).length} Aktionen, Sharing-Dialog, Umfang und Technical details; reserviertes Wort auf /billing; drei Auth-Mails mit Betreff und Ablaufzeit; keine Reichweitenversprechen in EN).`);
   process.exit(0);
 }
 

@@ -23,6 +23,7 @@ import {
 import { getMarketProfile, isMarketCode, listMarkets } from '../lib/marketProfiles';
 import { useInViewOnce } from '../lib/useInViewOnce';
 import { obligationLabel } from '../lib/obligationText';
+import { COVERAGE_COUNTS, coverageVars } from '../lib/coverage';
 
 // ─── /markets and /markets/:code · Brand Map Stufe 6b ────────────────────────
 // The country knowledge base. Every fact on these pages is derived in
@@ -150,7 +151,7 @@ function MarketsKpiCard({ markets }: { markets: ReturnType<typeof listMarkets> }
 }
 
 export function MarketsIndexPage() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const { locale } = useParams();
   const navigate = useNavigate();
   const markets = listMarkets();
@@ -272,8 +273,9 @@ export function MarketsIndexPage() {
                 className="mt-6 block border-t border-stroke-subtle pt-4 text-body-xs normal-case leading-relaxed tracking-normal text-fg-tertiary"
               >
                 {t('markets.regions.note', {
+                  ...coverageVars(i18n.resolvedLanguage || 'en', (c) => t(`markets.countries.${c}`, { defaultValue: c })),
                   defaultValue:
-                    'Eight markets today: Germany, France, Italy, Spain, the Netherlands, the United Kingdom, the United States and Türkiye. Where we don’t carry a national text yet, the market page says so.',
+                    '{{markets}} markets today: {{marketList}}. Where we don’t carry a national text yet, the market page says so.',
                 })}
               </Typography>
             </Reveal>
@@ -327,10 +329,10 @@ export function MarketsIndexPage() {
                   {t('compliance.howItWorks.hubCta.title', 'Ready to see what applies to you?')}
                 </h3>
                 <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
-                  {t(
-                    'compliance.howItWorks.hubCta.lead',
-                    'The assessment narrows the eight areas down to your business, your markets and your product — in under five minutes.',
-                  )}
+                  {t('compliance.howItWorks.hubCta.lead', {
+                    ...COVERAGE_COUNTS,
+                    defaultValue: 'The assessment narrows the {{areas}} areas down to your business, your markets and your product — in under five minutes.',
+                  })}
                 </p>
               </div>
               <Button

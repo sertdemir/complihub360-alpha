@@ -692,7 +692,8 @@
       "disputeConfirmBack": "Back",
       "disputeFailed": "The dispute could not be sent. Please try again or talk to us.",
       "rebookedFrom": "New appointment for an earlier booking"
-    }
+    },
+    "icsSummary": "Consultation with {{provider}} · CompliHub360"
   },
   "review": {
     "eyebrow": "REVIEW",

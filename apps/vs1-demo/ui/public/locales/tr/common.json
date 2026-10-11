@@ -5,44 +5,6 @@
     "complianceAreas": "Uyum Alanları",
     "resources": "Kaynaklar",
     "signup": "Ücretsiz kayıt ol",
-    "items": {
-      "aiEngine": {
-        "title": "Yapay Zeka Motoru",
-        "desc": "Güvenli veri çıkarımı ve eşleme"
-      },
-      "partnerMatching": {
-        "title": "Partner Eşleştirme",
-        "desc": "Riskten yerel uygulamaya"
-      },
-      "globalCoverage": {
-        "title": "Küresel Kapsam",
-        "desc": "İngiltere, AB, Almanya ve ABD"
-      },
-      "forPartners": {
-        "title": "Partner Firmalar İçin",
-        "desc": "Danışmanlar için potansiyel müşteri sağlama"
-      },
-      "founders": {
-        "title": "Kurucular ve CEO'lar",
-        "desc": "Riski en aza indirin ve daha hızlı büyüyün"
-      },
-      "operations": {
-        "title": "Operasyon Ekipleri",
-        "desc": "Günlük uyumluluğu otomatikleştirin"
-      },
-      "counsel": {
-        "title": "Kurum İçi Danışmanlar",
-        "desc": "Araştırma süresini %90 oranında azaltın"
-      },
-      "stories": {
-        "title": "Müşteri Hikayeleri",
-        "desc": "Gerçek uyumluluk sonuçlarını görün"
-      },
-      "guides": {
-        "title": "Rehberler ve Raporlar",
-        "desc": "Pazar detaylarına derinlemesine bakış"
-      }
-    },
     "aiGovernance": "Yapay Zeka Yönetişimi",
     "aiGovDesc": "Şeffaf ve uyumlu yapay zeka için çerçevemiz.",
     "dashboard": "Panelim",
@@ -368,7 +330,6 @@
     },
     "risk": {
       "subtitle": "Uyum motoru tarafından {{market}} için ağırlıklandırıldı.",
-      "hintEu": "Motorun profillediği sekiz pazarın ortalaması. Kendi ağırlığını görmek için bir pazar seçin.",
       "hintMarket": "{{market}} bu alanları gösterildiği gibi ağırlıklandırır — en güçlüsü önce."
     },
     "matrix": {

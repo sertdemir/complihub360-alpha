@@ -10,6 +10,7 @@ import type { DomainSlug } from '../../lib/domains';
 import type { CountryCode } from './types';
 import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 import { obligationLabel } from '../../lib/obligationText';
+import { COVERAGE_COUNTS } from '../../lib/coverage';
 
 interface Props {
   slug: DomainSlug;
@@ -182,8 +183,9 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
           </span>
           <span className="mt-1 block text-body-2xs leading-relaxed text-fg-secondary">
             {t('compliance.area.enforcementScaleSub', {
+              ...COVERAGE_COUNTS,
               defaultValue:
-                'All eight markets on one scale — the gold marker is the value the engine uses here.',
+                'All {{markets}} markets on one scale — the gold marker is the value the engine uses here.',
             })}
           </span>
 

@@ -5,44 +5,6 @@
     "complianceAreas": "Compliance Areas",
     "resources": "Resources",
     "signup": "Sign up for free",
-    "items": {
-      "aiEngine": {
-        "title": "The AI Engine",
-        "desc": "Secure data extraction & mapping"
-      },
-      "partnerMatching": {
-        "title": "Partner Matching",
-        "desc": "From risk to local execution"
-      },
-      "globalCoverage": {
-        "title": "Global Coverage",
-        "desc": "UK, EU, Germany & US"
-      },
-      "forPartners": {
-        "title": "For Partner Firms",
-        "desc": "Lead generation for advisors"
-      },
-      "founders": {
-        "title": "Founders & CEOs",
-        "desc": "Minimise risk & scale faster"
-      },
-      "operations": {
-        "title": "Operations Teams",
-        "desc": "Automate daily compliance"
-      },
-      "counsel": {
-        "title": "In-House Counsel",
-        "desc": "Cut research time by 90%"
-      },
-      "stories": {
-        "title": "Customer Stories",
-        "desc": "See real compliance outcomes"
-      },
-      "guides": {
-        "title": "Guides & Whitepapers",
-        "desc": "In-depth market deep-dives"
-      }
-    },
     "aiGovernance": "AI Governance",
     "aiGovDesc": "Our framework for transparent and compliant AI.",
     "dashboard": "My dashboard",
@@ -371,7 +333,6 @@
     },
     "risk": {
       "subtitle": "Weighted for {{market}} by the compliance engine.",
-      "hintEu": "Averaged across the eight markets the engine profiles. Pick a market to see its own weighting.",
       "hintMarket": "{{market}} weights these areas as shown — strongest first."
     },
     "matrix": {
@@ -412,7 +373,7 @@
       },
       "hubCta": {
         "title": "Ready to see what applies to you?",
-        "lead": "The assessment narrows the nine areas down to your business, your markets and your product — in under five minutes.",
+        "lead": "The assessment narrows the {{areas}} areas down to your business, your markets and your product — in under five minutes.",
         "btn": "Start an assessment"
       }
     },
@@ -762,8 +723,8 @@
       ],
       "askPlaceholder": "E.g.: Do I need a WEEE registration if I only sell through Amazon?"
     },
-    "areasEyebrow": "Nine areas, one way in",
-    "areasTitle": "The nine compliance areas",
+    "areasEyebrow": "{{areas}} areas, one way in",
+    "areasTitle": "The {{areas}} compliance areas",
     "areasLead": "Each opens a page with the duties it carries, the statute behind each one, and what it costs to get wrong.",
     "priority": {
       "immediate": "Immediate",
@@ -796,7 +757,7 @@
       "timelineTitle": "What comes next",
       "timelineLead_one": "One thread, in time order: first the filings that day-to-day operation demands, then the day new law lands. {{deferred}} of the {{total}} duties is settled law but not yet applicable.",
       "timelineLead_other": "One thread, in time order: first the filings that day-to-day operation demands, then the day new law lands. {{deferred}} of the {{total}} duties are settled law but not yet applicable.",
-      "marketsTitle": "The same area, eight weights",
+      "marketsTitle": "The same area, {{markets}} weights",
       "marketsLead": "{{top}} weights this area most heavily — {{topWeight}} out of 10, against {{second}} at {{secondWeight}}. Whoever serves both plans to {{top}}.",
       "coversTitle": "How CompliHub360 gets there",
       "relatedTitle": "Areas that travel with this one",
@@ -870,7 +831,7 @@
       "relatedStrongest": "Strongest connection",
       "sharedTriggers_one": "{{count}} shared trigger",
       "sharedTriggers_other": "{{count}} shared triggers",
-      "allAreasLink": "All nine areas at a glance",
+      "allAreasLink": "All {{areas}} areas at a glance",
       "coverageNoteEu_one": "The engine carries {{count}} duty for this area, on an EU-level source. Pick a market to see where a national source adds to it.",
       "coverageNoteEu_other": "The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.",
       "startShort": "Start the assessment",
@@ -914,7 +875,7 @@
       "authorities": "Competent authorities",
       "enforcementLeadEu_one": "The figures come from the sources the engine holds at EU level — {{count}} duty with a stated penalty range. The upper bound as written, not an expected cost.",
       "enforcementLeadEu_other": "The figures come from the sources the engine holds at EU level — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
-      "enforcementScaleSub": "All eight markets on one scale — the gold marker is the value the engine uses here.",
+      "enforcementScaleSub": "All {{markets}} markets on one scale — the gold marker is the value the engine uses here.",
       "timelineLeadAllLive": "Every duty here already applies — the thread shows the cadence each one returns on and the lead time it needs. The market switch above recalculates the lead times.",
       "marketsLeadTied": "{{count}} markets weight this area equally heavily ({{weight}} out of 10). Serving more than one means planning to the strictest of them.",
       "localSourcesNote": "The engine holds at least one local source for this area in {{count}} of the {{total}} markets. Elsewhere the EU-level instrument is what applies, and it is shown as such.",
@@ -1585,7 +1546,7 @@
       "eyebrow": "Regions",
       "title": "Where we stand — and where it goes next",
       "lead": "Every entry names the law it comes from: national where we carry it, EU-level where that is the law.",
-      "note": "Eight markets today: Germany, France, Italy, Spain, the Netherlands, the United Kingdom, the United States and Türkiye. Where we don’t carry a national text yet, the market page says so.",
+      "note": "{{markets}} markets today: {{marketList}}. Where we don’t carry a national text yet, the market page says so.",
       "items": {
         "eu": {
           "name": "European Union",
@@ -1798,11 +1759,11 @@
     },
     "compliance": {
       "title": "Compliance areas · CompliHub360",
-      "description": "Nine areas from tax and VAT through EPR to data privacy: what applies, how urgent it is and who helps you act on it."
+      "description": "{{areas}} areas from tax and VAT through EPR to data privacy: what applies, how urgent it is and who helps you act on it."
     },
     "markets": {
       "title": "Markets · CompliHub360",
-      "description": "Eight markets and what they weigh most — Germany, United Kingdom, Netherlands, France, Italy, Spain, United States and Türkiye."
+      "description": "{{markets}} markets and what they weigh most — {{marketList}}."
     },
     "pricing": {
       "title": "Pricing · CompliHub360",
@@ -1810,7 +1771,7 @@
     },
     "resources": {
       "title": "Resources · CompliHub360",
-      "description": "Where to read on: markets and the rules that apply there, the nine compliance areas, and the path from a question to a professional."
+      "description": "Where to read on: markets and the rules that apply there, the {{areas}} compliance areas, and the path from a question to a professional."
     },
     "about": {
       "title": "About us · CompliHub360",

@@ -11,6 +11,7 @@ import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { ObligationSeverity } from '@complihub/compliance-engine';
 import type { DomainSlug } from '../../lib/domains';
 import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
+import { COVERAGE_COUNTS } from '../../lib/coverage';
 
 interface Props {
   slug: DomainSlug;
@@ -206,7 +207,7 @@ export function RelatedAreas({ slug }: Props) {
         entries={entries}
         strongestLabel={t('compliance.area.relatedStrongest', 'Strongest connection')}
         exitTo={`${localePrefix}/compliance`}
-        exitLabel={t('compliance.area.allAreasLink', 'All nine areas at a glance')}
+        exitLabel={t('compliance.area.allAreasLink', { ...COVERAGE_COUNTS, defaultValue: 'All {{areas}} areas at a glance' })}
       />
     </div>
   );

@@ -692,7 +692,8 @@
       "disputeConfirmBack": "Zurück",
       "disputeFailed": "Der Widerspruch konnte nicht gesendet werden. Bitte versuchen Sie es erneut oder sprechen Sie mit uns.",
       "rebookedFrom": "Neuer Termin zu einer früheren Buchung"
-    }
+    },
+    "icsSummary": "CompliHub360 Erstgespräch — {{provider}}"
   },
   "review": {
     "eyebrow": "BEWERTUNG",

@@ -19,6 +19,28 @@ export const MARKET_CODES_SEO = ['de', 'uk', 'nl', 'fr', 'it', 'es', 'us', 'tr']
 // would drift the moment a domain is added, and the drift would be silent.
 export const COMPLIANCE_AREA_SLUGS = DOMAINS.map((d) => d.slug);
 
+// ─── Schritt 5: Maerkte und Bereiche in Worten ───────────────────────────────
+// Eine Funktion fuer Laufzeit (lib/coverage, hooks/useSeo) und Vorrendern
+// (vite-plugin-seo.ts): dieselbe Reihenfolge, dieselben Namen aus
+// common:markets.countries, derselbe Satzbau. Sonst laese ein Crawler ohne
+// JavaScript einen anderen Satz als alle anderen.
+
+/** {{markets}} und {{areas}} fuer Copy, die nur Zahlen nennt. */
+export const COVERAGE_COUNTS = { markets: MARKET_CODES_SEO.length, areas: COMPLIANCE_AREA_SLUGS.length };
+
+/** Die Maerkte als Namen, in der Reihenfolge von MARKET_CODES_SEO. */
+export function marketNameList(nameOf: (code: string) => string): string[] {
+  return MARKET_CODES_SEO.map((c) => nameOf(c.toUpperCase()));
+}
+
+/** "Germany, United Kingdom, … and Türkiye" in der Sprache der Seite. */
+export function marketListText(nameOf: (code: string) => string, locale: string): string {
+  const names = marketNameList(nameOf);
+  // Intl.ListFormat ist ES2021; die TS-Lib hier endet frueher, Browser und Node nicht.
+  const LF = (Intl as unknown as { ListFormat?: new (l: string, o: object) => { format: (x: string[]) => string } }).ListFormat;
+  try { return LF ? new LF(locale, { style: 'long', type: 'conjunction' }).format(names) : names.join(', '); } catch { return names.join(', '); }
+}
+
 export interface PublicRoute {
   /** Path under /:locale, '' for the index. */
   path: string;

@@ -11,6 +11,7 @@ import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { CountryCode } from './types';
 import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
+import { COVERAGE_COUNTS } from '../../lib/coverage';
 
 interface Props {
   slug: DomainSlug;
@@ -89,7 +90,7 @@ export function AreaMarketHeatmap({ slug, selectedCountry }: Props) {
       <div className="shrink-0 desktop-s:w-[380px]">
         <AreaSectionHeading
           eyebrow={eyebrows.markets}
-          title={t('compliance.area.marketsTitle', 'The same area, eight weights')}
+          title={t('compliance.area.marketsTitle', { ...COVERAGE_COUNTS, defaultValue: 'The same area, {{markets}} weights' })}
           lead={leadText}
         />
         {/* Where the engine actually holds a national source, said once for
