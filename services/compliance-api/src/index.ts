@@ -26,6 +26,8 @@ import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnaps
 import { loadAttendancePolicy, findRecentLead } from "./attendance.js";
 import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
 import { handleProviderPerformance, handleProviderOverview, handleEnforcementAppeal, handleAdminEnforcement } from "./performanceRoutes.js";
+import { authenticateApiClient, clientRateLimiter, setRateLimitHeaders, logApiRequest, handleExtRoutes, handleProviderApiAccess, handleAdminApiAccess } from "./apiRoutes.js";
+import { looksLikeApiKey } from "./apiClients.js";
 import { loadPerformancePolicy, qualityFactor, availabilitySlots, bookingOpen, validateAvailabilityHours, validTimezone, incidentsInWindow } from "./performance.js";
 import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent, StripeError } from "./stripe.js";
 import { checkVatId } from "./vies.js";
@@ -239,6 +241,48 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
     const correlationId = normalizeCorrelationId(req.headers['x-correlation-id']);
 
+    // Phase 7 (ADR-0010): ein Enterprise-API-Client weist sich mit
+    // `Authorization: Bearer chk_live_…` aus. Er bekommt ausschliesslich
+    // /api/v1/ext/*, ein eigenes Limit je Client und eine Protokollzeile je
+    // Aufruf — und laeuft NICHT in die JWT-Kette unten: ein API-Schluessel ist
+    // kein Login und kein Server-Key.
+    const bearer = typeof req.headers['authorization'] === 'string' && req.headers['authorization'].startsWith('Bearer ')
+        ? req.headers['authorization'].substring(7) : '';
+    if (looksLikeApiKey(bearer)) {
+        const startedAt = Date.now();
+        const clientIp = typeof req.headers['x-forwarded-for'] === 'string'
+            ? (req.headers['x-forwarded-for'] as string).split(',')[0].trim() : (req.socket.remoteAddress || 'unknown');
+        res.setHeader('x-correlation-id', correlationId);
+        let auth;
+        try { auth = await authenticateApiClient(bearer); } catch {
+            structuredLog('error', 'API client auth failed', { correlationId, errorCode: 'ERR_API_AUTH', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'API authentication failed', correlationId }));
+            return;
+        }
+        if (!auth.ok) {
+            res.writeHead(auth.status, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: auth.code, message: auth.message, correlationId }));
+            return;
+        }
+        const apiClient = auth.client;
+        res.on('finish', () => { void logApiRequest({ client: apiClient, method: req.method || '', url: req.url || '', status: res.statusCode, durationMs: Date.now() - startedAt, correlationId, ip: clientIp }); });
+        if (!(req.url || '').startsWith('/api/v1/ext/')) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'API_ROUTE_FORBIDDEN', message: 'API keys may only call /api/v1/ext/* routes', correlationId }));
+            return;
+        }
+        const rl = clientRateLimiter.check(apiClient.id, apiClient.rate_limit_per_minute);
+        setRateLimitHeaders(res, rl);
+        if (!rl.allowed) {
+            res.writeHead(429, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'RATE_LIMIT_EXCEEDED', message: 'Too many requests for this API client', retry_after_seconds: rl.retryAfterSec, correlationId }));
+            return;
+        }
+        await handleExtRoutes(req, res, correlationId, apiClient);
+        return;
+    }
+
     // Caller identity from a valid Supabase JWT (phase ③ subscription gate).
     let authUserId: string | null = null;
     let authEmail: string | null = null;
@@ -418,6 +462,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     const forwardedIp = typeof req.headers['x-forwarded-for'] === 'string'
         ? (req.headers['x-forwarded-for'] as string).split(',')[0].trim() : (req.socket.remoteAddress || 'unknown');
     if (await handleProviderApplication(req, res, correlationId, caller, forwardedIp)) return;
+    // Phase 7 (ADR-0010): Enterprise-API — Antrag und Schluessel des Anbieters
+    // (hinter dem Ownership-Guard), Entscheidung des Teams (Admin-Gate).
+    {
+        const own = /^\/api\/v1\/provider\/([a-z0-9-]+)\/api-access(?:\/key)?$/.exec((req.url || '').split('?')[0]);
+        if (own && await handleProviderApiAccess(req, res, correlationId, own[1], authUserId)) return;
+        if (/^\/api\/v1\/admin\/(?:api-access|api-clients\/)/.test(req.url || '')) {
+            if (!authViaApiKey && !authIsAdmin) {
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(403, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Admin only', correlationId }));
+                return;
+            }
+            if (await handleAdminApiAccess(req, res, correlationId, authUserId)) return;
+        }
+    }
     if (await handleProviderReview(req, res, correlationId, caller)) return;
 
     if (req.method === 'POST' && req.url === '/api/compliance/check') {
