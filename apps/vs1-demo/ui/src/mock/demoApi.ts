@@ -744,6 +744,7 @@ function partnerNotifications() {
     n(4, 'appointment_reminder', { providerKey: PARTNER_KEY, slot: iso(1, 12), offset: '1440' }, 26, true),
     n(5, 'evidence_expiring', { providerKey: PARTNER_KEY, label: 'insurance', to: iso(23).slice(0, 10) }, 30, true),
     n(6, 'subscription_scheduled', { providerKey: PARTNER_KEY, effectiveOn: iso(25).slice(0, 10) }, 31, true),
+    n(10, 'credit_issued', { providerKey: PARTNER_KEY, amount: '4023', label: 'cancelled' }, 50, true),
     n(7, 'credit_issued', { providerKey: PARTNER_KEY, amount: '4470' }, 75, true),
   ];
 }

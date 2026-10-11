@@ -1231,7 +1231,8 @@
     },
     "credit_issued": {
       "title": "Credit added",
-      "body": "{{amount}} from a missed appointment. It is applied to your next subscription invoice."
+      "body": "{{amount}} from a missed appointment. It is applied to your next subscription invoice.",
+      "bodyCancelled": "{{amount}} from a cancelled appointment that was not rebooked. It is applied to your next subscription invoice."
     },
     "payment_failed": {
       "title": "Lead charge did not go through",

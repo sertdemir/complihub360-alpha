@@ -1215,7 +1215,8 @@
     },
     "credit_issued": {
       "title": "Guthaben gutgeschrieben",
-      "body": "{{amount}} aus einem nicht wahrgenommenen Termin. Es wird mit der nächsten Abo-Rechnung verrechnet."
+      "body": "{{amount}} aus einem nicht wahrgenommenen Termin. Es wird mit der nächsten Abo-Rechnung verrechnet.",
+      "bodyCancelled": "{{amount}} aus einem abgesagten Termin, der nicht neu gebucht wurde. Es wird mit der nächsten Abo-Rechnung verrechnet."
     },
     "payment_failed": {
       "title": "Lead-Belastung gescheitert",
