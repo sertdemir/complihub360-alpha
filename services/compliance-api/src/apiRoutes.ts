@@ -107,7 +107,7 @@ export async function logApiRequest(a: { client: ApiClientRow; method: string; u
     const route = a.url.split('?')[0].slice(0, 200);
     try {
         await supabaseApi.insert('api_request_log', {
-            client_id: a.client.id, provider_key: a.client.provider_key, method: a.method, route, status: a.status,
+            client_id: a.client.id, provider_key: a.client.provider_key, method: a.method, route, status: a.status, at: new Date().toISOString(),
             duration_ms: Math.max(0, Math.round(a.durationMs)), correlation_id: a.correlationId, ip: a.ip.slice(0, 64),
         });
         await supabaseApi.update('api_clients', { id: a.client.id }, { last_used_at: new Date().toISOString(), last_used_ip: a.ip.slice(0, 64) });
@@ -287,12 +287,36 @@ export async function handleProviderApiAccess(
 ): Promise<boolean> {
     const path = (req.url || '').split('?')[0];
     const base = `/api/v1/provider/${providerKey}/api-access`;
-    if (path !== base && path !== `${base}/key`) return false;
+    if (path !== base && path !== `${base}/key` && path !== `${base}/log`) return false;
     res.setHeader('x-correlation-id', correlationId);
 
     try {
         const { eligible, planCode } = await apiEligibility(providerKey);
         const client = await currentClientOf(providerKey);
+
+        // Was die Integration tut: die letzten Aufrufe und die juengsten
+        // Ereignisse, wie sie der Pull-Feed liefert — damit der Anbieter nicht
+        // uns fragen muss, warum sein CRM nichts bekommt.
+        if (req.method === 'GET' && path === `${base}/log`) {
+            if (!client) { json(res, 200, { ok: true, calls: [], today: { count: 0, limited: 0, failed: 0 }, events: [], correlationId }); return true; }
+            const rows = (await supabaseApi.select('api_request_log', { client_id: client.id }, { order: 'at.desc', limit: 200 })) as Json[];
+            const dayStart = new Date(); dayStart.setUTCHours(0, 0, 0, 0);
+            const todayRows = rows.filter((r) => Date.parse(String(r.at)) >= dayStart.getTime());
+            const [a, b] = await Promise.all([
+                supabaseApi.select('event_log', { 'payload->>providerKey': providerKey }, { order: 'timestamp.desc', limit: 200 }) as Promise<EventLogRow[]>,
+                supabaseApi.select('event_log', { 'payload->>provider_key': providerKey }, { order: 'timestamp.desc', limit: 200 }) as Promise<EventLogRow[]>,
+            ]);
+            const seen = new Set<string>();
+            const events = [...a, ...b].filter((r) => { if (seen.has(r.id)) return false; seen.add(r.id); return eventBelongsTo(r, providerKey); })
+                .map(mapEventLogRow).filter((e): e is NonNullable<typeof e> => !!e).sort((x, y) => y.at.localeCompare(x.at)).slice(0, 10);
+            json(res, 200, {
+                ok: true,
+                calls: rows.slice(0, 20).map((r) => ({ id: r.id, method: r.method, route: r.route, status: r.status, duration_ms: r.duration_ms, at: r.at })),
+                today: { count: todayRows.length, limited: todayRows.filter((r) => r.status === 429).length, failed: todayRows.filter((r) => Number(r.status) >= 500).length },
+                events, correlationId,
+            });
+            return true;
+        }
 
         if (req.method === 'GET' && path === base) {
             json(res, 200, {

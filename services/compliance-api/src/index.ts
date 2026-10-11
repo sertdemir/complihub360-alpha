@@ -465,7 +465,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     // Phase 7 (ADR-0010): Enterprise-API — Antrag und Schluessel des Anbieters
     // (hinter dem Ownership-Guard), Entscheidung des Teams (Admin-Gate).
     {
-        const own = /^\/api\/v1\/provider\/([a-z0-9-]+)\/api-access(?:\/key)?$/.exec((req.url || '').split('?')[0]);
+        const own = /^\/api\/v1\/provider\/([a-z0-9-]+)\/api-access(?:\/key|\/log)?$/.exec((req.url || '').split('?')[0]);
         if (own && await handleProviderApiAccess(req, res, correlationId, own[1], authUserId)) return;
         if (/^\/api\/v1\/admin\/(?:api-access|api-clients\/)/.test(req.url || '')) {
             if (!authViaApiKey && !authIsAdmin) {

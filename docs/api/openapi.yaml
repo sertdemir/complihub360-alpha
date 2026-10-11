@@ -1871,6 +1871,17 @@ paths:
         '403': { description: API_NOT_ELIGIBLE }
         '409': { description: API_CLIENT_NOT_APPROVED — noch keine Freigabe }
 
+  /provider/{key}/api-access/log:
+    get:
+      summary: Was die Integration tut
+      description: Die letzten 20 Aufrufe (Methode, Route, Status, Dauer), die Tageszahlen (Aufrufe, 429, 5xx) und die zehn juengsten Ereignisse, wie sie der Pull-Feed liefert. Kein Schluessel, kein Body.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: "`{ calls[], today: { count, limited, failed }, events[] }`" }
+        '404': { description: Anbieter unbekannt oder fremd }
+
   /admin/api-access:
     get:
       summary: Alle API-Clients (Admin)

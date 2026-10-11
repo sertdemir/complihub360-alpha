@@ -4722,4 +4722,19 @@ describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Lim
         expect(g.body.client).toBeNull();
         expect(db.api_clients[0]).toMatchObject({ status: 'rejected', decision_note: 'Der Zweck ist mit den Nutzungsbedingungen nicht vereinbar.' });
     });
+
+    it('Protokoll fuer den Anbieter: letzte Aufrufe, Tageszahlen, juengste Ereignisse — ohne Schluessel', async () => {
+        seedGlobal();
+        const { key } = await activeKey();
+        (db.event_log ??= []).push({ id: randomUUID(), type: 'scheduling_confirmed', payload: { bookingId: randomUUID(), providerKey: 'test-kanzlei', slot_start: '2026-11-02T09:00:00Z' }, timestamp: '2026-10-01T10:00:00Z' });
+        expect((await asKey(key, '/api/v1/ext/me')).status).toBe(200);
+        await settle();
+        const r = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access/log');
+        expect(r.status).toBe(200);
+        expect(r.body.calls[0]).toMatchObject({ method: 'GET', route: '/api/v1/ext/me', status: 200 });
+        expect(r.body.today.count).toBeGreaterThanOrEqual(1);
+        expect(r.body.events.map((e: any) => e.type)).toEqual(['booking.created']);
+        expect(JSON.stringify(r.body)).not.toContain(key);
+        expect((await asJwt(USER_JWT, '/api/v1/provider/test-kanzlei/api-access/log')).status).toBe(404);
+    });
 });

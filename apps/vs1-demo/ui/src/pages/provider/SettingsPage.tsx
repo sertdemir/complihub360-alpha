@@ -9,6 +9,7 @@ import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/Confi
 import { ChangeEmailDrawer } from '../../components/provider/ChangeEmailDrawer';
 import { CalendarPanel } from '../../components/provider/CalendarPanel';
 import { AvailabilityPanel } from '../../components/provider/AvailabilityPanel';
+import { ApiAccessPanel } from '../../components/provider/ApiAccessPanel';
 import { InboxAddress } from '../../components/contact/SendStates';
 import { AVAILABILITY_EVENT, fetchCoverage, setAvailability, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
 import { fetchApplication } from '../../api/application';
@@ -37,6 +38,9 @@ const SECTIONS = [
   { id: 'after-booking', labelKey: 'settings.navAfterBooking' },
   { id: 'contact-email', labelKey: 'settings.navContactEmail' },
   { id: 'availability', labelKey: 'settings.navAvailability' },
+  // Phase 7 (ADR-0010, Canvas 1A): nur wenn der Tarif die API enthaelt —
+  // die Seite blendet den Eintrag ein, sobald der Abschnitt da ist.
+  { id: 'integration', labelKey: 'settings.navIntegration' },
   { id: 'workspace', labelKey: 'settings.navWorkspace' },
 ] as const;
 
@@ -79,6 +83,7 @@ export function SettingsPage() {
   const [identityFailed, setIdentityFailed] = useState(false);
   const [identityAttempt, setIdentityAttempt] = useState(0);
   const [deletion, setDeletion] = useState<'idle' | 'sent' | SendFailure>('idle');
+  const [apiEligible, setApiEligible] = useState(false);
 
   useEffect(() => {
     fetchCoverage().then((c) => {
@@ -158,7 +163,7 @@ export function SettingsPage() {
         <div className="grid gap-6 lg:grid-cols-[200px,1fr]">
           <nav aria-label={t('settings.navLabel')} className="lg:sticky lg:top-6 lg:self-start">
             <ul className="flex flex-wrap gap-1 lg:flex-col lg:gap-0.5">
-              {SECTIONS.map((s) => (
+              {SECTIONS.filter((s) => s.id !== 'integration' || apiEligible).map((s) => (
                 <li key={s.id}>
                   <button
                     type="button"
@@ -218,6 +223,10 @@ export function SettingsPage() {
             {/* Phase 6 (Canvas 3B): buchbare Fenster je Wochentag und Zeitzone —
                 derselbe Aufruf wie Pausieren, andere Felder. */}
             <AvailabilityPanel />
+
+            {/* Phase 7 (Canvas 1A): Enterprise-API — der Abschnitt existiert nur
+                unter einem Tarif mit api_eligible; sonst rendert er nichts. */}
+            <ApiAccessPanel onConfirm={setConfirm} onEligibility={setApiEligible} />
 
             {/* D1: Loeschung als Anfrage an unser Postfach, keine vorgetaeuschte Loeschung. */}
             <SectionCard id="workspace" title={t('settings.deleteTitle')} body={t('settings.deleteBody')}>

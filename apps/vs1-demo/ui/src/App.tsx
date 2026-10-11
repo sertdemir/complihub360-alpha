@@ -47,6 +47,7 @@ const ApplicationPage = lazy(() => import("./pages/provider/ApplicationPage").th
 const VerificationPage = lazy(() => import("./pages/provider/VerificationPage").then((m) => ({ default: m.VerificationPage })));
 const AdminProvidersPage = lazy(() => import("./pages/admin/AdminProvidersPage").then((m) => ({ default: m.AdminProvidersPage })));
 const AdminProviderReviewPage = lazy(() => import("./pages/admin/AdminProviderReviewPage").then((m) => ({ default: m.AdminProviderReviewPage })));
+const AdminApiAccessPage = lazy(() => import("./pages/admin/AdminApiAccessPage").then((m) => ({ default: m.AdminApiAccessPage })));
 const UserHomePage = lazy(() => import("./pages/user/UserHomePage").then((m) => ({ default: m.UserHomePage })));
 const SessionsPage = lazy(() => import("./pages/user/SessionsPage").then((m) => ({ default: m.SessionsPage })));
 const TerminePage = lazy(() => import("./pages/user/TerminePage").then((m) => ({ default: m.TerminePage })));
@@ -276,6 +277,7 @@ function AppContent() {
                         {/* Phase 2: Pruef-Queue + Reviewer-Pruefung */}
                         <Route path="admin/providers" element={<AdminProvidersPage />} />
                         <Route path="admin/providers/:key" element={<AdminProviderReviewPage />} />
+                        <Route path="admin/api-access" element={<AdminApiAccessPage />} />
                         <Route path="admin/security" element={<AdminComingSoonPage />} />
                         <Route path="admin/privacy" element={<AdminComingSoonPage />} />
                         <Route path="admin/alerts" element={<AdminComingSoonPage />} />

@@ -1,6 +1,6 @@
 # ADR-0010: Enterprise-API — gehashte Schlüssel, Scopes vom Team, Pull-Feed, Limit je Client, nur nach Offenlegung
 
-**Status:** PROPOSED (Entscheidungen 1–6 zur Bestätigung durch den Nutzer; Backend umgesetzt)
+**Status:** ACCEPTED (Entscheidungen 1–6 bestätigt am 2026-10-11; Canvas-Wahl 1A · 2A · 3A · 4A)
 **Date:** 2026-10-11
 **Bezug:** *Provider Dashboard Pricing & Operations Implementation Specification* v1.0 („Spec B") — „Global enterprise API" (Eligibility and activation, Permitted API capabilities, Prohibited API access, API events), „API and Integration Terms", Recommended build order Nr. 9 · [`KN-BRAND-001`](../../.knowledge/memory/nodes/KN-BRAND-001-complihub360-dna.md) §1 (We do not create needs), §3, §6 · ADR-0004 (Offenlegung erst nach der Buchung) · ADR-0005 (`shared_fields` als Grenze dessen, was fließt) · ADR-0009 (Analytics-Tiefe ohne Vorteil) · `TKT-PROV-15`
 **Offene Plan-Entscheidung Nr. 7** (API-Gebühren, Rate Limits, Auth) wird hiermit vorgeschlagen.

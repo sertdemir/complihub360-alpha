@@ -521,6 +521,7 @@
     "navAfterBooking": "After booking",
     "navContactEmail": "Contact email",
     "navAvailability": "Availability",
+    "navIntegration": "Integration",
     "navWorkspace": "Workspace",
     "afterBookingTitle": "Visible after booking",
     "afterBookingBody": "Clients only see these details once they have booked an appointment. They come from your application.",
@@ -1255,6 +1256,14 @@
     "enforcement_decided": {
       "title": "Your appeal was decided",
       "body": "Decision: {{decision}}. Details are under Performance."
+    },
+    "api_access_decided": {
+      "title": "Your API request was decided",
+      "body": "Decision: {{decision}}. Details are in Settings under Integration."
+    },
+    "api_access_suspended": {
+      "title": "Your API access is suspended",
+      "body": "Reason: {{reason}}. Your key stays stored. Details are in Settings."
     }
   },
   "overview": {
@@ -1318,5 +1327,75 @@
     "creditNote": "applied to your next invoice",
     "evidenceExpiring": "Evidence {{type}}",
     "until": "until {{date}}"
+  },
+  "apiAccess": {
+    "title": "Integration (API)",
+    "loadFailed": "The integration status couldn’t be loaded.",
+    "plan": {
+      "essential": "Essential",
+      "growth": "Growth",
+      "global": "Global"
+    },
+    "status": {
+      "requested": "requested",
+      "approved": "approved",
+      "active": "active",
+      "suspended": "suspended",
+      "revoked": "revoked",
+      "rejected": "rejected"
+    },
+    "intro": "For providers with their own CRM or routing integration. The team reviews every request; afterwards you create your key here.",
+    "nameLabel": "Integration name",
+    "namePh": "e.g. HubSpot CRM",
+    "useCaseLabel": "What do you need the integration for?",
+    "useCasePh": "Create leads after booking, write back the status …",
+    "contactLabel": "Technical contact (email)",
+    "scopesLabel": "Which data should the integration reach?",
+    "scopesNote": "availability:write (control availability from your system) is granted by the team only on separate approval.",
+    "termsAccept": "With this request you accept the API and integration terms (version {{version}}).",
+    "submit": "Send request",
+    "requestFailed": "The request couldn’t be sent. Please try again.",
+    "notEligibleNow": "Your current plan doesn’t include the API.",
+    "requestedBody": "Request from {{date}} · {{name}} · {{scopes}}. The team reviews purpose and scope and gets back to {{email}}. You’ll be informed here and by notification.",
+    "rejectedTitle": "The team didn’t approve the request",
+    "rejectedNoNote": "No reason is on file. You can request again.",
+    "approvedBody": "Approved with {{scopes}} · {{limit}} calls per minute. Create your key now — it is shown exactly once.",
+    "createKey": "Create key",
+    "keyFailed": "The key couldn’t be created. Please try again.",
+    "approvedOn": "Access approved · {{date}}",
+    "suspendedTitle": "The team suspended access on {{date}}.",
+    "suspendedBody": "Reason: {{reason}} Your key stays stored; calls answer 403 API_CLIENT_SUSPENDED. Reach us via Help & support if you have questions.",
+    "freshTitle": "Your new key · visible only now",
+    "freshBody": "Copy it into your system now. Afterwards we only show {{prefix}}. A lost key is not restored but rotated.",
+    "previousUntil": "The previous key remains valid until {{date}}.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "saved": "I’ve saved it",
+    "scopes": "Scopes",
+    "scopesByTeam": "granted by the team",
+    "rateLimit": "Rate limit",
+    "perMinute": "{{n}} calls / minute",
+    "setByTeam": "set by the team",
+    "lastUsed": "Last used",
+    "neverUsed": "never",
+    "terms": "Terms",
+    "acceptedOn": "accepted on {{date}}",
+    "rotate": "Rotate key",
+    "revoke": "Revoke access",
+    "rotateHint": "Rotate: the new key works immediately, the old one for another 24 hours. Revoke ends both at once.",
+    "rotateTitle": "Rotate the key?",
+    "rotateConsequence": "A new key is created and shown once. The current one remains valid for 24 hours so your integration can switch without an outage.",
+    "rotateLabel": "Rotate",
+    "revokeTitle": "Revoke access?",
+    "revokeConsequence": "Both keys become invalid immediately; your integration gets 401. Access can only be restored with a new request.",
+    "revokeLabel": "Revoke",
+    "revokeKeyword": "REVOKE",
+    "revokeFailed": "The revocation couldn’t be carried out. Your access is unchanged.",
+    "events": "Events",
+    "noEvents": "No events yet.",
+    "eventsNote": "Events are pulled, not pushed; we keep them for 90 days.",
+    "calls": "Recent calls",
+    "noCalls": "No calls yet.",
+    "callsNote": "Today: {{count}} calls · {{limited}} × 429 · {{failed}} × 5xx. The log keeps 90 days, without contents and without keys."
   }
 }
