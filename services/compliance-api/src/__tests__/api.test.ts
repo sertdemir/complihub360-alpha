@@ -1145,6 +1145,16 @@ describe('PATCH /api/v1/scheduling/:id (reschedule + outcome guards)', () => {
         expect(db.event_log.some((e) => e.type === 'booking_rescheduled')).toBe(true);
     });
 
+    it('meldet die Verschiebung in der Partner-Glocke (Mitglieder, nicht der Nutzer)', async () => {
+        seedProvider(); seedMember();
+        const b = seedBooking();
+        const target = future(3);
+        await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: target }) });
+        const n = (db.notifications ?? []).filter((x: any) => x.type === 'booking_rescheduled');
+        expect(n.map((x: any) => x.user_id)).toEqual([MEMBER_ID]);
+        expect(n[0].payload).toMatchObject({ providerKey: 'test-kanzlei', slot: target, from: b.slot_start });
+    });
+
     it('400s a slot in the past', async () => {
         const b = seedBooking();
         const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: '2020-01-01T09:00:00.000Z' }) });
@@ -1228,6 +1238,16 @@ describe('PATCH /api/v1/scheduling/:id — Absage', () => {
                 e.type === 'email_outbox' && e.payload?.kind === 'cancellation_provider');
         }
         expect(mail?.payload?.to).toBe('geheim@testkanzlei.example');
+    });
+
+    it('meldet die Absage in der Partner-Glocke, je Mitglied einmal', async () => {
+        seedProvider(); seedMember();
+        const id = seedBooking();
+        await api(`/api/v1/scheduling/${id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'cancelled' }) });
+        const n = (db.notifications ?? []).filter((x: any) => x.type === 'booking_cancelled');
+        expect(n.map((x: any) => x.user_id)).toEqual([MEMBER_ID]);
+        expect(n[0]).toMatchObject({ subject: 'booking', subject_id: id });
+        expect(n[0].payload.slot).toBeTruthy();
     });
 
     it('laesst ein Outcome (completed) ohne cancelled_by durch', async () => {

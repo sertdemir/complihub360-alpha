@@ -1204,6 +1204,14 @@
       "title": "New booking",
       "body": "A client booked an intro call for {{slot}}. The dossier is ready."
     },
+    "booking_cancelled": {
+      "title": "Booking cancelled",
+      "body": "The client cancelled the intro call on {{slot}}."
+    },
+    "booking_rescheduled": {
+      "title": "Booking moved",
+      "body": "The client moved the intro call from {{from}} to {{slot}}."
+    },
     "appointment_reminder": {
       "title": "Appointment in {{offset}}",
       "body": "Intro call on {{slot}}."

@@ -152,6 +152,26 @@ export async function notify(args: NotifyArgs): Promise<void> {
     }
 }
 
+/**
+ * Dieselbe Nachricht an jedes Mitglied eines Anbieters. Der dedupeKey wird je
+ * Mitglied ergaenzt — der Index ist (user_id, dedupe_key). Fehler beim Lesen
+ * der Mitglieder kippen die Route nicht: die Mail an den Anbieter geht
+ * unabhaengig davon.
+ */
+export async function notifyProviderMembers(
+    providerKey: string, actor: string | null, type: NotificationType, bookingId: string,
+    payload: PayloadFelder, dedupeKey: string,
+): Promise<void> {
+    try {
+        const members = (await supabaseApi.select('provider_members', { provider_key: providerKey }, { limit: 20 })) as Array<{ user_id: string }>;
+        for (const m of members) {
+            await notify({ to: m.user_id, actor, type, subject: 'booking', subjectId: bookingId, payload, dedupeKey: `${dedupeKey}:${m.user_id}` });
+        }
+    } catch {
+        structuredLog('info', 'Provider members not notified', { correlationId: 'notify', errorCode: 'ERR_NOTIFY', severity: 'info', route: `notify/${type}` });
+    }
+}
+
 interface NotificationRow {
     id: string;
     type: string;

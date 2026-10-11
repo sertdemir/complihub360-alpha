@@ -20,7 +20,7 @@ import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { checkMarketRequest } from "./marketRequests.js";
 import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, revokeGrant, settingsUrl } from "./nylasAuth.js";
-import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
+import { notify, notifyProviderMembers, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
 import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
 import { loadAttendancePolicy, findRecentLead } from "./attendance.js";
@@ -1546,6 +1546,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         subject: 'booking', subjectId: bookingId,
                         payload: { providerRef: await refOf(b.provider_key), from: b.slot_start, to: start.toISOString() },
                     });
+                    // Partner-Glocke: Wer neu bucht, landet dort (booking_created) —
+                    // wer verschiebt, bisher nicht, nur per Mail (Testlauf 2026-10-11).
+                    await notifyProviderMembers(b.provider_key, authUserId, 'booking_rescheduled', bookingId,
+                        { providerKey: b.provider_key, from: b.slot_start, slot: start.toISOString() }, `booking_rescheduled:${bookingId}:${start.toISOString()}`);
                     // Notify the provider (fire-and-forget, in their language):
                     // the user moved the slot, the provider's calendar must not
                     // silently drift. Delivery problems are events, not errors.
@@ -1602,6 +1606,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         subject: 'booking', subjectId: bookingId,
                         payload: { providerRef: await refOf(b.provider_key), from: b.slot_start },
                     });
+                    // Partner-Glocke: dieselbe Luecke wie beim Verschieben — die Absage
+                    // kam nur als Mail, die Glocke zeigte weiter die Buchung.
+                    await notifyProviderMembers(b.provider_key, authUserId, 'booking_cancelled', bookingId,
+                        { providerKey: b.provider_key, slot: b.slot_start }, `booking_cancelled:${bookingId}`);
                     // Der Anbieter erfuhr bis 2026-08-31 GAR NICHTS von einer
                     // Absage — der Verschieben-Pfad mailte, dieser nicht. Er
                     // behielt den Termin im Kalender und erschien zum Gespraech.

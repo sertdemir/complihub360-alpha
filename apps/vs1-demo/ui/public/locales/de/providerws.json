@@ -1188,6 +1188,14 @@
       "title": "Neue Buchung",
       "body": "Ein Mandant hat ein Erstgespräch am {{slot}} gebucht. Das Dossier liegt bereit."
     },
+    "booking_cancelled": {
+      "title": "Buchung abgesagt",
+      "body": "Der Mandant hat das Erstgespräch am {{slot}} abgesagt."
+    },
+    "booking_rescheduled": {
+      "title": "Buchung verschoben",
+      "body": "Der Mandant hat das Erstgespräch vom {{from}} auf {{slot}} verschoben."
+    },
     "appointment_reminder": {
       "title": "Termin in {{offset}}",
       "body": "Erstgespräch am {{slot}}."

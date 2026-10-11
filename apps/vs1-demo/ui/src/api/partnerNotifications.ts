@@ -12,7 +12,7 @@ import { apiFetch } from './client';
 // ist (services/compliance-api/src/notifications.ts → needsAction).
 
 export type PartnerNotificationType =
-  | 'booking_created' | 'appointment_reminder' | 'dispute_opened' | 'dispute_resolved'
+  | 'booking_created' | 'booking_cancelled' | 'booking_rescheduled' | 'appointment_reminder' | 'dispute_opened' | 'dispute_resolved'
   | 'performance_incident' | 'credit_issued' | 'payment_failed' | 'invoice_retry_scheduled'
   | 'subscription_scheduled' | 'subscription_schedule_done'
   | 'verification_info_requested' | 'verification_decided' | 'verification_activated' | 'evidence_expiring'
@@ -24,6 +24,8 @@ export type PartnerTopic = 'appointments' | 'billing' | 'verification' | 'plan';
 /** Thema (Filter) und Ziel (wohin ein Klick fuehrt) je Art. */
 export const PARTNER_TYPES: Record<PartnerNotificationType, { topic: PartnerTopic; to: string }> = {
   booking_created: { topic: 'appointments', to: 'termine' },
+  booking_cancelled: { topic: 'appointments', to: 'termine' },
+  booking_rescheduled: { topic: 'appointments', to: 'termine' },
   appointment_reminder: { topic: 'appointments', to: 'termine' },
   dispute_opened: { topic: 'appointments', to: 'termine' },
   dispute_resolved: { topic: 'appointments', to: 'termine' },
