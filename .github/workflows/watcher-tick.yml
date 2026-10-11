@@ -69,3 +69,41 @@ jobs:
             401|403) echo "::error::Tick abgewiesen ($code) — STAGING_API_KEY passt nicht zum API_KEY der API, oder die Basic-Auth-Wand steht vor /api"; exit 1 ;;
             *)       echo "::error::Unerwarteter Status $code"; exit 1 ;;
           esac
+
+  # Beta (Beta-Plan Di 20.10.): derselbe Tick gegen die Beta-API. Ohne die
+  # Secrets BETA_API_URL / BETA_API_KEY wird er uebersprungen — bis die Beta
+  # steht, ist das der Normalfall und kein Fehler.
+  tick-beta:
+    name: Waechter-Tick auf der Beta
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: POST /api/v1/admin/watchers/tick
+        env:
+          API_URL: ${{ secrets.BETA_API_URL }}
+          API_KEY: ${{ secrets.BETA_API_KEY }}
+        run: |
+          set -uo pipefail
+          if [ -z "${API_URL:-}" ] || [ -z "${API_KEY:-}" ]; then
+            echo "::warning::BETA_API_URL oder BETA_API_KEY fehlt — Tick uebersprungen"
+            exit 0
+          fi
+          body=$(mktemp)
+          code=$(curl -sS --max-time 120 -o "$body" -w '%{http_code}' \
+            -X POST "${API_URL%/}/api/v1/admin/watchers/tick" \
+            -H "x-api-key: ${API_KEY}" -H 'content-type: application/json' -d '{}') || {
+            echo "::error::Beta-API war nicht erreichbar"
+            exit 1
+          }
+          case "$code" in
+            200)
+              # Nur die Zusammenfassung — Zaehler, keine Daten.
+              summary=$(tr -d '\n' < "$body" | sed -n 's/.*"summary":\({[^}]*}\).*/\1/p')
+              echo "✓ Tick gelaufen: ${summary:-<ohne Zusammenfassung>}"
+              if printf '%s' "$summary" | grep -q '"errors":[1-9]'; then
+                echo "::warning::Der Tick meldet Fehler in einzelnen Paessen — Logs der API ansehen"
+              fi
+              ;;
+            401|403) echo "::error::Tick abgewiesen ($code) — BETA_API_KEY passt nicht zum API_KEY der API, oder die Basic-Auth-Wand steht vor /api"; exit 1 ;;
+            *)       echo "::error::Unerwarteter Status $code"; exit 1 ;;
+          esac

@@ -14,7 +14,7 @@
 # geschrieben. Weitergabe an Partner ueber einen sicheren Kanal (Passwort-Manager,
 # nicht per Mail-Klartext).
 #
-# Ueberschreibbar per Env: STAGING_SSH_HOST, STAGING_SSH_KEY, STAGING_COMPOSE_DIR,
+# Ueberschreibbar per Env: STAGING_SSH_HOST, STAGING_SSH_KEY, STAGING_COMPOSE_DIR, STAGING_AUTH_LABEL,
 # STAGING_VERIFY_URL.
 
 set -euo pipefail
@@ -23,7 +23,7 @@ HOST="${STAGING_SSH_HOST:-root@76.13.159.221}"
 SSH_KEY="${STAGING_SSH_KEY:-}"
 COMPOSE_DIR="${STAGING_COMPOSE_DIR:-/docker/complihub}"
 VERIFY_URL="${STAGING_VERIFY_URL:-https://staging.complihub360.com/build-info.json}"
-LABEL_KEY='traefik.http.middlewares.complihub-auth.basicauth.users'
+LABEL_KEY="${STAGING_AUTH_LABEL:-traefik.http.middlewares.complihub-auth.basicauth.users}"
 
 usage() {
   sed -n '/^# Basic-Auth/,/^# STAGING_VERIFY_URL\./p' "$0" | sed 's/^#\{1,2\} \{0,1\}//'
@@ -144,8 +144,8 @@ if [ "$mode" = "add" ]; then
     echo "         Backup liegt unter $backup"
   fi
   echo
-  echo "  URL       https://staging.complihub360.com"
-  echo "            https://next.staging.complihub360.com   (Preview, gleicher Login)"
+  echo "  URL       ${url%/build-info.json}"
+  case "$url" in *staging.complihub360.com*) echo "            https://next.staging.complihub360.com   (Preview, gleicher Login)" ;; esac
   echo "  Benutzer  $user"
   echo "  Passwort  $pw"
   echo
