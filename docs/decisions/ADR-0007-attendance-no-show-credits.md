@@ -34,6 +34,15 @@ Phase 4 liefert die Belastung bei der Buchung und sagt ausdrücklich: „die Geb
 
 8. **Guthaben im Monatslauf**: offenes Guthaben wird als negative Rechnungszeile bis zur Rechnungssumme verrechnet, der Verbrauch als negative `provider_credits`-Zeile; die Summe über `provider_credits` bleibt die Wahrheit. Die Vorschau zeigt Bestand, Verrechnung und Rest.
 
+## Ergänzung 2026-10-11: Nutzer-Absage wie Nutzer-No-Show
+
+**Entscheidung des Nutzers (2026-10-11):** „Weg 2" — sagt der Nutzer eine bestätigte Buchung mit Lead-Gebühr ab, gilt dasselbe wie beim Nutzer-No-Show (Spec B nennt „User cancellation or verified no-show" in einer Zeile). Anlass: Live-Test auf Staging, die Gebühr blieb nach der Absage ohne Frist und ohne Guthaben stehen.
+
+9. **Frist ab der Absage.** `PATCH /scheduling/:id` mit `status: cancelled` durch den Nutzer setzt `rebook_deadline` (heute + `rebook_days`) und `rebook_reminders_sent = 0` — nur bei `status confirmed` und vorhandenem `lead_ledger_id`. Absagen über den Server-Key (`cancelled_by system`) und Buchungen ohne Lead-Gebühr bleiben unberührt.
+10. **`no_show_by` bleibt leer.** Die Absage ist kein No-Show: sie zählt nicht in Performance- oder Serien-No-Show-Auswertungen (die zählen `status no_show`) und öffnet keinen Widerspruchsweg. Der Wächter erkennt sie an `status cancelled` + `cancelled_by user` ohne `no_show_by`.
+11. **Keine Erinnerungen an den Nutzer** (Wahl des Nutzers): Er hat sich bewusst entschieden; Erinnerungen an Tag 1/5/10 wären Druck. Neu buchen kann er jederzeit über die normale Partnersuche — Phase 5 hängt die Buchung an den bestehenden Lead und schließt die Frist ohne Guthaben (`findRecentLead`, offene Frist zählt immer).
+12. **Guthaben nach Fristablauf** wie beim No-Show (30 % der erfassten Gebühr, einmal, `credit_decided_at`). Anbieter-Mail und Glocke sagen ehrlich „abgesagt und nicht neu gebucht" statt „nicht erschienen" (`introCancelled`, `partnerNotif.credit_issued.bodyCancelled`, Nutzlast `label: cancelled`); `provider_credits.note` trägt „cancelled by user".
+
 ## Consequences
 
 - `scheduling` trägt `no_show_by`, `no_show_reported_at/by`, `dispute_status`, `rebook_deadline`, `rebooked_from`, `reschedule_count`, `rebook_reminders_sent`, `credit_decided_at`, `attendance`; `provider_performance_incidents` ist neu; `provider_credits` hängt an der Buchung (ein positives Guthaben je Buchung, Unique-Index).

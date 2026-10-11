@@ -23,7 +23,7 @@ import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, re
 import { notify, notifyProviderMembers, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
 import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
-import { loadAttendancePolicy, findRecentLead } from "./attendance.js";
+import { loadAttendancePolicy, findRecentLead, rebookDeadline } from "./attendance.js";
 import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
 import { handleProviderPerformance, handleProviderOverview, handleEnforcementAppeal, handleAdminEnforcement } from "./performanceRoutes.js";
 import { authenticateApiClient, clientRateLimiter, setRateLimitHeaders, logApiRequest, handleExtRoutes, handleProviderApiAccess, handleAdminApiAccess } from "./apiRoutes.js";
@@ -1629,6 +1629,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
                 const jetzt = new Date().toISOString();
+                // Nutzer-Absage wie ein Nutzer-No-Show (Entscheidung 2026-10-11,
+                // ADR-0007 Ergaenzung): 14 Tage Neubuchung beim selben Anbieter,
+                // danach 30 % Guthaben fuer den Anbieter — der Waechter entscheidet.
+                // Nur fuer eine bestaetigte Buchung mit Lead-Gebuehr; no_show_by
+                // bleibt leer, damit die Absage nirgends als No-Show zaehlt und
+                // kein Widerspruchsweg entsteht. Keine Erinnerungen an den Nutzer:
+                // er hat sich bewusst entschieden.
+                const absageMitFrist = status === 'cancelled' && !authViaApiKey && b.status === 'confirmed' && !!b.lead_ledger_id;
+                const fristFelder = absageMitFrist
+                    ? { rebook_deadline: rebookDeadline(jetzt, (await loadAttendancePolicy(jetzt.slice(0, 10))).rebookDays), rebook_reminders_sent: 0 }
+                    : {};
                 // Wer abgesagt hat, wird mitgeschrieben. Ohne diese Spalte ist
                 // eine Absage des Mandanten von einer des Anbieters nicht zu
                 // unterscheiden — und damit jede Auswertung darueber Raterei
@@ -1641,6 +1652,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         // Auftrag des Betriebs, nicht des Anbieters.
                         ? { cancelled_by: authViaApiKey ? 'system' : 'user', cancelled_at: jetzt }
                         : {}),
+                    ...fristFelder,
                 });
                 const evType = status === 'cancelled' ? 'user_cancelled' : status === 'no_show' ? 'no_show' : 'outcome_check';
                 await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });

@@ -23,4 +23,8 @@ describe('partnerNotificationText', () => {
     expect(r.body).toContain('Oct 12');
     expect(r.body).toContain('Oct 14');
   });
+  it('nimmt fuer Guthaben nach einer Absage den eigenen Satz', () => {
+    expect(partnerNotificationText(t, n('credit_issued', { amount: '4023', label: 'cancelled' }), 'en').body).toContain('partnerNotif.credit_issued.bodyCancelled');
+    expect(partnerNotificationText(t, n('credit_issued', { amount: '4023' }), 'en').body).toContain('partnerNotif.credit_issued.body|');
+  });
 });

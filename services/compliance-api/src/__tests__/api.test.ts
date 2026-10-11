@@ -3896,6 +3896,36 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         expect(db.provider_credits).toHaveLength(1);
     });
 
+    it('Nutzer-Absage mit Lead-Gebuehr oeffnet die Neubuchungsfrist, ohne No-Show zu werden', async () => {
+        seedProvider(); seedMember();
+        const ledger = seedLedger();
+        const b = seedBooking({ slot_start: future(2), slot_end: future(2), lead_ledger_id: ledger.id });
+        const ohneLead = seedBooking({ slot_start: future(3), slot_end: future(3) });
+        await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'cancelled' }) });
+        await api(`/api/v1/scheduling/${ohneLead.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'cancelled' }) });
+        expect(b).toMatchObject({ status: 'cancelled', cancelled_by: 'user', rebook_deadline: dayStr(14), rebook_reminders_sent: 0 });
+        expect(b.no_show_by ?? null).toBeNull();
+        expect(ohneLead.rebook_deadline ?? null).toBeNull();
+        // In der Frist: keine Erinnerung an den Nutzer (bewusste Absage).
+        const r = await tick(false);
+        expect(r.body.summary).toMatchObject({ rebookReminders: 0, creditsIssued: 0 });
+        expect((db.notifications ?? []).some((n: any) => n.type === 'rebook_reminder')).toBe(false);
+    });
+
+    it('Frist nach Nutzer-Absage abgelaufen → 30 % Guthaben mit eigenem Satz fuer den Anbieter', async () => {
+        seedProvider(); seedMember(); seedUsers();
+        const ledger = seedLedger();
+        const b = seedBooking({ status: 'cancelled', cancelled_by: 'user', cancelled_at: past(15 * 24), rebook_deadline: dayStr(-1), lead_ledger_id: ledger.id });
+        const live = await tick(false);
+        expect(live.body.summary).toMatchObject({ creditsIssued: 1, rebookDeadlinesClosed: 1 });
+        expect(db.provider_credits).toEqual([expect.objectContaining({ amount_cents: 4023, booking_id: b.id })]);
+        expect(db.provider_credits[0].note).toContain('cancelled by user');
+        expect(db.notifications.find((n: any) => n.type === 'credit_issued')?.payload).toMatchObject({ amount: '4023', label: 'cancelled' });
+        const mail = db.event_log.find((e: any) => e.type === 'email_outbox' && e.payload?.kind === 'credit_issued_provider');
+        expect(mail?.payload?.text).toMatch(/abgesagt|cancelled/);
+        expect(mail?.payload?.text).not.toMatch(/nicht erschienen|did not attend/);
+    });
+
     it('Frist abgelaufen nach Plattformfehler oder offenem Widerspruch → kein Guthaben', async () => {
         seedProvider(); seedMember();
         const l1 = seedLedger(); const l2 = seedLedger();
