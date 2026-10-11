@@ -9,6 +9,8 @@ import { SystemFooter } from "../../components/auth/SystemFooter";
 import { useAuthStore } from "../../store/useAuthStore";
 import { getSupabase, isSupabaseConfigured } from "../../lib/supabase";
 import { DOMAINS, type DomainSlug } from "../../lib/domains";
+import { FormErrorSummary, focusField, type FormError } from "../../components/ui/FormErrorSummary";
+import { FieldError, FIELD_ERROR_CLASS, errorAria } from "../../components/ui/FieldError";
 
 // ─── Auth · die Registrierung ────────────────────────────────────────────────
 // Im hellen Kleid seit 2026-08-28 (Nutzer-Entscheidung, Canvas "Register-Seite":
@@ -84,13 +86,27 @@ const FIELD =
     "mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35";
 const LABEL = "block text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary";
 
-function Field({ id, label, type = "text", value, onChange, placeholder, minLength }: {
+function Field({ id, label, type = "text", value, onChange, placeholder, minLength, autoComplete, error }: {
     id: string; label: string; type?: string; value: string; onChange: (v: string) => void; placeholder?: string; minLength?: number;
+    autoComplete?: string;
+    /** Regel V2: der Satz am Feld; die Zusammenfassung steht am Knopf. */
+    error?: string;
 }) {
     return (
         <div>
             <label htmlFor={id} className={"mt-5 " + LABEL}>{label}</label>
-            <input id={id} type={type} value={value} minLength={minLength} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={FIELD} />
+            <input
+                id={id}
+                type={type}
+                value={value}
+                minLength={minLength}
+                autoComplete={autoComplete}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={placeholder}
+                className={FIELD + (error ? FIELD_ERROR_CLASS : "")}
+                {...errorAria(id, !!error)}
+            />
+            <FieldError id={id} message={error} />
         </div>
     );
 }
@@ -184,8 +200,31 @@ export function RegisterPage() {
     const countryOptions = COUNTRY_DEFS.map((c) => ({ value: c.value, label: `${c.flag} ${t(`register.countryNames.${c.value}`)}` }));
     const isLast = step === 2;
 
-    const canProceed =
-        step === 0 ? Boolean(data.name && data.email && data.password.length >= 8 && data.consent) : true;
+    // Regel V2 (11.10.2026): "Weiter" bleibt aktiv. Bis dahin blieb der Knopf
+    // in Schritt 1 grau, bis alles stimmte — ohne zu sagen, was fehlt. Jetzt
+    // prueft der Klick, die Saetze stehen an den Feldern und gesammelt ueber
+    // dem Knopf, der Fokus geht aufs erste Feld. Nach dem ersten Versuch
+    // laufen sie mit. Die Schritte 2 und 3 haben keine Pflichtfelder.
+    const [tried, setTried] = useState(false);
+    const accountErrors = (): FormError[] => {
+        const errs: FormError[] = [];
+        if (!data.name.trim()) errs.push({ id: "reg-name", label: t("register.nameLabel"), message: t("common:contactSend.field.name") });
+        if (!/.+@.+\..+/.test(data.email.trim())) errs.push({ id: "reg-email", label: t("register.emailLabel"), message: t("login.validation.invalidEmail") });
+        if (data.password.length < 8) errs.push({ id: "reg-password", label: t("register.passwordLabel"), message: t("reset.errors.tooShort") });
+        if (!data.consent) errs.push({ id: "reg-consent", label: t("register.validation.consentLabel"), message: t("register.validation.consent") });
+        return errs;
+    };
+    const errors = tried && step === 0 ? accountErrors() : [];
+    const errFor = (id: string) => errors.find((e) => e.id === id)?.message;
+
+    const next = () => {
+        if (step === 0) {
+            setTried(true);
+            const now = accountErrors();
+            if (now.length) { focusField(now[0].id); return; }
+        }
+        if (isLast) void finish(); else setStep(step + 1);
+    };
 
     const finish = async () => {
         setAuthError(null);
@@ -325,7 +364,7 @@ export function RegisterPage() {
                     <StepDots current={step} />
 
                     {authError && (
-                        <div className="mb-5 rounded-lg border border-error-500/30 bg-error-bg px-4 py-2.5 text-body-xs text-error-700">
+                        <div role="alert" className="mb-5 rounded-lg border border-error-500/30 bg-error-bg px-4 py-2.5 text-body-xs text-error-700">
                             {authError}
                         </div>
                     )}
@@ -352,15 +391,17 @@ export function RegisterPage() {
                                     <div className="my-5 flex items-center gap-3 text-body-4xs font-bold uppercase tracking-[0.12em] text-fg-tertiary">
                                         <span className="h-px flex-1 bg-stroke-subtle" /> {t("register.orEmail")} <span className="h-px flex-1 bg-stroke-subtle" />
                                     </div>
-                                    <Field id="reg-name" label={t("register.nameLabel")} value={data.name} onChange={(v) => patch({ name: v })} placeholder={t("register.namePlaceholder")} />
-                                    <Field id="reg-email" label={t("register.emailLabel")} type="email" value={data.email} onChange={(v) => patch({ email: v })} placeholder="name@unternehmen.de" />
-                                    <Field id="reg-password" label={t("register.passwordLabel")} type="password" value={data.password} onChange={(v) => patch({ password: v })} placeholder={t("register.passwordPlaceholder")} minLength={8} />
-                                    <label className="mt-5 flex cursor-pointer items-start gap-3">
+                                    <Field id="reg-name" label={t("register.nameLabel")} value={data.name} onChange={(v) => patch({ name: v })} placeholder={t("register.namePlaceholder")} autoComplete="name" error={errFor("reg-name")} />
+                                    <Field id="reg-email" label={t("register.emailLabel")} type="email" value={data.email} onChange={(v) => patch({ email: v })} placeholder="name@unternehmen.de" autoComplete="email" error={errFor("reg-email")} />
+                                    <Field id="reg-password" label={t("register.passwordLabel")} type="password" value={data.password} onChange={(v) => patch({ password: v })} placeholder={t("register.passwordPlaceholder")} minLength={8} autoComplete="new-password" error={errFor("reg-password")} />
+                                    <label htmlFor="reg-consent" className="mt-5 flex cursor-pointer items-start gap-3">
                                         <input
+                                            id="reg-consent"
                                             type="checkbox"
                                             checked={data.consent}
                                             onChange={(e) => patch({ consent: e.target.checked })}
                                             className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand,#004D40)]"
+                                            {...errorAria("reg-consent", !!errFor("reg-consent"))}
                                         />
                                         <span className="text-body-2xs leading-relaxed text-fg-tertiary">
                                             <Trans
@@ -373,6 +414,7 @@ export function RegisterPage() {
                                             />
                                         </span>
                                     </label>
+                                    <FieldError id="reg-consent" message={errFor("reg-consent")} />
                                 </>
                             )}
 
@@ -446,6 +488,8 @@ export function RegisterPage() {
                         </motion.div>
                     </AnimatePresence>
 
+                    <FormErrorSummary errors={errors} className="mt-7" />
+
                     {/* Navigation */}
                     <div className="mt-7 flex items-center justify-between border-t border-stroke-subtle pt-5">
                         <button
@@ -458,8 +502,8 @@ export function RegisterPage() {
                         </button>
                         <button
                             type="button"
-                            disabled={!canProceed || loading}
-                            onClick={() => (isLast ? finish() : setStep(step + 1))}
+                            disabled={loading}
+                            onClick={next}
                             className="flex items-center gap-2 rounded-lg bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 enabled:hover:-translate-y-0.5 disabled:opacity-50"
                         >
                             {loading ? t("register.creating") : isLast ? t("register.createAccount") : t("register.next")}

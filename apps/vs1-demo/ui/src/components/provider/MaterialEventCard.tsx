@@ -7,6 +7,9 @@ import { Checkbox } from '../ui/Checkbox';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { FormField } from '../ui/FormField';
+import { ApiError } from '../../api/client';
+import { FieldError, errorAria } from '../ui/FieldError';
+import { focusField } from '../ui/FormErrorSummary';
 import { MATERIAL_EVENTS, reportMaterialEvent, type MaterialEvent, type MatrixRow } from '../../api/application';
 
 // ─── Wesentliche Änderung melden (Canvas D V2, Spec A §18) ───────────────────
@@ -28,20 +31,31 @@ export function MaterialEventCard({ services, onReported }: { services: MatrixRo
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // V2 (11.10.2026): das Ereignis ist das eine Pflichtfeld. Der Knopf bleibt
+  // aktiv; fehlt die Wahl, steht der Satz an der Gruppe und der Fokus geht
+  // aufs erste Ereignis. Bis hierher war der Knopf grau und der Satz
+  // `pickEvent` konnte nie erscheinen.
+  const [eventError, setEventError] = useState(false);
+  // Ein Datum, das der Server ablehnt (leer oder in der Zukunft), steht am Datum.
+  const [dateError, setDateError] = useState(false);
   const [done, setDone] = useState<string | null>(null);
 
   const countries = (s: MatrixRow) => s.cells.filter((c) => c.status === 'approved' || c.status === 'limited').map((c) => c.country_code).join(', ');
   const toggle = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
 
   const submit = async () => {
-    if (!event) { setErr(t('verification.materialEvent.pickEvent')); return; }
-    setBusy(true); setErr(null);
+    if (busy) return;
+    if (!event) { setEventError(true); focusField('material-event'); return; }
+    setBusy(true); setErr(null); setDateError(false);
     try {
       const r = await reportMaterialEvent({ event_type: event, occurred_on: since, service_ids: picked, note: note.trim() || undefined });
       setDone(r.paused_service_ids.length ? t('verification.materialEvent.done', { count: r.paused_service_ids.length }) : t('verification.materialEvent.doneNone'));
       setOpen(false); setEvent(null); setPicked([]); setNote('');
       await onReported();
-    } catch (e) { setErr(e instanceof Error ? e.message : t('application.saveError')); }
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 400 && /occurred_on/.test(e.message)) { setDateError(true); focusField('material-since'); }
+      else setErr(e instanceof Error ? e.message : t('application.saveError'));
+    }
     finally { setBusy(false); }
   };
 
@@ -54,14 +68,18 @@ export function MaterialEventCard({ services, onReported }: { services: MatrixRo
         <Button size="sm" variant="secondary" onClick={() => { setDone(null); setOpen(true); }}>{t('verification.materialEvent.open')}</Button>
       ) : (
         <div className="space-y-4">
-          <fieldset className="flex flex-col items-start gap-2">
+          <fieldset id="material-event" className="flex flex-col items-start gap-2" aria-describedby={eventError ? 'material-event-error' : undefined}>
             <legend className="mb-1 text-[12px] font-medium text-fg-secondary">{t('verification.materialEvent.what')}</legend>
             {MATERIAL_EVENTS.map((e) => (
-              <Radio key={e} name="material-event" size="sm" checked={event === e} onChange={() => setEvent(e)} label={t(`verification.materialEvent.events.${e}`)} />
+              <Radio key={e} name="material-event" size="sm" checked={event === e} error={eventError}
+                onChange={() => { setEvent(e); setEventError(false); }} label={t(`verification.materialEvent.events.${e}`)} />
             ))}
+            <FieldError id="material-event" alert message={eventError ? t('verification.materialEvent.pickEvent') : null} />
           </fieldset>
-          <FormField label={t('verification.materialEvent.since')} className="max-w-[220px]">
-            <Input inputSize="sm" type="date" max={today} value={since} onChange={(ev) => setSince(ev.target.value)} lang={locale} />
+          <FormField label={t('verification.materialEvent.since')} htmlFor="material-since" className="max-w-[220px]">
+            <Input id="material-since" inputSize="sm" type="date" max={today} value={since} lang={locale} error={dateError}
+              onChange={(ev) => { setSince(ev.target.value); setDateError(false); }} {...errorAria('material-since', dateError)} />
+            <FieldError id="material-since" alert message={dateError ? t('verification.materialEvent.dateInvalid') : null} />
           </FormField>
           {pausable.length > 0 && (
             <fieldset className="flex flex-col items-start gap-2">
@@ -77,10 +95,10 @@ export function MaterialEventCard({ services, onReported }: { services: MatrixRo
           <p className="rounded-md bg-surface-secondary px-3 py-2.5 text-[12.5px] leading-relaxed text-fg-secondary">
             {picked.length ? t('verification.materialEvent.effect') : t('verification.materialEvent.effectNone')} {t('verification.materialEvent.thanks')}
           </p>
-          {err && <p className="text-[12px] text-error-500">{err}</p>}
+          {err && <p role="alert" className="text-[12px] text-error-700 dark:text-red-300">{err}</p>}
           <div className="flex gap-2">
-            <Button size="sm" disabled={busy || !event} onClick={submit}>{picked.length ? t('verification.materialEvent.submit') : t('verification.materialEvent.submitNone')}</Button>
-            <Button size="sm" variant="ghost" disabled={busy} onClick={() => setOpen(false)}>{t('verification.materialEvent.cancel')}</Button>
+            <Button size="sm" disabled={busy} onClick={submit}>{picked.length ? t('verification.materialEvent.submit') : t('verification.materialEvent.submitNone')}</Button>
+            <Button size="sm" variant="ghost" disabled={busy} onClick={() => { setOpen(false); setEventError(false); setDateError(false); setErr(null); }}>{t('verification.materialEvent.cancel')}</Button>
           </div>
         </div>
       )}

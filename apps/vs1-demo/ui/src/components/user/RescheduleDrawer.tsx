@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { fetchSlots, rescheduleBooking, rescheduleFailureFrom, type RescheduleFailure } from '../../api/bookings';
+import { focusField } from '../ui/FormErrorSummary';
+import { FieldError, errorAria } from '../ui/FieldError';
 
 // ─── RescheduleDrawer ────────────────────────────────────────────────────────
 // "Verschieben" on the Termine page: pick a new slot from the provider's free
@@ -52,10 +54,14 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
   // Phase 5: ein Umbuchungslimit (409 RESCHEDULE_LIMIT) oder ein inzwischen
   // vergebener Slot ist eine Antwort, kein stilles "Verschoben ✓".
   const [failure, setFailure] = useState<RescheduleFailure | null>(null);
+  // Regel V2 (11.10.2026): der Knopf bleibt aktiv; ohne neuen Termin steht der
+  // Satz an der Terminliste und der Fokus dort.
+  const [tried, setTried] = useState(false);
+  const slotError = tried && !selected ? t('shared.pickSlotError') : null;
 
   useEffect(() => {
     if (!target) return;
-    setSelected(null); setState('idle'); setFailure(null);
+    setSelected(null); setState('idle'); setFailure(null); setTried(false);
     fetchSlots(target.publicRef).then(setSlots).catch(() => setSlots(fixtureSlots()));
   }, [target]);
 
@@ -71,7 +77,8 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
   }, [slots, df]);
 
   const confirm = async () => {
-    if (!target || !selected) return;
+    if (!target) return;
+    if (!selected) { setTried(true); focusField('reschedule-slots'); return; }
     setState('sending'); setFailure(null);
     let newId: string | undefined;
     try {
@@ -92,7 +99,7 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
       footer={
         <div className="flex items-center justify-end gap-2.5">
           <Button size="sm" variant="ghost" onClick={onClose}>{t('reschedule.cancel')}</Button>
-          <Button size="sm" onClick={confirm} disabled={!selected || state === 'sending' || state === 'done'}>
+          <Button size="sm" onClick={confirm} disabled={state === 'sending' || state === 'done'}>
             {state === 'done' ? t(rebook ? 'reschedule.rebookDone' : 'reschedule.done') : t(rebook ? 'reschedule.rebookConfirm' : 'reschedule.confirm')}
           </Button>
         </div>
@@ -102,8 +109,15 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
         <p className="text-[12px] text-fg-secondary">
           {t('reschedule.currentLabel')}: <span className="font-medium text-fg">{target?.currentLine}</span>
         </p>
-        <div>
-          <p className="mb-2 text-[12px] font-medium text-fg-secondary">{t('reschedule.pickLabel')}</p>
+        <div
+          id="reschedule-slots"
+          role="group"
+          aria-labelledby="reschedule-slots-label"
+          tabIndex={-1}
+          className="outline-none"
+          {...errorAria('reschedule-slots', !!slotError)}
+        >
+          <p id="reschedule-slots-label" className="mb-2 text-[12px] font-medium text-fg-secondary">{t('reschedule.pickLabel')}</p>
           {byDay.length === 0 ? (
             <p className="text-[13px] text-fg-tertiary">{t('reschedule.noSlots')}</p>
           ) : byDay.map(([day, isos]) => (
@@ -111,7 +125,7 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
               <p className="mb-1.5 text-[12px] font-semibold text-fg">{day}</p>
               <div className="flex flex-wrap gap-2">
                 {isos.map((iso) => (
-                  <button key={iso} type="button" onClick={() => setSelected(iso)}
+                  <button key={iso} type="button" aria-pressed={selected === iso} onClick={() => setSelected(iso)}
                     className={`rounded-lg border px-3 py-1.5 text-[13px] transition-colors ${
                       selected === iso
                         ? 'border-brand bg-brand/15 font-semibold text-fg-brand'
@@ -123,6 +137,7 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
               </div>
             </div>
           ))}
+          <FieldError id="reschedule-slots" message={slotError} alert />
         </div>
         {failure && (
           <p role="alert" className="rounded-lg border border-stroke bg-surface-secondary px-3.5 py-2.5 text-[12.5px] leading-relaxed text-fg">

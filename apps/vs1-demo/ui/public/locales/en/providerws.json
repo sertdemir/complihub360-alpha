@@ -50,7 +50,8 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "typePrefix": "Type ",
-    "typeSuffix": " to confirm:"
+    "typeSuffix": " to confirm:",
+    "keywordHint": "Type {{keyword}} above to continue."
   },
   "changeEmail": {
     "eyebrow": "SETTINGS",
@@ -165,7 +166,8 @@
       "network": "No connection. Nothing changed on your account — please try again.",
       "rateLimit": "Too many messages in a short time. Please wait a moment."
     },
-    "scope": "Not part of support: negotiations with companies, professional advice, fee disputes. You are the professional — we are the platform."
+    "scope": "Not part of support: negotiations with companies, professional advice, fee disputes. You are the professional — we are the platform.",
+    "messageTooShort": "Please describe what happened in at least 10 characters."
   },
   "billing": {
     "title": "Billing",
@@ -397,7 +399,8 @@
     "appealDecided": {
       "lifted": "The pause was lifted on {{date}}. Bookings are open again.",
       "upheld": "The team upheld the pause on {{date}}. It stays until the team lifts it."
-    }
+    },
+    "appealTooShort": "Please explain your appeal in at least 10 characters."
   },
   "magicAction": {
     "partnerBadge": "Partner",
@@ -651,7 +654,9 @@
     "attLinePlatform": "Platform failure · the client can rebook until {{deadline}}",
     "attRebookedFrom": "Rebooking of an earlier appointment · no second lead fee",
     "reportOpen": "Awaiting your report",
-    "proposalSaveFailed": "Not saved. Please try again."
+    "proposalSaveFailed": "Not saved. Please try again.",
+    "attChoiceRequired": "Please choose how the appointment went.",
+    "rateRequired": "Please choose a rating from 1 to 5 stars."
   },
   "intake": {
     "inviteOnlyTitle": "Partner intake is invite-only.",
@@ -678,7 +683,13 @@
     "doneNote": "Questions? partners@complihub360.com",
     "errorTitle": "Submission failed",
     "errorBody": "The package could not be submitted. Check your intake link or try again — or contact partners@complihub360.com.",
-    "titleNote": "Before booking, users see you as “Verified Provider A/B/C” with your approved areas and region — CompliHub360 forms that title, you do not need to."
+    "titleNote": "Before booking, users see you as “Verified Provider A/B/C” with your approved areas and region — CompliHub360 forms that title, you do not need to.",
+    "nameShort": "Firm name",
+    "statutesShort": "Partner guidelines and statutes",
+    "errors": {
+      "name": "Please enter your firm name (at least 2 characters).",
+      "statutes": "Please confirm the partner guidelines and statutes to submit your package."
+    }
   },
   "application": {
     "title": "Application",
@@ -794,7 +805,8 @@
       "registryUnavailable": "The registry is not reachable right now. The review team will decide on the document.",
       "reviewerHint": "Decided by the review team on the register extract — no upload needed.",
       "licenceHint": "Needed before activation, not before submitting.",
-      "uploadedOn": "uploaded {{date}}"
+      "uploadedOn": "uploaded {{date}}",
+      "vatTooShort": "Please enter your full VAT ID, for example DE123456789."
     },
     "agreements": {
       "intro": "Every acceptance is recorded with version, language, name and role. A new version replaces the old one but does not delete it — the state at the time of a booking remains verifiable.",
@@ -836,7 +848,8 @@
         "services": "{{services}} services in {{countries}} countries",
         "evidence": "Register extract, insurance, VAT ID",
         "agreements": "{{done}} of {{total}} agreements"
-      }
+      },
+      "lockedHint": "Submitting becomes possible once everything under “Still missing” is complete. Select an item to go there."
     },
     "missing": {
       "account": {
@@ -936,7 +949,15 @@
       "approvedFrom": "approved, from {{date}}",
       "plannedFrom": "scheduled from {{date}}",
       "plannedShort": "Change scheduled",
-      "withdrawFields": "Withdraw: {{fields}}"
+      "withdrawFields": "Withdraw: {{fields}}",
+      "numberInvalid": "Please enter a number of 0 or more, or leave the field empty."
+    },
+    "errors": {
+      "serviceCode": "Please enter a service code, for example tax-vat.returns.",
+      "serviceCodeUnknown": "This service code is not in our list. Please check the spelling, for example tax-vat.returns.",
+      "countryCode": "Please enter a two-letter country code, for example AT.",
+      "countryListed": "{{country}} is already listed for this service. Please enter a different country.",
+      "agreementName": "Please enter your name to accept."
     }
   },
   "verification": {
@@ -1067,7 +1088,8 @@
       "cancel": "Cancel",
       "done_one": "Reported. {{count}} service is paused; our review team will get in touch.",
       "done_other": "Reported. {{count}} services are paused; our review team will get in touch.",
-      "doneNone": "Reported. Our review team will get in touch."
+      "doneNone": "Reported. Our review team will get in touch.",
+      "dateInvalid": "Please choose the date it happened — today or earlier."
     }
   },
   "identity": {
@@ -1184,7 +1206,8 @@
       "errAllowance": "This plan covers {{allowance}} main categories, but {{used}} are released for your account.",
       "errAlready": "Something is already scheduled. Withdraw that first.",
       "errSame": "That is already your running plan.",
-      "errFailed": "That did not work just now. Please try again."
+      "errFailed": "That did not work just now. Please try again.",
+      "pickTargetRequired": "Please choose the plan you want to switch to."
     }
   },
   "partnerNotif": {
@@ -1421,6 +1444,13 @@
     "eventsNote": "Events are pulled, not pushed; we keep them for 90 days.",
     "calls": "Recent calls",
     "noCalls": "No calls yet.",
-    "callsNote": "Today: {{count}} calls · {{limited}} × 429 · {{failed}} × 5xx. The log keeps 90 days, without contents and without keys."
+    "callsNote": "Today: {{count}} calls · {{limited}} × 429 · {{failed}} × 5xx. The log keeps 90 days, without contents and without keys.",
+    "errors": {
+      "name": "Please enter a name for the integration.",
+      "useCase": "Please describe what you need the integration for.",
+      "scopes": "Please choose at least one data area.",
+      "termsLabel": "API and integration terms",
+      "terms": "Please accept the API and integration terms to send the request."
+    }
   }
 }

@@ -6,6 +6,8 @@ import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Check, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { focusField } from '../ui/FormErrorSummary';
+import { FieldError, FIELD_ERROR_CLASS, errorAria } from '../ui/FieldError';
 
 // ─── Wizard drawers · Figma 1698:293 (Other Markets) + 1740:428 (Country) ────
 // Both open INSIDE the wizard container (absolute, not a viewport portal): a
@@ -277,7 +279,12 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
   const { t } = useTranslation('home');
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   const valid = /.+@.+\..+/.test(email);
+  // Regel V2 (11.10.2026): der Knopf bleibt aktiv (gesperrt nur, solange der
+  // Link unterwegs ist). Ein Feld — der Satz steht am Feld, der Fokus geht hinein.
+  const [tried, setTried] = useState(false);
+  const emailError = tried && !valid ? t('common:contactSend.field.email') : null;
   const base = `account.${copyKey}`;
 
   return (
@@ -310,11 +317,14 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
             <input
               id="save-email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t('account.emailPlaceholder')}
-              className="mt-2 w-full rounded-xl border border-stroke px-4 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand"
+              className={'mt-2 w-full rounded-xl border border-stroke px-4 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand' + (emailError ? FIELD_ERROR_CLASS : '')}
+              {...errorAria('save-email', !!emailError)}
             />
+            <FieldError id="save-email" message={emailError} alert />
           </div>
         ) : (
           <div className="mt-7 rounded-xl border border-stroke-subtle bg-surface-secondary p-5 text-body-sm text-fg">
@@ -336,9 +346,12 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
           shape="soft"
           fullWidth
           type="button"
-          disabled={!sent && !valid}
+          disabled={sending}
           onClick={async () => {
             if (sent) { onClose(); return; }
+            setTried(true);
+            if (!valid) { focusField('save-email'); return; }
+            setSending(true);
             // Real magic-link signup (Wave A2): the link returns to /results,
             // where the saved profile (localStorage) rebuilds the page and the
             // fresh session unlocks the partner matches.
@@ -350,6 +363,7 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
                 options: { emailRedirectTo: `${window.location.origin}/${lang}/results` },
               }).catch(() => { /* rate-limit etc. — sent state still shows guidance */ });
             }
+            setSending(false);
             setSent(true);
           }}
           className="mt-3 flex transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40"

@@ -17,7 +17,7 @@ vi.mock('../../api/provider', () => ({
   fetchCoverage: () => fetchCoverage(),
   updateMatchmakingProfile: (...a: unknown[]) => updateMatchmakingProfile(...a),
 }));
-vi.mock('../../api/client', () => ({ identityHintFrom: () => null }));
+vi.mock('../../api/client', () => ({ identityHintFrom: () => null, identityFindingsOf: () => null }));
 // t() gibt den Schluessel zurueck: geprueft wird die Verdrahtung, nicht die Copy.
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key, i18n: { resolvedLanguage: 'en' } }),

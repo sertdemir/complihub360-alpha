@@ -6,6 +6,8 @@ import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
 import { patchSession } from '../../api/sessions';
 import { DOMAIN_I18N_KEY } from '../../lib/domains';
+import { focusField } from '../ui/FormErrorSummary';
+import { FieldError, errorAria } from '../ui/FieldError';
 
 // ─── Sitzungs-Aktionen (Figma 2654:89 · wiring map B13) ──────────────────────
 // Die Schublade hinter dem ···-Menue einer Sitzungs-Kachel (Canvas-Wahl 4B,
@@ -34,10 +36,14 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState('');
   const [error, setError] = useState('');
+  // Regel V2 (11.10.2026): "Speichern" bleibt aktiv. Ein Feld — ist der Name
+  // zu kurz, steht der Satz am Feld und der Fokus bleibt dort.
+  const [tried, setTried] = useState(false);
+  const nameError = tried && name.trim().length < 2 ? t('riskMapActions.nameTooShort') : null;
 
   useEffect(() => {
     setName(target?.title ?? '');
-    setBusy(false); setDone(''); setError('');
+    setBusy(false); setDone(''); setError(''); setTried(false);
   }, [target?.id, target?.action]);
 
   const run = async (fn: () => Promise<unknown>, msg: string) => {
@@ -51,6 +57,15 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
       setError(t('riskMapActions.actionError'));
     }
     setBusy(false);
+  };
+
+  const rename = () => {
+    if (!target || busy) return;
+    setTried(true);
+    if (name.trim().length < 2) { focusField('session-rename'); return; }
+    // Unveraenderter Name: nichts zu speichern — kein Fehler, kein Aufruf.
+    if (name.trim() === target.title) { onClose(); return; }
+    void run(() => patchSession(target.id, { label: name.trim() }), t('riskMapActions.renamed'));
   };
 
   const title = target?.action === 'archive' ? t('riskMapActions.archiveTitle') : t('riskMapActions.renameTitle');
@@ -71,30 +86,32 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
             <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
               <div className="flex items-center gap-2.5">
                 <PencilLine size={15} className="shrink-0 text-fg-accent" />
-                <p className="text-[13px] font-semibold text-fg">{t('riskMapActions.renameTitle')}</p>
+                <label htmlFor="session-rename" className="text-[13px] font-semibold text-fg">{t('riskMapActions.renameTitle')}</label>
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <input
+                  id="session-rename"
                   value={name}
                   autoFocus
                   onChange={(e) => setName(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !busy && name.trim().length >= 2 && name.trim() !== target.title) {
-                      void run(() => patchSession(target.id, { label: name.trim() }), t('riskMapActions.renamed'));
-                    }
+                    if (e.key === 'Enter') { e.preventDefault(); rename(); }
                   }}
-                  className="w-full rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-fg-brand"
+                  className={'w-full rounded-lg border bg-elevate/5 px-3 py-2 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-fg-brand '
+                    + (nameError ? 'border-error-500' : 'border-elevate/10')}
                   placeholder={t('riskMapActions.namePlaceholder')}
+                  {...errorAria('session-rename', !!nameError)}
                 />
                 <Button
                   size="sm"
                   variant="secondary"
-                  disabled={busy || name.trim().length < 2 || name.trim() === target.title}
-                  onClick={() => run(() => patchSession(target.id, { label: name.trim() }), t('riskMapActions.renamed'))}
+                  disabled={busy}
+                  onClick={rename}
                 >
                   {busy ? '…' : t('shared.save')}
                 </Button>
               </div>
+              <FieldError id="session-rename" message={nameError} alert />
             </div>
           )}
 
@@ -118,7 +135,7 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
           )}
 
           {done && <p className="rounded-md border border-fg-brand/30 bg-fg-brand/10 px-3 py-2 text-[12px] text-fg-secondary">{done}</p>}
-          {error && <p className="rounded-lg border border-error-500/30 bg-error-500/10 px-3 py-2 text-[12px] text-error-500">{error}</p>}
+          {error && <p role="alert" className="rounded-lg border border-error-500/30 bg-error-500/10 px-3 py-2 text-[12px] text-error-500">{error}</p>}
         </div>
       )}
     </Drawer>

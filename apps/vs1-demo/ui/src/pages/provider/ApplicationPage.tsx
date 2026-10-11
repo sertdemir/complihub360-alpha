@@ -14,7 +14,10 @@ import { Tag } from '../../components/ui/Tag';
 import { FormField } from '../../components/ui/FormField';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { ApiError, identityHintFrom } from '../../api/client';
+import { ApiError, identityFindingsOf, identityHintFrom } from '../../api/client';
+import { EMAIL_RE } from '../../api/contact';
+import { FormErrorSummary, focusField, type FormError } from '../../components/ui/FormErrorSummary';
+import { FieldError, errorAria } from '../../components/ui/FieldError';
 import {
   acceptAgreement, checkVatRegistry, createService, fetchApplication, fetchChanges, isPendingChange, patchApplication, previewService, putCoverage, removeService, saveService, submitApplication, uploadEvidence, withdrawChange,
   type AgreementType, type Application, type ApplicationPatch, type ChangePreview, type ChecklistItem, type Evidence, type EvidenceType, type ProviderChange, type Service, type ServiceInput,
@@ -66,9 +69,10 @@ function fmtSize(bytes: number | null): string {
 }
 
 function PanelHeader({ n, title, badge }: { n: number; title: string; badge: React.ReactNode }) {
+  // Die Ueberschrift ist Sprungziel fuer „Noch offen" (V2): fokussierbar per Skript, nicht per Tab.
   return (
     <div className="flex items-center justify-between gap-3">
-      <h2 className="text-[15px] font-semibold text-fg">{n} · {title}</h2>
+      <h2 id={`app-chapter-${CHAPTERS[n - 1]}`} tabIndex={-1} className="text-[15px] font-semibold text-fg outline-none">{n} · {title}</h2>
       {badge}
     </div>
   );
@@ -117,6 +121,19 @@ export function ApplicationPage() {
   useEffect(() => { void reload(); }, [reload]);
 
   const jump = (k: ChapterKey) => { setActive(k); refs.current[k]?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  // V2 (11.10.2026): ein Eintrag unter „Noch offen" fuehrt an seine Stelle —
+  // ins Feld, wenn es eines gibt (account.name → #app-account-name), sonst
+  // auf das Kapitel. Der Knopf „Einreichen" bleibt gesperrt: das ist ein
+  // Zustand des Dossiers, kein Eingabefehler.
+  const goToMissing = (m: string) => {
+    const k = m.split('.')[0] as ChapterKey;
+    if (!CHAPTERS.includes(k)) return;
+    setActive(k);
+    const fieldId = `app-${m.replace('.', '-')}`;
+    if (document.getElementById(fieldId)) { focusField(fieldId); return; }
+    document.getElementById(`app-chapter-${k}`)?.focus({ preventScroll: true });
+    refs.current[k]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const settled = !!app && SETTLED.has(app.provider.lifecycle_status);
   const chapters = settled ? CHAPTERS.filter((k) => k !== 'submit') : CHAPTERS;
@@ -179,7 +196,7 @@ export function ApplicationPage() {
               <section ref={(el) => { refs.current.services = el; }}><ServicesPanel app={app} changes={changes} onChanged={reload} /></section>
               <section ref={(el) => { refs.current.evidence = el; }}><EvidencePanel app={app} locale={locale} onChanged={reload} /></section>
               <section ref={(el) => { refs.current.agreements = el; }}><AgreementsPanel app={app} locale={locale} onChanged={reload} /></section>
-              {!settled && <section ref={(el) => { refs.current.submit = el; }}><SubmitPanel app={app} onChanged={reload} /></section>}
+              {!settled && <section ref={(el) => { refs.current.submit = el; }}><SubmitPanel app={app} onChanged={reload} onGoTo={goToMissing} /></section>}
             </div>
           </div>
         )}
@@ -193,10 +210,11 @@ export function ApplicationPage() {
 function useSave(onSaved: () => Promise<void> | void) {
   const { t } = useTranslation('providerws');
   const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const save = async (patch: ApplicationPatch) => {
+  /** `onError` darf einen Serverfehler einem Feld zuordnen (true = erledigt). */
+  const save = async (patch: ApplicationPatch, onError?: (e: unknown) => boolean) => {
     setState('saving');
     try { await patchApplication(patch); await onSaved(); setState('saved'); setTimeout(() => setState('idle'), 2000); return true; }
-    catch { setState('error'); return false; }
+    catch (e) { setState(onError?.(e) ? 'idle' : 'error'); return false; }
   };
   const label = state === 'saving' ? t('application.saving') : state === 'saved' ? t('application.saved') : t('application.save');
   return { save, state, label };
@@ -209,6 +227,34 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
   const [f, setF] = useState({ name: p.name ?? '', contact_email: p.contact_email ?? '', website_url: p.website_url ?? '', languages: (p.languages ?? []).join(', '), region: p.region ?? '' });
   const { save, state, label } = useSave(onSaved);
   const labels = { complete: t('application.state.complete'), open: t('application.state.open') };
+  // V2 (11.10.2026): ein Entwurf darf luecken haben — was fuer die Einreichung
+  // fehlt, nennt „Noch offen". Beim Speichern geprueft wird nur, was falsch
+  // eingetragen ist (eine E-Mail-Adresse ohne gueltige Form): Satz am Feld,
+  // Fokus dorthin. Nennt der Identitaets-Scan die Region, steht das dort.
+  const [tried, setTried] = useState(false);
+  const [regionHint, setRegionHint] = useState<string | null>(null);
+  const errorsOf = (): FormError[] => {
+    const errs: FormError[] = [];
+    if (f.contact_email.trim() && !EMAIL_RE.test(f.contact_email.trim())) errs.push({ id: 'app-account-contact_email', label: t('application.account.email'), message: t('common:contactSend.field.email') });
+    return errs;
+  };
+  const errors = tried ? errorsOf() : [];
+  const errFor = (id: string) => errors.find((e) => e.id === id)?.message;
+  const onSave = async () => {
+    if (state === 'saving') return;
+    setTried(true);
+    const now = errorsOf();
+    if (now.length) { focusField(now[0].id); return; }
+    setRegionHint(null);
+    const ok = await save(
+      { name: f.name, contact_email: f.contact_email, website_url: f.website_url, languages: f.languages.split(',').map((s) => s.trim()).filter(Boolean), region: f.region },
+      (e) => {
+        if (identityFindingsOf(e)?.[0]?.field !== 'region') return false;
+        setRegionHint(identityHintFrom(e, t)); focusField('app-account-region'); return true;
+      },
+    );
+    if (ok && settled) setEditing(false);
+  };
   return (
     <Card styleVariant="outlined" className="space-y-4 p-5">
       <PanelHeader n={1} title={t('application.chapter.account')} badge={<div className="flex items-center gap-2"><StateBadge complete={app.chapters.account.complete} labels={labels} />{settled && <EditToggle editing={editing} onToggle={() => setEditing(!editing)} />}</div>} />
@@ -220,17 +266,25 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
         ]} />
       ) : (<>
       <div className="grid gap-4 md:grid-cols-2">
-        <FormField label={t('application.account.name')} required><Input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></FormField>
-        <FormField label={t('application.account.email')} required><Input type="email" value={f.contact_email} onChange={(e) => setF({ ...f, contact_email: e.target.value })} /></FormField>
+        <FormField label={t('application.account.name')} htmlFor="app-account-name" required>
+          <Input id="app-account-name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+        </FormField>
+        <FormField label={t('application.account.email')} htmlFor="app-account-contact_email" required>
+          <Input id="app-account-contact_email" type="email" value={f.contact_email} onChange={(e) => setF({ ...f, contact_email: e.target.value })} error={!!errFor('app-account-contact_email')} {...errorAria('app-account-contact_email', !!errFor('app-account-contact_email'))} />
+          <FieldError id="app-account-contact_email" alert message={errFor('app-account-contact_email')} />
+        </FormField>
       </div>
       <div className="grid gap-4 md:grid-cols-[1fr_200px_200px]">
         <FormField label={t('application.account.website')}><Input value={f.website_url} onChange={(e) => setF({ ...f, website_url: e.target.value })} placeholder="https://" /></FormField>
         <FormField label={t('application.account.languages')}><Input value={f.languages} onChange={(e) => setF({ ...f, languages: e.target.value })} /></FormField>
-        <FormField label={t('application.account.region')}><Input value={f.region} onChange={(e) => setF({ ...f, region: e.target.value })} /></FormField>
+        <FormField label={t('application.account.region')} htmlFor="app-account-region">
+          <Input id="app-account-region" value={f.region} onChange={(e) => { setF({ ...f, region: e.target.value }); setRegionHint(null); }} error={!!regionHint} {...errorAria('app-account-region', !!regionHint)} />
+          <FieldError id="app-account-region" alert message={regionHint} />
+        </FormField>
       </div>
       <div className="flex items-center gap-3">
-        <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={async () => { if (await save({ name: f.name, contact_email: f.contact_email, website_url: f.website_url, languages: f.languages.split(',').map((s) => s.trim()).filter(Boolean), region: f.region }) && settled) setEditing(false); }}>{label}</Button>
-        {state === 'error' && <span className="text-[12px] text-error-500">{t('application.saveError')}</span>}
+        <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={onSave}>{label}</Button>
+        {state === 'error' && <span role="alert" className="text-[12px] text-error-700 dark:text-red-300">{t('application.saveError')}</span>}
       </div>
       </>)}
     </Card>
@@ -247,6 +301,15 @@ function LegalPanel({ app, settled, onSaved }: { app: Application; settled: bool
   const { save, state, label } = useSave(onSaved);
   const labels = { complete: t('application.state.complete'), open: t('application.state.open') };
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
+  // V2 (11.10.2026): ein Entwurf darf luecken haben; was fuer die Einreichung
+  // fehlt, nennt „Noch offen" und springt per Link in das Feld. Die ids folgen
+  // diesen Eintraegen (legal.entity_type → #app-legal-entity_type).
+  type LegalKey = 'entity_type' | 'registration_number' | 'registered_address' | 'representative_name';
+  const req = (k: LegalKey) => <Input id={`app-legal-${k}`} value={f[k]} onChange={set(k)} />;
+  const onSave = async () => {
+    if (state === 'saving') return;
+    if (await save(f) && settled) setEditing(false);
+  };
   return (
     <Card styleVariant="outlined" className="space-y-4 p-5">
       <PanelHeader n={2} title={t('application.chapter.legal')} badge={<div className="flex items-center gap-2"><StateBadge complete={app.chapters.legal.complete} labels={labels} />{settled && <EditToggle editing={editing} onToggle={() => setEditing(!editing)} />}</div>} />
@@ -261,14 +324,14 @@ function LegalPanel({ app, settled, onSaved }: { app: Application; settled: bool
         ]} />
       ) : (<>
       <div className="grid gap-4 md:grid-cols-[200px_1fr_240px]">
-        <FormField label={t('application.legal.entityType')} required><Input value={f.entity_type} onChange={set('entity_type')} /></FormField>
-        <FormField label={t('application.legal.registrationNumber')} required><Input value={f.registration_number} onChange={set('registration_number')} /></FormField>
+        <FormField label={t('application.legal.entityType')} htmlFor="app-legal-entity_type" required>{req('entity_type')}</FormField>
+        <FormField label={t('application.legal.registrationNumber')} htmlFor="app-legal-registration_number" required>{req('registration_number')}</FormField>
         <FormField label={t('application.evidence.type.vat_id')}><Input value={app.provider.vat_id ?? ''} readOnly /></FormField>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <FormField label={t('application.legal.registeredAddress')} required><Input value={f.registered_address} onChange={set('registered_address')} /></FormField>
+        <FormField label={t('application.legal.registeredAddress')} htmlFor="app-legal-registered_address" required>{req('registered_address')}</FormField>
         <div className="grid gap-4 md:grid-cols-[1fr_160px]">
-          <FormField label={t('application.legal.representative')} required><Input value={f.representative_name} onChange={set('representative_name')} /></FormField>
+          <FormField label={t('application.legal.representative')} htmlFor="app-legal-representative_name" required>{req('representative_name')}</FormField>
           <FormField label={t('application.legal.representativeTitle')}><Input value={f.representative_title} onChange={set('representative_title')} /></FormField>
         </div>
       </div>
@@ -277,8 +340,8 @@ function LegalPanel({ app, settled, onSaved }: { app: Application; settled: bool
         <FormField label={t('application.legal.insuranceValidUntil')}><Input type="date" value={f.insurance_valid_until} onChange={set('insurance_valid_until')} /></FormField>
       </div>
       <div className="flex items-center gap-3">
-        <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={async () => { if (await save(f) && settled) setEditing(false); }}>{label}</Button>
-        {state === 'error' && <span className="text-[12px] text-error-500">{t('application.saveError')}</span>}
+        <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={onSave}>{label}</Button>
+        {state === 'error' && <span role="alert" className="text-[12px] text-error-700 dark:text-red-300">{t('application.saveError')}</span>}
       </div>
       </>)}
     </Card>
@@ -294,13 +357,21 @@ function ServicesPanel({ app, changes, onChanged }: { app: Application; changes:
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [err, setErr] = useState<string | null>(null);
+  // V2 (11.10.2026): der Code ist das eine Pflichtfeld. Der Knopf bleibt
+  // aktiv; fehlt er oder kennt der Server ihn nicht, steht das am Feld.
+  const [codeError, setCodeError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const labels = { complete: t('application.state.complete'), open: t('application.state.open') };
 
   const add = async () => {
-    setBusy(true); setErr(null);
+    if (busy) return;
+    if (!code.trim()) { setCodeError(t('application.errors.serviceCode')); focusField('app-service-code'); return; }
+    setBusy(true); setErr(null); setCodeError(null);
     try { const s = await createService({ service_code: code.trim(), service_name: name.trim() || undefined }); setOpen(s.id); setAdding(false); setCode(''); setName(''); await onChanged(); }
-    catch (e) { setErr(identityHintFrom(e, t) ?? (e instanceof ApiError && e.status === 422 && /categor/i.test(e.message) ? t('application.services.allowanceError') : (e instanceof Error ? e.message : t('application.saveError')))); }
+    catch (e) {
+      if (e instanceof ApiError && e.body.errorCode === 'UNKNOWN_SERVICE_CODE') { setCodeError(t('application.errors.serviceCodeUnknown')); focusField('app-service-code'); return; }
+      setErr(identityHintFrom(e, t) ?? (e instanceof ApiError && e.status === 422 && /categor/i.test(e.message) ? t('application.services.allowanceError') : (e instanceof Error ? e.message : t('application.saveError'))));
+    }
     finally { setBusy(false); }
   };
 
@@ -314,11 +385,14 @@ function ServicesPanel({ app, changes, onChanged }: { app: Application; changes:
       ))}
       {adding ? (
         <div className="flex flex-wrap items-end gap-3 rounded-lg border border-stroke p-3">
-          <FormField label={t('application.services.codePlaceholder')} className="min-w-[240px] flex-1"><Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="tax-vat.returns" /></FormField>
+          <FormField label={t('application.services.codePlaceholder')} htmlFor="app-service-code" className="min-w-[240px] flex-1">
+            <Input id="app-service-code" value={code} onChange={(e) => { setCode(e.target.value); setCodeError(null); }} placeholder="tax-vat.returns" error={!!codeError} {...errorAria('app-service-code', !!codeError)} />
+          </FormField>
           <FormField label={t('application.services.namePlaceholder')} className="min-w-[240px] flex-1"><Input value={name} onChange={(e) => setName(e.target.value)} /></FormField>
-          <Button size="sm" disabled={busy || !code.trim()} onClick={add}>{t('application.services.add')}</Button>
-          <Button size="sm" variant="ghost" onClick={() => setAdding(false)}>{t('application.agreements.cancel')}</Button>
-          {err && <span className="basis-full text-[12px] text-error-500">{err}</span>}
+          <Button size="sm" disabled={busy} onClick={add}>{t('application.services.add')}</Button>
+          <Button size="sm" variant="ghost" onClick={() => { setAdding(false); setCodeError(null); }}>{t('application.agreements.cancel')}</Button>
+          <FieldError id="app-service-code" alert message={codeError} className="basis-full" />
+          {err && <span role="alert" className="basis-full text-[12px] text-error-700 dark:text-red-300">{err}</span>}
         </div>
       ) : (
         app.services.length > 0 && (
@@ -374,7 +448,25 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  // V2 (11.10.2026): ein Feld — „Land hinzufuegen" bleibt aktiv; ein Code,
+  // der kein ISO-2 ist oder schon da steht, bekommt einen Satz am Feld.
+  const [countryError, setCountryError] = useState<string | null>(null);
+  const [countryFailed, setCountryFailed] = useState(false);
+  const countryId = `app-country-${s.id}`;
   const codes = useMemo(() => s.coverage.map((c) => c.country_code), [s.coverage]);
+  const addCountry = async () => {
+    if (busy) return;
+    const msg = !/^[A-Z]{2}$/.test(country) ? t('application.errors.countryCode') : codes.includes(country) ? t('application.errors.countryListed', { country }) : null;
+    if (msg) { setCountryError(msg); focusField(countryId); return; }
+    setCountryError(null); setCountryFailed(false); setBusy(true);
+    try { await putCoverage(s.id, [...codes, country]); setCountry(''); await onChanged(); }
+    catch (e) {
+      // Bis hierher ging ein Fehler still verloren; jetzt steht er da.
+      if (e instanceof ApiError && e.status === 400 && /country_code/.test(e.message)) { setCountryError(t('application.errors.countryCode')); focusField(countryId); }
+      else setCountryFailed(true);
+    }
+    finally { setBusy(false); }
+  };
   const setCountries = async (next: string[]) => { setBusy(true); try { await putCoverage(s.id, next); await onChanged(); } finally { setBusy(false); } };
   const remove = async () => { setBusy(true); try { await removeService(s.id); await onChanged(); } finally { setBusy(false); } };
   const Chevron = expanded ? ChevronDown : ChevronRight;
@@ -492,10 +584,14 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Input inputSize="sm" value={country} onChange={(e) => setCountry(e.target.value.toUpperCase().slice(0, 2))} placeholder={t('application.services.countryPlaceholder')} className="w-[140px]" />
-            <Button size="sm" variant="ghost" disabled={busy || !/^[A-Z]{2}$/.test(country) || codes.includes(country)} onClick={() => { void setCountries([...codes, country]); setCountry(''); }}>{t('application.services.addCountry')}</Button>
+            <Input id={countryId} inputSize="sm" value={country} onChange={(e) => { setCountry(e.target.value.toUpperCase().slice(0, 2)); setCountryError(null); }}
+              placeholder={t('application.services.countryPlaceholder')} aria-label={t('application.services.countryPlaceholder')} className="w-[140px]"
+              error={!!countryError} {...errorAria(countryId, !!countryError)} />
+            <Button size="sm" variant="ghost" disabled={busy} onClick={addCountry}>{t('application.services.addCountry')}</Button>
             <span className="ml-auto text-[12px] text-fg-tertiary">{t('application.services.licenceHint')}</span>
             <Button size="sm" variant="ghost" disabled={busy} onClick={remove}>{s.status === 'approved' || s.status === 'limited' ? t('application.services.retire') : t('application.services.remove')}</Button>
+            <FieldError id={countryId} alert message={countryError} className="basis-full" />
+            {countryFailed && <p role="alert" className="basis-full text-[12px] text-error-700 dark:text-red-300">{t('application.saveError')}</p>}
           </div>
         </div>
       )}
@@ -525,6 +621,8 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
   const lastDay = isoDay(new Date(Date.now() + 365 * 86400_000));
   const at = mode === 'date' ? date : null;
   const dateInvalid = mode === 'date' && !(date >= tomorrow && date <= lastDay);
+  const label = (k: TermKey) => k === 'price_min' || k === 'price_max'
+    ? t(`application.change.form.${k}`, { currency: s.currency || 'EUR' }) : t(`application.change.form.${k}`);
 
   // Nur geaenderte Felder — gemessen am vorbelegten Wert. Aendert sich nur
   // der Zeitpunkt, gehen die offenen Werte mit dem neuen Datum erneut hinaus.
@@ -537,9 +635,26 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
     }
     return out as Partial<ServiceInput>;
   };
-  const invalid = TERMS.some((k) => form[k].trim() !== '' && !(Number(form[k]) >= 0)) || dateInvalid;
+  // V2 (11.10.2026): „Weiter" bleibt aktiv. Das Absenden prueft Datum und
+  // Zahlen; Satz am Feld, Zusammenfassung am Knopf, Fokus aufs erste.
+  const [tried, setTried] = useState(false);
+  const fid = (k: string) => `terms-${s.id}-${k}`;
+  const errorsOf = (): FormError[] => {
+    const errs: FormError[] = [];
+    if (dateInvalid) errs.push({ id: fid('date'), label: t('application.change.dateLabel'), message: t('application.change.dateInvalid') });
+    for (const k of TERMS) {
+      if (form[k].trim() !== '' && !(Number(form[k]) >= 0)) errs.push({ id: fid(k), label: label(k), message: t('application.change.numberInvalid') });
+    }
+    return errs;
+  };
+  const errors = tried ? errorsOf() : [];
+  const errFor = (k: string) => errors.find((e) => e.id === fid(k))?.message;
 
   const next = async () => {
+    if (busy) return;
+    setTried(true);
+    const now = errorsOf();
+    if (now.length) { focusField(now[0].id); return; }
     const patch = dirty();
     if (!Object.keys(patch).length) { onCancel(); return; }
     setBusy(true); setErr(null);
@@ -586,7 +701,7 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
         {when && <Group title={t('application.change.groupScheduled', { date: when })} rows={scheduled} />}
         <Group title={t('application.change.groupInstant')} rows={now} />
         <p className="text-[12.5px] text-fg-secondary">{when ? t('application.change.summaryNoteDated', { date: when }) : t('application.change.summaryNote')}</p>
-        {err && <p className="text-[12px] text-error-500">{err}</p>}
+        {err && <p role="alert" className="text-[12px] text-error-700 dark:text-red-300">{err}</p>}
         <div className="flex gap-2">
           <Button size="sm" disabled={busy} onClick={send}>{t('application.change.send')}</Button>
           <Button size="sm" variant="secondary" disabled={busy} onClick={() => setPreview(null)}>{t('application.change.back')}</Button>
@@ -595,8 +710,6 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
     );
   }
 
-  const label = (k: TermKey) => k === 'price_min' || k === 'price_max'
-    ? t(`application.change.form.${k}`, { currency: s.currency || 'EUR' }) : t(`application.change.form.${k}`);
   return (
     <div className="space-y-3 rounded-lg border border-stroke p-4">
       <p className="text-[13px] font-semibold text-fg">{t('application.change.edit')}</p>
@@ -610,23 +723,30 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
         </div>
         {mode === 'date' && (
           <div className="space-y-1">
-            <FormField label={t('application.change.dateLabel')}>
-              <Input inputSize="sm" type="date" min={tomorrow} max={lastDay} value={date} onChange={(e) => setDate(e.target.value)} className="w-[200px]" />
+            <FormField label={t('application.change.dateLabel')} htmlFor={fid('date')}>
+              <Input id={fid('date')} inputSize="sm" type="date" min={tomorrow} max={lastDay} value={date} onChange={(e) => setDate(e.target.value)} className="w-[200px]"
+                error={!!errFor('date')} {...errorAria(fid('date'), !!errFor('date'))} />
             </FormField>
-            <p className={`text-[11.5px] ${dateInvalid && date ? 'text-error-500' : 'text-fg-tertiary'}`}>{dateInvalid && date ? t('application.change.dateInvalid') : t('application.change.dateHint')}</p>
+            {/* Ein Datum ausserhalb des Rahmens nennt der Satz sofort; ein leeres erst nach dem Absenden. */}
+            {errFor('date') || (dateInvalid && date)
+              ? <FieldError id={fid('date')} message={t('application.change.dateInvalid')} className="text-[11.5px]" />
+              : <p className="text-[11.5px] text-fg-tertiary">{t('application.change.dateHint')}</p>}
           </div>
         )}
       </fieldset>
       <div className="grid gap-3 md:grid-cols-4">
         {TERMS.map((k) => (
-          <FormField key={k} label={label(k)}>
-            <Input inputSize="sm" type="number" min={0} inputMode="numeric" value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />
+          <FormField key={k} label={label(k)} htmlFor={fid(k)}>
+            <Input id={fid(k)} inputSize="sm" type="number" min={0} inputMode="numeric" value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })}
+              error={!!errFor(k)} {...errorAria(fid(k), !!errFor(k))} />
+            <FieldError id={fid(k)} message={errFor(k)} />
           </FormField>
         ))}
       </div>
-      {err && <p className="text-[12px] text-error-500">{err}</p>}
+      {err && <p role="alert" className="text-[12px] text-error-700 dark:text-red-300">{err}</p>}
+      <FormErrorSummary errors={errors} />
       <div className="flex gap-2">
-        <Button size="sm" disabled={busy || invalid} onClick={next}>{t('application.change.next')}</Button>
+        <Button size="sm" disabled={busy} onClick={next}>{t('application.change.next')}</Button>
         <Button size="sm" variant="ghost" disabled={busy} onClick={onCancel}>{t('application.change.cancel')}</Button>
       </div>
     </div>
@@ -639,6 +759,9 @@ function EvidencePanel({ app, locale, onChanged }: { app: Application; locale: s
   const { t } = useTranslation('providerws');
   const [vat, setVat] = useState(app.provider.vat_id ?? '');
   const [vatNote, setVatNote] = useState<string | null>(null);
+  // V2 (11.10.2026): ein Feld — „Im Register pruefen" bleibt aktiv; unter
+  // vier Zeichen steht ein Satz am Feld und der Fokus geht hinein.
+  const [vatShort, setVatShort] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -657,6 +780,9 @@ function EvidencePanel({ app, locale, onChanged }: { app: Application; locale: s
     } catch { setErr(t('application.evidence.uploadError')); } finally { setBusy(null); }
   };
   const registry = async () => {
+    if (busy === 'vat') return;
+    if (vat.trim().length < 4) { setVatShort(true); focusField('app-vat'); return; }
+    setVatShort(false);
     setBusy('vat'); setVatNote(null);
     try {
       const r = await checkVatRegistry(vat);
@@ -694,9 +820,11 @@ function EvidencePanel({ app, locale, onChanged }: { app: Application; locale: s
                 </p>
                 {isVat && item.state !== 'reviewed' && (
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <Input inputSize="sm" value={vat} onChange={(e) => setVat(e.target.value)} placeholder={t('application.evidence.vatPlaceholder')} className="w-[200px]" />
-                    <Button size="sm" variant="secondary" disabled={busy === 'vat' || vat.trim().length < 4} onClick={registry}>{t('application.evidence.checkRegistry')}</Button>
+                    <Input id="app-vat" inputSize="sm" value={vat} onChange={(e) => { setVat(e.target.value); setVatShort(false); }} placeholder={t('application.evidence.vatPlaceholder')}
+                      aria-label={t('application.evidence.type.vat_id')} className="w-[200px]" error={vatShort} {...errorAria('app-vat', vatShort)} />
+                    <Button size="sm" variant="secondary" disabled={busy === 'vat'} onClick={registry}>{t('application.evidence.checkRegistry')}</Button>
                     {vatNote && <span className="text-[12px] text-fg-secondary">{vatNote}</span>}
+                    <FieldError id="app-vat" alert message={vatShort ? t('application.evidence.vatTooShort') : null} className="basis-full" />
                   </div>
                 )}
               </div>
@@ -724,11 +852,22 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
   const [name, setName] = useState(app.confidential?.representative_name ?? '');
   const [title, setTitle] = useState(app.confidential?.representative_title ?? '');
   const [busy, setBusy] = useState(false);
+  // V2 (11.10.2026): der Name ist das eine Pflichtfeld der Annahme. Der Knopf
+  // bleibt aktiv; fehlt der Name, steht der Satz am Feld. Scheitert das
+  // Speichern, sagt die Maske es — bis hierher blieb sie still offen.
+  const [nameMissing, setNameMissing] = useState(false);
+  const [acceptFailed, setAcceptFailed] = useState(false);
   const done = SUBMIT_AGREEMENTS.filter((a) => app.agreements.some((x) => x.agreement_type === a));
+  const openModal = (a: AgreementType | null) => { setModal(a); setNameMissing(false); setAcceptFailed(false); };
   const accept = async () => {
-    if (!modal) return;
-    setBusy(true);
+    if (!modal || busy) return;
+    if (!name.trim()) { setNameMissing(true); focusField('app-agreement-name'); return; }
+    setBusy(true); setAcceptFailed(false);
     try { await acceptAgreement({ agreement_type: modal, version: AGREEMENT_VERSION, language: i18n.resolvedLanguage || 'en', accepted_by_name: name.trim(), accepted_by_title: title.trim() || undefined }); setModal(null); await onChanged(); }
+    catch (e) {
+      if (e instanceof ApiError && e.status === 400 && /accepted_by_name/.test(e.message)) { setNameMissing(true); focusField('app-agreement-name'); }
+      else setAcceptFailed(true);
+    }
     finally { setBusy(false); }
   };
   // Eine fehlende Annahme der zweiten Stufe ist kein Mangel: sie bekommt
@@ -742,7 +881,7 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
           <p className="text-[13px] font-medium text-fg">{t(`application.agreements.doc.${a}`)} <span className="ml-2 text-[11px] font-normal text-fg-tertiary">{t('application.agreements.version', { version: acc?.version ?? AGREEMENT_VERSION, language: (acc?.language ?? i18n.resolvedLanguage ?? 'en').toUpperCase() })}</span></p>
           <p className="text-[12px] text-fg-tertiary">{acc ? t('application.agreements.acceptedOn', { date: fmtDate(acc.accepted_at, locale), name: acc.accepted_by_name ?? '' }) : `${t('application.agreements.notAccepted')}${a === 'billing_authorization' ? ' ' + t('application.agreements.billingNote') : ''}`}</p>
         </div>
-        <Button size="sm" variant={acc ? 'ghost' : 'secondary'} onClick={() => setModal(a)}>{acc ? t('application.agreements.open') : t('application.agreements.accept')}</Button>
+        <Button size="sm" variant={acc ? 'ghost' : 'secondary'} onClick={() => openModal(a)}>{acc ? t('application.agreements.open') : t('application.agreements.accept')}</Button>
       </div>
     );
   };
@@ -766,14 +905,18 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
         {group(t('application.agreements.groupLater'), t('application.agreements.tagLater'), t('application.agreements.groupLaterHint'), LATER_AGREEMENTS, false)}
         <p className="max-w-3xl text-[12px] leading-relaxed text-fg-tertiary">{t('application.agreements.commercialNote')}</p>
       </div>
-      <Modal open={!!modal} onClose={() => setModal(null)} title={modal ? t('application.agreements.acceptTitle', { doc: t(`application.agreements.doc.${modal}`) }) : ''} size="md"
-        footer={<div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => setModal(null)}>{t('application.agreements.cancel')}</Button><Button disabled={busy || !name.trim()} onClick={accept}>{t('application.agreements.confirm', { version: AGREEMENT_VERSION })}</Button></div>}>
+      <Modal open={!!modal} onClose={() => openModal(null)} title={modal ? t('application.agreements.acceptTitle', { doc: t(`application.agreements.doc.${modal}`) }) : ''} size="md"
+        footer={<div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => openModal(null)}>{t('application.agreements.cancel')}</Button><Button disabled={busy} onClick={accept}>{t('application.agreements.confirm', { version: AGREEMENT_VERSION })}</Button></div>}>
         <div className="space-y-4">
           <p className="text-[13px] leading-relaxed text-fg-secondary">{modal === 'billing_authorization' ? t('application.agreements.billingNote') : t('application.agreements.intro')}</p>
           <div className="grid gap-3 md:grid-cols-2">
-            <FormField label={t('application.agreements.nameLabel')} required><Input value={name} onChange={(e) => setName(e.target.value)} /></FormField>
+            <FormField label={t('application.agreements.nameLabel')} htmlFor="app-agreement-name" required>
+              <Input id="app-agreement-name" value={name} onChange={(e) => { setName(e.target.value); setNameMissing(false); }} error={nameMissing} {...errorAria('app-agreement-name', nameMissing)} />
+              <FieldError id="app-agreement-name" alert message={nameMissing ? t('application.errors.agreementName') : null} />
+            </FormField>
             <FormField label={t('application.agreements.titleLabel')}><Input value={title} onChange={(e) => setTitle(e.target.value)} /></FormField>
           </div>
+          {acceptFailed && <p role="alert" className="text-[12px] text-error-700 dark:text-red-300">{t('application.saveError')}</p>}
         </div>
       </Modal>
     </Card>
@@ -782,18 +925,25 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
 
 // ─── 6 · Einreichen (4A) ─────────────────────────────────────────────────────
 
-function SubmitPanel({ app, onChanged }: { app: Application; onChanged: () => Promise<void> | void }) {
+function SubmitPanel({ app, onChanged, onGoTo }: { app: Application; onChanged: () => Promise<void> | void; onGoTo: (missing: string) => void }) {
   const { t } = useTranslation('providerws');
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [noteIsError, setNoteIsError] = useState(false);
   const missing = app.chapters.submit.missing;
   const submittable = app.provider.lifecycle_status === 'draft' || app.provider.lifecycle_status === 'more_info_required';
   const countries = new Set(app.services.flatMap((s) => s.coverage.map((c) => c.country_code)));
   const agreementsDone = SUBMIT_AGREEMENTS.filter((a) => app.agreements.some((x) => x.agreement_type === a)).length;
+  // Gesperrt ist „Einreichen" nur als Zustand (V2): das Dossier ist noch nicht
+  // vollstaendig — dann steht links, was fehlt, und jeder Eintrag fuehrt hin —
+  // oder die Bewerbung liegt schon beim Pruefteam. Der Grund steht am Knopf.
+  const inReview = app.provider.lifecycle_status === 'submitted' || app.provider.lifecycle_status === 'under_verification';
+  const lockReason = !submittable ? t(inReview ? 'shell.applicationBanner.submitted' : 'application.submit.notSubmittable')
+    : !app.chapters.submit.ready ? t('application.submit.lockedHint') : null;
   const submit = async () => {
-    setBusy(true); setNote(null);
+    setBusy(true); setNote(null); setNoteIsError(false);
     try { const r = await submitApplication(); setNote(r.ok ? t('application.submit.done') : null); await onChanged(); }
-    catch (e) { setNote(e instanceof ApiError && e.status === 409 ? t('application.submit.notSubmittable') : t('application.saveError')); }
+    catch (e) { setNoteIsError(true); setNote(e instanceof ApiError && e.status === 409 ? t('application.submit.notSubmittable') : t('application.saveError')); }
     finally { setBusy(false); }
   };
   return (
@@ -803,7 +953,16 @@ function SubmitPanel({ app, onChanged }: { app: Application; onChanged: () => Pr
         <div className="space-y-2">
           <p className="text-[13px] font-medium text-fg">{t('application.submit.missingTitle')}</p>
           {missing.length === 0 && <p className="text-[12px] text-fg-tertiary">—</p>}
-          {missing.map((m) => <p key={m} className="flex items-center gap-2 text-[13px] text-fg"><AlertCircle size={15} className="text-warning-600" />{t(`application.missing.${m}`)}</p>)}
+          {missing.length > 0 && (
+            <ul className="space-y-2">
+              {missing.map((m) => (
+                <li key={m} className="flex items-center gap-2 text-[13px] text-fg">
+                  <AlertCircle size={15} className="shrink-0 text-warning-600" aria-hidden />
+                  <button type="button" onClick={() => onGoTo(m)} className="text-left underline underline-offset-2 hover:no-underline">{t(`application.missing.${m}`)}</button>
+                </li>
+              ))}
+            </ul>
+          )}
           <p className="pt-1 text-[12px] leading-relaxed text-fg-tertiary">{t('application.submit.licenceNote')}</p>
         </div>
         <div className="space-y-2">
@@ -815,8 +974,11 @@ function SubmitPanel({ app, onChanged }: { app: Application; onChanged: () => Pr
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-4">
-        <Button size="lg" disabled={busy || !app.chapters.submit.ready || !submittable} onClick={submit}>{t('application.submit.cta')}</Button>
-        <span className="max-w-xl text-[12px] leading-relaxed text-fg-tertiary">{note ?? t('application.submit.note')}</span>
+        <Button size="lg" disabled={busy || !app.chapters.submit.ready || !submittable} aria-describedby={lockReason ? 'app-submit-lock' : undefined} onClick={submit}>{t('application.submit.cta')}</Button>
+        <span className="max-w-xl space-y-1 text-[12px] leading-relaxed text-fg-tertiary">
+          {lockReason && !note && <span id="app-submit-lock" className="block font-medium text-fg-secondary">{lockReason}</span>}
+          <span className="block" role={note && noteIsError ? 'alert' : undefined}>{note ?? t('application.submit.note')}</span>
+        </span>
       </div>
     </Card>
   );

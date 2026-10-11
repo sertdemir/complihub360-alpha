@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MailCheck } from 'lucide-react';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
-import { apiFetch } from '../../api/client';
+import { ApiError, apiFetch } from '../../api/client';
+import { FieldError, errorAria } from '../ui/FieldError';
 import { myProviderKey } from '../../api/provider';
 
 // ─── Change-Email drawer (Figma 2652:234 · wiring map B8) ────────────────────
@@ -22,13 +23,19 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  // V2 (11.10.2026): ein Feld — der Knopf bleibt aktiv, das Absenden prueft,
+  // der Satz steht am Feld (role="alert") und der Fokus geht hinein.
+  const [emailError, setEmailError] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { setEmail(''); setBusy(false); setSent(false); setError(''); }, [open]);
+  useEffect(() => { setEmail(''); setBusy(false); setSent(false); setError(''); setEmailError(false); }, [open]);
 
   const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
 
   const submit = async () => {
-    setBusy(true); setError('');
+    if (busy) return;
+    if (!valid) { setEmailError(true); inputRef.current?.focus(); return; }
+    setBusy(true); setError(''); setEmailError(false);
     try {
       await apiFetch(`/api/v1/provider/${await myProviderKey()}/change-email`, {
         method: 'POST',
@@ -36,7 +43,9 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
       });
       setSent(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('changeEmail.errorFallback'));
+      // Bemaengelt der Server die Adresse, steht das am Feld; alles andere oben.
+      if (e instanceof ApiError && e.status === 400 && /new_email/.test(e.message)) { setEmailError(true); inputRef.current?.focus(); }
+      else setError(e instanceof Error ? e.message : t('changeEmail.errorFallback'));
     }
     setBusy(false);
   };
@@ -55,7 +64,7 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
         ) : (
           <div className="flex w-full items-center justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={onClose}>{t('changeEmail.cancel')}</Button>
-            <Button variant="primary" size="sm" onClick={submit} disabled={!valid || busy}>
+            <Button variant="primary" size="sm" onClick={submit} disabled={busy}>
               {busy ? '…' : t('changeEmail.sendVerification')}
             </Button>
           </div>
@@ -81,20 +90,25 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
             <p className="mt-0.5 text-[13px] font-medium text-fg">{currentEmail}</p>
           </div>
           <div>
-            <p className="mb-1.5 text-[11px] text-fg-tertiary">{t('changeEmail.newAddress')}</p>
+            <label htmlFor="change-email-new" className="mb-1.5 block text-[11px] text-fg-tertiary">{t('changeEmail.newAddress')}</label>
             <input
+              id="change-email-new"
+              ref={inputRef}
               type="email"
               autoFocus
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError(false); }}
               placeholder="new-address@yourfirm.com"
-              className="w-full rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-fg-brand"
+              {...errorAria('change-email-new', emailError)}
+              className={'w-full rounded-lg border px-3 py-2.5 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-fg-brand '
+                + (emailError ? 'border-error-500 bg-error-bg dark:bg-red-500/10' : 'border-elevate/10 bg-elevate/5')}
             />
+            <FieldError id="change-email-new" alert message={emailError ? t('common:contactSend.field.email') : null} className="mt-1.5" />
           </div>
           <p className="text-[11px] leading-relaxed text-fg-tertiary">
             {t('changeEmail.notePrefix')}<span className="font-medium text-fg-secondary">{t('changeEmail.noteNew')}</span>{t('changeEmail.noteSuffix')}
           </p>
-          {error && <p className="rounded-lg border border-error-500/30 bg-error-500/10 px-3 py-2 text-[12px] text-error-500">{error}</p>}
+          {error && <p role="alert" className="rounded-lg border border-error-500/30 bg-error-500/10 px-3 py-2 text-[12px] text-error-500">{error}</p>}
         </div>
       )}
     </Drawer>

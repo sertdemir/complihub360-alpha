@@ -432,81 +432,6 @@
     "assistantTitle": "Asistan · {{area}}",
     "assistantIntro": "{{area}} hakkında sorun — yanıt alan bilgisinden ve oturumlarınızdan gelir."
   },
-  "configureAlerts": {
-    "eyebrow": "İZLEME",
-    "title": "Uyarıları yapılandır",
-    "savedNote": "Kaydedildi — e-posta ve uygulama içi uyarılar için geçerlidir.",
-    "deliveryNote": "Teslimat: e-posta + uygulama içi.",
-    "savePreferences": "Tercihleri kaydet",
-    "saveError": "Kaydetme başarısız — lütfen birazdan tekrar deneyin.",
-    "toggles": {
-      "thresholdBreach": {
-        "label": "Eşik aşımları",
-        "desc": "Ciro, izlenen herhangi bir pazarda bir KDV/OSS kayıt eşiğini aşıyor."
-      },
-      "thresholdApproach": {
-        "label": "Eşiğe yaklaşma (%80)",
-        "desc": "Bir eşiğe ulaşılmadan önce erken uyarı."
-      },
-      "deadlines": {
-        "label": "Beyan son tarihleri",
-        "desc": "OSS/EPR/GDPR beyan tarihleri — 14 ve 3 gün önceden."
-      },
-      "providerUpdates": {
-        "label": "Sağlayıcı güncellemeleri",
-        "desc": "Talepleriniz için onaylar, yanıtlar ve SLA olayları."
-      },
-      "ruleChanges": {
-        "label": "Mevzuat değişiklikleri",
-        "desc": "Kaydedilmiş bir oturumu etkileyen kural güncellemeleri (\"Yenileme gerekli\")."
-      },
-      "weeklyDigest": {
-        "label": "Haftalık özet",
-        "desc": "Tek tek uyarılar yerine haftada bir özet e-postası."
-      }
-    }
-  },
-  "docUpload": {
-    "titleUpload": "Belge yükle",
-    "titleProcessed": "Belge işlendi",
-    "uploadAnother": "Başka bir belge yükle",
-    "sanitizing": "Temizleniyor…",
-    "uploadSanitize": "Yükle ve temizle",
-    "classificationPublic": "genel",
-    "classificationInternal": "kurum içi",
-    "classificationConfidential": "gizli",
-    "classificationRestricted": "kısıtlı",
-    "tagSanitized": "temizlendi",
-    "tagSanitizationFailed": "temizleme başarısız",
-    "tagAiAllowed": "YZ: izinli",
-    "tagAiBlocked": "YZ: engelli",
-    "redactionReport": "Maskeleme raporu",
-    "maskedCount": "{{count}}× maskelendi",
-    "noPii": "Kişisel tanımlayıcı tespit edilmedi.",
-    "storedNote": "Yalnızca temizlenmiş sürüm saklandı — özgün metin işlemden sonra silindi.",
-    "aiBlockedClassification": "İçerik sınıflandırması nedeniyle YZ analizi engellenmeye devam ediyor.",
-    "aiBlockedConsent": "Bu belge için onay verene kadar YZ analizi engellenmeye devam ediyor.",
-    "chooseFile": "Bir dosya seçin (.txt · .md · .csv)",
-    "orPaste": "veya içeriği aşağıya yapıştırın",
-    "pastePlaceholder": "Belge içeriğini yapıştırın — sözleşmeler, notlar, faturalar …",
-    "consent": "Bu belgenin <em>temizlenmiş</em> sürümünün YZ destekli analizine onay veriyorum (Art. 6(1)(a) GDPR — her zaman geri alınabilir). Onay verilmezse belge saklanır ancak asla YZ'ye gönderilmez.",
-    "uploadFailed": "Yükleme başarısız",
-    "privacyNote": "Kişisel tanımlayıcılar (adlar, e-postalar, telefon numaraları, IBAN'lar) herhangi bir şey saklanmadan <em>önce</em> maskelenir. Ham metin asla kalıcı olarak saklanmaz."
-  },
-  "requestQuote": {
-    "title": "<accent>Teklif</accent> iste",
-    "close": "Kapat",
-    "sentTitle": "Talep gönderildi ✓",
-    "sentBody": "{{name}} bilgilendirildi ve onaylamak için 24 saati var. Talebi <em>Talepler</em> altında bulabilirsiniz.",
-    "slaTag": "24 sa. onay SLA'sı",
-    "messageLabel": "Sağlayıcıya mesajınız",
-    "messagePlaceholder": "Durumunuzu kısaca açıklayın — pazarlar, ciro aralığı, zaman planı …",
-    "privacyNote": "Durumsal bağlamınız <em>anonimleştirilerek</em> paylaşılır — mesajınızdaki adlar ve iletişim bilgileri maskelenir. Kimliğiniz yalnızca sağlayıcı onayladıktan sonra açıklanır (Art. 6(1)(b) GDPR — sözleşme öncesi ilişki). Yüklenen belgeler asla otomatik olarak paylaşılmaz.",
-    "sendError": "Gönderme başarısız: {{error}} — lütfen tekrar deneyin.",
-    "requestFailed": "Talep başarısız oldu",
-    "sending": "Gönderiliyor…",
-    "sendRequest": "Talebi gönder"
-  },
   "requestActions": {
     "eyebrow": "TALEP {{id}}",
     "eyebrowFallback": "TALEP",
@@ -741,7 +666,6 @@
     "saved": "Kaydedildi; risk haritası yeniden hesaplanıyor.",
     "error": "Kaydetme başarısız. Lütfen tekrar deneyin.",
     "changed": "değişti",
-    "none": "Seçim yok",
-    "needSelection": "En az bir pazar ve bir uyumluluk alanı seçin."
+    "none": "Seçim yok"
   }
 }

@@ -6,6 +6,7 @@ import { Modal } from '../../components/ui/Modal';
 import { Tag } from '../../components/ui/Tag';
 import { useWorkspaceData } from '../../lib/useWorkspaceData';
 import { LoadFailedState } from '../../components/provider/WorkspaceStates';
+import { FieldError } from '../../components/ui/FieldError';
 import { money, type PlanCode } from '../../api/billing';
 import {
   fetchSubscription, selectPlan, scheduleChange, scheduleCancellation, withdrawScheduled,
@@ -94,6 +95,9 @@ export function SubscriptionPage() {
   const [zielZahlweise, setZielZahlweise] = useState<Cadence>('monthly');
   const [grund, setGrund] = useState('');
   const [planFehler, setPlanFehler] = useState<Extract<ScheduleOutcome, { ok: false }> | null>(null);
+  // V2 (11.10.2026): der Zieltarif ist das eine Pflichtfeld des Wechsels. Der
+  // Knopf bleibt aktiv; fehlt die Wahl, steht der Satz an der Auswahl.
+  const [zielFehlt, setZielFehlt] = useState(false);
 
   // TKT-PROV-12 (A2): ohne geladenen Tarif keine Tarifkarten — vorher stand
   // hier die Entwurfsfassung „kein Abo, zwei Bereiche", auch fuer ein Konto
@@ -140,7 +144,11 @@ export function SubscriptionPage() {
   };
 
   const wechselVormerken = async () => {
-    if (!zielTarif) return;
+    if (busy) return;
+    // Derselbe Tarif in derselben Zahlweise ist kein Wechsel.
+    if (!zielTarif || (zielTarif.code === running?.plan_code && zielZahlweise === running?.cadence)) {
+      setZielFehlt(true); document.querySelector<HTMLElement>('#ziel-tarif button:not(:disabled)')?.focus(); return;
+    }
     setBusy(true); setPlanFehler(null);
     verarbeite(await scheduleChange(zielTarif.code as PlanCode, zielZahlweise));
   };
@@ -312,13 +320,13 @@ export function SubscriptionPage() {
             ohne Wahl koennte der Vergleich nichts zeigen. */}
         <Modal
           open={dialog === 'change'}
-          onClose={() => { setDialog(null); setPlanFehler(null); }}
+          onClose={() => { setDialog(null); setPlanFehler(null); setZielFehlt(false); }}
           size="lg"
           title={zielTarif ? t('subscription.manage.changeTitle', { plan: zielTarif.label }) : t('subscription.manage.change')}
           description={t('subscription.manage.changeIntro')}
           footer={
             <>
-              <Button size="md" variant="primary" loading={busy} disabled={!zielTarif} onClick={wechselVormerken}>
+              <Button size="md" variant="primary" loading={busy} onClick={wechselVormerken}>
                 {t('subscription.manage.scheduleFor', { date: stichtagText })}
               </Button>
               <Button size="md" variant="secondary" onClick={() => { setDialog(null); setPlanFehler(null); }}>
@@ -328,9 +336,9 @@ export function SubscriptionPage() {
           }
         >
           <div className="space-y-4">
-            <fieldset className="space-y-2">
+            <fieldset className="space-y-2" aria-describedby={zielFehlt ? 'ziel-tarif-error' : undefined}>
               <legend className="text-[13px] font-semibold text-fg">{t('subscription.manage.pickTarget')}</legend>
-              <div className="flex flex-wrap gap-2">
+              <div id="ziel-tarif" className="flex flex-wrap gap-2">
                 {plans.map((p) => {
                   const selbst = p.code === running.plan_code && zielZahlweise === running.cadence;
                   const passt = p.fits_released !== false;
@@ -340,7 +348,7 @@ export function SubscriptionPage() {
                       key={p.code}
                       type="button"
                       disabled={!passt || selbst}
-                      onClick={() => setZielTarif(p)}
+                      onClick={() => { setZielTarif(p); setZielFehlt(false); }}
                       className={`rounded-md border px-3 py-2 text-left text-[13px] transition ${
                         aktiv ? 'border-brand bg-brand-light font-semibold text-fg-brand' : 'border-stroke text-fg-secondary'
                       } ${!passt || selbst ? 'cursor-not-allowed opacity-50' : 'hover:border-stroke-strong'}`}
@@ -351,6 +359,7 @@ export function SubscriptionPage() {
                   );
                 })}
               </div>
+              <FieldError id="ziel-tarif" alert message={zielFehlt ? t('subscription.manage.pickTargetRequired') : null} />
               {/* Die Grenze steht VOR dem Klick: `fits_released` kommt aus dem
                   GET, damit niemand erst nach der Wahl ein 409 sieht. */}
               {plans.some((p) => p.fits_released === false) && (
@@ -363,7 +372,7 @@ export function SubscriptionPage() {
                   <button
                     key={c}
                     type="button"
-                    onClick={() => setZielZahlweise(c)}
+                    onClick={() => { setZielZahlweise(c); setZielFehlt(false); }}
                     className={`rounded-md border px-3 py-1.5 text-[13px] ${
                       zielZahlweise === c ? 'border-brand bg-brand-light font-semibold text-fg-brand' : 'border-stroke text-fg-secondary'
                     }`}
@@ -408,7 +417,7 @@ export function SubscriptionPage() {
               <li>{t('subscription.manage.factRanking')}</li>
             </ul>
 
-            {planFehler && <p className="text-[13px] text-error-700 dark:text-error-300">{fehlerText(planFehler)}</p>}
+            {planFehler && <p role="alert" className="text-[13px] text-error-700 dark:text-error-300">{fehlerText(planFehler)}</p>}
           </div>
         </Modal>
 
@@ -451,7 +460,7 @@ export function SubscriptionPage() {
                 className="w-full rounded-md border border-stroke bg-surface px-3 py-2 text-[13px] leading-relaxed text-fg"
               />
             </div>
-            {planFehler && <p className="text-[13px] text-error-700 dark:text-error-300">{fehlerText(planFehler)}</p>}
+            {planFehler && <p role="alert" className="text-[13px] text-error-700 dark:text-error-300">{fehlerText(planFehler)}</p>}
           </div>
         </Modal>
       </ProviderShell>

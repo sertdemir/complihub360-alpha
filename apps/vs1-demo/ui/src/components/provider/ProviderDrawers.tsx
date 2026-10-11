@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRequestContext } from '../../lib/requestContext';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,7 @@ import { fetchProviderRequests, type ProviderRequest } from '../../api/requests'
 import { sendContact, failureOf, EMAIL_RE } from '../../api/contact';
 import { fetchMyProvider, fetchCoverage } from '../../api/provider';
 import { useAuthStore } from '../../store/useAuthStore';
+import { FieldError, errorAria } from '../ui/FieldError';
 
 // ─── Provider workspace drawers ──────────────────────────────────────────────
 // Search: live filter over the booking inbox, result click deep-links to
@@ -116,9 +117,11 @@ export function HelpDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
   const [reference, setReference] = useState<string | null>(null);
   const [failure, setFailure] = useState<'unavailable' | 'network' | 'rateLimit' | null>(null);
+  const [messageError, setMessageError] = useState(false);
 
   useEffect(() => {
     if (!open) return;
+    setMessageError(false);
     fetchMyProvider().then((p) => setProviderName(p.name)).catch(() => {});
     fetchCoverage().then((c) => setContactEmail(c.contact_email ?? null)).catch(() => {});
   }, [open]);
@@ -127,9 +130,16 @@ export function HelpDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   // Logins. Ohne gueltige Adresse geht nichts ab — der Server lehnt sie ab.
   const email = user?.email ?? contactEmail ?? '';
   const name = (user?.user_metadata?.full_name as string | undefined)?.trim() || providerName || email.split('@')[0] || '';
-  const canSend = message.trim().length >= 10 && EMAIL_RE.test(email) && name.length > 0;
+  // V2 (11.10.2026): ohne Absender-Adresse kann das Ticket nicht abgehen —
+  // das ist ein Zustand, kein Eingabefehler; der Satz dazu steht am Knopf.
+  // Die Nachricht dagegen prueft das Absenden: Satz am Feld, Fokus hinein.
+  const senderReady = EMAIL_RE.test(email) && name.length > 0;
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+  const tooShort = message.trim().length < 10;
 
   const send = async () => {
+    if (state === 'sending') return;
+    if (tooShort) { setMessageError(true); messageRef.current?.focus(); return; }
     setState('sending'); setFailure(null);
     try {
       const r = await sendContact({
@@ -180,12 +190,18 @@ export function HelpDrawer({ open, onClose }: { open: boolean; onClose: () => vo
                   {SUBJECTS.map((s) => <option key={s} value={s}>{t(`helpDrawer.subject.${s}`)}</option>)}
                 </Select>
               </label>
-              <Textarea rows={4} value={message} onChange={(e) => setMessage(e.target.value)} placeholder={t('helpDrawer.messagePlaceholder')} aria-label={t('helpDrawer.ticketTitle')} />
-              {!EMAIL_RE.test(email) && <p className="text-[12px] text-fg-tertiary">{t('helpDrawer.noEmail')}</p>}
+              <div className="space-y-1.5">
+                <Textarea id="help-message" ref={messageRef} rows={4} value={message}
+                  onChange={(e) => { setMessage(e.target.value); if (messageError && e.target.value.trim().length >= 10) setMessageError(false); }}
+                  placeholder={t('helpDrawer.messagePlaceholder')} aria-label={t('helpDrawer.ticketTitle')}
+                  error={messageError} {...errorAria('help-message', messageError)} />
+                <FieldError id="help-message" alert message={messageError ? t('helpDrawer.messageTooShort') : null} />
+              </div>
+              {!senderReady && <p id="help-no-sender" className="text-[12px] text-fg-tertiary">{t('helpDrawer.noEmail')}</p>}
               {state === 'failed' && failure && <p role="alert" className="text-[12px] text-error-500">{t(`helpDrawer.failed.${failure}`)}</p>}
               <div className="flex items-start justify-between gap-3">
                 <p className="max-w-[260px] text-[11px] leading-relaxed text-fg-tertiary">{t('helpDrawer.note')}</p>
-                <Button size="sm" onClick={send} disabled={!canSend} loading={state === 'sending'}>{t('helpDrawer.send')}</Button>
+                <Button size="sm" onClick={send} disabled={!senderReady} aria-describedby={senderReady ? undefined : 'help-no-sender'} loading={state === 'sending'}>{t('helpDrawer.send')}</Button>
               </div>
             </>
           )}
