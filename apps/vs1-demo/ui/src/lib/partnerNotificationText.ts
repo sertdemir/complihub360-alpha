@@ -15,6 +15,8 @@ export function partnerNotificationText(t: TFunction, n: PartnerNotification, lo
     : '';
   const vars = {
     slot: when(p.slot),
+    // Verschiebung: der alte Termin (Absage/Verschiebung durch den Nutzer, 2026-10-11).
+    from: when(p.from),
     offset,
     amount: p.amount ? money(Number(p.amount)) : '',
     label: n.type === 'evidence_expiring' ? t(`application.evidence.type.${p.label}`, { defaultValue: p.label ?? '' }) : (p.label ?? ''),

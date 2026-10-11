@@ -17,4 +17,10 @@ describe('partnerNotificationText', () => {
     expect(r.body).toContain('application.evidence.type.insurance');
     expect(r.body).toContain('Nov');
   });
+  it('nennt bei einer Verschiebung alten und neuen Termin', () => {
+    const r = partnerNotificationText(t, n('booking_rescheduled', { from: '2026-10-12T09:00:00Z', slot: '2026-10-14T13:00:00Z' }), 'en');
+    expect(r.body).toContain('partnerNotif.booking_rescheduled.body');
+    expect(r.body).toContain('Oct 12');
+    expect(r.body).toContain('Oct 14');
+  });
 });

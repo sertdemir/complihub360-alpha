@@ -739,6 +739,8 @@ function partnerNotifications() {
     n(1, 'booking_created', { providerKey: PARTNER_KEY, slot: iso(2, 11) }, 0.05, false),
     n(2, 'payment_failed', { providerKey: PARTNER_KEY }, 1, false, READINESS.reasons.includes('payment_failed')),
     n(3, 'invoice_retry_scheduled', { providerKey: PARTNER_KEY, label: 'INV-2026-009', deadline: iso(7).slice(0, 10) }, 2, false, true),
+    n(8, 'booking_cancelled', { providerKey: PARTNER_KEY, slot: iso(3, 10) }, 4, false),
+    n(9, 'booking_rescheduled', { providerKey: PARTNER_KEY, from: iso(4, 9), slot: iso(5, 14) }, 8, true),
     n(4, 'appointment_reminder', { providerKey: PARTNER_KEY, slot: iso(1, 12), offset: '1440' }, 26, true),
     n(5, 'evidence_expiring', { providerKey: PARTNER_KEY, label: 'insurance', to: iso(23).slice(0, 10) }, 30, true),
     n(6, 'subscription_scheduled', { providerKey: PARTNER_KEY, effectiveOn: iso(25).slice(0, 10) }, 31, true),
