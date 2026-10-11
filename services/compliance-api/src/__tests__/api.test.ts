@@ -2714,6 +2714,89 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         expect(db.providers[0].lifecycle_status).toBe('limited');
     });
 
+    it('Zell-Freigabe in Steuer/Recht nur mit gepruefter Zulassung fuer das Land — sonst 422, nichts geaendert', async () => {
+        seedApplicant();
+        await fillDossier();
+        const svc = await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'tax-vat.returns' }) });
+        await own(`/services/${svc.body.service.id}/coverage`, { method: 'PUT', body: JSON.stringify({ countries: ['DE', 'AT'] }) });
+        const de = db.provider_service_coverage.find((c: any) => c.service_id === svc.body.service.id && c.country_code === 'DE');
+        const vorher = { ...de };
+        const logVorher = (db.provider_review_log ?? []).length;
+
+        for (const action of ['approve', 'limit']) {
+            const r = await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${de.id}`, { method: 'POST', body: JSON.stringify({ action, reason: 'nur Umsatzsteuer' }) });
+            expect(r.status).toBe(422);
+            expect(r.body).toMatchObject({
+                errorCode: 'LICENCE_REQUIRED',
+                message: 'A tax or legal service needs a reviewed licence for this country before the cell can be approved.',
+                area: 'tax-vat', country: 'DE',
+            });
+            expect(typeof r.body.correlationId).toBe('string');
+        }
+        expect(db.provider_service_coverage.find((c: any) => c.id === de.id)).toEqual(vorher);
+        expect((db.provider_review_log ?? []).length).toBe(logVorher);
+
+        // Hochgeladen reicht nicht, und eine AT-Zulassung deckt DE nicht.
+        db.provider_evidence.push(
+            { id: randomUUID(), provider_key: 'neue-kanzlei', evidence_type: 'professional_licence', source: 'document', result: 'received', upload_confirmed: true, supports_service_codes: ['tax-vat'], supports_countries: ['DE'] },
+            { id: randomUUID(), provider_key: 'neue-kanzlei', evidence_type: 'professional_licence', source: 'document', result: 'reviewed', upload_confirmed: true, supports_service_codes: ['tax-vat'], supports_countries: ['AT'], expires_at: '2099-01-01' },
+        );
+        expect((await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${de.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) })).status).toBe(422);
+
+        // Ablehnen, Pausieren, Wiedereroeffnen bleiben ohne Zulassung moeglich.
+        const at = db.provider_service_coverage.find((c: any) => c.service_id === svc.body.service.id && c.country_code === 'AT');
+        expect((await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${at.id}`, { method: 'POST', body: JSON.stringify({ action: 'reject', reason: 'Keine Zulassung' }) })).status).toBe(200);
+    });
+
+    it('mit gepruefter Zulassung: 200, und die Zelle laeuft mit der Zulassung ab', async () => {
+        seedApplicant();
+        await fillDossier();
+        const svc = await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'tax-vat.returns' }) });
+        await own(`/services/${svc.body.service.id}/coverage`, { method: 'PUT', body: JSON.stringify({ countries: ['DE', 'AT'] }) });
+        const lizenz = randomUUID();
+        db.provider_evidence.push({ id: lizenz, provider_key: 'neue-kanzlei', evidence_type: 'professional_licence', source: 'document', result: 'reviewed', upload_confirmed: true, supports_service_codes: ['tax-vat'], supports_countries: ['DE', 'AT'], expires_at: '2099-03-31' });
+        const de = db.provider_service_coverage.find((c: any) => c.service_id === svc.body.service.id && c.country_code === 'DE');
+        const at = db.provider_service_coverage.find((c: any) => c.service_id === svc.body.service.id && c.country_code === 'AT');
+
+        const ok = await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${de.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
+        expect(ok.status).toBe(200);
+        expect(db.provider_service_coverage.find((c: any) => c.id === de.id)).toMatchObject({ status: 'approved', expires_at: '2099-03-31' });
+        expect(db.provider_review_log.some((l: any) => l.subject === 'evidence' && l.subject_id === lizenz && l.action === 'licence_for_cell' && l.to_value === `${de.id}:DE`)).toBe(true);
+
+        // Ein frueheres Datum des Reviewers gewinnt, ein spaeteres nicht.
+        await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${at.id}`, { method: 'POST', body: JSON.stringify({ action: 'limit', reason: 'nur Erklaerungen', expires_at: '2100-01-01' }) });
+        expect(db.provider_service_coverage.find((c: any) => c.id === at.id)).toMatchObject({ status: 'limited', expires_at: '2099-03-31' });
+        await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${at.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve', expires_at: '2098-12-31' }) });
+        expect(db.provider_service_coverage.find((c: any) => c.id === at.id)).toMatchObject({ status: 'approved', expires_at: '2098-12-31' });
+    });
+
+    it('Datenschutz braucht keine Zulassung; das Dossier sagt je Leistung und Zelle, was gilt', async () => {
+        seedApplicant();
+        const privacyId = await fillDossier();
+        const svc = await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'tax-vat.returns' }) });
+        await own(`/services/${svc.body.service.id}/coverage`, { method: 'PUT', body: JSON.stringify({ countries: ['DE', 'AT'] }) });
+        db.provider_evidence.push({ id: randomUUID(), provider_key: 'neue-kanzlei', evidence_type: 'professional_licence', source: 'document', result: 'independently_verified', upload_confirmed: true, supports_service_codes: ['tax-vat'], supports_countries: ['DE'], expires_at: '2099-03-31' });
+        db.provider_evidence.push({ id: randomUUID(), provider_key: 'neue-kanzlei', evidence_type: 'professional_licence', source: 'document', result: 'expired', upload_confirmed: true, supports_service_codes: ['tax-vat'], supports_countries: ['AT'], expires_at: '2026-01-31' });
+
+        const privacy = db.provider_service_coverage.find((c: any) => c.service_id === privacyId);
+        const frei = await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${privacy.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
+        expect(frei.status).toBe(200);
+        expect(db.provider_service_coverage.find((c: any) => c.id === privacy.id).status).toBe('approved');
+
+        const d = await adminApi('/api/v1/admin/review/neue-kanzlei');
+        expect(d.status).toBe(200);
+        const datenschutz = d.body.matrix.find((m: any) => m.service_id === privacyId);
+        expect(datenschutz.regulated).toBe(false);
+        expect(datenschutz.cells[0].licence).toEqual({ required: false, state: 'not_required', expires_at: null });
+        const steuer = d.body.matrix.find((m: any) => m.service_id === svc.body.service.id);
+        expect(steuer.regulated).toBe(true);
+        const byLand = Object.fromEntries(steuer.cells.map((c: any) => [c.country_code, c.licence]));
+        expect(byLand).toEqual({
+            DE: { required: true, state: 'reviewed', expires_at: '2099-03-31' },
+            AT: { required: true, state: 'expired', expires_at: '2026-01-31' },
+        });
+    });
+
     it('verbietet Statuswechsel, die kein Reviewer setzt', async () => {
         seedApplicant();
         const r = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'submitted' }) });
@@ -3162,6 +3245,31 @@ describe('POST /api/v1/market-requests', () => {
         expect(byMarket).toEqual({ AR: 'de', BR: null });
     });
 
+    it('takes an update for provider coverage in an assessed market — with an account', async () => {
+        const res = await post({ market: 'DE', domains: ['tax-vat'], reason: 'provider_coverage', notify: true, locale: 'en' }, 'jwt');
+        expect(res.status).toBe(200);
+        expect(res.body).toMatchObject({ ok: true, market: 'DE', notify: true, reason: 'provider_coverage' });
+        const rows = db.market_requests ?? [];
+        expect(rows).toHaveLength(1);
+        expect(rows[0]).toMatchObject({ requester_key: `user:${USER_ID}`, market: 'DE', domains: ['tax-vat'], notify: true, reason: 'provider_coverage' });
+        expect(Object.keys(rows[0])).not.toContain('email');
+    });
+
+    it('refuses an update for provider coverage to a guest', async () => {
+        const res = await post({ market: 'DE', domains: ['tax-vat'], reason: 'provider_coverage', notify: true, guest_key: 'guest-abc-123' });
+        expect(res.status).toBe(403);
+        expect(res.body.errorCode).toBe('NOTIFY_REQUIRES_ACCOUNT');
+        expect(db.market_requests ?? []).toHaveLength(0);
+    });
+
+    it('a second coverage request for the same market keeps the first area and the update', async () => {
+        await post({ market: 'DE', domains: ['tax-vat'], reason: 'provider_coverage', notify: true }, 'jwt');
+        await post({ market: 'DE', domains: ['data-privacy'], reason: 'provider_coverage' }, 'jwt');
+        const rows = db.market_requests ?? [];
+        expect(rows).toHaveLength(1);
+        expect(rows[0]).toMatchObject({ domains: ['tax-vat', 'data-privacy'], notify: true, reason: 'provider_coverage' });
+    });
+
     it('answers broken JSON with 400 and a reference', async () => {
         const res = await api('/api/v1/market-requests', { method: 'POST', auth: 'none', body: '{broken' });
         expect(res.status).toBe(400);
@@ -3298,6 +3406,108 @@ describe('Watcher: Markt-Update', () => {
             'Dies ist die einzige E-Mail, die wir zu dieser Anfrage senden.',
         ].join('\n'));
         expect(renderMarketCoveredMail('BR', 'xx').subject).toBe(en.subject);
+    });
+
+    // ─── Zweig provider_coverage (Canvas C2, "Request More Coverage") ──────
+    const providerMails = () => (db.event_log ?? []).filter((e) => e.payload?.kind === 'provider_covered');
+    const seedCoverageRequest = () => {
+        db.auth_users = [{ id: USER_ID, email: 'jana@example.com', email_confirmed_at: '2026-09-01T00:00:00Z' }];
+        db.market_requests = [
+            { id: 'mr-cov', requester_key: `user:${USER_ID}`, user_id: USER_ID, guest_key: null, market: 'DE', domains: ['tax-vat', 'data-privacy'], notify: true, notified_at: null, locale: 'de', reason: 'provider_coverage' },
+            { id: 'mr-cov-no', requester_key: 'user:00000000-0000-4000-8000-0000000000c3', user_id: '00000000-0000-4000-8000-0000000000c3', guest_key: null, market: 'DE', domains: ['tax-vat'], notify: false, notified_at: null, locale: null, reason: 'provider_coverage' },
+        ];
+    };
+
+    it('provider coverage: no mail while no verified provider covers a requested area there — and never the market mail', async () => {
+        seedCoverageRequest();
+        // Ein Anbieter in DE, aber fuer einen anderen Bereich; einer fuer tax-vat, aber in AT.
+        seedProvider({ provider_key: 'nur-umwelt', areas: ['environment'], countries_supported: ['DE'] });
+        seedProvider({ provider_key: 'nur-at', areas: ['tax-vat'], countries_supported: ['AT'] });
+        process.env.WATCHERS_SHADOW = 'false';
+        try {
+            const r = await tick();
+            expect(r.body.summary.providerCoveredNotices).toBe(0);
+            expect(r.body.summary.marketCoveredNotices).toBe(0);
+            expect(providerMails()).toHaveLength(0);
+            expect(mails()).toHaveLength(0);
+            expect(db.market_requests.find((x: any) => x.id === 'mr-cov').notified_at).toBeNull();
+        } finally {
+            delete process.env.WATCHERS_SHADOW;
+        }
+    });
+
+    it('provider coverage: mails exactly once after a verified provider appears', async () => {
+        seedCoverageRequest();
+        process.env.WATCHERS_SHADOW = 'false';
+        try {
+            await tick();
+            expect(providerMails()).toHaveLength(0);
+            seedProvider({ provider_key: 'neu-de', areas: ['tax-vat'], countries_supported: ['DE'] });
+            const r1 = await tick();
+            expect(r1.body.summary.providerCoveredNotices).toBe(1);
+            const r2 = await tick();
+            expect(r2.body.summary.providerCoveredNotices).toBe(0);
+            const sent = providerMails();
+            expect(sent).toHaveLength(1);
+            expect(sent[0].type).toBe('email_outbox');
+            expect(sent[0].payload).toMatchObject({ requestId: 'mr-cov', market: 'DE', to: 'jana@example.com' });
+            // Nur der abgedeckte Bereich, auf Englisch (EN zuerst), Link auf die Risk Maps.
+            expect(sent[0].payload.subject).toBe('Verified provider coverage for Tax and VAT in Germany');
+            expect(sent[0].payload.text).toContain('/en/dashboard/sessions');
+            expect(JSON.stringify(sent[0].payload)).not.toContain('neu-de');
+            expect(db.market_requests.find((x: any) => x.id === 'mr-cov').notified_at).toBeTruthy();
+            // Ohne bestelltes Update: nichts.
+            expect(db.market_requests.find((x: any) => x.id === 'mr-cov-no').notified_at).toBeNull();
+            expect(mails()).toHaveLength(0);
+        } finally {
+            delete process.env.WATCHERS_SHADOW;
+        }
+    });
+
+    it('provider coverage: two passes at the same time send one mail (claim before send)', async () => {
+        seedCoverageRequest();
+        seedProvider({ provider_key: 'neu-de', areas: ['tax-vat'], countries_supported: ['DE'] });
+        const { runMarketCoverageTick } = await import('../watchers.js');
+        const { supabaseApi } = await import('../supabase.js');
+        const original = supabaseApi.select.bind(supabaseApi);
+        const spy = vi.spyOn(supabaseApi, 'select').mockImplementation(async (...args: Parameters<typeof original>) =>
+            JSON.parse(JSON.stringify(await original(...args))));
+        try {
+            const [a, b] = await Promise.all([runMarketCoverageTick(false), runMarketCoverageTick(false)]);
+            expect(a.providerNotices + b.providerNotices).toBe(1);
+            expect(providerMails()).toHaveLength(1);
+        } finally {
+            spy.mockRestore();
+        }
+    });
+
+    it('provider coverage: shadow mode only marks', async () => {
+        seedCoverageRequest();
+        seedProvider({ provider_key: 'neu-de', areas: ['tax-vat'], countries_supported: ['DE'] });
+        await tick();
+        await tick();
+        expect(providerMails()).toHaveLength(0);
+        expect((db.event_log ?? []).filter((e) => e.type === 'provider_covered_notice_shadow')).toHaveLength(1);
+        expect(db.market_requests.find((x: any) => x.id === 'mr-cov').notified_at).toBeNull();
+    });
+
+    it('provider coverage: says what is covered, what happens next, and that this is the only mail (copy not yet approved)', async () => {
+        const { renderProviderCoveredMail } = await import('../mailer.js');
+        const url = `${(process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '')}/en/dashboard/sessions`;
+        const alle = renderProviderCoveredMail({ market: 'DE', requested: ['Tax and VAT'], covered: ['Tax and VAT'], locale: 'en' });
+        expect(alle.subject).toBe('Verified provider coverage for Tax and VAT in Germany');
+        expect(alle.text).toBe([
+            'You asked us to let you know when a verified provider covers Tax and VAT in Germany. This is now the case.',
+            '',
+            'You can review your provider options in your Risk Map. Nothing is shared with a provider until you choose one and book.',
+            '',
+            `→ Open my Risk Maps: ${url}`,
+            '',
+            'This is the only email we send about this request.',
+        ].join('\n'));
+        const teil = renderProviderCoveredMail({ market: 'DE', requested: ['Tax and VAT', 'Data and Privacy'], covered: ['Tax and VAT'], locale: 'tr' });
+        expect(teil.subject).toBe('Verified provider coverage for Tax and VAT in Germany');
+        expect(teil.text.split('\n')[0]).toBe('You asked us to let you know when a verified provider covers Tax and VAT, Data and Privacy in Germany. This is now the case for Tax and VAT.');
     });
 
     it('in shadow mode only marks — no mail, the row stays open', async () => {

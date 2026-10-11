@@ -209,7 +209,7 @@ paths:
         '503': { description: Postfach oder Versand nicht konfiguriert — nichts angekommen }
   /market-requests:
     post:
-      summary: Request a market the engine does not cover yet
+      summary: Request a market the engine does not cover yet, or provider coverage in an assessed one
       description: >-
         Aktion „Request This Market“ des Zustands `marketUnavailable`. Oeffentlich
         (Gast mit `guest_key`) oder mit JWT; die Identitaet kommt nur aus dem
@@ -218,10 +218,26 @@ paths:
         Verfuegbarkeit (`notify`) gibt es nur mit Konto; fuer Gaeste wird keine
         E-Mail gespeichert.
 
-        Versand: Sobald die Engine den Markt prueft, schickt der Watcher je
-        Zeile mit `notify` genau eine Mail an die bestaetigte Adresse des
-        Kontos (aus `auth.users`, erst beim Versand gelesen) und setzt
-        `notified_at`.
+        Jede Zeile haelt ihren Grund (`reason`, Spalte seit 20261012000000).
+        Er folgt aus dem Markt, nicht aus dem Body: ein Markt, den die Engine
+        nicht prueft, ist `market`; ein gepruefter Markt ist nur mit
+        `reason: provider_coverage` und mindestens einem Bereich erlaubt und
+        wird `provider_coverage`.
+
+        Versand: genau eine Mail je Zeile mit `notify` an die bestaetigte
+        Adresse des Kontos (aus `auth.users`, erst beim Versand gelesen; in
+        `market_requests` steht keine Adresse), danach `notified_at`.
+        `market`: sobald die Engine den Markt prueft. `provider_coverage`:
+        sobald `matchable_provider_services` im Markt mindestens einen der
+        angefragten Bereiche abdeckt; die Mail nennt nur die abgedeckten
+        Bereiche (Englisch, andere Sprachen fallen auf EN zurueck).
+
+        Wiederholung (eine Zeile je Anfragendem und Markt, mergeMarketRequest):
+        `market` auf `market` ersetzt Bereiche und `notify` wie bisher. Sonst
+        werden die Bereiche einer noch offenen Zeile vereinigt, ein bestelltes
+        Update bleibt bestellt und `provider_coverage` bleibt erhalten. Ist die
+        Mail schon raus, ist die Wiederholung eine neue Anfrage (`notified_at`
+        wird geleert).
       parameters:
         - $ref: '#/components/parameters/CorrelationId'
       requestBody:
@@ -249,7 +265,11 @@ paths:
                 notify:
                   type: boolean
                   default: false
-                  description: Update per Mail, sobald der Markt abgedeckt ist — nur mit Konto
+                  description: >-
+                    Ein Update per Mail — nur mit Konto (Gast → 403
+                    `NOTIFY_REQUIRES_ACCOUNT`). `market`: wenn der Markt
+                    geprueft wird; `provider_coverage`: wenn ein freigegebener
+                    Anbieter dort einen der Bereiche abdeckt.
                 locale:
                   type: string
                   enum: [en, de, es, tr]
@@ -265,8 +285,9 @@ paths:
                     Markt ist geprueft, aber kein freigegebener Anbieter deckt
                     die genannten `domains` dort ab. Erlaubt dann auch einen
                     bekannten Markt (sonst 409 `MARKET_COVERED`); `domains` ist
-                    Pflicht, `notify` wird ignoriert — ein Update dafuer gibt es
-                    nicht.
+                    Pflicht. Mit Konto ist `notify` erlaubt (seit 2026-10-11).
+                    Fuer einen ungeprueften Markt wird der Wert ignoriert — die
+                    Zeile ist dann `market`.
       responses:
         '200':
           description: Anfrage gespeichert (neu oder aktualisiert)
@@ -284,6 +305,10 @@ paths:
                     type: string
                   notify:
                     type: boolean
+                    description: Der gespeicherte Stand nach dem Zusammenfuehren
+                  reason:
+                    type: string
+                    enum: [market, provider_coverage]
         '400':
           description: Body kein JSON (`INVALID_JSON`), Markt falsch geformt oder `guest_key` fehlt (`VALIDATION_ERROR`)
           headers:
@@ -1649,11 +1674,55 @@ paths:
   /admin/review/{key}:
     get:
       summary: Dossier fuer den Reviewer (Canvas 7A)
-      description: Alles aus dem Anbieter-Dossier plus provider_confidential, je bestaetigtem Dokument eine signierte Download-URL (zehn Minuten), Registerergebnis (VIES), Gate-Stand, vollstaendiges Protokoll.
+      description: >-
+        Alles aus dem Anbieter-Dossier plus provider_confidential, je bestaetigtem
+        Dokument eine signierte Download-URL (zehn Minuten), Registerergebnis
+        (VIES), Gate-Stand, vollstaendiges Protokoll.
+
+        `matrix[]` traegt je Leistung `regulated` (Steuer/Recht, isRegulatedArea)
+        und je Zelle `licence {required, state, expires_at}` aus licenceForCell
+        (verificationRules.ts): `state` ist not_required | reviewed | missing |
+        expired; `expires_at` ist der Ablauf der tragenden (bzw. zuletzt
+        abgelaufenen) Zulassung, null = kein Ablauf. Dieselben Felder liefert
+        GET /provider/{key}/verification.
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       responses:
-        '200': { description: Dossier mit gate }
+        '200':
+          description: Dossier mit gate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  matrix:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        service_id: { type: string, format: uuid }
+                        service_code: { type: string }
+                        service_name: { type: string }
+                        status: { type: string }
+                        regulated: { type: boolean, description: Bereich verlangt eine Zulassung je Land (tax-vat, legal-advisory) }
+                        cells:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              coverage_id: { type: string, format: uuid }
+                              country_code: { type: string }
+                              jurisdiction_code: { type: string, nullable: true }
+                              status: { type: string }
+                              limitations: { type: string, nullable: true }
+                              approved_at: { type: string, format: date-time, nullable: true }
+                              expires_at: { type: string, nullable: true }
+                              licence:
+                                type: object
+                                properties:
+                                  required: { type: boolean }
+                                  state: { type: string, enum: [not_required, reviewed, missing, expired] }
+                                  expires_at: { type: string, format: date, nullable: true }
         '403': { description: Kein Admin }
         '404': { description: Unbekannt }
 
@@ -1692,7 +1761,23 @@ paths:
   /admin/review/{key}/coverage/{id}:
     post:
       summary: Zell-Aktion Leistung × Land (Canvas 8A)
-      description: approve|limit|reject|pause|request_info|reopen. Alles ausser approve/reopen braucht reason — der Anbieter liest ihn. request_info legt eine provider_evidence_requests-Zeile an und setzt das Konto auf more_info_required. Der Leistungsstatus folgt seinen Zellen (approved / limited / pending_verification). Benachrichtigt den Dashboard-Login des Anbieters.
+      description: >-
+        approve|limit|reject|pause|request_info|reopen. Alles ausser approve/reopen
+        braucht reason — der Anbieter liest ihn. request_info legt eine
+        provider_evidence_requests-Zeile an und setzt das Konto auf
+        more_info_required. Der Leistungsstatus folgt seinen Zellen (approved /
+        limited / pending_verification). Benachrichtigt den Dashboard-Login des
+        Anbieters.
+
+        Regulierte Bereiche (tax-vat, legal-advisory): approve und limit
+        verlangen eine `professional_licence` mit Ergebnis reviewed oder
+        independently_verified, nicht abgelaufen, fuer diesen Bereich UND dieses
+        Land (licenceForCell). Fehlt sie, 422 `LICENCE_REQUIRED` und nichts wird
+        geschrieben. Mit Zulassung uebernimmt die Zelle deren `expires_at` —
+        oder das fruehere aus Body und Zulassung; die Zulassung wird als
+        eigener Protokolleintrag (subject evidence, action licence_for_cell)
+        festgehalten. reject, pause, request_info und reopen bleiben ohne
+        Zulassung moeglich.
       security: [ { bearerAuth: [] } ]
       parameters:
         - { name: key, in: path, required: true, schema: { type: string } }
@@ -1715,6 +1800,18 @@ paths:
         '200': { description: coverage, service_status }
         '201': { description: request angelegt (request_info) }
         '400': { description: Grund fehlt }
+        '422':
+          description: LICENCE_REQUIRED — approve/limit in einem regulierten Bereich ohne gepruefte Zulassung fuer dieses Land
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode: { type: string, enum: [LICENCE_REQUIRED] }
+                  message: { type: string, example: 'A tax or legal service needs a reviewed licence for this country before the cell can be approved.' }
+                  area: { type: string, example: tax-vat }
+                  country: { type: string, example: DE }
+                  correlationId: { type: string }
 
   /admin/review/{key}/lifecycle:
     post:

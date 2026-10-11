@@ -7,7 +7,7 @@ import { runSubscriptionPeriodTick } from "./subscriptions.js";
 import { runScheduledChanges } from "./changeSchedule.js";
 import { runAppointmentReminderTick, runRebookTick } from "./attendanceWatch.js";
 import { isKnownCountry } from "@complihub/compliance-engine";
-import { sendMagicLinkMail, sendReviewMail, sendMarketCoveredMail } from "./mailer.js";
+import { sendMagicLinkMail, sendReviewMail, sendMarketCoveredMail, sendProviderCoveredMail } from "./mailer.js";
 import { notify } from "./notifications.js";
 
 // ─── SLA Watchers (Beta) ──────────────────────────────────────────────────────
@@ -84,6 +84,7 @@ export interface TickSummary {
     evidenceExpired: number;
     reverificationDue: number;
     marketCoveredNotices: number;
+    providerCoveredNotices: number;
     billingSynced: number;
     subscriptionPeriodsRolled: number;
     scheduledChangesApplied: number;
@@ -186,7 +187,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, providerCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0 };
 
     let engagements: Engagement[];
     try {
@@ -376,10 +377,12 @@ export async function runWatcherTick(): Promise<TickSummary> {
         summary.errors += ir.errors;
     } catch { summary.errors++; }
 
-    // Markt-Update: angefragte Maerkte, die die Engine inzwischen prueft.
+    // Markt-Update: angefragte Maerkte, die die Engine inzwischen prueft —
+    // und angefragte Bereiche, die dort inzwischen ein Anbieter abdeckt.
     try {
         const mc = await runMarketCoverageTick(shadow);
         summary.marketCoveredNotices = mc.notices;
+        summary.providerCoveredNotices = mc.providerNotices;
         summary.errors += mc.errors;
     } catch { summary.errors++; }
 
@@ -652,15 +655,49 @@ export async function runEvidenceTick(shadow: boolean): Promise<EvidenceTickCoun
 // Die Adresse wird erst jetzt gelesen, aus auth.users
 // (auth_user_email_by_id, 20261001184141) — market_requests speichert keine.
 // Shadow schreibt nur Marker und fasst weder Zeile noch Postfach an.
+//
+// Zweiter Zweig seit 20261012000000 (reason = 'provider_coverage', Canvas C2
+// "Request More Coverage"): der Markt ist geprueft, aber zur Anfrage deckte
+// kein freigegebener Anbieter die genannten Bereiche ab. Faellig ist die Zeile,
+// sobald matchable_provider_services fuer diesen Markt eine Zeile mit einem
+// der Bereiche hat — dieselbe Grenze, die entscheidet, wer in der Suche
+// erscheint. Gleiche Regeln: Claim vor Versand, Adresse erst jetzt, Shadow
+// nur Marker. Zeilen ohne `reason` (vor der Migration) sind Laender-Anfragen.
 
-type MarketRequestRow = { id: string; user_id: string | null; market: string; notify: boolean; notified_at: string | null; locale?: string | null };
+type MarketRequestRow = { id: string; user_id: string | null; market: string; notify: boolean; notified_at: string | null; locale?: string | null; reason?: string | null; domains?: string[] | null };
 
-export interface MarketCoverageCounts { notices: number; errors: number }
+export interface MarketCoverageCounts { notices: number; providerNotices: number; errors: number }
+
+/** Beansprucht die Zeile (notified_at, nur solange leer) — true, wenn dieser Takt sie hat. */
+async function claimMarketRequest(id: string): Promise<boolean> {
+    const claimed = (await supabaseApi.updateWhere("market_requests",
+        { id: `eq.${id}`, notified_at: "is.null" },
+        { notified_at: new Date().toISOString() })) as unknown[];
+    return Array.isArray(claimed) && claimed.length === 1;
+}
+
+/** Bestaetigte Adresse des Logins, erst beim Versand gelesen (auth_user_email_by_id). */
+async function requesterEmail(userId: string | null): Promise<string | null> {
+    // Skalar wie bei auth_user_id_by_email (providerAuth.ts): PostgREST
+    // liefert den Wert selbst; die Zeilenform wird mitgelesen.
+    const roh = await supabaseApi.rpc("auth_user_email_by_id", { p_user_id: userId });
+    const email = Array.isArray(roh) ? (roh[0] as Record<string, unknown> | undefined)?.auth_user_email_by_id : roh;
+    return typeof email === "string" && email ? email : null;
+}
 
 export async function runMarketCoverageTick(shadow: boolean): Promise<MarketCoverageCounts> {
-    const counts: MarketCoverageCounts = { notices: 0, errors: 0 };
+    const counts: MarketCoverageCounts = { notices: 0, providerNotices: 0, errors: 0 };
     const rows = (await supabaseApi.select("market_requests", { notify: true }, { limit: 5000 })) as MarketRequestRow[];
-    const due = rows.filter((r) => r.user_id && !r.notified_at && isKnownCountry(r.market));
+    const open = rows.filter((r) => r.user_id && !r.notified_at);
+    const isCoverage = (r: MarketRequestRow) => r.reason === "provider_coverage";
+    const due = open.filter((r) => !isCoverage(r) && isKnownCountry(r.market));
+    try {
+        await runProviderCoverage(open.filter((r) => isCoverage(r) && (r.domains ?? []).length), shadow, counts);
+    } catch {
+        // Ein Lesefehler im zweiten Zweig haelt den ersten nicht auf.
+        structuredLog("error", "Provider coverage pass failed", { correlationId: "watchers", errorCode: "ERR_PROVIDER_NOTICE", severity: "error", route: "watchers/market-coverage" });
+        counts.errors++;
+    }
     if (!due.length) return counts;
 
     const shadowSeen = new Set<string>();
@@ -677,15 +714,8 @@ export async function runMarketCoverageTick(shadow: boolean): Promise<MarketCove
                 counts.notices++;
                 continue;
             }
-            const claimed = (await supabaseApi.updateWhere("market_requests",
-                { id: `eq.${r.id}`, notified_at: "is.null" },
-                { notified_at: new Date().toISOString() })) as unknown[];
-            if (!Array.isArray(claimed) || claimed.length !== 1) continue; // ein anderer Takt war schneller
-            // Skalar wie bei auth_user_id_by_email (providerAuth.ts): PostgREST
-            // liefert den Wert selbst; die Zeilenform wird mitgelesen.
-            const roh = await supabaseApi.rpc("auth_user_email_by_id", { p_user_id: r.user_id });
-            const email = Array.isArray(roh) ? (roh[0] as Record<string, unknown> | undefined)?.auth_user_email_by_id : roh;
-            await sendMarketCoveredMail({ to: typeof email === "string" && email ? email : null, requestId: r.id, market: r.market, locale: r.locale });
+            if (!(await claimMarketRequest(r.id))) continue; // ein anderer Takt war schneller
+            await sendMarketCoveredMail({ to: await requesterEmail(r.user_id), requestId: r.id, market: r.market, locale: r.locale });
             await mark("market_covered_notice", false, { requestId: r.id, market: r.market });
             counts.notices++;
         } catch {
@@ -694,4 +724,53 @@ export async function runMarketCoverageTick(shadow: boolean): Promise<MarketCove
         }
     }
     return counts;
+}
+
+/** Der Zweig 'provider_coverage': faellig, sobald ein freigegebener Anbieter im Markt einen der Bereiche abdeckt. */
+async function runProviderCoverage(rows: MarketRequestRow[], shadow: boolean, counts: MarketCoverageCounts): Promise<void> {
+    if (!rows.length) return;
+    // Je Markt einmal: welche Bereiche deckt dort heute mindestens ein
+    // freigegebener Anbieter ab? Nur der Bereich zaehlt, nie wer oder wie viele.
+    const coveredIn = new Map<string, Set<string>>();
+    for (const market of new Set(rows.map((r) => r.market))) {
+        const view = (await supabaseApi.select("matchable_provider_services", { country_code: market }, { limit: 5000 })) as Array<{ area_code?: string | null }>;
+        coveredIn.set(market, new Set(view.map((v) => v.area_code).filter((a): a is string => !!a)));
+    }
+    const due = rows
+        .map((r) => ({ r, covered: (r.domains ?? []).filter((d) => coveredIn.get(r.market)?.has(d)) }))
+        .filter((x) => x.covered.length);
+    if (!due.length) return;
+
+    // Bereichsnamen aus der Taxonomie (service_categories.label_en), wie in der
+    // Suche; ohne Eintrag bleibt der Code.
+    const cats = (await supabaseApi.select("service_categories", {}, { limit: 500 })) as Array<{ code: string; parent_code?: string | null; label_en?: string | null }>;
+    const labels = new Map(cats.filter((c) => c.parent_code == null && c.code).map((c) => [c.code, c.label_en || c.code]));
+    const label = (code: string) => labels.get(code) ?? code;
+
+    const shadowSeen = new Set<string>();
+    if (shadow) {
+        const marks = (await supabaseApi.select("event_log", { type: markerType("provider_covered_notice", true) }, { limit: 5000 })) as EventRow[];
+        for (const m of marks) if (typeof m.payload?.requestId === "string") shadowSeen.add(m.payload.requestId as string);
+    }
+
+    for (const { r, covered } of due) {
+        try {
+            if (shadow) {
+                if (shadowSeen.has(r.id)) continue;
+                await mark("provider_covered_notice", true, { requestId: r.id, market: r.market, areas: covered });
+                counts.providerNotices++;
+                continue;
+            }
+            if (!(await claimMarketRequest(r.id))) continue; // ein anderer Takt war schneller
+            await sendProviderCoveredMail({
+                to: await requesterEmail(r.user_id), requestId: r.id, market: r.market,
+                requested: (r.domains ?? []).map(label), covered: covered.map(label), locale: r.locale,
+            });
+            await mark("provider_covered_notice", false, { requestId: r.id, market: r.market, areas: covered });
+            counts.providerNotices++;
+        } catch {
+            structuredLog("error", "Provider coverage notice failed", { correlationId: "watchers", errorCode: "ERR_PROVIDER_NOTICE", severity: "error", route: "watchers/market-coverage" });
+            counts.errors++;
+        }
+    }
 }

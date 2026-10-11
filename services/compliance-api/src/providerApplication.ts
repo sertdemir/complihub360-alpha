@@ -16,7 +16,7 @@ import {
 } from './changeControl.js';
 import { isPending, isUnreviewedPlan, parseEffectiveDate, withSchedule } from './changeSchedule.js';
 import {
-    areaCodeOf, evidenceChecklist, requiredEvidence, submitValidation, SUBMIT_AGREEMENTS,
+    areaCodeOf, evidenceChecklist, isRegulatedArea, licenceForCell, requiredEvidence, submitValidation, SUBMIT_AGREEMENTS,
     type ChecklistItem, type EvidenceType,
 } from './verificationRules.js';
 
@@ -834,13 +834,24 @@ async function submit(res: ServerResponse, correlationId: string, caller: Caller
 
 // ─── Verification Center (5B) ────────────────────────────────────────────────
 
-export function coverageMatrix(services: any[], coverage: any[]) {
+/**
+ * Die Matrix Leistung × Land. `regulated` und `licence` je Zelle kommen aus
+ * verificationRules (isRegulatedArea, licenceForCell) — Anbieter und Reviewer
+ * sehen dieselbe Antwort auf "ist diese Zelle freigebbar".
+ */
+export function coverageMatrix(services: any[], coverage: any[], evidence: any[]) {
+    const now = new Date();
     return services.filter((s) => s.status !== 'retired').map((s) => ({
         service_id: s.id, service_code: s.service_code, service_name: s.service_name, status: s.status,
-        cells: coverage.filter((c) => c.service_id === s.id).map((c) => ({
-            coverage_id: c.id, country_code: c.country_code, jurisdiction_code: c.jurisdiction_code ?? null,
-            status: c.status, limitations: c.limitations ?? null, approved_at: c.approved_at ?? null, expires_at: c.expires_at ?? null,
-        })),
+        regulated: isRegulatedArea(s.service_code),
+        cells: coverage.filter((c) => c.service_id === s.id).map((c) => {
+            const lic = licenceForCell({ serviceCode: s.service_code, countryCode: c.country_code, evidence, now });
+            return {
+                coverage_id: c.id, country_code: c.country_code, jurisdiction_code: c.jurisdiction_code ?? null,
+                status: c.status, limitations: c.limitations ?? null, approved_at: c.approved_at ?? null, expires_at: c.expires_at ?? null,
+                licence: { required: lic.required, state: lic.state, expires_at: lic.expiresAt ?? null },
+            };
+        }),
     }));
 }
 
@@ -855,7 +866,7 @@ async function verification(res: ServerResponse, correlationId: string, provider
             reason: d.provider.lifecycle_status_reason ?? null,
             reverification_due_at: d.provider.reverification_due_at ?? null, grace_until: d.provider.reverification_grace_until ?? null,
         },
-        matrix: coverageMatrix(d.services, d.coverage),
+        matrix: coverageMatrix(d.services, d.coverage, d.evidence),
         checklist: d.checklist,
         open_requests: d.requests,
         // Das Protokoll ohne Reviewer-IDs: der Anbieter sieht, WAS entschieden

@@ -17,7 +17,7 @@ import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } f
 import { handleDomain } from "./domain.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
-import { checkMarketRequest } from "./marketRequests.js";
+import { checkMarketRequest, mergeMarketRequest } from "./marketRequests.js";
 import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, revokeGrant, settingsUrl } from "./nylasAuth.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
@@ -2588,13 +2588,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 return;
             }
             try {
-                await supabaseApi.upsert('market_requests', 'requester_key,market', check.row);
+                // Eine Zeile je Anfragendem und Markt. Was eine Wiederholung mit
+                // der bestehenden Zeile macht, entscheidet mergeMarketRequest —
+                // ein offenes Update geht dabei nicht still verloren.
+                const existing = ((await supabaseApi.select('market_requests',
+                    { requester_key: check.row.requester_key, market: check.row.market }, { limit: 1 })) as any[])[0] ?? null;
+                const row = mergeMarketRequest(existing, check.row);
+                await supabaseApi.upsert('market_requests', 'requester_key,market', row);
                 await supabaseApi.insert('event_log', {
                     type: 'market_requested',
-                    payload: { market: check.row.market, account: !!check.row.user_id, notify: check.row.notify },
+                    payload: { market: row.market, account: !!row.user_id, notify: row.notify },
                 });
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, market: check.row.market, notify: check.row.notify }));
+                res.end(JSON.stringify({ ok: true, market: row.market, notify: row.notify, reason: row.reason }));
             } catch (err) {
                 structuredLog('error', 'Market request failed', { correlationId, errorCode: 'ERR_MARKET_REQUEST', severity: 'error', route: req.url, detail: String(err).slice(0, 500) });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
