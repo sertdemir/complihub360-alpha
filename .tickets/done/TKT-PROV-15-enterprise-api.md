@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 7 — Enterprise-API: api_clients, Scopes, gehashte Schlüssel, Rate Limits, Ereignis-Feed, Freigabe"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Provider Phase 7 — Enterprise-API
