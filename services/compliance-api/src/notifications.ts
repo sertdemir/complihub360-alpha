@@ -57,7 +57,10 @@ export type NotificationType =
     | 'subscription_schedule_done'   // Der Stichtag ist erreicht, es ist geschehen
     // ADR-0008 B2a: eine Abo-Rechnung ist faellig; wir versuchen an Tag 1/3/6
     // die hinterlegte Karte. Die Frist bleibt.
-    | 'invoice_retry_scheduled';
+    | 'invoice_retry_scheduled'
+    // Phase 7 (ADR-0010): Enterprise-API — Entscheidung des Teams an den Anbieter.
+    | 'api_access_decided'          // Zugang freigegeben oder abgelehnt (label: approved|rejected)
+    | 'api_access_suspended';       // Zugang ausgesetzt — mit Grund
 
 /**
  * Die erlaubten Nutzlast-Felder. Bewusst eine geschlossene Liste: alles, was
@@ -149,6 +152,26 @@ export async function notify(args: NotifyArgs): Promise<void> {
         structuredLog('info', 'Notification not stored', {
             correlationId: 'notify', errorCode: 'ERR_NOTIFY', severity: 'info', route: `notify/${type}`,
         });
+    }
+}
+
+/**
+ * Dieselbe Nachricht an jedes Mitglied eines Anbieters. Der dedupeKey wird je
+ * Mitglied ergaenzt — der Index ist (user_id, dedupe_key). Fehler beim Lesen
+ * der Mitglieder kippen die Route nicht: die Mail an den Anbieter geht
+ * unabhaengig davon.
+ */
+export async function notifyProviderMembers(
+    providerKey: string, actor: string | null, type: NotificationType, bookingId: string,
+    payload: PayloadFelder, dedupeKey: string,
+): Promise<void> {
+    try {
+        const members = (await supabaseApi.select('provider_members', { provider_key: providerKey }, { limit: 20 })) as Array<{ user_id: string }>;
+        for (const m of members) {
+            await notify({ to: m.user_id, actor, type, subject: 'booking', subjectId: bookingId, payload, dedupeKey: `${dedupeKey}:${m.user_id}` });
+        }
+    } catch {
+        structuredLog('info', 'Provider members not notified', { correlationId: 'notify', errorCode: 'ERR_NOTIFY', severity: 'info', route: `notify/${type}` });
     }
 }
 

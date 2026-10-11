@@ -1,6 +1,6 @@
 -- ─── Marktanfragen: wofuer die Anfrage steht ─────────────────────────────────
 --
--- Gehoert zu 20261012000000_market_request_reason.sql. Geprueft wird:
+-- Gehoert zu 20261012000100_market_request_reason.sql. Geprueft wird:
 --
 --   1. Ohne Angabe ist eine Anfrage 'market' — so bleiben die Altzeilen.
 --   2. Nur die beiden bekannten Gruende.

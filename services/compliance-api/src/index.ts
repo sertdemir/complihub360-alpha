@@ -20,12 +20,14 @@ import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { checkMarketRequest, mergeMarketRequest } from "./marketRequests.js";
 import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, revokeGrant, settingsUrl } from "./nylasAuth.js";
-import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
+import { notify, notifyProviderMembers, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
 import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
-import { loadAttendancePolicy, findRecentLead } from "./attendance.js";
+import { loadAttendancePolicy, findRecentLead, rebookDeadline } from "./attendance.js";
 import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
 import { handleProviderPerformance, handleProviderOverview, handleEnforcementAppeal, handleAdminEnforcement } from "./performanceRoutes.js";
+import { authenticateApiClient, clientRateLimiter, setRateLimitHeaders, logApiRequest, handleExtRoutes, handleProviderApiAccess, handleAdminApiAccess } from "./apiRoutes.js";
+import { looksLikeApiKey } from "./apiClients.js";
 import { loadPerformancePolicy, qualityFactor, availabilitySlots, bookingOpen, validateAvailabilityHours, validTimezone, incidentsInWindow } from "./performance.js";
 import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent, StripeError } from "./stripe.js";
 import { checkVatId } from "./vies.js";
@@ -239,6 +241,48 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
     const correlationId = normalizeCorrelationId(req.headers['x-correlation-id']);
 
+    // Phase 7 (ADR-0010): ein Enterprise-API-Client weist sich mit
+    // `Authorization: Bearer chk_live_…` aus. Er bekommt ausschliesslich
+    // /api/v1/ext/*, ein eigenes Limit je Client und eine Protokollzeile je
+    // Aufruf — und laeuft NICHT in die JWT-Kette unten: ein API-Schluessel ist
+    // kein Login und kein Server-Key.
+    const bearer = typeof req.headers['authorization'] === 'string' && req.headers['authorization'].startsWith('Bearer ')
+        ? req.headers['authorization'].substring(7) : '';
+    if (looksLikeApiKey(bearer)) {
+        const startedAt = Date.now();
+        const clientIp = typeof req.headers['x-forwarded-for'] === 'string'
+            ? (req.headers['x-forwarded-for'] as string).split(',')[0].trim() : (req.socket.remoteAddress || 'unknown');
+        res.setHeader('x-correlation-id', correlationId);
+        let auth;
+        try { auth = await authenticateApiClient(bearer); } catch {
+            structuredLog('error', 'API client auth failed', { correlationId, errorCode: 'ERR_API_AUTH', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'API authentication failed', correlationId }));
+            return;
+        }
+        if (!auth.ok) {
+            res.writeHead(auth.status, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: auth.code, message: auth.message, correlationId }));
+            return;
+        }
+        const apiClient = auth.client;
+        res.on('finish', () => { void logApiRequest({ client: apiClient, method: req.method || '', url: req.url || '', status: res.statusCode, durationMs: Date.now() - startedAt, correlationId, ip: clientIp }); });
+        if (!(req.url || '').startsWith('/api/v1/ext/')) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'API_ROUTE_FORBIDDEN', message: 'API keys may only call /api/v1/ext/* routes', correlationId }));
+            return;
+        }
+        const rl = clientRateLimiter.check(apiClient.id, apiClient.rate_limit_per_minute);
+        setRateLimitHeaders(res, rl);
+        if (!rl.allowed) {
+            res.writeHead(429, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'RATE_LIMIT_EXCEEDED', message: 'Too many requests for this API client', retry_after_seconds: rl.retryAfterSec, correlationId }));
+            return;
+        }
+        await handleExtRoutes(req, res, correlationId, apiClient);
+        return;
+    }
+
     // Caller identity from a valid Supabase JWT (phase ③ subscription gate).
     let authUserId: string | null = null;
     let authEmail: string | null = null;
@@ -418,6 +462,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     const forwardedIp = typeof req.headers['x-forwarded-for'] === 'string'
         ? (req.headers['x-forwarded-for'] as string).split(',')[0].trim() : (req.socket.remoteAddress || 'unknown');
     if (await handleProviderApplication(req, res, correlationId, caller, forwardedIp)) return;
+    // Phase 7 (ADR-0010): Enterprise-API — Antrag und Schluessel des Anbieters
+    // (hinter dem Ownership-Guard), Entscheidung des Teams (Admin-Gate).
+    {
+        const own = /^\/api\/v1\/provider\/([a-z0-9-]+)\/api-access(?:\/key|\/log)?$/.exec((req.url || '').split('?')[0]);
+        if (own && await handleProviderApiAccess(req, res, correlationId, own[1], authUserId)) return;
+        if (/^\/api\/v1\/admin\/(?:api-access|api-clients\/)/.test(req.url || '')) {
+            if (!authViaApiKey && !authIsAdmin) {
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(403, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Admin only', correlationId }));
+                return;
+            }
+            if (await handleAdminApiAccess(req, res, correlationId, authUserId)) return;
+        }
+    }
     if (await handleProviderReview(req, res, correlationId, caller)) return;
 
     if (req.method === 'POST' && req.url === '/api/compliance/check') {
@@ -1546,6 +1605,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         subject: 'booking', subjectId: bookingId,
                         payload: { providerRef: await refOf(b.provider_key), from: b.slot_start, to: start.toISOString() },
                     });
+                    // Partner-Glocke: Wer neu bucht, landet dort (booking_created) —
+                    // wer verschiebt, bisher nicht, nur per Mail (Testlauf 2026-10-11).
+                    await notifyProviderMembers(b.provider_key, authUserId, 'booking_rescheduled', bookingId,
+                        { providerKey: b.provider_key, from: b.slot_start, slot: start.toISOString() }, `booking_rescheduled:${bookingId}:${start.toISOString()}`);
                     // Notify the provider (fire-and-forget, in their language):
                     // the user moved the slot, the provider's calendar must not
                     // silently drift. Delivery problems are events, not errors.
@@ -1566,6 +1629,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
                 const jetzt = new Date().toISOString();
+                // Nutzer-Absage wie ein Nutzer-No-Show (Entscheidung 2026-10-11,
+                // ADR-0007 Ergaenzung): 14 Tage Neubuchung beim selben Anbieter,
+                // danach 30 % Guthaben fuer den Anbieter — der Waechter entscheidet.
+                // Nur fuer eine bestaetigte Buchung mit Lead-Gebuehr; no_show_by
+                // bleibt leer, damit die Absage nirgends als No-Show zaehlt und
+                // kein Widerspruchsweg entsteht. Keine Erinnerungen an den Nutzer:
+                // er hat sich bewusst entschieden.
+                const absageMitFrist = status === 'cancelled' && !authViaApiKey && b.status === 'confirmed' && !!b.lead_ledger_id;
+                const fristFelder = absageMitFrist
+                    ? { rebook_deadline: rebookDeadline(jetzt, (await loadAttendancePolicy(jetzt.slice(0, 10))).rebookDays), rebook_reminders_sent: 0 }
+                    : {};
                 // Wer abgesagt hat, wird mitgeschrieben. Ohne diese Spalte ist
                 // eine Absage des Mandanten von einer des Anbieters nicht zu
                 // unterscheiden — und damit jede Auswertung darueber Raterei
@@ -1578,6 +1652,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         // Auftrag des Betriebs, nicht des Anbieters.
                         ? { cancelled_by: authViaApiKey ? 'system' : 'user', cancelled_at: jetzt }
                         : {}),
+                    ...fristFelder,
                 });
                 const evType = status === 'cancelled' ? 'user_cancelled' : status === 'no_show' ? 'no_show' : 'outcome_check';
                 await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });
@@ -1602,6 +1677,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         subject: 'booking', subjectId: bookingId,
                         payload: { providerRef: await refOf(b.provider_key), from: b.slot_start },
                     });
+                    // Partner-Glocke: dieselbe Luecke wie beim Verschieben — die Absage
+                    // kam nur als Mail, die Glocke zeigte weiter die Buchung.
+                    await notifyProviderMembers(b.provider_key, authUserId, 'booking_cancelled', bookingId,
+                        { providerKey: b.provider_key, slot: b.slot_start }, `booking_cancelled:${bookingId}`);
                     // Der Anbieter erfuhr bis 2026-08-31 GAR NICHTS von einer
                     // Absage — der Verschieben-Pfad mailte, dieser nicht. Er
                     // behielt den Termin im Kalender und erschien zum Gespraech.

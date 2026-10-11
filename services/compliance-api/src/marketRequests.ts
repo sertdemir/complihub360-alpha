@@ -14,7 +14,7 @@ import { SLUG_TO_ENGINE } from "./dashboard.js";
 //   im Body wird nicht gelesen — sonst koennte ein Gast fuer ein fremdes Konto
 //   ein Update bestellen.
 //
-// Seit 20261012000000 haelt die Zeile fest, WOFUER sie steht (`reason`):
+// Seit 20261012000100 haelt die Zeile fest, WOFUER sie steht (`reason`):
 // 'market' = das Land ist noch nicht in der Engine; 'provider_coverage' = das
 // Land ist geprueft, aber kein freigegebener Anbieter deckt die genannten
 // Bereiche ab (Canvas C2, "Request More Coverage"). Der Grund folgt aus dem

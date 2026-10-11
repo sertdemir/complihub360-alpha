@@ -3,6 +3,7 @@ import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
 import { runBillingReadinessTick } from "./leadCharge.js";
 import { runInvoiceRetryTick } from "./invoiceRetry.js";
+import { runApiRequestLogRetentionTick } from "./apiRoutes.js";
 import { runSubscriptionPeriodTick } from "./subscriptions.js";
 import { runScheduledChanges } from "./changeSchedule.js";
 import { runAppointmentReminderTick, runRebookTick } from "./attendanceWatch.js";
@@ -97,6 +98,7 @@ export interface TickSummary {
     invoiceRetryNotices: number;
     invoiceRetryAttempts: number;
     invoiceRetryPaid: number;
+    apiRequestLogPruned: number;
 }
 
 // ─── Shared reminder core ─────────────────────────────────────────────────────
@@ -187,7 +189,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, providerCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, providerCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0, apiRequestLogPruned: 0 };
 
     let engagements: Engagement[];
     try {
@@ -376,6 +378,9 @@ export async function runWatcherTick(): Promise<TickSummary> {
         summary.invoiceRetryPaid = ir.paid;
         summary.errors += ir.errors;
     } catch { summary.errors++; }
+
+    // Phase 7 (ADR-0010): das API-Protokoll haelt 90 Tage — danach weg.
+    try { summary.apiRequestLogPruned = await runApiRequestLogRetentionTick(shadow); } catch { summary.errors++; }
 
     // Markt-Update: angefragte Maerkte, die die Engine inzwischen prueft —
     // und angefragte Bereiche, die dort inzwischen ein Anbieter abdeckt.
@@ -656,7 +661,7 @@ export async function runEvidenceTick(shadow: boolean): Promise<EvidenceTickCoun
 // (auth_user_email_by_id, 20261001184141) — market_requests speichert keine.
 // Shadow schreibt nur Marker und fasst weder Zeile noch Postfach an.
 //
-// Zweiter Zweig seit 20261012000000 (reason = 'provider_coverage', Canvas C2
+// Zweiter Zweig seit 20261012000100 (reason = 'provider_coverage', Canvas C2
 // "Request More Coverage"): der Markt ist geprueft, aber zur Anfrage deckte
 // kein freigegebener Anbieter die genannten Bereiche ab. Faellig ist die Zeile,
 // sobald matchable_provider_services fuer diesen Markt eine Zeile mit einem

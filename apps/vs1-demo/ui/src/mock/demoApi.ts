@@ -739,9 +739,12 @@ function partnerNotifications() {
     n(1, 'booking_created', { providerKey: PARTNER_KEY, slot: iso(2, 11) }, 0.05, false),
     n(2, 'payment_failed', { providerKey: PARTNER_KEY }, 1, false, READINESS.reasons.includes('payment_failed')),
     n(3, 'invoice_retry_scheduled', { providerKey: PARTNER_KEY, label: 'INV-2026-009', deadline: iso(7).slice(0, 10) }, 2, false, true),
+    n(8, 'booking_cancelled', { providerKey: PARTNER_KEY, slot: iso(3, 10) }, 4, false),
+    n(9, 'booking_rescheduled', { providerKey: PARTNER_KEY, from: iso(4, 9), slot: iso(5, 14) }, 8, true),
     n(4, 'appointment_reminder', { providerKey: PARTNER_KEY, slot: iso(1, 12), offset: '1440' }, 26, true),
     n(5, 'evidence_expiring', { providerKey: PARTNER_KEY, label: 'insurance', to: iso(23).slice(0, 10) }, 30, true),
     n(6, 'subscription_scheduled', { providerKey: PARTNER_KEY, effectiveOn: iso(25).slice(0, 10) }, 31, true),
+    n(10, 'credit_issued', { providerKey: PARTNER_KEY, amount: '4023', label: 'cancelled' }, 50, true),
     n(7, 'credit_issued', { providerKey: PARTNER_KEY, amount: '4470' }, 75, true),
   ];
 }
@@ -1079,6 +1082,96 @@ function partnerOverview() {
   };
 }
 
+
+// ─── Phase 7: Enterprise-API (ADR-0010) ──────────────────────────────────────
+// Der Demo-Anbieter laeuft auf Growth; dieser Abschnitt antwortet trotzdem
+// `eligible: true` mit plan_code 'global', damit die Flaeche im Mock zu sehen
+// und zu bedienen ist (Antrag → Freigabe → Schluessel → Rotation → Widerruf).
+// Der Zustand lebt im Prozess des Dev-Servers; die Freigabe uebernimmt hier
+// nach dem Antrag sofort der „Admin"-Pfad (PATCH /admin/api-clients/:id).
+type MockApiClient = {
+  id: string; provider_key: string; name: string; status: 'requested' | 'approved' | 'active' | 'suspended' | 'revoked' | 'rejected';
+  use_case: string | null; contact_name: string | null; contact_email: string | null; requested_scopes: string[]; scopes: string[];
+  rate_limit_per_minute: number; key_prefix: string | null; key_created_at: string | null; previous_key_valid_until: string | null;
+  last_used_at: string | null; approved_at: string | null; suspended_at: string | null; suspended_reason: string | null;
+  revoked_at: string | null; decision_note: string | null; terms_version: string | null; created_at: string | null;
+};
+const API_STATE: { clients: MockApiClient[] } = {
+  clients: [{
+    id: uuid(91, 9), provider_key: 'lund-nordic', name: 'Lund Nordic AB · CRM', status: 'active', use_case: 'Leads nach der Buchung ins CRM spiegeln', contact_name: null, contact_email: 'it@lundnordic.example',
+    requested_scopes: ['leads:read', 'events:read'], scopes: ['leads:read', 'events:read'], rate_limit_per_minute: 60, key_prefix: 'chk_live_c21e…', key_created_at: iso(-20), previous_key_valid_until: null,
+    last_used_at: plus(-2 * H), approved_at: iso(-21), suspended_at: null, suspended_reason: null, revoked_at: null, decision_note: null, terms_version: 'api-terms-v1', created_at: iso(-22),
+  }],
+};
+const apiClientOf = (key: string) => API_STATE.clients.find((c) => c.provider_key === key && c.status !== 'revoked' && c.status !== 'rejected') ?? null;
+function apiAccess(key: string) {
+  const c = apiClientOf(key);
+  return { ok: true, eligible: true, plan_code: 'global', terms_version: 'api-terms-v1', requestable_scopes: ['leads:read', 'leads:write', 'events:read', 'billing:read'], client: c };
+}
+function apiAccessRequest(key: string, body: Record<string, unknown>) {
+  if (apiClientOf(key)) return { __status: 409, errorCode: 'API_CLIENT_EXISTS', message: 'An API access request already exists for this provider' };
+  if (body.accept_terms !== true) return { __status: 400, errorCode: 'TERMS_NOT_ACCEPTED', message: 'The API terms must be accepted' };
+  const c: MockApiClient = {
+    id: uuid(100 + API_STATE.clients.length, 9), provider_key: key, name: String(body.name ?? ''), status: 'requested', use_case: String(body.use_case ?? ''), contact_name: null, contact_email: String(body.contact_email ?? ''),
+    requested_scopes: Array.isArray(body.requested_scopes) ? (body.requested_scopes as string[]) : [], scopes: [], rate_limit_per_minute: 120, key_prefix: null, key_created_at: null, previous_key_valid_until: null,
+    last_used_at: null, approved_at: null, suspended_at: null, suspended_reason: null, revoked_at: null, decision_note: null, terms_version: 'api-terms-v1', created_at: plus(0),
+  };
+  API_STATE.clients.unshift(c);
+  return { ok: true, client: c };
+}
+function apiKeyIssue(key: string) {
+  const c = apiClientOf(key);
+  if (!c || (c.status !== 'approved' && c.status !== 'active')) return { __status: 409, errorCode: 'API_CLIENT_NOT_APPROVED', message: 'A key can be created once the team has approved the request' };
+  const hex = Array.from({ length: 48 }, () => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join('');
+  const rotating = c.status === 'active';
+  c.status = 'active'; c.key_prefix = `chk_live_${hex.slice(0, 4)}…`; c.key_created_at = plus(0);
+  c.previous_key_valid_until = rotating ? plus(24 * H) : null;
+  return { ok: true, key: `chk_live_${hex}`, shown_once: true, previous_key_valid_until: c.previous_key_valid_until, client: c };
+}
+function apiAccessRevoke(key: string) {
+  const c = apiClientOf(key);
+  if (!c) return { __status: 404, errorCode: 'NOT_FOUND', message: 'No API access to revoke' };
+  c.status = 'revoked'; c.revoked_at = plus(0); c.key_prefix = null; c.previous_key_valid_until = null;
+  return { ok: true, client: c };
+}
+function apiAccessLog(key: string) {
+  const c = apiClientOf(key);
+  if (!c || c.status !== 'active') return { ok: true, calls: [], today: { count: 0, limited: 0, failed: 0 }, events: [] };
+  const calls = [
+    { id: uuid(81, 9), method: 'GET', route: '/api/v1/ext/leads', status: 200, duration_ms: 84, at: plus(-19 * 60_000) },
+    { id: uuid(82, 9), method: 'PATCH', route: '/api/v1/ext/leads/8e2a', status: 200, duration_ms: 61, at: plus(-20 * 60_000) },
+    { id: uuid(83, 9), method: 'GET', route: '/api/v1/ext/events', status: 429, duration_ms: 3, at: plus(-22 * 60_000) },
+    { id: uuid(84, 9), method: 'GET', route: '/api/v1/ext/events', status: 200, duration_ms: 52, at: plus(-23 * 60_000) },
+    { id: uuid(85, 9), method: 'GET', route: '/api/v1/ext/me', status: 200, duration_ms: 31, at: plus(-5 * H) },
+  ];
+  const events = [
+    { id: uuid(86, 9), type: 'booking.created', at: plus(-48 * 60_000), booking_id: uuid(1, 9), data: { slot_start: iso(1, 11) } },
+    { id: uuid(87, 9), type: 'lead.revealed', at: plus(-48 * 60_000), booking_id: uuid(1, 9), data: { shared_fields: ['email', 'company_name', 'message'], acknowledgement_version: 'booking-ack-v1' } },
+    { id: uuid(88, 9), type: 'user.no_show', at: iso(-2), booking_id: uuid(2, 9), data: {} },
+    { id: uuid(89, 9), type: 'lead.credit_issued', at: iso(-4, 3), booking_id: uuid(3, 9), data: { amount_cents: 4023, currency: 'USD' } },
+  ];
+  return { ok: true, calls, today: { count: 318, limited: 3, failed: 0 }, events };
+}
+function adminApiClients() {
+  return { ok: true, clients: API_STATE.clients.map((c) => ({ ...c, provider_name: c.provider_key === PARTNER_KEY ? 'Schmidt & Partner' : 'Lund Nordic AB', plan_code: 'global', eligible: true, fee_note: null, approved_by: null, last_used_ip: c.last_used_at ? '203.0.113.7' : null })) };
+}
+function adminApiDecide(id: string, body: Record<string, unknown>) {
+  const c = API_STATE.clients.find((x) => x.id === id);
+  if (!c) return { __status: 404, errorCode: 'NOT_FOUND', message: 'API client not found' };
+  const now = plus(0);
+  switch (body.action) {
+    case 'approve': c.status = 'approved'; c.scopes = Array.isArray(body.scopes) ? (body.scopes as string[]) : c.requested_scopes; c.rate_limit_per_minute = Number(body.rate_limit_per_minute ?? c.rate_limit_per_minute); c.approved_at = now; break;
+    case 'reject': if (!body.decision_note) return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'decision_note is required' }; c.status = 'rejected'; c.decision_note = String(body.decision_note); break;
+    case 'suspend': if (!body.reason) return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'reason is required' }; c.status = 'suspended'; c.suspended_at = now; c.suspended_reason = String(body.reason); break;
+    case 'reinstate': c.status = c.key_prefix ? 'active' : 'approved'; c.suspended_at = null; c.suspended_reason = null; break;
+    case 'revoke': c.status = 'revoked'; c.revoked_at = now; c.key_prefix = null; break;
+    case 'update': if (Array.isArray(body.scopes)) c.scopes = body.scopes as string[]; if (body.rate_limit_per_minute !== undefined) c.rate_limit_per_minute = Number(body.rate_limit_per_minute); break;
+    default: return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'unknown action' };
+  }
+  if (typeof body.decision_note === 'string' && body.action !== 'reject') c.decision_note = body.decision_note;
+  return { ok: true, client: adminApiClients().clients.find((x) => x.id === id) };
+}
+
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
@@ -1100,6 +1193,10 @@ export function route(method: string, path: string, body: Record<string, unknown
       ? { __status: 403, errorCode: 'ANALYTICS_LEVEL', message: 'CSV export needs the advanced analytics level' }
       : partnerPerformance();
     if (p[0] === 'provider' && p[2] === 'overview') return partnerOverview();
+    // Phase 7: Enterprise-API — Stand und Protokoll des Anbieters, Liste fuer den Admin.
+    if (p[0] === 'provider' && p[2] === 'api-access' && p[3] === 'log') return apiAccessLog(p[1]);
+    if (p[0] === 'provider' && p[2] === 'api-access') return apiAccess(p[1]);
+    if (p[0] === 'admin' && p[1] === 'api-access') return adminApiClients();
     if (p[0] === 'provider' && p[2] === 'coverage') { const c = partnerCoverage(); return { ...c, coverage: { ...c.coverage, availability_hours: AVAIL.hours, timezone: AVAIL.timezone, booking_paused_at: null } }; }
     if (p[0] === 'provider' && p[2] === 'invoices') return partnerInvoices();
     if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'preview') return partnerBillingPreview();
@@ -1154,6 +1251,11 @@ export function route(method: string, path: string, body: Record<string, unknown
   // vorbei, damit dort kein Versand vorgetaeuscht wird.
   if (p[0] === 'contact' && method === 'POST') return { ok: true, acknowledged: true, correlationId: `mock-${Date.now().toString(36)}` };
   // Phase 6: Verfuegbarkeit — Status (Abwesend) und Fenster/Zeitzone ueber denselben Aufruf.
+  // Phase 7: Enterprise-API — Antrag, Schluessel, Widerruf, Entscheidung des Teams.
+  if (p[0] === 'provider' && p[2] === 'api-access' && p[3] === 'key' && method === 'POST') return apiKeyIssue(p[1]);
+  if (p[0] === 'provider' && p[2] === 'api-access' && !p[3] && method === 'POST') return apiAccessRequest(p[1], body);
+  if (p[0] === 'provider' && p[2] === 'api-access' && !p[3] && method === 'DELETE') return apiAccessRevoke(p[1]);
+  if (p[0] === 'admin' && p[1] === 'api-clients' && p[2] && method === 'PATCH') return adminApiDecide(p[2], body);
   if (p[0] === 'provider' && p[2] === 'availability' && method === 'PATCH') {
     if (typeof body.status === 'string') MOCK_AVAILABILITY = body.status === 'ooo' ? 'ooo' : 'available';
     if ('hours' in body) AVAIL.hours = body.hours && Object.keys(body.hours as object).length ? (body.hours as typeof AVAIL.hours) : null;

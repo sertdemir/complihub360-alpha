@@ -1,0 +1,217 @@
+# Beta deploy (Beta-Plan Di 20.10.) — von Hand, je Release-Kandidat.
+#
+#   build-api / build-ui   ubuntu-latest, bauen den gewaehlten Stand (Input `ref`)
+#   deploy-api             self-hosted Runner auf dem VPS, installiert + startet neu
+#   deploy-ui              self-hosted Runner auf dem VPS, NACH der API
+#   verify                 ubuntu-latest, prueft die Beta von aussen
+#
+# Gleicher Aufbau und dieselben Regeln wie deploy-staging.yml (dort der Kopf
+# lesen): die self-hosted Jobs laden nur ein Artefakt und kopieren es, kein
+# Checkout, kein npm — gehalten von scripts/check-workflow-runners.mjs. Dieser
+# Workflow hat KEINEN push- oder pull_request-Trigger: Tester sehen nur Staende,
+# die jemand bewusst ausgeliefert hat (Entscheidung 11.10.2026).
+#
+# Unterschiede zu Staging:
+#   - eigenes Supabase-Projekt (Repo-Variablen BETA_SUPABASE_URL/_ANON_KEY);
+#     der Build bricht ab, wenn sie fehlen oder auf Staging zeigen.
+#   - KEIN Demo-Login: VITE_DEMO_LOGIN bleibt leer, damit ist auch der
+#     TEMP-DEMO-DATEN-Zweig in api/client.ts aus.
+#   - Ziele /docker/complihub-beta/site und /docker/complihub-beta-api/app,
+#     eigene sudo-Wrapper complihub-beta-api-* (scripts/vps/setup-beta.sh).
+#   - verify verlangt 401: die Beta ist geschlossen (Basic-Auth je Tester).
+#     Ein 200 waere ein offener Zugang und damit ein Fehler.
+name: Deploy Beta
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit, Tag oder Branch, der ausgeliefert wird (Release-Kandidat)
+        required: true
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-beta
+  cancel-in-progress: false
+
+jobs:
+  build-api:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install workspace dependencies
+        run: npm ci
+
+      - name: Bundle API
+        run: |
+          mkdir -p out
+          for p in packages/types packages/compliance-engine packages/agent-core \
+                   packages/agent-registry packages/policy-engine packages/task-orchestrator \
+                   services/redaction; do
+            npm run build --workspace "$p" --if-present
+          done
+          npx esbuild services/compliance-api/src/index.ts --bundle --platform=node \
+            --format=cjs --outfile=out/index.cjs
+          echo "{\"sha\":\"$(git rev-parse HEAD)\",\"channel\":\"beta\",\"builtAt\":\"$(date -u +%FT%TZ)\"}" > out/api-build-info.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: beta-api-bundle
+          path: out/
+          retention-days: 14
+          if-no-files-found: error
+
+  build-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Beta-Variablen pruefen
+        env:
+          URL: ${{ vars.BETA_SUPABASE_URL }}
+          KEY: ${{ vars.BETA_SUPABASE_ANON_KEY }}
+        run: |
+          set -eu
+          [ -n "$URL" ] && [ -n "$KEY" ] || { echo "::error::BETA_SUPABASE_URL / BETA_SUPABASE_ANON_KEY fehlen (Repo → Settings → Variables)"; exit 1; }
+          case "$URL" in
+            *kqylqwogxbiwpnomkzsn*) echo "::error::BETA_SUPABASE_URL zeigt auf Staging — die Beta braucht ihr eigenes Projekt"; exit 1 ;;
+          esac
+
+      - name: Install workspace dependencies
+        run: npm ci
+
+      - name: Build workspace packages
+        run: |
+          for p in packages/types packages/compliance-engine packages/agent-core \
+                   packages/agent-registry packages/policy-engine packages/task-orchestrator \
+                   services/redaction; do
+            npm run build --workspace "$p" --if-present
+          done
+
+      - name: Build frontend (ohne Demo-Login)
+        env:
+          VITE_SUPABASE_URL: ${{ vars.BETA_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.BETA_SUPABASE_ANON_KEY }}
+          VITE_CONTACT_INBOX: ${{ vars.CONTACT_INBOX }}
+          VITE_PLAUSIBLE_DOMAIN: ''
+          VITE_SITE_ORIGIN: ''
+        run: |
+          npm run build --workspace apps/vs1-demo/ui
+          printf 'User-agent: *\nDisallow: /\n' > apps/vs1-demo/ui/dist/robots.txt
+          echo "{\"sha\":\"$(git rev-parse HEAD)\",\"channel\":\"beta\",\"builtAt\":\"$(date -u +%FT%TZ)\"}" > apps/vs1-demo/ui/dist/build-info.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: beta-ui-dist
+          path: apps/vs1-demo/ui/dist/
+          retention-days: 14
+          if-no-files-found: error
+
+  deploy-api:
+    needs: build-api
+    runs-on: [self-hosted, complihub-staging]
+    timeout-minutes: 10
+    steps:
+      - name: Clear the workspace
+        run: rm -rf beta-api-bundle
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: beta-api-bundle
+          path: beta-api-bundle
+
+      - name: Install bundle + restart container
+        run: |
+          set -euo pipefail
+          test -s beta-api-bundle/index.cjs
+          install -m 644 beta-api-bundle/index.cjs beta-api-bundle/api-build-info.json \
+            /docker/complihub-beta-api/app/
+          sudo /usr/local/sbin/complihub-beta-api-restart
+
+      - name: Verify health
+        run: |
+          for a in $(seq 1 15); do
+            if sudo /usr/local/sbin/complihub-beta-api-health 2>/dev/null | grep -q '"ok":true'; then
+              echo "✓ Beta-API gesund (nach ${a} Versuch(en))"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::Beta-API meldete sich nicht gesund innerhalb von ~45s"
+          sudo /usr/local/sbin/complihub-beta-api-logs || true
+          exit 1
+
+  deploy-ui:
+    needs: [build-ui, deploy-api]
+    runs-on: [self-hosted, complihub-staging]
+    timeout-minutes: 10
+    steps:
+      - name: Clear the workspace
+        run: rm -rf beta-ui-dist
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: beta-ui-dist
+          path: beta-ui-dist
+
+      - name: Install site
+        run: |
+          set -euo pipefail
+          test -s beta-ui-dist/index.html
+          rsync -a --delete beta-ui-dist/ /docker/complihub-beta/site/
+          chmod -R a+rX /docker/complihub-beta/site
+
+  verify:
+    needs: [build-api, deploy-ui]
+    runs-on: ubuntu-latest
+    steps:
+      # Geschlossen heisst 401. Mit dem Pruef-Zugang (Secret BETA_VERIFY_AUTH,
+      # „user:passwort") wird zusaetzlich bewiesen, dass DIESER Build auf der
+      # Platte liegt. Ohne Secret bleibt es beim Lebenszeichen.
+      - name: Check beta from the public internet
+        env:
+          VERIFY_AUTH: ${{ secrets.BETA_VERIFY_AUTH }}
+          WANT: ${{ needs.build-api.outputs.sha }}
+        run: |
+          set -uo pipefail
+          url=https://beta.complihub360.com
+          hdr=$(curl -sS --max-time 20 -D - -o /dev/null "$url") || { echo "::error::$url nicht erreichbar"; exit 1; }
+          code=$(printf '%s\n' "$hdr" | awk 'toupper($1) ~ /^HTTP/ { c = $2 } END { print c }')
+          if [ "$code" != "401" ]; then
+            echo "::error::$url antwortet $code statt 401 — die Beta ist nicht geschlossen"
+            exit 1
+          fi
+          echo "✓ geschlossen (401)"
+          printf '%s\n' "$hdr" | grep -qi '^x-robots-tag:.*noindex' || { echo "::error::Kein X-Robots-Tag: noindex"; exit 1; }
+          echo "✓ noindex steht"
+          if [ -n "${VERIFY_AUTH:-}" ]; then
+            sha=$(curl -s --max-time 20 -u "$VERIFY_AUTH" "$url/build-info.json" | tr -d ' \n' | sed -n 's/.*"sha":"\([0-9a-f]*\)".*/\1/p')
+            [ "$sha" = "$WANT" ] || { echo "::error::Ausgeliefert ist ${sha:-<keine build-info.json>}, erwartet $WANT"; exit 1; }
+            echo "✓ Ausgelieferter Build ist ${WANT:0:8}"
+          else
+            echo "::warning::BETA_VERIFY_AUTH fehlt — der ausgelieferte Stand wurde nicht geprueft"
+          fi

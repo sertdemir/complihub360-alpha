@@ -15,6 +15,8 @@ export function partnerNotificationText(t: TFunction, n: PartnerNotification, lo
     : '';
   const vars = {
     slot: when(p.slot),
+    // Verschiebung: der alte Termin (Absage/Verschiebung durch den Nutzer, 2026-10-11).
+    from: when(p.from),
     offset,
     amount: p.amount ? money(Number(p.amount)) : '',
     label: n.type === 'evidence_expiring' ? t(`application.evidence.type.${p.label}`, { defaultValue: p.label ?? '' }) : (p.label ?? ''),
@@ -23,5 +25,7 @@ export function partnerNotificationText(t: TFunction, n: PartnerNotification, lo
     // Phase 6: Entscheidung ueber den Einspruch steht im label (lifted|upheld).
     decision: p.label === 'lifted' ? t('partnerNotif.decision.lifted') : p.label === 'upheld' ? t('partnerNotif.decision.upheld') : '',
   };
-  return { title: t(`partnerNotif.${n.type}.title`, vars), body: t(`partnerNotif.${n.type}.body`, vars) };
+  // Guthaben nach einer Nutzer-Absage (2026-10-11): eigener Satz, sonst hiesse es „nicht wahrgenommen“.
+  const bodyKey = n.type === 'credit_issued' && p.label === 'cancelled' ? 'bodyCancelled' : 'body';
+  return { title: t(`partnerNotif.${n.type}.title`, vars), body: t(`partnerNotif.${n.type}.${bodyKey}`, vars) };
 }

@@ -76,10 +76,21 @@ MISSING=$(for c in complihub-api-api-1 complihub-web-1 traefik-traefik-1; do
 done)
 [ -z "$MISSING" ] && NOW[containers]=OK || { NOW[containers]=FAIL; DETAIL[containers]="not running: $MISSING"; }
 
+# Beta (Beta-Plan Di 20.10.): nur, wenn setup-beta.sh sie eingerichtet hat.
+# Geschlossen heisst 401 — ein 200 waere ein offener Zugang und ein Alarm.
+KEYS="ui api supabase containers"
+if [ -d /docker/complihub-beta ]; then
+  KEYS="$KEYS beta_ui beta_api"
+  BCODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://beta.complihub360.com/ || echo 000)
+  [ "$BCODE" = "401" ] && NOW[beta_ui]=OK || { NOW[beta_ui]=FAIL; DETAIL[beta_ui]="HTTP $BCODE (expected 401 — beta must stay closed)"; }
+  BHEALTH=$(docker exec complihub-beta-api-api-1 wget -qO- -T 15 http://localhost:3005/health 2>/dev/null || true)
+  echo "$BHEALTH" | grep -q '"ok":true' && NOW[beta_api]=OK || { NOW[beta_api]=FAIL; DETAIL[beta_api]="health: ${BHEALTH:-no response}"; }
+fi
+
 # State-change detection (missing state file = first run, treat all as OK-known).
 touch "$STATE"
 CHANGES=""
-for k in ui api supabase containers; do
+for k in $KEYS; do
   PREV=$(grep "^$k=" "$STATE" | cut -d= -f2)
   [ -z "$PREV" ] && PREV=OK
   if [ "${NOW[$k]}" != "$PREV" ]; then
@@ -90,10 +101,10 @@ for k in ui api supabase containers; do
     fi
   fi
 done
-: > "$STATE"; for k in ui api supabase containers; do echo "$k=${NOW[$k]}" >> "$STATE"; done
+: > "$STATE"; for k in $KEYS; do echo "$k=${NOW[$k]}" >> "$STATE"; done
 
 if [ -n "$CHANGES" ]; then
-  BODY="Staging availability change at $(ts):\n$CHANGES\n\nCurrent state: ui=${NOW[ui]} api=${NOW[api]} supabase=${NOW[supabase]} containers=${NOW[containers]}\nRunbook: docs/runbooks/staging-backup-restore.md"
+  BODY="Staging availability change at $(ts):\n$CHANGES\n\nCurrent state: ui=${NOW[ui]} api=${NOW[api]} supabase=${NOW[supabase]} containers=${NOW[containers]}${NOW[beta_ui]:+ beta_ui=${NOW[beta_ui]} beta_api=${NOW[beta_api]}}\nRunbook: docs/runbooks/staging-backup-restore.md"
   if printf '%b' "$CHANGES" | grep -q DOWN; then SUBJ="[CompliHub staging] ALERT: service down"; else SUBJ="[CompliHub staging] recovered"; fi
   send_mail "$SUBJ" "$(printf '%b' "$BODY")" >> "$LOG" 2>&1
   echo "$(ts) TRANSITION $(printf '%b' "$CHANGES" | tr '\n' ';')" >> "$LOG"

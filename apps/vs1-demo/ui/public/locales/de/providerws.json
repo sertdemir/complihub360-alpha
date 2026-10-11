@@ -521,6 +521,7 @@
     "navAfterBooking": "Nach der Buchung",
     "navContactEmail": "Kontakt-E-Mail",
     "navAvailability": "Verfügbarkeit",
+    "navIntegration": "Integration",
     "navWorkspace": "Workspace",
     "afterBookingTitle": "Nach der Buchung sichtbar",
     "afterBookingBody": "Diese Angaben sehen Mandanten erst, wenn sie einen Termin gebucht haben. Sie stammen aus Ihrer Bewerbung.",
@@ -1188,6 +1189,14 @@
       "title": "Neue Buchung",
       "body": "Ein Mandant hat ein Erstgespräch am {{slot}} gebucht. Das Dossier liegt bereit."
     },
+    "booking_cancelled": {
+      "title": "Buchung abgesagt",
+      "body": "Der Mandant hat das Erstgespräch am {{slot}} abgesagt."
+    },
+    "booking_rescheduled": {
+      "title": "Buchung verschoben",
+      "body": "Der Mandant hat das Erstgespräch vom {{from}} auf {{slot}} verschoben."
+    },
     "appointment_reminder": {
       "title": "Termin in {{offset}}",
       "body": "Erstgespräch am {{slot}}."
@@ -1206,7 +1215,8 @@
     },
     "credit_issued": {
       "title": "Guthaben gutgeschrieben",
-      "body": "{{amount}} aus einem nicht wahrgenommenen Termin. Es wird mit der nächsten Abo-Rechnung verrechnet."
+      "body": "{{amount}} aus einem nicht wahrgenommenen Termin. Es wird mit der nächsten Abo-Rechnung verrechnet.",
+      "bodyCancelled": "{{amount}} aus einem abgesagten Termin, der nicht neu gebucht wurde. Es wird mit der nächsten Abo-Rechnung verrechnet."
     },
     "payment_failed": {
       "title": "Lead-Belastung gescheitert",
@@ -1255,6 +1265,14 @@
     "enforcement_decided": {
       "title": "Ihr Einspruch wurde entschieden",
       "body": "Entscheidung: {{decision}}. Die Einzelheiten stehen unter Performance."
+    },
+    "api_access_decided": {
+      "title": "Ihr API-Antrag wurde entschieden",
+      "body": "Entscheidung: {{decision}}. Die Einzelheiten stehen in den Einstellungen unter Integration."
+    },
+    "api_access_suspended": {
+      "title": "Ihr API-Zugang ist ausgesetzt",
+      "body": "Grund: {{reason}}. Ihr Schlüssel bleibt gespeichert. Die Einzelheiten stehen in den Einstellungen."
     }
   },
   "overview": {
@@ -1318,5 +1336,75 @@
     "creditNote": "wird mit der nächsten Rechnung verrechnet",
     "evidenceExpiring": "Nachweis {{type}}",
     "until": "bis {{date}}"
+  },
+  "apiAccess": {
+    "title": "Integration (API)",
+    "loadFailed": "Der Stand der Integration konnte nicht geladen werden.",
+    "plan": {
+      "essential": "Essential",
+      "growth": "Growth",
+      "global": "Global"
+    },
+    "status": {
+      "requested": "beantragt",
+      "approved": "freigegeben",
+      "active": "aktiv",
+      "suspended": "ausgesetzt",
+      "revoked": "widerrufen",
+      "rejected": "abgelehnt"
+    },
+    "intro": "Für Anbieter mit eigener CRM- oder Routing-Anbindung. Das Team prüft jeden Antrag; danach erzeugen Sie Ihren Schlüssel hier.",
+    "nameLabel": "Name der Integration",
+    "namePh": "z. B. HubSpot CRM",
+    "useCaseLabel": "Wofür brauchen Sie die Anbindung?",
+    "useCasePh": "Leads nach der Buchung anlegen, Status zurückmelden …",
+    "contactLabel": "Technischer Kontakt (E-Mail)",
+    "scopesLabel": "Welche Daten soll die Anbindung erreichen?",
+    "scopesNote": "availability:write (Verfügbarkeit aus Ihrem System steuern) vergibt das Team nur auf gesonderte Freigabe.",
+    "termsAccept": "Mit dem Antrag akzeptieren Sie die API- und Integrationsbedingungen (Fassung {{version}}).",
+    "submit": "Antrag senden",
+    "requestFailed": "Der Antrag konnte nicht gesendet werden. Bitte versuchen Sie es noch einmal.",
+    "notEligibleNow": "Ihr aktueller Tarif enthält die API nicht.",
+    "requestedBody": "Antrag vom {{date}} · {{name}} · {{scopes}}. Das Team prüft Zweck und Umfang und meldet sich bei {{email}}. Sie werden hier und per Benachrichtigung informiert.",
+    "rejectedTitle": "Das Team hat den Antrag nicht freigegeben",
+    "rejectedNoNote": "Eine Begründung liegt nicht vor. Sie können erneut beantragen.",
+    "approvedBody": "Freigegeben mit {{scopes}} · {{limit}} Aufrufe je Minute. Erzeugen Sie jetzt Ihren Schlüssel — er wird genau einmal angezeigt.",
+    "createKey": "Schlüssel erzeugen",
+    "keyFailed": "Der Schlüssel konnte nicht erzeugt werden. Bitte versuchen Sie es noch einmal.",
+    "approvedOn": "Zugang freigegeben · {{date}}",
+    "suspendedTitle": "Das Team hat den Zugang am {{date}} ausgesetzt.",
+    "suspendedBody": "Grund: {{reason}} Ihr Schlüssel bleibt gespeichert; Aufrufe antworten 403 API_CLIENT_SUSPENDED. Melden Sie sich über Hilfe & Support, wenn Sie Fragen haben.",
+    "freshTitle": "Ihr neuer Schlüssel · nur jetzt sichtbar",
+    "freshBody": "Kopieren Sie ihn jetzt in Ihr System. Danach zeigen wir nur noch {{prefix}}. Ein verlorener Schlüssel wird nicht wiederhergestellt, sondern rotiert.",
+    "previousUntil": "Der vorige Schlüssel gilt noch bis {{date}}.",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "saved": "Habe ich gespeichert",
+    "scopes": "Scopes",
+    "scopesByTeam": "vom Team vergeben",
+    "rateLimit": "Rate Limit",
+    "perMinute": "{{n}} Aufrufe / Minute",
+    "setByTeam": "vom Team gesetzt",
+    "lastUsed": "Zuletzt benutzt",
+    "neverUsed": "noch nie",
+    "terms": "Bedingungen",
+    "acceptedOn": "angenommen am {{date}}",
+    "rotate": "Schlüssel rotieren",
+    "revoke": "Zugang widerrufen",
+    "rotateHint": "Rotieren: der neue Schlüssel gilt sofort, der alte noch 24 Stunden. Widerrufen beendet beide sofort.",
+    "rotateTitle": "Schlüssel rotieren?",
+    "rotateConsequence": "Ein neuer Schlüssel wird erzeugt und einmal angezeigt. Der bisherige gilt noch 24 Stunden, damit Ihre Integration ohne Ausfall umstellen kann.",
+    "rotateLabel": "Rotieren",
+    "revokeTitle": "Zugang widerrufen?",
+    "revokeConsequence": "Beide Schlüssel werden sofort ungültig; Ihre Integration bekommt 401. Der Zugang lässt sich nur über einen neuen Antrag wiederherstellen.",
+    "revokeLabel": "Widerrufen",
+    "revokeKeyword": "WIDERRUFEN",
+    "revokeFailed": "Der Widerruf konnte nicht ausgeführt werden. Ihr Zugang ist unverändert.",
+    "events": "Ereignisse",
+    "noEvents": "Noch keine Ereignisse.",
+    "eventsNote": "Ereignisse werden abgeholt, nicht zugestellt; wir halten sie 90 Tage vor.",
+    "calls": "Letzte Aufrufe",
+    "noCalls": "Noch keine Aufrufe.",
+    "callsNote": "Heute: {{count}} Aufrufe · {{limited}} × 429 · {{failed}} × 5xx. Das Protokoll hält 90 Tage, ohne Inhalte und ohne Schlüssel."
   }
 }

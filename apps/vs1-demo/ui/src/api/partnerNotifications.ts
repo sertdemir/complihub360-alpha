@@ -12,18 +12,22 @@ import { apiFetch } from './client';
 // ist (services/compliance-api/src/notifications.ts → needsAction).
 
 export type PartnerNotificationType =
-  | 'booking_created' | 'appointment_reminder' | 'dispute_opened' | 'dispute_resolved'
+  | 'booking_created' | 'booking_cancelled' | 'booking_rescheduled' | 'appointment_reminder' | 'dispute_opened' | 'dispute_resolved'
   | 'performance_incident' | 'credit_issued' | 'payment_failed' | 'invoice_retry_scheduled'
   | 'subscription_scheduled' | 'subscription_schedule_done'
   | 'verification_info_requested' | 'verification_decided' | 'verification_activated' | 'evidence_expiring'
   // Phase 6 (ADR-0009): Serien-No-Shows und Durchsetzung.
-  | 'serial_no_show_alert' | 'booking_paused' | 'enforcement_decided';
+  | 'serial_no_show_alert' | 'booking_paused' | 'enforcement_decided'
+  // Phase 7 (ADR-0010): Enterprise-API — Entscheidung des Teams.
+  | 'api_access_decided' | 'api_access_suspended';
 
 export type PartnerTopic = 'appointments' | 'billing' | 'verification' | 'plan';
 
 /** Thema (Filter) und Ziel (wohin ein Klick fuehrt) je Art. */
 export const PARTNER_TYPES: Record<PartnerNotificationType, { topic: PartnerTopic; to: string }> = {
   booking_created: { topic: 'appointments', to: 'termine' },
+  booking_cancelled: { topic: 'appointments', to: 'termine' },
+  booking_rescheduled: { topic: 'appointments', to: 'termine' },
   appointment_reminder: { topic: 'appointments', to: 'termine' },
   dispute_opened: { topic: 'appointments', to: 'termine' },
   dispute_resolved: { topic: 'appointments', to: 'termine' },
@@ -40,6 +44,8 @@ export const PARTNER_TYPES: Record<PartnerNotificationType, { topic: PartnerTopi
   serial_no_show_alert: { topic: 'appointments', to: 'performance' },
   booking_paused: { topic: 'appointments', to: 'performance' },
   enforcement_decided: { topic: 'appointments', to: 'performance' },
+  api_access_decided: { topic: 'plan', to: 'settings' },
+  api_access_suspended: { topic: 'plan', to: 'settings' },
 };
 
 export interface PartnerNotification {

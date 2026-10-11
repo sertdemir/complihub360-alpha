@@ -108,6 +108,11 @@ export async function runAppointmentReminderTick(shadow: boolean, nowIso = new D
     return counts;
 }
 
+/** Vom Nutzer abgesagt (nicht vom Betrieb, nicht als Plattformfehler) — zaehlt fuer Frist und Guthaben wie ein Nutzer-No-Show. */
+function isUserCancellation(b: Row): boolean {
+    return b.status === 'cancelled' && b.cancelled_by === 'user' && !b.no_show_by;
+}
+
 export async function runRebookTick(shadow: boolean, nowIso = new Date().toISOString()): Promise<AttendanceTickCounts> {
     const counts: AttendanceTickCounts = { appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, deadlinesClosed: 0, errors: 0 };
     const today = nowIso.slice(0, 10);
@@ -118,7 +123,8 @@ export async function runRebookTick(shadow: boolean, nowIso = new Date().toISOSt
             supabaseApi.select('scheduling', { status: 'no_show' }, { limit: 500 }) as Promise<Row[]>,
             supabaseApi.select('scheduling', { status: 'cancelled' }, { limit: 500 }) as Promise<Row[]>,
         ]);
-        rows = [...noShows, ...cancelled].filter((b) => b.rebook_deadline && !b.credit_decided_at && (b.no_show_by === 'user' || b.no_show_by === 'platform'));
+        rows = [...noShows, ...cancelled].filter((b) => b.rebook_deadline && !b.credit_decided_at
+            && (b.no_show_by === 'user' || b.no_show_by === 'platform' || isUserCancellation(b)));
     } catch { counts.errors++; return counts; }
 
     for (const b of rows) {
@@ -128,6 +134,8 @@ export async function runRebookTick(shadow: boolean, nowIso = new Date().toISOSt
                 // Noch in der Frist: Erinnerung faellig?
                 const day = rebookReminderDue({ noShowAtIso: String(b.no_show_reported_at ?? b.updated_at ?? b.created_at), deadline, sent: Number(b.rebook_reminders_sent ?? 0), today, days: policy.rebookReminderDays });
                 if (day === null) continue;
+                // Nach einer bewussten Absage keine Erinnerungen (Entscheidung 2026-10-11).
+                if (isUserCancellation(b)) continue;
                 if (b.dispute_status === 'open') continue; // solange der Admin prueft, keine Erinnerung
                 if (shadow) { await mark('rebook_reminder', true, { bookingId: b.id, providerKey: b.provider_key, day }); counts.rebookReminders++; continue; }
                 await supabaseApi.update('scheduling', { id: b.id }, { rebook_reminders_sent: Number(b.rebook_reminders_sent ?? 0) + 1 });
@@ -142,7 +150,7 @@ export async function runRebookTick(shadow: boolean, nowIso = new Date().toISOSt
 
             // Frist abgelaufen. Offener Widerspruch haelt die Entscheidung an.
             if (b.dispute_status === 'open') continue;
-            const creditable = b.no_show_by === 'user' && b.dispute_status !== 'upheld' && !!b.lead_ledger_id;
+            const creditable = (b.no_show_by === 'user' || isUserCancellation(b)) && b.dispute_status !== 'upheld' && !!b.lead_ledger_id;
             let amount = 0; let ledger: Row | null = null;
             if (creditable) {
                 const l = (await supabaseApi.select('provider_lead_ledger', { id: b.lead_ledger_id }, { limit: 1 })) as Row[];
@@ -165,7 +173,7 @@ export async function runRebookTick(shadow: boolean, nowIso = new Date().toISOSt
             if (amount > 0 && ledger) {
                 await supabaseApi.insert('provider_credits', {
                     provider_key: b.provider_key, amount_cents: amount, currency: ledger.currency ?? 'USD', reason: 'user_no_rebook_30pct',
-                    ledger_id: ledger.id, booking_id: b.id, note: `${policy.creditPct} % of ${ledger.final_fee_cents} · no rebooking by ${deadline}`,
+                    ledger_id: ledger.id, booking_id: b.id, note: `${policy.creditPct} % of ${ledger.final_fee_cents} · ${isUserCancellation(b) ? 'cancelled by user, ' : ''}no rebooking by ${deadline}`,
                 });
                 // Spur im Ledger: eine credit-Zeile, die auf die Belastung zeigt (append-only, Spec B "credit history").
                 await supabaseApi.insert('provider_lead_ledger', {
@@ -179,9 +187,9 @@ export async function runRebookTick(shadow: boolean, nowIso = new Date().toISOSt
                 await supabaseApi.insert('event_log', { type: 'lead.credit_issued', payload: { bookingId: b.id, providerKey: b.provider_key, ledgerId: ledger.id, creditCents: amount, currency: ledger.currency ?? 'USD', pct: policy.creditPct } });
                 const prov = await providerRow(b.provider_key);
                 for (const m of await membersOf(b.provider_key)) {
-                    await notify({ to: m, type: 'credit_issued', subject: 'booking', subjectId: b.id, payload: { providerKey: b.provider_key, amount: String(amount) }, dedupeKey: `credit_issued:${b.id}:${m}` });
+                    await notify({ to: m, type: 'credit_issued', subject: 'booking', subjectId: b.id, payload: { providerKey: b.provider_key, amount: String(amount), ...(isUserCancellation(b) ? { label: 'cancelled' } : {}) }, dedupeKey: `credit_issued:${b.id}:${m}` });
                 }
-                await sendCreditIssuedMail({ to: prov?.contact_email ?? null, providerKey: b.provider_key, bookingId: b.id, amountCents: amount, currency: ledger.currency ?? 'USD', pct: policy.creditPct, locale: prov?.languages?.[0] });
+                await sendCreditIssuedMail({ to: prov?.contact_email ?? null, providerKey: b.provider_key, bookingId: b.id, amountCents: amount, currency: ledger.currency ?? 'USD', pct: policy.creditPct, locale: prov?.languages?.[0], cause: isUserCancellation(b) ? 'cancelled' : 'no_show' });
                 counts.creditsIssued++;
             } else {
                 await supabaseApi.insert('event_log', { type: 'rebook_deadline_closed', payload: { bookingId: b.id, providerKey: b.provider_key, noShowBy: b.no_show_by, creditCents: 0 } });

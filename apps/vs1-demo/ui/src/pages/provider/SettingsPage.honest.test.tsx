@@ -25,6 +25,8 @@ vi.mock('../../api/provider', () => ({
   updateAvailabilityHours: vi.fn(),
 }));
 vi.mock('../../api/application', () => ({ fetchApplication: () => api.fetchApplication() }));
+// Phase 7: der Demo-Tarif hier ist nicht API-berechtigt — der Abschnitt existiert nicht.
+vi.mock('../../api/apiAccess', () => ({ fetchApiAccess: () => Promise.resolve({ ok: true, eligible: false, plan_code: 'growth', terms_version: 'api-terms-v1', requestable_scopes: [], client: null }), REQUESTABLE_SCOPES: [] }));
 vi.mock('../../api/contact', () => ({
   CONTACT_INBOX: null,
   sendContact: (p: unknown) => api.sendContact(p),
