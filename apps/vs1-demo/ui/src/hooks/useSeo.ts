@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PUBLIC_ROUTES, SEO_LOCALES, DEFAULT_LOCALE, absoluteUrl } from '../lib/publicRoutes';
 import { DOMAIN_BY_SLUG } from '../lib/domains';
+import { coverageVars } from '../lib/coverage';
 
 // ─── useSeo ───────────────────────────────────────────────────────────────────
 // Head management for the public pages, in ONE place rather than per page.
@@ -68,8 +69,11 @@ export function useSeo() {
         })
       : '';
 
-    const title = t(`seo.${route.seoKey}.title`, { country, area });
-    const description = t(`seo.${route.seoKey}.description`, { country, area });
+    // Schritt 5: Zahl und Liste der Maerkte/Bereiche aus den Daten (lib/coverage),
+    // dieselben Werte wie das Vorrendern in vite-plugin-seo.ts.
+    const cov = coverageVars(locale ?? 'en', (c) => t(`markets.countries.${c}`, { defaultValue: c }));
+    const title = t(`seo.${route.seoKey}.title`, { country, area, ...cov });
+    const description = t(`seo.${route.seoKey}.description`, { country, area, ...cov });
 
     document.title = title;
     setMeta('name', 'description', description);

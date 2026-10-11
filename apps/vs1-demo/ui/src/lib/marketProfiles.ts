@@ -280,3 +280,23 @@ export function listMarkets(): {
     };
   }).sort((a, b) => b.obligationCount - a.obligationCount);
 }
+
+/**
+ * Where an area reaches, derived from the engine — never authored (EN-Launch
+ * step 5, checklist "Coverage changes are reflected without editing static
+ * homepage copy"). `markets` are the markets that hold a national source for
+ * the area; `euWide` says an EU Regulation applies to it directly in every EU
+ * market. The homepage atlas renders exactly this, so a market the engine
+ * adds tomorrow shows up there without anyone touching the copy.
+ */
+export function areaReach(slug: DomainSlug): { markets: CountryCode[]; euWide: boolean } {
+  const markets = MARKET_CODES.filter((code) => getMarketProfile(code).byDomain.some((g) => g.domainSlug === slug));
+  let euWide = false;
+  for (const [subdomainId, byCountry] of Object.entries(ObligationEnrichmentMap)) {
+    const domain = SUBDOMAIN_DOMAIN[subdomainId];
+    if (!domain || slugForSubdomain(subdomainId, domain) !== slug) continue;
+    const fallback = (byCountry as Record<string, ObligationEnrichment | undefined>).default;
+    if ((fallback?.scope ?? 'eu') === 'eu') { euWide = true; break; }
+  }
+  return { markets, euWide };
+}

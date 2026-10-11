@@ -852,7 +852,6 @@
     "items": [
       {
         "title": "Vergi ve KDV",
-        "markets": "DE · UK · NL · FR · IT · ES",
         "desc": "Sattığınız her pazarda hangi KDV rejiminin geçerli olduğunu ve kaydın ne zaman gerektiğini bilin.",
         "intro": "Sınır ötesi KDV, OSS/IOSS, topluluk içi teslimat, uzaktan satış eşikleri. Altı pazar; altı KDV rejimi, altı kayıt eşiği, altı beyan takvimi demektir. Her birini izleriz.",
         "cover": [
@@ -871,7 +870,6 @@
       },
       {
         "title": "EPR ve Ambalaj",
-        "markets": "DE · UK · NL · FR · AT · BE",
         "desc": "Bir pazarda üretici sayılıp sayılmadığınızı ve ilk sevkiyattan önce neyi kaydettirmeniz gerektiğini bilin.",
         "intro": "Ambalaj, pil ve elektronikte genişletilmiş üretici sorumluluğu. Her pazar kendi sicilini, ücret tarifesini ve raporlama takvimini işletir. Nereye ve ne zaman kaydolacağınızı haritalarız.",
         "cover": [
@@ -890,7 +888,6 @@
       },
       {
         "title": "Veri ve Gizlilik",
-        "markets": "AB GENELİ · BREXIT SONRASI UK",
         "desc": "Neyi, hangi hukuki dayanakla toplayabileceğinizi ve neyi belgeleyebilmeniz gerektiğini bilin.",
         "intro": "AB'de ve Brexit sonrası Birleşik Krallık'ta veri koruma. İşleme kayıtlarından uluslararası aktarımlara kadar, yalnızca merkezinizi değil, verinizi izleyen yükümlülükleri ortaya koyarız.",
         "cover": [
@@ -909,7 +906,6 @@
       },
       {
         "title": "Pazarlama Uyumu",
-        "markets": "AB GENELİ · EPRIVACY",
         "desc": "Ne iddia edebileceğinizi, insanlara nasıl ulaşabileceğinizi ve rızanın nasıl görünmesi gerektiğini bilin.",
         "intro": "ePrivacy ve tüketici hukuku kapsamında onay ve dürüst pazarlama kuralları. Çerez duvarları, opt-in'ler ve dark pattern incelemeleri pazara göre değişir — her düzenleyicinin fiilen neyi uyguladığını izleriz.",
         "cover": [
@@ -928,7 +924,6 @@
       },
       {
         "title": "Şirket Kuruluşu ve Bildirimler",
-        "markets": "DE · AT · CH",
         "desc": "Yapınızın nerede yükümlülük doğurduğunu bilin — işyeri, beyanlar, gerçek faydalanıcılar.",
         "intro": "DACH bölgesinde şirket düzeyindeki yükümlülükler. Yıllık beyanlar, gerçek faydalanıcı şeffaflığı ve grup içi sözleşmelerin her birinin kendi vadeleri ve yaptırımları vardır.",
         "cover": [
@@ -947,7 +942,6 @@
       },
       {
         "title": "Ürün Uygunluğu",
-        "markets": "AB GENELİ · UK",
         "desc": "Ürününüzün piyasaya arz edilip edilemeyeceğini ve hangi kanıtları saklamanız gerektiğini bilin.",
         "intro": "Bir ürünün piyasaya arz edilip edilemeyeceği ve bunun arkasında hangi kanıtın durduğu. Ambalajdan ayrı: burada ürünün kendisi söz konusu — güvenlik, uygunluk, dokümantasyon ve AB içinde bunun sorumluluğunu kimin üstlendiği.",
         "cover": [
@@ -966,7 +960,6 @@
       },
       {
         "title": "Lojistik ve Gümrük",
-        "markets": "DE · UK · NL · FR · AB",
         "desc": "Malınızın sınırı geçmek için neye ihtiyaç duyduğunu ve bunun sorumluluğunu kimin taşıdığını bilin.",
         "intro": "Malın sınırı geçmek için neye ihtiyaç duyduğu ve geçtikten sonra sorumluluğu kimin taşıdığı. Gümrük kimliği, beyannameler, istatistik ve kimin ödeyeceğini, kimin sorumlu olacağını belirleyen teslim şartları.",
         "cover": [
@@ -985,7 +978,6 @@
       },
       {
         "title": "Hukuki Destek",
-        "markets": "AB GENELİ",
         "desc": "Bir sorunun gerçekten avukat gerektirip gerektirmediğini bilin — ve dosyanızı zaten bilen birine ulaşın.",
         "intro": "Kontrol listesi değil, nitelikli yanıt gerektiren sorular: sözleşmeler, koşullar, tüketici hakları, uyuşmazlıklar. CompliHub360 bir hukuk bürosu değildir — Verified Provider’lar kendi mesleki sorumlulukları altında danışmanlık verir ve biz ulaştığınız kişinin dosyanızı zaten bilmesini sağlarız.",
         "cover": [
@@ -1004,7 +996,6 @@
       },
       {
         "title": "Çevresel Uyum",
-        "markets": "AB GENELİ · BİRLEŞİK KRALLIK",
         "desc": "Cihaz ve pil kayıtları, ömrün sonunda geri alma ve maddeler hakkında bildirmeniz gerekenler.",
         "intro": "Ambalajın ötesindeki çevresel yükümlülükler: elektrikli cihazlar ve piller için ulusal kayıtlar, ömrünün sonunda geri alma ve sattığınız eşyalardaki maddelere ilişkin bilgilendirme yükümlülükleri.",
         "cover": [
@@ -1333,7 +1324,6 @@
     },
     "markets": {
       "pre": "Bugün kapsadığımız pazarlar: ",
-      "list": "Almanya · Birleşik Krallık · Hollanda · Fransa · İtalya · İspanya",
       "post": ". 2026 boyunca daha fazla ülke ekleniyor."
     },
     "disclaimer": "CompliHub360 bir orkestrasyon platformudur — hukuk bürosu değildir. Hukuki, vergisel ve mevzuata ilişkin danışmanlık, kendi mesleki sorumlulukları altında Verified Provider'lar tarafından verilir. §§ RDG / StBerG anlamında Rechtsberatung sunmuyoruz.",

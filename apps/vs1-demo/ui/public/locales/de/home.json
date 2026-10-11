@@ -852,7 +852,6 @@
     "items": [
       {
         "title": "Steuern & USt",
-        "markets": "DE · UK · NL · FR · IT · ES",
         "desc": "Wissen, welches Umsatzsteuerregime in jedem Markt gilt, in den Sie verkaufen, und wann eine Registrierung fällig wird.",
         "intro": "Grenzüberschreitende USt, OSS/IOSS, innergemeinschaftliche Lieferungen, Versandhandelsschwellen. Sechs Märkte bedeuten sechs USt-Regime, sechs Registrierungsschwellen, sechs Meldezyklen. Wir verfolgen jeden davon.",
         "cover": [
@@ -871,7 +870,6 @@
       },
       {
         "title": "EPR & Verpackung",
-        "markets": "DE · UK · NL · FR · AT · BE",
         "desc": "Wissen, ob Sie in einem Markt als Hersteller gelten — und was Sie vor der ersten Sendung registrieren müssen.",
         "intro": "Erweiterte Herstellerverantwortung für Verpackungen, Batterien und Elektronik. Jeder Markt führt sein eigenes Register mit eigenen Gebühren und Meldezyklen. Wir kartieren, wo und wann Sie sich registrieren.",
         "cover": [
@@ -890,7 +888,6 @@
       },
       {
         "title": "Daten & Datenschutz",
-        "markets": "EU-WEIT · UK NACH DEM BREXIT",
         "desc": "Wissen, was Sie erheben dürfen, auf welcher Grundlage, und was Sie belegen können müssen.",
         "intro": "Datenschutz in der EU und im UK nach dem Brexit. Vom Verarbeitungsverzeichnis bis zu internationalen Übermittlungen zeigen wir die Pflichten auf, die Ihren Daten folgen — nicht nur Ihrem Hauptsitz.",
         "cover": [
@@ -909,7 +906,6 @@
       },
       {
         "title": "Marketing-Compliance",
-        "markets": "EU-WEIT · EPRIVACY",
         "desc": "Wissen, was Sie versprechen dürfen, wie Sie Menschen erreichen dürfen und wie Einwilligung aussehen muss.",
         "intro": "Einwilligungs- und Lauterkeitsregeln unter ePrivacy und Verbraucherrecht. Cookie-Walls, Opt-ins und Dark-Pattern-Prüfungen variieren je Markt — wir verfolgen, was jede Behörde tatsächlich durchsetzt.",
         "cover": [
@@ -928,7 +924,6 @@
       },
       {
         "title": "Gründung & Meldungen",
-        "markets": "DE · AT · CH",
         "desc": "Wissen, wo Ihre Aufstellung Pflichten auslöst — Betriebsstätte, Meldungen, wirtschaftlich Berechtigte.",
         "intro": "Pflichten auf Unternehmensebene in der DACH-Region. Jahresabschlüsse, Transparenz über wirtschaftlich Berechtigte und konzerninterne Verträge haben jeweils eigene Fristen und Sanktionen.",
         "cover": [
@@ -947,7 +942,6 @@
       },
       {
         "title": "Produkt-Compliance",
-        "markets": "EU-WEIT · UK",
         "desc": "Wissen, ob Ihr Produkt in Verkehr gebracht werden darf und welche Nachweise Sie vorhalten müssen.",
         "intro": "Ob ein Produkt überhaupt in Verkehr gebracht werden darf und welcher Nachweis dahintersteht. Getrennt von der Verpackung: hier geht es um das Produkt selbst — Sicherheit, Konformität, Dokumentation, und wer innerhalb der EU dafür einsteht.",
         "cover": [
@@ -966,7 +960,6 @@
       },
       {
         "title": "Logistik & Zoll",
-        "markets": "DE · UK · NL · FR · EU",
         "desc": "Wissen, was Ihre Ware für den Grenzübertritt braucht und wer dabei haftet.",
         "intro": "Was Ware für den Grenzübertritt braucht und wer haftet, sobald sie ihn macht. Zollidentität, Anmeldungen, Statistik und die Lieferbedingungen, die entscheiden, wer zahlt und wer einsteht.",
         "cover": [
@@ -985,7 +978,6 @@
       },
       {
         "title": "Rechtliche Unterstützung",
-        "markets": "EU-WEIT",
         "desc": "Wissen, wann eine Frage wirklich eine Anwältin braucht — und jemanden erreichen, der Ihren Fall schon kennt.",
         "intro": "Die Fragen, die eine qualifizierte Antwort brauchen statt einer Checkliste: Verträge, AGB, Verbraucherrechte, Streitfälle. CompliHub360 ist keine Kanzlei — Verified Provider beraten unter eigener Berufshaftung, und wir sorgen dafür, dass die Person, die Sie erreichen, Ihren Fall bereits kennt.",
         "cover": [
@@ -1004,7 +996,6 @@
       },
       {
         "title": "Umwelt-Compliance",
-        "markets": "EU-WEIT · UK",
         "desc": "Register für Geräte und Batterien, Rücknahme am Lebensende, und was Sie über Stoffe offenlegen müssen.",
         "intro": "Umweltpflichten jenseits der Verpackung: nationale Register für Elektrogeräte und Batterien, Rücknahme am Lebensende, und die Informationspflichten für Stoffe in den Erzeugnissen, die Sie verkaufen.",
         "cover": [
@@ -1333,7 +1324,6 @@
     },
     "markets": {
       "pre": "Märkte, die wir heute abdecken: ",
-      "list": "Deutschland · Vereinigtes Königreich · Niederlande · Frankreich · Italien · Spanien",
       "post": ". Weitere Länder folgen im Lauf des Jahres 2026."
     },
     "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform — keine Kanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Provider in eigener beruflicher Haftung. Wir erbringen keine Rechtsberatung im Sinne der §§ RDG / StBerG.",

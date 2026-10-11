@@ -8,6 +8,7 @@ import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 import { RelatedAccordion, type RelatedEntry } from './RelatedAreas';
 import type { MarketProfile } from '../../lib/marketProfiles';
 import { obligationLabel } from '../../lib/obligationText';
+import { COVERAGE_COUNTS } from '../../lib/coverage';
 
 interface Props {
   profile: MarketProfile;
@@ -72,7 +73,7 @@ export function MarketRelatedAreas({ profile }: Props) {
         entries={entries}
         strongestLabel={t('compliance.area.relatedStrongest', 'Strongest connection')}
         exitTo={`${localePrefix}/compliance`}
-        exitLabel={t('compliance.area.allAreasLink', 'All nine areas at a glance')}
+        exitLabel={t('compliance.area.allAreasLink', { ...COVERAGE_COUNTS, defaultValue: 'All {{areas}} areas at a glance' })}
       />
     </div>
   );

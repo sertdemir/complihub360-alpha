@@ -427,7 +427,23 @@
     "doneTitle": "Done ✓",
     "dossierUnlocked": "🔓 Dossier unlocked",
     "contactInDashboard": "Requester contact will appear in your partner dashboard thread.",
-    "closeNote": "You can close this window or open your partner dashboard."
+    "closeNote": "You can close this window or open your partner dashboard.",
+    "fields": {
+      "country": "Country",
+      "markets": "Markets",
+      "categories": "Areas",
+      "businessType": "Business type",
+      "businessTypeNote": "Business details",
+      "marketScope": "Market scope",
+      "riskSignals": "Risk signals",
+      "revenueBand": "Revenue band",
+      "intent": "Intent",
+      "urgency": "Urgency",
+      "note": "Note",
+      "existingProvider": "Existing provider",
+      "domain": "Area",
+      "timeline": "Timeline"
+    }
   },
   "requests": {
     "title": "Requests",

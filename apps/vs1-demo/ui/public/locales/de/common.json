@@ -5,44 +5,6 @@
     "complianceAreas": "Compliance-Bereiche",
     "resources": "Ressourcen",
     "signup": "Kostenlos starten",
-    "items": {
-      "aiEngine": {
-        "title": "Die KI Engine",
-        "desc": "Sichere Datenextraktion & Mapping"
-      },
-      "partnerMatching": {
-        "title": "Partner Matching",
-        "desc": "Vom Risiko zur lokalen Umsetzung"
-      },
-      "globalCoverage": {
-        "title": "Globale Abdeckung",
-        "desc": "UK, EU, DACH & USA"
-      },
-      "forPartners": {
-        "title": "Für Partnerkanzleien",
-        "desc": "Lead-Generierung für Berater"
-      },
-      "founders": {
-        "title": "Gründer & CEOs",
-        "desc": "Risiken minimieren & schneller skalieren"
-      },
-      "operations": {
-        "title": "Operations Teams",
-        "desc": "Tägliche Compliance automatisieren"
-      },
-      "counsel": {
-        "title": "In-house Counsel",
-        "desc": "Recherchezeit um 90% reduzieren"
-      },
-      "stories": {
-        "title": "Erfolgsgeschichten",
-        "desc": "Echte Compliance-Erfolge"
-      },
-      "guides": {
-        "title": "Guides & Whitepaper",
-        "desc": "Detaillierte Marktanalysen"
-      }
-    },
     "aiGovernance": "KI Governance",
     "aiGovDesc": "Unser Framework für transparente und rechtskonforme KI.",
     "dashboard": "Mein Dashboard",
@@ -368,7 +330,6 @@
     },
     "risk": {
       "subtitle": "Von der Compliance-Engine für {{market}} gewichtet.",
-      "hintEu": "Gemittelt über die acht Märkte, die die Engine profiliert. Wählen Sie einen Markt für dessen eigene Gewichtung.",
       "hintMarket": "{{market}} gewichtet diese Bereiche wie gezeigt — stärkster zuerst."
     },
     "matrix": {

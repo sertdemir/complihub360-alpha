@@ -160,7 +160,7 @@ function toRows(bookings: UserBooking[], locale: string): Row[] {
 export const icsUtc = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 export const icsEsc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
 
-export function icsHref(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'provider' | 'meta'>): string {
+export function icsHref(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'provider' | 'meta'>, summary?: string): string {
   const start = icsUtc(r.slotStartIso);
   // Ohne Ende waere der Eintrag punktfoermig; 30 Minuten sind die Slot-Laenge
   // der Buchungsstrecke (POST /scheduling setzt slot_end genauso).
@@ -170,7 +170,7 @@ export function icsHref(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'pro
     `DTSTAMP:${icsUtc(new Date().toISOString())}`,
     `DTSTART:${start}`,
     `DTEND:${end}`,
-    `SUMMARY:${icsEsc(`CompliHub360 Erstgespräch — ${r.provider}`)}`,
+    `SUMMARY:${icsEsc(summary ?? `Consultation with ${r.provider} · CompliHub360`)}`,
     `DESCRIPTION:${icsEsc(r.meta)}`,
     'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   return `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
@@ -178,9 +178,9 @@ export function icsHref(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'pro
 
 // "In den Kalender" ist ein Button, kein <a download> — so trägt er dieselbe
 // Gestalt wie jede andere Aktion. Der Anker entsteht nur für den Klick.
-export function ladeIcs(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'provider' | 'meta'>) {
+export function ladeIcs(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'provider' | 'meta'>, summary?: string) {
   const a = document.createElement('a');
-  a.href = icsHref(r);
+  a.href = icsHref(r, summary);
   a.download = 'complihub-termin.ics';
   document.body.appendChild(a);
   a.click();
@@ -406,7 +406,7 @@ export function TerminePage() {
         </Tag>
         {r.status === 'confirmed' && !r.needsOutcome && (
           <>
-            <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(r)}>
+            <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(r, t('termine.icsSummary', { provider: r.provider }))}>
               {t('termine.addToCalendar')}
             </Button>
             <ActionMenu
@@ -467,7 +467,7 @@ export function TerminePage() {
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
         {r.status === 'confirmed' && (
           <>
-            <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(r)}>
+            <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(r, t('termine.icsSummary', { provider: r.provider }))}>
               {t('termine.addToCalendar')}
             </Button>
             <ActionMenu
@@ -531,7 +531,7 @@ export function TerminePage() {
               {next.paused && <p className="mt-1 text-[12.5px] font-medium text-fg-brand">{t('termine.paused.short')}</p>}
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <Button size="sm" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(next)}>
+              <Button size="sm" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(next, t('termine.icsSummary', { provider: next.provider }))}>
                 {t('termine.addToCalendar')}
               </Button>
               <Button size="sm" variant="outline" onClick={() => onReschedule(next)}>{t('termine.reschedule')}</Button>

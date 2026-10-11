@@ -6,6 +6,7 @@ import { DOMAINS } from '../../lib/domains';
 import { MARKET_CODES } from '../../lib/marketProfiles';
 import { Badge } from '../ui/Badge';
 import { NewsletterBand } from './NewsletterBand';
+import { marketNames } from '../../lib/coverage';
 
 // ─── S10 — Site footer · Figma 1212:11 ──────────────────────────────────────
 // Light four-column footer closing the landing page: brand + positioning, the
@@ -230,7 +231,7 @@ export function SiteFooter() {
         <div className="border-t border-stroke-subtle py-10 text-center">
           <p className="mx-auto max-w-2xl text-body-sm text-fg-secondary">
             {t('footer.markets.pre')}
-            <span className="font-semibold text-fg">{t('footer.markets.list')}</span>
+            <span className="font-semibold text-fg">{marketNames((c) => t(`common:markets.countries.${c}`, { defaultValue: c })).join(' · ')}</span>
             {t('footer.markets.post')}
           </p>
           <p className="mx-auto mt-5 max-w-3xl text-body-2xs leading-relaxed text-fg-tertiary">

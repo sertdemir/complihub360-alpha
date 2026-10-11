@@ -21,6 +21,7 @@ import { DOMAINS, type DomainSlug } from '../../lib/domains';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
+import { areaReachLine } from '../../lib/coverage';
 
 // ─── S4 — What CompliHub360 Knows · Figma 1249:439 ──────────────────────────────
 // "Six domains. One coherent map." A 3×2 grid of domain cards (gold frame on
@@ -106,7 +107,7 @@ function DomainDrawer({ index, onClose }: { index: number; onClose: () => void }
           </div>
           <h3 className="mt-3 font-serif text-[2.25rem] font-bold leading-none text-fg">{t(`${base}.title`)}</h3>
           <p className="mt-3 text-body-sm font-semibold text-fg-brand">
-            {t('domains.activeIn')} <span className="text-fg-secondary">{t(`${base}.markets`)}</span>
+            {t('domains.activeIn')} <span className="text-fg-secondary">{areaReachLine(DOMAINS[index].slug, t('domains.euWide'))}</span>
           </p>
           <p className="mt-6 text-body leading-relaxed text-fg-secondary">{t(`${base}.intro`)}</p>
 
@@ -171,7 +172,7 @@ export function DomainsKnows() {
               <Icon size={26} strokeWidth={1.75} className="text-fg-brand" />
               <p className="mt-4 text-[18px] font-bold text-fg">{t(`domains.items.${i}.title`)}</p>
               <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{t(`domains.items.${i}.desc`)}</p>
-              <p className="mt-4 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t(`domains.items.${i}.markets`)}</p>
+              <p className="mt-4 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{areaReachLine(DOMAINS[i].slug, t('domains.euWide'))}</p>
               <span className="mt-4 inline-flex items-center gap-1 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-brand">
                 {t('domains.cardCta')} <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
               </span>

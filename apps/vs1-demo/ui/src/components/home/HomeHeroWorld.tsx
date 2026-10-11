@@ -16,6 +16,7 @@ import { Button } from '../ui/Button';
 import { GoldWord } from '../providers/SectionHeading';
 import { Stagger, StaggerItem } from '../providers/SectionHeading';
 import { HeroWorldMap } from './HeroWorldMap';
+import { COVERAGE_COUNTS } from '../../lib/coverage';
 
 // ─── S1 — Hero (world-map edition, canvas "Homepage Hero" 2026-08-24) ─────────
 // Replaces HomeHero ON THE HOMEPAGE ONLY — HomeHero itself stays in the tree
@@ -91,7 +92,7 @@ export function HomeHeroWorld() {
               <br />
               <GoldWord>{t('heroWorld.title.line2')}</GoldWord>
             </h1>
-            <p className="mt-6 max-w-[44ch] text-[1.25rem] leading-[1.6] text-fg-secondary">{t('heroWorld.lead')}</p>
+            <p className="mt-6 max-w-[44ch] text-[1.25rem] leading-[1.6] text-fg-secondary">{t('heroWorld.lead', COVERAGE_COUNTS)}</p>
             <div className="mt-9 flex max-w-[480px] flex-col gap-3">
               <Button size="lg" fullWidth onClick={startRiskMap}>
                 {t('heroWorld.ctaRiskMap')} <ArrowRight size={17} />
@@ -143,7 +144,7 @@ export function HomeHeroWorld() {
               className="border-stroke-subtle px-6 lg:border-r lg:px-7 lg:last:border-r-0"
             >
               <p className="text-body-md font-bold text-fg">{t(`heroWorld.proofs.${i}.title`)}</p>
-              <p className="mt-0.5 text-body-2xs text-fg-tertiary">{t(`heroWorld.proofs.${i}.desc`)}</p>
+              <p className="mt-0.5 text-body-2xs text-fg-tertiary">{t(`heroWorld.proofs.${i}.desc`, COVERAGE_COUNTS)}</p>
             </StaggerItem>
           ))}
         </Stagger>

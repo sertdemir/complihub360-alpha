@@ -852,7 +852,6 @@
     "items": [
       {
         "title": "Impuestos e IVA",
-        "markets": "DE · UK · NL · FR · IT · ES",
         "desc": "Saber qué régimen de IVA se aplica en cada mercado al que vende y cuándo toca registrarse.",
         "intro": "IVA transfronterizo, OSS/IOSS, entregas intracomunitarias, umbrales de venta a distancia. Seis mercados significan seis regímenes de IVA, seis umbrales de registro, seis calendarios de presentación. Seguimos cada uno.",
         "cover": [
@@ -871,7 +870,6 @@
       },
       {
         "title": "EPR y envases",
-        "markets": "DE · UK · NL · FR · AT · BE",
         "desc": "Saber si cuenta como productor en un mercado y qué debe registrar antes del primer envío.",
         "intro": "Responsabilidad ampliada del productor para envases, pilas y electrónica. Cada mercado tiene su propio registro, tarifas y calendario de informes. Mapeamos con quién debe registrarse y cuándo.",
         "cover": [
@@ -890,7 +888,6 @@
       },
       {
         "title": "Datos y privacidad",
-        "markets": "TODA LA UE · UK POST-BREXIT",
         "desc": "Saber qué puede recoger, con qué base y qué tiene que poder demostrar.",
         "intro": "Protección de datos en la UE y en el Reino Unido tras el Brexit. Del registro de actividades a las transferencias internacionales, mostramos las obligaciones que siguen a sus datos — no solo a su sede.",
         "cover": [
@@ -909,7 +906,6 @@
       },
       {
         "title": "Compliance de marketing",
-        "markets": "TODA LA UE · EPRIVACY",
         "desc": "Saber qué puede afirmar, cómo puede dirigirse a las personas y cómo debe ser el consentimiento.",
         "intro": "Reglas de consentimiento y marketing leal bajo ePrivacy y el derecho del consumidor. Los cookie walls, los opt-ins y el escrutinio de dark patterns varían por mercado — seguimos lo que cada regulador realmente hace cumplir.",
         "cover": [
@@ -928,7 +924,6 @@
       },
       {
         "title": "Constitución y presentaciones",
-        "markets": "DE · AT · CH",
         "desc": "Saber dónde su estructura genera obligaciones: establecimiento permanente, presentaciones, titulares reales.",
         "intro": "Obligaciones a nivel de entidad en la región DACH. Las cuentas anuales, la transparencia de titulares reales y los contratos intragrupo tienen sus propios plazos y sanciones.",
         "cover": [
@@ -947,7 +942,6 @@
       },
       {
         "title": "Conformidad de producto",
-        "markets": "TODA LA UE · UK",
         "desc": "Saber si su producto puede comercializarse y qué pruebas debe conservar.",
         "intro": "Si un producto puede comercializarse siquiera y qué prueba lo respalda. Separado del envase: aquí se trata del producto en sí — seguridad, conformidad, documentación y quién responde por él dentro de la UE.",
         "cover": [
@@ -966,7 +960,6 @@
       },
       {
         "title": "Logística y aduanas",
-        "markets": "DE · UK · NL · FR · UE",
         "desc": "Saber qué necesita su mercancía para cruzar una frontera y quién responde cuando lo hace.",
         "intro": "Qué necesita la mercancía para cruzar una frontera y quién responde una vez que lo hace. Identidad aduanera, declaraciones, estadística y las condiciones de entrega que deciden quién paga y quién responde.",
         "cover": [
@@ -985,7 +978,6 @@
       },
       {
         "title": "Apoyo jurídico",
-        "markets": "TODA LA UE",
         "desc": "Saber cuándo una cuestión necesita de verdad a un abogado, y llegar a uno que ya conoce su caso.",
         "intro": "Las cuestiones que necesitan una respuesta cualificada y no una lista de comprobación: contratos, condiciones, derechos del consumidor, litigios. CompliHub360 no es un despacho — los Verified Providers asesoran bajo su propia responsabilidad profesional, y nos ocupamos de que quien le atienda ya conozca su caso.",
         "cover": [
@@ -1004,7 +996,6 @@
       },
       {
         "title": "Cumplimiento ambiental",
-        "markets": "UE · REINO UNIDO",
         "desc": "Registros para aparatos y baterías, recogida al final de la vida útil y qué debe informar sobre las sustancias.",
         "intro": "Obligaciones ambientales más allá del envase: registros nacionales para aparatos eléctricos y baterías, recogida al final de la vida útil, y los deberes de información sobre sustancias en los artículos que vende.",
         "cover": [
@@ -1333,7 +1324,6 @@
     },
     "markets": {
       "pre": "Mercados que cubrimos hoy: ",
-      "list": "Alemania · Reino Unido · Países Bajos · Francia · Italia · España",
       "post": ". Más países se incorporarán a lo largo de 2026."
     },
     "disclaimer": "CompliHub360 es una plataforma de orquestación — no un despacho de abogados. El asesoramiento jurídico, fiscal y regulatorio lo prestan Verified Providers bajo su propia responsabilidad profesional. No prestamos Rechtsberatung en el sentido de los §§ RDG / StBerG.",

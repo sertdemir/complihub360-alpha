@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import type { Plugin } from 'vite';
-import { PUBLIC_ROUTES, SEO_LOCALES, DEFAULT_LOCALE, absoluteUrl } from './src/lib/publicRoutes';
+import { PUBLIC_ROUTES, SEO_LOCALES, DEFAULT_LOCALE, absoluteUrl, COVERAGE_COUNTS, marketListText } from './src/lib/publicRoutes';
 
 // ─── vite-plugin-seo ──────────────────────────────────────────────────────────
 // The half of the head that a crawler sees WITHOUT running JavaScript.
@@ -85,8 +85,14 @@ export function seoPlugin(): Plugin {
           const slug = route.seoKey === 'complianceArea' ? route.path.split('/')[1] : '';
           const area = slug ? (areas[slug]?.title ?? slug) : '';
 
+          // Schritt 5: {{markets}}, {{areas}}, {{marketList}} — dieselbe Funktion
+          // wie hooks/useSeo, damit der vorgerenderte Kopf denselben Satz traegt.
+          const marketList = marketListText((c) => countries[c] ?? c, locale);
           const fill = (s: string) =>
-            s.replace(/\{\{country\}\}/g, country).replace(/\{\{area\}\}/g, area);
+            s.replace(/\{\{country\}\}/g, country).replace(/\{\{area\}\}/g, area)
+              .replace(/\{\{markets\}\}/g, String(COVERAGE_COUNTS.markets))
+              .replace(/\{\{areas\}\}/g, String(COVERAGE_COUNTS.areas))
+              .replace(/\{\{marketList\}\}/g, marketList);
           const title = fill(entry.title);
           const description = fill(entry.description);
           const canonical = absoluteUrl(origin, locale, route.path);

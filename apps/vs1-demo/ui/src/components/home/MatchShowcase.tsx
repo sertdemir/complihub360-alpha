@@ -124,6 +124,8 @@ export function MatchShowcase() {
             </span>
           </h2>
           <p className="max-w-[62ch] text-body-lg leading-relaxed text-fg-secondary">{t('matchmaking.subtitle')}</p>
+          {/* Schritt 5: die drei Karten unten sind erfunden — das sagt die Seite. */}
+          <p className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t('matchmaking.exampleLabel')}</p>
         </Reveal>
 
       </Container>

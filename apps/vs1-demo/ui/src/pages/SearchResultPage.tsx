@@ -6,6 +6,7 @@ import { Logo } from '../components/ui/Logo';
 import { Button } from '../components/ui/Button';
 import { DOMAINS } from '../lib/domains';
 import { areasForQuery } from '../lib/searchAreas';
+import { COVERAGE_COUNTS } from '../lib/coverage';
 
 // ─── /search · die ehrliche Bruecke (Beta-Plan Mi 14.10.) ────────────────────
 // Canvas „Suche als ehrliche Brücke", Wahl 10.10.2026: A1 · B3 · C2 · D2;
@@ -133,7 +134,7 @@ export function SearchResultPage() {
             {ENTRIES.map((g) => (
               <a key={g.key} href={`/${locale}/${g.path}`} className="group rounded-xl border border-stroke bg-surface p-4 transition-colors hover:border-fg-brand">
                 <BookOpen size={18} className="text-fg-brand" />
-                <p className="mt-2 text-body-sm font-semibold leading-snug text-fg">{t(`search.entries.${g.key}`)}</p>
+                <p className="mt-2 text-body-sm font-semibold leading-snug text-fg">{t(`search.entries.${g.key}`, COVERAGE_COUNTS)}</p>
                 <span className="mt-2 inline-flex items-center gap-1 text-body-2xs font-medium text-fg-brand">
                   {t('search.guideRead')} <ArrowRight size={13} />
                 </span>

@@ -84,3 +84,18 @@ describe('public route manifest', () => {
     expect(legal.every((r) => r.priority < index.priority)).toBe(true);
   });
 });
+
+describe('Schritt 5: Maerkte und Bereiche in Worten', () => {
+  it('die SEO-Maerkte sind genau die Maerkte der Engine', async () => {
+    const { MARKET_CODES } = await import('./marketProfiles');
+    const { MARKET_CODES_SEO } = await import('./publicRoutes');
+    expect([...MARKET_CODES_SEO].map((c) => c.toUpperCase()).sort()).toEqual([...MARKET_CODES].sort());
+  });
+
+  it('Laufzeit und Vorrendern bauen denselben Satz', async () => {
+    const { marketListText, COVERAGE_COUNTS } = await import('./publicRoutes');
+    const names: Record<string, string> = { DE: 'Germany', UK: 'United Kingdom', NL: 'Netherlands', FR: 'France', IT: 'Italy', ES: 'Spain', US: 'United States', TR: 'Türkiye' };
+    expect(marketListText((c) => names[c], 'en')).toBe('Germany, United Kingdom, Netherlands, France, Italy, Spain, United States, and Türkiye');
+    expect(COVERAGE_COUNTS).toEqual({ markets: 8, areas: 9 });
+  });
+});

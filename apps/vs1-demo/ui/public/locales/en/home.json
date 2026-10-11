@@ -83,7 +83,7 @@
       "line1": "Cross-border compliance.",
       "line2": "Simplified."
     },
-    "lead": "Understand your obligations. Find the right specialists. Stay compliant — everywhere you sell.",
+    "lead": "Understand your obligations across {{markets}} markets. Find the right specialists. Stay compliant.",
     "ctaRiskMap": "Assess My Needs",
     "ask": {
       "placeholder": "Describe what you need",
@@ -109,8 +109,8 @@
     ],
     "proofs": [
       {
-        "title": "360° coverage",
-        "desc": "Across countries, topics and regulations."
+        "title": "360° view",
+        "desc": "{{areas}} compliance areas across {{markets}} markets, in one map."
       },
       {
         "title": "Expert network",
@@ -303,11 +303,11 @@
   "marketsDrawer": {
     "header": "Markets",
     "title": "Other markets",
-    "count": "{{selected}} selected · {{total}} available",
-    "desc": "Outside the headline grid. Pick the markets you operate in — we map their regulations and route to the right Verified Provider.",
+    "count": "{{selected}} selected · {{total}} markets",
+    "desc": "We don't assess these markets yet. Add the ones you operate in: your risk map marks them as not covered yet, and you can request coverage there.",
     "searchPlaceholder": "Search by name or country code",
     "european": "European markets",
-    "expanding": "Coverage expanding",
+    "expanding": "More markets",
     "noMatch": "No markets match “{{query}}”.",
     "footNote": "Selections add to your risk map. Edit anytime in Step 4.",
     "add_one": "Add {{count}} Market",
@@ -744,7 +744,8 @@
       "gold": "connect",
       "post": " you with who fixes it."
     },
-    "subtitle": "A risk map is where it starts. What makes CompliHub360 different is what comes after: Verified Providers across countries and areas, checked against evidence, response-tracked, with structured handovers. You don’t search. We match.",
+    "subtitle": "A risk map is where it starts. What makes CompliHub360 different is what comes after: Verified Providers, checked against evidence, response-tracked, with structured handovers. You don’t search. We match.",
+    "exampleLabel": "Example matches · anonymized",
     "matches": [
       {
         "place": "Munich, DE",
@@ -861,13 +862,13 @@
     "cardCta": "Click to see more",
     "drawerEyebrow": "Area",
     "drawerAria": "{{domain}} detail",
-    "activeIn": "Active in:",
+    "activeIn": "National rules in:",
+    "euWide": "EU-wide",
     "items": [
       {
         "title": "Tax & VAT",
-        "markets": "DE · UK · NL · FR · IT · ES",
         "desc": "Know which VAT regime applies in each market you sell into, and when a registration becomes due.",
-        "intro": "Cross-border VAT, OSS/IOSS, intra-community supply, distance-selling thresholds. Six markets means six VAT regimes, six registration thresholds, six filing cadences. We track each.",
+        "intro": "Cross-border VAT, OSS/IOSS, intra-community supply, distance-selling thresholds. Every market has its own VAT regime, registration threshold and filing cadence. We track each one we cover.",
         "cover": [
           "OSS / IOSS quarterly returns",
           "Distance-selling threshold monitoring",
@@ -884,7 +885,6 @@
       },
       {
         "title": "EPR & Packaging",
-        "markets": "DE · UK · NL · FR · AT · BE",
         "desc": "Know whether you count as a producer in a market — and what you must register before the first shipment.",
         "intro": "Extended Producer Responsibility across packaging, batteries, and electronics. Each market runs its own register, fee schedule, and reporting cadence. We map who you register with and when.",
         "cover": [
@@ -903,7 +903,6 @@
       },
       {
         "title": "Data & Privacy",
-        "markets": "EU-WIDE · POST-BREXIT UK",
         "desc": "Know what you may collect, on what basis, and what you have to be able to show.",
         "intro": "Data protection across the EU and post-Brexit UK. From records of processing to international transfers, we surface the obligations that follow your data — not just your headquarters.",
         "cover": [
@@ -922,7 +921,6 @@
       },
       {
         "title": "Marketing Compliance",
-        "markets": "EU-WIDE · EPRIVACY",
         "desc": "Know what you may claim, how you may reach people, and what consent has to look like.",
         "intro": "Consent and fair-marketing rules under ePrivacy and consumer law. Cookie walls, opt-ins, and dark-pattern scrutiny vary by market — we track what each regulator actually enforces.",
         "cover": [
@@ -941,7 +939,6 @@
       },
       {
         "title": "Company Setup & Filings",
-        "markets": "DE · AT · CH",
         "desc": "Know where your setup creates obligations — permanent establishment, filings, beneficial owners.",
         "intro": "Entity-level obligations in the DACH region. Annual statements, beneficial-owner transparency, and intra-group contracts each carry their own deadlines and penalties.",
         "cover": [
@@ -960,7 +957,6 @@
       },
       {
         "title": "Product Compliance",
-        "markets": "EU-WIDE · UK",
         "desc": "Know whether your product may go on the market, and what evidence you have to hold.",
         "intro": "Whether a product may be placed on the market at all, and what proof stands behind it. Separate from packaging: this is the product itself — safety, conformity, documentation, and who inside the EU answers for it.",
         "cover": [
@@ -979,7 +975,6 @@
       },
       {
         "title": "Logistics & Customs",
-        "markets": "DE · UK · NL · FR · EU",
         "desc": "Know what your goods need to cross a border, and who carries the liability when they do.",
         "intro": "What goods need in order to cross a border, and who carries the liability once they do. Customs identity, declarations, statistics and the terms of delivery that decide who pays and who answers.",
         "cover": [
@@ -998,7 +993,6 @@
       },
       {
         "title": "Legal Support",
-        "markets": "EU-WIDE",
         "desc": "Know when a question genuinely needs a lawyer — and reach one who already has your case.",
         "intro": "The questions that need a qualified answer rather than a checklist: contracts, terms, consumer rights, disputes. CompliHub360 is not a law firm — Verified Providers advise under their own professional liability, and we make sure the one you reach already has your case.",
         "cover": [
@@ -1017,7 +1011,6 @@
       },
       {
         "title": "Environmental Compliance",
-        "markets": "EU-WIDE · UK",
         "desc": "Registers for devices and batteries, take-back at end of life, and what you must disclose about substances.",
         "intro": "Environmental duties beyond packaging: national registers for electrical equipment and batteries, take-back at end of life, and the information duties that attach to substances in the articles you sell.",
         "cover": [
@@ -1232,7 +1225,7 @@
           },
           {
             "q": "Can I check several markets and areas at once?",
-            "a": "Yes. The assessment covers every market and area you operate in and merges the obligations into one coherent map — prioritised across all of them."
+            "a": "Yes. Pick every market you operate in from the {{markets}} we cover today and the assessment merges their obligations into one map, prioritised across all of them. A market we don't cover yet is marked as such, and you can request it."
           },
           {
             "q": "What if my market isn't covered yet?",
@@ -1366,9 +1359,8 @@
       }
     },
     "markets": {
-      "pre": "Markets we cover today: ",
-      "list": "Germany · United Kingdom · Netherlands · France · Italy · Spain",
-      "post": ". More countries rolling out through 2026."
+      "pre": "Markets we assess today: ",
+      "post": ". Other markets on request."
     },
     "disclaimer": "CompliHub360 is an orchestration platform — not a law firm. Legal, tax, and regulatory advice is delivered by Verified Providers under their own professional liability. We do not provide Rechtsberatung within the meaning of §§ RDG / StBerG.",
     "copyright": "© 2026 CompliHub360.",
