@@ -46,6 +46,10 @@ Grundsätze aus Spec B, die hier Code werden:
    Global, antwortet die API 403 `API_NOT_ELIGIBLE`, der Client bleibt
    gespeichert.
 
+## Entscheidungen (bestätigt 2026-10-11)
+
+Alle sechs Vorschläge bestätigt · Canvas-Wahl 1A · 2A · 3A · 4A.
+
 ## Umsetzung (Backend, 2026-10-11)
 
 - Migration `20261012000000_enterprise_api.sql` + pgTAP `15_enterprise_api_test.sql`.
@@ -56,7 +60,21 @@ Grundsätze aus Spec B, die hier Code werden:
   `api_access_suspended`).
 - Admin-Aktionen: approve · reject (Begründung Pflicht) · suspend (Grund
   Pflicht) · reinstate · revoke · update.
-- 14 API-Tests (Leak-Guards, Scopes, 429, Rotation, Widerruf, Abo unter Global).
+- 15 API-Tests (Leak-Guards, Scopes, 429, Rotation, Widerruf, Abo unter Global, Protokoll).
+- `GET /provider/:key/api-access/log`: letzte Aufrufe, Tageszahlen, jüngste Ereignisse (3A).
+
+## Umsetzung (UI, 2026-10-11)
+
+- `api/apiAccess.ts`, `components/provider/ApiAccessPanel.tsx` (Antrag · beantragt ·
+  freigegeben · Schlüssel einmal im Klartext · aktiv mit Fakten, Rotation, Widerruf
+  per Drawer mit Schlüsselwort · Ereignisse und Protokoll · ausgesetzt mit Grund ·
+  abgelehnt mit Begründung), Einstellungen-Navigation nur bei `eligible`.
+- `pages/admin/AdminApiAccessPage.tsx` + Route `admin/api-access` + Nav „API access“
+  (Scopes als Häkchen, Limit, Gebühren-Notiz, Freigeben/Ablehnen mit Begründung,
+  Sperren mit Grund, Wiedereinsetzen, Widerrufen).
+- Mock: stateful `api-access`-Routen; der Demo-Anbieter antwortet dort als Global.
+- Partner-Post: `api_access_decided`, `api_access_suspended` (Thema Tarif → Einstellungen).
+- 5 Panel-Tests; UI-Suite 487 grün; `npm run build` grün.
 
 ## Acceptance Criteria
 
@@ -82,11 +100,11 @@ Grundsätze aus Spec B, die hier Code werden:
 
 ### UI
 
-- [ ] Canvas (vier Sektionen × drei Varianten): Zugang beantragen ·
+- [x] Canvas (vier Sektionen × drei Varianten): Zugang beantragen ·
   Schlüssel und Scopes · Ereignisse und Protokoll · Admin-Freigabe.
-- [ ] Figma-Seite nach der Wahl des Nutzers.
-- [ ] Lokal: Abschnitt/Seite im Partner-Dashboard (nur Global), Admin-Queue,
-  Mock, Locales, Screenshots.
+- [x] Figma-Seite nach der Wahl des Nutzers: „Enterprise-API (Phase 7)“, 3679:2 (Frames 3679:3, 3680:180, 3681:285, 3683:399, Notiz 3683:730).
+- [x] Lokal: Abschnitt „Integration (API)“ in den Einstellungen (nur bei
+  `eligible`), Admin-Seite „API access“, Mock, Locales de/en/es/tr, Screenshots.
 - [ ] Review des Nutzers → Staging (Migration per Supabase-MCP, Testlauf).
 
 ## DNA-Check
