@@ -92,4 +92,16 @@ describe('Leads', () => {
     it('die Sicht des Anbieters traegt nie den Hash', () => {
         expect(JSON.stringify(clientView(client()))).not.toContain(client().key_hash as string);
     });
+
+    it('kennt die Namen, die der Server wirklich schreibt (Staging 2026-10-14): user_cancelled, booking_user_no_show, booking_rebooked, creditCents, evidence_expiring_notice', () => {
+        const t = (type: string, payload: Record<string, unknown>) => mapEventLogRow({ id: 'e', type, payload, timestamp: '2026-10-14T00:00:00Z' });
+        expect(t('user_cancelled', { bookingId: 'b', providerKey: 'k', userId: 'u', status: 'cancelled' })).toMatchObject({ type: 'booking.cancelled', booking_id: 'b', data: { cancelled_by: 'user' } });
+        expect(t('booking_user_no_show', { bookingId: 'b', providerKey: 'k', userId: 'u', deadline: '2026-10-24', by: 'x' })).toMatchObject({ type: 'user.no_show', data: { rebook_until: '2026-10-24' } });
+        expect(t('booking_rebooked', { bookingId: 'n', fromBookingId: 'b', providerKey: 'k', slotStart: '2026-10-20T09:00:00Z' })).toMatchObject({ type: 'booking.created', booking_id: 'n', data: { slot_start: '2026-10-20T09:00:00Z', rebooked_from: 'b' } });
+        expect(t('lead.credit_issued', { bookingId: 'b', providerKey: 'k', ledgerId: 'l', creditCents: 4023, currency: 'USD', pct: 30 })).toMatchObject({ type: 'lead.credit_issued', data: { amount_cents: 4023, currency: 'USD', pct: 30 } });
+        expect(t('evidence_expiring_notice', { providerKey: 'k', evidenceId: 'ev', evidenceType: 'license', expiresAt: '2026-11-01' })).toMatchObject({ type: 'verification.expiring', data: { evidence_type: 'license', expires_at: '2026-11-01' } });
+        // Nutzer-ID und Melder bleiben draussen.
+        const noShow = t('booking_user_no_show', { bookingId: 'b', providerKey: 'k', userId: 'u', deadline: '2026-10-24', by: 'x' })!;
+        expect(JSON.stringify(noShow)).not.toMatch(/"u"|"x"/);
+    });
 });
