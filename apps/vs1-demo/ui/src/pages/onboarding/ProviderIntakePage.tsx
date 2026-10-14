@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
@@ -6,7 +6,9 @@ import { Input } from '../../components/ui/Input';
 import { FilterChip } from '../../components/ui/Badge';
 import { Banner } from '../../components/ui/Banner';
 import { Logo } from '../../components/ui/Logo';
-import { apiFetch } from '../../api/client';
+import { FormErrorSummary, focusField, type FormError } from '../../components/ui/FormErrorSummary';
+import { FieldError, errorAria } from '../../components/ui/FieldError';
+import { ApiError, apiFetch } from '../../api/client';
 import { DOMAINS } from '../../lib/domains';
 import type { BillingModel } from '../../api/provider';
 
@@ -31,9 +33,26 @@ export function ProviderIntakePage() {
   const [certs, setCerts] = useState('');
   const [statutes, setStatutes] = useState(false);
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
-  const canSubmit = useMemo(() => name.trim().length > 1 && statutes && state !== 'sending', [name, statutes, state]);
+  // V2 (11.10.2026): der Knopf bleibt aktiv. Bis hierher blieb er grau, bis
+  // Name und Bestaetigung stimmten — ohne zu sagen, was fehlt. Jetzt prueft
+  // das Absenden: Fehler am Feld und gesammelt am Knopf, Fokus aufs erste.
+  const [tried, setTried] = useState(false);
+  const [serverName, setServerName] = useState(false);
+  const errorsOf = (): FormError[] => {
+    const errs: FormError[] = [];
+    if (name.trim().length < 2 || serverName) errs.push({ id: 'intake-name', label: t('intake.nameShort'), message: t('intake.errors.name') });
+    if (!statutes) errs.push({ id: 'intake-statutes', label: t('intake.statutesShort'), message: t('intake.errors.statutes') });
+    return errs;
+  };
+  const errors = tried ? errorsOf() : [];
+  const errFor = (id: string) => errors.find((e) => e.id === id)?.message;
 
-  const submit = async () => {
+  const submit = async (e?: FormEvent) => {
+    e?.preventDefault();
+    if (state === 'sending') return;
+    setTried(true);
+    const now = errorsOf();
+    if (now.length) { focusField(now[0].id); return; }
     setState('sending');
     try {
       await apiFetch('/api/v1/provider/intake', {
@@ -53,7 +72,11 @@ export function ProviderIntakePage() {
         }),
       });
       setState('done');
-    } catch {
+    } catch (err) {
+      // Der Server bemaengelt den Namen (400 "name required"): der Satz steht am Feld.
+      if (err instanceof ApiError && err.status === 400 && /name/i.test(err.message)) {
+        setServerName(true); setState('idle'); focusField('intake-name'); return;
+      }
       setState('error');
     }
   };
@@ -90,24 +113,30 @@ export function ProviderIntakePage() {
     );
   }
 
-  const field = (label: string, node: React.ReactNode) => (
+  const field = (label: string, node: React.ReactNode, htmlFor?: string) => (
     <div>
-      <p className="mb-1 text-[12px] font-medium text-fg-secondary">{label}</p>
+      {htmlFor
+        ? <label htmlFor={htmlFor} className="mb-1 block text-[12px] font-medium text-fg-secondary">{label}</label>
+        : <p className="mb-1 text-[12px] font-medium text-fg-secondary">{label}</p>}
       {node}
     </div>
   );
 
   return shell(
-    <>
+    <form onSubmit={submit} noValidate className="space-y-6">
       <div>
         <h1 className="font-serif text-[28px] font-bold leading-tight text-fg">{t('intake.title')}</h1>
         <p className="mt-1 text-body-sm leading-relaxed text-fg-secondary">{t('intake.sub')}</p>
       </div>
-      {state === 'error' && <Banner status="error" title={t('intake.errorTitle')}>{t('intake.errorBody')}</Banner>}
+      {state === 'error' && <Banner status="error" role="alert" title={t('intake.errorTitle')}>{t('intake.errorBody')}</Banner>}
       <div className="space-y-4 rounded-xl border border-stroke bg-surface-secondary/40 p-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('intake.secFirm')}</p>
         <div className="grid gap-3 sm:grid-cols-2">
-          {field(t('intake.name'), <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Studio Bianchi SRL" />)}
+          {field(t('intake.name'), <>
+            <Input id="intake-name" value={name} onChange={(e) => { setName(e.target.value); setServerName(false); }} placeholder="Studio Bianchi SRL"
+              error={!!errFor('intake-name')} {...errorAria('intake-name', !!errFor('intake-name'))} />
+            <FieldError id="intake-name" message={errFor('intake-name')} className="mt-1.5" />
+          </>, 'intake-name')}
           {field(t('intake.website'), <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" />)}
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -118,7 +147,7 @@ export function ProviderIntakePage() {
           <div className="flex flex-wrap gap-2">
             {DOMAINS.map((d) => (
               <FilterChip key={d.slug} size="sm" selected={cats.has(d.slug)}
-                onClick={() => setCats((s) => { const n = new Set(s); n.has(d.slug) ? n.delete(d.slug) : n.add(d.slug); return n; })}>
+                onClick={() => setCats((s) => { const n = new Set(s); if (n.has(d.slug)) n.delete(d.slug); else n.add(d.slug); return n; })}>
                 {d.label}
               </FilterChip>
             ))}
@@ -148,15 +177,22 @@ export function ProviderIntakePage() {
             placeholder={t('intake.certsPh')}
             className="w-full rounded-lg border border-stroke bg-transparent px-3.5 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:outline-none focus:ring-1 focus:ring-focus" />,
         )}
-        <label className="flex items-start gap-2.5 text-[12px] leading-relaxed text-fg-secondary">
-          <input type="checkbox" checked={statutes} onChange={(e) => setStatutes(e.target.checked)} className="mt-0.5" />
-          {t('intake.statutes')}
-        </label>
+        <div>
+          <label htmlFor="intake-statutes" className="flex items-start gap-2.5 text-[12px] leading-relaxed text-fg-secondary">
+            <input id="intake-statutes" type="checkbox" checked={statutes} onChange={(e) => setStatutes(e.target.checked)} className="mt-0.5"
+              {...errorAria('intake-statutes', !!errFor('intake-statutes'))} />
+            {t('intake.statutes')}
+          </label>
+          <FieldError id="intake-statutes" message={errFor('intake-statutes')} className="mt-1.5 pl-[22px]" />
+        </div>
       </div>
-      <div className="flex items-center gap-3">
-        <Button onClick={submit} disabled={!canSubmit}>{state === 'sending' ? t('intake.sending') : t('intake.submit')}</Button>
-        <p className="text-[11px] text-fg-tertiary">{t('intake.vettingNote')}</p>
+      <div className="space-y-4">
+        <FormErrorSummary errors={errors} />
+        <div className="flex items-center gap-3">
+          <Button type="submit" loading={state === 'sending'}>{state === 'sending' ? t('intake.sending') : t('intake.submit')}</Button>
+          <p className="text-[11px] text-fg-tertiary">{t('intake.vettingNote')}</p>
+        </div>
       </div>
-    </>,
+    </form>,
   );
 }

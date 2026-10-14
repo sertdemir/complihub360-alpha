@@ -104,7 +104,9 @@ export function LimitedCoverageCard({ coverage, asGuest, onReviewMatch }: {
       <p className="text-body-xs leading-[1.5] text-fg-secondary">{t('common:states.limitedCoverage.message')}</p>
       <div role="table" aria-label={t('results:matchStates.matrixLabel')} className="mt-1 flex flex-col gap-1.5">
         <div role="row" className="grid items-center gap-1.5" style={{ gridTemplateColumns: cols }}>
-          <span role="columnheader" className="sr-only">{t('common:states.scope.areas')}</span>
+          {/* Im Raster bleiben: sr-only ist absolut positioniert und faellt aus dem
+              Grid — dann rutscht der erste Markt ueber die Bereichsnamen. */}
+          <span role="columnheader"><span className="sr-only">{t('common:states.scope.areas')}</span></span>
           {coverage.markets.map((m) => (
             <span key={m} role="columnheader" title={names.market(m)} className="text-center text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{m}</span>
           ))}

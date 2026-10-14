@@ -7,7 +7,8 @@
     "send": "Send",
     "save": "Save",
     "done": "Done",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "pickSlotError": "Please choose a time slot."
   },
   "status": {
     "awaitingConfirmation": "Awaiting confirmation",
@@ -432,81 +433,6 @@
     "assistantTitle": "Assistant · {{area}}",
     "assistantIntro": "Ask about {{area}} — answers come from the area knowledge and your risk maps."
   },
-  "configureAlerts": {
-    "eyebrow": "MONITORING",
-    "title": "Configure alerts",
-    "savedNote": "Saved — applies to e-mail and in-app alerts.",
-    "deliveryNote": "Delivery: e-mail + in-app.",
-    "savePreferences": "Save preferences",
-    "saveError": "Saving failed — try again in a moment.",
-    "toggles": {
-      "thresholdBreach": {
-        "label": "Threshold breaches",
-        "desc": "Revenue crosses a VAT/OSS registration threshold in any monitored market."
-      },
-      "thresholdApproach": {
-        "label": "Approaching thresholds (80%)",
-        "desc": "Early warning before a threshold is reached."
-      },
-      "deadlines": {
-        "label": "Filing deadlines",
-        "desc": "OSS/EPR/GDPR filing dates — 14 and 3 days ahead."
-      },
-      "providerUpdates": {
-        "label": "Provider updates",
-        "desc": "Confirmations, replies and SLA events on your requests."
-      },
-      "ruleChanges": {
-        "label": "Regulatory changes",
-        "desc": "Rule updates that affect a saved risk map (\"Needs refresh\")."
-      },
-      "weeklyDigest": {
-        "label": "Weekly digest",
-        "desc": "One summary mail per week instead of individual alerts."
-      }
-    }
-  },
-  "docUpload": {
-    "titleUpload": "Upload document",
-    "titleProcessed": "Document processed",
-    "uploadAnother": "Upload another",
-    "sanitizing": "Sanitizing…",
-    "uploadSanitize": "Upload & sanitize",
-    "classificationPublic": "public",
-    "classificationInternal": "internal",
-    "classificationConfidential": "confidential",
-    "classificationRestricted": "restricted",
-    "tagSanitized": "sanitized",
-    "tagSanitizationFailed": "sanitization failed",
-    "tagAiAllowed": "AI: allowed",
-    "tagAiBlocked": "AI: blocked",
-    "redactionReport": "Redaction report",
-    "maskedCount": "{{count}}× masked",
-    "noPii": "No personal identifiers detected.",
-    "storedNote": "Only the sanitized version was stored — the original text was discarded after processing.",
-    "aiBlockedClassification": "AI analysis stays blocked because of the content classification.",
-    "aiBlockedConsent": "AI analysis stays blocked until you grant consent for this document.",
-    "chooseFile": "Choose a file (.txt · .md · .csv)",
-    "orPaste": "or paste the content below",
-    "pastePlaceholder": "Paste document content — contracts, notes, invoices …",
-    "consent": "I consent to AI-assisted analysis of the <em>sanitized</em> version of this document (Art. 6(1)(a) GDPR — revocable anytime). Without consent the document is stored but never touches AI.",
-    "uploadFailed": "Upload failed",
-    "privacyNote": "Personal identifiers (names, e-mails, phone numbers, IBANs) are masked <em>before</em> anything is stored. The raw text never persists."
-  },
-  "requestQuote": {
-    "title": "Request <accent>quote</accent>",
-    "close": "Close",
-    "sentTitle": "Request sent ✓",
-    "sentBody": "{{name}} has been notified and has 24h to confirm. You will find the request under <em>Requests</em>.",
-    "slaTag": "24h confirm SLA",
-    "messageLabel": "Your message to the provider",
-    "messagePlaceholder": "Briefly describe your situation — markets, revenue band, timeline …",
-    "privacyNote": "Your situational context is shared <em>anonymized</em> — names and contact details in your message are masked. Your identity is revealed only after the provider confirms (Art. 6(1)(b) GDPR — contract initiation). Uploaded documents are never shared automatically.",
-    "sendError": "Sending failed: {{error}} — please try again.",
-    "requestFailed": "Request failed",
-    "sending": "Sending…",
-    "sendRequest": "Send request"
-  },
   "requestActions": {
     "eyebrow": "REQUEST {{id}}",
     "eyebrowFallback": "REQUEST",
@@ -541,7 +467,8 @@
     "archiveDesc": "Hides the risk map from the list · monitoring pauses · restorable anytime.",
     "archived": "Archived ✓",
     "actionError": "Action failed — try again in a moment.",
-    "archiveQuestion": "Archive this risk map?"
+    "archiveQuestion": "Archive this risk map?",
+    "nameTooShort": "Please enter a name with at least 2 characters."
   },
   "userSearch": {
     "eyebrow": "WORKSPACE",
@@ -591,7 +518,8 @@
     "you": "You",
     "authorUser": "user",
     "authorProvider": "provider",
-    "authorSystem": "system"
+    "authorSystem": "system",
+    "messageTooShort": "Please write a message of at least {{min}} characters."
   },
   "assistant": {
     "title": "VAT Assistant",
@@ -709,7 +637,8 @@
     },
     "bodyLabel": "Your experience (optional)",
     "bodyPh": "How did the intro call go?",
-    "note": "Verified reviews come only from real appointments and appear anonymized on the provider profile. Your name stays private."
+    "note": "Verified reviews come only from real appointments and appear anonymized on the provider profile. Your name stays private.",
+    "ratingRequired": "Please choose a rating from 1 to 5 stars."
   },
   "reschedule": {
     "eyebrow": "Reschedule appointment",
@@ -742,7 +671,6 @@
     "saved": "Saved — the risk map is being recalculated.",
     "error": "Saving failed. Please try again.",
     "changed": "changed",
-    "none": "Nothing selected",
-    "needSelection": "Select at least one market and one compliance area."
+    "none": "Nothing selected"
   }
 }

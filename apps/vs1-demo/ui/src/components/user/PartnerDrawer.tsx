@@ -10,6 +10,8 @@ import { goToBookingConfirmed } from '../../lib/bookingConfirmed';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Banner } from '../ui/Banner';
+import { focusField } from '../ui/FormErrorSummary';
+import { FieldError, errorAria } from '../ui/FieldError';
 import { ApiError } from '../../api/client';
 import {
   bookingFailureFrom, createBooking, fetchAcknowledgement, fetchProviderDetail, fetchSlots,
@@ -89,6 +91,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   onBooked?: (publicRef: string, b: { name: string; slotStart: string }) => void;
 }) {
   const { t, i18n } = useTranslation('results');
+  const { t: tw } = useTranslation('userws');
   // 3 V3: Beschreibung in der Sprache des Nutzers statt der englischen Server-Zeile.
   const { beschreibung } = useRequestContext();
   const navigate = useNavigate();
@@ -105,6 +108,12 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   const [ackKey, setAckKey] = useState(0);
   const [slotsKey, setSlotsKey] = useState(0);
   const [reviewOpen, setReviewOpen] = useState(false);
+  // Regel V2 (11.10.2026): der Knopf bleibt aktiv, auch ohne gewaehlten
+  // Termin. Ein Klick ohne Termin sagt es an der Terminliste und setzt den
+  // Fokus dorthin. Gesperrt bleibt er nur, solange die Bestaetigung laedt
+  // (`!ack`, mit ihrem Hinweis) oder die Buchung laeuft.
+  const [slotTried, setSlotTried] = useState(false);
+  const slotError = slotTried && !selected ? tw('shared.pickSlotError') : null;
   const sharedRows = useSharedRows();
 
   // Phase 3: die Schublade spricht den Anbieter nur ueber den opaken Ref an.
@@ -120,6 +129,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
     setSending(false);
     setFailure(null);
     setReviewOpen(false);
+    setSlotTried(false);
   }, [open, key, sessionMessage]);
 
   // Die Bestaetigung in der Sprache des Nutzers — geladen, sobald der
@@ -304,7 +314,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
               onOtherProvider={onClose}
               onRetry={() => setFailure(null)}
               onReread={() => { setFailure(null); setAckKey((k) => k + 1); }}
-              onPickSlot={() => { setFailure(null); setSelected(null); setSlotsKey((k) => k + 1); }}
+              onPickSlot={() => { setFailure(null); setSelected(null); setSlotTried(false); setSlotsKey((k) => k + 1); }}
             />
           ) : (
             <>
@@ -323,8 +333,11 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
                 shape="soft"
                 fullWidth
                 type="button"
-                disabled={!selected || !ack || sending}
-                onClick={() => setReviewOpen(true)}
+                disabled={!ack || sending}
+                onClick={() => {
+                  if (!selected) { setSlotTried(true); focusField('partner-slots'); return; }
+                  setReviewOpen(true);
+                }}
                 className="disabled:opacity-50"
               >
                 {t('detail.bookCta')} <ArrowRight size={15} />
@@ -341,6 +354,14 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
 
       {step === 'termin' && (
         <>
+          <div
+            id="partner-slots"
+            role="group"
+            aria-label={t('schedule.title')}
+            tabIndex={-1}
+            className="outline-none"
+            {...errorAria('partner-slots', !!slotError)}
+          >
           {slots === null ? (
             <p className="text-body-xs text-fg-tertiary">{t('detail.slotsLoading')}</p>
           ) : byDay.length === 0 ? (
@@ -368,6 +389,8 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
               </div>
             ))
           )}
+          </div>
+          <FieldError id="partner-slots" message={slotError} alert />
 
           <div className="mt-5 border-t border-stroke-subtle pt-4">
             <label htmlFor="partner-message" className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">

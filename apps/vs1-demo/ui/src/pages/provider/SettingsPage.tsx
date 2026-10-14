@@ -14,7 +14,8 @@ import { InboxAddress } from '../../components/contact/SendStates';
 import { AVAILABILITY_EVENT, fetchCoverage, setAvailability, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
 import { fetchApplication } from '../../api/application';
 import { CONTACT_INBOX, failureOf, sendContact, type SendFailure } from '../../api/contact';
-import { identityHintFrom } from '../../api/client';
+import { identityFindingsOf, identityHintFrom } from '../../api/client';
+import { FieldError, errorAria } from '../../components/ui/FieldError';
 import { Input } from '../../components/ui/Input';
 import { FilterChip } from '../../components/ui/Badge';
 
@@ -278,6 +279,9 @@ export function MatchmakingPanel() {
   const [attempt, setAttempt] = useState(0);
   const [saved, setSaved] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');
   const [identityHint, setIdentityHint] = useState<string | null>(null);
+  // V2 (11.10.2026): nennt der Identitaets-Scan die Region, steht der Satz an
+  // der Region (Serverfehler am Feld), sonst wie bisher ueber dem Knopf.
+  const [regionHint, setRegionHint] = useState<string | null>(null);
 
   useEffect(() => {
     setLoadFailed(false);
@@ -293,6 +297,7 @@ export function MatchmakingPanel() {
   const save = async () => {
     setSaved('saving');
     setIdentityHint(null);
+    setRegionHint(null);
     try {
       await updateMatchmakingProfile({
         billing_model: billing,
@@ -305,7 +310,11 @@ export function MatchmakingPanel() {
       // Sachlich, ohne Verstoss-Sprache — der Anbieter soll wissen, was er
       // aendern muss, nicht, dass er etwas falsch gemacht haette.
       const hint = identityHintFrom(e, t);
-      if (hint) { setIdentityHint(hint); setSaved('idle'); return; }
+      if (hint) {
+        if (identityFindingsOf(e)?.[0]?.field === 'region') { setRegionHint(hint); document.getElementById('mm-region')?.focus(); }
+        else setIdentityHint(hint);
+        setSaved('idle'); return;
+      }
       // Kein „Gespeichert", wenn nichts gespeichert wurde.
       setSaved('error');
       return;
@@ -341,8 +350,10 @@ export function MatchmakingPanel() {
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <p className="mb-1 text-[12px] font-medium text-fg-secondary">{t('settings.regionLabel')}</p>
-          <Input value={region} onChange={(e) => setRegion(e.target.value)} />
+          <label htmlFor="mm-region" className="mb-1 block text-[12px] font-medium text-fg-secondary">{t('settings.regionLabel')}</label>
+          <Input id="mm-region" value={region} onChange={(e) => { setRegion(e.target.value); setRegionHint(null); }}
+            error={!!regionHint} {...errorAria('mm-region', !!regionHint)} />
+          <FieldError id="mm-region" alert message={regionHint} className="mt-1.5" />
         </div>
         <div>
           <p className="mb-1 text-[12px] font-medium text-fg-secondary">{t('settings.activeSinceLabel')}</p>
@@ -374,11 +385,11 @@ export function MatchmakingPanel() {
         </div>
         <p className="mt-2 text-[11px] text-fg-tertiary">{t('settings.pricingNoteV2')}</p>
       </div>
-      {identityHint && <Banner status="warning" title={identityHint} />}
+      {identityHint && <Banner status="warning" role="alert" title={identityHint} />}
       <div className="flex items-center gap-3">
         <Button size="sm" onClick={save} disabled={!loaded || saved === 'saving'}>{t('settings.matchmakingSave')}</Button>
         {saved === 'done' && <span className="text-[12px] text-fg-brand">{t('settings.matchmakingSaved')}</span>}
-        {saved === 'error' && <span className="text-[12px] text-error-500">{t('application.saveError')}</span>}
+        {saved === 'error' && <span role="alert" className="text-[12px] text-error-700 dark:text-red-300">{t('application.saveError')}</span>}
         {loadFailed && (
           <>
             <span className="min-w-0 flex-1 text-[12px] text-fg-secondary">{t('common:states.partner.profileUnavailable')}</span>

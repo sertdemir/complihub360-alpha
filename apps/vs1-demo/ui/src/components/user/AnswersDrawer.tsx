@@ -6,6 +6,8 @@ import { Button } from '../ui/Button';
 import { STEPS, MARKET_CODE, selectionFromProfile, buildProfile } from '../home/AnimatedWizard';
 import type { SearchProfile } from '../wizard/WizardContext';
 import { updateSessionAnswers } from '../../api/sessions';
+import { FormErrorSummary, focusField, type FormError } from '../ui/FormErrorSummary';
+import { FieldError } from '../ui/FieldError';
 
 // ─── Antworten bearbeiten — Akkordeon in der Schublade ───────────────────────
 // Canvas "Antworten bearbeiten", Nutzer-Wahl 1B + 2B (2026-09-05):
@@ -62,6 +64,12 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
   const [extra, setExtra] = useState<string[]>(initial.extraMarkets);
   const [openStep, setOpenStep] = useState<StepKey | null>(null);
   const [state, setState] = useState<'idle' | 'busy' | 'done' | 'error'>('idle');
+  // Regel V2 (11.10.2026): "Speichern" bleibt aktiv, sobald es etwas zu
+  // speichern gibt (ohne Aenderung bleibt er aus — das ist kein Pruefergebnis,
+  // sondern nichts zu tun). Fehlt ein Markt oder ein Bereich, steht der Satz
+  // am Schritt und gesammelt ueber dem Knopf; der Fokus geht auf den ersten
+  // betroffenen Schritt, der sich dafuer oeffnet.
+  const [tried, setTried] = useState(false);
 
   // Jedes Oeffnen startet frisch vom gespeicherten Stand — nichts bleibt
   // unbemerkt aus einer frueheren Runde haengen.
@@ -71,6 +79,7 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
     setExtra(initial.extraMarkets);
     setOpenStep(null);
     setState('idle');
+    setTried(false);
   }, [open, initial]);
 
   const stepIds = (k: StepKey) => STEPS[ORDER.indexOf(k)].cards.filter((c) => c.id !== 'Others').map((c) => c.id);
@@ -82,7 +91,15 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
 
   const hasMarkets = picked('markets').size + extra.length > 0;
   const hasDomains = picked('domains').size > 0;
-  const canSave = changes > 0 && hasMarkets && hasDomains && state !== 'busy';
+  const missing: StepKey[] = [...(!hasMarkets ? ['markets' as const] : []), ...(!hasDomains ? ['domains' as const] : [])];
+  const errors: FormError[] = tried
+    ? missing.map((k) => ({
+      id: `answers-${k}`,
+      label: th(`wizard.review.${REVIEW_KEY[k]}`),
+      message: t(k === 'markets' ? 'common:contactSend.field.markets' : 'common:contactSend.field.areas'),
+    }))
+    : [];
+  const errFor = (k: StepKey) => errors.find((e) => e.id === `answers-${k}`)?.message;
 
   const toggle = (k: StepKey, id: string) =>
     setSelected((prev) => {
@@ -107,10 +124,17 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
     setSelected(new Set(initial.selected));
     setExtra(initial.extraMarkets);
     setOpenStep(null);
+    setTried(false);
   };
 
   const save = async () => {
-    if (!canSave) return;
+    if (changes === 0 || state === 'busy') return;
+    setTried(true);
+    if (missing.length) {
+      setOpenStep(missing[0]);
+      focusField(`answers-${missing[0]}`);
+      return;
+    }
     setState('busy');
     try {
       // buildProfile setzt Markt/Taetigkeit/Bereiche neu; alles andere
@@ -139,15 +163,18 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
   };
 
   const footer = (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-body-2xs text-fg-secondary">
-        {state === 'done' ? t('answersDrawer.saved') : state === 'error' ? <span className="text-risk-high">{t('answersDrawer.error')}</span> : t('answersDrawer.footerNote')}
-      </span>
-      <div className="flex shrink-0 gap-2">
-        <Button variant="ghost" size="sm" onClick={discard} disabled={changes === 0 || state === 'busy'}>{t('answersDrawer.discard')}</Button>
-        <Button variant="primary" size="sm" onClick={save} disabled={!canSave}>
-          {state === 'busy' ? '…' : t('answersDrawer.save')}
-        </Button>
+    <div className="flex flex-col gap-3">
+      <FormErrorSummary errors={errors} />
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-body-2xs text-fg-secondary">
+          {state === 'done' ? t('answersDrawer.saved') : state === 'error' ? <span className="text-risk-high">{t('answersDrawer.error')}</span> : t('answersDrawer.footerNote')}
+        </span>
+        <div className="flex shrink-0 gap-2">
+          <Button variant="ghost" size="sm" onClick={discard} disabled={changes === 0 || state === 'busy'}>{t('answersDrawer.discard')}</Button>
+          <Button variant="primary" size="sm" onClick={save} disabled={changes === 0 || state === 'busy'}>
+            {state === 'busy' ? '…' : t('answersDrawer.save')}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -159,16 +186,20 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
           const isOpen = openStep === k;
           const chips = answerChips(k);
           const changed = changedSteps.includes(k);
+          const err = errFor(k);
           return (
             <section
               key={k}
+              id={`answers-${k}`}
               className={'rounded-[10px] border bg-surface transition-shadow '
-                + (isOpen ? 'border-brand shadow-[0_8px_24px_-18px_rgba(11,21,18,0.25)]' : 'border-stroke')}
+                + (err ? 'border-error-500 ' : isOpen ? 'border-brand ' : 'border-stroke ')
+                + (isOpen ? 'shadow-[0_8px_24px_-18px_rgba(11,21,18,0.25)]' : '')}
             >
               <button
                 type="button"
                 onClick={() => setOpenStep(isOpen ? null : k)}
                 aria-expanded={isOpen}
+                aria-describedby={err ? `answers-${k}-error` : undefined}
                 className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
               >
                 <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-extrabold text-fg-on-brand">{i + 1}</span>
@@ -187,10 +218,21 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
                 </span>
                 <ChevronDown size={16} className={'shrink-0 text-fg-tertiary transition-transform ' + (isOpen ? 'rotate-180' : '')} />
               </button>
+              {err && (
+                <div className="-mt-2 px-4 pb-3">
+                  <FieldError id={`answers-${k}`} message={err} />
+                </div>
+              )}
               {isOpen && (
                 <div className="border-t border-stroke-subtle px-4 pb-4 pt-3.5">
                   <p className="mb-2.5 text-[11px] text-fg-tertiary">{th(`wizard.steps.${k}.subtitle`)}</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div
+                    role="group"
+                    aria-label={th(`wizard.review.${REVIEW_KEY[k]}`)}
+                    aria-invalid={err ? true : undefined}
+                    aria-describedby={err ? `answers-${k}-error` : undefined}
+                    className="flex flex-wrap gap-2"
+                  >
                     {stepIds(k).map((id) => {
                       const on = selected.has(id);
                       return (
@@ -227,9 +269,6 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
           {t('answersDrawer.hint')}{' '}
           <b className={changes ? 'text-fg-accent-strong' : ''}>{t('answersDrawer.unsaved', { count: changes })}</b>
         </p>
-        {changes > 0 && (!hasMarkets || !hasDomains) && (
-          <p className="text-[10.5px] text-risk-high">{t('answersDrawer.needSelection')}</p>
-        )}
       </div>
     </Drawer>
   );

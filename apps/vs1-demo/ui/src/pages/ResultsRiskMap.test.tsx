@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { act, render, screen, within, fireEvent } from '@testing-library/react';
+import { act, render, screen, within, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { AnonProvider, SearchLaw } from '../api/search';
@@ -624,7 +624,9 @@ describe('ResultsRiskMap with mixed markets', () => {
 
   it('says nothing about other markets when every requested one was checked', async () => {
     setProfile({ country: 'DE', markets: ['NL'], categories: ['tax-vat'] });
-    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    // Mit Treffer: ohne waere es P1 (kein freigegebener Anbieter), und der
+    // bietet seine eigene Anfrage an — hier geht es nur um ungepruefte Maerkte.
+    runSearch.mockResolvedValue({ providers: [prov('alpha', 100)], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
     renderPage();
 
     expect(await screen.findByText('VAT return')).toBeInTheDocument();
@@ -865,5 +867,60 @@ describe('ResultsRiskMap delayed (J3)', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'common:states.riskMapLoading.heading' })).toBeInTheDocument();
     expect(screen.queryByText('common:states.riskMapDelayed.heading')).not.toBeInTheDocument();
+  });
+});
+
+// ─── Kein freigegebener Anbieter in einem geprueften Markt (P1 · Q1) und ─────
+// begrenzte Abdeckung fuer Gaeste (S1). Entscheidungen a · c, 11.10.2026;
+// Figma 3693:4040 / 3693:4131 / 3693:4204.
+
+describe('ResultsRiskMap provider coverage from the coverage data', () => {
+  const setProfile = (p: object) => localStorage.setItem('ch360_last_profile', JSON.stringify(p));
+  const noCoverage = { markets: ['DE'], areas: ['tax-vat'], covered: { DE: [] as string[] } };
+
+  it('P1: a guest sees the approved state with the guest sentence and requests the missing areas', async () => {
+    setProfile({ country: 'DE', categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], coverage: noCoverage, laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    requestMarket.mockResolvedValue(undefined);
+    renderPage();
+
+    expect(await screen.findByText('common:states.noProviderMatch.heading')).toBeInTheDocument();
+    expect(screen.getByText('common:states.marketRequest.guestMessage')).toBeInTheDocument();
+    // Nie der Satz mit Update-Versprechen: Gaeste bekommen keins (G2).
+    expect(screen.queryByText('common:states.noProviderMatch.message')).not.toBeInTheDocument();
+    expect(screen.queryByText('partners.none')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /requestThisMarket/ }));
+    await waitFor(() => expect(requestMarket).toHaveBeenCalledWith({ market: 'DE', domains: ['tax-vat'], asGuest: true, locale: 'en', reason: 'provider_coverage', notify: false }));
+  });
+
+  it('Q1: with an account the provider column shows the state, the opt-in and the request', async () => {
+    auth.isLoggedIn = true;
+    auth.user = { email: 'jm@example.com' };
+    setProfile({ country: 'DE', categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], coverage: noCoverage, laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    requestMarket.mockResolvedValue(undefined);
+    renderPage();
+
+    expect(await screen.findByText('common:states.noProviderMatch.message')).toBeInTheDocument();
+    const optIn = screen.getByRole('checkbox');
+    expect(optIn).not.toBeChecked();
+    fireEvent.click(optIn);
+    fireEvent.click(screen.getByRole('button', { name: /requestThisMarket/ }));
+    await waitFor(() => expect(requestMarket).toHaveBeenCalledWith(expect.objectContaining({ market: 'DE', domains: ['tax-vat'], reason: 'provider_coverage', notify: true, asGuest: false })));
+  });
+
+  it('S1: a guest with matches sees the limited-coverage matrix', async () => {
+    setProfile({ country: 'DE', markets: ['NL'], categories: ['tax-vat', 'data-privacy'] });
+    runSearch.mockResolvedValue({
+      providers: [prov('alpha', 90), prov('beta', 70)],
+      coverage: { markets: ['DE', 'NL'], areas: ['tax-vat', 'data-privacy'], covered: { DE: ['tax-vat', 'data-privacy'], NL: ['tax-vat'] } },
+      laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })],
+    });
+    renderPage();
+
+    expect(await screen.findByText('common:states.limitedCoverage.heading')).toBeInTheDocument();
+    expect(screen.getAllByTestId('teaser-card')).toHaveLength(2);
+    // Die Matrix-Kopfzeile: ein Platzhalter fuer die Bereichsspalte, dann je Markt eine Spalte.
+    expect(screen.getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['common:states.scope.areas', 'DE', 'NL']);
   });
 });

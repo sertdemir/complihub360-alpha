@@ -211,8 +211,11 @@ export async function submitApplication(providerKey?: string): Promise<SubmitRes
   return apiFetch<SubmitResult>(`/api/v1/provider/${await key(providerKey)}/submit`, { method: 'POST', body: '{}' });
 }
 
-export interface MatrixCell { coverage_id: string; country_code: string; jurisdiction_code: string | null; status: CoverageStatus; limitations: string | null; approved_at: string | null; expires_at: string | null }
-export interface MatrixRow { service_id: string; service_code: string; service_name: string; status: ServiceStatus; cells: MatrixCell[] }
+export interface MatrixCell { coverage_id: string; country_code: string; jurisdiction_code: string | null; status: CoverageStatus; limitations: string | null; approved_at: string | null; expires_at: string | null; licence?: CellLicence }
+/** Zulassung je Zelle (Entscheidung b, 11.10.2026) — aus licenceForCell im Server. */
+export interface CellLicence { required: boolean; state: 'not_required' | 'reviewed' | 'missing' | 'expired'; expires_at: string | null }
+/** `regulated`: Leistung in einem Bereich mit Zulassungspflicht je Land (tax-vat, legal-advisory). */
+export interface MatrixRow { service_id: string; service_code: string; service_name: string; status: ServiceStatus; regulated?: boolean; cells: MatrixCell[] }
 export interface HistoryEntry { id: string; subject: string; subject_id: string | null; action: string; from: string | null; to: string | null; reason: string | null; actor_kind: 'reviewer' | 'provider' | 'system'; created_at: string }
 
 export interface Verification {

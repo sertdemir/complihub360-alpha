@@ -52,22 +52,55 @@ describe('ApiAccessPanel', () => {
     expect(screen.queryByText(/apiAccess\./)).toBeNull();
   });
 
-  it('ohne Client: der Antrag braucht Name, Zweck, Kontakt, Scopes und die Bedingungen', async () => {
+  it('ohne Client: der Antrag braucht Name, Zweck, Kontakt, Scopes und die Bedingungen — V2: Knopf aktiv, Fehler am Feld und am Knopf', async () => {
     api.fetchApiAccess.mockResolvedValue({ ...base, client: null });
     api.requestApiAccess.mockResolvedValue(client({ status: 'requested', scopes: [] }));
     render(<ApiAccessPanel onConfirm={() => {}} />);
     const submit = await screen.findByRole('button', { name: 'apiAccess.submit' });
-    expect(submit).toBeDisabled();
-    fireEvent.change(screen.getByPlaceholderText('apiAccess.namePh'), { target: { value: 'HubSpot CRM' } });
+    expect(submit).not.toBeDisabled();
+    fireEvent.click(submit);
+    // Zusammenfassung ueber dem Knopf mit allen vier offenen Punkten, Fokus aufs erste Feld.
+    const summary = await screen.findByRole('alert');
+    expect(summary).toHaveTextContent('apiAccess.errors.name');
+    expect(summary).toHaveTextContent('apiAccess.errors.useCase');
+    expect(summary).toHaveTextContent('common:contactSend.field.email');
+    expect(summary).toHaveTextContent('apiAccess.errors.terms');
+    const nameField = screen.getByPlaceholderText('apiAccess.namePh');
+    expect(nameField).toHaveFocus();
+    expect(nameField).toHaveAttribute('aria-invalid', 'true');
+    expect(nameField).toHaveAttribute('aria-describedby', 'api-name-error');
+    expect(api.requestApiAccess).not.toHaveBeenCalled();
+
+    fireEvent.change(nameField, { target: { value: 'HubSpot CRM' } });
     fireEvent.change(screen.getByPlaceholderText('apiAccess.useCasePh'), { target: { value: 'Leads ins CRM' } });
     fireEvent.change(screen.getByPlaceholderText('it@example.com'), { target: { value: 'it@k.example' } });
-    expect(submit).toBeDisabled(); // Bedingungen fehlen noch
+    // Live nachgefuehrt: nur die Bedingungen fehlen noch.
+    expect(screen.getByRole('alert')).not.toHaveTextContent('apiAccess.errors.name');
+    expect(screen.getByRole('alert')).toHaveTextContent('apiAccess.errors.terms');
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[boxes.length - 1]!);
-    expect(submit).not.toBeDisabled();
+    expect(screen.queryByRole('alert')).toBeNull();
     fireEvent.click(submit);
     await waitFor(() => expect(api.requestApiAccess).toHaveBeenCalledWith(expect.objectContaining({ name: 'HubSpot CRM', contact_email: 'it@k.example', accept_terms: true, requested_scopes: ['leads:read', 'events:read'] })));
     expect(await screen.findByText('apiAccess.status.requested')).toBeInTheDocument();
+  });
+
+  it('ohne Scope: der Fehler steht an der Gruppe, der Antrag geht nicht raus', async () => {
+    api.fetchApiAccess.mockResolvedValue({ ...base, client: null });
+    render(<ApiAccessPanel onConfirm={() => {}} />);
+    const submit = await screen.findByRole('button', { name: 'apiAccess.submit' });
+    fireEvent.change(screen.getByPlaceholderText('apiAccess.namePh'), { target: { value: 'HubSpot CRM' } });
+    fireEvent.change(screen.getByPlaceholderText('apiAccess.useCasePh'), { target: { value: 'Leads ins CRM' } });
+    fireEvent.change(screen.getByPlaceholderText('it@example.com'), { target: { value: 'it@k.example' } });
+    const boxes = screen.getAllByRole('checkbox');
+    fireEvent.click(boxes[0]!); // leads:read ab
+    fireEvent.click(boxes[2]!); // events:read ab
+    fireEvent.click(boxes[boxes.length - 1]!); // Bedingungen an
+    fireEvent.click(submit);
+    expect(await screen.findByRole('alert')).toHaveTextContent('apiAccess.errors.scopes');
+    expect(screen.getByRole('group')).toHaveAttribute('aria-describedby', 'api-scopes-error');
+    expect(boxes[0]).toHaveFocus();
+    expect(api.requestApiAccess).not.toHaveBeenCalled();
   });
 
   it('freigegeben: der Schluessel erscheint einmal im Klartext und verschwindet mit „gespeichert"', async () => {

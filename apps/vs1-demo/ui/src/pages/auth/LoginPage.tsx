@@ -9,6 +9,8 @@ import { SystemFooter } from "../../components/auth/SystemFooter";
 import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
 import { clearExpired, readExpired, rememberReturnTo } from "../../lib/sessionExpiry";
 import { Banner } from "../../components/ui/Banner";
+import { FormErrorSummary, focusField } from "../../components/ui/FormErrorSummary";
+import { FieldError, FIELD_ERROR_CLASS, errorAria } from "../../components/ui/FieldError";
 
 // ─── Auth · die Anmeldeseite ─────────────────────────────────────────────────
 // Im hellen Kleid seit 2026-08-28 (Nutzer-Entscheidung, Canvas "Login-Seite":
@@ -192,6 +194,18 @@ export function LoginPage() {
     const [password, setPassword] = useState("");
     const [showPw, setShowPw] = useState(false);
 
+    // Regel V2 (11.10.2026): die Knoepfe bleiben aktiv, geprueft wird beim
+    // Absenden. Die Formulare mit nur der E-Mail (Anmeldelink, Passwort
+    // vergessen, neuer Link) zeigen den Satz am Feld; das Anbieter-Formular
+    // mit E-Mail und Passwort zusaetzlich die Zusammenfassung am Knopf. Nach
+    // dem ersten Versuch laufen die Meldungen mit; jeder Ansichtswechsel
+    // beginnt ohne Meldung.
+    const [tried, setTried] = useState(false);
+    useEffect(() => { setTried(false); }, [view, mode]);
+    const emailValid = /.+@.+\..+/.test(email);
+    const emailError = tried && !emailValid ? t("login.validation.invalidEmail") : null;
+    const passwordError = tried && view === "form" && mode === "partner" && !password ? t("login.validation.passwordRequired") : null;
+
     const redirectTarget = params.get("redirect") || expired?.returnTo || null;
     const finishLogin = (role: "user" | "partner") => {
         login(role, (email || "you").split("@")[0]);
@@ -229,7 +243,8 @@ export function LoginPage() {
 
     const handleMagicLink = async () => {
         setAuthError(null);
-        if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
+        setTried(true);
+        if (!emailValid) { focusField("login-email"); return; }
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { setView("magic-sent"); return; }
         // Der Magic Link landet oft in einem neuen Tab — der Ruecksprung
@@ -242,6 +257,9 @@ export function LoginPage() {
 
     const handlePasswordSignIn = async () => {
         setAuthError(null);
+        setTried(true);
+        if (!emailValid) { focusField("login-email"); return; }
+        if (!password) { focusField("login-password"); return; }
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { finishLogin("partner"); return; }
         const { error } = await sb.auth.signInWithPassword({ email, password });
@@ -254,7 +272,8 @@ export function LoginPage() {
     // welche Adressen registriert sind.
     const handleForgot = async () => {
         setAuthError(null);
-        if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
+        setTried(true);
+        if (!emailValid) { focusField("login-email"); return; }
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (sb) {
             await sb.auth.resetPasswordForEmail(email, { redirectTo: resetUrl });
@@ -280,8 +299,8 @@ export function LoginPage() {
     const isMessage = view === "magic-sent" || view === "reset-sent" || view === "error";
 
     const errorBanner = authError ? (
-        <div className="mb-5 flex items-start gap-2 rounded-lg border border-error-500/30 bg-error-bg px-4 py-2.5 text-body-xs text-error-700">
-            <AlertTriangle size={15} className="mt-0.5 shrink-0" /> {authError}
+        <div role="alert" className="mb-5 flex items-start gap-2 rounded-lg border border-error-500/30 bg-error-bg px-4 py-2.5 text-body-xs text-error-700">
+            <AlertTriangle size={15} className="mt-0.5 shrink-0" aria-hidden /> {authError}
         </div>
     ) : null;
 
@@ -349,7 +368,7 @@ export function LoginPage() {
                     transition={{ duration: 0.25, ease: "easeOut" }}
                 >
                     {view === "forgot" ? (
-                        <form onSubmit={(e) => { e.preventDefault(); handleForgot(); }}>
+                        <form noValidate onSubmit={(e) => { e.preventDefault(); handleForgot(); }}>
                             <h2 className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("login.forgot.title")}</h2>
                             <p className="mt-2 text-body-md leading-relaxed text-fg-secondary">{t("login.forgot.subtitle")}</p>
                             <label htmlFor="login-email" className={"mt-7 " + LABEL}>{t("login.forgot.emailLabel")}</label>
@@ -359,8 +378,10 @@ export function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder={t("login.placeholders.firm")}
-                                className={FIELD}
+                                className={FIELD + (emailError ? FIELD_ERROR_CLASS : "")}
+                                {...errorAria("login-email", !!emailError)}
                             />
+                            <FieldError id="login-email" message={emailError} alert />
                             <button type="submit" className={CTA}>
                                 {t("login.forgot.send")} <ArrowRight size={16} />
                             </button>
@@ -368,7 +389,7 @@ export function LoginPage() {
                             <BackToSignIn onClick={() => setView("form")} />
                         </form>
                     ) : mode === "user" ? (
-                        <form onSubmit={(e) => { e.preventDefault(); handleMagicLink(); }}>
+                        <form noValidate onSubmit={(e) => { e.preventDefault(); handleMagicLink(); }}>
                             <h2 className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("login.user.title")}</h2>
                             <label htmlFor="login-email" className={"mt-7 block " + LABEL}>{t("login.emailLabel")}</label>
                             <input
@@ -377,8 +398,10 @@ export function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder={t("login.placeholders.business")}
-                                className={FIELD}
+                                className={FIELD + (emailError ? FIELD_ERROR_CLASS : "")}
+                                {...errorAria("login-email", !!emailError)}
                             />
+                            <FieldError id="login-email" message={emailError} alert />
                             <button type="submit" className={CTA}>
                                 {t("login.user.send")} <ArrowRight size={16} />
                             </button>
@@ -393,7 +416,7 @@ export function LoginPage() {
                             <p className="mt-7 text-center text-body-2xs leading-relaxed text-fg-tertiary">{t("login.user.legal")}</p>
                         </form>
                     ) : (
-                        <form onSubmit={(e) => { e.preventDefault(); handlePasswordSignIn(); }}>
+                        <form noValidate onSubmit={(e) => { e.preventDefault(); handlePasswordSignIn(); }}>
                             <h2 className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("login.partner.title")}</h2>
                             <label htmlFor="login-email" className={"mt-7 block " + LABEL}>{t("login.emailLabel")}</label>
                             <input
@@ -402,8 +425,10 @@ export function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder={t("login.placeholders.firm")}
-                                className={FIELD}
+                                className={FIELD + (emailError ? FIELD_ERROR_CLASS : "")}
+                                {...errorAria("login-email", !!emailError)}
                             />
+                            <FieldError id="login-email" message={emailError} />
                             <div className="mt-5 flex items-center justify-between">
                                 <label htmlFor="login-password" className={LABEL}>{t("login.partner.passwordLabel")}</label>
                                 <button type="button" onClick={() => setView("forgot")} className="text-body-2xs font-semibold text-brand transition-colors hover:text-brand-700">
@@ -417,7 +442,8 @@ export function LoginPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••••"
-                                    className={FIELD + " pr-16"}
+                                    className={FIELD + " pr-16" + (passwordError ? FIELD_ERROR_CLASS : "")}
+                                    {...errorAria("login-password", !!passwordError)}
                                 />
                                 <button
                                     type="button"
@@ -427,6 +453,14 @@ export function LoginPage() {
                                     {showPw ? t("login.hide") : t("login.show")}
                                 </button>
                             </div>
+                            <FieldError id="login-password" message={passwordError} />
+                            <FormErrorSummary
+                                className="mt-5"
+                                errors={[
+                                    ...(emailError ? [{ id: "login-email", label: t("login.emailLabel"), message: emailError }] : []),
+                                    ...(passwordError ? [{ id: "login-password", label: t("login.partner.passwordLabel"), message: passwordError }] : []),
+                                ]}
+                            />
                             <button type="submit" className={CTA}>
                                 {t("login.partner.signIn")} <ArrowRight size={16} />
                             </button>
@@ -521,7 +555,7 @@ export function LoginPage() {
 
                                     <div className="mx-auto mt-8 max-w-[360px] text-left">
                                         {errorBanner}
-                                        <form onSubmit={(e) => { e.preventDefault(); handleMagicLink(); }}>
+                                        <form noValidate onSubmit={(e) => { e.preventDefault(); handleMagicLink(); }}>
                                             <label htmlFor="login-email" className={LABEL}>{t("login.emailLabel")}</label>
                                             <input
                                                 id="login-email"
@@ -529,8 +563,10 @@ export function LoginPage() {
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 placeholder={t("login.placeholders.business")}
-                                                className={FIELD}
+                                                className={FIELD + (emailError ? FIELD_ERROR_CLASS : "")}
+                                                {...errorAria("login-email", !!emailError)}
                                             />
+                                            <FieldError id="login-email" message={emailError} alert />
                                             <button type="submit" className={CTA}>
                                                 {t("login.errors.sendNewLink")} <ArrowRight size={16} />
                                             </button>

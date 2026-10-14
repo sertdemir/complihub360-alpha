@@ -13,6 +13,7 @@ import {
 } from '../../api/bookings';
 import { DateMark } from '../../components/ui/DateMark';
 import { useRequestContext } from '../../lib/requestContext';
+import { FieldError } from '../../components/ui/FieldError';
 
 // ─── Provider · Termine & Leads ──────────────────────────────────────────────
 // Matchmaking v2: the booking IS the paid lead. The dossier (user identity +
@@ -107,8 +108,12 @@ export function LeadsPage() {
   // appointment — feeds the internal lead-quality signal.
   const [leadRating, setLeadRating] = useState(0);
   const [leadRated, setLeadRated] = useState<Set<string>>(new Set());
+  // V2 (11.10.2026): „OK" bleibt aktiv; ohne Sterne steht der Satz an der
+  // Sternreihe und der Fokus geht auf den ersten Stern.
+  const [ratingMissing, setRatingMissing] = useState(false);
   const rateLead = (r: Row) => {
-    if (leadRating < 1) return;
+    if (leadRating < 1) { setRatingMissing(true); document.querySelector<HTMLElement>('#lead-rating button')?.focus(); return; }
+    setRatingMissing(false);
     setLeadRated((s) => new Set(s).add(r.id));
     submitReview({ bookingId: r.id, fromRole: 'provider', rating: leadRating, categories: [] }).catch(() => {});
   };
@@ -141,9 +146,14 @@ export function LeadsPage() {
   const [attChoice, setAttChoice] = useState<Record<string, AttendanceOutcome | null>>({});
   const [attBusy, setAttBusy] = useState<string | null>(null);
   const [attFailed, setAttFailed] = useState<string | null>(null);
+  // V2 (11.10.2026): „Melden" bleibt aktiv; ohne Wahl steht der Satz an der
+  // Auswahl (je Termin) und der Fokus geht auf die erste Moeglichkeit.
+  const [attMissing, setAttMissing] = useState<string | null>(null);
   const sendAttendance = async (r: Row) => {
+    if (attBusy === r.id) return;
     const outcome = attChoice[r.id];
-    if (!outcome) return;
+    if (!outcome) { setAttMissing(r.id); document.querySelector<HTMLElement>(`#att-${r.id} [role="radio"]`)?.focus(); return; }
+    setAttMissing(null);
     setAttBusy(r.id); setAttFailed(null);
     try {
       const res = await reportAttendance(r.id, outcome);
@@ -241,13 +251,14 @@ export function LeadsPage() {
     return (
       <div className="space-y-3 border-t border-stroke bg-surface-secondary/60 px-5 py-4">
         <p className="text-[13px] font-semibold text-fg">{t('termine.attQuestion')}</p>
-        <div role="radiogroup" aria-label={t('termine.attQuestion')} className="space-y-2">
+        <div id={`att-${r.id}`} role="radiogroup" aria-label={t('termine.attQuestion')} className="space-y-2"
+          aria-invalid={attMissing === r.id || undefined} aria-describedby={attMissing === r.id ? `att-${r.id}-error` : undefined}>
           {options.map((o) => {
             const on = choice === o.key;
             return (
               <button
                 key={o.key} type="button" role="radio" aria-checked={on} disabled={busy}
-                onClick={() => setAttChoice((m) => ({ ...m, [r.id]: o.key }))}
+                onClick={() => { setAttChoice((m) => ({ ...m, [r.id]: o.key })); if (attMissing === r.id) setAttMissing(null); }}
                 className={'flex w-full items-start gap-3 rounded-lg border px-3.5 py-3 text-left transition-colors disabled:opacity-60 '
                   + (on ? 'border-brand bg-brand-light' : 'border-stroke bg-surface hover:border-brand/50')}
               >
@@ -266,10 +277,11 @@ export function LeadsPage() {
             <span className="text-[11.5px] text-fg-tertiary">{t('termine.attTenMinuteHint')}</span>
           </div>
         )}
+        <FieldError id={`att-${r.id}`} alert message={attMissing === r.id ? t('termine.attChoiceRequired') : null} />
         {attFailed === r.id && <p role="alert" className="text-[12px] text-fg-secondary">{t('termine.attFailed')}</p>}
         <div className="flex justify-end gap-2">
           <Button size="sm" variant="ghost" disabled={busy || !choice} onClick={() => setAttChoice((m) => ({ ...m, [r.id]: null }))}>{t('termine.attCancel')}</Button>
-          <Button size="sm" disabled={busy || !choice} onClick={() => sendAttendance(r)}>
+          <Button size="sm" disabled={busy} onClick={() => sendAttendance(r)}>
             {busy ? '…' : t(choice === 'user_no_show' ? 'termine.attReportNoShow' : 'termine.attReport')}
           </Button>
         </div>
@@ -357,7 +369,7 @@ export function LeadsPage() {
 
       <Drawer
         open={!!dossierFor}
-        onClose={() => setDossierFor(null)}
+        onClose={() => { setDossierFor(null); setRatingMissing(false); }}
         eyebrow={t('termine.dossierEyebrow')}
         title={dossierFor ? (dossierFor.company ?? t('termine.companyMissing')) : ''}
       >
@@ -379,15 +391,19 @@ export function LeadsPage() {
                 {leadRated.has(dossierFor.id) ? (
                   <p className="mt-2 text-[12px] text-fg-brand">{t('termine.rated')}</p>
                 ) : (
-                  <div className="mt-2 flex items-center gap-2">
-                    <div className="flex items-center gap-1">
-                      {[1, 2, 3, 4, 5].map((n) => (
-                        <button key={n} type="button" aria-label={`${n}`} onClick={() => setLeadRating(n)}
-                          className={`text-[20px] leading-none ${n <= leadRating ? 'text-fg-accent' : 'text-white/20 hover:text-white/40'}`}>★</button>
-                      ))}
+                  <>
+                    <div className="mt-2 flex items-center gap-2">
+                      <div id="lead-rating" className="flex items-center gap-1" role="group" aria-label={t('termine.rateLead')}
+                        aria-describedby={ratingMissing ? 'lead-rating-error' : undefined}>
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <button key={n} type="button" aria-label={`${n}`} onClick={() => { setLeadRating(n); setRatingMissing(false); }}
+                            className={`text-[20px] leading-none ${n <= leadRating ? 'text-fg-accent' : 'text-white/20 hover:text-white/40'}`}>★</button>
+                        ))}
+                      </div>
+                      <Button size="sm" variant="secondary" onClick={() => rateLead(dossierFor)}>OK</Button>
                     </div>
-                    <Button size="sm" variant="secondary" disabled={leadRating < 1} onClick={() => rateLead(dossierFor)}>OK</Button>
-                  </div>
+                    <FieldError id="lead-rating" alert message={ratingMissing ? t('termine.rateRequired') : null} className="mt-1.5" />
+                  </>
                 )}
                 <p className="mt-2 text-[11px] text-fg-tertiary">{t('termine.rateNote')}</p>
               </div>

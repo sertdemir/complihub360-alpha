@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { LoadFailedState } from '../../components/provider/WorkspaceStates';
@@ -6,6 +6,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
 import { Textarea } from '../../components/ui/Textarea';
+import { FieldError, errorAria } from '../../components/ui/FieldError';
 import { useWorkspaceData } from '../../lib/useWorkspaceData';
 import { useRequestContext } from '../../lib/requestContext';
 import {
@@ -158,8 +159,14 @@ function EnforcementCard({ e, t, locale, onChanged }: { e: ProviderEnforcement; 
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  // V2 (11.10.2026): ein Feld — der Knopf bleibt aktiv; zu kurz heisst Satz am
+  // Feld und Fokus hinein, statt eines grauen Knopfs ohne Grund.
+  const [tooShort, setTooShort] = useState(false);
+  const noteRef = useRef<HTMLTextAreaElement>(null);
   const date = (iso: string) => new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
   const send = async () => {
+    if (busy) return;
+    if (note.trim().length < 10) { setTooShort(true); noteRef.current?.focus(); return; }
     setBusy(true); setFailed(false);
     try { await appealEnforcement(e.id, note.trim()); onChanged(); }
     catch { setFailed(true); }
@@ -180,10 +187,13 @@ function EnforcementCard({ e, t, locale, onChanged }: { e: ProviderEnforcement; 
       ) : (
         <div className="space-y-2">
           <label className="block text-[12px] font-medium text-fg-secondary" htmlFor="appeal-note">{t('performance.appealLabel')}</label>
-          <Textarea id="appeal-note" rows={3} value={note} onChange={(ev) => setNote(ev.target.value)} placeholder={t('performance.appealPlaceholder')} />
+          <Textarea id="appeal-note" ref={noteRef} rows={3} value={note} placeholder={t('performance.appealPlaceholder')} error={tooShort}
+            onChange={(ev) => { setNote(ev.target.value); if (tooShort && ev.target.value.trim().length >= 10) setTooShort(false); }}
+            {...errorAria('appeal-note', tooShort)} />
+          <FieldError id="appeal-note" alert message={tooShort ? t('performance.appealTooShort') : null} />
           <div className="flex items-center gap-3">
-            <Button size="sm" onClick={send} disabled={note.trim().length < 10} loading={busy}>{t('performance.appealSend')}</Button>
-            {failed && <span className="text-[12px] text-error-500">{t('performance.appealFailed')}</span>}
+            <Button size="sm" onClick={send} loading={busy}>{t('performance.appealSend')}</Button>
+            {failed && <span role="alert" className="text-[12px] text-error-700 dark:text-red-300">{t('performance.appealFailed')}</span>}
           </div>
         </div>
       )}

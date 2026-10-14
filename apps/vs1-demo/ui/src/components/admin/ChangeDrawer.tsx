@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Drawer } from '../ui/Drawer';
 import { Badge, type BadgeTone } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -65,16 +65,22 @@ export function ChangeDrawer({ providerKey, providerName, changeId, onClose, onD
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // V2 (11.10.2026): die Notiz ist das eine Feld. Fehlt sie fuer eine
+  // Entscheidung, die der Partner liest, steht der Satz an der Notiz
+  // (role="alert") und der Fokus geht hinein — nicht mehr oben im Banner.
+  const [noteMissing, setNoteMissing] = useState(false);
+  const noteRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    setDetail(null); setNote(''); setErr(null);
+    setDetail(null); setNote(''); setErr(null); setNoteMissing(false);
     if (changeId) fetchChangeDetail(providerKey, changeId).then(setDetail).catch(() => setErr('This change could not be loaded.'));
   }, [providerKey, changeId]);
 
   const decide = async (decision: ChangeDecision, needsNote: boolean) => {
     if (!changeId) return;
-    if (needsNote && !note.trim()) { setErr('Please add a note — the provider will read it.'); return; }
-    setBusy(true); setErr(null);
+    if (busy) return;
+    if (needsNote && !note.trim()) { setNoteMissing(true); noteRef.current?.focus(); return; }
+    setBusy(true); setErr(null); setNoteMissing(false);
     try { await decideChange(providerKey, changeId, decision, note.trim()); onDecided(); onClose(); }
     catch (e) {
       setErr(e instanceof ApiError && e.status === 409 && /live value/i.test(e.message)
@@ -98,12 +104,18 @@ export function ChangeDrawer({ providerKey, providerName, changeId, onClose, onD
     <Drawer open={!!changeId} onClose={onClose} size="lg" eyebrow="Change request" title={`${providerName} · ${c ? label(c.event_type ?? c.change_type.split(',')[0]) : '…'}`}
       headerExtra={due ? <Badge tone={due.tone} size="sm">{due.label}</Badge> : dl ? <Badge tone={dl.tone} size="sm">{dl.label}</Badge> : null}
       footer={c && ['submitted', 'under_review'].includes(c.status) ? (
-        <div className="flex flex-wrap gap-2">
-          {(ACTIONS[c.effect] ?? []).map((a) => <Button key={a.decision} size="sm" variant={a.variant} disabled={busy || (a.decision === 'approve' && c.effect === 'held' && detail?.stale)} onClick={() => decide(a.decision, a.needsNote)}>{a.decision === 'approve' && c.effect === 'held' && future ? `Approve · schedules for ${day(dated!)}` : a.label}</Button>)}
+        <div className="flex flex-wrap items-center gap-2">
+          {(ACTIONS[c.effect] ?? []).map((a) => {
+            // Ein veralteter Live-Wert sperrt die Freigabe — ein Zustand, kein
+            // Eingabefehler. Der Grund steht neben den Knoepfen.
+            const staleLock = a.decision === 'approve' && c.effect === 'held' && !!detail?.stale;
+            return <Button key={a.decision} size="sm" variant={a.variant} disabled={busy || staleLock} aria-describedby={staleLock ? 'change-stale-reason' : undefined} onClick={() => decide(a.decision, a.needsNote)}>{a.decision === 'approve' && c.effect === 'held' && future ? `Approve · schedules for ${day(dated!)}` : a.label}</Button>;
+          })}
+          {c.effect === 'held' && detail?.stale && <p id="change-stale-reason" className="text-[12px] text-fg-tertiary">Approve is unavailable: the live value changed since this was submitted.</p>}
         </div>
       ) : null}>
       {!detail && !err && <Skeleton variant="rect" height={220} />}
-      {err && <Banner status="warning" title={err} className="mb-4" />}
+      {err && <Banner status="warning" role="alert" title={err} className="mb-4" />}
       {c && detail && (
         <div className="space-y-5 text-[13px]">
           <p className="text-fg-tertiary">
@@ -145,10 +157,13 @@ export function ChangeDrawer({ providerKey, providerName, changeId, onClose, onD
             </p>
           </div>
           {['submitted', 'under_review'].includes(c.status) && (
-            <label className="block">
-              <span className="mb-1 block text-[12px] font-medium text-fg-secondary">Note to the provider (required for reject, re-verification and keeping paused)</span>
-              <Textarea inputSize="sm" rows={3} value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000} />
-            </label>
+            <div>
+              <label htmlFor="change-note" className="mb-1 block text-[12px] font-medium text-fg-secondary">Note to the provider (required for reject, re-verification and keeping paused)</label>
+              <Textarea id="change-note" ref={noteRef} inputSize="sm" rows={3} value={note} maxLength={1000} error={noteMissing}
+                onChange={(e) => { setNote(e.target.value); if (e.target.value.trim()) setNoteMissing(false); }}
+                aria-invalid={noteMissing || undefined} aria-describedby={noteMissing ? 'change-note-error' : undefined} />
+              {noteMissing && <p id="change-note-error" role="alert" className="mt-1.5 text-[12px] leading-snug text-error-700 dark:text-red-300">Please add a note — the provider will read it.</p>}
+            </div>
           )}
         </div>
       )}

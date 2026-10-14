@@ -1107,7 +1107,75 @@ export async function sendMarketCoveredMail(p: {
     locale?: string | null;
 }): Promise<void> {
     const { subject, text } = renderMarketCoveredMail(p.market, p.locale);
-    const kind = 'market_covered';
+    await deliverRequestMail({ to: p.to, requestId: p.requestId, market: p.market, subject, text, kind: 'market_covered' });
+}
+
+// ─── Anbieter-Update (market_requests.reason = 'provider_coverage') ──────────
+// "Request More Coverage" (Canvas C2): der Markt ist geprueft, aber kein
+// freigegebener Anbieter deckte die angefragten Bereiche ab. Genau eine Mail
+// je Anfrage, sobald matchable_provider_services dort mindestens einen dieser
+// Bereiche abdeckt; der Watcher setzt vorher notified_at.
+//
+// DNA: Information, kein Verkauf. Kein "jetzt schnell", kein Upsell, keine Aussage
+// ueber Pflichten. Die Mail nennt nur die Bereiche, die tatsaechlich
+// abgedeckt sind — und sagt nicht "ein Anbieter deckt alles ab", wenn es
+// mehrere sein koennen. Dass nichts an einen Anbieter geht, bevor der Nutzer
+// waehlt und bucht, steht drin, weil genau das die Sorge bei einer solchen
+// Mail ist.
+//
+// Copy NOCH NICHT ABGENOMMEN (Entwurf 2026-10-11). Englisch zuerst
+// (EN-Launch): die anderen Sprachen fallen auf EN zurueck, der Link dann
+// ebenfalls auf /en, damit Mail und Seite dieselbe Sprache sprechen.
+
+type ProviderCoveredStrings = { subject: string; intro: string; all: string; some: string; next: string; cta: string; once: string };
+
+const PROVIDER_COVERED_STRINGS: Partial<Record<MailLocale, ProviderCoveredStrings>> & { en: ProviderCoveredStrings } = {
+    en: {
+        subject: 'Verified provider coverage for {areas} in {market}',
+        intro: 'You asked us to let you know when a verified provider covers {requested} in {market}.',
+        all: 'This is now the case.',
+        some: 'This is now the case for {areas}.',
+        next: 'You can review your provider options in your Risk Map. Nothing is shared with a provider until you choose one and book.',
+        cta: 'Open my Risk Maps',
+        once: 'This is the only email we send about this request.',
+    },
+};
+
+/** Betreff und Text des Anbieter-Updates. `requested` = die Bereiche der
+ *  Anfrage, `covered` = die davon jetzt abgedeckten; beide als Namen. */
+export function renderProviderCoveredMail(p: { market: string; requested: string[]; covered: string[]; locale?: string | null }): { subject: string; text: string } {
+    const wanted = resolveLocale(p.locale ?? undefined);
+    const loc: MailLocale = PROVIDER_COVERED_STRINGS[wanted] ? wanted : 'en';
+    const t = PROVIDER_COVERED_STRINGS[loc] ?? PROVIDER_COVERED_STRINGS.en;
+    let name = p.market;
+    try { name = new Intl.DisplayNames([loc], { type: 'region' }).of(p.market) ?? p.market; } catch { /* Code statt Name */ }
+    // Komma statt "and": die Bereichsnamen tragen selbst ein "and" ("Tax and
+    // VAT") — "Tax and VAT and Data and Privacy" liest sich als ein Bereich.
+    const list = (xs: string[]) => new Intl.ListFormat(loc, { style: 'short', type: 'unit' }).format(xs);
+    const fill = (x: string) => x.split('{market}').join(name).split('{areas}').join(list(p.covered)).split('{requested}').join(list(p.requested));
+    const allCovered = p.requested.every((r) => p.covered.includes(r));
+    const url = `${PUBLIC_APP_URL}/${loc}/dashboard/sessions`;
+    return {
+        subject: fill(t.subject),
+        text: [`${fill(t.intro)} ${fill(allCovered ? t.all : t.some)}`, '', fill(t.next), '', `→ ${t.cta}: ${url}`, '', t.once].join('\n'),
+    };
+}
+
+export async function sendProviderCoveredMail(p: {
+    to: string | null;
+    requestId: string;
+    market: string;
+    requested: string[];
+    covered: string[];
+    locale?: string | null;
+}): Promise<void> {
+    const { subject, text } = renderProviderCoveredMail(p);
+    await deliverRequestMail({ to: p.to, requestId: p.requestId, market: p.market, subject, text, kind: 'provider_covered' });
+}
+
+/** Versand der beiden Anfrage-Updates: ohne Adresse nichts, ohne Resend ins Outbox-Protokoll. */
+async function deliverRequestMail(p: { to: string | null; requestId: string; market: string; subject: string; text: string; kind: 'market_covered' | 'provider_covered' }): Promise<void> {
+    const { subject, text, kind } = p;
     const apiKey = process.env.RESEND_API_KEY;
     try {
         if (!p.to) {
@@ -1132,7 +1200,7 @@ export async function sendMarketCoveredMail(p: {
             payload: { requestId: p.requestId, market: p.market, to: p.to, subject, providerId: (body as { id?: string }).id, status: res.status, kind },
         });
     } catch (err) {
-        structuredLog('error', 'Market covered mail failed', {
+        structuredLog('error', kind === 'market_covered' ? 'Market covered mail failed' : 'Provider covered mail failed', {
             correlationId: 'watchers', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
         });
         try {
