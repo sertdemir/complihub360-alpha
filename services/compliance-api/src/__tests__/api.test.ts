@@ -4175,7 +4175,8 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         const user = await api('/api/v1/bookings', { auth: 'jwt' });
         expect(user.body.bookings[0]).toMatchObject({ no_show_by: 'user', dispute_status: 'none', rebook_deadline: dayStr(13), rebook_open: true });
         expect(user.body.bookings[0].dispute_open_until).toBeTruthy();
-        expect(JSON.stringify(user.body)).not.toMatch(/fee|band|ledger|credit/i);
+        // Nur Schlüsselnamen prüfen: Werte wie randomUUID()-IDs enthalten sonst zufällig „fee“.
+        expect(JSON.stringify(user.body)).not.toMatch(/"\w*(fee|band|ledger|credit)\w*":/i);
     });
 
     it('Monatslauf mit provider-Filter rechnet nur diesen Anbieter ab', async () => {
