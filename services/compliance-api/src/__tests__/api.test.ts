@@ -4561,6 +4561,11 @@ describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Lim
         const ok = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: requestBody() });
         expect(ok.status).toBe(201);
         expect(ok.body.client).toMatchObject({ status: 'requested', requested_scopes: ['leads:read', 'leads:write', 'events:read', 'billing:read'], scopes: [], terms_version: 'api-terms-v1' });
+        // Staging 2026-10-14: der Antrag schickte `scopes: null` und lief in das
+        // NOT NULL der Tabelle — der Test-Store kennt keine Constraints, also
+        // steht die Zeile hier woertlich: leeres Array, nie null.
+        expect(db.api_clients[0].scopes).toEqual([]);
+        expect(db.api_clients[0].scopes).not.toBeNull();
         expect(db.event_log.some((e) => e.type === 'api_access_requested')).toBe(true);
         expect(db.event_log.some((e) => e.type === 'admin_alert' && e.payload.kind === 'api_access_requested')).toBe(true);
         const zweit = await asJwt(MEMBER_JWT, '/api/v1/provider/test-kanzlei/api-access', { method: 'POST', body: requestBody() });

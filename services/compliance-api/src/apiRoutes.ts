@@ -346,7 +346,7 @@ export async function handleProviderApiAccess(
             if (!scopes.ok) { json(res, 400, { errorCode: 'VALIDATION_ERROR', message: scopes.reason, correlationId }); return true; }
             const [row] = (await supabaseApi.insert('api_clients', {
                 provider_key: providerKey, name, status: 'requested', use_case: useCase, contact_name: contactName, contact_email: contactEmail,
-                requested_scopes: scopes.scopes, scopes: null, rate_limit_per_minute: 120, terms_version: API_TERMS_VERSION, created_by: userId, created_at: new Date().toISOString(),
+                requested_scopes: scopes.scopes, scopes: [], rate_limit_per_minute: 120, terms_version: API_TERMS_VERSION, created_by: userId, created_at: new Date().toISOString(),
             })) as ApiClientRow[];
             await supabaseApi.insert('event_log', { type: 'api_access_requested', actor_id: userId, payload: { providerKey, clientId: row.id, requestedScopes: scopes.scopes } });
             await supabaseApi.insert('event_log', { type: 'admin_alert', payload: { kind: 'api_access_requested', providerKey, clientId: row.id } });
