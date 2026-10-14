@@ -3,6 +3,9 @@ import { LEAD_FEE_POLICY_VERSION } from '../billing.js';
 import { createHash, createHmac, randomUUID, generateKeyPairSync, sign as cryptoSign } from 'node:crypto';
 import { createServer as createHttpServer } from 'node:http';
 
+/** Leak-Guards pruefen Feldnamen, nicht Zufall: UUIDs bestehen aus Hex und koennen "fee", "bad", "ace" enthalten. */
+const ohneIds = (text: string) => text.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '<id>');
+
 // ─── API integration tests (13-layer audit P1 #7) ────────────────────────────
 // The real HTTP server runs in-process on a test port; only supabaseApi is
 // replaced by an in-memory table store. This pins the manually-verified flows:
@@ -3965,7 +3968,7 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         const user = await api('/api/v1/bookings', { auth: 'jwt' });
         expect(user.body.bookings[0]).toMatchObject({ no_show_by: 'user', dispute_status: 'none', rebook_deadline: dayStr(13), rebook_open: true });
         expect(user.body.bookings[0].dispute_open_until).toBeTruthy();
-        expect(JSON.stringify(user.body)).not.toMatch(/fee|band|ledger|credit/i);
+        expect(ohneIds(JSON.stringify(user.body))).not.toMatch(/fee|band|ledger|credit/i);
     });
 
     it('Monatslauf mit provider-Filter rechnet nur diesen Anbieter ab', async () => {
@@ -4635,7 +4638,7 @@ describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Lim
         const text = JSON.stringify(r.body);
         expect(text).not.toContain('geheim');
         expect(text).not.toContain('andere-kanzlei');
-        expect(text).not.toMatch(/fee|band|ledger|stripe/i);
+        expect(ohneIds(text)).not.toMatch(/fee|band|ledger|stripe/i);
         // since-Filter und Seite
         const seit = await asKey(key, '/api/v1/ext/leads?since=2026-10-02T00:00:00Z');
         expect(seit.body.leads).toHaveLength(1);
