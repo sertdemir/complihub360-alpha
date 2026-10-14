@@ -422,5 +422,9 @@
   "delayed": {
     "yourAnswers": "Your answers",
     "saved": "Saved"
+  },
+  "providerCoverage": {
+    "notifyLabel": "Email me when a verified provider covers this",
+    "notifyHelp": "We’ll email you at {{email}}. Only for this request."
   }
 }

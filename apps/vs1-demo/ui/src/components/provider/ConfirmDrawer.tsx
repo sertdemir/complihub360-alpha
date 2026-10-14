@@ -44,7 +44,11 @@ export function ConfirmDrawer({ spec, onClose, labels }: { spec: ConfirmSpec | n
 
   useEffect(() => { setTyped(''); setBusy(false); setFailed(false); }, [spec?.title]);
 
+  // Das Schluesselwort ist eine Sperre (Zustand), keine Formular-Pruefung
+  // (V2, 11.10.2026): der Knopf bleibt grau, bis es dasteht — und neben ihm
+  // steht, warum.
   const armed = !spec?.keyword || typed.trim().toUpperCase() === spec.keyword.toUpperCase();
+  const waitingForKeyword = !!spec?.keyword && !armed;
 
   const run = async () => {
     if (!spec) return;
@@ -70,9 +74,12 @@ export function ConfirmDrawer({ spec, onClose, labels }: { spec: ConfirmSpec | n
       eyebrow={L.eyebrow}
       title={spec?.title ?? L.fallbackTitle}
       footer={
-        <div className="flex w-full items-center justify-end gap-2">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2">
+          {waitingForKeyword && (
+            <p id="confirm-keyword-hint" className="mr-auto text-[11px] text-fg-tertiary">{t('confirmDrawer.keywordHint', { keyword: spec!.keyword })}</p>
+          )}
           <Button variant="ghost" size="sm" onClick={onClose} disabled={busy}>{L.cancel}</Button>
-          <Button variant="primary" size="sm" onClick={run} disabled={!armed || busy}>
+          <Button variant="primary" size="sm" onClick={run} disabled={!armed || busy} aria-describedby={waitingForKeyword ? 'confirm-keyword-hint' : undefined}>
             {busy ? '…' : spec?.confirmLabel ?? L.confirm}
           </Button>
         </div>
@@ -89,10 +96,11 @@ export function ConfirmDrawer({ spec, onClose, labels }: { spec: ConfirmSpec | n
           )}
           {spec.keyword && (
             <div>
-              <p className="mb-1.5 text-[11px] text-fg-tertiary">
+              <label htmlFor="confirm-keyword" className="mb-1.5 block text-[11px] text-fg-tertiary">
                 {t('confirmDrawer.typePrefix')}<span className="font-semibold text-fg">{spec.keyword}</span>{t('confirmDrawer.typeSuffix')}
-              </p>
+              </label>
               <input
+                id="confirm-keyword"
                 value={typed}
                 onChange={(e) => setTyped(e.target.value)}
                 className="w-full rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-error-500"

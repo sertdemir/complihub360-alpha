@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -7,6 +7,8 @@ import { Banner } from '../ui/Banner';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { Checkbox } from '../ui/Checkbox';
+import { FormErrorSummary, focusField, type FormError } from '../ui/FormErrorSummary';
+import { FieldError, errorAria } from '../ui/FieldError';
 import type { ConfirmSpec } from './ConfirmDrawer';
 import {
   fetchApiAccess, requestApiAccess, issueApiKey, revokeApiAccess, fetchApiAccessLog, REQUESTABLE_SCOPES,
@@ -225,32 +227,56 @@ function Fact({ label, value, sub }: { label: string; value: string; sub?: strin
 }
 
 function RequestForm({ terms, busy, onSubmit }: { terms: string; busy: boolean; onSubmit: (b: { name: string; use_case: string; contact_email: string; contact_name?: string; requested_scopes: ApiScope[] }) => void }) {
-  const { t } = useTranslation('providerws');
+  const { t } = useTranslation(['providerws', 'common']);
   const [name, setName] = useState('');
   const [useCase, setUseCase] = useState('');
   const [email, setEmail] = useState('');
   const [scopes, setScopes] = useState<ApiScope[]>(['leads:read', 'events:read']);
   const [terms_, setTerms] = useState(false);
   const toggle = (s: ApiScope) => setScopes((cur) => (cur.includes(s) ? cur.filter((x) => x !== s) : [...cur, s]));
-  const valid = name.trim() && useCase.trim() && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) && scopes.length > 0 && terms_;
+  // V2 (11.10.2026): der Knopf bleibt aktiv; das Absenden prueft. Fehler am
+  // Feld, gesammelt ueber dem Knopf (H2), Fokus aufs erste fehlerhafte Feld.
+  const [tried, setTried] = useState(false);
+  const errorsOf = (): FormError[] => {
+    const errs: FormError[] = [];
+    if (!name.trim()) errs.push({ id: 'api-name', label: t('apiAccess.nameLabel'), message: t('apiAccess.errors.name') });
+    if (!useCase.trim()) errs.push({ id: 'api-use-case', label: t('apiAccess.useCaseLabel'), message: t('apiAccess.errors.useCase') });
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) errs.push({ id: 'api-contact', label: t('apiAccess.contactLabel'), message: t('common:contactSend.field.email') });
+    if (!scopes.length) errs.push({ id: 'api-scopes', label: t('apiAccess.scopesLabel'), message: t('apiAccess.errors.scopes') });
+    if (!terms_) errs.push({ id: 'api-terms', label: t('apiAccess.errors.termsLabel'), message: t('apiAccess.errors.terms') });
+    return errs;
+  };
+  const errors = tried ? errorsOf() : [];
+  const errFor = (id: string) => errors.find((e) => e.id === id)?.message;
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (busy) return;
+    setTried(true);
+    const now = errorsOf();
+    if (now.length) { focusField(now[0].id); return; }
+    onSubmit({ name: name.trim(), use_case: useCase.trim(), contact_email: email.trim(), requested_scopes: scopes });
+  };
   return (
-    <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); if (valid) onSubmit({ name: name.trim(), use_case: useCase.trim(), contact_email: email.trim(), requested_scopes: scopes }); }}>
+    <form className="space-y-4" noValidate onSubmit={submit}>
       <p className="max-w-2xl text-body-sm leading-relaxed text-fg-secondary">{t('apiAccess.intro')}</p>
-      <label className="block space-y-1.5">
-        <span className="text-[12px] font-medium text-fg-secondary">{t('apiAccess.nameLabel')}</span>
-        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('apiAccess.namePh')} maxLength={120} />
-      </label>
-      <label className="block space-y-1.5">
-        <span className="text-[12px] font-medium text-fg-secondary">{t('apiAccess.useCaseLabel')}</span>
-        <Textarea value={useCase} onChange={(e) => setUseCase(e.target.value)} placeholder={t('apiAccess.useCasePh')} rows={3} maxLength={2000} />
-      </label>
-      <label className="block space-y-1.5">
-        <span className="text-[12px] font-medium text-fg-secondary">{t('apiAccess.contactLabel')}</span>
-        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="it@example.com" maxLength={200} />
-      </label>
+      <div className="space-y-1.5">
+        <label htmlFor="api-name" className="block text-[12px] font-medium text-fg-secondary">{t('apiAccess.nameLabel')}</label>
+        <Input id="api-name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('apiAccess.namePh')} maxLength={120} error={!!errFor('api-name')} {...errorAria('api-name', !!errFor('api-name'))} />
+        <FieldError id="api-name" message={errFor('api-name')} />
+      </div>
+      <div className="space-y-1.5">
+        <label htmlFor="api-use-case" className="block text-[12px] font-medium text-fg-secondary">{t('apiAccess.useCaseLabel')}</label>
+        <Textarea id="api-use-case" value={useCase} onChange={(e) => setUseCase(e.target.value)} placeholder={t('apiAccess.useCasePh')} rows={3} maxLength={2000} error={!!errFor('api-use-case')} {...errorAria('api-use-case', !!errFor('api-use-case'))} />
+        <FieldError id="api-use-case" message={errFor('api-use-case')} />
+      </div>
+      <div className="space-y-1.5">
+        <label htmlFor="api-contact" className="block text-[12px] font-medium text-fg-secondary">{t('apiAccess.contactLabel')}</label>
+        <Input id="api-contact" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="it@example.com" maxLength={200} error={!!errFor('api-contact')} {...errorAria('api-contact', !!errFor('api-contact'))} />
+        <FieldError id="api-contact" message={errFor('api-contact')} />
+      </div>
       <div className="space-y-2">
-        <span className="text-[12px] font-medium text-fg-secondary">{t('apiAccess.scopesLabel')}</span>
-        <div className="flex flex-wrap gap-2">
+        <span id="api-scopes-label" className="text-[12px] font-medium text-fg-secondary">{t('apiAccess.scopesLabel')}</span>
+        <div id="api-scopes" role="group" aria-labelledby="api-scopes-label" {...errorAria('api-scopes', !!errFor('api-scopes'))} className="flex flex-wrap gap-2">
           {REQUESTABLE_SCOPES.map((s) => (
             <label key={s} className={scopes.includes(s)
               ? 'flex cursor-pointer items-center gap-2 rounded-full border border-stroke-brand/50 bg-brand-light px-3 py-1.5 text-[12px] font-medium text-fg-brand'
@@ -260,11 +286,18 @@ function RequestForm({ terms, busy, onSubmit }: { terms: string; busy: boolean; 
             </label>
           ))}
         </div>
+        <FieldError id="api-scopes" message={errFor('api-scopes')} />
         <p className="text-[11px] text-fg-tertiary">{t('apiAccess.scopesNote')}</p>
       </div>
-      <div className="flex flex-wrap items-center gap-4 border-t border-stroke-subtle pt-3">
-        <Checkbox size="sm" checked={terms_} onChange={(e) => setTerms(e.target.checked)} label={<span className="text-body-sm text-fg-secondary">{t('apiAccess.termsAccept', { version: terms })}</span>} />
-        <Button size="sm" type="submit" disabled={!valid || busy} className="ml-auto">{t('apiAccess.submit')}</Button>
+      <div className="space-y-3 border-t border-stroke-subtle pt-3">
+        <div>
+          <Checkbox id="api-terms" size="sm" checked={terms_} onChange={(e) => setTerms(e.target.checked)} error={!!errFor('api-terms')} {...errorAria('api-terms', !!errFor('api-terms'))} label={<span className="text-body-sm text-fg-secondary">{t('apiAccess.termsAccept', { version: terms })}</span>} />
+          <FieldError id="api-terms" message={errFor('api-terms')} />
+        </div>
+        <FormErrorSummary errors={errors} />
+        <div className="flex justify-end">
+          <Button size="sm" type="submit" disabled={busy}>{t('apiAccess.submit')}</Button>
+        </div>
       </div>
     </form>
   );

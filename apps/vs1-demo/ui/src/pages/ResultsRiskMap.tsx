@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Fragment } from 'react';
+import { useState, useEffect, useRef, useMemo, Fragment } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -7,7 +7,7 @@ import { describeCeiling, penaltyText } from '../lib/penaltyCeiling';
 import { cadenceLabel, obligationLabel } from '../lib/obligationText';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
 import { runSearch, type AnonProvider, type SearchCoverage, type SearchLaw } from '../api/search';
-import { isLimitedCoverage } from '../lib/matchState';
+import { coverageGaps, isLimitedCoverage } from '../lib/matchState';
 import { LimitedCoverageCard, OneMatchGuest, ProviderStateHead } from '../components/results/ProviderStates';
 import { useApiData } from '../lib/useApiData';
 import { referenceOf } from '../api/client';
@@ -41,12 +41,15 @@ import {
   MarketRequestList,
   MarketRequestSent,
   isMarketUnavailable,
+  NoProviderMatchCard,
+  NoProviderMatchGuest,
   NoVerifiedProvider,
   NotCheckedCard,
   NotCheckedRow,
   PartialMarketNotice,
   partialMarketsOf,
   unavailableMarketsOf,
+  useCoverageRequest,
   useMarketRequests,
 } from '../components/results/MarketRequest';
 import { PRIORITY_EN, priorityOf } from '../lib/priority';
@@ -417,6 +420,21 @@ export function ResultsRiskMap() {
   // hat keinen JWT, der Server braucht dann den guest_key (sonst 400).
   const { status: requestStatus, send: sendRequest } = useMarketRequests({ areas: requestAreas, asGuest: !user });
   const allRequested = unavailable.length > 0 && unavailable.every((m) => requestStatus[m] === 'sent');
+  // Entscheidung a (11.10.2026), Canvas P1 · Q1: ein gepruefter Markt ohne
+  // freigegebenen Anbieter. Ausgeloest aus den Abdeckungsdaten der Suche
+  // (coverage), nicht aus der Laenderliste der Engine — die kennt den Markt
+  // ja. Aeltere Antworten ohne coverage: der gepruefte Umfang aus dem Profil.
+  const noProviderMatch = providersLive && (pageState === 'live' || pageState === 'none') && !marketUnavailable && anonProviders.length === 0;
+  const noMatchGaps = useMemo(() => {
+    if (!noProviderMatch) return [];
+    const fromCoverage = coverageGaps(searchData.coverage);
+    if (fromCoverage.length) return fromCoverage;
+    const scope = scopeProfile ? scopeOf(scopeProfile, 'checked') : null;
+    return scope && scope.areas.length ? scope.markets.map((m) => ({ market: m, areas: scope.areas })) : [];
+  }, [noProviderMatch, searchData.coverage, scopeProfile]);
+  const coverageRequest = useCoverageRequest(noMatchGaps, !user);
+  // Entscheidung c (11.10.2026), Canvas S1: "begrenzt" auch fuer Gaeste.
+  const guestLimited = !user && providersLive && anonProviders.length > 0 && isLimitedCoverage(anonProviders.length, searchData.coverage);
   // Die Engine hat geantwortet — mit oder ohne Pflichten. Nur dann gibt es
   // eine Map, die man speichern kann, und eine Aussage "what applies to you".
   const hasResult = pageState === 'live' || pageState === 'none';
@@ -597,7 +615,14 @@ export function ResultsRiskMap() {
         // H3 (01.10.2026): kein Markt geprueft → keine Anbieter-Karten mit
         // "Does not cover your market", sondern der abgenommene Zustand.
         providers={marketUnavailable ? [] : anonProviders}
-        providersEmptyState={marketUnavailable ? <NoVerifiedProvider /> : undefined}
+        providersEmptyState={marketUnavailable ? <NoVerifiedProvider /> : noProviderMatch && noMatchGaps.length ? (
+          <NoProviderMatchCard
+            gaps={noMatchGaps}
+            email={user?.email ?? null}
+            status={coverageRequest.status}
+            onRequest={(notify) => coverageRequest.send(notify)}
+          />
+        ) : undefined}
         // K3 (01.10.2026): der ungepruefte Markt steht oben in der Spalte,
         // die Anbieter fuer die geprueften Maerkte bleiben darunter.
         providersTop={partial.length > 0 || providerHead ? (
@@ -929,15 +954,28 @@ export function ResultsRiskMap() {
         {providersLive && (
           <div className="mt-16">
             {anonProviders.length === 0 ? (
-              <p className="text-body-sm text-fg-secondary">{t('partners.none')}</p>
+              noMatchGaps.length ? (
+                // P1 (Figma 3693:4040): abgenommener Zustand statt "No provider
+                // covers this area yet."
+                <NoProviderMatchGuest gaps={noMatchGaps} status={coverageRequest.status} onRequest={() => coverageRequest.send(false)} />
+              ) : (
+                <p className="text-body-sm text-fg-secondary">{t('partners.none')}</p>
+              )
             ) : anonProviders.length === 1 ? (
               // B3 (Canvas 09.10.2026, Figma 3634:2931): ein Treffer im
               // Singular, die Fakten offen, Name und Kontakt nicht.
-              <OneMatchGuest
-                provider={anonProviders[0]}
-                requestedMarkets={searchData.coverage?.markets ?? (scopeProfile ? scopeOf(scopeProfile, 'checked').markets : [])}
-                onReview={() => setSaveOpen(true)}
-              />
+              <div className="flex flex-col gap-5">
+                <OneMatchGuest
+                  provider={anonProviders[0]}
+                  requestedMarkets={searchData.coverage?.markets ?? (scopeProfile ? scopeOf(scopeProfile, 'checked').markets : [])}
+                  onReview={() => setSaveOpen(true)}
+                />
+                {guestLimited && searchData.coverage && (
+                  <div className="lg:max-w-[360px] lg:self-end">
+                    <LimitedCoverageCard coverage={searchData.coverage} asGuest onReviewMatch={() => setSaveOpen(true)} />
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
@@ -964,7 +1002,10 @@ export function ResultsRiskMap() {
                   </button>
                 </div>
 
-                <div className="mt-6 grid gap-5 sm:grid-cols-3">
+                {/* S1 (Figma 3693:4204): begrenzte Abdeckung auch fuer Gaeste —
+                    dieselbe Matrix-Karte wie mit Konto (C2), neben den Teasern. */}
+                <div className={guestLimited ? 'mt-6 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]' : 'mt-6'}>
+                <div className="grid gap-5 sm:grid-cols-3">
                   {anonProviders.slice(0, 3).map((p) => (
                     <div
                       key={p.public_ref}
@@ -979,6 +1020,10 @@ export function ResultsRiskMap() {
                       <span className="text-body-md font-bold text-fg-brand">{t('partners.match', { pct: `${p.match}%` })}</span>
                     </div>
                   ))}
+                </div>
+                {guestLimited && searchData.coverage && (
+                  <LimitedCoverageCard coverage={searchData.coverage} asGuest onReviewMatch={() => setSaveOpen(true)} />
+                )}
                 </div>
               </>
             )}

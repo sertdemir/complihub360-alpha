@@ -46,6 +46,15 @@ export function areaCodeOf(serviceCode: string): string {
     return (serviceCode || '').split('.')[0];
 }
 
+/**
+ * Braucht dieser Bereich eine Zulassung je Land? Die eine Stelle, an der das
+ * entschieden wird — Checkliste, Queue-Risiko und Zell-Freigabe fragen hier.
+ * Nimmt auch einen Leistungs-Code ('tax-vat.returns').
+ */
+export function isRegulatedArea(areaOrServiceCode: string): boolean {
+    return REGULATED_AREAS.has(areaCodeOf(areaOrServiceCode));
+}
+
 export interface ServiceLike { id: string; service_code: string; status: string }
 export interface CoverageLike { service_id: string; country_code: string; status: string }
 
@@ -69,7 +78,7 @@ export function requiredEvidence(services: ServiceLike[], coverage: CoverageLike
     for (const s of services) {
         if (s.status === 'retired') continue;
         const area = areaCodeOf(s.service_code);
-        if (!REGULATED_AREAS.has(area)) continue;
+        if (!isRegulatedArea(area)) continue;
         for (const c of coverage) {
             if (c.service_id !== s.id) continue;
             const key = `${area}:${c.country_code}`;
@@ -111,6 +120,66 @@ export function evidenceMatches(req: RequiredEvidence, e: EvidenceLike): boolean
         if (lands.length && !lands.includes(req.country_code)) return false;
     }
     return true;
+}
+
+// ─── Zulassung je Zelle (Leistung × Land) ────────────────────────────────────
+//
+// Das Gegenstueck zur Ausnahme in activationGate: dort sperrt eine offene
+// Zulassung das Konto nicht, weil sie die ZELLE sperrt. Hier steht, was das
+// heisst. Eine Zelle in einem regulierten Bereich ist erst freigebbar, wenn
+// eine gepruefte, nicht abgelaufene Zulassung fuer genau diesen Bereich und
+// dieses Land vorliegt. Eine DE-Zulassung deckt AT nicht.
+
+export type LicenceState = 'not_required' | 'reviewed' | 'missing' | 'expired';
+
+export interface CellLicence {
+    required: boolean;
+    state: LicenceState;
+    /** Die Zulassung, an der die Zelle haengt (bei 'reviewed') bzw. die zuletzt abgelaufene (bei 'expired'). */
+    evidenceId?: string;
+    /** Ablauf dieser Zulassung; null = kein Ablaufdatum. */
+    expiresAt?: string | null;
+}
+
+/** Ablauf als Tag: am Ablaufdatum gilt der Nachweis nicht mehr — wie im Ablauf-Watcher (exp <= heute). */
+const dayOf = (v: string | null | undefined): string | null => (v ? String(v).slice(0, 10) : null);
+
+/** Spaeteres Ablaufdatum zuerst; kein Ablaufdatum ist das beste. */
+function laterExpiry(a: string | null | undefined, b: string | null | undefined): number {
+    const da = dayOf(a), db = dayOf(b);
+    if (da === db) return 0;
+    if (da === null) return -1;
+    if (db === null) return 1;
+    return da > db ? -1 : 1;
+}
+
+/**
+ * Welche Zulassung traegt diese Zelle? Rein, ohne Datenbank — Zell-Aktion und
+ * Dossier fragen beide hier.
+ *
+ * Brauchbar ist eine `professional_licence` mit Ergebnis reviewed oder
+ * independently_verified, die fuer Bereich UND Land gilt (evidenceMatches:
+ * leere supports_*-Listen gelten ueberall) und nicht abgelaufen ist. Gibt es
+ * mehrere, zaehlt die unabhaengig gepruefte vor der geprueften, dann die mit
+ * dem spaetesten Ablauf. 'expired' heisst: es gab passende, aber keine gilt
+ * mehr — der Reviewer soll "abgelaufen" sehen, nicht "fehlt".
+ */
+export function licenceForCell(input: { serviceCode: string; countryCode: string; evidence: EvidenceLike[]; now?: Date }): CellLicence {
+    const area = areaCodeOf(input.serviceCode);
+    if (!isRegulatedArea(area)) return { required: false, state: 'not_required' };
+    const today = (input.now ?? new Date()).toISOString().slice(0, 10);
+    const req: RequiredEvidence = { type: 'professional_licence', source: 'document', service_code: area, country_code: input.countryCode, required_for_submit: false };
+    const matching = input.evidence.filter((e) => evidenceMatches(req, e));
+    const checked = (e: EvidenceLike) => e.result === 'reviewed' || e.result === 'independently_verified';
+    const lapsed = (e: EvidenceLike) => { const d = dayOf(e.expires_at); return d !== null && d <= today; };
+
+    const usable = matching.filter((e) => checked(e) && !lapsed(e)).sort((a, b) =>
+        Number(b.result === 'independently_verified') - Number(a.result === 'independently_verified') || laterExpiry(a.expires_at, b.expires_at));
+    if (usable.length) return { required: true, state: 'reviewed', evidenceId: usable[0].id, expiresAt: usable[0].expires_at ?? null };
+
+    const expired = matching.filter((e) => e.result === 'expired' || (checked(e) && lapsed(e))).sort((a, b) => laterExpiry(a.expires_at, b.expires_at));
+    if (expired.length) return { required: true, state: 'expired', evidenceId: expired[0].id, expiresAt: expired[0].expires_at ?? null };
+    return { required: true, state: 'missing' };
 }
 
 /** Rang eines Nachweis-Ergebnisses: der beste zaehlt fuer die Checkliste. */
@@ -266,6 +335,7 @@ export function activationGate(input: GateInput): GateVerdict {
         if (item.state === 'reviewed') continue;
         // Zulassungen zaehlen nur fuer Zellen, die freigegeben werden sollen;
         // eine offene Zulassung sperrt die Zelle (Reviewer), nicht das Konto.
+        // Durchgesetzt in der Zell-Aktion (providerReview.ts) ueber licenceForCell.
         if (item.type === 'professional_licence') continue;
         missing.push(`evidence.${item.type}`);
     }

@@ -432,81 +432,6 @@
     "assistantTitle": "Asistente · {{area}}",
     "assistantIntro": "Pregunte sobre {{area}} — la respuesta sale del conocimiento del área y de sus sesiones."
   },
-  "configureAlerts": {
-    "eyebrow": "MONITORIZACIÓN",
-    "title": "Configurar alertas",
-    "savedNote": "Guardado — se aplica a alertas por correo y en la aplicación.",
-    "deliveryNote": "Entrega: correo + en la aplicación.",
-    "savePreferences": "Guardar preferencias",
-    "saveError": "No se pudo guardar — inténtelo de nuevo en un momento.",
-    "toggles": {
-      "thresholdBreach": {
-        "label": "Superación de umbrales",
-        "desc": "Los ingresos superan un umbral de registro de IVA/OSS en cualquier mercado monitorizado."
-      },
-      "thresholdApproach": {
-        "label": "Umbrales próximos (80 %)",
-        "desc": "Aviso temprano antes de alcanzar un umbral."
-      },
-      "deadlines": {
-        "label": "Plazos de presentación",
-        "desc": "Fechas de presentación OSS/EPR/GDPR — con 14 y 3 días de antelación."
-      },
-      "providerUpdates": {
-        "label": "Novedades de proveedores",
-        "desc": "Confirmaciones, respuestas y eventos de SLA de sus solicitudes."
-      },
-      "ruleChanges": {
-        "label": "Cambios regulatorios",
-        "desc": "Cambios normativos que afectan a una sesión guardada («Necesita actualización»)."
-      },
-      "weeklyDigest": {
-        "label": "Resumen semanal",
-        "desc": "Un correo resumen a la semana en lugar de alertas individuales."
-      }
-    }
-  },
-  "docUpload": {
-    "titleUpload": "Subir documento",
-    "titleProcessed": "Documento procesado",
-    "uploadAnother": "Subir otro",
-    "sanitizing": "Saneando…",
-    "uploadSanitize": "Subir y sanear",
-    "classificationPublic": "público",
-    "classificationInternal": "interno",
-    "classificationConfidential": "confidencial",
-    "classificationRestricted": "restringido",
-    "tagSanitized": "saneado",
-    "tagSanitizationFailed": "saneado fallido",
-    "tagAiAllowed": "IA: permitida",
-    "tagAiBlocked": "IA: bloqueada",
-    "redactionReport": "Informe de anonimización",
-    "maskedCount": "{{count}}× enmascarado",
-    "noPii": "No se detectaron identificadores personales.",
-    "storedNote": "Solo se almacenó la versión saneada — el texto original se descartó tras el procesamiento.",
-    "aiBlockedClassification": "El análisis con IA sigue bloqueado por la clasificación del contenido.",
-    "aiBlockedConsent": "El análisis con IA sigue bloqueado hasta que otorgue su consentimiento para este documento.",
-    "chooseFile": "Elija un archivo (.txt · .md · .csv)",
-    "orPaste": "o pegue el contenido abajo",
-    "pastePlaceholder": "Pegue el contenido del documento — contratos, notas, facturas …",
-    "consent": "Doy mi consentimiento al análisis asistido por IA de la versión <em>saneada</em> de este documento (Art. 6(1)(a) GDPR — revocable en cualquier momento). Sin consentimiento, el documento se almacena pero nunca pasa por la IA.",
-    "uploadFailed": "Error al subir",
-    "privacyNote": "Los identificadores personales (nombres, correos, teléfonos, IBAN) se enmascaran <em>antes</em> de almacenar nada. El texto original nunca se conserva."
-  },
-  "requestQuote": {
-    "title": "Solicitar <accent>presupuesto</accent>",
-    "close": "Cerrar",
-    "sentTitle": "Solicitud enviada ✓",
-    "sentBody": "{{name}} ha sido notificado y tiene 24 h para confirmar. Encontrará la solicitud en <em>Solicitudes</em>.",
-    "slaTag": "SLA de confirmación de 24 h",
-    "messageLabel": "Su mensaje al proveedor",
-    "messagePlaceholder": "Describa brevemente su situación — mercados, rango de ingresos, plazos …",
-    "privacyNote": "Su contexto situacional se comparte <em>anonimizado</em> — los nombres y datos de contacto de su mensaje se enmascaran. Su identidad solo se revela cuando el proveedor confirma (Art. 6(1)(b) GDPR — inicio de contrato). Los documentos subidos nunca se comparten automáticamente.",
-    "sendError": "Error al enviar: {{error}} — inténtelo de nuevo.",
-    "requestFailed": "La solicitud falló",
-    "sending": "Enviando…",
-    "sendRequest": "Enviar solicitud"
-  },
   "requestActions": {
     "eyebrow": "SOLICITUD {{id}}",
     "eyebrowFallback": "SOLICITUD",
@@ -741,7 +666,6 @@
     "saved": "Guardado: el mapa de riesgos se está recalculando.",
     "error": "No se pudo guardar. Inténtelo de nuevo.",
     "changed": "cambiado",
-    "none": "Sin selección",
-    "needSelection": "Seleccione al menos un mercado y un área de cumplimiento."
+    "none": "Sin selección"
   }
 }

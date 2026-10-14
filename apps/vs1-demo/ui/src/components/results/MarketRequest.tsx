@@ -439,3 +439,136 @@ export function NotCheckedCard({
     </section>
   );
 }
+
+// ─── Geprüfter Markt ohne freigegebenen Anbieter (Canvas P1 · Q1) ────────────
+// Figma 3693:4040 (P1, Gast) / 3693:4131 (Q1, mit Konto), abgenommen 11.10.2026.
+//
+// Die Engine prueft den Markt, aber /search meldet fuer keinen gewaehlten
+// Bereich einen freigegebenen Anbieter (coverage). Ausgeloest aus den
+// Abdeckungsdaten, nicht aus der Laenderliste der Engine (Entscheidung a).
+// "Request This Market" schickt je Markt die fehlenden Bereiche als
+// Abdeckungsanfrage (reason provider_coverage).
+
+export interface CoverageGapLike { market: string; areas: string[] }
+
+/** Eine Anfrage fuer alle Luecken auf einmal; ein Status fuer den Knopf. */
+export function useCoverageRequest(gaps: CoverageGapLike[], asGuest: boolean) {
+  const { i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage || 'en';
+  const [status, setStatus] = useState<MarketRequestStatus>('idle');
+  const send = useCallback(async (notify = false) => {
+    setStatus('sending');
+    try {
+      for (const g of gaps) {
+        await requestMarket({ market: g.market, domains: g.areas, asGuest, locale, reason: 'provider_coverage', notify: !asGuest && notify });
+      }
+      setStatus('sent');
+    } catch {
+      setStatus('failed');
+    }
+  }, [gaps, asGuest, locale]);
+  return { status, send };
+}
+
+function GapChips({ gaps }: { gaps: CoverageGapLike[] }) {
+  const names = useNames();
+  const chips = gaps.flatMap((g) => g.areas.map((a) => `${names.area(a)} · ${names.market(g.market)}`));
+  if (!chips.length) return null;
+  return (
+    <ul className="flex flex-wrap justify-center gap-2" aria-label={chips.join(', ')}>
+      {chips.map((c) => (
+        <li key={c} className="rounded-md border border-stroke-subtle bg-surface px-2.5 py-1 text-body-2xs font-semibold text-fg-secondary">{c}</li>
+      ))}
+    </ul>
+  );
+}
+
+/** P1 — Gast: der Zustand mittig im Anbieter-Abschnitt. Gaeste bekommen kein
+ *  Update (G2, 27.09.), deshalb der abgenommene Gast-Satz statt "choose to be
+ *  notified". */
+export function NoProviderMatchGuest({ gaps, status, onRequest }: {
+  gaps: CoverageGapLike[];
+  status: MarketRequestStatus;
+  onRequest: () => void;
+}) {
+  const { t } = useTranslation(['common', 'results']);
+  if (status === 'sent') {
+    return <div className="flex justify-center"><MarketRequestSent markets={gaps.map((g) => g.market)} /></div>;
+  }
+  return (
+    <section
+      aria-label={t('common:states.noProviderMatch.heading')}
+      className="flex flex-col items-center gap-3 border-t border-stroke-subtle pt-8 text-center"
+    >
+      <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-brand">{t('results:snapshot.providersEyebrow')}</span>
+      <h2 className="max-w-[640px] text-balance font-serif text-[1.75rem] font-bold leading-tight text-fg">{t('common:states.noProviderMatch.heading')}</h2>
+      <p className="max-w-[560px] text-body-sm leading-relaxed text-fg-secondary">{t('common:states.marketRequest.guestMessage')}</p>
+      <GapChips gaps={gaps} />
+      <span className="flex flex-col items-center gap-1.5 pt-1">
+        <Button size="lg" loading={status === 'sending'} onClick={onRequest}>
+          {t('common:states.actions.requestThisMarket')}
+        </Button>
+        {status === 'failed' && <Failed />}
+      </span>
+    </section>
+  );
+}
+
+/** Q1 — mit Konto: die H3-Karte in der Anbieter-Spalte, dazu Opt-in und
+ *  Anfrage. Der abgenommene Satz ("choose to be notified") stimmt, seit der
+ *  Watcher die Anbieter-Mail verschickt (X1). Ohne bekannte Adresse kein
+ *  Opt-in — dann ist der Satz fuer diesen Nutzer nicht einloesbar, und es
+ *  steht der Gast-Satz da. */
+export function NoProviderMatchCard({ gaps, email, status, onRequest }: {
+  gaps: CoverageGapLike[];
+  email: string | null;
+  status: MarketRequestStatus;
+  onRequest: (notify: boolean) => void;
+}) {
+  const { t } = useTranslation(['common', 'results']);
+  const names = useNames();
+  const [notify, setNotify] = useState(false);
+  return (
+    <section
+      aria-label={t('common:states.noProviderMatch.heading')}
+      className="flex flex-col gap-2 rounded-2xl border border-dashed border-stroke bg-surface px-[22px] py-5"
+    >
+      <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-tertiary">{t('results:snapshot.providersEyebrow')}</span>
+      <h2 className="text-body font-bold leading-[1.35] text-fg">{t('common:states.noProviderMatch.heading')}</h2>
+      <p className="text-body-sm leading-[1.55] text-fg-secondary">
+        {email ? t('common:states.noProviderMatch.message') : t('common:states.marketRequest.guestMessage')}
+      </p>
+      {status === 'sent' ? (
+        <div role="status" className="mt-1 rounded-lg bg-brand-light px-3.5 py-3">
+          <p className="text-body-xs font-bold text-fg">
+            {t('common:states.marketRequest.sent', { markets: names.list([...new Set(gaps.map((g) => g.market))].map(names.market)) })}
+          </p>
+          <p className="mt-1 text-body-3xs leading-relaxed text-fg-secondary">{t('common:states.marketRequest.sentBody')}</p>
+        </div>
+      ) : (
+        <>
+          {email && (
+            <div className="mt-1 rounded-lg bg-surface-secondary px-3 py-2.5">
+              <Checkbox
+                checked={notify}
+                onChange={(e) => setNotify(e.target.checked)}
+                disabled={status === 'sending'}
+                className="items-start"
+                label={
+                  <span className="flex flex-col gap-0.5">
+                    <span className="text-body-xs font-semibold text-fg">{t('results:providerCoverage.notifyLabel')}</span>
+                    <span className="text-body-3xs text-fg-tertiary">{t('results:providerCoverage.notifyHelp', { email })}</span>
+                  </span>
+                }
+              />
+            </div>
+          )}
+          <Button className="mt-1 w-full" loading={status === 'sending'} onClick={() => onRequest(notify)}>
+            {t('common:states.actions.requestThisMarket')}
+          </Button>
+          {status === 'failed' && <Failed />}
+        </>
+      )}
+    </section>
+  );
+}

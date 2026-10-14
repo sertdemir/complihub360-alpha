@@ -5,6 +5,8 @@ import { Logo } from '../../components/ui/Logo';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
 import { verifyMagicToken, actOnEngagement, type EngagementDossier, type UnlockedDossier } from '../../api/engagement';
+import { focusField } from '../../components/ui/FormErrorSummary';
+import { FieldError, errorAria } from '../../components/ui/FieldError';
 
 // ─── Provider magic-link action page ─────────────────────────────────────────
 // Target of the e-mailed links (?id=…&token=…&action=confirm|reply|decline).
@@ -31,6 +33,9 @@ export const DOSSIER_FIELDS = [
 
 export function ProviderMagicActionPage() {
   const { t } = useTranslation('providerws');
+  // Der Satz zur Mindestlaenge ist derselbe wie im geteilten Verlauf
+  // (ThreadDrawer, userws:thread.*) — Antworten an Mandanten, eine Regel.
+  const { t: tw } = useTranslation('userws');
   const params = new URLSearchParams(useLocation().search);
   const token = params.get('token') || '';
   const action = (params.get('action') || 'confirm') as 'confirm' | 'reply' | 'decline';
@@ -42,6 +47,11 @@ export function ProviderMagicActionPage() {
   const [message, setMessage] = useState('');
   const [dossier, setDossier] = useState<EngagementDossier | null>(null);
   const [unlocked, setUnlocked] = useState<UnlockedDossier | null>(null);
+  // Regel V2 (11.10.2026): der Knopf bleibt aktiv (gesperrt nur, solange die
+  // Aktion laeuft). Ein Feld — ist die Antwort zu kurz, steht der Satz am
+  // Feld und der Fokus dort.
+  const [tried, setTried] = useState(false);
+  const replyError = action === 'reply' && tried && message.trim().length < 5 ? tw('thread.messageTooShort', { min: 5 }) : null;
 
   useEffect(() => {
     if (!token) { setPhase('invalid'); return; }
@@ -52,6 +62,11 @@ export function ProviderMagicActionPage() {
   }, []);
 
   const act = async () => {
+    if (action === 'reply' && message.trim().length < 5) {
+      setTried(true);
+      focusField('magic-reply');
+      return;
+    }
     setPhase('working');
     try {
       const u = await actOnEngagement(action, engagementId, token, action === 'reply' ? message : undefined);
@@ -122,13 +137,20 @@ export function ProviderMagicActionPage() {
               </div>
             )}
             {action === 'reply' && (
-              <textarea
-                rows={4}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder={t('magicAction.replyPlaceholder')}
-                className="mt-4 w-full resize-none rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
-              />
+              <>
+                <textarea
+                  id="magic-reply"
+                  rows={4}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={t('magicAction.replyPlaceholder')}
+                  aria-label={t('magicAction.replyTitle')}
+                  className={'mt-4 w-full resize-none rounded-lg border bg-elevate/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none '
+                    + (replyError ? 'border-error-500' : 'border-elevate/10')}
+                  {...errorAria('magic-reply', !!replyError)}
+                />
+                <FieldError id="magic-reply" message={replyError} alert />
+              </>
             )}
             <p className="mt-4 text-[12px] leading-relaxed text-fg-tertiary">
               {action === 'decline' ? t('magicAction.pressNoteDecline') : t('magicAction.pressNoteAccept')}
@@ -137,7 +159,7 @@ export function ProviderMagicActionPage() {
               variant={action === 'decline' ? 'danger' : 'primary'}
               className="mt-5 w-full"
               onClick={act}
-              disabled={phase === 'working' || (action === 'reply' && message.trim().length < 5)}
+              disabled={phase === 'working'}
             >
               {phase === 'working' ? t('magicAction.workingButton') : copy.button}
             </Button>

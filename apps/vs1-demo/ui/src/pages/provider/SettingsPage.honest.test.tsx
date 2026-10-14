@@ -32,7 +32,7 @@ vi.mock('../../api/contact', () => ({
   sendContact: (p: unknown) => api.sendContact(p),
   failureOf: (e: { status?: number }) => (e?.status === 503 ? 'unavailable' : 'network'),
 }));
-vi.mock('../../api/client', () => ({ identityHintFrom: () => null }));
+vi.mock('../../api/client', () => ({ identityHintFrom: () => null, identityFindingsOf: () => null }));
 vi.mock('../../components/provider/ProviderShell', () => ({ ProviderShell: ({ children }: { children: ReactNode }) => <div>{children}</div> }));
 vi.mock('../../components/provider/CalendarPanel', () => ({ CalendarPanel: () => <div>calendar</div> }));
 vi.mock('../../components/provider/ChangeEmailDrawer', () => ({ ChangeEmailDrawer: () => null }));

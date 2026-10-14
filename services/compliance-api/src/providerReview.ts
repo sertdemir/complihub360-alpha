@@ -10,7 +10,7 @@ import { same } from './changeControl.js';
 import { applyHeldValues, liveRows, liveValue, staleFields } from './changeSchedule.js';
 import { allowanceFor, coverageMatrix, loadDossier, readJson, reviewLog, type Dossier } from './providerApplication.js';
 import {
-    activationGate, serviceStatusFromCoverage, transitionAllowed, ACTIVATION_AGREEMENTS, type GateVerdict,
+    activationGate, areaCodeOf, isRegulatedArea, licenceForCell, serviceStatusFromCoverage, transitionAllowed, ACTIVATION_AGREEMENTS, type GateVerdict,
 } from './verificationRules.js';
 
 // ─── Der Review-Arbeitsplatz ─────────────────────────────────────────────────
@@ -99,7 +99,7 @@ export interface QueueRow {
 /** Risiko einer Zeile: hoch bei regulierten Bereichen oder entzogener Zulassung, mittel bei neuer Bewerbung, niedrig bei Ablauf. */
 export function queueRisk(kind: QueueRow['kind'], areas: string[], lifecycle: string): Risk {
     if (lifecycle === 'suspended') return 'high';
-    if (areas.some((a) => a === 'legal-advisory' || a === 'tax-vat')) return kind === 'expiring_evidence' ? 'medium' : 'high';
+    if (areas.some(isRegulatedArea)) return kind === 'expiring_evidence' ? 'medium' : 'high';
     if (kind === 'application' || kind === 'change_request') return 'medium';
     return 'low';
 }
@@ -194,7 +194,10 @@ async function dossier(res: ServerResponse, correlationId: string, providerKey: 
         confidential: d.confidential,
         has_dashboard_user: !!member,
         services: d.services.map((s) => ({ ...s, coverage: d.coverage.filter((c) => c.service_id === s.id) })),
-        matrix: coverageMatrix(d.services, d.coverage),
+        // Je Leistung `regulated`, je Zelle `licence` (licenceForCell) — die
+        // Oberflaeche zeigt, was die Zell-Freigabe verlangt, ohne die Regel
+        // nachzubauen.
+        matrix: coverageMatrix(d.services, d.coverage, d.evidence),
         checklist: d.checklist,
         evidence,
         registry: {
@@ -256,6 +259,25 @@ async function decideCoverage(req: IncomingMessage, res: ServerResponse, correla
         json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'This action needs a reason the provider can act on', correlationId }); return;
     }
     const now = new Date().toISOString();
+
+    // Freigabe in einem regulierten Bereich nur mit gepruefter Zulassung fuer
+    // genau dieses Land (Spec A §5.3, §21). Das ist die Sperre, auf die
+    // activationGate mit "eine offene Zulassung sperrt die Zelle" verweist.
+    // Ohne sie aendert sich nichts — kein Update, kein Protokoll.
+    let licence: ReturnType<typeof licenceForCell> | null = null;
+    if ((action === 'approve' || action === 'limit') && isRegulatedArea(service.service_code)) {
+        const evidence = (await supabaseApi.select('provider_evidence', { provider_key: providerKey, evidence_type: 'professional_licence' }, { limit: 200 })) as any[];
+        licence = licenceForCell({ serviceCode: service.service_code, countryCode: cell.country_code, evidence });
+        if (licence.state !== 'reviewed') {
+            json(res, 422, {
+                errorCode: 'LICENCE_REQUIRED',
+                message: 'A tax or legal service needs a reviewed licence for this country before the cell can be approved.',
+                area: areaCodeOf(service.service_code), country: cell.country_code, correlationId,
+            });
+            return;
+        }
+    }
+
     const providers = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
     const p = providers[0];
 
@@ -280,9 +302,22 @@ async function decideCoverage(req: IncomingMessage, res: ServerResponse, correla
     if (next === 'approved' || next === 'limited') { patch.approved_at = now; patch.approved_by = caller.userId; }
     patch.limitations = next === 'limited' ? (str(d.limitations, 500) || reason) : next === 'approved' ? null : (reason ?? cell.limitations ?? null);
     const exp = isoDate(d.expires_at); patch.expires_at = exp ?? (next === 'approved' || next === 'limited' ? cell.expires_at ?? null : null);
+    if (licence?.state === 'reviewed') {
+        // Die Zelle laeuft mit ihrer Zulassung ab — frueher, wenn der Reviewer
+        // ein frueheres Datum setzt. matchable_provider_services blendet eine
+        // abgelaufene Zelle von selbst aus; niemand muss nachziehen.
+        const bounds = [licence.expiresAt ?? null, exp].filter((v): v is string => !!v);
+        patch.expires_at = bounds.length ? bounds.reduce((a, b) => (Date.parse(a) <= Date.parse(b) ? a : b)) : null;
+    }
     const nxt = isoDate(d.next_review_at); if (nxt) patch.next_review_at = nxt;
     await supabaseApi.update('provider_service_coverage', { id: coverageId }, patch);
     await reviewLog({ providerKey, subject: 'coverage', subjectId: coverageId, action, from: cell.status, to: next, reason, actorId: caller.userId, actorKind: 'reviewer' });
+    if (licence?.state === 'reviewed') {
+        // An welcher Zulassung die Freigabe haengt. Eigener Eintrag statt im
+        // Freitext `reason` — den liest der Anbieter als Begruendung, und das
+        // Protokoll hat kein Metadatenfeld.
+        await reviewLog({ providerKey, subject: 'evidence', subjectId: licence.evidenceId, action: 'licence_for_cell', to: `${coverageId}:${cell.country_code}`, actorId: caller.userId, actorKind: 'reviewer' });
+    }
 
     // Der Leistungsstatus folgt seinen Zellen (Spec A §19): frei, sobald eine
     // Zelle frei ist; limited, wenn nicht alle; sonst zurueck in die Pruefung.

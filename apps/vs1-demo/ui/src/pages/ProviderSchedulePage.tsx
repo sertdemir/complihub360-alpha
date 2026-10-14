@@ -10,6 +10,8 @@ import { Banner } from '../components/ui/Banner';
 import { AcknowledgementList, BookingFailureCard } from '../components/user/BookingAcknowledgement';
 import { SharingReviewDialog, useSharedRows } from '../components/user/SharingReview';
 import { goToBookingConfirmed } from '../lib/bookingConfirmed';
+import { focusField } from '../components/ui/FormErrorSummary';
+import { FieldError, errorAria } from '../components/ui/FieldError';
 
 // ─── Native Scheduling (stage 3) — Phase-3 wiring ────────────────────────────
 // Mirrors the Figma "Scheduling — Buchung" screens: slot picker (from
@@ -42,6 +44,7 @@ export function ProviderSchedulePage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('results');
+  const { t: tw } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
   const { data: slots } = useApiData<string[]>(() => fetchSlots(key), fixtureSlots());
   // `?slot=` kommt von einem Termin-Chip: wer dort einen Termin angetippt hat,
@@ -53,6 +56,11 @@ export function ProviderSchedulePage() {
   const [state, setState] = useState<'idle' | 'sending'>('idle');
   const [failure, setFailure] = useState<BookingFailure | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
+  // Regel V2 (11.10.2026): der Knopf bleibt aktiv, auch ohne gewaehlten
+  // Termin — ein Klick sagt es an der Terminliste und setzt den Fokus dorthin.
+  // Gesperrt bleibt er, solange die Bestaetigung laedt oder gebucht wird.
+  const [slotTried, setSlotTried] = useState(false);
+  const slotError = slotTried && !selected ? tw('shared.pickSlotError') : null;
   const sharedRows = useSharedRows();
   const [ack, setAck] = useState<BookingAcknowledgement | null>(null);
   const [ackKey, setAckKey] = useState(0);
@@ -116,7 +124,14 @@ export function ProviderSchedulePage() {
           <p className="mt-1 text-body-sm text-fg-secondary">{t('schedule.sub')}</p>
         </div>
         <div className="grid gap-6 lg:grid-cols-[1fr,380px]">
-          <section className="rounded-xl border border-stroke-subtle bg-surface-secondary p-7">
+          <section
+            id="schedule-slots"
+            role="group"
+            aria-label={t('schedule.title')}
+            tabIndex={-1}
+            className="rounded-xl border border-stroke-subtle bg-surface-secondary p-7 outline-none"
+            {...errorAria('schedule-slots', !!slotError)}
+          >
             {byDay.map(([day, isos]) => (
               <div key={day} className="mb-5">
                 <p className="mb-2 text-body-xs font-semibold text-fg">{day}</p>
@@ -125,6 +140,7 @@ export function ProviderSchedulePage() {
                     <button
                       key={iso}
                       type="button"
+                      aria-pressed={selected === iso}
                       onClick={() => setSelected(iso)}
                       className={`rounded-lg border px-4 py-2 text-body-xs transition-colors ${selected === iso ? 'border-brand font-semibold text-fg-brand' : 'border-stroke-subtle text-fg-secondary hover:border-stroke'}`}
                     >
@@ -134,6 +150,7 @@ export function ProviderSchedulePage() {
                 </div>
               </div>
             ))}
+            <FieldError id="schedule-slots" message={slotError} alert />
           </section>
           <aside className="h-fit space-y-4 rounded-xl border border-stroke-subtle bg-surface-secondary p-7">
             <h2 className="text-body-md font-semibold text-fg">{t('schedule.summaryTitle')}</h2>
@@ -141,6 +158,7 @@ export function ProviderSchedulePage() {
               {slotLine ?? t('schedule.pickSlot')}
             </p>
             <textarea
+              aria-label={t('schedule.messageLabel')}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={3}
@@ -155,7 +173,7 @@ export function ProviderSchedulePage() {
                 failure={failure}
                 onRetry={() => setFailure(null)}
                 onReread={() => { setFailure(null); setAckKey((k) => k + 1); }}
-                onPickSlot={() => { setFailure(null); setSelected(null); }}
+                onPickSlot={() => { setFailure(null); setSelected(null); setSlotTried(false); }}
               />
             ) : (
               <>
@@ -164,8 +182,11 @@ export function ProviderSchedulePage() {
                   shape="soft"
                   fullWidth
                   type="button"
-                  disabled={!selected || !ack || state === 'sending'}
-                  onClick={() => setReviewOpen(true)}
+                  disabled={!ack || state === 'sending'}
+                  onClick={() => {
+                    if (!selected) { setSlotTried(true); focusField('schedule-slots'); return; }
+                    setReviewOpen(true);
+                  }}
                   className="disabled:opacity-50"
                 >
                   {t('detail.bookCta')} <ArrowRight size={15} />

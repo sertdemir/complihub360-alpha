@@ -6,6 +6,8 @@ import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
 import { fetchEngagementDetail, postThreadMessage, type EngagementDetail, type Proposal } from '../../api/thread';
+import { focusField } from '../ui/FormErrorSummary';
+import { FieldError, errorAria } from '../ui/FieldError';
 
 // ─── Thread drawer (Figma: Request-thread 2654:2 / Reply 2649:2) ─────────────
 // The shared engagement history, opened from BOTH workspaces. `viewer` decides
@@ -110,10 +112,15 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
   const [timeline, setTimeline] = useState('');
   const [model, setModel] = useState('');
   const [deliverables, setDeliverables] = useState('');
+  // Regel V2 (11.10.2026): "Senden" bleibt aktiv. Pflicht ist nur die
+  // Nachricht (der Vorschlag ist optional) — ist sie zu kurz, steht der Satz
+  // am Feld und der Fokus dort.
+  const [tried, setTried] = useState(false);
+  const draftError = tried && draft.trim().length < 2 ? t('thread.messageTooShort', { min: 2 }) : null;
 
   useEffect(() => {
     if (!open || !engagementId) return;
-    setDetail(null); setLoadFailed(false);
+    setDetail(null); setLoadFailed(false); setTried(false);
     setProposalOpen(false); setPrice(''); setTimeline(''); setModel(''); setDeliverables('');
     fetchEngagementDetail(engagementId)
       .then(setDetail)
@@ -132,11 +139,13 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
   };
 
   const send = async () => {
-    if (!engagementId || draft.trim().length < 2) return;
+    if (!engagementId || sending) return;
+    setTried(true);
+    if (draft.trim().length < 2) { focusField('thread-draft'); return; }
     setSending(true);
     try {
       await postThreadMessage(engagementId, viewer, draft.trim(), buildProposal());
-      setDraft(''); setProposalOpen(false); setPrice(''); setTimeline(''); setModel(''); setDeliverables('');
+      setDraft(''); setTried(false); setProposalOpen(false); setPrice(''); setTimeline(''); setModel(''); setDeliverables('');
       setDetail(await fetchEngagementDetail(engagementId));
     } catch { /* keep draft for retry */ }
     setSending(false);
@@ -195,19 +204,24 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
           )}
           <div className="flex w-full items-end gap-2">
             <textarea
+              id="thread-draft"
               rows={2}
               value={draft}
               onChange={(ev) => setDraft(ev.target.value)}
               placeholder={viewer === 'provider' ? t('thread.replyToClient') : t('thread.replyToProvider')}
-              className="flex-1 resize-none rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
+              aria-label={viewer === 'provider' ? t('thread.replyToClient') : t('thread.replyToProvider')}
+              className={'flex-1 resize-none rounded-lg border bg-elevate/5 px-3 py-2 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none '
+                + (draftError ? 'border-error-500' : 'border-elevate/10')}
+              {...errorAria('thread-draft', !!draftError)}
             />
             {viewer === 'provider' && !proposalOpen && (
               <Button variant="ghost" size="sm" onClick={() => setProposalOpen(true)}>{t('thread.addProposal')}</Button>
             )}
-            <Button variant="primary" size="sm" onClick={send} disabled={sending || draft.trim().length < 2}>
+            <Button variant="primary" size="sm" onClick={send} disabled={sending}>
               {sending ? '…' : t('shared.send')}
             </Button>
           </div>
+          <FieldError id="thread-draft" message={draftError} alert />
         </div>
       }
     >

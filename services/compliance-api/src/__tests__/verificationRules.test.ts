@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
-    activationGate, evidenceChecklist, requiredEvidence, serviceStatusFromCoverage, submitValidation, transitionAllowed,
-    type ChecklistItem,
+    activationGate, evidenceChecklist, isRegulatedArea, licenceForCell, requiredEvidence, serviceStatusFromCoverage, submitValidation, transitionAllowed,
+    type ChecklistItem, type EvidenceLike,
 } from '../verificationRules.js';
 
 // ─── Die Regeln der Verifikation, ohne Datenbank ─────────────────────────────
@@ -240,5 +240,65 @@ describe('serviceStatusFromCoverage — der Leistungsstatus folgt seinen Zellen'
     it('laesst retired und paused in Ruhe', () => {
         expect(serviceStatusFromCoverage('retired', [cov('a', 'DE', 'approved')])).toBe('retired');
         expect(serviceStatusFromCoverage('paused', [cov('a', 'DE', 'approved')])).toBe('paused');
+    });
+});
+
+describe('licenceForCell — eine Zelle im regulierten Bereich haengt an ihrer Zulassung', () => {
+    const NOW = new Date('2026-10-11T12:00:00Z');
+    const lic = (id: string, over: Partial<EvidenceLike> = {}): EvidenceLike => ({
+        id, evidence_type: 'professional_licence', source: 'document', result: 'reviewed', upload_confirmed: true,
+        supports_service_codes: ['tax-vat'], supports_countries: ['DE'], expires_at: '2027-06-30', ...over,
+    });
+    const cell = (evidence: EvidenceLike[], serviceCode = 'tax-vat.returns', countryCode = 'DE') =>
+        licenceForCell({ serviceCode, countryCode, evidence, now: NOW });
+
+    it('nennt Steuer und Recht reguliert — an einer Stelle', () => {
+        expect(isRegulatedArea('tax-vat')).toBe(true);
+        expect(isRegulatedArea('legal-advisory.contracts')).toBe(true);
+        expect(isRegulatedArea('data-privacy')).toBe(false);
+    });
+
+    it('nicht regulierter Bereich: keine Zulassung noetig', () => {
+        expect(cell([], 'data-privacy.notices')).toEqual({ required: false, state: 'not_required' });
+    });
+
+    it('ohne Zulassung: missing', () => {
+        expect(cell([])).toEqual({ required: true, state: 'missing' });
+        // Hochgeladen, aber nicht geprueft, zaehlt nicht.
+        expect(cell([lic('a', { result: 'received' }), lic('b', { result: 'rejected' })]).state).toBe('missing');
+        // Ein anderer Nachweistyp auch nicht.
+        expect(cell([lic('c', { evidence_type: 'insurance' })]).state).toBe('missing');
+    });
+
+    it('gepruefte Zulassung fuer Bereich und Land: reviewed, mit Id und Ablauf', () => {
+        expect(cell([lic('a')])).toEqual({ required: true, state: 'reviewed', evidenceId: 'a', expiresAt: '2027-06-30' });
+    });
+
+    it('zieht die unabhaengig gepruefte vor, dann den spaetesten Ablauf — ohne Ablauf ist am besten', () => {
+        expect(cell([lic('a', { expires_at: '2030-01-01' }), lic('b', { result: 'independently_verified', expires_at: '2027-01-01' })]).evidenceId).toBe('b');
+        expect(cell([lic('a', { expires_at: '2027-01-01' }), lic('b', { expires_at: '2028-01-01' })]).evidenceId).toBe('b');
+        expect(cell([lic('a', { expires_at: '2028-01-01' }), lic('b', { expires_at: null })])).toMatchObject({ evidenceId: 'b', expiresAt: null });
+    });
+
+    it('abgelaufen nach Datum: expired — am Ablauftag gilt sie nicht mehr', () => {
+        expect(cell([lic('a', { expires_at: '2026-10-01' })])).toMatchObject({ required: true, state: 'expired', evidenceId: 'a' });
+        expect(cell([lic('a', { expires_at: '2026-10-11' })]).state).toBe('expired');
+        expect(cell([lic('a', { expires_at: '2026-10-12' })]).state).toBe('reviewed');
+    });
+
+    it('abgelaufen nach Ergebnis: expired', () => {
+        expect(cell([lic('a', { result: 'expired', expires_at: null })])).toMatchObject({ state: 'expired', evidenceId: 'a' });
+        // Eine gueltige daneben gewinnt.
+        expect(cell([lic('a', { result: 'expired' }), lic('b')])).toMatchObject({ state: 'reviewed', evidenceId: 'b' });
+    });
+
+    it('eine DE-Zulassung deckt AT nicht, und Steuer deckt Recht nicht', () => {
+        expect(cell([lic('a')], 'tax-vat', 'AT').state).toBe('missing');
+        expect(cell([lic('a')], 'legal-advisory', 'DE').state).toBe('missing');
+    });
+
+    it('leere supports_*-Listen gelten fuer alle Laender und Bereiche', () => {
+        expect(cell([lic('a', { supports_countries: [] })], 'tax-vat', 'AT').state).toBe('reviewed');
+        expect(cell([lic('a', { supports_countries: null, supports_service_codes: null })], 'legal-advisory', 'FR').state).toBe('reviewed');
     });
 });

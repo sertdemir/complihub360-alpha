@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Select } from '../ui/Select';
+import { errorAria } from '../ui/FieldError';
 import { fetchCoverage, updateAvailabilityHours, WEEKDAYS, type AvailabilityHours, type AvailabilityWindow, type Weekday } from '../../api/provider';
 
 // ─── Partner-Einstellungen · Buchbare Zeiten ─────────────────────────────────
@@ -73,7 +74,16 @@ export function AvailabilityPanel() {
   });
   const removeWindow = (d: Weekday, i: number) => setHours((h) => ({ ...h, [d]: (h[d] ?? []).filter((_, j) => j !== i) }));
 
+  // V2 (11.10.2026): Speichern ist nicht mehr gesperrt, solange ein Tag nicht
+  // stimmt — der Satz steht ohnehin am Tag. Das Absenden springt zum ersten
+  // betroffenen Tag. Gesperrt bleibt nur, solange der gespeicherte Stand
+  // fehlt (sonst ueberschriebe ein Klick ihn mit der Vorgabe).
   const save = async () => {
+    if (saved === 'saving') return;
+    if (invalid.length) {
+      document.getElementById(`avail-${invalid[0]}`)?.querySelector<HTMLElement>('select')?.focus();
+      return;
+    }
     setSaved('saving');
     try {
       const clean: AvailabilityHours = {};
@@ -104,17 +114,17 @@ export function AvailabilityPanel() {
           const w = hours[d] ?? [];
           const bad = invalid.includes(d);
           return (
-            <div key={d} className="flex flex-wrap items-center gap-2 py-2" data-weekday={d} data-invalid={bad || undefined}>
+            <div key={d} id={`avail-${d}`} className="flex flex-wrap items-center gap-2 py-2" data-weekday={d} data-invalid={bad || undefined}>
               <span className={'w-9 shrink-0 text-[13px] font-semibold ' + (w.length ? 'text-fg' : 'text-fg-tertiary')}>{t(`settings.availability.weekday.${d}`)}</span>
               {w.length === 0 && <span className="text-[12px] text-fg-tertiary">{t('settings.availability.notBookable')}</span>}
               {w.map((win, i) => (
                 <span key={i} className="flex items-center gap-1.5">
                   {i > 0 && <span className="text-[11px] text-fg-tertiary">{t('settings.availability.and')}</span>}
-                  <Select inputSize="sm" value={win.from} onChange={(e) => setWindow(d, i, { from: e.target.value })} aria-label={t('settings.availability.from')}>
+                  <Select inputSize="sm" value={win.from} onChange={(e) => setWindow(d, i, { from: e.target.value })} aria-label={t('settings.availability.from')} error={bad} {...errorAria(`avail-${d}`, bad)}>
                     {TIMES.map((x) => <option key={x} value={x}>{x}</option>)}
                   </Select>
                   <span className="text-[11px] text-fg-tertiary">{t('settings.availability.to')}</span>
-                  <Select inputSize="sm" value={win.to} onChange={(e) => setWindow(d, i, { to: e.target.value })} aria-label={t('settings.availability.to')}>
+                  <Select inputSize="sm" value={win.to} onChange={(e) => setWindow(d, i, { to: e.target.value })} aria-label={t('settings.availability.to')} error={bad} {...errorAria(`avail-${d}`, bad)}>
                     {TIMES.map((x) => <option key={x} value={x}>{x}</option>)}
                   </Select>
                   <button type="button" aria-label={t('settings.availability.remove')} className="px-1 text-fg-tertiary hover:text-fg" onClick={() => removeWindow(d, i)}>✕</button>
@@ -123,7 +133,7 @@ export function AvailabilityPanel() {
               {w.length < 3 && (
                 <button type="button" className="text-[12px] font-medium text-fg-brand hover:underline" onClick={() => addWindow(d)}>{t('settings.availability.addWindow')}</button>
               )}
-              {bad && <span className="basis-full text-[11px] text-error-500">{t('settings.availability.invalid')}</span>}
+              {bad && <span id={`avail-${d}-error`} className="basis-full text-[11px] text-error-700 dark:text-red-300">{t('settings.availability.invalid')}</span>}
             </div>
           );
         })}
@@ -140,7 +150,7 @@ export function AvailabilityPanel() {
               <Button size="sm" variant="ghost" onClick={() => setAttempt((n) => n + 1)}>{t('common:states.actions.tryAgain')}</Button>
             </>
           )}
-          <Button size="sm" onClick={save} disabled={!loaded || invalid.length > 0 || saved === 'saving'}>{t('settings.availability.save')}</Button>
+          <Button size="sm" onClick={save} disabled={!loaded || saved === 'saving'}>{t('settings.availability.save')}</Button>
         </div>
       </div>
     </Card>

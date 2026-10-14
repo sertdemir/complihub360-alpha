@@ -495,7 +495,11 @@ function search(body: unknown) {
   const anyKnown = [country, ...markets].some((c) => isKnownCountry(String(c).toUpperCase()));
   const covered: Record<string, string[]> = {};
   for (const m of knownMarkets) covered[m] = requested.filter((a) => PROVIDERS.some((p) => (COVERS[p._key] ?? []).includes(a) && (PROVIDER_DETAIL[p._key]?.markets ?? []).includes(m)));
-  return { ok: true, providers, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
+  // Wie der Server: wer keinen der angefragten Bereiche abdeckt, steht nicht in
+  // der Trefferliste. So ist "kein freigegebener Anbieter" (P1 · Q1) lokal
+  // erreichbar — Wizard: z. B. nur Umwelt oder nur Recht.
+  const matching = providers.filter((p) => p.match_basis.domains_matched.length > 0);
+  return { ok: true, providers: matching, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
 }
 
 type MockDetail = {
@@ -941,8 +945,21 @@ function p2Application(key?: string) {
     chapters: { account: { complete: true, missing: [] }, legal: { complete: true, missing: [] }, services: { complete: true, missing: [] }, evidence: { complete: false, missing }, agreements: { complete: true, missing: [] }, submit: { ready: false, missing } },
     services: p2Services(), checklist: p2Checklist(), evidence: p2Evidence(), agreements: p2Agreements(), open_requests: p2Requests() };
 }
+// Wie der Server (verificationRules.ts, licenceForCell): Steuer und Recht
+// brauchen je Land eine gepruefte Zulassung (Entscheidung b, 11.10.2026).
+const REGULATED = ['tax-vat', 'legal-advisory'];
+function mockLicence(serviceCode: string, country: string) {
+  const area = serviceCode.split('.')[0];
+  if (!REGULATED.includes(area)) return { required: false, state: 'not_required' as const, expires_at: null };
+  const ev = p2Evidence().filter((e) => e.evidence_type === 'professional_licence'
+    && (!e.supports_service_codes.length || (e.supports_service_codes as string[]).includes(area))
+    && (!e.supports_countries.length || (e.supports_countries as string[]).includes(country)));
+  const ok = ev.find((e) => e.result === 'reviewed' || e.result === 'independently_verified');
+  if (ok) return { required: true, state: 'reviewed' as const, expires_at: ok.expires_at };
+  return { required: true, state: ev.some((e) => e.result === 'expired') ? 'expired' as const : 'missing' as const, expires_at: null };
+}
 function p2Matrix() {
-  return p2Services().map((s) => ({ service_id: s.id, service_code: s.service_code, service_name: s.service_name, status: s.status, cells: s.coverage.map((c) => ({ coverage_id: c.id, country_code: c.country_code, jurisdiction_code: c.jurisdiction_code, status: c.status, limitations: c.limitations, approved_at: c.approved_at, expires_at: c.expires_at })) }));
+  return p2Services().map((s) => ({ service_id: s.id, service_code: s.service_code, service_name: s.service_name, status: s.status, regulated: REGULATED.includes(s.service_code.split('.')[0]), cells: s.coverage.map((c) => ({ coverage_id: c.id, country_code: c.country_code, jurisdiction_code: c.jurisdiction_code, status: c.status, limitations: c.limitations, approved_at: c.approved_at, expires_at: c.expires_at, licence: mockLicence(s.service_code, c.country_code) })) }));
 }
 function p2Verification(key?: string) {
   if (key === PARTNER_KEY) {
@@ -1269,7 +1286,8 @@ export function route(method: string, path: string, body: Record<string, unknown
     // nach Anbieter-Abdeckung (C2), mit Bereichen und ohne Update.
     const coverage = body.reason === 'provider_coverage' && Array.isArray(body.domains) && body.domains.length > 0;
     if (isKnownCountry(market) && !coverage) return { __status: 409, errorCode: 'MARKET_COVERED', message: 'This market is already covered' };
-    return { ok: true, market, notify: body.notify === true && !isKnownCountry(market) };
+    // Seit X1 (11.10.2026) auch fuer Abdeckungsanfragen — nur mit Konto.
+    return { ok: true, market, notify: body.notify === true, reason: isKnownCountry(market) ? 'provider_coverage' : 'market' };
   }
   if (p[0] === 'scheduling' && p.length === 1 && method === 'POST') return createBooking(body);
   if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'proposal' && method === 'PATCH') return reportProposal(p[3], body);
@@ -1295,6 +1313,14 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'provider' && p[2] === 'evidence' && p[3] === 'registry') { const v = String(body.vat_id ?? '').toUpperCase().replace(/[^A-Z0-9]/g, ''); const valid = /^DE\d{9}$/.test(v); return { ok: true, evidence: { id: uuid(97, 7), evidence_type: 'vat_id', source: 'registry_check', result: valid ? 'independently_verified' : 'rejected', original_name: null, size_bytes: null, upload_confirmed: true, uploaded_at: null, identifier: v, expires_at: null, supports_countries: [], supports_service_codes: [] }, vat: { status: valid ? 'valid' : 'invalid', vat_id: v, country_code: v.slice(0, 2), name: valid ? 'Neue Kanzlei GmbH' : null, checked_at: plus(0) } }; }
   if (p[0] === 'provider' && p[2] === 'submit') return { ok: false, __status: 422, errorCode: 'INCOMPLETE', message: 'A few things are still missing before we can review your application', missing: ['evidence.insurance'] };
   if (p[0] === 'admin' && p[1] === 'review' && p[3] === 'lifecycle') return String(body.to) === 'active' || String(body.to) === 'limited' ? { __status: 422, errorCode: 'GATE_NOT_MET', message: 'Activation is not possible yet', gate: p2Gate() } : { ok: true, from: 'more_info_required', to: body.to, gate: null };
+  if (p[0] === 'admin' && p[1] === 'review' && p[3] === 'coverage' && (body.action === 'approve' || body.action === 'limit')) {
+    // Wie der Server: regulierte Zelle ohne gepruefte Zulassung → 422.
+    const svc = p2Services().find((sv) => sv.coverage.some((c) => c.id === p[4]));
+    const cell = svc?.coverage.find((c) => c.id === p[4]);
+    if (svc && cell && mockLicence(svc.service_code, cell.country_code).state !== 'not_required' && mockLicence(svc.service_code, cell.country_code).state !== 'reviewed') {
+      return { __status: 422, errorCode: 'LICENCE_REQUIRED', message: 'A tax or legal service needs a reviewed licence for this country before the cell can be approved.', area: svc.service_code.split('.')[0], country: cell.country_code };
+    }
+  }
   if (p[0] === 'admin' && p[1] === 'review' && p[3] === 'coverage') return String(body.action) === 'request_info' ? { ok: true, request: { ...p2Requests()[0], id: uuid(96, 7), country_code: 'AT' }, lifecycle_status: 'more_info_required' } : { ok: true, coverage: { id: p[4], status: body.action === 'approve' ? 'approved' : body.action === 'reject' ? 'rejected' : body.action === 'limit' ? 'limited' : body.action === 'pause' ? 'suspended' : 'pending' }, service_status: 'limited' };
   if (p[0] === 'admin' && p[1] === 'review' && p[3] === 'request') return { ok: true, request: { ...p2Requests()[0], id: uuid(95, 7) }, lifecycle_status: 'more_info_required' };
   return { ok: true };

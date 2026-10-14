@@ -432,81 +432,6 @@
     "assistantTitle": "Assistent · {{area}}",
     "assistantIntro": "Fragen Sie zu {{area}} — die Antwort kommt aus dem Bereichswissen und Ihren Sitzungen."
   },
-  "configureAlerts": {
-    "eyebrow": "MONITORING",
-    "title": "Alerts konfigurieren",
-    "savedNote": "Gespeichert — gilt für E-Mail- und In-App-Alerts.",
-    "deliveryNote": "Zustellung: E-Mail + In-App.",
-    "savePreferences": "Einstellungen speichern",
-    "saveError": "Speichern fehlgeschlagen — versuchen Sie es gleich erneut.",
-    "toggles": {
-      "thresholdBreach": {
-        "label": "Schwellenwert-Überschreitungen",
-        "desc": "Der Umsatz überschreitet in einem überwachten Markt eine USt-/OSS-Registrierungsschwelle."
-      },
-      "thresholdApproach": {
-        "label": "Annäherung an Schwellenwerte (80 %)",
-        "desc": "Frühwarnung, bevor ein Schwellenwert erreicht wird."
-      },
-      "deadlines": {
-        "label": "Abgabefristen",
-        "desc": "OSS-/EPR-/GDPR-Abgabetermine — 14 und 3 Tage im Voraus."
-      },
-      "providerUpdates": {
-        "label": "Anbieter-Updates",
-        "desc": "Bestätigungen, Antworten und SLA-Ereignisse zu Ihren Anfragen."
-      },
-      "ruleChanges": {
-        "label": "Regulatorische Änderungen",
-        "desc": "Regeländerungen, die eine gespeicherte Sitzung betreffen („Aktualisierung nötig“)."
-      },
-      "weeklyDigest": {
-        "label": "Wöchentliche Zusammenfassung",
-        "desc": "Eine Sammel-Mail pro Woche statt einzelner Alerts."
-      }
-    }
-  },
-  "docUpload": {
-    "titleUpload": "Dokument hochladen",
-    "titleProcessed": "Dokument verarbeitet",
-    "uploadAnother": "Weiteres hochladen",
-    "sanitizing": "Wird bereinigt…",
-    "uploadSanitize": "Hochladen & bereinigen",
-    "classificationPublic": "öffentlich",
-    "classificationInternal": "intern",
-    "classificationConfidential": "vertraulich",
-    "classificationRestricted": "eingeschränkt",
-    "tagSanitized": "bereinigt",
-    "tagSanitizationFailed": "Bereinigung fehlgeschlagen",
-    "tagAiAllowed": "KI: erlaubt",
-    "tagAiBlocked": "KI: blockiert",
-    "redactionReport": "Schwärzungsbericht",
-    "maskedCount": "{{count}}× maskiert",
-    "noPii": "Keine personenbezogenen Identifikatoren erkannt.",
-    "storedNote": "Nur die bereinigte Version wurde gespeichert — der Originaltext wurde nach der Verarbeitung verworfen.",
-    "aiBlockedClassification": "Die KI-Analyse bleibt aufgrund der Inhaltsklassifizierung blockiert.",
-    "aiBlockedConsent": "Die KI-Analyse bleibt blockiert, bis Sie für dieses Dokument Ihre Einwilligung erteilen.",
-    "chooseFile": "Datei auswählen (.txt · .md · .csv)",
-    "orPaste": "oder Inhalt unten einfügen",
-    "pastePlaceholder": "Dokumentinhalt einfügen — Verträge, Notizen, Rechnungen …",
-    "consent": "Ich willige in die KI-gestützte Analyse der <em>bereinigten</em> Version dieses Dokuments ein (Art. 6(1)(a) GDPR — jederzeit widerrufbar). Ohne Einwilligung wird das Dokument gespeichert, aber nie von KI verarbeitet.",
-    "uploadFailed": "Hochladen fehlgeschlagen",
-    "privacyNote": "Personenbezogene Identifikatoren (Namen, E-Mails, Telefonnummern, IBANs) werden maskiert, <em>bevor</em> etwas gespeichert wird. Der Rohtext wird nie dauerhaft gespeichert."
-  },
-  "requestQuote": {
-    "title": "Angebot <accent>anfragen</accent>",
-    "close": "Schließen",
-    "sentTitle": "Anfrage gesendet ✓",
-    "sentBody": "{{name}} wurde benachrichtigt und hat 24 Std. Zeit zu bestätigen. Sie finden die Anfrage unter <em>Anfragen</em>.",
-    "slaTag": "24h-Bestätigungs-SLA",
-    "messageLabel": "Ihre Nachricht an den Anbieter",
-    "messagePlaceholder": "Beschreiben Sie kurz Ihre Situation — Märkte, Umsatzband, Zeitplan …",
-    "privacyNote": "Ihr situativer Kontext wird <em>anonymisiert</em> geteilt — Namen und Kontaktdaten in Ihrer Nachricht werden maskiert. Ihre Identität wird erst nach Bestätigung durch den Anbieter offengelegt (Art. 6(1)(b) GDPR — Vertragsanbahnung). Hochgeladene Dokumente werden nie automatisch geteilt.",
-    "sendError": "Senden fehlgeschlagen: {{error}} — bitte versuchen Sie es erneut.",
-    "requestFailed": "Anfrage fehlgeschlagen",
-    "sending": "Wird gesendet…",
-    "sendRequest": "Anfrage senden"
-  },
   "requestActions": {
     "eyebrow": "ANFRAGE {{id}}",
     "eyebrowFallback": "ANFRAGE",
@@ -742,7 +667,6 @@
     "saved": "Gespeichert — die Risk Map wird neu berechnet.",
     "error": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
     "changed": "geändert",
-    "none": "Keine Auswahl",
-    "needSelection": "Mindestens ein Markt und ein Compliance-Bereich müssen ausgewählt sein."
+    "none": "Keine Auswahl"
   }
 }

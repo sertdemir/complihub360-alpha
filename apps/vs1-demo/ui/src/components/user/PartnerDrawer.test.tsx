@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PartnerDrawer } from './PartnerDrawer';
@@ -9,12 +9,16 @@ import type { AnonProvider } from '../../api/search';
 // Anbieter nicht gebucht werden kann. Die Detailseite hielt sich daran, die
 // Schublade nicht (Testlauf Phase 4, 2026-10-09).
 
-const { fetchProviderDetail } = vi.hoisted(() => ({ fetchProviderDetail: vi.fn() }));
+const { fetchProviderDetail, fetchSlots, fetchAcknowledgement } = vi.hoisted(() => ({
+  fetchProviderDetail: vi.fn(),
+  fetchSlots: vi.fn(),
+  fetchAcknowledgement: vi.fn(),
+}));
 
 vi.mock('../../api/bookings', () => ({
   fetchProviderDetail: (...a: unknown[]) => fetchProviderDetail(...a),
-  fetchSlots: vi.fn().mockResolvedValue([]),
-  fetchAcknowledgement: vi.fn().mockResolvedValue(null),
+  fetchSlots: (...a: unknown[]) => fetchSlots(...a),
+  fetchAcknowledgement: (...a: unknown[]) => fetchAcknowledgement(...a),
   createBooking: vi.fn(),
   bookingFailureFrom: () => ({ kind: 'generic' }),
 }));
@@ -40,7 +44,11 @@ function renderDrawer() {
 }
 
 describe('PartnerDrawer · Buchbarkeit', () => {
-  beforeEach(() => { fetchProviderDetail.mockReset(); });
+  beforeEach(() => {
+    fetchProviderDetail.mockReset();
+    fetchSlots.mockReset().mockResolvedValue([]);
+    fetchAcknowledgement.mockReset().mockResolvedValue(null);
+  });
 
   it('ohne Zahlungsbereitschaft: Hinweis statt Buchungsknopf', async () => {
     fetchProviderDetail.mockResolvedValue({ ...DETAIL, bookable_chargeable: false });
@@ -54,5 +62,57 @@ describe('PartnerDrawer · Buchbarkeit', () => {
     renderDrawer();
     expect(await screen.findByRole('button', { name: /detail\.bookCta/ })).toBeInTheDocument();
     expect(screen.queryByText('detail.notBookableNote')).not.toBeInTheDocument();
+  });
+});
+
+// ─── Regel V2 (11.10.2026) · Termin waehlen ──────────────────────────────────
+// Der Knopf war gesperrt, solange kein Termin gewaehlt war. Jetzt bleibt er
+// aktiv: ein Klick ohne Termin sagt es an der Terminliste (role="alert") und
+// setzt den Fokus auf den ersten Termin. Gesperrt bleibt er nur, solange die
+// Bestaetigung laedt — das ist ein Ladezustand, kein Pruefergebnis.
+describe('PartnerDrawer · Termin waehlen (V2)', () => {
+  const SLOT = '2026-10-01T09:00:00.000Z';
+  const ACK = { version: 'booking-ack-v1', language: 'en', body: 'a', sharedFields: ['email'], userDiscount: { pct: 10, policyVersion: 1 }, lines: ['a'] };
+
+  beforeEach(() => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, bookable_chargeable: true });
+    fetchSlots.mockReset().mockResolvedValue([SLOT]);
+    fetchAcknowledgement.mockReset().mockResolvedValue(ACK);
+  });
+
+  async function toTermin() {
+    renderDrawer();
+    fireEvent.click(await screen.findByRole('button', { name: /detail\.bookCta/ }));
+    // Im Termin-Schritt steht der Knopf erneut — aktiv, sobald die Bestaetigung da ist.
+    const knopf = screen.getByRole('button', { name: /detail\.bookCta/ });
+    await waitFor(() => expect(knopf).toBeEnabled());
+    return knopf;
+  }
+
+  it('ohne Termin: Satz an der Terminliste, Fokus auf dem ersten Termin, keine Pruefung', async () => {
+    const knopf = await toTermin();
+    fireEvent.click(knopf);
+
+    expect(screen.getByRole('alert')).toHaveTextContent('shared.pickSlotError');
+    const gruppe = screen.getByRole('group', { name: 'schedule.title' });
+    expect(gruppe).toHaveAttribute('aria-invalid', 'true');
+    expect(gruppe).toHaveAttribute('aria-describedby', 'partner-slots-error');
+    expect(gruppe.querySelector('button')).toHaveFocus();
+    expect(screen.queryByRole('dialog', { name: /sharingReview/ })).not.toBeInTheDocument();
+  });
+
+  it('mit Termin verschwindet der Satz', async () => {
+    const knopf = await toTermin();
+    fireEvent.click(knopf);
+    const gruppe = screen.getByRole('group', { name: 'schedule.title' });
+    fireEvent.click(gruppe.querySelector('button')!);
+    expect(screen.queryByText('shared.pickSlotError')).not.toBeInTheDocument();
+  });
+
+  it('solange die Bestaetigung laedt, bleibt der Knopf gesperrt (Ladezustand)', async () => {
+    fetchAcknowledgement.mockReset().mockReturnValue(new Promise(() => {}));
+    renderDrawer();
+    fireEvent.click(await screen.findByRole('button', { name: /detail\.bookCta/ }));
+    expect(screen.getByRole('button', { name: /detail\.bookCta/ })).toBeDisabled();
   });
 });

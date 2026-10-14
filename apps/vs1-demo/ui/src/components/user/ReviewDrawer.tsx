@@ -4,6 +4,8 @@ import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { FilterChip } from '../ui/Badge';
 import { submitReview } from '../../api/bookings';
+import { focusField } from '../ui/FormErrorSummary';
+import { FieldError, errorAria } from '../ui/FieldError';
 
 // ─── ReviewDrawer ────────────────────────────────────────────────────────────
 // Post-appointment review (notifications-alerts-concept §2): stars + category
@@ -28,12 +30,17 @@ export function ReviewDrawer({ target, onClose, onSubmitted }: {
   const [cats, setCats] = useState<Set<string>>(new Set());
   const [body, setBody] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'done'>('idle');
+  // Regel V2 (11.10.2026): "Absenden" bleibt aktiv. Pflicht ist nur die
+  // Bewertung — fehlt sie, steht der Satz an den Sternen und der Fokus dort.
+  const [tried, setTried] = useState(false);
+  const ratingError = tried && rating < 1 ? t('review.ratingRequired') : null;
 
-  const reset = () => { setRating(0); setCats(new Set()); setBody(''); setState('idle'); };
+  const reset = () => { setRating(0); setCats(new Set()); setBody(''); setState('idle'); setTried(false); };
   const close = () => { reset(); onClose(); };
 
   const submit = async () => {
-    if (!target || rating < 1) return;
+    if (!target) return;
+    if (rating < 1) { setTried(true); focusField('review-rating'); return; }
     setState('sending');
     submitReview({
       // Der Server liest den Anbieter aus der Buchung — der Browser kennt
@@ -53,7 +60,7 @@ export function ReviewDrawer({ target, onClose, onSubmitted }: {
       footer={
         <div className="flex items-center justify-end gap-2.5">
           <Button size="sm" variant="ghost" onClick={close}>{t('review.cancel')}</Button>
-          <Button size="sm" onClick={submit} disabled={rating < 1 || state !== 'idle'}>
+          <Button size="sm" onClick={submit} disabled={state !== 'idle'}>
             {state === 'done' ? t('review.done') : t('review.submit')}
           </Button>
         </div>
@@ -61,8 +68,8 @@ export function ReviewDrawer({ target, onClose, onSubmitted }: {
     >
       <div className="space-y-5">
         <div>
-          <p className="mb-2 text-[12px] font-medium text-fg-secondary">{t('review.ratingLabel')}</p>
-          <div className="flex items-center gap-1.5">
+          <p id="review-rating-label" className="mb-2 text-[12px] font-medium text-fg-secondary">{t('review.ratingLabel')}</p>
+          <div id="review-rating" role="group" aria-labelledby="review-rating-label" className="flex items-center gap-1.5" {...errorAria('review-rating', !!ratingError)}>
             {[1, 2, 3, 4, 5].map((n) => (
               <button key={n} type="button" aria-label={`${n}`} onClick={() => setRating(n)}
                 className={`text-[26px] leading-none transition-colors ${n <= rating ? 'text-fg-accent' : 'text-white/20 hover:text-white/40'}`}>
@@ -71,6 +78,7 @@ export function ReviewDrawer({ target, onClose, onSubmitted }: {
             ))}
             {rating > 0 && <span className="ml-2 text-[13px] text-fg-secondary">{rating}/5</span>}
           </div>
+          <FieldError id="review-rating" message={ratingError} alert />
         </div>
         <div>
           <p className="mb-2 text-[12px] font-medium text-fg-secondary">{t('review.categoriesLabel')}</p>
@@ -84,8 +92,8 @@ export function ReviewDrawer({ target, onClose, onSubmitted }: {
           </div>
         </div>
         <div>
-          <p className="mb-2 text-[12px] font-medium text-fg-secondary">{t('review.bodyLabel')}</p>
-          <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={4} placeholder={t('review.bodyPh')}
+          <label htmlFor="review-body" className="mb-2 block text-[12px] font-medium text-fg-secondary">{t('review.bodyLabel')}</label>
+          <textarea id="review-body" value={body} onChange={(e) => setBody(e.target.value)} rows={4} placeholder={t('review.bodyPh')}
             className="w-full rounded-lg border border-stroke bg-transparent px-3.5 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:outline-none focus:ring-1 focus:ring-focus" />
         </div>
         <p className="text-[11px] leading-relaxed text-fg-tertiary">{t('review.note')}</p>

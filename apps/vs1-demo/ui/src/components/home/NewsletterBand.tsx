@@ -5,6 +5,8 @@ import { ArrowRight, Check } from 'lucide-react';
 import { FreeAccountDrawer } from './MarketsDrawer';
 import { SectionEyebrow, Reveal } from '../providers/SectionHeading';
 import { Button } from '../ui/Button';
+import { focusField } from '../ui/FormErrorSummary';
+import { FieldError, FIELD_ERROR_CLASS, errorAria } from '../ui/FieldError';
 
 // ─── S10 — Newsletter band (canvas "Auf dem Laufenden" · Split, 2026-08-25) ──
 // The slim grey band became the page's closing statement: a FULL-BLEED
@@ -34,6 +36,10 @@ export function NewsletterBand() {
   const [subscribed, setSubscribed] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const valid = /.+@.+\..+/.test(email);
+  // Regel V2 (11.10.2026): ein Feld — der Satz steht am Feld, der Fokus geht
+  // hinein. Vorher tat ein Klick mit ungueltiger Adresse schlicht nichts.
+  const [tried, setTried] = useState(false);
+  const emailError = tried && !valid ? t('common:contactSend.field.email') : null;
 
   return (
     <section id="newsletter" className="bg-surface">
@@ -77,21 +83,29 @@ export function NewsletterBand() {
               </motion.div>
             ) : (
               <form
+                noValidate
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (valid) setSubscribed(true);
+                  setTried(true);
+                  if (!valid) { focusField('newsletter-email'); return; }
+                  setSubscribed(true);
                 }}
                 className="mt-3 flex flex-col gap-3"
               >
-                <motion.input
-                  variants={cardItem}
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t('newsletter.placeholder')}
-                  aria-label={t('newsletter.emailAria')}
-                  className="min-w-0 rounded-xl border border-stroke px-4 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand"
-                />
+                <motion.div variants={cardItem} className="flex flex-col">
+                  <input
+                    id="newsletter-email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t('newsletter.placeholder')}
+                    aria-label={t('newsletter.emailAria')}
+                    className={'min-w-0 rounded-xl border border-stroke px-4 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand' + (emailError ? FIELD_ERROR_CLASS : '')}
+                    {...errorAria('newsletter-email', !!emailError)}
+                  />
+                  <FieldError id="newsletter-email" message={emailError} alert />
+                </motion.div>
                 <motion.div variants={cardItem}>
                   <Button size="lg" shape="soft" type="submit" fullWidth>
                     {t('newsletter.subscribe')}

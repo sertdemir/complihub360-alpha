@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, CheckCircle2, Clock, ExternalLink, FileText, Info, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, ExternalLink, FileText, Info, ShieldCheck, XCircle } from 'lucide-react';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { Card } from '../../components/ui/Card';
 import { Badge, type BadgeTone } from '../../components/ui/Badge';
@@ -17,7 +17,7 @@ import {
   decideCoverage, decideEvidence, fetchReviewDossier, requestInfo, setLifecycle, withdrawRequest,
   type CellAction, type EvidenceDecision, type Gate, type ReviewDossier, type ReviewEvidence,
 } from '../../api/review';
-import type { CoverageStatus, LifecycleStatus, MatrixCell } from '../../api/application';
+import type { CellLicence, CoverageStatus, LifecycleStatus, MatrixCell } from '../../api/application';
 import { LIFECYCLE } from './AdminProvidersPage';
 import { cn } from '../../lib/utils';
 
@@ -56,6 +56,30 @@ function fmt(iso: string | null | undefined, locale: string, time = false): stri
   if (!iso) return '—';
   const d = new Date(iso); if (Number.isNaN(d.getTime())) return iso;
   return time ? d.toLocaleString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+/** Aktionen einer Zelle. In regulierten Bereichen ohne gepruefte Zulassung
+ *  (R1, Entscheidung b) kein Approve und kein Limit — der Server antwortet
+ *  dort 422 LICENCE_REQUIRED —, sondern "Request licence" als Hauptaktion. */
+export function cellActions(st: CellState, licence?: CellLicence): Array<[string, CellAction, 'success' | 'ghost']> {
+  const base: Array<[string, CellAction, 'success' | 'ghost']> = st === 'pending' || st === 'requested' ? [['Approve', 'approve', 'success'], ['Limit', 'limit', 'ghost'], ['Reject', 'reject', 'ghost'], ['Request', 'request_info', 'ghost']]
+    : st === 'approved' ? [['Limit', 'limit', 'ghost'], ['Pause', 'pause', 'ghost']] : st === 'limited' ? [['Approve', 'approve', 'success'], ['Pause', 'pause', 'ghost']] : [['Reopen', 'reopen', 'ghost']];
+  if (!licence?.required || licence.state === 'reviewed' || st === 'rejected' || st === 'suspended' || st === 'expired') return base;
+  return [['Request licence', 'request_info', 'success'], ...base.filter(([, a]) => a !== 'approve' && a !== 'limit' && a !== 'request_info')];
+}
+
+/** Zulassungsstand einer Zelle (Entscheidung b). Admin-Copy bleibt Englisch. */
+export function LicenceLine({ licence, country, locale }: { licence: CellLicence; country: string; locale: string }) {
+  if (!licence.required) return <p className="mt-1 text-[12px] text-fg-tertiary">No licence needed</p>;
+  if (licence.state === 'reviewed') {
+    return <p className="mt-1 flex items-center gap-1.5 text-[12px] font-semibold text-fg-brand"><ShieldCheck size={13} aria-hidden />Licence reviewed{licence.expires_at ? ` · until ${fmt(licence.expires_at, locale)}` : ''}</p>;
+  }
+  return (
+    <p className="mt-1 flex items-center gap-1.5 text-[12px] font-semibold text-warning-700 dark:text-amber-300">
+      <Info size={13} aria-hidden />
+      {licence.state === 'expired' ? `Licence expired${licence.expires_at ? ` · ${fmt(licence.expires_at, locale)}` : ''}` : `No reviewed licence for ${country}`}
+    </p>
+  );
 }
 
 function KV({ k, v, ok }: { k: string; v: React.ReactNode; ok?: boolean }) {
@@ -100,7 +124,7 @@ export function AdminProviderReviewPage() {
           <Link to={base}><Button size="sm" variant="ghost">← Queue</Button></Link>
           <span className="ml-auto flex items-center gap-2">
             {lc && <Badge tone={lc.tone} appearance="solid" size="md">{lc.label}</Badge>}
-            {d?.services.some((s) => /^(tax-vat|legal-advisory)/.test(s.service_code)) && <Badge tone="error" appearance="outline" size="md">High risk · regulated area</Badge>}
+            {d?.matrix.some((r) => r.regulated) && <Badge tone="error" appearance="outline" size="md">High risk · regulated area</Badge>}
           </span>
         </div>
         {error && <Banner status="warning" title={error} />}
@@ -183,12 +207,16 @@ export function AdminProviderReviewPage() {
                               if (!cell) return <td key={c} className="px-3 py-3 text-fg-tertiary">—</td>;
                               const st: CellState = cell.status === 'pending' && (requestedCells.has(`${row.service_id}:${c}`) || requestedCells.has(`*:${c}`)) ? 'requested' : cell.status;
                               const Icon = CELL[st].icon;
-                              const actions: Array<[string, CellAction, 'success' | 'ghost']> = st === 'pending' || st === 'requested' ? [['Approve', 'approve', 'success'], ['Limit', 'limit', 'ghost'], ['Reject', 'reject', 'ghost'], ['Request', 'request_info', 'ghost']]
-                                : st === 'approved' ? [['Limit', 'limit', 'ghost'], ['Pause', 'pause', 'ghost']] : st === 'limited' ? [['Approve', 'approve', 'success'], ['Pause', 'pause', 'ghost']] : [['Reopen', 'reopen', 'ghost']];
+                              // R1 (Figma 3705:4311): in regulierten Bereichen nur mit gepruefter
+                              // Zulassung fuer dieses Land freigebbar — sonst steht "Request
+                              // licence" statt Approve/Limit (der Server antwortet 422).
+                              const lic = cell.licence;
+                              const actions = cellActions(st, lic);
                               return (
                                 <td key={c} className="px-3 py-3">
                                   <span className="flex items-center gap-2"><Icon size={15} className={CELL[st].color} /><Badge tone={CELL[st].tone} size="sm">{CELL[st].label}</Badge></span>
                                   <p className="mt-1 text-[12px] text-fg-tertiary">{cell.limitations ?? (cell.approved_at ? `since ${fmt(cell.approved_at, locale)}` : '')}</p>
+                                  {lic && <LicenceLine licence={lic} country={c} locale={locale} />}
                                   <div className="mt-1.5 flex flex-wrap gap-1">{actions.map(([l, a, v]) => <Button key={a} size="sm" variant={v} onClick={() => a === 'approve' || a === 'reopen' ? act(() => decideCoverage(key, cell.coverage_id, { action: a }), `${l}: ${row.service_name} · ${c}`) : setDialog({ kind: 'cell', cell, action: a })}>{l}</Button>)}</div>
                                 </td>
                               );
