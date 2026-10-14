@@ -151,14 +151,14 @@ export interface ApiEvent {
 
 /** Welche Felder der Nutzlast auf den Draht duerfen — je Ereignis, nie Kontaktdaten. */
 const EVENT_FIELDS: Record<ApiEventType, string[]> = {
-    'booking.created': ['slot_start', 'slot_end', 'area_code', 'country'],
+    'booking.created': ['slot_start', 'slot_end', 'area_code', 'country', 'rebooked_from'],
     'booking.rescheduled': ['from', 'to'],
     'booking.cancelled': ['cancelled_by', 'slot_start'],
     'meeting.completed': ['slot_start'],
     'user.no_show': ['slot_start', 'rebook_until'],
     'provider.no_show': ['slot_start', 'incident_id'],
     'lead.revealed': ['shared_fields', 'acknowledgement_version'],
-    'lead.credit_issued': ['amount_cents', 'currency', 'reason'],
+    'lead.credit_issued': ['amount_cents', 'currency', 'pct', 'reason'],
     'verification.expiring': ['evidence_type', 'expires_at'],
     'payment.failed': ['ledger_id', 'currency'],
 };
@@ -168,22 +168,34 @@ const EVENT_FIELDS: Record<ApiEventType, string[]> = {
  * nicht zur API gehoert. Der Anbieter ist schon gefiltert (providerKey).
  */
 export function mapEventLogRow(row: EventLogRow): ApiEvent | null {
-    const p = (row.payload ?? {}) as Record<string, unknown>;
+    // Kopie der Nutzlast: die Normalisierung unten schreibt Feldnamen um, nie die Zeile.
+    const p: Record<string, unknown> = { ...((row.payload ?? {}) as Record<string, unknown>) };
     let type: ApiEventType | null = null;
+    // Die Namen links sind die, die der Server WIRKLICH schreibt (Staging-
+    // Testlauf 2026-10-14: user_cancelled, booking_user_no_show, booking_rebooked,
+    // evidence_expiring_notice, creditCents) — nicht die, die man erwarten wuerde.
     switch (row.type) {
         case 'scheduling_confirmed': case 'booking_created': type = 'booking.created'; break;
+        case 'booking_rebooked':
+            // Neubuchung ohne zweite Gebuehr (Phase 5): eine neue Buchung, mit Verweis auf die alte.
+            type = 'booking.created'; p.rebooked_from = p.fromBookingId ?? null; break;
         case 'booking_rescheduled': type = 'booking.rescheduled'; break;
         case 'booking_cancelled': type = 'booking.cancelled'; break;
+        case 'user_cancelled': type = 'booking.cancelled'; p.cancelled_by = 'user'; break;
+        case 'provider_cancelled': type = 'booking.cancelled'; p.cancelled_by = 'provider'; break;
         case 'attendance_reported': {
             const outcome = String(p.outcome ?? '');
             type = outcome === 'attended' ? 'meeting.completed' : outcome === 'user_no_show' ? 'user.no_show' : outcome === 'provider_no_show' ? 'provider.no_show' : null;
             break;
         }
+        case 'booking_user_no_show': type = 'user.no_show'; p.rebook_until = p.deadline ?? null; break;
         case 'no_show_reported': type = 'provider.no_show'; break;
         case 'provider_performance_incident': case 'performance_incident': type = 'provider.no_show'; break;
         case 'lead.revealed': type = 'lead.revealed'; break;
-        case 'lead.credit_issued': case 'credit_issued': type = 'lead.credit_issued'; break;
-        case 'evidence_expiring': type = 'verification.expiring'; break;
+        case 'lead.credit_issued': case 'credit_issued':
+            type = 'lead.credit_issued'; if (p.amount_cents === undefined && p.amountCents === undefined) p.amount_cents = p.creditCents ?? null; break;
+        case 'evidence_expiring': case 'evidence_expiring_notice':
+            type = 'verification.expiring'; break;
         case 'lead_payment_failed': case 'payment_failed': type = 'payment.failed'; break;
         default: type = null;
     }
