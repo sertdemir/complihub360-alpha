@@ -271,7 +271,7 @@ export function PlatformPage() {
                     <Button
                       variant="primary"
                       size="md"
-                      onClick={() => navigate(localize('/partner-apply'))}
+                      onClick={() => navigate(localize('/provider-apply'))}
                     >
                       {t('platform.intake.ctaButton')}
                       <ArrowRight size={16} className="ml-2" aria-hidden />

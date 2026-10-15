@@ -56,7 +56,7 @@ export function AccountActions({ lang, onNavigate }: AccountActionsProps) {
   const SECONDARY = `${BASE} border-thin border-stroke-brand text-fg-brand hover:bg-brand-light`;
 
   if (isLoggedIn) {
-    const to = `/${lang}${role === 'partner' ? '/partner-dashboard' : '/dashboard'}`;
+    const to = `/${lang}${role === 'partner' ? '/provider-dashboard' : '/dashboard'}`;
     return (
       <Link to={to} onClick={onNavigate} className={`${PRIMARY} w-full`}>
         <LayoutDashboard size={17} aria-hidden />

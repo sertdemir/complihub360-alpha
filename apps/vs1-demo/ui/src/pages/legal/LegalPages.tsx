@@ -326,7 +326,7 @@ export function TermsPage() {
             Verified Provider erbringen ihre Leistungen im eigenen Namen, auf eigene Rechnung und in eigener beruflicher
             Verantwortung. Der Beratungsvertrag kommt unmittelbar zwischen Ihnen und dem Partner zustande; CompliHub360
             ist daran nicht beteiligt und haftet nicht für dessen Leistung.{' '}
-            {PLACEHOLDER('Prüf- und Aufnahmekriterien für Partner, Folgen bei Ausschluss')}
+            {PLACEHOLDER('Prüf- und Aufnahmekriterien für Anbieter, Folgen bei Ausschluss')}
           </p>
         </Section>
         <Section heading={t('terms.headings.account')}>

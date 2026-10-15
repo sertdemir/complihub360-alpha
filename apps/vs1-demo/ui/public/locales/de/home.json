@@ -520,7 +520,7 @@
       "desc": "Behalten Sie Ihre Risk Map und lassen Sie sich mit Verified Providern matchen — kostenlos, ohne Kreditkarte. Hinweise bei Regeländerungen sind in Vorbereitung. Wir senden Ihnen einen Magic-Link per E-Mail, es gibt also kein Passwort zu merken.",
       "benefits": [
         "Ihr gespeichertes Risk-Map-Dossier",
-        "Verified-Partner-Matching",
+        "Verified-Provider-Matching",
         "Hinweise bei Vorschriftenänderungen — in Vorbereitung"
       ],
       "confirm": "Ihr Fortschritt ist gesichert.",
@@ -532,7 +532,7 @@
       "desc": "Behalten Sie Ihre Risk Map und lassen Sie sich mit Verified Providern in Ihren Märkten matchen. Kostenlos, ohne Kreditkarte. Regulatorische Hinweise sind in Vorbereitung und erscheinen in Ihrem Konto, sobald sie verfügbar sind. Wir senden Ihnen einen Magic-Link per E-Mail, ein Passwort ist nicht nötig.",
       "benefits": [
         "Ihr gespeichertes Risk-Map-Dossier",
-        "Verified-Partner-Matching",
+        "Verified-Provider-Matching",
         "Regulatorische Hinweise — in Vorbereitung"
       ],
       "confirm": "Klicken Sie auf den Link, um die Einrichtung Ihres kostenlosen Kontos abzuschließen.",
@@ -568,7 +568,7 @@
       },
       {
         "value": "3",
-        "label": "Partner bereit"
+        "label": "Anbieter bereit"
       }
     ],
     "rows": [
@@ -711,7 +711,7 @@
     "partnersTitle": "Wir haben gefunden, wer das umsetzen kann.",
     "unlock": "Meine besten Matches mit kostenlosem Konto ansehen",
     "save": {
-      "title": "Diese Map speichern. Partner freischalten.",
+      "title": "Diese Map speichern. Anbieter freischalten.",
       "subtitle": "Kostenloses Konto. Keine Kreditkarte. Founding-Member-Zugang bis zum Beta-Launch.",
       "cta": "Kostenloses Konto erstellen"
     },
@@ -1066,7 +1066,7 @@
       "gold": "Drei",
       "post": " leise Grundsätze."
     },
-    "subtitle": "Compliance-Produkte schreien meist. Wir müssen das nicht. Risiko braucht keine Drohung. Entscheidungen brauchen keinen 20-Schritte-Funnel. Partner brauchen keinen Marktplatz. Fahren Sie über die Karten, um zu sehen, was wir stattdessen getan haben.",
+    "subtitle": "Compliance-Produkte schreien meist. Wir müssen das nicht. Risiko braucht keine Drohung. Entscheidungen brauchen keinen 20-Schritte-Funnel. Anbieter brauchen keinen Marktplatz. Fahren Sie über die Karten, um zu sehen, was wir stattdessen getan haben.",
     "hoverCue": "Zum Ansehen hovern",
     "cards": [
       {
@@ -1098,7 +1098,7 @@
       "gold": "Homebase",
       "post": " für alles rund um Compliance."
     },
-    "subtitle": "Das Assessment ist kostenlos. Was danach kommt — Ihr Workspace, Live-News, Expertenwissen, Ihre Partner — macht CompliHub360 zu dem Ort, an den Sie zurückkehren.",
+    "subtitle": "Das Assessment ist kostenlos. Was danach kommt — Ihr Workspace, Live-News, Expertenwissen, Ihre Anbieter — macht CompliHub360 zu dem Ort, an den Sie zurückkehren.",
     "pills": {
       "live": "Heute verfügbar",
       "beta": "Startet mit der Beta"
@@ -1132,7 +1132,7 @@
       }
     ],
     "workspace": {
-      "title": "Ihre Karte. Ihre Partner. Ihr Verlauf. Dauerhaft.",
+      "title": "Ihre Karte. Ihre Anbieter. Ihr Verlauf. Dauerhaft.",
       "desc": "Das Assessment wird zum gespeicherten Dossier. Ihre Mandats-Chronik lebt in Ihrem Dashboard. Anbieterbeziehungen, Compliance-Verlauf, Risk Map — alles an einem Ort, alles Ihres."
     },
     "newsCard": {
@@ -1204,7 +1204,7 @@
         ]
       },
       {
-        "label": "Partner & Mandate",
+        "label": "Anbieter & Mandate",
         "items": [
           {
             "q": "Erhalte ich hier Rechtsberatung?",
@@ -1315,7 +1315,7 @@
         "title": "Unternehmen",
         "links": {
           "about": "Über uns",
-          "partner": "Partner",
+          "partner": "Anbieter",
           "trustSecurity": "Vertrauen & Sicherheit",
           "contact": "Kontakt",
           "support": "Support"

@@ -69,6 +69,21 @@ const VERBOTEN = [
   // Internet-Domain bleiben Domains, ein Fachbereich heisst Area.
   { muster: /\b(?:Compliance )?Domains?\b(?!\s*(?:name|Name|-))/g, statt: 'Area(s)',
     ausser: /\b(?:email|e-mail|web|internet|domain name|supported-domain)\b/i },
+  // 15.10.2026 (Nutzer): Wer auf CompliHub360 berät, ist ein Provider —
+  // EN Provider, DE Anbieter, ES proveedor, TR sağlayıcı. "Partner" bleibt nur
+  // im allgemeinen Wortsinn (Vertrags-, Geschäfts-, Fulfilment-Partner); genau
+  // diese Schluessel stehen unten namentlich. Die Postfach-Adresse
+  // partners@complihub360.com und der Platzhalter {{partners}} sind keine
+  // Begriffe (Lookahead/-behind).
+  { muster: /(?<!\{\{)\bpartner(?:s|n)?\b(?!@)/gi, statt: 'Provider / Anbieter / proveedor / sağlayıcı',
+    schluessel: new Map([
+      ['common:compliance.legal-advisory.affected', 'Partner im allgemeinen Sinn (Lieferanten oder Partner)'],
+      ['common:compliance.legal-advisory.affectedRoles.[1].name', 'Vertragspartner'],
+      ['common:compliance.legal-advisory.affectedRoles.[1].line', 'Lieferanten oder Partner im Ausland'],
+      ['common:compliance.legal-advisory.affectedChecks.[2]', 'Vertraege mit Partnern'],
+      ['common:markets.obligationDesc.monitor-kyb', 'Geschaeftspartner (KYB)'],
+      ['home:domains.items.[6].matters.[2]', 'Fulfilment-Partner'],
+    ]) },
   // Schritt 3 (2026-10-10): die Stufe heisst Priority, die oberste Immediate.
   { muster: /\bSeverit(?:y|ies)\b/gi,      statt: 'Priority' },
   // "routing-critical" ist keine Stufe, sondern sagt, dass Anfragen an diese

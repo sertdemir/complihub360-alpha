@@ -23,10 +23,10 @@ export function ApplicationStatusBanner() {
   const { pathname } = useLocation();
   const [status, setStatus] = useState<LifecycleStatus | null>(null);
   useEffect(() => { fetchMyProvider().then((m) => setStatus(m.lifecycle_status)).catch(() => {}); }, []);
-  if (!status || /partner-dashboard\/(application|verification)/.test(pathname)) return null;
+  if (!status || /provider-dashboard\/(application|verification)/.test(pathname)) return null;
   const kind = SHOW[status];
   if (!kind) return null;
-  const base = `/${i18n.resolvedLanguage || 'en'}/partner-dashboard`;
+  const base = `/${i18n.resolvedLanguage || 'en'}/provider-dashboard`;
   const target = kind === 'submitted' ? 'verification' : 'application';
   return (
     <Banner status={kind === 'more_info_required' ? 'warning' : 'brand'} className="mb-5" title={t(`shell.applicationBanner.${kind}`)}

@@ -11,7 +11,7 @@ import { resolve } from 'path';
 // Faehrt eine neue Workspace-Seite auf, ohne dort einzutragen, legt sich der
 // Marketing-Header ueber die ProviderShell: die Seite funktioniert, sieht aber
 // falsch aus, und weder Typecheck noch Build noch ein Test schlagen an. Genau
-// das ist am 2026-10-04 mit `/partner-dashboard/subscription` passiert und fiel
+// das ist am 2026-10-04 mit `/provider-dashboard/subscription` passiert und fiel
 // erst im Screenshot auf.
 //
 // Was dieser Test NICHT prueft: ob der Header auf den uebrigen Seiten richtig
@@ -19,11 +19,11 @@ import { resolve } from 'path';
 
 const read = (p: string) => readFileSync(resolve(__dirname, p), 'utf8');
 
-/** Die Unterpfade aus `<Route path="partner-dashboard/<seg>" …>` in App.tsx. */
+/** Die Unterpfade aus `<Route path="provider-dashboard/<seg>" …>` in App.tsx. */
 function routeSegments(): string[] {
     const src = read('../../App.tsx');
     const out = new Set<string>();
-    for (const m of src.matchAll(/path="partner-dashboard\/([a-z0-9-]+)"/g)) out.add(m[1]);
+    for (const m of src.matchAll(/path="provider-dashboard\/([a-z0-9-]+)"/g)) out.add(m[1]);
     return [...out].sort();
 }
 

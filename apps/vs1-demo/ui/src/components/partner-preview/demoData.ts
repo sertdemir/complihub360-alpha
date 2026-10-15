@@ -26,7 +26,7 @@ export const demoPartnerData: PartnerData = {
     { id: 'l-mkt', title: 'Marketplace · NL · DE · €25M+', matchPct: 81, meta: '3 Critical · arrived yesterday', dimmed: true },
   ],
   tier: {
-    tierName: 'Founding Partner · Tier 1',
+    tierName: 'Founding Provider · Tier 1',
     note: '12% above network average · review in 23 days',
     windowLabel: 'Last 90 days',
     trend: '↑ trending steady',

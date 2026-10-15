@@ -10,7 +10,7 @@
     "navSettings": "Einstellungen",
     "navNotifications": "Benachrichtigungen",
     "navHelp": "Hilfe & Support",
-    "partnerBadge": "Partner",
+    "partnerBadge": "Anbieter",
     "searchAria": "Suche",
     "availabilityAria": "Verfügbarkeit umschalten",
     "outOfOffice": "Pausiert",
@@ -78,7 +78,7 @@
     "coverageToday": "Ihre Abdeckung heute: {{markets}}. Wählen Sie den Markt für die Expansion — Nachfragezahlen beziehen sich auf die letzten 30 Tage.",
     "addedTitle": "{{code}} hinzugefügt",
     "addedBody": " — Verifizierung ausstehend (≈ 2 Werktage). Nach der Verifizierung erscheint der Markt im Ranking.",
-    "candidateNote": "{{requests}} offene Anfragen / 30 T · {{partners}} Partner",
+    "candidateNote": "{{requests}} offene Anfragen / 30 T · {{partners}} Anbieter",
     "allCovered": "Alle gelisteten Märkte sind bereits abgedeckt.",
     "errorFallback": "Der Markt konnte nicht hinzugefügt werden.",
     "countryNl": "Niederlande",
@@ -271,7 +271,7 @@
     "previewProfile": "Öffentliches Profil ansehen",
     "viewRankingImpact": "Ranking-Auswirkung ansehen",
     "subtitle": "Ihr öffentliches Profil + Matching-Gewichte. Jede Änderung wirkt sich innerhalb von 60 Sekunden auf Suchranking und Lead-Routing aus. Ein neuer Markt löst eine Re-Verifizierung von 2 Werktagen aus, bevor er live geht.",
-    "rankBannerTitle": "Aktueller Suchrang: #3 von 47 verifizierten DE-Partnern · letzte 30 Tage",
+    "rankBannerTitle": "Aktueller Suchrang: #3 von 47 verifizierten DE-Anbietern · letzte 30 Tage",
     "rankBannerBody": "Märkte hinzufügen, Domänen entfernen oder das SLA-Ziel ändern verschiebt Ihr Ranking jeweils innerhalb von ~60 Sek. Für neue Märkte ist eine erneute Verifizierung erforderlich.",
     "edit": "Bearbeiten",
     "publicIdentityTitle": "Öffentliche Identität",
@@ -293,10 +293,10 @@
     "domainDatTitle": "Datenschutz",
     "domainDatMeta": "1 aktiv · Rang #14 (steigend)",
     "expansionBannerTitle": "Eine Expansion in Customs & Excise (CST) würde die Rang-#1-Anwärterposition freischalten",
-    "expansionBannerBody": "14 Kunden haben letzten Monat Risk Maps mit DE + CST-Abdeckungslücken erstellt · nur 4 Partner decken beides ab · CST hinzufügen > geschätzt 18–24 k € MRR + voraussichtlich Top-3 in der CST-Domäne.",
+    "expansionBannerBody": "14 Kunden haben letzten Monat Risk Maps mit DE + CST-Abdeckungslücken erstellt · nur 4 Anbieter decken beides ab · CST hinzufügen > geschätzt 18–24 k € MRR + voraussichtlich Top-3 in der CST-Domäne.",
     "exploreExpansion": "Expansion erkunden",
     "languagesTitle": "Gesprochene Sprachen",
-    "languagesSub": "Mandanten filtern Partner nach Sprache · beeinflusst das Matching",
+    "languagesSub": "Mandanten filtern Anbieter nach Sprache · beeinflusst das Matching",
     "slaTitle": "SLA-Ziel",
     "slaSub": "Wie schnell Sie sich zur Bestätigung verpflichten · wirkt direkt auf Ihr Ranking",
     "sla6hTitle": "Bestätigung innerhalb von 6 h",
@@ -400,7 +400,7 @@
     }
   },
   "magicAction": {
-    "partnerBadge": "Partner",
+    "partnerBadge": "Anbieter",
     "verifying": "Ihr Link wird geprüft…",
     "invalidTitle": "Link nicht mehr gültig",
     "invalidBody": "Dieser Magic-Link ist ungültig, abgelaufen (24 h) oder wurde bereits verwendet — jeder Link funktioniert genau einmal. Bitte nutzen Sie die aktuellste E-Mail oder kontaktieren Sie den Mandanten über Ihr Dashboard.",
@@ -426,8 +426,8 @@
     "workingButton": "Wird ausgeführt…",
     "doneTitle": "Erledigt ✓",
     "dossierUnlocked": "🔓 Dossier freigeschaltet",
-    "contactInDashboard": "Die Kontaktdaten des Anfragenden erscheinen im Thread Ihres Partner-Dashboards.",
-    "closeNote": "Sie können dieses Fenster schließen oder Ihr Partner-Dashboard öffnen."
+    "contactInDashboard": "Die Kontaktdaten des Anfragenden erscheinen im Thread Ihres Anbieter-Dashboards.",
+    "closeNote": "Sie können dieses Fenster schließen oder Ihr Anbieter-Dashboard öffnen."
   },
   "requests": {
     "title": "Anfragen",
@@ -638,10 +638,10 @@
     "proposalSaveFailed": "Nicht gespeichert. Bitte versuchen Sie es noch einmal."
   },
   "intake": {
-    "inviteOnlyTitle": "Partner-Intake nur mit Einladung.",
-    "inviteOnlyBody": "CompliHub360-Provider werden direkt von unserem Team angeworben und über einen persönlichen Intake-Link aufgenommen. Es gibt keine öffentliche Selbstregistrierung — jeder Partner durchläuft vor der Freischaltung eine manuelle Prüfung gegen unsere Richtlinien und Statuten.",
-    "inviteOnlyContact": "Du berätst Unternehmen zu Compliance und möchtest Partner werden? Melde dich: partners@complihub360.com",
-    "title": "Partner-Intake",
+    "inviteOnlyTitle": "Anbieter-Intake nur mit Einladung.",
+    "inviteOnlyBody": "CompliHub360-Anbieter werden direkt von unserem Team angeworben und über einen persönlichen Intake-Link aufgenommen. Es gibt keine öffentliche Selbstregistrierung — jeder Anbieter durchläuft vor der Freischaltung eine manuelle Prüfung gegen unsere Richtlinien und Statuten.",
+    "inviteOnlyContact": "Du berätst Unternehmen zu Compliance und möchtest Anbieter werden? Melde dich: partners@complihub360.com",
+    "title": "Anbieter-Intake",
     "sub": "Reiche dein Kanzlei-Paket ein — wir prüfen es manuell und schalten deinen Workspace nach dem Vetting frei.",
     "secFirm": "Kanzlei & Abdeckung",
     "name": "Kanzleiname *",
@@ -653,12 +653,12 @@
     "secCerts": "Zertifizierungen & Statuten",
     "certs": "Zertifizierungen (eine pro Zeile)",
     "certsPh": "Dottore Commercialista · Kammer Mailand\nISO 27001",
-    "statutes": "Ich bestätige, dass unsere Kanzlei die CompliHub360-Partnerrichtlinien und -Statuten erfüllt, und stimme der manuellen Prüfung der eingereichten Angaben zu.",
+    "statutes": "Ich bestätige, dass unsere Kanzlei die CompliHub360-Anbieterrichtlinien und -Statuten erfüllt, und stimme der manuellen Prüfung der eingereichten Angaben zu.",
     "submit": "Paket zur Prüfung einreichen",
     "sending": "Wird eingereicht…",
     "vettingNote": "Nach der Prüfung erhältst du deinen Workspace-Zugang — in der Regel innerhalb von 2 Werktagen.",
     "doneTitle": "Paket eingegangen — in Prüfung.",
-    "doneBody": "Danke! Unser Team prüft deine Angaben jetzt gegen die Partnerrichtlinien. Du hörst von uns — in der Regel innerhalb von 2 Werktagen. Dein Workspace bleibt bis zur Freischaltung inaktiv.",
+    "doneBody": "Danke! Unser Team prüft deine Angaben jetzt gegen die Anbieterrichtlinien. Du hörst von uns — in der Regel innerhalb von 2 Werktagen. Dein Workspace bleibt bis zur Freischaltung inaktiv.",
     "doneNote": "Fragen? partners@complihub360.com",
     "errorTitle": "Einreichen fehlgeschlagen",
     "errorBody": "Das Paket konnte nicht übermittelt werden. Prüfe deinen Intake-Link oder versuche es erneut — oder kontaktiere partners@complihub360.com.",
@@ -790,7 +790,7 @@
       "groupLaterHint": "Nötig, bevor Ihr Konto aktiviert wird — nicht, um einzureichen. Sie können sie jetzt oder später erteilen.",
       "commercialNote": "Die kommerziellen Bedingungen gehören zur Wahl Ihres Tarifs und werden dort gezeigt, nicht hier.",
       "doc": {
-        "provider_agreement": "Partnervereinbarung",
+        "provider_agreement": "Anbietervereinbarung",
         "privacy_notice": "Datenschutzhinweise für Anbieter",
         "billing_authorization": "Abrechnungsermächtigung",
         "commercial_terms": "Kommerzielle Bedingungen"
@@ -845,7 +845,7 @@
         "professional_licence": "Nachweis: berufliche Zulassung"
       },
       "agreements": {
-        "provider_agreement": "Annahme: Partnervereinbarung",
+        "provider_agreement": "Annahme: Anbietervereinbarung",
         "privacy_notice": "Annahme: Datenschutzhinweise",
         "billing_authorization": "Annahme: Abrechnungsermächtigung"
       }

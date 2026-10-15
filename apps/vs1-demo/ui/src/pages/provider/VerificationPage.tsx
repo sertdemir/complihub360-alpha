@@ -63,7 +63,7 @@ function Stat({ label, value, hint, badge }: { label: string; value: React.React
 export function VerificationPage() {
   const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
-  const base = `/${locale}/partner-dashboard`;
+  const base = `/${locale}/provider-dashboard`;
   const [v, setV] = useState<Verification | null>(null);
   const [error, setError] = useState<string | null>(null);
   const load = () => fetchVerification().then(setV).catch(() => setError(t('verification.loadError')));

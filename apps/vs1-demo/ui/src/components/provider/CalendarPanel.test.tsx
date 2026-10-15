@@ -16,9 +16,9 @@ import { ApiError } from '../../api/client';
 let search = '';
 function Probe() { search = useLocation().search; return null; }
 const onConfirm = vi.fn();
-const at = (url = '/de/partner-dashboard/settings') => render(
+const at = (url = '/de/provider-dashboard/settings') => render(
   <MemoryRouter initialEntries={[url]}>
-    <Routes><Route path="/:locale/partner-dashboard/settings" element={<><CalendarPanel onConfirm={onConfirm} /><Probe /></>} /></Routes>
+    <Routes><Route path="/:locale/provider-dashboard/settings" element={<><CalendarPanel onConfirm={onConfirm} /><Probe /></>} /></Routes>
   </MemoryRouter>,
 );
 const assign = vi.fn();
@@ -80,14 +80,14 @@ describe('CalendarPanel', () => {
 
   it('Rueckkehr: Meldung im Abschnitt, Parameter weg aus der URL', async () => {
     api.fetchCalendar.mockResolvedValue({ configured: true, connected: true, email: 'k@x.de' });
-    at('/de/partner-dashboard/settings?calendar=connected');
+    at('/de/provider-dashboard/settings?calendar=connected');
     expect(await screen.findByText('settings.calendar.returnedOkTitle')).toBeInTheDocument();
     await waitFor(() => expect(search).toBe(''));
   });
 
   it('Rueckkehr gescheitert: Meldung, und der Weg zum Verbinden bleibt', async () => {
     api.fetchCalendar.mockResolvedValue({ configured: true, connected: false, email: null });
-    at('/de/partner-dashboard/settings?calendar=failed');
+    at('/de/provider-dashboard/settings?calendar=failed');
     expect(await screen.findByText('settings.calendar.returnedFailTitle')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /settings\.calendar\.connect/ })).toBeInTheDocument();
   });

@@ -4444,7 +4444,7 @@ describe('Kalender: Nylas Hosted Auth', () => {
         nylasAuthMock.exchangeCode.mockResolvedValue({ grantId: 'grant-1', email: 'kalender@testkanzlei.example' });
         const back = await callback(`code=abc&state=${encodeURIComponent(state)}`);
         expect(back.status).toBe(302);
-        expect(back.headers.get('location')).toBe('https://app.test/de/partner-dashboard/settings?calendar=connected');
+        expect(back.headers.get('location')).toBe('https://app.test/de/provider-dashboard/settings?calendar=connected');
         expect(db.providers[0]).toMatchObject({ nylas_grant_id: 'grant-1', nylas_calendar_id: 'kalender@testkanzlei.example' });
         expect((db.event_log ?? []).some((e) => e.type === 'calendar_connected')).toBe(true);
 
@@ -4471,7 +4471,7 @@ describe('Kalender: Nylas Hosted Auth', () => {
         const { signState } = await vi.importActual<typeof import('../nylasAuth.js')>('../nylasAuth.js');
         nylasAuthMock.exchangeCode.mockResolvedValue(null);
         const back = await callback(`code=abc&state=${encodeURIComponent(signState('test-kanzlei', 'tr'))}`);
-        expect(back.headers.get('location')).toBe('https://app.test/tr/partner-dashboard/settings?calendar=failed');
+        expect(back.headers.get('location')).toBe('https://app.test/tr/provider-dashboard/settings?calendar=failed');
         expect(db.providers[0].nylas_grant_id ?? null).toBeNull();
     });
 

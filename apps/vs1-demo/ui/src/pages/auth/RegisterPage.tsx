@@ -30,7 +30,7 @@ import { FieldError, FIELD_ERROR_CLASS, errorAria } from "../../components/ui/Fi
 //   toter Code, hier ersatzlos ausgebaut. Der Tab zeigt jetzt die R4-Weiche
 //   IN der Formularspalte (Nutzer-Entscheidung 2026-08-29, vorher eine
 //   zentrierte Karte): sie erklaert den echten Weg und fuehrt zur Bewerbung
-//   auf /partner-apply.
+//   auf /provider-apply.
 //
 // Drei Schritte, unveraendert in der Sache: Konto → Unternehmen → Bedarf.
 // Abschluss: mit konfiguriertem Supabase ein echtes signUp mit
@@ -326,7 +326,7 @@ export function RegisterPage() {
                            Inhalt der Formularspalte, das Narrativ links bleibt
                            stehen. Anbieter werden geprueft aufgenommen, nicht
                            selbst registriert (v2 §10/D7) — der Weg fuehrt zur
-                           Bewerbung (/partner-apply). */
+                           Bewerbung (/provider-apply). */
                         <motion.div
                             key="partner-gate"
                             initial={{ opacity: 0, y: 12 }}
@@ -344,7 +344,7 @@ export function RegisterPage() {
                             </p>
                             <button
                                 type="button"
-                                onClick={() => navigate(`/${lang}/partner-apply`)}
+                                onClick={() => navigate(`/${lang}/provider-apply`)}
                                 className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3.5 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
                             >
                                 {t("register.partnerGate.cta")} <ArrowRight size={16} />

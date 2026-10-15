@@ -28,7 +28,7 @@ export function AuthCallbackPage() {
             const claimed =
                 (session.user?.app_metadata?.role as string | undefined) ??
                 (session.user?.user_metadata?.role as string | undefined);
-            const target = claimed === "partner" ? "partner-dashboard" : "dashboard";
+            const target = claimed === "partner" ? "provider-dashboard" : "dashboard";
             // G2: nach einem Ablauf zurueck auf die Seite, auf der es passierte.
             clearExpired();
             navigate(takeReturnTo() ?? `/${lang}/${target}`, { replace: true });

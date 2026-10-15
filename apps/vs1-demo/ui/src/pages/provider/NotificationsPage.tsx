@@ -63,7 +63,7 @@ export function NotificationsPage() {
   };
   const open = (n: PartnerNotification) => {
     if (n.unread) markNotificationsRead({ id: n.id }).catch(() => {});
-    navigate(`/${locale}/partner-dashboard/${n.to}`);
+    navigate(`/${locale}/provider-dashboard/${n.to}`);
   };
 
   return (
