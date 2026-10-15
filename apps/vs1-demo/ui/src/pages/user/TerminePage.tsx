@@ -73,6 +73,8 @@ interface Row {
   needsOutcome?: boolean; // slot passed, outcome not recorded (watchdog §1)
   /** Canvas F V1: Leistung beim Anbieter pausiert. */
   paused: boolean;
+  /** Canvas E1: schon bewertet, laut Server. */
+  reviewed: boolean;
   att: BookingAttendance;
 }
 
@@ -145,6 +147,7 @@ function toRows(bookings: UserBooking[], locale: string): Row[] {
       status: b.status,
       needsOutcome: b.status === 'confirmed' && start.getTime() < Date.now(),
       paused: b.providerPaused,
+      reviewed: b.reviewed,
       att: b.attendance,
     };
   });
@@ -419,7 +422,7 @@ export function TerminePage() {
           </>
         )}
         {r.status === 'completed' && (
-          reviewed.has(r.id)
+          r.reviewed || reviewed.has(r.id)
             ? <span className="text-[12px] text-fg-brand">{t('termine.reviewed')}</span>
             : <Button variant="primary" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerName: r.provider })}>{t('termine.review')}</Button>
         )}
@@ -480,7 +483,7 @@ export function TerminePage() {
           </>
         )}
         {r.status === 'completed' && (
-          reviewed.has(r.id)
+          r.reviewed || reviewed.has(r.id)
             ? <span className="text-[12px] text-fg-brand">{t('termine.reviewed')}</span>
             : <Button variant="primary" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerName: r.provider })}>{t('termine.review')}</Button>
         )}

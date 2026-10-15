@@ -84,10 +84,25 @@ function attendanceFields(id: string, status: string, slotEnd: string) {
 // Status-Ueberschreibungen aus Anwesenheits-Meldung und Neubuchung im Mock.
 const STATUS_OVERRIDE: Record<string, string> = {};
 const REBOOKED: Array<{ id: string; from: string; key: string; slot_start: string }> = [];
+// Punkt 1 (Canvas E1): Bewertungen des Nutzers je Buchung, wie der Server sie
+// ueber `reviewed` an der Termin-Liste meldet.
+const REVIEWED = new Set<string>();
+
+// POST /reviews wie der Server: einmal je Buchung, nur nach dem Termin.
+function submitReviewMock(body: Record<string, unknown>) {
+  const id = String(body.booking_id ?? '');
+  const row = bookings().find((x) => x.id === id);
+  if (!row) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Booking not found' };
+  const held = row.status !== 'cancelled' && (row.status === 'completed' || Date.parse(row.slot_start) <= Date.now());
+  if (!held) return { __status: 409, errorCode: 'BOOKING_NOT_HELD', message: 'Reviews are possible after the consultation took place' };
+  if (REVIEWED.has(id)) return { __status: 409, errorCode: 'ALREADY_REVIEWED', message: 'This booking has already been reviewed' };
+  REVIEWED.add(id);
+  return { ok: true, __status: 201 };
+}
 
 function bookings() {
   const b = (id: string, key: string, name: string, region: string, web: string | null, start: string, end: string, status: string) =>
-    ({ id, public_ref: REF[key] ?? null, provider_name: name, provider_descriptor: DESCRIPTOR[key] ?? '', provider_area_codes: AREAS[key] ?? [], provider_region: region, provider_website: web, identity_revealed: true, slot_start: start, slot_end: end, status: STATUS_OVERRIDE[id] ?? status, message: null, ...attendanceFields(id, STATUS_OVERRIDE[id] ?? status, end) });
+    ({ id, public_ref: REF[key] ?? null, provider_name: name, provider_descriptor: DESCRIPTOR[key] ?? '', provider_area_codes: AREAS[key] ?? [], provider_region: region, provider_website: web, identity_revealed: true, slot_start: start, slot_end: end, status: STATUS_OVERRIDE[id] ?? status, message: null, reviewed: REVIEWED.has(id), ...attendanceFields(id, STATUS_OVERRIDE[id] ?? status, end) });
   const rebooked = REBOOKED.map((r) => { const src = bookings0().find((x) => x.id === r.from); return src ? { ...b(r.id, r.key, src.provider_name, src.provider_region ?? '', src.provider_website, r.slot_start, new Date(new Date(r.slot_start).getTime() + 30 * 60_000).toISOString(), 'confirmed'), rebooked_from: r.from } : null; }).filter((x): x is NonNullable<typeof x> => !!x);
   return [...rebooked, ...bookings0()];
   function bookings0() { return [
@@ -1290,6 +1305,7 @@ export function route(method: string, path: string, body: Record<string, unknown
     return { ok: true, market, notify: body.notify === true, reason: isKnownCountry(market) ? 'provider_coverage' : 'market' };
   }
   if (p[0] === 'scheduling' && p.length === 1 && method === 'POST') return createBooking(body);
+  if (p[0] === 'reviews' && p.length === 1 && method === 'POST') return submitReviewMock(body);
   if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'proposal' && method === 'PATCH') return reportProposal(p[3], body);
   if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'attendance' && method === 'PATCH') return reportAttendance(p[3], body);
   if (p[0] === 'scheduling' && p.length === 2 && method === 'PATCH') return patchBooking(p[1], body);

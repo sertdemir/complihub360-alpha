@@ -1,5 +1,5 @@
 import { myProviderKey } from './provider';
-import { apiFetch, ApiError } from './client';
+import { apiFetch, ApiError, referenceOf } from './client';
 import type { RankBasis } from './search';
 
 // ─── Bookings (Termine) — user side ──────────────────────────────────────────
@@ -78,6 +78,8 @@ export interface UserBooking {
   message: string | null;
   /** Canvas F V1: der Anbieter hat die Leistung dieses Termins nach einem wesentlichen Ereignis pausiert. */
   providerPaused: boolean;
+  /** Canvas E1 (15.10.2026): der Nutzer hat diesen Termin schon bewertet — vom Server, nicht aus dem Speicher der Seite. */
+  reviewed: boolean;
   attendance: BookingAttendance;
 }
 
@@ -95,6 +97,7 @@ interface ApiBookingRow extends ApiAttendanceFields {
   status: BookingStatus;
   message: string | null;
   provider_paused?: boolean;
+  reviewed?: boolean;
 }
 
 // Affiliate 1b: zaehlt den Klick auf die Website eines Anbieters. Der Server
@@ -116,6 +119,7 @@ export async function fetchUserBookings(): Promise<UserBooking[]> {
     providerDescriptor: b.provider_descriptor ?? '',
     providerAreaCodes: b.provider_area_codes ?? [],
     providerPaused: !!b.provider_paused,
+    reviewed: !!b.reviewed,
     providerRegion: b.provider_region,
     identityRevealed: !!b.identity_revealed,
     providerWebsite: b.provider_website,
@@ -439,6 +443,22 @@ export async function submitReview(r: ReviewSubmission): Promise<void> {
       body: r.body ?? null,
     }),
   });
+}
+
+/** Punkt 1 (Canvas E1, 15.10.2026): warum eine Bewertung nicht gespeichert
+ *  wurde. Zwei 409 sind keine Stoerung, sondern eine Lage, die ein erneuter
+ *  Versuch nicht aendert — sie bekommen einen neutralen Hinweis statt eines
+ *  Fehlers. Alles andere ist ein echter Fehler mit Referenz. */
+export type ReviewFailure =
+  | { kind: 'already_reviewed' }
+  | { kind: 'not_held' }
+  | { kind: 'generic'; reference: { id: string; at: string } | null };
+
+export function reviewFailureFrom(err: unknown): ReviewFailure {
+  const code = err instanceof ApiError ? String(err.body.errorCode ?? '') : '';
+  if (code === 'ALREADY_REVIEWED') return { kind: 'already_reviewed' };
+  if (code === 'BOOKING_NOT_HELD') return { kind: 'not_held' };
+  return { kind: 'generic', reference: referenceOf(err) };
 }
 
 export async function markOutcome(id: string, status: 'completed' | 'no_show'): Promise<void> {
