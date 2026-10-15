@@ -120,7 +120,8 @@ Nicht berührt: Risk Map, Wizard, Ranking, AI-Verhalten.
   genügt, ist eine Rechtsfrage; Claude entscheidet sie nicht. Bis dahin bleibt
   der Schalter aus, es gilt faktisch B1. Kommt ein Text, ist das eine neue
   Fassung (Reacceptance nach §23); die Readiness verlangt ohnehin eine nicht
-  abgelöste Annahme.
+  abgelöste Annahme. Entwurf eines Mandatstexts zur Rechtsprüfung:
+  `docs/legal/zahlungsmandat-2026-10-entwurf.md` (2026-10-15).
 - [x] Die Benachrichtigung `invoice_retry_scheduled` in der Glocke: Darstellung
   seit #295 (2026-10-10, `partnerNotifications.ts` Thema `billing`, Ziel
   `/billing`; Titel und Zeile in de/en). Befund 2026-10-15: es und tr hatten
