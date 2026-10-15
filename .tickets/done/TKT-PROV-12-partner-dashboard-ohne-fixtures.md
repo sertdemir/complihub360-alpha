@@ -1,7 +1,7 @@
 ---
 title: "Partner-Dashboard ohne Fixtures: ehrliche Leer- und Fehlerzustände"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Partner-Dashboard ohne Fixtures
@@ -37,7 +37,7 @@ oder einen ehrlichen Fehlerzustand.
 - [x] Entfällt: Beispieldaten-Banner und `?state=` auf /requests, „within 5 days" (Key entfernt), „✓ verified · no bounces 90d" (Key entfernt), „Markt hinzufügen" (`AddMarketDrawer` geloescht), Rang-Banner, erfundener Rang „#3", Ranking-Bewegungen, Qualitaetsliste, funktionsloses „30 Tage"-Menue
 - [x] Tests: `useWorkspaceData` (3), `WorkspaceStates` (7), `PartnerHonest` (7), Settings E2 (+1); Gegenproben: alte LeadsPage (2 fallen), Schwelle 0 (1 faellt), Liste bei Entwurf (1 faellt)
 - [x] Lokal mit Screenshots (Mock, DE/EN/390 px)
-- [ ] Review des Nutzers, dann Staging
+- [x] Review des Nutzers (2026-10-15: „Review ist durch“); Staging seit den Merges von #280 (Teil 2) und #298 (Einstellungen E2)
 
 ## Design / Tech Details
 

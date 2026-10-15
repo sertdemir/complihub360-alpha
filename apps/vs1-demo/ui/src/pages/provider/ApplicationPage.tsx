@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { AlertCircle, CheckCircle2, ChevronDown, ChevronRight, FileText, Info, Trash2, Upload } from 'lucide-react';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Card } from '../../components/ui/Card';
@@ -55,7 +56,41 @@ const SERVICE_TONE: Record<Service['status'], BadgeTone> = { draft: 'neutral', p
 // kommerziellen Bedingungen haengen am Tarif und werden dort gezeigt.
 const SUBMIT_AGREEMENTS: AgreementType[] = ['provider_agreement', 'privacy_notice'];
 const LATER_AGREEMENTS: AgreementType[] = ['billing_authorization'];
-const AGREEMENT_VERSION = '2026-09';
+// Fassungen je Dokument. Die Abrechnungsermaechtigung traegt seit 2026-10-15
+// einen vollen Text (docs/legal/zahlungsmandat-2026-10-entwurf.md) — als
+// Interim, bis die Rechtspruefung ihn bestaetigt oder ersetzt. Eine aeltere
+// Annahme bleibt gueltig (der Server zaehlt jede nicht abgeloeste), die Zeile
+// sagt aber, dass eine neue Fassung vorliegt, und der Knopf fuehrt dorthin.
+const AGREEMENT_VERSIONS: Record<AgreementType, string> = { provider_agreement: '2026-09', privacy_notice: '2026-09', billing_authorization: '2026-10', commercial_terms: '2026-09' };
+const versionOf = (a: AgreementType) => AGREEMENT_VERSIONS[a];
+type MandateSection = { title: string; intro?: string; items: string[] };
+
+// Voller Mandatstext im Annahme-Modal: Kurzfassung oben, die Abschnitte
+// scrollbar, darunter der Hinweis auf die laufende Rechtspruefung —
+// Unsicherheit wird benannt, nicht versteckt (DNA).
+function MandateText({ t }: { t: TFunction }) {
+  const raw = t('application.mandate.sections', { returnObjects: true, defaultValue: [] }) as unknown;
+  const sections: MandateSection[] = Array.isArray(raw)
+    ? raw.filter((x): x is MandateSection => !!x && typeof x === 'object' && typeof (x as MandateSection).title === 'string' && Array.isArray((x as MandateSection).items))
+    : [];
+  return (
+    <div className="space-y-3">
+      <p className="text-[13px] leading-relaxed text-fg-secondary">{t('application.agreements.billingNote')}</p>
+      <div data-testid="mandate-text" className="max-h-[48vh] space-y-4 overflow-y-auto rounded-md border border-stroke-subtle bg-surface-secondary p-4">
+        {sections.map((sec, i) => (
+          <section key={i} className="space-y-1.5">
+            <h4 className="text-[13px] font-semibold text-fg">{sec.title}</h4>
+            {sec.intro && <p className="text-[13px] leading-relaxed text-fg-secondary">{sec.intro}</p>}
+            {sec.items.length > 1
+              ? <ul className="list-disc space-y-1 pl-5 text-[13px] leading-relaxed text-fg-secondary">{sec.items.map((p, j) => <li key={j}>{p}</li>)}</ul>
+              : sec.items.map((p, j) => <p key={j} className="text-[13px] leading-relaxed text-fg-secondary">{p}</p>)}
+          </section>
+        ))}
+      </div>
+      <p className="text-[12px] leading-relaxed text-fg-tertiary">{t('application.mandate.reviewNote', { version: versionOf('billing_authorization') })}</p>
+    </div>
+  );
+}
 
 function fmtDate(iso: string | null | undefined, locale: string): string {
   if (!iso) return '';
@@ -863,7 +898,7 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
     if (!modal || busy) return;
     if (!name.trim()) { setNameMissing(true); focusField('app-agreement-name'); return; }
     setBusy(true); setAcceptFailed(false);
-    try { await acceptAgreement({ agreement_type: modal, version: AGREEMENT_VERSION, language: i18n.resolvedLanguage || 'en', accepted_by_name: name.trim(), accepted_by_title: title.trim() || undefined }); setModal(null); await onChanged(); }
+    try { await acceptAgreement({ agreement_type: modal, version: versionOf(modal), language: i18n.resolvedLanguage || 'en', accepted_by_name: name.trim(), accepted_by_title: title.trim() || undefined }); setModal(null); await onChanged(); }
     catch (e) {
       if (e instanceof ApiError && e.status === 400 && /accepted_by_name/.test(e.message)) { setNameMissing(true); focusField('app-agreement-name'); }
       else setAcceptFailed(true);
@@ -874,14 +909,15 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
   // deshalb keinen Warnrahmen, sondern denselben ruhigen wie eine erteilte.
   const row = (a: AgreementType, pflicht: boolean) => {
     const acc = app.agreements.find((x) => x.agreement_type === a);
+    const outdated = !!acc && acc.version !== versionOf(a);
     return (
       <div key={a} className={cn('flex flex-wrap items-start gap-3 rounded-md border px-4 py-3', acc || !pflicht ? 'border-stroke-subtle' : 'border-warning-500/50')}>
         <Checkbox checked={!!acc} readOnly aria-label={t(`application.agreements.doc.${a}`)} className="mt-0.5" />
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-medium text-fg">{t(`application.agreements.doc.${a}`)} <span className="ml-2 text-[11px] font-normal text-fg-tertiary">{t('application.agreements.version', { version: acc?.version ?? AGREEMENT_VERSION, language: (acc?.language ?? i18n.resolvedLanguage ?? 'en').toUpperCase() })}</span></p>
-          <p className="text-[12px] text-fg-tertiary">{acc ? t('application.agreements.acceptedOn', { date: fmtDate(acc.accepted_at, locale), name: acc.accepted_by_name ?? '' }) : `${t('application.agreements.notAccepted')}${a === 'billing_authorization' ? ' ' + t('application.agreements.billingNote') : ''}`}</p>
+          <p className="text-[13px] font-medium text-fg">{t(`application.agreements.doc.${a}`)} <span className="ml-2 text-[11px] font-normal text-fg-tertiary">{t('application.agreements.version', { version: acc?.version ?? versionOf(a), language: (acc?.language ?? i18n.resolvedLanguage ?? 'en').toUpperCase() })}</span></p>
+          <p className="text-[12px] text-fg-tertiary">{outdated ? t('application.mandate.newVersion', { version: versionOf(a), old: acc!.version }) : acc ? t('application.agreements.acceptedOn', { date: fmtDate(acc.accepted_at, locale), name: acc.accepted_by_name ?? '' }) : `${t('application.agreements.notAccepted')}${a === 'billing_authorization' ? ' ' + t('application.agreements.billingNote') : ''}`}</p>
         </div>
-        <Button size="sm" variant={acc ? 'ghost' : 'secondary'} onClick={() => openModal(a)}>{acc ? t('application.agreements.open') : t('application.agreements.accept')}</Button>
+        <Button size="sm" variant={acc && !outdated ? 'ghost' : 'secondary'} onClick={() => openModal(a)}>{acc && !outdated ? t('application.agreements.open') : t('application.agreements.accept')}</Button>
       </div>
     );
   };
@@ -905,10 +941,12 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
         {group(t('application.agreements.groupLater'), t('application.agreements.tagLater'), t('application.agreements.groupLaterHint'), LATER_AGREEMENTS, false)}
         <p className="max-w-3xl text-[12px] leading-relaxed text-fg-tertiary">{t('application.agreements.commercialNote')}</p>
       </div>
-      <Modal open={!!modal} onClose={() => openModal(null)} title={modal ? t('application.agreements.acceptTitle', { doc: t(`application.agreements.doc.${modal}`) }) : ''} size="md"
-        footer={<div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => openModal(null)}>{t('application.agreements.cancel')}</Button><Button disabled={busy} onClick={accept}>{t('application.agreements.confirm', { version: AGREEMENT_VERSION })}</Button></div>}>
+      <Modal open={!!modal} onClose={() => openModal(null)} title={modal ? t('application.agreements.acceptTitle', { doc: t(`application.agreements.doc.${modal}`) }) : ''} size={modal === 'billing_authorization' ? 'lg' : 'md'}
+        footer={<div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => openModal(null)}>{t('application.agreements.cancel')}</Button><Button disabled={busy} onClick={accept}>{t('application.agreements.confirm', { version: modal ? versionOf(modal) : '' })}</Button></div>}>
         <div className="space-y-4">
-          <p className="text-[13px] leading-relaxed text-fg-secondary">{modal === 'billing_authorization' ? t('application.agreements.billingNote') : t('application.agreements.intro')}</p>
+          {modal === 'billing_authorization'
+            ? <MandateText t={t} />
+            : <p className="text-[13px] leading-relaxed text-fg-secondary">{t('application.agreements.intro')}</p>}
           <div className="grid gap-3 md:grid-cols-2">
             <FormField label={t('application.agreements.nameLabel')} htmlFor="app-agreement-name" required>
               <Input id="app-agreement-name" value={name} onChange={(e) => { setName(e.target.value); setNameMissing(false); }} error={nameMissing} {...errorAria('app-agreement-name', nameMissing)} />
