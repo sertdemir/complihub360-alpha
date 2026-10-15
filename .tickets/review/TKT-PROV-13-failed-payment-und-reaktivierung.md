@@ -1,7 +1,7 @@
 ---
 title: "Gescheiterte Zahlung und Reaktivierung entscheiden (ADR-0008)"
 assignee: "Nutzer (Entscheidung) · Claude (Umsetzung)"
-status: "doing"
+status: "review"
 ---
 
 # Gescheiterte Zahlung und Reaktivierung
@@ -108,10 +108,27 @@ Nicht berührt: Risk Map, Wizard, Ranking, AI-Verhalten.
   `invoiceRetry.ts`: Bescheid am Fälligkeitstag (Mail + Benachrichtigung),
   Versuche an Tag 1/3/6, `due_at` unberührt; sechs Routentests, vier
   Unit-Tests. Hinter `INVOICE_RETRY_ENABLED=1`.
-- [ ] **Mandat prüfen**, bevor `INVOICE_RETRY_ENABLED=1` gesetzt wird: deckt
-  `billing_authorization` (Fassung 2026-09) die Belastung von
-  Abo-Rechnungen? Der Text liegt nicht im Repo.
-- [ ] Die Benachrichtigung `invoice_retry_scheduled` hat noch keine Darstellung
-  in der Glocke (wie die Phase-5-Typen); die Mail trägt die Nachricht.
-- [ ] Auf Staging prüfen, ob der Stripe-Key SetupIntents anlegen darf
-  (Restricted Key, vgl. Befund 2026-10-04).
+- [ ] **Mandat prüfen**, bevor `INVOICE_RETRY_ENABLED=1` gesetzt wird —
+  **Befund 2026-10-15, Entscheidung beim Nutzer:** Es gibt keinen
+  Mandatstext. `billing_authorization 2026-09` ist eine Versionsnummer in
+  `provider_agreement_acceptance`; der Anbieter sieht im Annahme-Modal
+  (`ApplicationPage`, Kapitel 5) genau einen Satz —
+  `application.agreements.billingNote`: „Sie erlaubt uns, Abo und
+  Lead-Gebühren über die hinterlegte Zahlungsmethode abzurechnen" — und
+  bestätigt mit Name und Rolle. Auf Staging liegt eine Annahme (en). Ob dieser
+  Satz als Mandat für den off-session-Einzug offener Abo-Rechnungen (B2a)
+  genügt, ist eine Rechtsfrage; Claude entscheidet sie nicht. Bis dahin bleibt
+  der Schalter aus, es gilt faktisch B1. Kommt ein Text, ist das eine neue
+  Fassung (Reacceptance nach §23); die Readiness verlangt ohnehin eine nicht
+  abgelöste Annahme.
+- [x] Die Benachrichtigung `invoice_retry_scheduled` in der Glocke: Darstellung
+  seit #295 (2026-10-10, `partnerNotifications.ts` Thema `billing`, Ziel
+  `/billing`; Titel und Zeile in de/en). Befund 2026-10-15: es und tr hatten
+  nur 6 der 22 Arten und keine Rahmentexte der Glocke (Stunden, „Sizi
+  bekliyor", leer, Chips) — fielen still auf Englisch zurück. Alle 16 Arten
+  plus Rahmentexte in es/tr ergänzt; `terminology:check` grün.
+- [x] Auf Staging prüfen, ob der Stripe-Key SetupIntents anlegen darf:
+  `setup_intents: write` am Restricted Key gesetzt und per
+  `GET /v1/setup_intents?limit=1` aus dem API-Container belegt (200,
+  2026-10-10; `docs/stripe-setup.md`). Offen bleibt nur der Weg durch den
+  Knopf auf `/billing` — braucht einen Anbieter im Zustand `payment_failed`.

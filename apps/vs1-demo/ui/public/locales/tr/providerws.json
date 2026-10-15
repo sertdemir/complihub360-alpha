@@ -1234,6 +1234,84 @@
     "until": "{{date}} tarihine kadar"
   },
   "partnerNotif": {
+    "hours_one": "{{count}} saat",
+    "hours_other": "{{count}} saat",
+    "minutes_one": "{{count}} dakika",
+    "minutes_other": "{{count}} dakika",
+    "needsYou": "Sizi bekliyor",
+    "forInfo": "Bilginize",
+    "seeAll": "Tüm bildirimleri gör",
+    "empty": "Henüz bildirim yok. Randevular, faturalama ve doğrulama güncellemeleri burada görünür.",
+    "pageSubtitle": "CompliHub360'ın size gönderdiği her şey: randevular, faturalama, doğrulama ve planınız.",
+    "chipAppointments": "Randevular",
+    "chipVerification": "Doğrulama",
+    "chipPlan": "Plan",
+    "goTo": "Aç",
+    "booking_created": {
+      "title": "Yeni randevu",
+      "body": "Bir müşteri {{slot}} için ön görüşme randevusu aldı. Dosya hazır."
+    },
+    "booking_cancelled": {
+      "title": "Randevu iptal edildi",
+      "body": "Müşteri {{slot}} tarihindeki ön görüşmeyi iptal etti."
+    },
+    "booking_rescheduled": {
+      "title": "Randevu ertelendi",
+      "body": "Müşteri ön görüşmeyi {{from}} tarihinden {{slot}} tarihine aldı."
+    },
+    "appointment_reminder": {
+      "title": "{{offset}} sonra randevu",
+      "body": "Ön görüşme: {{slot}}."
+    },
+    "dispute_opened": {
+      "title": "Bir müşteri bildiriminize itiraz ediyor",
+      "body": "{{slot}} tarihindeki randevu hakkında. CompliHub360 inceleyip size bilgi verecek."
+    },
+    "dispute_resolved": {
+      "title": "Bir randevu hakkında karar",
+      "body": "{{slot}} tarihindeki randevu: {{label}}."
+    },
+    "performance_incident": {
+      "title": "Katılınmayan randevu kaydedildi",
+      "body": "{{slot}} tarihindeki randevuda bulunmadığınız kaydedildi. Bu, performans rakamlarınıza yansır."
+    },
+    "credit_issued": {
+      "title": "Bakiye eklendi",
+      "body": "Katılınmayan bir randevudan {{amount}}. Bir sonraki abonelik faturanızdan düşülür.",
+      "bodyCancelled": "İptal edilip yeniden alınmayan bir randevudan {{amount}}. Bir sonraki abonelik faturanızdan düşülür."
+    },
+    "payment_failed": {
+      "title": "Lead ücreti tahsil edilemedi",
+      "body": "Kartı yeniden kontrol edene veya başka bir kart ekleyene kadar randevular duraklatılır. Görünür kalırsınız."
+    },
+    "invoice_retry_scheduled": {
+      "title": "{{label}} numaralı faturanın vadesi geldi",
+      "body": "Yarın hâlâ açıksa kayıtlı kartınızı deneyeceğiz. {{deadline}} itibarıyla, fatura açık kaldığı sürece yeni randevular duraklatılır."
+    },
+    "subscription_scheduled": {
+      "title": "Plan değişikliği planlandı",
+      "body": "{{effectiveOn}} tarihinde yürürlüğe girer. O zamana kadar geri alabilirsiniz."
+    },
+    "subscription_schedule_done": {
+      "title": "Plan değişikliği yürürlükte",
+      "body": "Planınız bugün planlandığı gibi değişti."
+    },
+    "verification_info_requested": {
+      "title": "Bir belge daha gerekiyor",
+      "body": "İnceleme için bir kanıt daha gerekiyor."
+    },
+    "verification_decided": {
+      "title": "İnceleme sonuçlandı",
+      "body": "Bir karar verildi. Sonucu Doğrulama bölümünde görebilirsiniz."
+    },
+    "verification_activated": {
+      "title": "Hesabınız aktif",
+      "body": "Şirketler artık onaylı hizmetler için sizi bulup randevu alabilir."
+    },
+    "evidence_expiring": {
+      "title": "Bir belgenin süresi yakında doluyor",
+      "body": "{{label}} belgesinin süresi {{deadline}} tarihinde doluyor."
+    },
     "decision": {
       "lifted": "kaldırıldı",
       "upheld": "onaylandı"
