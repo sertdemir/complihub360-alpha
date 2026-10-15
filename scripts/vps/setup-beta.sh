@@ -47,13 +47,20 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 # Beta-Verzeichnis). Haben die Router keine eindeutigen Namen, sieht man das
 # im diff — dann von Hand nachziehen, nicht blind schreiben.
 log "API-Compose (abgeleitet aus $STAGING_API_DIR)"
+# Staging fuehrt zusaetzlich einen Router fuer den Hostinger-Namen
+# (*.hstgr.cloud). Der darf NICHT mit: sonst lauschen Staging- und Beta-API
+# auf derselben Regel, und Traefik verteilt /api zufaellig auf beide
+# Datenbanken (Befund beim Einrichten am 14.10.2026).
 sed -e "s/$STAGING_HOST/$HOST_NAME/g" \
     -e 's/routers\.complihub-api/routers.complihub-beta-api/g' \
     -e 's/services\.complihub-api/services.complihub-beta-api/g' \
     -e 's/service=complihub-api/service=complihub-beta-api/g' \
+    -e '/hstgr\.cloud/d' -e '/routers\.complihub-beta-api-hstgr\./d' \
+    -e 's/routers\.complihub-beta-api-staging\./routers.complihub-beta-api./g' \
     "$STAGING_API_DIR/docker-compose.yml" > "$TMP/api-compose.yml"
 diff -u "$STAGING_API_DIR/docker-compose.yml" "$TMP/api-compose.yml" || true
 grep -q "$STAGING_HOST" "$TMP/api-compose.yml" && die "Abgeleitete Datei nennt noch $STAGING_HOST."
+grep -q "hstgr" "$TMP/api-compose.yml" && die "Abgeleitete Datei nennt noch einen hstgr-Router — Staging und Beta wuerden sich /api teilen."
 grep -q "$HOST_NAME" "$TMP/api-compose.yml" || die "Abgeleitete Datei nennt $HOST_NAME nicht — Router-Regel pruefen."
 
 # ─── 2. Web-Compose ──────────────────────────────────────────────────────────

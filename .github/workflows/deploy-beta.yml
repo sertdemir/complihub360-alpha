@@ -117,6 +117,9 @@ jobs:
           VITE_SUPABASE_URL: ${{ vars.BETA_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.BETA_SUPABASE_ANON_KEY }}
           VITE_CONTACT_INBOX: ${{ vars.CONTACT_INBOX }}
+          # Google-Login aus, bis im Beta-Projekt ein eigener OAuth-Client steht
+          # (lib/supabase.ts, isGoogleLoginEnabled). Einschalten: '1'.
+          VITE_AUTH_GOOGLE: ''
           VITE_PLAUSIBLE_DOMAIN: ''
           VITE_SITE_ORIGIN: ''
         run: |

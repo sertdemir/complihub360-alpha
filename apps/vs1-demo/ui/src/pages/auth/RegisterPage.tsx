@@ -7,7 +7,7 @@ import { Logo } from "../../components/ui/Logo";
 import { Segment } from "../../components/compliance-areas";
 import { SystemFooter } from "../../components/auth/SystemFooter";
 import { useAuthStore } from "../../store/useAuthStore";
-import { getSupabase, isSupabaseConfigured } from "../../lib/supabase";
+import { getSupabase, isSupabaseConfigured, isGoogleLoginEnabled } from "../../lib/supabase";
 import { DOMAINS, type DomainSlug } from "../../lib/domains";
 import { FormErrorSummary, focusField, type FormError } from "../../components/ui/FormErrorSummary";
 import { FieldError, FIELD_ERROR_CLASS, errorAria } from "../../components/ui/FieldError";
@@ -382,15 +382,21 @@ export function RegisterPage() {
                                     <h2 className="font-serif text-[1.5rem] font-bold leading-tight text-fg">
                                         {t("register.stepTitles.account")}
                                     </h2>
-                                    <button
-                                        type="button"
-                                        className="mt-5 flex w-full items-center justify-center gap-2.5 rounded-lg border border-stroke bg-surface px-5 py-3 text-body-sm font-semibold text-fg transition-colors hover:bg-surface-secondary"
-                                    >
-                                        <GoogleIcon /> {t("register.googleSignup")}
-                                    </button>
-                                    <div className="my-5 flex items-center gap-3 text-body-4xs font-bold uppercase tracking-[0.12em] text-fg-tertiary">
-                                        <span className="h-px flex-1 bg-stroke-subtle" /> {t("register.orEmail")} <span className="h-px flex-1 bg-stroke-subtle" />
-                                    </div>
+                                    {/* Google nur mit VITE_AUTH_GOOGLE=1 (lib/supabase). Der Knopf hat
+                                        noch keinen Handler — vor dem Einschalten verdrahten. */}
+                                    {isGoogleLoginEnabled && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="mt-5 flex w-full items-center justify-center gap-2.5 rounded-lg border border-stroke bg-surface px-5 py-3 text-body-sm font-semibold text-fg transition-colors hover:bg-surface-secondary"
+                                            >
+                                                <GoogleIcon /> {t("register.googleSignup")}
+                                            </button>
+                                            <div className="my-5 flex items-center gap-3 text-body-4xs font-bold uppercase tracking-[0.12em] text-fg-tertiary">
+                                                <span className="h-px flex-1 bg-stroke-subtle" /> {t("register.orEmail")} <span className="h-px flex-1 bg-stroke-subtle" />
+                                            </div>
+                                        </>
+                                    )}
                                     <Field id="reg-name" label={t("register.nameLabel")} value={data.name} onChange={(v) => patch({ name: v })} placeholder={t("register.namePlaceholder")} autoComplete="name" error={errFor("reg-name")} />
                                     <Field id="reg-email" label={t("register.emailLabel")} type="email" value={data.email} onChange={(v) => patch({ email: v })} placeholder="name@unternehmen.de" autoComplete="email" error={errFor("reg-email")} />
                                     <Field id="reg-password" label={t("register.passwordLabel")} type="password" value={data.password} onChange={(v) => patch({ password: v })} placeholder={t("register.passwordPlaceholder")} minLength={8} autoComplete="new-password" error={errFor("reg-password")} />
