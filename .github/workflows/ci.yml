@@ -41,6 +41,12 @@ jobs:
         # geschuetzte Configs) und duerfen nicht still verrotten.
         run: npm run hooks:test
 
+      - name: Test beta scripts
+        # Ohne Abhaengigkeiten: der reine Verteilungsplan der Test-Provider
+        # (scripts/beta/seed-test-providers.mjs). Das Schreiben selbst laeuft
+        # von Hand auf dem VPS gegen das Beta-Projekt.
+        run: npm run scripts:test
+
       - name: Install dependencies
         # npm ci can sometimes be unreliable with complex local workspace linking
         # we fallback to a standard npm install to ensure resilient CI builds.

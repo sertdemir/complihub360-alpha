@@ -54,7 +54,10 @@ esac
 ssh_args=(-o BatchMode=no)
 [ -n "$SSH_KEY" ] && ssh_args+=(-i "$SSH_KEY")
 
-ssh "${ssh_args[@]}" "$HOST" bash -s -- "$cmd" "$user" "$COMPOSE_DIR" "$LABEL_KEY" "$VERIFY_URL" <<'REMOTE_EOF'
+# ssh fuegt die Argumente zu EINER Befehlszeile zusammen; ein leeres Argument
+# (list ohne Benutzer) fiele dabei weg und verschoebe $3..$5 auf dem Server
+# ("$5: unbound variable", gefunden 15.10.2026). Darum ein Platzhalter.
+ssh "${ssh_args[@]}" "$HOST" bash -s -- "$cmd" "${user:--}" "$COMPOSE_DIR" "$LABEL_KEY" "$VERIFY_URL" <<'REMOTE_EOF'
 set -euo pipefail
 
 mode="$1"; user="$2"; dir="$3"; key="$4"; url="$5"
