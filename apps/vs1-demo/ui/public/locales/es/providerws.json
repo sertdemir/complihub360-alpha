@@ -1234,6 +1234,84 @@
     "until": "hasta el {{date}}"
   },
   "partnerNotif": {
+    "hours_one": "{{count}} hora",
+    "hours_other": "{{count}} horas",
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minutos",
+    "needsYou": "Requiere su atención",
+    "forInfo": "Para su información",
+    "seeAll": "Ver todas las notificaciones",
+    "empty": "Aún no hay notificaciones. Aquí aparecerán reservas, facturación y novedades de la verificación.",
+    "pageSubtitle": "Todo lo que CompliHub360 le ha enviado: reservas, facturación, verificación y su plan.",
+    "chipAppointments": "Citas",
+    "chipVerification": "Verificación",
+    "chipPlan": "Plan",
+    "goTo": "Abrir",
+    "booking_created": {
+      "title": "Nueva reserva",
+      "body": "Un cliente ha reservado una primera consulta para el {{slot}}. El expediente está listo."
+    },
+    "booking_cancelled": {
+      "title": "Reserva cancelada",
+      "body": "El cliente ha cancelado la primera consulta del {{slot}}."
+    },
+    "booking_rescheduled": {
+      "title": "Reserva aplazada",
+      "body": "El cliente ha movido la primera consulta del {{from}} al {{slot}}."
+    },
+    "appointment_reminder": {
+      "title": "Cita en {{offset}}",
+      "body": "Primera consulta el {{slot}}."
+    },
+    "dispute_opened": {
+      "title": "Un cliente discrepa de su informe",
+      "body": "Sobre la cita del {{slot}}. CompliHub360 lo revisará y le informará."
+    },
+    "dispute_resolved": {
+      "title": "Decisión sobre una cita",
+      "body": "Cita del {{slot}}: {{label}}."
+    },
+    "performance_incident": {
+      "title": "Cita no atendida registrada",
+      "body": "Se ha registrado su ausencia en la cita del {{slot}}. Esto forma parte de sus cifras de rendimiento."
+    },
+    "credit_issued": {
+      "title": "Crédito abonado",
+      "body": "{{amount}} por una cita no atendida. Se aplicará a su próxima factura de suscripción.",
+      "bodyCancelled": "{{amount}} por una cita cancelada que no se volvió a reservar. Se aplicará a su próxima factura de suscripción."
+    },
+    "payment_failed": {
+      "title": "El cargo del lead no se ha completado",
+      "body": "Las reservas quedan en pausa hasta que vuelva a comprobar la tarjeta o añada otra. Usted sigue visible."
+    },
+    "invoice_retry_scheduled": {
+      "title": "La factura {{label}} ha vencido",
+      "body": "Si mañana sigue abierta, intentaremos el cobro con la tarjeta guardada. A partir del {{deadline}}, las nuevas reservas quedan en pausa mientras siga abierta."
+    },
+    "subscription_scheduled": {
+      "title": "Cambio de plan programado",
+      "body": "Entra en vigor el {{effectiveOn}}. Hasta entonces puede retirarlo."
+    },
+    "subscription_schedule_done": {
+      "title": "Cambio de plan en vigor",
+      "body": "Su plan ha cambiado hoy según lo programado."
+    },
+    "verification_info_requested": {
+      "title": "Falta un documento",
+      "body": "Para la revisión necesitamos un justificante más."
+    },
+    "verification_decided": {
+      "title": "Revisión decidida",
+      "body": "Hay una decisión. En Verificación puede ver el resultado."
+    },
+    "verification_activated": {
+      "title": "Su cuenta está activa",
+      "body": "Las empresas ya pueden encontrarle y reservarle para los servicios aprobados."
+    },
+    "evidence_expiring": {
+      "title": "Un justificante caduca pronto",
+      "body": "{{label}} caduca el {{deadline}}."
+    },
     "decision": {
       "lifted": "levantada",
       "upheld": "confirmada"
