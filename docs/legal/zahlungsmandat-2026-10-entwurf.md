@@ -1,6 +1,6 @@
 # CompliHub360 · Zahlungsmandat für Anbieter — Entwurf Fassung 2026-10
 
-**Stand: 15.10.2026 · Status: Entwurf zur Rechtsprüfung · ersetzt nach Freigabe die Fassung `billing_authorization 2026-09`**
+**Stand: 15.10.2026 · Status: Entwurf zur Rechtsprüfung · seit 15.10.2026 als Fassung `2026-10` im Annahme-Modal (Interim, Entscheidung des Nutzers) · ersetzt die textlose Fassung `2026-09`; im Produkt steht statt `[Betreiber]` bis zur Freigabe „CompliHub360“**
 
 > **Kein Rechtsrat.** Dieser Entwurf stammt aus der Produktentwicklung. Er
 > beschreibt, was die Plattform heute tatsächlich tut, in Worten, die ein

@@ -121,7 +121,14 @@ Nicht berührt: Risk Map, Wizard, Ranking, AI-Verhalten.
   der Schalter aus, es gilt faktisch B1. Kommt ein Text, ist das eine neue
   Fassung (Reacceptance nach §23); die Readiness verlangt ohnehin eine nicht
   abgelöste Annahme. Entwurf eines Mandatstexts zur Rechtsprüfung:
-  `docs/legal/zahlungsmandat-2026-10-entwurf.md` (2026-10-15).
+  `docs/legal/zahlungsmandat-2026-10-entwurf.md` (2026-10-15), englisch
+  `payment-mandate-2026-10-draft.md` fuer die Rechtspruefung. **Interim seit
+  2026-10-15 (Nutzer: „setze erstmal deinen vorgeschlagenen Text ein“):** der
+  Entwurf steht als Fassung `2026-10` im Annahme-Modal (vier Sprachen, neun
+  Abschnitte, Hinweis auf die laufende Pruefung); eine Annahme der Fassung
+  2026-09 zeigt „neue Fassung liegt vor“. Der Server zaehlt weiter jede nicht
+  abgeloeste Annahme; `INVOICE_RETRY_ENABLED` bleibt aus, bis die Pruefung
+  bestaetigt.
 - [x] Die Benachrichtigung `invoice_retry_scheduled` in der Glocke: Darstellung
   seit #295 (2026-10-10, `partnerNotifications.ts` Thema `billing`, Ziel
   `/billing`; Titel und Zeile in de/en). Befund 2026-10-15: es und tr hatten
