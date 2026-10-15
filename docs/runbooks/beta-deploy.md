@@ -89,3 +89,17 @@ Dazu läuft `alert-watchdog.sh` alle 5 Minuten. Er prüft `beta_ui` (401) und
 aber seit dem 30.08. abgenommen (`deploy-staging.yml`, verify). Er dürfte
 `ui` also dauerhaft als FAIL führen. Weil er nur bei Zustandswechseln mailt,
 fällt das nicht auf. Das ist nicht Teil dieses Schritts.
+
+**Hostinger-Router (14.10.2026):** Die Staging-API hat neben
+`staging.complihub360.com` einen zweiten Router für
+`complihub.srv1759934.hstgr.cloud`. Die erste Fassung von `setup-beta.sh`
+übernahm ihn in die Beta-Compose-Datei. Dann hätten Staging- und Beta-API auf
+derselben Regel gelauscht. Das Skript streicht ihn jetzt und bricht ab, falls
+noch `hstgr` in der abgeleiteten Datei steht. Gefunden im Probelauf, bevor
+etwas geschrieben war.
+
+**Google-Login (15.10.2026):** Der Knopf erscheint nur mit
+`VITE_AUTH_GOOGLE=1`. Die Beta baut ohne, weil im Beta-Projekt kein
+OAuth-Client steht. Der Knopf auf der Registrierung hat noch keinen Handler.
+Vor dem Einschalten muss er verdrahtet werden.
+
