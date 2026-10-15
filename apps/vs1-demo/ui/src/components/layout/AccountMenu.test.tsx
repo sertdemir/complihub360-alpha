@@ -83,7 +83,7 @@ describe('AccountMenu', () => {
     await user.click(screen.getByRole('button', { name: /serkan test/i }));
     expect(screen.getByRole('link', { name: /dashboard/i })).toHaveAttribute(
       'href',
-      '/de/partner-dashboard',
+      '/de/provider-dashboard',
     );
   });
 

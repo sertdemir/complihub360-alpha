@@ -186,9 +186,9 @@ const TITLE: Record<string, string> = {
   review_request: 'Please rate your appointment',
   review_submitted: 'Review submitted',
   review_overdue_warning: 'Warning: lead review overdue',
-  provider_downgraded_reviews: 'Partner status downgraded (missing reviews)',
+  provider_downgraded_reviews: 'Provider status downgraded (missing reviews)',
   provider_detail_opened: 'Profile detail opened',
-  provider_intake_submitted: 'Partner package submitted',
+  provider_intake_submitted: 'Provider package submitted',
   provider_profile_updated: 'Matchmaking profile updated',
 };
 

@@ -109,7 +109,7 @@ export function clearLocalAuth(storage: Pick<Storage, 'length' | 'key' | 'remove
 
 /** Wohin nach dem Wechsel: die Startseite der Rolle. */
 export function homeFor(role: SavedAccount['role'], lang: string): string {
-  return role === 'partner' ? `/${lang}/partner-dashboard` : role === 'admin' ? `/${lang}/admin` : `/${lang}/dashboard`;
+  return role === 'partner' ? `/${lang}/provider-dashboard` : role === 'admin' ? `/${lang}/admin` : `/${lang}/dashboard`;
 }
 
-export const ROLE_LABEL: Record<SavedAccount['role'], string> = { user: 'Nutzer', partner: 'Partner', admin: 'Admin' };
+export const ROLE_LABEL: Record<SavedAccount['role'], string> = { user: 'Nutzer', partner: 'Anbieter', admin: 'Admin' };

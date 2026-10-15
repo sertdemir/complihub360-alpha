@@ -46,7 +46,7 @@ import { initialsOf } from '../../lib/initials';
  *  auf Deutsch. 'admin' fehlte ganz und fiel auf "Unternehmen". */
 const ROLE_KEY: Record<UserRole, { key: string; fallback: string }> = {
   user: { key: 'account.role.user', fallback: 'Company' },
-  partner: { key: 'account.role.partner', fallback: 'Advisory partner' },
+  partner: { key: 'account.role.partner', fallback: 'Provider' },
   admin: { key: 'account.role.admin', fallback: 'Administration' },
 };
 
@@ -75,7 +75,7 @@ export function AccountMenu({ lang, inverse = false, closeKey, className }: Acco
   // Unveraendert aus beiden Kopfzeilen uebernommen: eine Rolle 'admin' landet
   // weiterhin im Nutzer-Dashboard. Ob sie stattdessen ins Control Center
   // gehoert, ist eine eigene Entscheidung und nicht Teil dieser.
-  const dashHref = `/${lang}${effectiveRole === 'partner' ? '/partner-dashboard' : '/dashboard'}`;
+  const dashHref = `/${lang}${effectiveRole === 'partner' ? '/provider-dashboard' : '/dashboard'}`;
 
   return (
     <NavMenu align="end" closeKey={closeKey} className={className}>

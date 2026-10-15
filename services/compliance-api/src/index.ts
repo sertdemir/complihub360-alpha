@@ -2385,7 +2385,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             // Webhook sofort `billing_ready`.
             const session = await stripeRequest('POST', 'billing_portal/sessions', {
                 customer: customerId,
-                return_url: `${appUrl}/en/partner-dashboard/billing?from=portal`,
+                return_url: `${appUrl}/en/provider-dashboard/billing?from=portal`,
             });
             await supabaseApi.insert('event_log', { type: 'billing_portal_opened', payload: { providerKey } });
             res.setHeader('x-correlation-id', correlationId);
@@ -2607,7 +2607,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             back('failed');
         }
     } else if (req.method === 'POST' && req.url === '/api/v1/contact') {
-        // Kontaktseite und /partner-apply (contact.ts). Ein Postfach, die
+        // Kontaktseite und /provider-apply (contact.ts). Ein Postfach, die
         // Nachricht geht dorthin und nicht in die Datenbank.
         res.setHeader('x-correlation-id', correlationId);
         if (contactRateLimited(ip)) {

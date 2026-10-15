@@ -568,7 +568,7 @@
       },
       {
         "value": "3",
-        "label": "partner hazır"
+        "label": "sağlayıcı hazır"
       }
     ],
     "rows": [
@@ -711,7 +711,7 @@
     "partnersTitle": "Bunu kimin çözebileceğini bulduk.",
     "unlock": "En iyi eşleşmelerinizi ücretsiz hesapla görün",
     "save": {
-      "title": "Bu haritayı kaydedin. Partner'ların kilidini açın.",
+      "title": "Bu haritayı kaydedin. Sağlayıcıların kilidini açın.",
       "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Beta lansmanına kadar kurucu üye erişimi.",
       "cta": "Ücretsiz hesap oluşturun"
     },
@@ -1066,7 +1066,7 @@
       "gold": "Üç",
       "post": " sessiz ilke."
     },
-    "subtitle": "Uyum ürünleri genellikle bağırır. Bizim buna ihtiyacımız yok. Risk tehdide ihtiyaç duymaz. Kararlar 20 adımlı bir huniye ihtiyaç duymaz. Partner'lar bir pazar yerine ihtiyaç duymaz. Bunun yerine ne yaptığımızı görmek için kartların üzerine gelin.",
+    "subtitle": "Uyum ürünleri genellikle bağırır. Bizim buna ihtiyacımız yok. Risk tehdide ihtiyaç duymaz. Kararlar 20 adımlı bir huniye ihtiyaç duymaz. Sağlayıcılar bir pazar yerine ihtiyaç duymaz. Bunun yerine ne yaptığımızı görmek için kartların üzerine gelin.",
     "hoverCue": "Görmek için üzerine gelin",
     "cards": [
       {
@@ -1098,7 +1098,7 @@
       "gold": "ana üssüne",
       "post": "."
     },
-    "subtitle": "Değerlendirme ücretsizdir. Sonrasında gelenler — çalışma alanınız, canlı haberler, uzman içeriği, partner'larınız — CompliHub360'ı geri döndüğünüz yer yapar.",
+    "subtitle": "Değerlendirme ücretsizdir. Sonrasında gelenler — çalışma alanınız, canlı haberler, uzman içeriği, sağlayıcılarınız — CompliHub360'ı geri döndüğünüz yer yapar.",
     "pills": {
       "live": "Bugün kullanılabilir",
       "beta": "Beta ile geliyor"
@@ -1132,7 +1132,7 @@
       }
     ],
     "workspace": {
-      "title": "Haritanız. Partner'larınız. Kaydınız. Kalıcı.",
+      "title": "Haritanız. Sağlayıcılarınız. Kaydınız. Kalıcı.",
       "desc": "Değerlendirme, kaydedilmiş bir dosyaya dönüşür. İş zaman çizelgeniz panonuzda yaşar. Sağlayıcı ilişkileri, uyum kaydı, Risk Map — hepsi tek yerde, hepsi sizin."
     },
     "newsCard": {
@@ -1204,7 +1204,7 @@
         ]
       },
       {
-        "label": "Partnerler ve işler",
+        "label": "Sağlayıcılar ve işler",
         "items": [
           {
             "q": "Bana hukuki danışmanlık mı veriyorsunuz?",
@@ -1315,7 +1315,7 @@
         "title": "Şirket",
         "links": {
           "about": "Hakkımızda",
-          "partner": "Partnerler",
+          "partner": "Sağlayıcılar",
           "trustSecurity": "Güven ve Güvenlik",
           "contact": "İletişim",
           "support": "Destek"

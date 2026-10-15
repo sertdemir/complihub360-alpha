@@ -122,7 +122,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             footOncePre: 'Each link works ',
             footOnceStrong: 'once',
             footOncePost: ' and expires after 24 hours.',
-            footRanking: 'Fast confirmations improve your partner ranking.',
+            footRanking: 'Fast confirmations improve your provider ranking.',
             footerTagline: 'CompliHub360 — the orchestration layer between compliance complexity and operational reality.',
             footerReason: 'You received this e-mail because your firm is a listed provider on complihub360.com.',
         },
@@ -174,7 +174,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             footOncePre: 'Jeder Link funktioniert ',
             footOnceStrong: 'einmal',
             footOncePost: ' und läuft nach 24 Stunden ab.',
-            footRanking: 'Schnelle Bestätigungen verbessern Ihr Partner-Ranking.',
+            footRanking: 'Schnelle Bestätigungen verbessern Ihr Anbieter-Ranking.',
             footerTagline: 'CompliHub360 — die Orchestrierungsschicht zwischen Compliance-Komplexität und operativer Realität.',
             footerReason: 'Sie erhalten diese E-Mail, weil Ihre Kanzlei als Anbieter auf complihub360.com gelistet ist.',
         },
@@ -226,7 +226,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             footOncePre: 'Cada enlace funciona ',
             footOnceStrong: 'una sola vez',
             footOncePost: ' y caduca a las 24 horas.',
-            footRanking: 'Las confirmaciones rápidas mejoran su posición como partner.',
+            footRanking: 'Las confirmaciones rápidas mejoran su posición como proveedor.',
             footerTagline: 'CompliHub360 — la capa de orquestación entre la complejidad del compliance y la realidad operativa.',
             footerReason: 'Usted recibe este correo porque su firma figura como proveedor en complihub360.com.',
         },
@@ -278,7 +278,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             footOncePre: 'Her bağlantı yalnızca ',
             footOnceStrong: 'bir kez',
             footOncePost: ' çalışır ve 24 saat sonra geçerliliğini yitirir.',
-            footRanking: 'Hızlı onaylar partner sıralamanızı iyileştirir.',
+            footRanking: 'Hızlı onaylar sağlayıcı sıralamanızı iyileştirir.',
             footerTagline: 'CompliHub360 — uyum karmaşıklığı ile operasyonel gerçeklik arasındaki orkestrasyon katmanı.',
             footerReason: 'Bu e-postayı, firmanız complihub360.com üzerinde listelenmiş bir sağlayıcı olduğu için alıyorsunuz.',
         },
@@ -512,15 +512,15 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
         },
         request_provider: {
             subject: 'Please review your lead within 2 days',
-            body: 'Your booked appointment has taken place. Please rate this lead within the next 2 days. Lead reviews are part of the CompliHub360 partnership: they feed the ranking that brings users and providers together. If no review has been submitted after 2 days, we send one reminder; if it is still missing after another 2 days, the partner status is set to "downgraded" and visibility in matchings is reduced.\n\n→ Partner dashboard → Appointments → open dossier → "Rate this lead"',
+            body: 'Your booked appointment has taken place. Please rate this lead within the next 2 days. Lead reviews are part of the CompliHub360 provider rules: they feed the ranking that brings users and providers together. If no review has been submitted after 2 days, we send one reminder; if it is still missing after another 2 days, the provider status is set to "downgraded" and visibility in matchings is reduced.\n\n→ Provider dashboard → Appointments → open dossier → "Rate this lead"',
         },
         warning_provider: {
             subject: 'Reminder: lead review still outstanding',
-            body: 'The review for your lead has not been submitted yet; the 2-day window after the appointment has passed. Under the partnership rules, the partner status is set to "downgraded" if the review is still missing after 2 more days, and visibility in user matchings is then reduced. Submitting the review closes the matter.\n\n→ Partner dashboard → Appointments → open dossier → "Rate this lead"',
+            body: 'The review for your lead has not been submitted yet; the 2-day window after the appointment has passed. Under the provider rules, the provider status is set to "downgraded" if the review is still missing after 2 more days, and visibility in user matchings is then reduced. Submitting the review closes the matter.\n\n→ Provider dashboard → Appointments → open dossier → "Rate this lead"',
         },
         downgraded_provider: {
-            subject: 'Partner status changed: lead review outstanding',
-            body: 'The review for your lead was not submitted within the 4-day window. As set out in the partnership rules, your partner status is now "downgraded" and your visibility in user matchings is reduced. To restore your status, submit the outstanding review and write to partners@complihub360.com — we take care of the rest.',
+            subject: 'Provider status changed: lead review outstanding',
+            body: 'The review for your lead was not submitted within the 4-day window. As set out in the provider rules, your provider status is now "downgraded" and your visibility in user matchings is reduced. To restore your status, submit the outstanding review and write to partners@complihub360.com — we take care of the rest.',
         },
     },
     de: {
@@ -530,15 +530,15 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
         },
         request_provider: {
             subject: 'Bitte bewerten Sie Ihren Lead innerhalb von 2 Tagen',
-            body: 'Ihr gebuchter Termin hat stattgefunden. Bitte bewerten Sie diesen Lead innerhalb der nächsten 2 Tage. Lead-Bewertungen sind Teil der CompliHub360-Partnerschaft: Sie fließen in das Ranking ein, über das User und Provider zusammenfinden. Liegt nach 2 Tagen keine Bewertung vor, erinnern wir Sie einmal; fehlt sie nach weiteren 2 Tagen weiterhin, wird der Partner-Status auf „herabgestuft" gesetzt und die Sichtbarkeit in Matchings reduziert.\n\n→ Partner-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
+            body: 'Ihr gebuchter Termin hat stattgefunden. Bitte bewerten Sie diesen Lead innerhalb der nächsten 2 Tage. Lead-Bewertungen sind Teil der CompliHub360-Anbieterregeln: Sie fließen in das Ranking ein, über das User und Provider zusammenfinden. Liegt nach 2 Tagen keine Bewertung vor, erinnern wir Sie einmal; fehlt sie nach weiteren 2 Tagen weiterhin, wird der Anbieter-Status auf „herabgestuft" gesetzt und die Sichtbarkeit in Matchings reduziert.\n\n→ Anbieter-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
         },
         warning_provider: {
             subject: 'Erinnerung: Lead-Bewertung steht noch aus',
-            body: 'Die Bewertung für Ihren Lead liegt noch nicht vor; die Frist von 2 Tagen nach dem Termin ist abgelaufen. Nach den Partnerschaftsregeln wird der Partner-Status auf „herabgestuft" gesetzt, wenn die Bewertung nach weiteren 2 Tagen noch fehlt; die Sichtbarkeit in User-Matchings ist dann reduziert. Mit der Bewertung ist die Sache erledigt.\n\n→ Partner-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
+            body: 'Die Bewertung für Ihren Lead liegt noch nicht vor; die Frist von 2 Tagen nach dem Termin ist abgelaufen. Nach den Anbieterregeln wird der Anbieter-Status auf „herabgestuft" gesetzt, wenn die Bewertung nach weiteren 2 Tagen noch fehlt; die Sichtbarkeit in User-Matchings ist dann reduziert. Mit der Bewertung ist die Sache erledigt.\n\n→ Anbieter-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
         },
         downgraded_provider: {
-            subject: 'Partner-Status geändert: Lead-Bewertung ausstehend',
-            body: 'Die Bewertung für Ihren Lead wurde innerhalb der 4-Tage-Frist nicht abgegeben. Wie in den Partnerschaftsregeln festgelegt, ist Ihr Partner-Status jetzt „herabgestuft" und Ihre Sichtbarkeit in User-Matchings reduziert. Um den Status wiederherzustellen, reichen Sie die ausstehende Bewertung nach und schreiben Sie an partners@complihub360.com — wir kümmern uns um den Rest.',
+            subject: 'Anbieter-Status geändert: Lead-Bewertung ausstehend',
+            body: 'Die Bewertung für Ihren Lead wurde innerhalb der 4-Tage-Frist nicht abgegeben. Wie in den Anbieterregeln festgelegt, ist Ihr Anbieter-Status jetzt „herabgestuft" und Ihre Sichtbarkeit in User-Matchings reduziert. Um den Status wiederherzustellen, reichen Sie die ausstehende Bewertung nach und schreiben Sie an partners@complihub360.com — wir kümmern uns um den Rest.',
         },
     },
     es: {
@@ -548,15 +548,15 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
         },
         request_provider: {
             subject: 'Valore su lead en un plazo de 2 días',
-            body: 'Su cita reservada ha tenido lugar. Valore este lead en los próximos 2 días. Las valoraciones de leads forman parte de la colaboración con CompliHub360: alimentan el ranking que conecta a usuarios y proveedores. Si tras 2 días no hay valoración, le enviamos un recordatorio; si sigue faltando tras otros 2 días, el estado de partner pasa a «degradado» y la visibilidad en los matchings se reduce.\n\n→ Panel de partner → Citas → abrir dossier → «Valorar este lead»',
+            body: 'Su cita reservada ha tenido lugar. Valore este lead en los próximos 2 días. Las valoraciones de leads forman parte de la colaboración con CompliHub360: alimentan el ranking que conecta a usuarios y proveedores. Si tras 2 días no hay valoración, le enviamos un recordatorio; si sigue faltando tras otros 2 días, el estado de proveedor pasa a «degradado» y la visibilidad en los matchings se reduce.\n\n→ Panel de proveedor → Citas → abrir dossier → «Valorar este lead»',
         },
         warning_provider: {
             subject: 'Recordatorio: valoración del lead pendiente',
-            body: 'La valoración de su lead aún no se ha enviado; el plazo de 2 días tras la cita ha vencido. Según las reglas de la colaboración, el estado de partner pasa a «degradado» si la valoración sigue faltando tras otros 2 días, y la visibilidad en los matchings queda entonces reducida. Con la valoración el asunto queda cerrado.\n\n→ Panel de partner → Citas → abrir dossier → «Valorar este lead»',
+            body: 'La valoración de su lead aún no se ha enviado; el plazo de 2 días tras la cita ha vencido. Según las reglas de la colaboración, el estado de proveedor pasa a «degradado» si la valoración sigue faltando tras otros 2 días, y la visibilidad en los matchings queda entonces reducida. Con la valoración el asunto queda cerrado.\n\n→ Panel de proveedor → Citas → abrir dossier → «Valorar este lead»',
         },
         downgraded_provider: {
-            subject: 'Estado de partner modificado: valoración del lead pendiente',
-            body: 'La valoración de su lead no se envió dentro del plazo de 4 días. Tal como establecen las reglas de la colaboración, su estado de partner es ahora «degradado» y su visibilidad en los matchings está reducida. Para restaurar su estado, envíe la valoración pendiente y escriba a partners@complihub360.com — nosotros nos ocupamos del resto.',
+            subject: 'Estado de proveedor modificado: valoración del lead pendiente',
+            body: 'La valoración de su lead no se envió dentro del plazo de 4 días. Tal como establecen las reglas de la colaboración, su estado de proveedor es ahora «degradado» y su visibilidad en los matchings está reducida. Para restaurar su estado, envíe la valoración pendiente y escriba a partners@complihub360.com — nosotros nos ocupamos del resto.',
         },
     },
     tr: {
@@ -566,15 +566,15 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
         },
         request_provider: {
             subject: 'Lütfen lead\'inizi 2 gün içinde değerlendirin',
-            body: 'Rezerve ettiğiniz randevu gerçekleşti. Lütfen bu lead\'i önümüzdeki 2 gün içinde değerlendirin. Lead değerlendirmeleri CompliHub360 partnerliğinin bir parçasıdır: kullanıcılarla sağlayıcıları bir araya getiren sıralamaya katkı sağlar. 2 gün sonra değerlendirme yoksa size bir hatırlatma göndeririz; 2 gün daha geçtikten sonra hâlâ eksikse partner statüsü «düşürüldü» olarak ayarlanır ve eşleştirmelerdeki görünürlük azaltılır.\n\n→ Partner paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
+            body: 'Rezerve ettiğiniz randevu gerçekleşti. Lütfen bu lead\'i önümüzdeki 2 gün içinde değerlendirin. Lead değerlendirmeleri CompliHub360 sağlayıcı kurallarının bir parçasıdır: kullanıcılarla sağlayıcıları bir araya getiren sıralamaya katkı sağlar. 2 gün sonra değerlendirme yoksa size bir hatırlatma göndeririz; 2 gün daha geçtikten sonra hâlâ eksikse sağlayıcı statüsü «düşürüldü» olarak ayarlanır ve eşleştirmelerdeki görünürlük azaltılır.\n\n→ Sağlayıcı paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
         },
         warning_provider: {
             subject: 'Hatırlatma: lead değerlendirmesi bekliyor',
-            body: 'Lead\'inizin değerlendirmesi henüz gönderilmedi; randevudan sonraki 2 günlük süre doldu. Partnerlik kurallarına göre, değerlendirme 2 gün daha eksik kalırsa partner statüsü «düşürüldü» olarak ayarlanır ve eşleştirmelerdeki görünürlük o zaman azaltılır. Değerlendirmeyi gönderdiğinizde konu kapanır.\n\n→ Partner paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
+            body: 'Lead\'inizin değerlendirmesi henüz gönderilmedi; randevudan sonraki 2 günlük süre doldu. Sağlayıcı kurallarına göre, değerlendirme 2 gün daha eksik kalırsa sağlayıcı statüsü «düşürüldü» olarak ayarlanır ve eşleştirmelerdeki görünürlük o zaman azaltılır. Değerlendirmeyi gönderdiğinizde konu kapanır.\n\n→ Sağlayıcı paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
         },
         downgraded_provider: {
-            subject: 'Partner statüsü değişti: lead değerlendirmesi bekliyor',
-            body: 'Lead\'inizin değerlendirmesi 4 günlük süre içinde gönderilmedi. Partnerlik kurallarında belirtildiği gibi partner statünüz artık «düşürüldü» ve eşleştirmelerdeki görünürlüğünüz azaltıldı. Statünüzü geri almak için bekleyen değerlendirmeyi gönderin ve partners@complihub360.com adresine yazın — gerisini biz hallederiz.',
+            subject: 'Sağlayıcı statüsü değişti: lead değerlendirmesi bekliyor',
+            body: 'Lead\'inizin değerlendirmesi 4 günlük süre içinde gönderilmedi. Sağlayıcı kurallarında belirtildiği gibi sağlayıcı statünüz artık «düşürüldü» ve eşleştirmelerdeki görünürlüğünüz azaltıldı. Statünüzü geri almak için bekleyen değerlendirmeyi gönderin ve partners@complihub360.com adresine yazın — gerisini biz hallederiz.',
         },
     },
 };
@@ -589,28 +589,28 @@ const RESCHEDULE_STRINGS: Record<MailLocale, { subject: string; intro: string; f
         intro: 'The client has moved the booked intro call to a new slot. The booking and the shared dossier stay unchanged.',
         fromLabel: 'Previous time',
         toLabel: 'New time',
-        note: 'No action needed — the appointment is confirmed for the new time. You can see all bookings in your partner dashboard under Appointments.',
+        note: 'No action needed — the appointment is confirmed for the new time. You can see all bookings in your provider dashboard under Appointments.',
     },
     de: {
         subject: 'Termin verschoben: Ihre CompliHub360-Buchung hat eine neue Zeit',
         intro: 'Der Mandant hat das gebuchte Erstgespräch auf einen neuen Slot verschoben. Buchung und geteiltes Dossier bleiben unverändert.',
         fromLabel: 'Bisherige Zeit',
         toLabel: 'Neue Zeit',
-        note: 'Keine Aktion nötig — der Termin ist für die neue Zeit bestätigt. Alle Buchungen finden Sie im Partner-Dashboard unter Termine.',
+        note: 'Keine Aktion nötig — der Termin ist für die neue Zeit bestätigt. Alle Buchungen finden Sie im Anbieter-Dashboard unter Termine.',
     },
     es: {
         subject: 'Cita movida: su reserva de CompliHub360 tiene una nueva hora',
         intro: 'El cliente ha movido la llamada inicial reservada a un nuevo horario. La reserva y el dossier compartido permanecen sin cambios.',
         fromLabel: 'Hora anterior',
         toLabel: 'Nueva hora',
-        note: 'No se requiere ninguna acción — la cita está confirmada para la nueva hora. Puede ver todas las reservas en su panel de partner, en Citas.',
+        note: 'No se requiere ninguna acción — la cita está confirmada para la nueva hora. Puede ver todas las reservas en su panel de proveedor, en Citas.',
     },
     tr: {
         subject: 'Randevu taşındı: CompliHub360 rezervasyonunuzun yeni bir saati var',
         intro: 'Müşteri, rezerve edilen ilk görüşmeyi yeni bir zamana taşıdı. Rezervasyon ve paylaşılan dosya değişmeden kalır.',
         fromLabel: 'Önceki saat',
         toLabel: 'Yeni saat',
-        note: 'İşlem gerekmez — randevu yeni saat için onaylandı. Tüm rezervasyonları partner panelindeki Randevular bölümünde görebilirsiniz.',
+        note: 'İşlem gerekmez — randevu yeni saat için onaylandı. Tüm rezervasyonları sağlayıcı panelindeki Randevular bölümünde görebilirsiniz.',
     },
 };
 
@@ -619,25 +619,25 @@ const CANCELLATION_STRINGS: Record<MailLocale, { subject: string; intro: string;
         subject: 'Appointment cancelled: your CompliHub360 booking will not take place',
         intro: 'The client has cancelled the booked intro call. The slot is free again — please remove it from your calendar.',
         whenLabel: 'Cancelled slot',
-        note: 'The lead fee was charged at booking and is not affected. You can see all bookings in your partner dashboard under Appointments.',
+        note: 'The lead fee was charged at booking and is not affected. You can see all bookings in your provider dashboard under Appointments.',
     },
     de: {
         subject: 'Termin abgesagt: Ihre CompliHub360-Buchung findet nicht statt',
         intro: 'Der Mandant hat das gebuchte Erstgespräch abgesagt. Der Slot ist wieder frei — bitte streichen Sie ihn aus Ihrem Kalender.',
         whenLabel: 'Abgesagter Termin',
-        note: 'Die Lead-Gebühr fiel bei der Buchung an und ist davon nicht berührt. Alle Buchungen finden Sie im Partner-Dashboard unter Termine.',
+        note: 'Die Lead-Gebühr fiel bei der Buchung an und ist davon nicht berührt. Alle Buchungen finden Sie im Anbieter-Dashboard unter Termine.',
     },
     es: {
         subject: 'Cita cancelada: su reserva de CompliHub360 no se celebrará',
         intro: 'El cliente ha cancelado la llamada inicial reservada. El horario vuelve a estar libre — elimínelo de su calendario.',
         whenLabel: 'Cita cancelada',
-        note: 'La tarifa de lead se cobró en el momento de la reserva y no se ve afectada. Puede ver todas las reservas en su panel de partner, en Citas.',
+        note: 'La tarifa de lead se cobró en el momento de la reserva y no se ve afectada. Puede ver todas las reservas en su panel de proveedor, en Citas.',
     },
     tr: {
         subject: 'Randevu iptal edildi: CompliHub360 rezervasyonunuz gerçekleşmeyecek',
         intro: 'Müşteri, rezerve edilen ilk görüşmeyi iptal etti. Zaman dilimi yeniden boşta — lütfen takviminizden kaldırın.',
         whenLabel: 'İptal edilen randevu',
-        note: 'Lead ücreti rezervasyon sırasında tahsil edildi ve bundan etkilenmez. Tüm rezervasyonları partner panelindeki Randevular bölümünde görebilirsiniz.',
+        note: 'Lead ücreti rezervasyon sırasında tahsil edildi ve bundan etkilenmez. Tüm rezervasyonları sağlayıcı panelindeki Randevular bölümünde görebilirsiniz.',
     },
 };
 
@@ -819,21 +819,21 @@ const VERIFICATION_STRINGS: Record<MailLocale, Record<VerificationMailKind, { su
     en: {
         info_requested: {
             subject: 'One more document for your CompliHub360 verification',
-            body: 'Thank you for your application. To complete the verification, our review team has asked for one more piece of evidence.\n\nYou can see exactly what is needed, and upload it, in your dashboard under Verification. Your application keeps its place in the queue while you do.\n\nIf anything is unclear, reply to this email — a person will answer.\n\n→ Partner dashboard → Verification',
+            body: 'Thank you for your application. To complete the verification, our review team has asked for one more piece of evidence.\n\nYou can see exactly what is needed, and upload it, in your dashboard under Verification. Your application keeps its place in the queue while you do.\n\nIf anything is unclear, reply to this email — a person will answer.\n\n→ Provider dashboard → Verification',
         },
         activated: {
             subject: 'Your CompliHub360 provider account is active',
-            body: 'Your verification is complete. Your approved services are now visible to businesses in the markets you were approved for.\n\nWhich services and countries are approved, and any that are still open, you can see in your dashboard under Verification.\n\nThank you for your trust.\n\n→ Partner dashboard → Verification',
+            body: 'Your verification is complete. Your approved services are now visible to businesses in the markets you were approved for.\n\nWhich services and countries are approved, and any that are still open, you can see in your dashboard under Verification.\n\nThank you for your trust.\n\n→ Provider dashboard → Verification',
         },
     },
     de: {
         info_requested: {
             subject: 'Ein weiterer Nachweis für Ihre CompliHub360-Verifizierung',
-            body: 'Vielen Dank für Ihre Bewerbung. Um die Verifizierung abzuschließen, hat unser Prüfteam einen weiteren Nachweis angefordert.\n\nWas genau benötigt wird, sehen Sie in Ihrem Dashboard unter Verifizierung — dort können Sie den Nachweis auch direkt hochladen. Ihre Bewerbung behält währenddessen ihren Platz in der Prüfung.\n\nWenn etwas unklar ist, antworten Sie einfach auf diese E-Mail — ein Mensch antwortet Ihnen.\n\n→ Partner-Dashboard → Verifizierung',
+            body: 'Vielen Dank für Ihre Bewerbung. Um die Verifizierung abzuschließen, hat unser Prüfteam einen weiteren Nachweis angefordert.\n\nWas genau benötigt wird, sehen Sie in Ihrem Dashboard unter Verifizierung — dort können Sie den Nachweis auch direkt hochladen. Ihre Bewerbung behält währenddessen ihren Platz in der Prüfung.\n\nWenn etwas unklar ist, antworten Sie einfach auf diese E-Mail — ein Mensch antwortet Ihnen.\n\n→ Anbieter-Dashboard → Verifizierung',
         },
         activated: {
             subject: 'Ihr CompliHub360-Anbieterkonto ist aktiv',
-            body: 'Ihre Verifizierung ist abgeschlossen. Ihre freigegebenen Leistungen sind ab jetzt für Unternehmen in den freigegebenen Märkten sichtbar.\n\nWelche Leistungen und Länder freigegeben sind und welche noch offen sind, sehen Sie in Ihrem Dashboard unter Verifizierung.\n\nVielen Dank für Ihr Vertrauen.\n\n→ Partner-Dashboard → Verifizierung',
+            body: 'Ihre Verifizierung ist abgeschlossen. Ihre freigegebenen Leistungen sind ab jetzt für Unternehmen in den freigegebenen Märkten sichtbar.\n\nWelche Leistungen und Länder freigegeben sind und welche noch offen sind, sehen Sie in Ihrem Dashboard unter Verifizierung.\n\nVielen Dank für Ihr Vertrauen.\n\n→ Anbieter-Dashboard → Verifizierung',
         },
     },
     es: {
@@ -849,11 +849,11 @@ const VERIFICATION_STRINGS: Record<MailLocale, Record<VerificationMailKind, { su
     tr: {
         info_requested: {
             subject: 'CompliHub360 doğrulamanız için bir belge daha',
-            body: 'Başvurunuz için teşekkür ederiz. Doğrulamayı tamamlamak için inceleme ekibimiz bir belge daha talep etti.\n\nTam olarak neyin gerekli olduğunu panelinizde Doğrulama bölümünde görebilir ve belgeyi oradan yükleyebilirsiniz. Bu sırada başvurunuz sıradaki yerini korur.\n\nBir şey net değilse bu e-postayı yanıtlayın — size bir insan cevap verir.\n\n→ Partner paneli → Doğrulama',
+            body: 'Başvurunuz için teşekkür ederiz. Doğrulamayı tamamlamak için inceleme ekibimiz bir belge daha talep etti.\n\nTam olarak neyin gerekli olduğunu panelinizde Doğrulama bölümünde görebilir ve belgeyi oradan yükleyebilirsiniz. Bu sırada başvurunuz sıradaki yerini korur.\n\nBir şey net değilse bu e-postayı yanıtlayın — size bir insan cevap verir.\n\n→ Sağlayıcı paneli → Doğrulama',
         },
         activated: {
             subject: 'CompliHub360 sağlayıcı hesabınız aktif',
-            body: 'Doğrulamanız tamamlandı. Onaylanan hizmetleriniz artık onaylandığınız pazarlardaki işletmeler tarafından görülebilir.\n\nHangi hizmet ve ülkelerin onaylandığını ve hangilerinin hâlâ açık olduğunu panelinizde Doğrulama bölümünde görebilirsiniz.\n\nGüveniniz için teşekkür ederiz.\n\n→ Partner paneli → Doğrulama',
+            body: 'Doğrulamanız tamamlandı. Onaylanan hizmetleriniz artık onaylandığınız pazarlardaki işletmeler tarafından görülebilir.\n\nHangi hizmet ve ülkelerin onaylandığını ve hangilerinin hâlâ açık olduğunu panelinizde Doğrulama bölümünde görebilirsiniz.\n\nGüveniniz için teşekkür ederiz.\n\n→ Sağlayıcı paneli → Doğrulama',
         },
     },
 };
@@ -904,25 +904,25 @@ export async function sendVerificationMail(p: {
 const BOOKING_STRINGS: Record<MailLocale, { subject: string; intro: string; whenLabel: string; note: string }> = {
     en: {
         subject: 'New booking: a client has booked an intro call with you',
-        intro: 'A client has booked an intro call through CompliHub360. Company, contact and message are in your partner dashboard under Appointments.',
+        intro: 'A client has booked an intro call through CompliHub360. Company, contact and message are in your provider dashboard under Appointments.',
         whenLabel: 'Booked slot',
         note: 'The lead fee for this booking was charged to your card on file; the receipt comes from Stripe. Please remember the 10 % CompliHub360 discount on your fees for this request.',
     },
     de: {
         subject: 'Neue Buchung: ein Mandant hat ein Erstgespräch mit Ihnen gebucht',
-        intro: 'Ein Mandant hat über CompliHub360 ein Erstgespräch gebucht. Firma, Kontakt und Nachricht finden Sie im Partner-Dashboard unter Termine.',
+        intro: 'Ein Mandant hat über CompliHub360 ein Erstgespräch gebucht. Firma, Kontakt und Nachricht finden Sie im Anbieter-Dashboard unter Termine.',
         whenLabel: 'Gebuchter Termin',
         note: 'Die Lead-Gebühr für diese Buchung wurde Ihrer hinterlegten Karte belastet; der Beleg kommt von Stripe. Bitte denken Sie an die 10 % CompliHub360-Rabatt auf Ihr Honorar für dieses Anliegen.',
     },
     es: {
         subject: 'Nueva reserva: un cliente ha reservado una llamada inicial con usted',
-        intro: 'Un cliente ha reservado una llamada inicial a través de CompliHub360. Empresa, contacto y mensaje están en su panel de partner, en Citas.',
+        intro: 'Un cliente ha reservado una llamada inicial a través de CompliHub360. Empresa, contacto y mensaje están en su panel de proveedor, en Citas.',
         whenLabel: 'Horario reservado',
         note: 'La tarifa de lead de esta reserva se ha cargado a su tarjeta registrada; el recibo lo envía Stripe. Recuerde el 10 % de descuento CompliHub360 sobre sus honorarios para esta solicitud.',
     },
     tr: {
         subject: 'Yeni rezervasyon: bir müşteri sizinle ilk görüşme rezerve etti',
-        intro: 'Bir müşteri CompliHub360 üzerinden ilk görüşme rezerve etti. Şirket, iletişim ve mesaj partner panelinizde Randevular bölümünde.',
+        intro: 'Bir müşteri CompliHub360 üzerinden ilk görüşme rezerve etti. Şirket, iletişim ve mesaj sağlayıcı panelinizde Randevular bölümünde.',
         whenLabel: 'Rezerve edilen zaman',
         note: 'Bu rezervasyonun lead ücreti kayıtlı kartınızdan tahsil edildi; makbuz Stripe tarafından gönderilir. Bu talep için ücretlerinizde % 10 CompliHub360 indirimini lütfen unutmayın.',
     },
@@ -932,22 +932,22 @@ const PAYMENT_FAILED_STRINGS: Record<MailLocale, { subject: string; intro: strin
     en: {
         subject: 'Action needed: a lead charge did not go through',
         intro: 'A client wanted to book an intro call with you, but the lead fee could not be charged to your card on file. The booking did not take place and no data was shared.',
-        note: 'Bookings stay paused until a different payment method is on file, or until the same card has been checked again. Both are under Billing in your partner dashboard; nothing is charged by the check. You remain visible in search results.',
+        note: 'Bookings stay paused until a different payment method is on file, or until the same card has been checked again. Both are under Billing in your provider dashboard; nothing is charged by the check. You remain visible in search results.',
     },
     de: {
         subject: 'Handlung nötig: eine Lead-Belastung ist nicht durchgegangen',
         intro: 'Ein Mandant wollte ein Erstgespräch mit Ihnen buchen, aber die Lead-Gebühr konnte Ihrer hinterlegten Karte nicht belastet werden. Die Buchung ist nicht zustande gekommen, es wurden keine Daten geteilt.',
-        note: 'Buchungen bleiben ausgesetzt, bis ein anderes Zahlungsmittel hinterlegt oder dieselbe Karte erneut geprüft ist. Beides finden Sie im Partner-Dashboard unter Abrechnung; die Prüfung belastet nichts. In den Suchergebnissen bleiben Sie sichtbar.',
+        note: 'Buchungen bleiben ausgesetzt, bis ein anderes Zahlungsmittel hinterlegt oder dieselbe Karte erneut geprüft ist. Beides finden Sie im Anbieter-Dashboard unter Abrechnung; die Prüfung belastet nichts. In den Suchergebnissen bleiben Sie sichtbar.',
     },
     es: {
         subject: 'Acción necesaria: un cargo de lead no se ha realizado',
         intro: 'Un cliente quería reservar una llamada inicial con usted, pero la tarifa de lead no se pudo cargar a su tarjeta registrada. La reserva no se realizó y no se compartió ningún dato.',
-        note: 'Las reservas quedan en pausa hasta que haya otro método de pago registrado o se haya vuelto a comprobar la misma tarjeta. Ambas opciones están en Facturación de su panel de partner; la comprobación no cobra nada. Sigue siendo visible en los resultados de búsqueda.',
+        note: 'Las reservas quedan en pausa hasta que haya otro método de pago registrado o se haya vuelto a comprobar la misma tarjeta. Ambas opciones están en Facturación de su panel de proveedor; la comprobación no cobra nada. Sigue siendo visible en los resultados de búsqueda.',
     },
     tr: {
         subject: 'İşlem gerekli: bir lead ücreti tahsil edilemedi',
         intro: 'Bir müşteri sizinle ilk görüşme rezerve etmek istedi, ancak lead ücreti kayıtlı kartınızdan tahsil edilemedi. Rezervasyon gerçekleşmedi ve hiçbir veri paylaşılmadı.',
-        note: 'Farklı bir ödeme yöntemi kaydedilene veya aynı kart yeniden kontrol edilene kadar rezervasyonlar duraklatılır. İkisi de partner panelinde Faturalandırma bölümünde; kontrol hiçbir ücret almaz. Arama sonuçlarında görünür kalırsınız.',
+        note: 'Farklı bir ödeme yöntemi kaydedilene veya aynı kart yeniden kontrol edilene kadar rezervasyonlar duraklatılır. İkisi de sağlayıcı panelinde Faturalandırma bölümünde; kontrol hiçbir ücret almaz. Arama sonuçlarında görünür kalırsınız.',
     },
 };
 
@@ -1012,28 +1012,28 @@ const INVOICE_RETRY_STRINGS: Record<MailLocale, { subject: string; intro: string
         intro: 'Invoice {invoice} for {amount} is due today and still open.',
         tries: 'If it is still open tomorrow, we will try to collect it from your card on file on {dates}. Once the invoice is paid, we stop.',
         frist: 'The deadline stays the same: if the invoice is still open on {block}, new bookings pause from then until it is paid. You remain visible in search results.',
-        self: 'You can pay the invoice yourself at any time under Billing in your partner dashboard.',
+        self: 'You can pay the invoice yourself at any time under Billing in your provider dashboard.',
     },
     de: {
         subject: 'Ihre Rechnung {invoice} ist fällig',
         intro: 'Die Rechnung {invoice} über {amount} ist heute fällig und noch offen.',
         tries: 'Ist sie morgen noch offen, versuchen wir, den Betrag am {dates} von Ihrer hinterlegten Karte einzuziehen. Sobald die Rechnung bezahlt ist, versuchen wir nichts mehr.',
         frist: 'Die Frist bleibt dabei unverändert: Ist die Rechnung am {block} noch offen, pausieren ab dann neue Buchungen, bis sie bezahlt ist. In den Suchergebnissen bleiben Sie sichtbar.',
-        self: 'Sie können die Rechnung jederzeit selbst im Partner-Dashboard unter Abrechnung bezahlen.',
+        self: 'Sie können die Rechnung jederzeit selbst im Anbieter-Dashboard unter Abrechnung bezahlen.',
     },
     es: {
         subject: 'La factura {invoice} vence hoy',
         intro: 'La factura {invoice} por {amount} vence hoy y sigue abierta.',
         tries: 'Si mañana sigue abierta, intentaremos cobrarla de su tarjeta registrada el {dates}. En cuanto la factura esté pagada, dejamos de intentarlo.',
         frist: 'El plazo no cambia: si la factura sigue abierta el {block}, las nuevas reservas se pausan desde entonces hasta que esté pagada. Sigue siendo visible en los resultados de búsqueda.',
-        self: 'Puede pagar la factura usted mismo en cualquier momento en Facturación de su panel de partner.',
+        self: 'Puede pagar la factura usted mismo en cualquier momento en Facturación de su panel de proveedor.',
     },
     tr: {
         subject: '{invoice} faturasının vadesi geldi',
         intro: '{amount} tutarındaki {invoice} faturasının vadesi bugün ve fatura hâlâ açık.',
         tries: 'Yarın hâlâ açıksa, tutarı {dates} tarihlerinde kayıtlı kartınızdan tahsil etmeyi deneyeceğiz. Fatura ödendiği anda denemeyi bırakırız.',
         frist: 'Süre değişmez: fatura {block} tarihinde hâlâ açıksa, ödenene kadar o tarihten itibaren yeni rezervasyonlar duraklatılır. Arama sonuçlarında görünür kalırsınız.',
-        self: 'Faturayı istediğiniz zaman partner panelinde Faturalandırma bölümünden kendiniz ödeyebilirsiniz.',
+        self: 'Faturayı istediğiniz zaman sağlayıcı panelinde Faturalandırma bölümünden kendiniz ödeyebilirsiniz.',
     },
 };
 
@@ -1222,20 +1222,20 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
     en: {
         noteLabel: 'Note from our review team',
         human: 'If anything is unclear, reply to this email — a person will answer.',
-        approved: { subject: 'Your change is live', body: 'Our review team has approved your change from {date}. It is now visible to businesses.\n\n→ Partner dashboard → Application' },
-        approved_scheduled: { subject: 'Your change takes effect on {from}', body: 'Our review team has approved your change from {date}. It takes effect on {from}; until then businesses see your current details.\n\nYou can withdraw it in your partner dashboard until that date.\n\n→ Partner dashboard → Application' },
+        approved: { subject: 'Your change is live', body: 'Our review team has approved your change from {date}. It is now visible to businesses.\n\n→ Provider dashboard → Application' },
+        approved_scheduled: { subject: 'Your change takes effect on {from}', body: 'Our review team has approved your change from {date}. It takes effect on {from}; until then businesses see your current details.\n\nYou can withdraw it in your provider dashboard until that date.\n\n→ Provider dashboard → Application' },
         rejected: { subject: 'Your change was not applied', body: 'Our review team did not apply your change from {date}. Your previous details stay in place.\n\nYou can adjust the details and send them again.' },
-        reverification: { subject: 'One document for your change', body: 'For your change from {date}, our review team needs a current document.\n\nYou can upload it in your partner dashboard under Application → Evidence.' },
+        reverification: { subject: 'One document for your change', body: 'For your change from {date}, our review team needs a current document.\n\nYou can upload it in your provider dashboard under Application → Evidence.' },
         resumed: { subject: 'Your services can be booked again', body: 'We have reviewed your report. The paused services are visible and bookable again.\n\nThank you for reporting the change right away.' },
         kept_paused: { subject: 'Your report: the services stay paused for now', body: 'We have reviewed your report. The affected services stay paused for now.' },
     },
     de: {
         noteLabel: 'Hinweis unseres Prüfteams',
         human: 'Wenn etwas unklar ist, antworten Sie einfach auf diese E-Mail — ein Mensch antwortet Ihnen.',
-        approved: { subject: 'Ihre Änderung ist übernommen', body: 'Unser Prüfteam hat Ihre Änderung vom {date} freigegeben. Sie ist ab jetzt für Unternehmen sichtbar.\n\n→ Partner-Dashboard → Bewerbung' },
-        approved_scheduled: { subject: 'Ihre Änderung gilt ab {from}', body: 'Unser Prüfteam hat Ihre Änderung vom {date} freigegeben. Sie wird am {from} wirksam; bis dahin sehen Unternehmen die bisherigen Angaben.\n\nBis zu diesem Datum können Sie die Änderung im Partner-Dashboard zurückziehen.\n\n→ Partner-Dashboard → Bewerbung' },
+        approved: { subject: 'Ihre Änderung ist übernommen', body: 'Unser Prüfteam hat Ihre Änderung vom {date} freigegeben. Sie ist ab jetzt für Unternehmen sichtbar.\n\n→ Anbieter-Dashboard → Bewerbung' },
+        approved_scheduled: { subject: 'Ihre Änderung gilt ab {from}', body: 'Unser Prüfteam hat Ihre Änderung vom {date} freigegeben. Sie wird am {from} wirksam; bis dahin sehen Unternehmen die bisherigen Angaben.\n\nBis zu diesem Datum können Sie die Änderung im Anbieter-Dashboard zurückziehen.\n\n→ Anbieter-Dashboard → Bewerbung' },
         rejected: { subject: 'Ihre Änderung wurde nicht übernommen', body: 'Unser Prüfteam hat Ihre Änderung vom {date} nicht übernommen. Es gilt weiter der bisherige Stand.\n\nSie können die Angaben anpassen und erneut senden.' },
-        reverification: { subject: 'Ein Nachweis zu Ihrer Änderung', body: 'Zu Ihrer Änderung vom {date} braucht unser Prüfteam einen aktuellen Nachweis.\n\nSie laden ihn im Partner-Dashboard unter Bewerbung → Nachweise hoch.' },
+        reverification: { subject: 'Ein Nachweis zu Ihrer Änderung', body: 'Zu Ihrer Änderung vom {date} braucht unser Prüfteam einen aktuellen Nachweis.\n\nSie laden ihn im Anbieter-Dashboard unter Bewerbung → Nachweise hoch.' },
         resumed: { subject: 'Ihre Leistungen sind wieder buchbar', body: 'Wir haben Ihre Meldung geprüft. Die pausierten Leistungen sind wieder sichtbar und buchbar.\n\nDanke, dass Sie die Änderung gleich gemeldet haben.' },
         kept_paused: { subject: 'Ihre Meldung: die Leistungen bleiben vorerst pausiert', body: 'Wir haben Ihre Meldung geprüft. Die betroffenen Leistungen bleiben vorerst pausiert.' },
     },
@@ -1252,10 +1252,10 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
     tr: {
         noteLabel: 'İnceleme ekibimizin notu',
         human: 'Bir şey net değilse bu e-postayı yanıtlayın — size bir insan cevap verir.',
-        approved: { subject: 'Değişikliğiniz yayında', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi onayladı. Artık işletmeler tarafından görülebilir.\n\n→ Partner paneli → Başvuru' },
-        approved_scheduled: { subject: 'Değişikliğiniz {from} tarihinde geçerli olacak', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi onayladı. Değişiklik {from} tarihinde geçerli olacak; o zamana kadar işletmeler mevcut bilgilerinizi görür.\n\nBu tarihe kadar değişikliği partner panelinden geri çekebilirsiniz.\n\n→ Partner paneli → Başvuru' },
+        approved: { subject: 'Değişikliğiniz yayında', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi onayladı. Artık işletmeler tarafından görülebilir.\n\n→ Sağlayıcı paneli → Başvuru' },
+        approved_scheduled: { subject: 'Değişikliğiniz {from} tarihinde geçerli olacak', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi onayladı. Değişiklik {from} tarihinde geçerli olacak; o zamana kadar işletmeler mevcut bilgilerinizi görür.\n\nBu tarihe kadar değişikliği sağlayıcı panelinden geri çekebilirsiniz.\n\n→ Sağlayıcı paneli → Başvuru' },
         rejected: { subject: 'Değişikliğiniz uygulanmadı', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi uygulamadı. Önceki bilgileriniz geçerli kalır.\n\nBilgileri düzenleyip yeniden gönderebilirsiniz.' },
-        reverification: { subject: 'Değişikliğiniz için bir belge', body: '{date} tarihli değişikliğiniz için inceleme ekibimizin güncel bir belgeye ihtiyacı var.\n\nBelgeyi partner panelinde Başvuru → Belgeler bölümünden yükleyebilirsiniz.' },
+        reverification: { subject: 'Değişikliğiniz için bir belge', body: '{date} tarihli değişikliğiniz için inceleme ekibimizin güncel bir belgeye ihtiyacı var.\n\nBelgeyi sağlayıcı panelinde Başvuru → Belgeler bölümünden yükleyebilirsiniz.' },
         resumed: { subject: 'Hizmetleriniz yeniden rezerve edilebilir', body: 'Bildiriminizi inceledik. Duraklatılan hizmetler yeniden görünür ve rezerve edilebilir.\n\nDeğişikliği hemen bildirdiğiniz için teşekkür ederiz.' },
         kept_paused: { subject: 'Bildiriminiz: hizmetler şimdilik duraklatılmış kalıyor', body: 'Bildiriminizi inceledik. İlgili hizmetler şimdilik duraklatılmış kalıyor.' },
     },

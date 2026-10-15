@@ -63,7 +63,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
   const location = useLocation();
-  const base = `/${locale}/partner-dashboard`;
+  const base = `/${locale}/provider-dashboard`;
   const [searchOpen, setSearchOpen] = useState(false);
   // Konto in der Sidebar (Staging-Befund 2026-10-09: hier stand fest
   // „K. Schmidt · Schmidt & Partner", egal wer angemeldet war). Der Name des
@@ -159,7 +159,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
         title: label,
         icon: <Icon size={18} />,
         count: badgeFor(it.to),
-        active: location.pathname.includes(`/partner-dashboard/${it.to}`),
+        active: location.pathname.includes(`/provider-dashboard/${it.to}`),
       };
     }),
   }));
@@ -207,7 +207,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
         {NAV.map((g) => (
           <SidebarGroup key={g.groupKey} label={t(g.groupKey)}>
             {g.items.map((it) => {
-              const active = location.pathname.includes(`/partner-dashboard/${it.to}`) || (it.to === 'verification' && location.pathname.includes('/partner-dashboard/application'));
+              const active = location.pathname.includes(`/provider-dashboard/${it.to}`) || (it.to === 'verification' && location.pathname.includes('/provider-dashboard/application'));
               const Icon = it.icon;
               if (it.to === 'help') {
                 // NavItem IS the button (AppShell) — wrapping it in another one

@@ -52,7 +52,7 @@ describe('gemerkte Konten', () => {
 
 describe('homeFor', () => {
   it('fuehrt jede Rolle auf ihre Startseite', () => {
-    expect(homeFor('partner', 'de')).toBe('/de/partner-dashboard');
+    expect(homeFor('partner', 'de')).toBe('/de/provider-dashboard');
     expect(homeFor('user', 'de')).toBe('/de/dashboard');
     expect(homeFor('admin', 'en')).toBe('/en/admin');
   });

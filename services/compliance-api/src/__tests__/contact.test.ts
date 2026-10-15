@@ -89,7 +89,7 @@ describe('handleContact', () => {
     it('Bewerbung: strukturierte Felder in der Mail ans Postfach', async () => {
         const { d, sent } = deps();
         await handleContact(APP, d, 'ref-3');
-        expect(sent[0].subject).toBe('[Partner-Bewerbung] Muster Steuerberatung · Max Muster');
+        expect(sent[0].subject).toBe('[Anbieter-Bewerbung] Muster Steuerberatung · Max Muster');
         expect(sent[0].text).toContain('Maerkte: DE, AT');
         expect(sent[0].text).toContain('Bereiche: tax-vat');
     });

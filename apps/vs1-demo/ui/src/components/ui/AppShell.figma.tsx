@@ -36,7 +36,7 @@ figma.connect(
     example: () => (
       <MobileTopbar
         logo={<Logo lockup="horizontal" tone="on-petrol" href={null} className="h-[29px] w-auto" />}
-        contextLabel="Partner"
+        contextLabel="Provider"
         actions={<>{/* search icon · verified badge */}</>}
       />
     ),

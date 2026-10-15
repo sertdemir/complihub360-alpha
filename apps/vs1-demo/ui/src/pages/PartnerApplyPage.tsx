@@ -12,7 +12,7 @@ import { MARKET_CODES } from '../lib/marketProfiles';
 import { SendFailed } from '../components/contact/SendStates';
 import { EMAIL_RE, failureOf, invalidFieldOf, sendContact, type SendFailure } from '../api/contact';
 
-// ─── /partner-apply · die Partner-Bewerbung ──────────────────────────────────
+// ─── /provider-apply · die Partner-Bewerbung ──────────────────────────────────
 // Gebaut 2026-08-29 (Nutzer-Entscheidung): "Als Partner bewerben" fuehrt in
 // ein EIGENES Formular, nicht auf die Kontaktseite — der Bewerber soll beim
 // Ausfuellen sehen, was danach passiert. Links die Aussicht (Eingang &

@@ -211,7 +211,7 @@ export function LoginPage() {
         login(role, (email || "you").split("@")[0]);
         clearExpired();
         const redirect = redirectTarget;
-        navigate(redirect || `/${lang}/${role === "partner" ? "partner-dashboard" : "dashboard"}`);
+        navigate(redirect || `/${lang}/${role === "partner" ? "provider-dashboard" : "dashboard"}`);
     };
 
     // Dev-Einstieg in den Admin-Workspace (bewusst ohne oeffentliche Admin-UI):
@@ -265,7 +265,7 @@ export function LoginPage() {
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) { setAuthError(readableError(error.message)); return; }
         clearExpired();
-        navigate(redirectTarget || `/${lang}/partner-dashboard`);
+        navigate(redirectTarget || `/${lang}/provider-dashboard`);
     };
 
     // Dieselbe Bestaetigung, egal ob es das Konto gibt — sonst verraet die Seite,

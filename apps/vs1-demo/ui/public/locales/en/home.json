@@ -522,7 +522,7 @@
       "desc": "Keep your risk map and match with Verified Providers — free, no credit card. Alerts for when the rules change are in preparation. We'll email you a magic link, so there's no password to remember.",
       "benefits": [
         "Your saved risk-map dossier",
-        "Verified-Partner matching",
+        "Verified-Provider matching",
         "Alerts when regulations move — in preparation"
       ],
       "confirm": "Your progress is safe.",
@@ -534,7 +534,7 @@
       "desc": "Keep your risk map and match with Verified Providers in your markets. Free, no credit card. Regulatory alerts are in preparation and arrive in your account when they ship. We'll email you a magic link, so there's no password.",
       "benefits": [
         "Your saved risk-map dossier",
-        "Verified-Partner matching",
+        "Verified-Provider matching",
         "Regulatory alerts — in preparation"
       ],
       "confirm": "Click the link to finish setting up your free account.",
@@ -570,7 +570,7 @@
       },
       {
         "value": "3",
-        "label": "partners ready"
+        "label": "providers ready"
       }
     ],
     "rows": [
@@ -713,7 +713,7 @@
     "partnersTitle": "We've found who can act on this.",
     "unlock": "See my best matches with a free account",
     "save": {
-      "title": "Save this map. Unlock the partners.",
+      "title": "Save this map. Unlock the providers.",
       "subtitle": "Free account. No credit card. Founding-member access through Beta launch.",
       "cta": "Create free account"
     },
@@ -1092,7 +1092,7 @@
       "gold": "Three",
       "post": " quiet defaults."
     },
-    "subtitle": "Compliance products usually shout. We shouldn't have to. Risk doesn't need a threat. Decisions don't need a 20-step funnel. Partners don't need a marketplace. Hover each card to see what we did instead.",
+    "subtitle": "Compliance products usually shout. We shouldn't have to. Risk doesn't need a threat. Decisions don't need a 20-step funnel. Providers don't need a marketplace. Hover each card to see what we did instead.",
     "hoverCue": "Hover to see",
     "cards": [
       {
@@ -1124,7 +1124,7 @@
       "gold": "home base",
       "post": " for everything compliance."
     },
-    "subtitle": "The assessment is free. What comes after — your workspace, live news, expert content, your partners — is what makes CompliHub360 the place you come back to.",
+    "subtitle": "The assessment is free. What comes after — your workspace, live news, expert content, your providers — is what makes CompliHub360 the place you come back to.",
     "pills": {
       "live": "Available today",
       "beta": "Launching with Beta"
@@ -1158,7 +1158,7 @@
       }
     ],
     "workspace": {
-      "title": "Your map. Your partners. Your trail. Persistent.",
+      "title": "Your map. Your providers. Your trail. Persistent.",
       "desc": "The assessment becomes a saved dossier. Your engagement timeline lives in your dashboard. Provider relationships, compliance trail, risk map — all in one place, all yours."
     },
     "newsCard": {
@@ -1234,7 +1234,7 @@
         ]
       },
       {
-        "label": "Partners & engagements",
+        "label": "Providers & engagements",
         "items": [
           {
             "q": "Are you giving me legal advice?",
@@ -1351,7 +1351,7 @@
         "title": "Company",
         "links": {
           "about": "About",
-          "partner": "Partners",
+          "partner": "Providers",
           "trustSecurity": "Trust & Security",
           "contact": "Contact",
           "support": "Support"

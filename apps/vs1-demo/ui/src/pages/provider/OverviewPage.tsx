@@ -40,7 +40,7 @@ export function OverviewPage() {
   const { t: tRaw, i18n } = useTranslation('providerws');
   const t = tRaw as unknown as T;
   const locale = i18n.resolvedLanguage || 'en';
-  const base = `/${locale}/partner-dashboard`;
+  const base = `/${locale}/provider-dashboard`;
   const { data, state, error, reload } = useWorkspaceData(fetchOverview);
 
   const today = new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });

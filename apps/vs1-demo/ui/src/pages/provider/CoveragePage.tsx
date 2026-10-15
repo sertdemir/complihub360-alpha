@@ -106,7 +106,7 @@ export function CoveragePage() {
                   {t('common:states.partner.coverage.hours', { hours: profile.data.sla_target_confirm_hours })}
                 </p>
               )}
-              <Button size="sm" variant="secondary" className="ml-auto" onClick={() => navigate(`/${locale}/partner-dashboard/application`)}>
+              <Button size="sm" variant="secondary" className="ml-auto" onClick={() => navigate(`/${locale}/provider-dashboard/application`)}>
                 {t('common:states.partner.coverage.submitChange')}
               </Button>
             </div>

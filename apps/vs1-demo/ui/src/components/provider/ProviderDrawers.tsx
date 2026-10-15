@@ -70,7 +70,7 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
             <button
               key={r.id}
               type="button"
-              onClick={() => { onClose(); navigate(`/${locale}/partner-dashboard/termine`); }}
+              onClick={() => { onClose(); navigate(`/${locale}/provider-dashboard/termine`); }}
               className="flex w-full items-center justify-between gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
             >
               <span>
@@ -163,7 +163,7 @@ export function HelpDrawer({ open, onClose }: { open: boolean; onClose: () => vo
         <div className="space-y-2" data-section="topics">
           {TOPICS.map((x) => (
             <button key={x.key} type="button"
-              onClick={() => { onClose(); navigate(`/${locale}/partner-dashboard/${x.to}`); }}
+              onClick={() => { onClose(); navigate(`/${locale}/provider-dashboard/${x.to}`); }}
               className="flex w-full items-center justify-between gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50">
               <span className="min-w-0">
                 <span className="block text-[13px] font-semibold text-fg">{t(`helpDrawer.topic.${x.key}.title`)}</span>

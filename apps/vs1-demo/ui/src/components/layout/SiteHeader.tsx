@@ -51,7 +51,7 @@ export function SiteHeader() {
   // `SiteHeader.workspace.guard.test.ts` haelt beide Seiten jetzt zusammen.
   // Phase 6: 'overview' ist die Startseite des Partner-Dashboards (ADR-0009 Nr. 5).
   const PROVIDER_WORKSPACE = ['overview', 'requests', 'termine', 'performance', 'coverage', 'verification', 'application', 'billing', 'subscription', 'settings', 'notifications', 'help'];
-  if (localeOk && seg[1] === 'partner-dashboard' && PROVIDER_WORKSPACE.includes(seg[2])) {
+  if (localeOk && seg[1] === 'provider-dashboard' && PROVIDER_WORKSPACE.includes(seg[2])) {
     return null;
   }
   // The user App-Workspace pages (v2, own UserShell) — no global header.

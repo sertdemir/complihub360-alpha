@@ -92,7 +92,7 @@
       "node2Desc": "İş modeli ve bağlam",
       "node3Label": "Risk Motoru",
       "node3Desc": "Risk düzeyi hesapla",
-      "node4Label": "Partner Eşleşmesi",
+      "node4Label": "Sağlayıcı Eşleşmesi",
       "node4Desc": "1 tıkla engagement",
       "stat1Label": "Risk profili için adımlar",
       "stat2Label": "Maks. onay süresi",
@@ -282,7 +282,7 @@
       "title": "Üç adımda ağın içinde",
       "ctaTitle": "Hazır mısınız?",
       "ctaBody": "Başvuru, iletişim sayfasındaki „Sağlayıcı olarak listelenmek“ yolundan ilerler — üç iş günü içinde dönüş yapılır.",
-      "ctaButton": "Partner olarak başvur"
+      "ctaButton": "Sağlayıcı olarak başvur"
     },
     "intakeStep": {
       "apply": {
@@ -1222,7 +1222,7 @@
     "fallbackName": "Hesabım",
     "role": {
       "user": "Şirket",
-      "partner": "Danışman ortak",
+      "partner": "Sağlayıcı",
       "admin": "Yönetim"
     }
   },
@@ -1601,7 +1601,7 @@
       "confirmed": "Randevu onaylandı",
       "yourCost": "Sizin maliyetiniz",
       "fee": "Aracılık ücreti",
-      "feePaidBy": "partner karşılar",
+      "feePaidBy": "sağlayıcı karşılar",
       "match": "%{{pct}} eşleşme",
       "noSlot": "Satılık sıra yok",
       "verified": "Verified Provider",
@@ -1609,7 +1609,7 @@
       "range": "180–240 €",
       "perHour": "/ saat",
       "published": "ilk temastan önce yayımlanır",
-      "billTitle": "Partnerin faturası",
+      "billTitle": "Sağlayıcının faturası",
       "billListing": "Dizin kaydı",
       "billProfile": "Profil görüntüleme",
       "billClick": "Profile tıklama",
@@ -1767,7 +1767,7 @@
     }
   },
   "partnerApply": {
-    "eyebrow": "Partner olun",
+    "eyebrow": "Sağlayıcı olun",
     "titlePre": "Ağa giden ",
     "titleGold": "yolunuz",
     "titlePost": " — adım adım.",
@@ -1778,7 +1778,7 @@
       },
       "access": {
         "title": "Kişisel erişim bağlantınız",
-        "desc": "Uygunsa e-postayla bir magic link alırsınız — şifre yok, bağlantı sizi doğrudan partner alanınıza götürür."
+        "desc": "Uygunsa e-postayla bir magic link alırsınız — şifre yok, bağlantı sizi doğrudan sağlayıcı alanınıza götürür."
       },
       "listing": {
         "title": "Onboarding ve listelenme",

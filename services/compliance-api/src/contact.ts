@@ -3,7 +3,7 @@ import { SLUG_TO_ENGINE } from './dashboard.js';
 
 // ─── Kontakt und Partner-Bewerbung (Beta-Plan Di 13.10.) ─────────────────────
 // Entscheidung 2026-10-09: EIN Postfach fuer alle vier Wege der Kontaktseite
-// und fuer die Bewerbung von /partner-apply; das Anliegen steht im Betreff.
+// und fuer die Bewerbung von /provider-apply; das Anliegen steht im Betreff.
 // Die Zusagen der Seite bleiben stehen — deshalb geht nach dem Eingang eine
 // Bestaetigung an den Absender.
 //
@@ -110,7 +110,7 @@ const INBOX_LABEL: Record<ContactLane, string> = {
     sales: 'Preise',
     partner: 'Anbieter',
     privacy: 'Datenschutz',
-    application: 'Partner-Bewerbung',
+    application: 'Anbieter-Bewerbung',
 };
 
 /** An das eigene Postfach. Intern, deshalb deutsch und ohne Gestaltung;
@@ -156,7 +156,7 @@ const ACK: Record<Locale, AckStrings> = {
         introApplication: 'thank you — your application has reached us.',
         topic: 'Topic',
         reference: 'Reference',
-        lanes: { support: 'Help with the assessment', sales: 'Pricing and plans', partner: 'Getting listed as a provider', privacy: 'Privacy and security', application: 'Partner application' },
+        lanes: { support: 'Help with the assessment', sales: 'Pricing and plans', partner: 'Getting listed as a provider', privacy: 'Privacy and security', application: 'Provider application' },
         next: {
             quick: 'A person reads and sorts it on the same business day. You get a substantive reply by the next business day. If it takes longer, we send you an interim note.',
             partner: 'A person reads it on the same business day. You get a reply within 3 business days.',
@@ -173,7 +173,7 @@ const ACK: Record<Locale, AckStrings> = {
         introApplication: 'vielen Dank — Ihre Bewerbung ist bei uns angekommen.',
         topic: 'Anliegen',
         reference: 'Referenz',
-        lanes: { support: 'Hilfe beim Assessment', sales: 'Preise und Tarife', partner: 'Als Anbieter gelistet werden', privacy: 'Datenschutz und Sicherheit', application: 'Partner-Bewerbung' },
+        lanes: { support: 'Hilfe beim Assessment', sales: 'Preise und Tarife', partner: 'Als Anbieter gelistet werden', privacy: 'Datenschutz und Sicherheit', application: 'Anbieter-Bewerbung' },
         next: {
             quick: 'Ein Mensch liest und sortiert sie am selben Werktag. Eine fachliche Antwort erhalten Sie bis zum nächsten Werktag. Dauert es länger, schicken wir Ihnen eine Zwischennachricht.',
             partner: 'Ein Mensch liest sie am selben Werktag. Eine Antwort erhalten Sie innerhalb von 3 Werktagen.',
@@ -190,7 +190,7 @@ const ACK: Record<Locale, AckStrings> = {
         introApplication: 'gracias, su solicitud nos ha llegado.',
         topic: 'Asunto',
         reference: 'Referencia',
-        lanes: { support: 'Ayuda con la evaluación', sales: 'Precios y planes', partner: 'Aparecer como proveedor', privacy: 'Privacidad y seguridad', application: 'Solicitud de socio' },
+        lanes: { support: 'Ayuda con la evaluación', sales: 'Precios y planes', partner: 'Aparecer como proveedor', privacy: 'Privacidad y seguridad', application: 'Solicitud de proveedor' },
         next: {
             quick: 'Una persona lo lee y lo clasifica el mismo día hábil. Recibirá una respuesta de fondo a más tardar el siguiente día hábil. Si tardamos más, le enviaremos un mensaje intermedio.',
             partner: 'Una persona lo lee el mismo día hábil. Recibirá una respuesta en un plazo de 3 días hábiles.',
@@ -207,7 +207,7 @@ const ACK: Record<Locale, AckStrings> = {
         introApplication: 'teşekkür ederiz, başvurunuz bize ulaştı.',
         topic: 'Konu',
         reference: 'Referans',
-        lanes: { support: 'Değerlendirmede yardım', sales: 'Fiyatlar ve planlar', partner: 'Sağlayıcı olarak listelenmek', privacy: 'Gizlilik ve güvenlik', application: 'Partner başvurusu' },
+        lanes: { support: 'Değerlendirmede yardım', sales: 'Fiyatlar ve planlar', partner: 'Sağlayıcı olarak listelenmek', privacy: 'Gizlilik ve güvenlik', application: 'Sağlayıcı başvurusu' },
         next: {
             quick: 'Mesajınızı aynı iş günü içinde bir kişi okur ve sınıflandırır. En geç bir sonraki iş günü içerikli bir yanıt alırsınız. Daha uzun sürerse size bir ara bilgi göndeririz.',
             partner: 'Mesajınızı aynı iş günü içinde bir kişi okur. 3 iş günü içinde yanıt alırsınız.',

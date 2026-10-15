@@ -92,7 +92,7 @@
       "node2Desc": "Modelo de negocio y contexto",
       "node3Label": "Motor de Riesgos",
       "node3Desc": "Calcular nivel de riesgo",
-      "node4Label": "Emparejamiento de Socios",
+      "node4Label": "Emparejamiento de proveedores",
       "node4Desc": "Engagement en 1 clic",
       "stat1Label": "Pasos para el perfil de riesgo",
       "stat2Label": "Tiempo máximo de confirmación",
@@ -282,7 +282,7 @@
       "title": "En la red en tres pasos",
       "ctaTitle": "¿Preparado?",
       "ctaBody": "La solicitud se tramita por la vía «Figurar como proveedor» de la página de contacto, con respuesta en tres días hábiles.",
-      "ctaButton": "Solicitar ser partner"
+      "ctaButton": "Solicitar ser proveedor"
     },
     "intakeStep": {
       "apply": {
@@ -1222,7 +1222,7 @@
     "fallbackName": "Mi cuenta",
     "role": {
       "user": "Empresa",
-      "partner": "Socio asesor",
+      "partner": "Proveedor",
       "admin": "Administración"
     }
   },
@@ -1601,7 +1601,7 @@
       "confirmed": "Cita confirmada",
       "yourCost": "Su coste",
       "fee": "Comisión de intermediación",
-      "feePaidBy": "la asume el partner",
+      "feePaidBy": "la asume el proveedor",
       "match": "{{pct}} % match",
       "noSlot": "Ningún puesto en venta",
       "verified": "Verified Provider",
@@ -1609,7 +1609,7 @@
       "range": "180–240 €",
       "perHour": "/ hora",
       "published": "publicada antes del primer contacto",
-      "billTitle": "La factura del partner",
+      "billTitle": "La factura del proveedor",
       "billListing": "Entrada en el directorio",
       "billProfile": "Visita al perfil",
       "billClick": "Clic en el perfil",
@@ -1767,7 +1767,7 @@
     }
   },
   "partnerApply": {
-    "eyebrow": "Conviértase en partner",
+    "eyebrow": "Conviértase en proveedor",
     "titlePre": "Su camino a la ",
     "titleGold": "red",
     "titlePost": ", paso a paso.",
@@ -1778,7 +1778,7 @@
       },
       "access": {
         "title": "Su enlace de acceso personal",
-        "desc": "Si encaja, recibirá un magic link por correo: sin contraseña, el enlace le lleva directo a su área de partner."
+        "desc": "Si encaja, recibirá un magic link por correo: sin contraseña, el enlace le lleva directo a su área de proveedor."
       },
       "listing": {
         "title": "Onboarding y listado",
