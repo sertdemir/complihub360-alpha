@@ -29,6 +29,14 @@ export const isDemoLoginEnabled = resolveDemoLogin({
   mockApi: isMockApi,
 });
 
+/**
+ * Google-Login (Beta-Plan 15.10.2026) — fail-closed wie der Demo-Login.
+ * Der Knopf erscheint nur mit VITE_AUTH_GOOGLE=1, also erst, wenn im
+ * Supabase-Projekt des Builds der Google-Provider samt OAuth-Client steht.
+ * Vorher fuehrte er in einen Fehler (Login) bzw. ins Leere (Registrierung).
+ */
+export const isGoogleLoginEnabled = import.meta.env.VITE_AUTH_GOOGLE === '1';
+
 export function resolveDemoLogin(o: { dev: boolean; supabaseConfigured: boolean; demoFlag: boolean; mockApi: boolean }): boolean {
   return o.demoFlag || o.mockApi || (o.dev && !o.supabaseConfigured);
 }

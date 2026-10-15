@@ -92,7 +92,7 @@
       "node2Desc": "Geschäftsmodell & Kontext",
       "node3Label": "Risiko-Engine",
       "node3Desc": "Risikoniveau berechnen",
-      "node4Label": "Partner-Match",
+      "node4Label": "Anbieter-Match",
       "node4Desc": "1-Klick-Engagement",
       "stat1Label": "Schritte zum Risikoprofil",
       "stat2Label": "Max. Bestätigungszeit",
@@ -282,7 +282,7 @@
       "title": "In drei Schritten im Netzwerk",
       "ctaTitle": "Bereit?",
       "ctaBody": "Die Bewerbung läuft über den Weg „Als Anbieter gelistet werden“ auf der Kontaktseite — mit Rückmeldung in drei Werktagen.",
-      "ctaButton": "Als Partner bewerben"
+      "ctaButton": "Als Anbieter bewerben"
     },
     "intakeStep": {
       "apply": {
@@ -1222,7 +1222,7 @@
     "fallbackName": "Mein Konto",
     "role": {
       "user": "Unternehmen",
-      "partner": "Beratungspartner",
+      "partner": "Anbieter",
       "admin": "Administration"
     }
   },
@@ -1601,7 +1601,7 @@
       "confirmed": "Termin bestätigt",
       "yourCost": "Ihre Kosten",
       "fee": "Vermittlungsgebühr",
-      "feePaidBy": "trägt der Partner",
+      "feePaidBy": "trägt der Anbieter",
       "match": "{{pct}} % Match",
       "noSlot": "Kein Platz zu verkaufen",
       "verified": "Verified Provider",
@@ -1609,7 +1609,7 @@
       "range": "180–240 €",
       "perHour": "/ Stunde",
       "published": "veröffentlicht vor dem Erstkontakt",
-      "billTitle": "Abrechnung des Partners",
+      "billTitle": "Abrechnung des Anbieters",
       "billListing": "Eintrag im Verzeichnis",
       "billProfile": "Profilaufruf",
       "billClick": "Klick aufs Profil",
@@ -1767,7 +1767,7 @@
     }
   },
   "partnerApply": {
-    "eyebrow": "Partner werden",
+    "eyebrow": "Anbieter werden",
     "titlePre": "Ihr Weg ins ",
     "titleGold": "Netzwerk",
     "titlePost": " — Schritt für Schritt.",
@@ -1778,7 +1778,7 @@
       },
       "access": {
         "title": "Ihr persönlicher Zugangslink",
-        "desc": "Passt es, bekommen Sie einen Magic-Link per E-Mail — kein Passwort, der Link führt direkt in Ihren Partner-Bereich."
+        "desc": "Passt es, bekommen Sie einen Magic-Link per E-Mail — kein Passwort, der Link führt direkt in Ihren Anbieter-Bereich."
       },
       "listing": {
         "title": "Onboarding und Listung",

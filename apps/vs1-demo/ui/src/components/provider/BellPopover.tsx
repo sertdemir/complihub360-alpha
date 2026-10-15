@@ -52,7 +52,7 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
   const openItem = (i: PartnerNotification) => {
     setOpen(false);
     if (i.unread) markNotificationsRead({ id: i.id }).catch(() => {});
-    navigate(`/${locale}/partner-dashboard/${i.to}`);
+    navigate(`/${locale}/provider-dashboard/${i.to}`);
   };
 
   const needs = (items ?? []).filter((i) => i.needsAction);
@@ -141,7 +141,7 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
                 variant="ghost"
                 size="sm"
                 className="w-full"
-                onClick={() => { setOpen(false); navigate(`/${locale}/partner-dashboard/notifications`); }}
+                onClick={() => { setOpen(false); navigate(`/${locale}/provider-dashboard/notifications`); }}
               >
                 {t('partnerNotif.seeAll')}
               </Button>

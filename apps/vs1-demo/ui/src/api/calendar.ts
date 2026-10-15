@@ -4,7 +4,7 @@ import { myProviderKey } from './provider';
 // ─── Kalender verbinden (Nylas Hosted Auth) ──────────────────────────────────
 // Server: services/compliance-api/src/nylasAuth.ts. Der Anbieter startet die
 // Anmeldung bei Google/Microsoft ueber eine Auth-URL; der Rueckweg landet auf
-// /partner-dashboard/settings?calendar=connected|failed.
+// /provider-dashboard/settings?calendar=connected|failed.
 
 export interface CalendarStatus {
   /** Hosted Auth eingerichtet (NYLAS_* in der API-Env). */

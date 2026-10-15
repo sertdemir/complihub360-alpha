@@ -79,7 +79,7 @@ export function DomainsStep({ className }: { className?: string }) {
         <WizardOptionCard
           icon={<ShieldCheck size={22} />}
           title="Full Coverage"
-          desc="Cross-domain partner routing"
+          desc="Cross-area provider routing"
         />
       </div>
       <p className="mt-6 text-center text-[13px] text-fg-tertiary">

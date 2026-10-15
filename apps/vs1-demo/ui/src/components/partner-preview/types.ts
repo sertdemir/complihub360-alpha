@@ -1,5 +1,5 @@
 // ─── Partner-preview view-model ───────────────────────────────────────────────
-// Presentational types for the shared partner-dashboard blocks used BOTH on the
+// Presentational types for the shared provider-dashboard blocks used BOTH on the
 // provider landing page (preview) and (later) in the real partner dashboard.
 // Decoupled from the thin `useDashboardStore` LeadRequest — the store maps its
 // data into these richer view-models at the call site.
@@ -47,7 +47,7 @@ export interface TierKpi {
 }
 
 export interface TierSummary {
-  tierName: string; // "Founding Partner · Tier 1"
+  tierName: string; // "Founding Provider · Tier 1"
   note: string; // "12% above network average · review in 23 days"
   windowLabel: string; // "Last 90 days"
   trend: string; // "↑ trending steady"

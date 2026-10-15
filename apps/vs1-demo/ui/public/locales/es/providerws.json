@@ -10,7 +10,7 @@
     "navSettings": "Configuración",
     "navNotifications": "Notificaciones",
     "navHelp": "Ayuda y soporte",
-    "partnerBadge": "Partner",
+    "partnerBadge": "Proveedor",
     "searchAria": "Buscar",
     "availabilityAria": "Cambiar disponibilidad",
     "outOfOffice": "En pausa",
@@ -78,7 +78,7 @@
     "coverageToday": "Su cobertura actual: {{markets}}. Elija el mercado al que expandirse — las cifras de demanda corresponden a los últimos 30 días.",
     "addedTitle": "{{code}} añadido",
     "addedBody": " — verificación pendiente (≈ 2 días laborables). Aparecerá en el ranking una vez verificado.",
-    "candidateNote": "{{requests}} solicitudes abiertas / 30 d · {{partners}} partners",
+    "candidateNote": "{{requests}} solicitudes abiertas / 30 d · {{partners}} proveedores",
     "allCovered": "Todos los mercados listados ya están cubiertos.",
     "errorFallback": "No se pudo añadir el mercado.",
     "countryNl": "Países Bajos",
@@ -271,7 +271,7 @@
     "previewProfile": "Ver perfil público",
     "viewRankingImpact": "Ver impacto en el ranking",
     "subtitle": "Su perfil público + pesos de matching. Cada cambio afecta al ranking de búsqueda y al enrutamiento de leads en 60 segundos. Añadir un mercado activa una reverificación de 2 días laborables antes de publicarse.",
-    "rankBannerTitle": "Posición actual en búsqueda: #3 de 47 partners DE verificados · últimos 30 días",
+    "rankBannerTitle": "Posición actual en búsqueda: #3 de 47 proveedores DE verificados · últimos 30 días",
     "rankBannerBody": "Añadir mercados, eliminar dominios o cambiar el objetivo de SLA desplaza su ranking en ~60 s. Los mercados nuevos requieren una nueva verificación.",
     "edit": "Editar",
     "publicIdentityTitle": "Identidad pública",
@@ -293,10 +293,10 @@
     "domainDatTitle": "Protección de datos",
     "domainDatMeta": "1 activo · puesto #14 (mejorando)",
     "expansionBannerTitle": "Expandirse a Customs & Excise (CST) desbloquearía la posición de aspirante al puesto #1",
-    "expansionBannerBody": "14 clientes ejecutaron Risk Maps el mes pasado con brechas de cobertura DE + CST · solo 4 partners cubren ambos · añadir CST > est. 18-24 k € MRR + probable top-3 en el dominio CST.",
+    "expansionBannerBody": "14 clientes ejecutaron Risk Maps el mes pasado con brechas de cobertura DE + CST · solo 4 proveedores cubren ambos · añadir CST > est. 18-24 k € MRR + probable top-3 en el dominio CST.",
     "exploreExpansion": "Explorar expansión",
     "languagesTitle": "Idiomas hablados",
-    "languagesSub": "Los clientes filtran partners por idioma · afecta al matching",
+    "languagesSub": "Los clientes filtran proveedores por idioma · afecta al matching",
     "slaTitle": "Objetivo de SLA",
     "slaSub": "Con qué rapidez se compromete a confirmar · afecta directamente a su ranking",
     "sla6hTitle": "Confirmar en 6 h",
@@ -400,7 +400,7 @@
     }
   },
   "magicAction": {
-    "partnerBadge": "Partner",
+    "partnerBadge": "Proveedor",
     "verifying": "Verificando su enlace…",
     "invalidTitle": "El enlace ya no es válido",
     "invalidBody": "Este Magic-Link es inválido, ha caducado (24 h) o ya se utilizó — cada enlace funciona exactamente una vez. Utilice el correo más reciente o contacte con el cliente a través de su dashboard.",
@@ -426,8 +426,8 @@
     "workingButton": "Procesando…",
     "doneTitle": "Hecho ✓",
     "dossierUnlocked": "🔓 Dosier desbloqueado",
-    "contactInDashboard": "El contacto del solicitante aparecerá en el hilo de su dashboard de partner.",
-    "closeNote": "Puede cerrar esta ventana o abrir su dashboard de partner."
+    "contactInDashboard": "El contacto del solicitante aparecerá en el hilo de su dashboard de proveedor.",
+    "closeNote": "Puede cerrar esta ventana o abrir su dashboard de proveedor."
   },
   "requests": {
     "title": "Solicitudes",
@@ -638,10 +638,10 @@
     "proposalSaveFailed": "No se ha guardado. Inténtelo de nuevo."
   },
   "intake": {
-    "inviteOnlyTitle": "El alta de partners es solo por invitación.",
-    "inviteOnlyBody": "Los proveedores de CompliHub360 son captados directamente por nuestro equipo e incorporados mediante un enlace personal de alta. No hay autorregistro público: cada partner pasa una verificación manual según nuestras directrices y estatutos antes de la activación.",
-    "inviteOnlyContact": "¿Asesoras a empresas en compliance y quieres ser partner? Escríbenos: partners@complihub360.com",
-    "title": "Alta de partner",
+    "inviteOnlyTitle": "El alta de proveedores es solo por invitación.",
+    "inviteOnlyBody": "Los proveedores de CompliHub360 son captados directamente por nuestro equipo e incorporados mediante un enlace personal de alta. No hay autorregistro público: cada proveedor pasa una verificación manual según nuestras directrices y estatutos antes de la activación.",
+    "inviteOnlyContact": "¿Asesoras a empresas en compliance y quieres ser proveedor? Escríbenos: partners@complihub360.com",
+    "title": "Alta de proveedor",
     "sub": "Envía el paquete de tu despacho — lo revisamos manualmente y activamos tu workspace tras la verificación.",
     "secFirm": "Despacho y cobertura",
     "name": "Nombre del despacho *",
@@ -653,12 +653,12 @@
     "secCerts": "Certificaciones y estatutos",
     "certs": "Certificaciones (una por línea)",
     "certsPh": "Dottore Commercialista · Colegio de Milán\nISO 27001",
-    "statutes": "Confirmo que nuestro despacho cumple las directrices y estatutos de partner de CompliHub360 y acepto la verificación manual de la información enviada.",
+    "statutes": "Confirmo que nuestro despacho cumple las directrices y estatutos de proveedor de CompliHub360 y acepto la verificación manual de la información enviada.",
     "submit": "Enviar paquete para revisión",
     "sending": "Enviando…",
     "vettingNote": "Tras la revisión recibirás el acceso a tu workspace — normalmente en 2 días laborables.",
     "doneTitle": "Paquete recibido — en revisión.",
-    "doneBody": "¡Gracias! Nuestro equipo verifica ahora tu información según las directrices de partner. Tendrás noticias — normalmente en 2 días laborables. Tu workspace permanece inactivo hasta la activación.",
+    "doneBody": "¡Gracias! Nuestro equipo verifica ahora tu información según las directrices de proveedor. Tendrás noticias — normalmente en 2 días laborables. Tu workspace permanece inactivo hasta la activación.",
     "doneNote": "¿Preguntas? partners@complihub360.com",
     "errorTitle": "Error al enviar",
     "errorBody": "No se pudo enviar el paquete. Comprueba tu enlace de alta o inténtalo de nuevo — o contacta con partners@complihub360.com.",
@@ -806,6 +806,73 @@
       "titleLabel": "Su cargo",
       "confirm": "Aceptar la versión {{version}}",
       "cancel": "Cancelar"
+    },
+    "mandate": {
+      "newVersion": "Hay una nueva versión {{version}}. Su aceptación de la versión {{old}} sigue vigente; léala y acéptela de nuevo.",
+      "reviewNote": "Versión {{version}}. La revisión jurídica de este texto sigue en curso. Si cambia, le presentaremos la nueva versión de nuevo.",
+      "sections": [
+        {
+          "title": "1. De qué se trata",
+          "items": [
+            "Con esta declaración autoriza a CompliHub360 a cobrar los importes indicados en la sección 2 mediante el método de pago que ha guardado en nuestro proveedor de servicios de pago, Stripe. Los datos de su tarjeta los guarda exclusivamente Stripe; CompliHub360 no los ve ni los almacena."
+          ]
+        },
+        {
+          "title": "2. Qué importes",
+          "intro": "Solo estos dos, nada más:",
+          "items": [
+            "Su factura de suscripción por el plan elegido, con la periodicidad que seleccionó al contratar.",
+            "La tarifa por lead de una reserva que una empresa realiza con usted. Se cobra por reserva y el importe se muestra en su cuenta, en «Facturación», antes de cada reserva."
+          ]
+        },
+        {
+          "title": "3. Cuándo cobramos",
+          "items": [
+            "Factura de suscripción: Recibe la factura con 14 días para pagar y puede pagarla usted mismo. Si en la fecha de vencimiento sigue abierta, se lo comunicamos por correo electrónico y en su cuenta. Después intentamos el cobro con su método de pago guardado el día 1, 3 y 6 tras el vencimiento, como máximo una vez al día. Si paga entretanto, no se realiza ningún intento más.",
+            "Tarifa por lead: en el momento de la reserva, antes de que la empresa vea sus datos de contacto."
+          ]
+        },
+        {
+          "title": "4. Cuánto",
+          "items": [
+            "La factura de suscripción corresponde al precio del plan que confirmó al contratar o en el último cambio. Un cambio de plan o una cancelación surte efecto al final del periodo en curso.",
+            "La tarifa por lead depende del tamaño de la consulta y de su plan. Antes de cada reserva ve el importe y su cálculo en «Facturación»; los descuentos de su plan ya están aplicados.",
+            "El crédito de plataforma que se le haya abonado (por ejemplo tras una cita no atendida) se compensa con su siguiente factura de suscripción. No se paga en efectivo."
+          ]
+        },
+        {
+          "title": "5. Si un cobro no se completa",
+          "items": [
+            "Tarifa por lead: La reserva no se lleva a cabo. No se genera ninguna tarifa y la empresa no ve ninguno de sus datos. Usted sigue visible y puede comprobar el método de pago o guardar otro. Hasta entonces no acepta nuevas reservas.",
+            "Factura de suscripción: La factura sigue abierta y el plazo no cambia. Puede pagar usted mismo en cualquier momento. Si la factura sigue abierta 7 días después del vencimiento, las nuevas reservas quedan en pausa hasta que se pague. Incluso entonces sigue visible.",
+            "CompliHub360 no cobra ninguna tarifa propia por un intento fallido. Si el emisor de su tarjeta cobra comisiones depende de su contrato con él."
+          ]
+        },
+        {
+          "title": "6. Si revertimos algo",
+          "items": [
+            "Si una reserva no se lleva a cabo después de un cobro ya realizado (por ejemplo porque la misma hora se asignó al mismo tiempo), devolvemos la tarifa por lead al mismo método de pago por iniciativa propia. No tiene que hacer nada; la operación aparece en su historial de facturación."
+          ]
+        },
+        {
+          "title": "7. Revocación",
+          "items": [
+            "Puede revocar este mandato en cualquier momento en su cuenta, en «Configuración». A partir de entonces no cobramos nada más y usted no acepta nuevas reservas hasta que acepte de nuevo una versión vigente. Las facturas emitidas antes de la revocación siguen siendo exigibles y las paga usted."
+          ]
+        },
+        {
+          "title": "8. Qué registramos",
+          "items": [
+            "De cada aceptación guardamos la versión y el idioma de este texto, el nombre y el cargo de la persona que acepta, la fecha y hora y una referencia técnica. Una nueva versión no sustituye a la anterior con efecto retroactivo: para cada reserva sigue siendo verificable qué versión estaba vigente en ese momento."
+          ]
+        },
+        {
+          "title": "9. Cambios",
+          "items": [
+            "Si modificamos este texto en un punto que le afecta, le presentamos la nueva versión para su aceptación. Hasta que la acepte, no cobramos nada nuevo más allá de lo que permite la versión anterior."
+          ]
+        }
+      ]
     },
     "submit": {
       "missingTitle": "Aún falta",
@@ -1234,6 +1301,84 @@
     "until": "hasta el {{date}}"
   },
   "partnerNotif": {
+    "hours_one": "{{count}} hora",
+    "hours_other": "{{count}} horas",
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minutos",
+    "needsYou": "Requiere su atención",
+    "forInfo": "Para su información",
+    "seeAll": "Ver todas las notificaciones",
+    "empty": "Aún no hay notificaciones. Aquí aparecerán reservas, facturación y novedades de la verificación.",
+    "pageSubtitle": "Todo lo que CompliHub360 le ha enviado: reservas, facturación, verificación y su plan.",
+    "chipAppointments": "Citas",
+    "chipVerification": "Verificación",
+    "chipPlan": "Plan",
+    "goTo": "Abrir",
+    "booking_created": {
+      "title": "Nueva reserva",
+      "body": "Un cliente ha reservado una primera consulta para el {{slot}}. El expediente está listo."
+    },
+    "booking_cancelled": {
+      "title": "Reserva cancelada",
+      "body": "El cliente ha cancelado la primera consulta del {{slot}}."
+    },
+    "booking_rescheduled": {
+      "title": "Reserva aplazada",
+      "body": "El cliente ha movido la primera consulta del {{from}} al {{slot}}."
+    },
+    "appointment_reminder": {
+      "title": "Cita en {{offset}}",
+      "body": "Primera consulta el {{slot}}."
+    },
+    "dispute_opened": {
+      "title": "Un cliente discrepa de su informe",
+      "body": "Sobre la cita del {{slot}}. CompliHub360 lo revisará y le informará."
+    },
+    "dispute_resolved": {
+      "title": "Decisión sobre una cita",
+      "body": "Cita del {{slot}}: {{label}}."
+    },
+    "performance_incident": {
+      "title": "Cita no atendida registrada",
+      "body": "Se ha registrado su ausencia en la cita del {{slot}}. Esto forma parte de sus cifras de rendimiento."
+    },
+    "credit_issued": {
+      "title": "Crédito abonado",
+      "body": "{{amount}} por una cita no atendida. Se aplicará a su próxima factura de suscripción.",
+      "bodyCancelled": "{{amount}} por una cita cancelada que no se volvió a reservar. Se aplicará a su próxima factura de suscripción."
+    },
+    "payment_failed": {
+      "title": "El cargo del lead no se ha completado",
+      "body": "Las reservas quedan en pausa hasta que vuelva a comprobar la tarjeta o añada otra. Usted sigue visible."
+    },
+    "invoice_retry_scheduled": {
+      "title": "La factura {{label}} ha vencido",
+      "body": "Si mañana sigue abierta, intentaremos el cobro con la tarjeta guardada. A partir del {{deadline}}, las nuevas reservas quedan en pausa mientras siga abierta."
+    },
+    "subscription_scheduled": {
+      "title": "Cambio de plan programado",
+      "body": "Entra en vigor el {{effectiveOn}}. Hasta entonces puede retirarlo."
+    },
+    "subscription_schedule_done": {
+      "title": "Cambio de plan en vigor",
+      "body": "Su plan ha cambiado hoy según lo programado."
+    },
+    "verification_info_requested": {
+      "title": "Falta un documento",
+      "body": "Para la revisión necesitamos un justificante más."
+    },
+    "verification_decided": {
+      "title": "Revisión decidida",
+      "body": "Hay una decisión. En Verificación puede ver el resultado."
+    },
+    "verification_activated": {
+      "title": "Su cuenta está activa",
+      "body": "Las empresas ya pueden encontrarle y reservarle para los servicios aprobados."
+    },
+    "evidence_expiring": {
+      "title": "Un justificante caduca pronto",
+      "body": "{{label}} caduca el {{deadline}}."
+    },
     "decision": {
       "lifted": "levantada",
       "upheld": "confirmada"

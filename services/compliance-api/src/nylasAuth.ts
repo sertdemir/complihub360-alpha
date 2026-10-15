@@ -122,5 +122,5 @@ export async function revokeGrant(grantId: string): Promise<boolean> {
 export function settingsUrl(locale: string, result: 'connected' | 'failed'): string {
     const app = (process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '');
     const l = LOCALES.has(locale) ? locale : 'en';
-    return `${app}/${l}/partner-dashboard/settings?calendar=${result}`;
+    return `${app}/${l}/provider-dashboard/settings?calendar=${result}`;
 }

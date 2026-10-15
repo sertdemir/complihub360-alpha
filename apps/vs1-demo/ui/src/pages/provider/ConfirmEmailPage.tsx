@@ -50,7 +50,7 @@ export function ConfirmEmailPage() {
             <p className="mt-2 text-[13px] leading-relaxed text-fg-secondary">
               {t('confirmEmail.doneBody', { email })}
             </p>
-            <Link to={`/${locale}/partner-dashboard/settings`} className="mt-6 inline-block rounded-xl bg-brand px-6 py-3 text-[14px] font-bold text-fg-on-brand">
+            <Link to={`/${locale}/provider-dashboard/settings`} className="mt-6 inline-block rounded-xl bg-brand px-6 py-3 text-[14px] font-bold text-fg-on-brand">
               {t('confirmEmail.backToSettings')}
             </Link>
           </>
@@ -62,7 +62,7 @@ export function ConfirmEmailPage() {
             <p className="mt-2 text-[13px] leading-relaxed text-fg-secondary">
               {t('confirmEmail.failedBody')}
             </p>
-            <Link to={`/${locale}/partner-dashboard/settings`} className="mt-6 inline-block rounded-xl border border-elevate/20 px-6 py-3 text-[14px] font-semibold text-fg">
+            <Link to={`/${locale}/provider-dashboard/settings`} className="mt-6 inline-block rounded-xl border border-elevate/20 px-6 py-3 text-[14px] font-semibold text-fg">
               {t('confirmEmail.openSettings')}
             </Link>
           </>

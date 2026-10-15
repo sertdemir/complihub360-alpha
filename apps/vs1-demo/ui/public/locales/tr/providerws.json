@@ -10,7 +10,7 @@
     "navSettings": "Ayarlar",
     "navNotifications": "Bildirimler",
     "navHelp": "Yardım ve destek",
-    "partnerBadge": "Partner",
+    "partnerBadge": "Sağlayıcı",
     "searchAria": "Ara",
     "availabilityAria": "Uygunluk durumunu değiştir",
     "outOfOffice": "Duraklatıldı",
@@ -78,7 +78,7 @@
     "coverageToday": "Bugünkü kapsamınız: {{markets}}. Genişlemek istediğiniz pazarı seçin — talep rakamları son 30 güne aittir.",
     "addedTitle": "{{code}} eklendi",
     "addedBody": " — doğrulama bekleniyor (≈ 2 iş günü). Doğrulandıktan sonra sıralamada görünecektir.",
-    "candidateNote": "{{requests}} açık talep / 30 g · {{partners}} partner",
+    "candidateNote": "{{requests}} açık talep / 30 g · {{partners}} sağlayıcı",
     "allCovered": "Listelenen tüm pazarlar zaten kapsanıyor.",
     "errorFallback": "Pazar eklenemedi.",
     "countryNl": "Hollanda",
@@ -271,7 +271,7 @@
     "previewProfile": "Herkese açık profili önizle",
     "viewRankingImpact": "Sıralama etkisini görüntüle",
     "subtitle": "Herkese açık profiliniz + eşleştirme ağırlıkları. Her düzenleme 60 saniye içinde arama sıralamasını ve talep yönlendirmesini etkiler. Pazar eklemek, yayına girmeden önce 2 iş günü süren yeniden doğrulamayı tetikler.",
-    "rankBannerTitle": "Güncel arama sıralaması: 47 doğrulanmış DE partneri içinde #3 · son 30 gün",
+    "rankBannerTitle": "Güncel arama sıralaması: 47 doğrulanmış DE sağlayıcısı içinde #3 · son 30 gün",
     "rankBannerBody": "Pazar eklemek, alan kaldırmak veya SLA hedefini değiştirmek sıralamanızı ~60 sn içinde değiştirir. Yeni pazarlar için yeniden doğrulama gerekir.",
     "edit": "Düzenle",
     "publicIdentityTitle": "Herkese açık kimlik",
@@ -293,10 +293,10 @@
     "domainDatTitle": "Veri Gizliliği",
     "domainDatMeta": "1 aktif · sıra #14 (yükseliyor)",
     "expansionBannerTitle": "Customs & Excise (CST) alanına genişlemek #1 sıra adaylığı konumunun kilidini açar",
-    "expansionBannerBody": "Geçen ay 14 müşteri DE + CST kapsam boşluklarıyla Risk Map çalıştırdı · yalnızca 4 partner her ikisini de kapsıyor · CST eklemek > tahmini 18-24 bin € MRR + CST alanında muhtemel ilk 3.",
+    "expansionBannerBody": "Geçen ay 14 müşteri DE + CST kapsam boşluklarıyla Risk Map çalıştırdı · yalnızca 4 sağlayıcı her ikisini de kapsıyor · CST eklemek > tahmini 18-24 bin € MRR + CST alanında muhtemel ilk 3.",
     "exploreExpansion": "Genişlemeyi keşfet",
     "languagesTitle": "Konuşulan diller",
-    "languagesSub": "Müşteriler partnerleri dile göre filtreler · eşleştirmeyi etkiler",
+    "languagesSub": "Müşteriler sağlayıcıları dile göre filtreler · eşleştirmeyi etkiler",
     "slaTitle": "SLA hedefi",
     "slaSub": "Onaylamayı ne kadar hızlı taahhüt ettiğiniz · sıralamanızı doğrudan etkiler",
     "sla6hTitle": "6 saat içinde onay",
@@ -400,7 +400,7 @@
     }
   },
   "magicAction": {
-    "partnerBadge": "Partner",
+    "partnerBadge": "Sağlayıcı",
     "verifying": "Bağlantınız doğrulanıyor…",
     "invalidTitle": "Bağlantı artık geçerli değil",
     "invalidBody": "Bu Magic-Link geçersiz, süresi dolmuş (24 sa) veya zaten kullanılmış — her bağlantı tam olarak bir kez çalışır. Lütfen en güncel e-postayı kullanın veya müşteriyle panonuz üzerinden iletişime geçin.",
@@ -426,8 +426,8 @@
     "workingButton": "İşleniyor…",
     "doneTitle": "Tamamlandı ✓",
     "dossierUnlocked": "🔓 Dosya kilidi açıldı",
-    "contactInDashboard": "Talep sahibinin iletişim bilgileri partner panonuzdaki mesaj dizisinde görünecektir.",
-    "closeNote": "Bu pencereyi kapatabilir veya partner panonuzu açabilirsiniz."
+    "contactInDashboard": "Talep sahibinin iletişim bilgileri sağlayıcı panonuzdaki mesaj dizisinde görünecektir.",
+    "closeNote": "Bu pencereyi kapatabilir veya sağlayıcı panonuzu açabilirsiniz."
   },
   "requests": {
     "title": "Talepler",
@@ -638,10 +638,10 @@
     "proposalSaveFailed": "Kaydedilmedi. Lütfen tekrar deneyin."
   },
   "intake": {
-    "inviteOnlyTitle": "Partner kaydı yalnızca davetle.",
-    "inviteOnlyBody": "CompliHub360 sağlayıcıları doğrudan ekibimiz tarafından bulunur ve kişisel bir kayıt bağlantısıyla alınır. Herkese açık kayıt yoktur — her partner, aktivasyondan önce yönergelerimize ve tüzüğümüze göre manuel incelemeden geçer.",
-    "inviteOnlyContact": "Şirketlere uyum danışmanlığı veriyor ve partner olmak mı istiyorsun? Bize yaz: partners@complihub360.com",
-    "title": "Partner kaydı",
+    "inviteOnlyTitle": "Sağlayıcı kaydı yalnızca davetle.",
+    "inviteOnlyBody": "CompliHub360 sağlayıcıları doğrudan ekibimiz tarafından bulunur ve kişisel bir kayıt bağlantısıyla alınır. Herkese açık kayıt yoktur — her sağlayıcı, aktivasyondan önce yönergelerimize ve tüzüğümüze göre manuel incelemeden geçer.",
+    "inviteOnlyContact": "Şirketlere uyum danışmanlığı veriyor ve sağlayıcı olmak mı istiyorsun? Bize yaz: partners@complihub360.com",
+    "title": "Sağlayıcı kaydı",
     "sub": "Firma paketini gönder — manuel olarak inceleyip doğrulamadan sonra çalışma alanını aktive ederiz.",
     "secFirm": "Firma ve kapsam",
     "name": "Firma adı *",
@@ -653,12 +653,12 @@
     "secCerts": "Sertifikalar ve tüzük",
     "certs": "Sertifikalar (her satıra bir)",
     "certsPh": "Dottore Commercialista · Milano Odası\nISO 27001",
-    "statutes": "Firmamızın CompliHub360 partner yönergelerine ve tüzüğüne uyduğunu onaylıyor, gönderilen bilgilerin manuel incelenmesini kabul ediyorum.",
+    "statutes": "Firmamızın CompliHub360 sağlayıcı yönergelerine ve tüzüğüne uyduğunu onaylıyor, gönderilen bilgilerin manuel incelenmesini kabul ediyorum.",
     "submit": "Paketi incelemeye gönder",
     "sending": "Gönderiliyor…",
     "vettingNote": "İncelemeden sonra çalışma alanı erişimini alırsın — genellikle 2 iş günü içinde.",
     "doneTitle": "Paket alındı — incelemede.",
-    "doneBody": "Teşekkürler! Ekibimiz bilgilerini partner yönergelerine göre inceliyor. Genellikle 2 iş günü içinde haber alırsın. Çalışma alanın aktivasyona kadar pasif kalır.",
+    "doneBody": "Teşekkürler! Ekibimiz bilgilerini sağlayıcı yönergelerine göre inceliyor. Genellikle 2 iş günü içinde haber alırsın. Çalışma alanın aktivasyona kadar pasif kalır.",
     "doneNote": "Sorular? partners@complihub360.com",
     "errorTitle": "Gönderim başarısız",
     "errorBody": "Paket gönderilemedi. Kayıt bağlantını kontrol et veya tekrar dene — ya da partners@complihub360.com ile iletişime geç.",
@@ -806,6 +806,73 @@
       "titleLabel": "Göreviniz",
       "confirm": "Sürüm {{version}} kabul et",
       "cancel": "İptal"
+    },
+    "mandate": {
+      "newVersion": "Yeni sürüm {{version}} mevcut. {{old}} sürümüne verdiğiniz onay geçerliliğini korur; lütfen okuyup yeniden onaylayın.",
+      "reviewNote": "Sürüm {{version}}. Bu metnin hukuki incelemesi devam ediyor. Metin değişirse yeni sürümü size yeniden sunarız.",
+      "sections": [
+        {
+          "title": "1. Konu",
+          "items": [
+            "Bu beyanla CompliHub360’a, 2. bölümde belirtilen tutarları ödeme hizmeti sağlayıcımız Stripe’ta kayıtlı ödeme yönteminizden tahsil etme izni verirsiniz. Kart bilgileriniz yalnızca Stripe’ta tutulur; CompliHub360 bunları görmez ve saklamaz."
+          ]
+        },
+        {
+          "title": "2. Hangi tutarlar",
+          "intro": "Yalnızca bu ikisi, başka hiçbir şey:",
+          "items": [
+            "Seçtiğiniz plan için, abonelik sırasında belirlediğiniz dönemde kesilen abonelik faturanız.",
+            "Bir şirketin sizden aldığı randevu için lead ücreti. Randevu başına alınır ve tutarı her randevudan önce hesabınızda „Faturalama“ altında gösterilir."
+          ]
+        },
+        {
+          "title": "3. Ne zaman tahsil ederiz",
+          "items": [
+            "Abonelik faturası: Faturayı 14 günlük ödeme süresiyle alırsınız ve kendiniz ödeyebilirsiniz. Vade gününde hâlâ açıksa bunu e-posta ile ve hesabınızda bildiririz. Ardından vadeden sonraki 1., 3. ve 6. günde, günde en fazla bir kez, kayıtlı ödeme yönteminizden tahsil etmeyi deneriz. Bu arada kendiniz öderseniz başka deneme yapılmaz.",
+            "Lead ücreti: randevu anında, şirkete iletişim bilgileriniz gösterilmeden önce."
+          ]
+        },
+        {
+          "title": "4. Ne kadar",
+          "items": [
+            "Abonelik faturası, abonelik sırasında veya son plan değişikliğinde onayladığınız plan fiyatına eşittir. Plan değişikliği veya iptal, mevcut dönemin sonunda yürürlüğe girer.",
+            "Lead ücreti, talebin büyüklüğüne ve planınıza bağlıdır. Tutarı ve hesaplamayı her randevudan önce „Faturalama“ altında görürsünüz; planınızın indirimleri düşülmüştür.",
+            "Size tanınan platform bakiyesi (örneğin katılınmayan bir randevu sonrasında) bir sonraki abonelik faturanızdan düşülür. Nakit olarak ödenmez."
+          ]
+        },
+        {
+          "title": "5. Bir tahsilat başarısız olursa",
+          "items": [
+            "Lead ücreti: Randevu gerçekleşmez. Ücret oluşmaz ve şirkete hiçbir bilginiz gösterilmez. Görünür kalırsınız; ödeme yöntemini kontrol edebilir veya başka bir yöntem kaydedebilirsiniz. O zamana kadar yeni randevu kabul etmezsiniz.",
+            "Abonelik faturası: Fatura açık kalır, süre olduğu gibi kalır. İstediğiniz zaman kendiniz ödeyebilirsiniz. Fatura vadeden 7 gün sonra hâlâ açıksa, ödenene kadar yeni randevular duraklatılır. O durumda da görünür kalırsınız.",
+            "CompliHub360 başarısız bir deneme için kendi adına ücret almaz. Kart kuruluşunuzun ücret alıp almayacağı, onunla yaptığınız sözleşmeye bağlıdır."
+          ]
+        },
+        {
+          "title": "6. Bir işlemi geri alırsak",
+          "items": [
+            "Tahsilat başarılı olduktan sonra randevu gerçekleşmezse (örneğin aynı saat aynı anda başkasına verildiği için), lead ücretini kendi inisiyatifimizle aynı ödeme yöntemine iade ederiz. Bir şey yapmanız gerekmez; işlem faturalama geçmişinizde görünür."
+          ]
+        },
+        {
+          "title": "7. Geri alma",
+          "items": [
+            "Bu yetkiyi hesabınızda „Ayarlar“ altında istediğiniz zaman geri alabilirsiniz. O andan itibaren hiçbir tahsilat yapmayız ve güncel bir sürümü yeniden onaylayana kadar yeni randevu kabul etmezsiniz. Geri almadan önce oluşan faturalar ödenmesi gereken borç olarak kalır ve sizin tarafınızdan ödenir."
+          ]
+        },
+        {
+          "title": "8. Neleri kaydederiz",
+          "items": [
+            "Her onayda bu metnin sürümünü ve dilini, onaylayan kişinin adını ve rolünü, zamanı ve teknik bir referansı saklarız. Yeni bir sürüm eskisini geriye dönük olarak değiştirmez: her randevu için o anda hangi sürümün geçerli olduğu doğrulanabilir kalır."
+          ]
+        },
+        {
+          "title": "9. Değişiklikler",
+          "items": [
+            "Bu metni sizi etkileyen bir noktada değiştirirsek yeni sürümü onayınıza sunarız. Onaylamanıza kadar eski sürümün izin verdiğinin ötesinde yeni bir tahsilat yapmayız."
+          ]
+        }
+      ]
     },
     "submit": {
       "missingTitle": "Hâlâ eksik",
@@ -1234,6 +1301,84 @@
     "until": "{{date}} tarihine kadar"
   },
   "partnerNotif": {
+    "hours_one": "{{count}} saat",
+    "hours_other": "{{count}} saat",
+    "minutes_one": "{{count}} dakika",
+    "minutes_other": "{{count}} dakika",
+    "needsYou": "Sizi bekliyor",
+    "forInfo": "Bilginize",
+    "seeAll": "Tüm bildirimleri gör",
+    "empty": "Henüz bildirim yok. Randevular, faturalama ve doğrulama güncellemeleri burada görünür.",
+    "pageSubtitle": "CompliHub360'ın size gönderdiği her şey: randevular, faturalama, doğrulama ve planınız.",
+    "chipAppointments": "Randevular",
+    "chipVerification": "Doğrulama",
+    "chipPlan": "Plan",
+    "goTo": "Aç",
+    "booking_created": {
+      "title": "Yeni randevu",
+      "body": "Bir müşteri {{slot}} için ön görüşme randevusu aldı. Dosya hazır."
+    },
+    "booking_cancelled": {
+      "title": "Randevu iptal edildi",
+      "body": "Müşteri {{slot}} tarihindeki ön görüşmeyi iptal etti."
+    },
+    "booking_rescheduled": {
+      "title": "Randevu ertelendi",
+      "body": "Müşteri ön görüşmeyi {{from}} tarihinden {{slot}} tarihine aldı."
+    },
+    "appointment_reminder": {
+      "title": "{{offset}} sonra randevu",
+      "body": "Ön görüşme: {{slot}}."
+    },
+    "dispute_opened": {
+      "title": "Bir müşteri bildiriminize itiraz ediyor",
+      "body": "{{slot}} tarihindeki randevu hakkında. CompliHub360 inceleyip size bilgi verecek."
+    },
+    "dispute_resolved": {
+      "title": "Bir randevu hakkında karar",
+      "body": "{{slot}} tarihindeki randevu: {{label}}."
+    },
+    "performance_incident": {
+      "title": "Katılınmayan randevu kaydedildi",
+      "body": "{{slot}} tarihindeki randevuda bulunmadığınız kaydedildi. Bu, performans rakamlarınıza yansır."
+    },
+    "credit_issued": {
+      "title": "Bakiye eklendi",
+      "body": "Katılınmayan bir randevudan {{amount}}. Bir sonraki abonelik faturanızdan düşülür.",
+      "bodyCancelled": "İptal edilip yeniden alınmayan bir randevudan {{amount}}. Bir sonraki abonelik faturanızdan düşülür."
+    },
+    "payment_failed": {
+      "title": "Lead ücreti tahsil edilemedi",
+      "body": "Kartı yeniden kontrol edene veya başka bir kart ekleyene kadar randevular duraklatılır. Görünür kalırsınız."
+    },
+    "invoice_retry_scheduled": {
+      "title": "{{label}} numaralı faturanın vadesi geldi",
+      "body": "Yarın hâlâ açıksa kayıtlı kartınızı deneyeceğiz. {{deadline}} itibarıyla, fatura açık kaldığı sürece yeni randevular duraklatılır."
+    },
+    "subscription_scheduled": {
+      "title": "Plan değişikliği planlandı",
+      "body": "{{effectiveOn}} tarihinde yürürlüğe girer. O zamana kadar geri alabilirsiniz."
+    },
+    "subscription_schedule_done": {
+      "title": "Plan değişikliği yürürlükte",
+      "body": "Planınız bugün planlandığı gibi değişti."
+    },
+    "verification_info_requested": {
+      "title": "Bir belge daha gerekiyor",
+      "body": "İnceleme için bir kanıt daha gerekiyor."
+    },
+    "verification_decided": {
+      "title": "İnceleme sonuçlandı",
+      "body": "Bir karar verildi. Sonucu Doğrulama bölümünde görebilirsiniz."
+    },
+    "verification_activated": {
+      "title": "Hesabınız aktif",
+      "body": "Şirketler artık onaylı hizmetler için sizi bulup randevu alabilir."
+    },
+    "evidence_expiring": {
+      "title": "Bir belgenin süresi yakında doluyor",
+      "body": "{{label}} belgesinin süresi {{deadline}} tarihinde doluyor."
+    },
     "decision": {
       "lifted": "kaldırıldı",
       "upheld": "onaylandı"

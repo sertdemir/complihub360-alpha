@@ -1275,7 +1275,7 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'provider' && p[2] === 'calendar' && p[3] === 'connect' && method === 'POST') {
     mockCalendar.connected = true;
     const loc = typeof body.locale === 'string' ? body.locale : 'de';
-    return { url: `/${loc}/partner-dashboard/settings?calendar=connected` };
+    return { url: `/${loc}/provider-dashboard/settings?calendar=connected` };
   }
   // Kontakt und Bewerbung: der Server prueft und schickt (contact.ts); der
   // lokale Mock antwortet nur in der Form eines Erfolgs. Auf Staging erreicht

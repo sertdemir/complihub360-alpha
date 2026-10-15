@@ -8,7 +8,7 @@ import { Card } from '../../components/ui/Card';
 // honest instead of dead links.
 
 const COPY: Record<string, { title: string; gold: string; sub: string }> = {
-  providers: { title: 'Provider Network', gold: 'Network', sub: 'Coverage, responsiveness and SLA health per partner — lands with the provider_profiles schema.' },
+  providers: { title: 'Provider Network', gold: 'Network', sub: 'Coverage, responsiveness and SLA health per provider — lands with the provider_profiles schema.' },
   security: { title: 'Security Posture', gold: 'Posture', sub: 'Auth failures and abuse signals — lands with per-failure security events.' },
   privacy: { title: 'Privacy Pipeline', gold: 'Privacy', sub: 'Gate decisions per document — lands with the documents list endpoint.' },
   alerts: { title: 'Alerts', gold: 'Alerts', sub: 'Configurable thresholds on any admin metric — design final, build scheduled.' },

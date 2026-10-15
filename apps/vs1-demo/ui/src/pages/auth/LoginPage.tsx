@@ -6,7 +6,7 @@ import { ArrowRight, AlertTriangle, Mail } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 import { useAuthStore } from "../../store/useAuthStore";
 import { SystemFooter } from "../../components/auth/SystemFooter";
-import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
+import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled, isGoogleLoginEnabled } from "../../lib/supabase";
 import { clearExpired, readExpired, rememberReturnTo } from "../../lib/sessionExpiry";
 import { Banner } from "../../components/ui/Banner";
 import { FormErrorSummary, focusField } from "../../components/ui/FormErrorSummary";
@@ -211,7 +211,7 @@ export function LoginPage() {
         login(role, (email || "you").split("@")[0]);
         clearExpired();
         const redirect = redirectTarget;
-        navigate(redirect || `/${lang}/${role === "partner" ? "partner-dashboard" : "dashboard"}`);
+        navigate(redirect || `/${lang}/${role === "partner" ? "provider-dashboard" : "dashboard"}`);
     };
 
     // Dev-Einstieg in den Admin-Workspace (bewusst ohne oeffentliche Admin-UI):
@@ -265,7 +265,7 @@ export function LoginPage() {
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) { setAuthError(readableError(error.message)); return; }
         clearExpired();
-        navigate(redirectTarget || `/${lang}/partner-dashboard`);
+        navigate(redirectTarget || `/${lang}/provider-dashboard`);
     };
 
     // Dieselbe Bestaetigung, egal ob es das Konto gibt — sonst verraet die Seite,
@@ -405,7 +405,7 @@ export function LoginPage() {
                             <button type="submit" className={CTA}>
                                 {t("login.user.send")} <ArrowRight size={16} />
                             </button>
-                            <GoogleButton onClick={() => handleOAuth("user")} />
+                            {isGoogleLoginEnabled && <GoogleButton onClick={() => handleOAuth("user")} />}
                             {isDemoLoginEnabled && <DemoLoginRow role="user" onEnter={finishLogin} />}
                             <p className="mt-6 text-center text-body-sm text-fg-secondary">
                                 {t("login.user.newHere")}{" "}
@@ -464,7 +464,7 @@ export function LoginPage() {
                             <button type="submit" className={CTA}>
                                 {t("login.partner.signIn")} <ArrowRight size={16} />
                             </button>
-                            <GoogleButton onClick={() => handleOAuth("partner")} />
+                            {isGoogleLoginEnabled && <GoogleButton onClick={() => handleOAuth("partner")} />}
                             {isDemoLoginEnabled && <DemoLoginRow role="partner" onEnter={finishLogin} />}
                             <p className="mt-7 text-center text-body-2xs leading-relaxed text-fg-tertiary">{t("login.partner.legal")}</p>
                         </form>

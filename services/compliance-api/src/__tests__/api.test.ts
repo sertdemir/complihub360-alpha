@@ -3,6 +3,9 @@ import { LEAD_FEE_POLICY_VERSION } from '../billing.js';
 import { createHash, createHmac, randomUUID, generateKeyPairSync, sign as cryptoSign } from 'node:crypto';
 import { createServer as createHttpServer } from 'node:http';
 
+/** Leak-Guards pruefen Feldnamen, nicht Zufall: UUIDs bestehen aus Hex und koennen "fee", "bad", "ace" enthalten. */
+const ohneIds = (text: string) => text.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '<id>');
+
 // ─── API integration tests (13-layer audit P1 #7) ────────────────────────────
 // The real HTTP server runs in-process on a test port; only supabaseApi is
 // replaced by an in-memory table store. This pins the manually-verified flows:
@@ -4461,7 +4464,7 @@ describe('Kalender: Nylas Hosted Auth', () => {
         nylasAuthMock.exchangeCode.mockResolvedValue({ grantId: 'grant-1', email: 'kalender@testkanzlei.example' });
         const back = await callback(`code=abc&state=${encodeURIComponent(state)}`);
         expect(back.status).toBe(302);
-        expect(back.headers.get('location')).toBe('https://app.test/de/partner-dashboard/settings?calendar=connected');
+        expect(back.headers.get('location')).toBe('https://app.test/de/provider-dashboard/settings?calendar=connected');
         expect(db.providers[0]).toMatchObject({ nylas_grant_id: 'grant-1', nylas_calendar_id: 'kalender@testkanzlei.example' });
         expect((db.event_log ?? []).some((e) => e.type === 'calendar_connected')).toBe(true);
 
@@ -4488,7 +4491,7 @@ describe('Kalender: Nylas Hosted Auth', () => {
         const { signState } = await vi.importActual<typeof import('../nylasAuth.js')>('../nylasAuth.js');
         nylasAuthMock.exchangeCode.mockResolvedValue(null);
         const back = await callback(`code=abc&state=${encodeURIComponent(signState('test-kanzlei', 'tr'))}`);
-        expect(back.headers.get('location')).toBe('https://app.test/tr/partner-dashboard/settings?calendar=failed');
+        expect(back.headers.get('location')).toBe('https://app.test/tr/provider-dashboard/settings?calendar=failed');
         expect(db.providers[0].nylas_grant_id ?? null).toBeNull();
     });
 
@@ -4866,7 +4869,7 @@ describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Lim
         const text = JSON.stringify(r.body);
         expect(text).not.toContain('geheim');
         expect(text).not.toContain('andere-kanzlei');
-        expect(text).not.toMatch(/fee|band|ledger|stripe/i);
+        expect(ohneIds(text)).not.toMatch(/fee|band|ledger|stripe/i);
         // since-Filter und Seite
         const seit = await asKey(key, '/api/v1/ext/leads?since=2026-10-02T00:00:00Z');
         expect(seit.body.leads).toHaveLength(1);

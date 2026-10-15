@@ -53,8 +53,8 @@ describe('Konfiguration und URLs', () => {
     });
 
     it('Rueckweg in die Einstellungen der Sprache', () => {
-        expect(settingsUrl('de', 'connected')).toBe('https://app.test/de/partner-dashboard/settings?calendar=connected');
-        expect(settingsUrl('xx', 'failed')).toBe('https://app.test/en/partner-dashboard/settings?calendar=failed');
+        expect(settingsUrl('de', 'connected')).toBe('https://app.test/de/provider-dashboard/settings?calendar=connected');
+        expect(settingsUrl('xx', 'failed')).toBe('https://app.test/en/provider-dashboard/settings?calendar=failed');
     });
 });
 

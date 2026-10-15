@@ -56,7 +56,7 @@ export interface PartnerNotification {
   unread: boolean;
   needsAction: boolean;
   topic: PartnerTopic;
-  /** Pfad unter /partner-dashboard/. */
+  /** Pfad unter /provider-dashboard/. */
   to: string;
 }
 

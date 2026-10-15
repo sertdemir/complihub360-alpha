@@ -568,7 +568,7 @@
       },
       {
         "value": "3",
-        "label": "partners listos"
+        "label": "proveedores listos"
       }
     ],
     "rows": [
@@ -711,7 +711,7 @@
     "partnersTitle": "Hemos encontrado quién puede actuar sobre esto.",
     "unlock": "Vea sus mejores matches con una cuenta gratuita",
     "save": {
-      "title": "Guarde este mapa. Desbloquee los partners.",
+      "title": "Guarde este mapa. Desbloquee los proveedores.",
       "subtitle": "Cuenta gratuita. Sin tarjeta de crédito. Acceso de miembro fundador hasta el lanzamiento de la Beta.",
       "cta": "Crear cuenta gratuita"
     },
@@ -1066,7 +1066,7 @@
       "gold": "Tres",
       "post": " principios discretos."
     },
-    "subtitle": "Los productos de compliance suelen gritar. Nosotros no tenemos por qué. El riesgo no necesita amenaza. Las decisiones no necesitan un embudo de 20 pasos. Los partners no necesitan un marketplace. Pase el cursor por cada tarjeta para ver qué hicimos en su lugar.",
+    "subtitle": "Los productos de compliance suelen gritar. Nosotros no tenemos por qué. El riesgo no necesita amenaza. Las decisiones no necesitan un embudo de 20 pasos. Los proveedores no necesitan un marketplace. Pase el cursor por cada tarjeta para ver qué hicimos en su lugar.",
     "hoverCue": "Pase el cursor para ver",
     "cards": [
       {
@@ -1098,7 +1098,7 @@
       "gold": "base",
       "post": " de todo su compliance."
     },
-    "subtitle": "La evaluación es gratuita. Lo que viene después — su espacio de trabajo, noticias en vivo, contenido experto, sus partners — es lo que convierte a CompliHub360 en el lugar al que usted vuelve.",
+    "subtitle": "La evaluación es gratuita. Lo que viene después — su espacio de trabajo, noticias en vivo, contenido experto, sus proveedores — es lo que convierte a CompliHub360 en el lugar al que usted vuelve.",
     "pills": {
       "live": "Disponible hoy",
       "beta": "Llega con la Beta"
@@ -1132,7 +1132,7 @@
       }
     ],
     "workspace": {
-      "title": "Su mapa. Sus partners. Su historial. Permanente.",
+      "title": "Su mapa. Sus proveedores. Su historial. Permanente.",
       "desc": "La evaluación se convierte en un dossier guardado. Su cronología de encargos vive en su dashboard. Relaciones con proveedores, historial de compliance, Risk Map — todo en un solo lugar, todo suyo."
     },
     "newsCard": {
@@ -1204,7 +1204,7 @@
         ]
       },
       {
-        "label": "Partners y encargos",
+        "label": "Proveedores y encargos",
         "items": [
           {
             "q": "¿Me están dando asesoramiento jurídico?",
@@ -1315,7 +1315,7 @@
         "title": "Empresa",
         "links": {
           "about": "Sobre nosotros",
-          "partner": "Partners",
+          "partner": "Proveedores",
           "trustSecurity": "Confianza y seguridad",
           "contact": "Contacto",
           "support": "Soporte"

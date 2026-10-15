@@ -66,7 +66,7 @@ export function ContactPage() {
   const localize = (href: string) => (href.startsWith('/') ? `/${locale}${href}` : href);
 
   // Tiefenlink fuer Zubringer (heute: der "formlose Fragen"-Weg der
-  // Bewerbungsseite /partner-apply): /contact?lane=partner waehlt den Weg vor
+  // Bewerbungsseite /provider-apply): /contact?lane=partner waehlt den Weg vor
   // und scrollt zum Formular — ohne das landete ein Bewerber oben im Hero und
   // musste den Anbieter-Weg selbst suchen (Nutzer-Befund 2026-08-29).
   const [params] = useSearchParams();

@@ -77,7 +77,7 @@ export interface ReadinessItem {
   done: boolean;
   title: string;
   sub?: string;
-  /** Ziel im Partner-Bereich (relativ zu /:locale/partner-dashboard). */
+  /** Ziel im Partner-Bereich (relativ zu /:locale/provider-dashboard). */
   action?: { label: string; to: string };
 }
 
@@ -184,7 +184,7 @@ export function ReadinessEmpty({
                 {it.sub && <span className="block text-[12px] text-fg-tertiary">{it.sub}</span>}
               </span>
               {it.action && (
-                <Button size="sm" variant="secondary" onClick={() => navigate(`/${locale}/partner-dashboard/${it.action!.to}`)}>
+                <Button size="sm" variant="secondary" onClick={() => navigate(`/${locale}/provider-dashboard/${it.action!.to}`)}>
                   {it.action.label}
                 </Button>
               )}

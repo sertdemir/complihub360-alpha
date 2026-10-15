@@ -200,7 +200,7 @@ export function SettingsPage() {
                 </div>
               )}
               <button type="button" className="text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline"
-                onClick={() => navigate(`/${locale}/partner-dashboard/application`)}>
+                onClick={() => navigate(`/${locale}/provider-dashboard/application`)}>
                 {t('settings.changeViaApplication')}
               </button>
             </SectionCard>

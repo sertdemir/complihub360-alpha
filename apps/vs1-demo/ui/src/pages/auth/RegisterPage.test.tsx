@@ -18,6 +18,7 @@ vi.mock('../../lib/supabase', () => ({
   getSupabase: vi.fn().mockResolvedValue(null),
   isSupabaseConfigured: false,
   isDemoLoginEnabled: false,
+  isGoogleLoginEnabled: false,
 }));
 
 function renderPage() {

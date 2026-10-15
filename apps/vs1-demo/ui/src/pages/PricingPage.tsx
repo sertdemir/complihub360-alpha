@@ -130,7 +130,7 @@ function PartnerBillVignette() {
       className="w-[340px] max-w-full overflow-hidden rounded-xl bg-surface shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary"
     >
       <div className="border-b border-stroke-subtle px-5 py-3 text-body-4xs font-extrabold uppercase tracking-[0.12em] text-fg-tertiary">
-        {t('pricing.vignette.billTitle', "The partner's bill")}
+        {t('pricing.vignette.billTitle', "The provider's bill")}
       </div>
       <div className="px-5 py-2">
         {rows.map((r, i) => (

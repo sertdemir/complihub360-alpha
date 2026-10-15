@@ -94,7 +94,7 @@
       "node2Desc": "Business model & context",
       "node3Label": "Risk Engine",
       "node3Desc": "Calculate risk level",
-      "node4Label": "Partner Match",
+      "node4Label": "Provider Match",
       "node4Desc": "1-Click engagement",
       "stat1Label": "Steps to risk profile",
       "stat2Label": "Max confirmation time",
@@ -284,7 +284,7 @@
       "title": "Into the network in three steps",
       "ctaTitle": "Ready?",
       "ctaBody": "Applications go through the “Getting listed as a provider” route on the contact page — with a response within three business days.",
-      "ctaButton": "Apply as a partner"
+      "ctaButton": "Apply as a provider"
     },
     "intakeStep": {
       "apply": {
@@ -1228,7 +1228,7 @@
     "fallbackName": "My account",
     "role": {
       "user": "Company",
-      "partner": "Advisory partner",
+      "partner": "Provider",
       "admin": "Administration"
     }
   },
@@ -1648,7 +1648,7 @@
       "confirmed": "Appointment confirmed",
       "yourCost": "Your cost",
       "fee": "Placement fee",
-      "feePaidBy": "borne by the partner",
+      "feePaidBy": "borne by the provider",
       "match": "{{pct}}% match",
       "noSlot": "No slot for sale",
       "verified": "Verified Provider",
@@ -1656,7 +1656,7 @@
       "range": "€180–240",
       "perHour": "/ hour",
       "published": "published before first contact",
-      "billTitle": "The partner's bill",
+      "billTitle": "The provider's bill",
       "billListing": "Directory listing",
       "billProfile": "Profile view",
       "billClick": "Click on the profile",
@@ -1815,7 +1815,7 @@
     }
   },
   "partnerApply": {
-    "eyebrow": "Become a partner",
+    "eyebrow": "Become a provider",
     "titlePre": "Your path into the ",
     "titleGold": "network",
     "titlePost": " — step by step.",
@@ -1826,7 +1826,7 @@
       },
       "access": {
         "title": "Your personal access link",
-        "desc": "If it is a fit, you receive a magic link by email — no password, the link takes you straight to your partner workspace."
+        "desc": "If it is a fit, you receive a magic link by email — no password, the link takes you straight to your provider workspace."
       },
       "listing": {
         "title": "Onboarding and listing",

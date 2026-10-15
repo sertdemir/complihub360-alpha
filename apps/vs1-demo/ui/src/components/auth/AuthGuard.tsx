@@ -23,7 +23,7 @@ export function AuthGuard({ requiredRole }: AuthGuardProps) {
   }
 
   if (role && role !== requiredRole) {
-    const correctDashboard = role === 'partner' ? 'partner-dashboard' : role === 'admin' ? 'admin' : 'dashboard';
+    const correctDashboard = role === 'partner' ? 'provider-dashboard' : role === 'admin' ? 'admin' : 'dashboard';
     return <Navigate to={`/${lang}/${correctDashboard}`} replace />;
   }
 

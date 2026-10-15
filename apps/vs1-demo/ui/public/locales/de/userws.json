@@ -640,7 +640,7 @@
     },
     "bodyLabel": "Deine Erfahrung (optional)",
     "bodyPh": "Wie lief das Erstgespräch?",
-    "note": "Verifizierte Bewertungen stammen nur aus echten Terminen und erscheinen anonymisiert auf dem Provider-Profil. Dein Name bleibt privat.",
+    "note": "Verifizierte Bewertungen stammen nur aus echten Terminen und erscheinen anonymisiert auf dem Anbieter-Profil. Dein Name bleibt privat.",
     "close": "Schließen",
     "sendFailed": {
       "heading": "Wir konnten Ihre Bewertung nicht senden",

@@ -1,4 +1,5 @@
 import { SessionExpiryWatcher } from "./components/auth/SessionExpiryWatcher";
+import { LegacyPartnerRedirect } from "./components/routing/LegacyPartnerRedirect";
 import { lazy, useEffect } from "react";
 import { trackScrollDepth } from "./lib/analytics";
 import { useSeo } from "./hooks/useSeo";
@@ -248,25 +249,25 @@ function AppContent() {
                         <Route path="dashboard/*" element={<LocaleRedirect to="dashboard" />} />
                     </Route>
                     
-                    {/* Partner Dashboard Routes (Auth Guarded) */}
+                    {/* Provider Dashboard Routes (Auth Guarded) */}
                     <Route element={<AuthGuard requiredRole="partner" />}>
                         {/* Phase 6 (ADR-0009 Nr. 5): die Übersicht ist die Landung nach dem
                             Login. Die Anfragen-Seite der stillgelegten Pipeline ist abgehängt;
                             ihr alter Pfad landet ebenfalls auf der Übersicht. */}
-                        <Route path="partner-dashboard" element={<Navigate to="overview" replace />} />
-                        <Route path="partner-dashboard/overview" element={<OverviewPage />} />
-                        <Route path="partner-dashboard/requests" element={<LocaleRedirect to="partner-dashboard/overview" />} />
-                        <Route path="partner-dashboard/termine" element={<LeadsPage />} />
-                        <Route path="partner-dashboard/performance" element={<PerformancePage />} />
-                        <Route path="partner-dashboard/coverage" element={<CoveragePage />} />
-                        <Route path="partner-dashboard/billing" element={<BillingPage />} />
-                        <Route path="partner-dashboard/subscription" element={<SubscriptionPage />} />
-                        <Route path="partner-dashboard/settings" element={<SettingsPage />} />
-                        <Route path="partner-dashboard/notifications" element={<NotificationsPage />} />
+                        <Route path="provider-dashboard" element={<Navigate to="overview" replace />} />
+                        <Route path="provider-dashboard/overview" element={<OverviewPage />} />
+                        <Route path="provider-dashboard/requests" element={<LocaleRedirect to="provider-dashboard/overview" />} />
+                        <Route path="provider-dashboard/termine" element={<LeadsPage />} />
+                        <Route path="provider-dashboard/performance" element={<PerformancePage />} />
+                        <Route path="provider-dashboard/coverage" element={<CoveragePage />} />
+                        <Route path="provider-dashboard/billing" element={<BillingPage />} />
+                        <Route path="provider-dashboard/subscription" element={<SubscriptionPage />} />
+                        <Route path="provider-dashboard/settings" element={<SettingsPage />} />
+                        <Route path="provider-dashboard/notifications" element={<NotificationsPage />} />
                         {/* Phase 2 Onboarding: Dossier + Verification Center */}
-                        <Route path="partner-dashboard/application" element={<ApplicationPage />} />
-                        <Route path="partner-dashboard/verification" element={<VerificationPage />} />
-                        <Route path="partner-dashboard/*" element={<LocaleRedirect to="partner-dashboard/overview" />} />
+                        <Route path="provider-dashboard/application" element={<ApplicationPage />} />
+                        <Route path="provider-dashboard/verification" element={<VerificationPage />} />
+                        <Route path="provider-dashboard/*" element={<LocaleRedirect to="provider-dashboard/overview" />} />
                     </Route>
 
                     {/* Admin Control Center (Auth Guarded · dev entry: /login?as=admin) */}
@@ -289,12 +290,14 @@ function AppContent() {
                     {/* v2 (D7): providers onboard via the token-gated intake link —
                         the old self-registration wizard is retired. */}
                     <Route path="provider-intake" element={<ProviderIntakePage />} />
-                    <Route path="partner-onboarding" element={<ProviderIntakePage />} />
+                    <Route path="partner-onboarding" element={<LegacyPartnerRedirect from="partner-onboarding" to="provider-intake" />} />
                     <Route path="register" element={<RegisterPage />} />
                     {/* Oeffentliche Partner-Bewerbung — fuehrt in die manuelle
                         Pruefung; der token-gesicherte Intake bleibt der Weg fuer
                         eingeladene Partner. */}
-                    <Route path="partner-apply" element={<PartnerApplyPage />} />
+                    <Route path="provider-apply" element={<PartnerApplyPage />} />
+                    <Route path="partner-apply" element={<LegacyPartnerRedirect from="partner-apply" to="provider-apply" />} />
+                    <Route path="partner-dashboard/*" element={<LegacyPartnerRedirect from="partner-dashboard" to="provider-dashboard" />} />
                     <Route path="verify-email" element={<EmailVerificationPage />} />
                     <Route path="auth/callback" element={<AuthCallbackPage />} />
                     <Route path="reset-password" element={<ResetPasswordPage />} />
