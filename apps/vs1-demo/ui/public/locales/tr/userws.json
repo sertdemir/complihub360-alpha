@@ -516,7 +516,13 @@
     "you": "Siz",
     "authorUser": "kullanıcı",
     "authorProvider": "sağlayıcı",
-    "authorSystem": "sistem"
+    "authorSystem": "sistem",
+    "notSent": "Gönderilmedi",
+    "edit": "Düzenle",
+    "sendFailed": {
+      "heading": "Mesajınızı gönderemedik",
+      "message": "Mesajınız hâlâ burada. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
+    }
   },
   "assistant": {
     "title": "KDV Asistanı",
@@ -633,7 +639,24 @@
     },
     "bodyLabel": "Deneyimin (isteğe bağlı)",
     "bodyPh": "İlk görüşme nasıl geçti?",
-    "note": "Doğrulanmış değerlendirmeler yalnızca gerçek randevulardan gelir ve sağlayıcı profilinde anonim görünür. Adın gizli kalır."
+    "note": "Doğrulanmış değerlendirmeler yalnızca gerçek randevulardan gelir ve sağlayıcı profilinde anonim görünür. Adın gizli kalır.",
+    "close": "Kapat",
+    "sendFailed": {
+      "heading": "Değerlendirmenizi gönderemedik",
+      "message": "Puanınız ve yorumlarınız hâlâ burada. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
+    },
+    "submitted": {
+      "heading": "Teşekkürler, değerlendirmeniz gönderildi",
+      "message": "Sağlayıcı profilinde anonim olarak görünür. Adınız gizli kalır."
+    },
+    "alreadyReviewed": {
+      "heading": "Bu randevuyu zaten değerlendirdiniz",
+      "message": "Önceki değerlendirmeniz kayıtlı. Her randevu bir kez değerlendirilebilir."
+    },
+    "notHeld": {
+      "heading": "Bu randevu değerlendirilemez",
+      "message": "Yalnızca gerçekleşen randevular değerlendirilebilir."
+    }
   },
   "reschedule": {
     "eyebrow": "Randevuyu ertele",

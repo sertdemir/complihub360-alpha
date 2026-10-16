@@ -1664,7 +1664,8 @@ paths:
         (dieselben Bereiche als Codes, das UI uebersetzt sie), `provider_website`
         erst nach Offenlegung. `provider_paused`: der kommende Termin liegt in
         einem Bereich, den der Anbieter nach einem wesentlichen Ereignis
-        pausiert hat (Change-Control, Canvas F V1). Phase 5: `no_show_by`,
+        pausiert hat (Change-Control, Canvas F V1). `reviewed`: der Nutzer hat
+        diesen Termin schon bewertet (Canvas E1, 15.10.2026). Phase 5: `no_show_by`,
         `no_show_reported_at`, `dispute_status`, `dispute_open_until`,
         `rebook_deadline`, `rebook_open`, `rebooked_from`, `reschedule_count`,
         `reschedule_limit`, `attendance_reportable` — nie Band, Gebuehr oder

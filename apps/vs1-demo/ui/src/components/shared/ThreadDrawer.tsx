@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, X } from 'lucide-react';
+import { AlertCircle, FileText, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { Drawer } from '../ui/Drawer';
@@ -8,6 +8,8 @@ import { Tag } from '../ui/Tag';
 import { fetchEngagementDetail, postThreadMessage, type EngagementDetail, type Proposal } from '../../api/thread';
 import { focusField } from '../ui/FormErrorSummary';
 import { FieldError, errorAria } from '../ui/FieldError';
+import { TechnicalDetails } from '../results/RiskMapState';
+import { referenceOf } from '../../api/client';
 
 // ─── Thread drawer (Figma: Request-thread 2654:2 / Reply 2649:2) ─────────────
 // The shared engagement history, opened from BOTH workspaces. `viewer` decides
@@ -15,6 +17,26 @@ import { FieldError, errorAria } from '../ui/FieldError';
 // attach a structured proposal (Provider Flows §5), rendered as a card for
 // both sides. Copy lives in the 'userws' namespace (thread.*); raw api values
 // (status, engagement_model, author) stay canonical and are mapped for display.
+//
+// Punkt 1 (Canvas-Wahl T2 · C3, 15.10.2026; Figma 3740:4375): scheiterte das
+// Senden, passierte sichtbar nichts — wer den Drawer schloss, hielt die
+// Nachricht fuer gesendet. Jetzt bleibt sie als Blase „Not sent“ im Verlauf
+// stehen, mit „Try Again“, „Edit“ (zurueck ins Feld) und der Referenz.
+// Vorher wird der Verlauf einmal neu geladen: bei einer Zeitueberschreitung
+// kann die Nachricht doch angekommen sein — dann gilt sie als gesendet, und
+// ein zweiter Versuch erzeugt kein Duplikat.
+
+interface FailedMessage {
+  body: string;
+  proposal?: Proposal;
+  reference: { id: string; at: string } | null;
+}
+
+/** Ob die Nachricht trotz Fehler im Verlauf steht: gleicher Absender, gleicher
+ *  Text, nicht aelter als der Sendeversuch (mit Spiel fuer Uhrabweichung). */
+export function arrivedDespiteError(d: EngagementDetail | null, viewer: string, body: string, since: number): boolean {
+  return !!d?.messages.some((m) => m.author === viewer && m.body === body && new Date(m.created_at).getTime() >= since - 60_000);
+}
 
 interface ThreadDrawerProps {
   open: boolean;
@@ -116,11 +138,12 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
   // Nachricht (der Vorschlag ist optional) — ist sie zu kurz, steht der Satz
   // am Feld und der Fokus dort.
   const [tried, setTried] = useState(false);
+  const [failed, setFailed] = useState<FailedMessage | null>(null);
   const draftError = tried && draft.trim().length < 2 ? t('thread.messageTooShort', { min: 2 }) : null;
 
   useEffect(() => {
     if (!open || !engagementId) return;
-    setDetail(null); setLoadFailed(false); setTried(false);
+    setDetail(null); setLoadFailed(false); setTried(false); setFailed(null);
     setProposalOpen(false); setPrice(''); setTimeline(''); setModel(''); setDeliverables('');
     fetchEngagementDetail(engagementId)
       .then(setDetail)
@@ -138,17 +161,51 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
     return Object.keys(p).length ? p : undefined;
   };
 
+  const clearComposer = () => {
+    setDraft(''); setTried(false); setProposalOpen(false); setPrice(''); setTimeline(''); setModel(''); setDeliverables('');
+  };
+
+  const deliver = async (body: string, proposal: Proposal | undefined) => {
+    if (!engagementId) return;
+    setSending(true);
+    const since = Date.now();
+    try {
+      await postThreadMessage(engagementId, viewer, body, proposal);
+      setFailed(null);
+      setDetail(await fetchEngagementDetail(engagementId).catch(() => detail));
+    } catch (err) {
+      const fresh = await fetchEngagementDetail(engagementId).catch(() => null);
+      if (fresh) setDetail(fresh);
+      if (arrivedDespiteError(fresh, viewer, body, since)) setFailed(null);
+      else setFailed({ body, proposal, reference: referenceOf(err) });
+    }
+    setSending(false);
+  };
+
   const send = async () => {
     if (!engagementId || sending) return;
     setTried(true);
     if (draft.trim().length < 2) { focusField('thread-draft'); return; }
-    setSending(true);
-    try {
-      await postThreadMessage(engagementId, viewer, draft.trim(), buildProposal());
-      setDraft(''); setTried(false); setProposalOpen(false); setPrice(''); setTimeline(''); setModel(''); setDeliverables('');
-      setDetail(await fetchEngagementDetail(engagementId));
-    } catch { /* keep draft for retry */ }
-    setSending(false);
+    const body = draft.trim();
+    const proposal = buildProposal();
+    // T2: der Text wandert in den Verlauf — als gesendet oder als „Not sent“.
+    clearComposer();
+    await deliver(body, proposal);
+  };
+
+  const retry = () => { if (failed && !sending) void deliver(failed.body, failed.proposal); };
+
+  const edit = () => {
+    if (!failed) return;
+    const p = failed.proposal;
+    setDraft(failed.body);
+    if (p) {
+      setProposalOpen(true);
+      setPrice(p.price_range ?? ''); setTimeline(p.timeline ?? ''); setModel(p.engagement_model ?? '');
+      setDeliverables((p.deliverables ?? []).join('\n'));
+    }
+    setFailed(null);
+    focusField('thread-draft');
   };
 
   const e = detail?.engagement;
@@ -257,6 +314,28 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
               </div>
             );
           })}
+        </div>
+      )}
+      {failed && (
+        <div className="mt-3 flex flex-col items-end gap-1.5">
+          <div className="max-w-[85%] rounded-xl border-[1.5px] border-dashed border-error-500/70 px-3.5 py-2.5 text-[13px] leading-relaxed text-fg">
+            <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-error-700 dark:text-red-300">
+              {t('thread.you')} · {t('thread.notSent')}
+            </p>
+            {failed.body}
+            {failed.proposal && <ProposalCard p={failed.proposal} />}
+          </div>
+          <div role="alert" className="flex flex-col items-end gap-1 text-right">
+            <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
+              <span className="flex items-center gap-1.5 text-[12px] font-semibold text-error-700 dark:text-red-300">
+                <AlertCircle size={14} aria-hidden="true" />{t('thread.sendFailed.heading')}
+              </span>
+              <Button variant="ghost" size="sm" onClick={retry} disabled={sending}>{sending ? '…' : t('common:states.actions.tryAgain')}</Button>
+              <Button variant="ghost" size="sm" onClick={edit} disabled={sending}>{t('thread.edit')}</Button>
+            </div>
+            <p className="text-[12px] leading-relaxed text-fg-secondary">{t('thread.sendFailed.message')}</p>
+          </div>
+          <TechnicalDetails reference={failed.reference} />
         </div>
       )}
     </Drawer>

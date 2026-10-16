@@ -1345,6 +1345,26 @@ describe('POST /api/v1/reviews — nur aus einer gehaltenen Buchung', () => {
         expect((await send()).status).toBe(409);
     });
 
+    it('die Termin-Liste meldet je Buchung, ob der Nutzer sie schon bewertet hat (Canvas E1)', async () => {
+        // Vorher kannte nur der Speicher der Seite den Status: nach dem
+        // Neuladen stand „Rate provider“ wieder da und endete in 409.
+        seedProvider();
+        const bewertet = seedBooking();
+        const offen = seedBooking();
+        // Bewertung des Anbieters zu einem fremden Lead zaehlt nicht mit
+        (db.reviews ??= []).push({ id: randomUUID(), booking_id: offen.id, provider_key: 'test-kanzlei', from_role: 'provider', rating: 3 });
+        const r = await api('/api/v1/reviews', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ booking_id: bewertet.id, from_role: 'user', rating: 4 }),
+        });
+        expect(r.status).toBe(201);
+        const list = await api('/api/v1/bookings', { auth: 'jwt' });
+        expect(list.status).toBe(200);
+        const byId = Object.fromEntries(list.body.bookings.map((b: any) => [b.id, b.reviewed]));
+        expect(byId[bewertet.id]).toBe(true);
+        expect(byId[offen.id]).toBe(false);
+    });
+
     it('laesst den Anbieter nur als Mitglied den Lead bewerten', async () => {
         seedProvider();
         const b = seedBooking({ user_id: randomUUID() });

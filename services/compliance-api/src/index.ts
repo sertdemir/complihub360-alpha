@@ -1216,6 +1216,25 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const r = await requestOf(authUserId, b.provider_key);
                     pausedFlag[b.id] = bookingAffected(paused.get(b.provider_key), r?.category);
                 }
+                // Punkt 1 (Canvas E1, 15.10.2026): ob der Nutzer den Termin
+                // schon bewertet hat, kommt vom Server. Vorher kannte das nur
+                // der Speicher der Seite — nach dem Neuladen stand „Rate
+                // provider“ wieder da und der zweite Versuch endete in 409.
+                // Reviews tragen keinen user_id: je gebuchtem Anbieter einmal
+                // lesen und gegen die eigenen Buchungs-IDs abgleichen.
+                const reviewedIds = new Set<string>();
+                try {
+                    const ownIds = new Set(rows.map((b: any) => b.id));
+                    for (const key of new Set(rows.map((b: any) => b.provider_key as string))) {
+                        const revs = (await supabaseApi.select('reviews', { provider_key: key, from_role: 'user' }, { limit: 1000 })) as any[];
+                        for (const r of revs) if (r.booking_id && ownIds.has(r.booking_id)) reviewedIds.add(r.booking_id);
+                    }
+                } catch {
+                    // Die Termine bleiben lesbar; ohne Flag zeigt die Karte
+                    // „Rate provider“, und der Server antwortet ALREADY_REVIEWED
+                    // (der Drawer sagt das dann ehrlich, E1). Nicht still: geloggt.
+                    structuredLog('warn', 'Reviewed flag lookup failed', { correlationId, errorCode: 'ERR_BOOKINGS_REVIEWED', severity: 'warn', route: req.url });
+                }
                 const bookings = rows.map((b: any) => {
                     const p = byKey[b.provider_key] || {};
                     const areas = [...new Set(viewAll.filter((r: any) => r.provider_key === b.provider_key).map((r: any) => r.area_code as string).filter(Boolean))];
@@ -1238,6 +1257,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         status: b.status,
                         message: b.message ?? null,
                         provider_paused: !!pausedFlag[b.id],
+                        reviewed: reviewedIds.has(b.id),
                         ...attendanceFields(b, attPolicy, attNow),
                     };
                 });

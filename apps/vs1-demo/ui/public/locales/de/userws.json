@@ -516,7 +516,13 @@
     "you": "Sie",
     "authorUser": "Nutzer",
     "authorProvider": "Anbieter",
-    "authorSystem": "System"
+    "authorSystem": "System",
+    "notSent": "Nicht gesendet",
+    "edit": "Bearbeiten",
+    "sendFailed": {
+      "heading": "Wir konnten Ihre Nachricht nicht senden",
+      "message": "Ihre Nachricht ist noch da. Bitte versuchen Sie es erneut. Wenn das Problem bleibt, wenden Sie sich an den Support."
+    }
   },
   "assistant": {
     "title": "USt-Assistent",
@@ -634,7 +640,24 @@
     },
     "bodyLabel": "Deine Erfahrung (optional)",
     "bodyPh": "Wie lief das Erstgespräch?",
-    "note": "Verifizierte Bewertungen stammen nur aus echten Terminen und erscheinen anonymisiert auf dem Anbieter-Profil. Dein Name bleibt privat."
+    "note": "Verifizierte Bewertungen stammen nur aus echten Terminen und erscheinen anonymisiert auf dem Anbieter-Profil. Dein Name bleibt privat.",
+    "close": "Schließen",
+    "sendFailed": {
+      "heading": "Wir konnten Ihre Bewertung nicht senden",
+      "message": "Ihre Bewertung und Ihr Text sind noch da. Bitte versuchen Sie es erneut. Wenn das Problem bleibt, wenden Sie sich an den Support."
+    },
+    "submitted": {
+      "heading": "Vielen Dank, Ihre Bewertung ist gesendet",
+      "message": "Sie erscheint anonymisiert im Profil des Anbieters. Ihr Name bleibt privat."
+    },
+    "alreadyReviewed": {
+      "heading": "Sie haben diesen Termin bereits bewertet",
+      "message": "Ihre frühere Bewertung ist gespeichert. Jeder Termin kann einmal bewertet werden."
+    },
+    "notHeld": {
+      "heading": "Dieser Termin kann nicht bewertet werden",
+      "message": "Bewertungen sind nur für Termine möglich, die stattgefunden haben."
+    }
   },
   "reschedule": {
     "eyebrow": "Termin verschieben",

@@ -516,7 +516,13 @@
     "you": "Usted",
     "authorUser": "usuario",
     "authorProvider": "proveedor",
-    "authorSystem": "sistema"
+    "authorSystem": "sistema",
+    "notSent": "No enviado",
+    "edit": "Editar",
+    "sendFailed": {
+      "heading": "No pudimos enviar su mensaje",
+      "message": "Su mensaje sigue aquí. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
+    }
   },
   "assistant": {
     "title": "Asistente de IVA",
@@ -633,7 +639,24 @@
     },
     "bodyLabel": "Tu experiencia (opcional)",
     "bodyPh": "¿Cómo fue la primera llamada?",
-    "note": "Las valoraciones verificadas provienen solo de citas reales y aparecen anonimizadas en el perfil del proveedor. Tu nombre permanece privado."
+    "note": "Las valoraciones verificadas provienen solo de citas reales y aparecen anonimizadas en el perfil del proveedor. Tu nombre permanece privado.",
+    "close": "Cerrar",
+    "sendFailed": {
+      "heading": "No pudimos enviar su valoración",
+      "message": "Su valoración y sus comentarios siguen aquí. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
+    },
+    "submitted": {
+      "heading": "Gracias, su valoración se ha enviado",
+      "message": "Aparece de forma anónima en el perfil del proveedor. Su nombre se mantiene privado."
+    },
+    "alreadyReviewed": {
+      "heading": "Ya ha valorado esta cita",
+      "message": "Su valoración anterior está guardada. Cada cita puede valorarse una vez."
+    },
+    "notHeld": {
+      "heading": "Esta cita no se puede valorar",
+      "message": "Solo se pueden valorar las citas que han tenido lugar."
+    }
   },
   "reschedule": {
     "eyebrow": "Reprogramar cita",
