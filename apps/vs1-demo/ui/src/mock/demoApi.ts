@@ -1052,6 +1052,11 @@ const calendarStatus = () => ({ configured: true, connected: mockCalendar.connec
 // Dieselben Zahlen wie die Partner-Termine oben: 12 Buchungen in 90 Tagen,
 // davon 9 stattgefunden, 2 Nutzer-No-Shows (einer mit offenem Widerspruch),
 // 1 eigener No-Show (= 1 Vorfall). Growth → Verlauf ja, CSV nein.
+// `previous` ist das Fenster davor (Tage 91–180): 11 Buchungen, 7
+// stattgefunden, 2 Nutzer-No-Shows, 2 eigene No-Shows, Bewertung 4,6 aus
+// 5 Stimmen, "wieder buchen" 3 von 4 (unter der Stichprobe → keine Quote).
+// Der Mock kennt nur diesen einen Anbieter mit Performance; Richtung und
+// Differenz rechnet die Oberflaeche selbst.
 const AVAIL = { hours: null as Record<string, Array<{ from: string; to: string }>> | null, timezone: 'Europe/Berlin' };
 function partnerPerformance() {
   const counted = (count: number, of: number) => ({ count, of, rate: of >= 5 ? Math.round((count / of) * 100) / 100 : null });
@@ -1063,6 +1068,13 @@ function partnerPerformance() {
       cancelled_by_provider: counted(0, 12), cancelled_by_user: counted(1, 12),
       disputes_open: 1, incidents: { count: 1, window_days: 90, alert_at: 2, pause_at: 3 },
       rating: { average: 4.6, count: 7, min_count: 5 }, would_use_again: counted(6, 7), upcoming: 1,
+    },
+    previous: {
+      policy_version: 1, window_days: 90, from: iso(-180), to: iso(-90), bookings: 11, rate_min_bookings: 5, rates_shown: true,
+      attended: counted(7, 11), user_no_show: counted(2, 11), provider_no_show: counted(2, 11),
+      cancelled_by_provider: counted(0, 11), cancelled_by_user: counted(0, 11),
+      disputes_open: 0, incidents: { count: 2, window_days: 90, alert_at: 2, pause_at: 3 },
+      rating: { average: 4.6, count: 5, min_count: 5 }, would_use_again: counted(3, 4), upcoming: 0,
     },
     analytics: { level: 'enhanced', trends: true, export: false },
     trends: {
