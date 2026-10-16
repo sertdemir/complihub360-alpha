@@ -1204,9 +1204,34 @@ function adminApiDecide(id: string, body: Record<string, unknown>) {
   return { ok: true, client: adminApiClients().clients.find((x) => x.id === id) };
 }
 
+// ─── Zuruecksetzen fuer die Kernfluss-E2E (e2e/flows) ────────────────────────
+// Der Datensatz ist in Teilen veraenderlich (Anwesenheit, Readiness, Zaehler,
+// API-Clients), damit Melden, Pruefen und Beantragen im Mock sichtbar greifen.
+// Ein Test, der dieselbe Seite nach einem anderen Test liest, saehe sonst
+// dessen Spuren. `POST /api/v1/mock/reset` stellt den Ausgangszustand her;
+// die echte API kennt die Route nicht, und der Demo-Login auf Staging ruft
+// sie nie.
+const INITIAL_MOCK_STATE = JSON.stringify({ ATT, STATUS_OVERRIDE, READINESS, AVAIL, API_STATE });
+export function resetMockState(): void {
+  const init = JSON.parse(INITIAL_MOCK_STATE) as { ATT: typeof ATT; STATUS_OVERRIDE: typeof STATUS_OVERRIDE; READINESS: typeof READINESS; AVAIL: typeof AVAIL; API_STATE: typeof API_STATE };
+  for (const k of Object.keys(ATT)) delete ATT[k];
+  Object.assign(ATT, init.ATT);
+  for (const k of Object.keys(STATUS_OVERRIDE)) delete STATUS_OVERRIDE[k];
+  Object.assign(STATUS_OVERRIDE, init.STATUS_OVERRIDE);
+  READINESS = init.READINESS;
+  RECHECKS = 0;
+  REBOOK_N = 0;
+  laufNr = 100;
+  MOCK_AVAILABILITY = 'available';
+  AVAIL.hours = init.AVAIL.hours;
+  AVAIL.timezone = init.AVAIL.timezone;
+  API_STATE.clients = init.API_STATE.clients;
+}
+
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
+  if (p[0] === 'mock' && p[1] === 'reset' && method === 'POST') { resetMockState(); return { ok: true }; }
   if (method === 'GET') {
     // Kalender-Status (nylasAuth.ts) — vor dem allgemeinen GET-Rueckfall unten.
     if (p[0] === 'provider' && p[2] === 'calendar' && p.length === 3) return calendarStatus();
