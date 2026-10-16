@@ -337,7 +337,7 @@
     "actionOpenRq": "{{id}} öffnen →"
   },
   "performance": {
-    "title": "Performance",
+    "title": "Ihre <accent>Performance</accent>.",
     "subtitle": "Was aus Ihren Buchungen folgt. Jede Zahl nennt ihre Basis und ihren Zeitraum; eine Quote steht erst ab fünf Buchungen. Das Ranking sieht genau diese Fakten — in jedem Tarif dieselben.",
     "range": "Letzte {{days}} Tage · {{bookings}} Buchungen",
     "policy": "Regel-Fassung {{version}}",
@@ -397,7 +397,36 @@
     "appealDecided": {
       "lifted": "Die Pause wurde am {{date}} aufgehoben. Buchungen sind wieder möglich.",
       "upheld": "Das Team hat die Pause am {{date}} bestätigt. Sie bleibt bis zur Aufhebung durch das Team."
-    }
+    },
+    "compareNote": "Pfeile vergleichen mit den {{days}} Tagen davor",
+    "trend": {
+      "vsPrevious": "vs. {{days}} Tage davor",
+      "same": "wie in den {{days}} Tagen davor",
+      "noPrevious": "kein Vergleichszeitraum",
+      "pp": "{{value}} Pp"
+    },
+    "basisBookings": "{{counted}} Buchungen",
+    "rateFrom": "Quote ab {{need}} Buchungen",
+    "ratingBasis": "von 5 · aus {{count}} Bewertungen",
+    "ratingAfterBooking": "nach Buchung, nur verifizierte Termine",
+    "wouldRebookAsked": "Frage nach dem Termin",
+    "insufficientShort": "noch zu wenig Daten",
+    "unit": {
+      "booking": "Buchung",
+      "noShow": "nicht erschienen"
+    },
+    "meter": {
+      "first": "1. Vorfall",
+      "alert": "Hinweis ab {{n}}",
+      "pause": "Buchungspause ab {{n}}"
+    },
+    "chart": {
+      "took": "stattgefunden",
+      "noShow": "No-Show (Nutzer oder Sie)",
+      "cancelled": "abgesagt"
+    },
+    "trendsNote": "Monatsverlauf ab Growth; Bereich und Land ebenso. Essential zeigt die Fakten oben ohne Verlauf; CSV-Export ab Global. Dieselben Fakten in jedem Tarif.",
+    "bySelf": "durch Sie"
   },
   "magicAction": {
     "partnerBadge": "Anbieter",

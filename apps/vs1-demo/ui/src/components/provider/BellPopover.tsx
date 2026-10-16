@@ -91,13 +91,14 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
         type="button"
         aria-label={t('bell.aria')}
         onClick={() => setOpen((v) => !v)}
-        className={cn('relative text-fg-tertiary transition-colors hover:text-fg', open && 'text-fg')}
+        className={cn('relative grid h-9 w-9 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg', open && 'text-fg')}
       >
-        <Bell size={18} />
+        <Bell size={17} />
+        {/* Goldpunkt statt Zaehler-Bubble (Angleich an die UserShell, 16.10.2026):
+            die Zahl steht ohnehin in der Seitenleiste; hier nur, DASS etwas
+            ungelesen ist. */}
         {!!unread && (
-          <span className="absolute -right-1.5 -top-1.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-fg-brand px-[3px] text-[9px] font-bold leading-none text-white">
-            {unread > 99 ? '99+' : unread}
-          </span>
+          <span aria-hidden="true" className="absolute right-[7px] top-[7px] h-2 w-2 rounded-full bg-accent ring-2 ring-surface" />
         )}
       </button>
 
