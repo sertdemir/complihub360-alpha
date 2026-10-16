@@ -1226,6 +1226,7 @@ export function resetMockState(): void {
   AVAIL.hours = init.AVAIL.hours;
   AVAIL.timezone = init.AVAIL.timezone;
   API_STATE.clients = init.API_STATE.clients;
+  REVIEWED.clear();
 }
 
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
