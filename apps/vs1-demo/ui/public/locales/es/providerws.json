@@ -337,7 +337,7 @@
     "actionOpenRq": "Abrir {{id}} →"
   },
   "performance": {
-    "title": "Rendimiento",
+    "title": "Su <accent>rendimiento</accent>.",
     "subtitle": "Lo que se desprende de sus reservas. Cada cifra indica su base y su periodo; una tasa aparece solo a partir de cinco reservas. El ranking ve exactamente estos hechos, iguales en todos los planes.",
     "range": "Últimos {{days}} días · {{bookings}} reservas",
     "policy": "Versión de reglas {{version}}",
@@ -397,7 +397,36 @@
     "appealDecided": {
       "lifted": "La pausa se levantó el {{date}}. Las reservas vuelven a estar abiertas.",
       "upheld": "El equipo confirmó la pausa el {{date}}. Se mantiene hasta que el equipo la levante."
-    }
+    },
+    "compareNote": "Las flechas comparan con los {{days}} días anteriores",
+    "trend": {
+      "vsPrevious": "frente a los {{days}} días anteriores",
+      "same": "igual que los {{days}} días anteriores",
+      "noPrevious": "sin periodo de comparación",
+      "pp": "{{value}} pp"
+    },
+    "basisBookings": "{{counted}} reservas",
+    "rateFrom": "tasa a partir de {{need}} reservas",
+    "ratingBasis": "de 5 · de {{count}} valoraciones",
+    "ratingAfterBooking": "tras la reserva, solo citas verificadas",
+    "wouldRebookAsked": "pregunta tras la cita",
+    "insufficientShort": "aún pocos datos",
+    "unit": {
+      "booking": "reserva",
+      "noShow": "no se presentó"
+    },
+    "meter": {
+      "first": "1.º incidente",
+      "alert": "aviso a partir de {{n}}",
+      "pause": "pausa de reservas a partir de {{n}}"
+    },
+    "chart": {
+      "took": "celebradas",
+      "noShow": "ausencia (usuario o usted)",
+      "cancelled": "canceladas"
+    },
+    "trendsNote": "Evolución mensual a partir de Growth; área y país también. Essential muestra los hechos de arriba sin evolución; exportación CSV a partir de Global. Los mismos hechos en todos los planes.",
+    "bySelf": "por usted"
   },
   "magicAction": {
     "partnerBadge": "Proveedor",
