@@ -5,7 +5,7 @@ import { notify } from "./notifications.js";
 import { sendSerialNoShowMail } from "./mailer.js";
 import { getActiveSubscription, loadPricingConfig, getDiscountCounter, cycleStartFor, resolveLedgerStatus } from "./billing.js";
 import {
-    loadPerformancePolicy, computePerformance, analyticsDepth, trendsBy, bookingsCsv, incidentsInWindow, userNoShowsInWindow,
+    loadPerformancePolicy, computePerformance, previousWindow, analyticsDepth, trendsBy, bookingsCsv, incidentsInWindow, userNoShowsInWindow,
     serialNoShowState, bookingOpen, type BookingFact, type IncidentFact, type ReviewFact, type PerformancePolicy,
 } from "./performance.js";
 
@@ -103,8 +103,14 @@ export async function handleProviderPerformance(req: IncomingMessage, res: Serve
             res.end(bookingsCsv(inWindow));
             return;
         }
-        const facts = computePerformance({ bookings, incidents, reviews, policy });
-        const body: Json = { ok: true, providerKey, performance: facts, analytics: depth, enforcement: enforcementWire(enforcement), correlationId };
+        // Laufendes Fenster und das davor, gleiche Rechnung, gleiche Regeln
+        // (Quoten erst ab rate_min_bookings). Keine Deltas: Richtung und
+        // Differenz rechnet die Oberflaeche, und sie zeigt keinen Pfeil, wenn
+        // eines der Fenster unter der Mindeststichprobe liegt.
+        const nowIso = new Date().toISOString();
+        const facts = computePerformance({ bookings, incidents, reviews, policy, nowIso });
+        const previous = computePerformance({ bookings, incidents, reviews, policy, nowIso, window: previousWindow(facts) });
+        const body: Json = { ok: true, providerKey, performance: facts, previous, analytics: depth, enforcement: enforcementWire(enforcement), correlationId };
         if (depth.trends) {
             body.trends = { area: trendsBy(bookings, 'area', policy.windowDays), country: trendsBy(bookings, 'country', policy.windowDays), month: trendsBy(bookings, 'month', 365) };
         }
