@@ -8,7 +8,13 @@ import { cn } from '../../lib/utils';
 // (white card in light, petrol card on slate in dark). Sub-parts: Header / Title /
 // Description / Content / Footer.
 
-export type CardStyleVariant = 'outlined' | 'filled' | 'elevated';
+export type CardStyleVariant = 'outlined' | 'filled' | 'elevated' | 'workspace';
+
+/** Die EINE Karte der Arbeitsbereiche (User-Dashboard seit 2026-09-05, Provider
+ *  seit dem Angleich 2026-10-16): feiner Rand, weicher Schatten, Surface-Grund —
+ *  auf dem Gradient hell wie dunkel abgesetzt. Als Konstante exportiert, weil
+ *  `EmptyState` und `UserHomePage` sie auf Nicht-Card-Elementen brauchen. */
+export const WORKSPACE_CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   interactive?: boolean;
@@ -23,6 +29,7 @@ const CARD_STYLE: Record<CardStyleVariant, string> = {
   outlined: 'border border-stroke bg-surface shadow-sm',
   filled: 'border border-transparent bg-surface-secondary',
   elevated: 'border border-stroke-subtle bg-surface shadow-md',
+  workspace: 'border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]',
 };
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
