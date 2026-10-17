@@ -84,10 +84,25 @@ function attendanceFields(id: string, status: string, slotEnd: string) {
 // Status-Ueberschreibungen aus Anwesenheits-Meldung und Neubuchung im Mock.
 const STATUS_OVERRIDE: Record<string, string> = {};
 const REBOOKED: Array<{ id: string; from: string; key: string; slot_start: string }> = [];
+// Punkt 1 (Canvas E1): Bewertungen des Nutzers je Buchung, wie der Server sie
+// ueber `reviewed` an der Termin-Liste meldet.
+const REVIEWED = new Set<string>();
+
+// POST /reviews wie der Server: einmal je Buchung, nur nach dem Termin.
+function submitReviewMock(body: Record<string, unknown>) {
+  const id = String(body.booking_id ?? '');
+  const row = bookings().find((x) => x.id === id);
+  if (!row) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Booking not found' };
+  const held = row.status !== 'cancelled' && (row.status === 'completed' || Date.parse(row.slot_start) <= Date.now());
+  if (!held) return { __status: 409, errorCode: 'BOOKING_NOT_HELD', message: 'Reviews are possible after the consultation took place' };
+  if (REVIEWED.has(id)) return { __status: 409, errorCode: 'ALREADY_REVIEWED', message: 'This booking has already been reviewed' };
+  REVIEWED.add(id);
+  return { ok: true, __status: 201 };
+}
 
 function bookings() {
   const b = (id: string, key: string, name: string, region: string, web: string | null, start: string, end: string, status: string) =>
-    ({ id, public_ref: REF[key] ?? null, provider_name: name, provider_descriptor: DESCRIPTOR[key] ?? '', provider_area_codes: AREAS[key] ?? [], provider_region: region, provider_website: web, identity_revealed: true, slot_start: start, slot_end: end, status: STATUS_OVERRIDE[id] ?? status, message: null, ...attendanceFields(id, STATUS_OVERRIDE[id] ?? status, end) });
+    ({ id, public_ref: REF[key] ?? null, provider_name: name, provider_descriptor: DESCRIPTOR[key] ?? '', provider_area_codes: AREAS[key] ?? [], provider_region: region, provider_website: web, identity_revealed: true, slot_start: start, slot_end: end, status: STATUS_OVERRIDE[id] ?? status, message: null, reviewed: REVIEWED.has(id), ...attendanceFields(id, STATUS_OVERRIDE[id] ?? status, end) });
   const rebooked = REBOOKED.map((r) => { const src = bookings0().find((x) => x.id === r.from); return src ? { ...b(r.id, r.key, src.provider_name, src.provider_region ?? '', src.provider_website, r.slot_start, new Date(new Date(r.slot_start).getTime() + 30 * 60_000).toISOString(), 'confirmed'), rebooked_from: r.from } : null; }).filter((x): x is NonNullable<typeof x> => !!x);
   return [...rebooked, ...bookings0()];
   function bookings0() { return [
@@ -1052,6 +1067,11 @@ const calendarStatus = () => ({ configured: true, connected: mockCalendar.connec
 // Dieselben Zahlen wie die Partner-Termine oben: 12 Buchungen in 90 Tagen,
 // davon 9 stattgefunden, 2 Nutzer-No-Shows (einer mit offenem Widerspruch),
 // 1 eigener No-Show (= 1 Vorfall). Growth → Verlauf ja, CSV nein.
+// `previous` ist das Fenster davor (Tage 91–180): 11 Buchungen, 7
+// stattgefunden, 2 Nutzer-No-Shows, 2 eigene No-Shows, Bewertung 4,6 aus
+// 5 Stimmen, "wieder buchen" 3 von 4 (unter der Stichprobe → keine Quote).
+// Der Mock kennt nur diesen einen Anbieter mit Performance; Richtung und
+// Differenz rechnet die Oberflaeche selbst.
 const AVAIL = { hours: null as Record<string, Array<{ from: string; to: string }>> | null, timezone: 'Europe/Berlin' };
 function partnerPerformance() {
   const counted = (count: number, of: number) => ({ count, of, rate: of >= 5 ? Math.round((count / of) * 100) / 100 : null });
@@ -1063,6 +1083,13 @@ function partnerPerformance() {
       cancelled_by_provider: counted(0, 12), cancelled_by_user: counted(1, 12),
       disputes_open: 1, incidents: { count: 1, window_days: 90, alert_at: 2, pause_at: 3 },
       rating: { average: 4.6, count: 7, min_count: 5 }, would_use_again: counted(6, 7), upcoming: 1,
+    },
+    previous: {
+      policy_version: 1, window_days: 90, from: iso(-180), to: iso(-90), bookings: 11, rate_min_bookings: 5, rates_shown: true,
+      attended: counted(7, 11), user_no_show: counted(2, 11), provider_no_show: counted(2, 11),
+      cancelled_by_provider: counted(0, 11), cancelled_by_user: counted(0, 11),
+      disputes_open: 0, incidents: { count: 2, window_days: 90, alert_at: 2, pause_at: 3 },
+      rating: { average: 4.6, count: 5, min_count: 5 }, would_use_again: counted(3, 4), upcoming: 0,
     },
     analytics: { level: 'enhanced', trends: true, export: false },
     trends: {
@@ -1189,9 +1216,35 @@ function adminApiDecide(id: string, body: Record<string, unknown>) {
   return { ok: true, client: adminApiClients().clients.find((x) => x.id === id) };
 }
 
+// ─── Zuruecksetzen fuer die Kernfluss-E2E (e2e/flows) ────────────────────────
+// Der Datensatz ist in Teilen veraenderlich (Anwesenheit, Readiness, Zaehler,
+// API-Clients), damit Melden, Pruefen und Beantragen im Mock sichtbar greifen.
+// Ein Test, der dieselbe Seite nach einem anderen Test liest, saehe sonst
+// dessen Spuren. `POST /api/v1/mock/reset` stellt den Ausgangszustand her;
+// die echte API kennt die Route nicht, und der Demo-Login auf Staging ruft
+// sie nie.
+const INITIAL_MOCK_STATE = JSON.stringify({ ATT, STATUS_OVERRIDE, READINESS, AVAIL, API_STATE });
+export function resetMockState(): void {
+  const init = JSON.parse(INITIAL_MOCK_STATE) as { ATT: typeof ATT; STATUS_OVERRIDE: typeof STATUS_OVERRIDE; READINESS: typeof READINESS; AVAIL: typeof AVAIL; API_STATE: typeof API_STATE };
+  for (const k of Object.keys(ATT)) delete ATT[k];
+  Object.assign(ATT, init.ATT);
+  for (const k of Object.keys(STATUS_OVERRIDE)) delete STATUS_OVERRIDE[k];
+  Object.assign(STATUS_OVERRIDE, init.STATUS_OVERRIDE);
+  READINESS = init.READINESS;
+  RECHECKS = 0;
+  REBOOK_N = 0;
+  laufNr = 100;
+  MOCK_AVAILABILITY = 'available';
+  AVAIL.hours = init.AVAIL.hours;
+  AVAIL.timezone = init.AVAIL.timezone;
+  API_STATE.clients = init.API_STATE.clients;
+  REVIEWED.clear();
+}
+
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
+  if (p[0] === 'mock' && p[1] === 'reset' && method === 'POST') { resetMockState(); return { ok: true }; }
   if (method === 'GET') {
     // Kalender-Status (nylasAuth.ts) — vor dem allgemeinen GET-Rueckfall unten.
     if (p[0] === 'provider' && p[2] === 'calendar' && p.length === 3) return calendarStatus();
@@ -1290,6 +1343,7 @@ export function route(method: string, path: string, body: Record<string, unknown
     return { ok: true, market, notify: body.notify === true, reason: isKnownCountry(market) ? 'provider_coverage' : 'market' };
   }
   if (p[0] === 'scheduling' && p.length === 1 && method === 'POST') return createBooking(body);
+  if (p[0] === 'reviews' && p.length === 1 && method === 'POST') return submitReviewMock(body);
   if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'proposal' && method === 'PATCH') return reportProposal(p[3], body);
   if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'attendance' && method === 'PATCH') return reportAttendance(p[3], body);
   if (p[0] === 'scheduling' && p.length === 2 && method === 'PATCH') return patchBooking(p[1], body);

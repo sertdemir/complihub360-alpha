@@ -337,7 +337,7 @@
     "actionOpenRq": "{{id}} aç →"
   },
   "performance": {
-    "title": "Performans",
+    "title": "<accent>Performansınız</accent>.",
     "subtitle": "Randevularınızdan çıkan sonuçlar. Her sayı dayanağını ve dönemini belirtir; oranlar yalnızca beş randevudan itibaren görünür. Sıralama tam olarak bu verileri görür; her planda aynıdır.",
     "range": "Son {{days}} gün · {{bookings}} randevu",
     "policy": "Kural sürümü {{version}}",
@@ -397,7 +397,36 @@
     "appealDecided": {
       "lifted": "Duraklatma {{date}} tarihinde kaldırıldı. Rezervasyonlar yeniden açık.",
       "upheld": "Ekip duraklatmayı {{date}} tarihinde onayladı. Ekip kaldırana kadar sürer."
-    }
+    },
+    "compareNote": "Oklar önceki {{days}} günle karşılaştırır",
+    "trend": {
+      "vsPrevious": "önceki {{days}} güne göre",
+      "same": "önceki {{days}} günle aynı",
+      "noPrevious": "karşılaştırma dönemi yok",
+      "pp": "{{value}} puan"
+    },
+    "basisBookings": "{{counted}} randevu",
+    "rateFrom": "oran {{need}} randevudan itibaren",
+    "ratingBasis": "5 üzerinden · {{count}} değerlendirmeden",
+    "ratingAfterBooking": "randevu sonrası, yalnızca doğrulanmış randevular",
+    "wouldRebookAsked": "randevu sonrası soru",
+    "insufficientShort": "henüz yeterli veri yok",
+    "unit": {
+      "booking": "randevu",
+      "noShow": "gelmedi"
+    },
+    "meter": {
+      "first": "1. olay",
+      "alert": "{{n}} ile uyarı",
+      "pause": "{{n}} ile rezervasyon duraklaması"
+    },
+    "chart": {
+      "took": "gerçekleşti",
+      "noShow": "gelmeme (kullanıcı veya siz)",
+      "cancelled": "iptal"
+    },
+    "trendsNote": "Aylık seyir Growth’tan itibaren; alan ve ülke de öyle. Essential yukarıdaki verileri seyir olmadan gösterir; CSV dışa aktarma Global’den itibaren. Her planda aynı veriler.",
+    "bySelf": "sizin tarafınızdan"
   },
   "magicAction": {
     "partnerBadge": "Sağlayıcı",
@@ -806,6 +835,73 @@
       "titleLabel": "Göreviniz",
       "confirm": "Sürüm {{version}} kabul et",
       "cancel": "İptal"
+    },
+    "mandate": {
+      "newVersion": "Yeni sürüm {{version}} mevcut. {{old}} sürümüne verdiğiniz onay geçerliliğini korur; lütfen okuyup yeniden onaylayın.",
+      "reviewNote": "Sürüm {{version}}. Bu metnin hukuki incelemesi devam ediyor. Metin değişirse yeni sürümü size yeniden sunarız.",
+      "sections": [
+        {
+          "title": "1. Konu",
+          "items": [
+            "Bu beyanla CompliHub360’a, 2. bölümde belirtilen tutarları ödeme hizmeti sağlayıcımız Stripe’ta kayıtlı ödeme yönteminizden tahsil etme izni verirsiniz. Kart bilgileriniz yalnızca Stripe’ta tutulur; CompliHub360 bunları görmez ve saklamaz."
+          ]
+        },
+        {
+          "title": "2. Hangi tutarlar",
+          "intro": "Yalnızca bu ikisi, başka hiçbir şey:",
+          "items": [
+            "Seçtiğiniz plan için, abonelik sırasında belirlediğiniz dönemde kesilen abonelik faturanız.",
+            "Bir şirketin sizden aldığı randevu için lead ücreti. Randevu başına alınır ve tutarı her randevudan önce hesabınızda „Faturalama“ altında gösterilir."
+          ]
+        },
+        {
+          "title": "3. Ne zaman tahsil ederiz",
+          "items": [
+            "Abonelik faturası: Faturayı 14 günlük ödeme süresiyle alırsınız ve kendiniz ödeyebilirsiniz. Vade gününde hâlâ açıksa bunu e-posta ile ve hesabınızda bildiririz. Ardından vadeden sonraki 1., 3. ve 6. günde, günde en fazla bir kez, kayıtlı ödeme yönteminizden tahsil etmeyi deneriz. Bu arada kendiniz öderseniz başka deneme yapılmaz.",
+            "Lead ücreti: randevu anında, şirkete iletişim bilgileriniz gösterilmeden önce."
+          ]
+        },
+        {
+          "title": "4. Ne kadar",
+          "items": [
+            "Abonelik faturası, abonelik sırasında veya son plan değişikliğinde onayladığınız plan fiyatına eşittir. Plan değişikliği veya iptal, mevcut dönemin sonunda yürürlüğe girer.",
+            "Lead ücreti, talebin büyüklüğüne ve planınıza bağlıdır. Tutarı ve hesaplamayı her randevudan önce „Faturalama“ altında görürsünüz; planınızın indirimleri düşülmüştür.",
+            "Size tanınan platform bakiyesi (örneğin katılınmayan bir randevu sonrasında) bir sonraki abonelik faturanızdan düşülür. Nakit olarak ödenmez."
+          ]
+        },
+        {
+          "title": "5. Bir tahsilat başarısız olursa",
+          "items": [
+            "Lead ücreti: Randevu gerçekleşmez. Ücret oluşmaz ve şirkete hiçbir bilginiz gösterilmez. Görünür kalırsınız; ödeme yöntemini kontrol edebilir veya başka bir yöntem kaydedebilirsiniz. O zamana kadar yeni randevu kabul etmezsiniz.",
+            "Abonelik faturası: Fatura açık kalır, süre olduğu gibi kalır. İstediğiniz zaman kendiniz ödeyebilirsiniz. Fatura vadeden 7 gün sonra hâlâ açıksa, ödenene kadar yeni randevular duraklatılır. O durumda da görünür kalırsınız.",
+            "CompliHub360 başarısız bir deneme için kendi adına ücret almaz. Kart kuruluşunuzun ücret alıp almayacağı, onunla yaptığınız sözleşmeye bağlıdır."
+          ]
+        },
+        {
+          "title": "6. Bir işlemi geri alırsak",
+          "items": [
+            "Tahsilat başarılı olduktan sonra randevu gerçekleşmezse (örneğin aynı saat aynı anda başkasına verildiği için), lead ücretini kendi inisiyatifimizle aynı ödeme yöntemine iade ederiz. Bir şey yapmanız gerekmez; işlem faturalama geçmişinizde görünür."
+          ]
+        },
+        {
+          "title": "7. Geri alma",
+          "items": [
+            "Bu yetkiyi hesabınızda „Ayarlar“ altında istediğiniz zaman geri alabilirsiniz. O andan itibaren hiçbir tahsilat yapmayız ve güncel bir sürümü yeniden onaylayana kadar yeni randevu kabul etmezsiniz. Geri almadan önce oluşan faturalar ödenmesi gereken borç olarak kalır ve sizin tarafınızdan ödenir."
+          ]
+        },
+        {
+          "title": "8. Neleri kaydederiz",
+          "items": [
+            "Her onayda bu metnin sürümünü ve dilini, onaylayan kişinin adını ve rolünü, zamanı ve teknik bir referansı saklarız. Yeni bir sürüm eskisini geriye dönük olarak değiştirmez: her randevu için o anda hangi sürümün geçerli olduğu doğrulanabilir kalır."
+          ]
+        },
+        {
+          "title": "9. Değişiklikler",
+          "items": [
+            "Bu metni sizi etkileyen bir noktada değiştirirsek yeni sürümü onayınıza sunarız. Onaylamanıza kadar eski sürümün izin verdiğinin ötesinde yeni bir tahsilat yapmayız."
+          ]
+        }
+      ]
     },
     "submit": {
       "missingTitle": "Hâlâ eksik",

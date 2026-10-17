@@ -519,7 +519,13 @@
     "authorUser": "user",
     "authorProvider": "provider",
     "authorSystem": "system",
-    "messageTooShort": "Please write a message of at least {{min}} characters."
+    "messageTooShort": "Please write a message of at least {{min}} characters.",
+    "notSent": "Not sent",
+    "edit": "Edit",
+    "sendFailed": {
+      "heading": "We couldn’t send your message",
+      "message": "Your message is still here. Please try again. If the problem continues, contact support."
+    }
   },
   "assistant": {
     "title": "VAT Assistant",
@@ -638,7 +644,24 @@
     "bodyLabel": "Your experience (optional)",
     "bodyPh": "How did the intro call go?",
     "note": "Verified reviews come only from real appointments and appear anonymized on the provider profile. Your name stays private.",
-    "ratingRequired": "Please choose a rating from 1 to 5 stars."
+    "ratingRequired": "Please choose a rating from 1 to 5 stars.",
+    "close": "Close",
+    "sendFailed": {
+      "heading": "We couldn’t submit your review",
+      "message": "Your rating and comments are still here. Please try again. If the problem continues, contact support."
+    },
+    "submitted": {
+      "heading": "Thank you, your review is submitted",
+      "message": "It appears anonymized on the provider profile. Your name stays private."
+    },
+    "alreadyReviewed": {
+      "heading": "You’ve already reviewed this appointment",
+      "message": "Your earlier review is saved. Each appointment can be reviewed once."
+    },
+    "notHeld": {
+      "heading": "This appointment can’t be reviewed",
+      "message": "Reviews are only possible for appointments that took place."
+    }
   },
   "reschedule": {
     "eyebrow": "Reschedule appointment",

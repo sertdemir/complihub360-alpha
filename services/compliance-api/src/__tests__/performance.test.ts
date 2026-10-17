@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 vi.mock('../supabase.js', () => ({ supabaseApi: {} }));
 
 import {
-    computePerformance, qualityFactor, serialNoShowState, incidentsInWindow, userNoShowsInWindow, analyticsDepth, trendsBy, bookingsCsv,
+    computePerformance, previousWindow, qualityFactor, serialNoShowState, incidentsInWindow, userNoShowsInWindow, analyticsDepth, trendsBy, bookingsCsv,
     validateAvailabilityHours, validTimezone, availabilitySlots, bookingOpen, performancePolicyFromRow, DEFAULT_PERFORMANCE_POLICY,
     type BookingFact,
 } from '../performance.js';
@@ -48,6 +48,60 @@ describe('computePerformance', () => {
         expect(f.incidents).toEqual({ count: 1, window_days: 90, alert_at: 2, pause_at: 3 });
         expect(f.disputes_open).toBe(1);
         expect(f.upcoming).toBe(1);
+    });
+});
+
+describe('computePerformance — Vergleichsfenster (previous)', () => {
+    it('previousWindow ist gleich lang und endet vor dem laufenden Fenster', () => {
+        const cur = computePerformance({ policy: P, nowIso: NOW, incidents: [], reviews: [], bookings: [] });
+        const w = previousWindow(cur);
+        expect(Date.parse(w.to)).toBe(Date.parse(cur.from) - 1);
+        expect(Date.parse(w.to) - Date.parse(w.from)).toBe(P.windowDays * 86_400_000);
+    });
+
+    it('eine Buchung am Tag 100 zaehlt im Vorfenster, nicht im laufenden', () => {
+        const rows = [b({ slot_start: daysAgo(100) }), b({ slot_start: daysAgo(10) }), b({ slot_start: daysAgo(200) })];
+        const cur = computePerformance({ policy: P, nowIso: NOW, incidents: [], reviews: [], bookings: rows });
+        const prev = computePerformance({ policy: P, nowIso: NOW, incidents: [], reviews: [], bookings: rows, window: previousWindow(cur) });
+        expect(cur.bookings).toBe(1);
+        expect(prev.bookings).toBe(1);
+        expect(prev.window_days).toBe(P.windowDays);
+        expect(prev.from).toBe(new Date(Date.parse(NOW) - 180 * 86_400_000 - 1).toISOString());
+        expect(prev.to).toBe(new Date(Date.parse(cur.from) - 1).toISOString());
+    });
+
+    it('Quoten im Vorfenster erst ab der Mindeststichprobe, sonst null', () => {
+        const few = [b({ slot_start: daysAgo(100) }), b({ slot_start: daysAgo(120), status: 'no_show', no_show_by: 'user' })];
+        const cur = computePerformance({ policy: P, nowIso: NOW, incidents: [], reviews: [], bookings: few });
+        const prev = computePerformance({ policy: P, nowIso: NOW, incidents: [], reviews: [], bookings: few, window: previousWindow(cur) });
+        expect(prev.bookings).toBe(2);
+        expect(prev.rates_shown).toBe(false);
+        expect(prev.attended).toEqual({ count: 1, rate: null, of: 2 });
+        expect(prev.user_no_show.rate).toBeNull();
+        const enough = [100, 105, 110, 115, 120].map((d) => b({ slot_start: daysAgo(d) }));
+        const prev5 = computePerformance({ policy: P, nowIso: NOW, incidents: [], reviews: [], bookings: enough, window: previousWindow(cur) });
+        expect(prev5.rates_shown).toBe(true);
+        expect(prev5.attended).toEqual({ count: 5, rate: 1, of: 5 });
+    });
+
+    it('ohne Buchungen im Vorfenster stehen Nullen und null-Quoten, kein undefined', () => {
+        const cur = computePerformance({ policy: P, nowIso: NOW, incidents: [], reviews: [], bookings: [b({})] });
+        const prev = computePerformance({ policy: P, nowIso: NOW, incidents: [], reviews: [], bookings: [b({})], window: previousWindow(cur) });
+        expect(prev.bookings).toBe(0);
+        expect(prev.rates_shown).toBe(false);
+        expect(prev.attended).toEqual({ count: 0, rate: null, of: 0 });
+        expect(prev.rating).toEqual({ average: null, count: 0, min_count: 5 });
+        expect(prev.would_use_again).toEqual({ count: 0, rate: null, of: 0 });
+    });
+
+    it('Vorfaelle und Bewertungen des Vorfensters: Stand zum Fensterende', () => {
+        const cur = computePerformance({ policy: P, nowIso: NOW, incidents: [], reviews: [], bookings: [] });
+        const prev = computePerformance({ policy: P, nowIso: NOW, bookings: [], window: previousWindow(cur),
+            incidents: [{ id: 'i1', kind: 'no_show', recorded_at: daysAgo(5) }, { id: 'i2', kind: 'no_show', recorded_at: daysAgo(100) }],
+            reviews: [{ rating: 5, created_at: daysAgo(3) }, { rating: 3, created_at: daysAgo(95) }],
+        });
+        expect(prev.incidents.count).toBe(1);
+        expect(prev.rating).toEqual({ average: 3, count: 1, min_count: 5 });
     });
 });
 

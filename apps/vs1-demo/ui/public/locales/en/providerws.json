@@ -339,7 +339,7 @@
     "actionOpenRq": "Open {{id}} →"
   },
   "performance": {
-    "title": "Performance",
+    "title": "Your <accent>performance</accent>.",
     "subtitle": "What follows from your bookings. Every number names its basis and period; a rate appears only from five bookings. Ranking sees exactly these facts — the same on every plan.",
     "range": "Last {{days}} days · {{bookings}} bookings",
     "policy": "Policy version {{version}}",
@@ -400,7 +400,36 @@
       "lifted": "The pause was lifted on {{date}}. Bookings are open again.",
       "upheld": "The team upheld the pause on {{date}}. It stays until the team lifts it."
     },
-    "appealTooShort": "Please explain your appeal in at least 10 characters."
+    "appealTooShort": "Please explain your appeal in at least 10 characters.",
+    "compareNote": "Arrows compare with the {{days}} days before",
+    "trend": {
+      "vsPrevious": "vs. previous {{days}} days",
+      "same": "same as the {{days}} days before",
+      "noPrevious": "no comparison period",
+      "pp": "{{value}} pp"
+    },
+    "basisBookings": "{{counted}} bookings",
+    "rateFrom": "rate from {{need}} bookings",
+    "ratingBasis": "out of 5 · from {{count}} reviews",
+    "ratingAfterBooking": "after booking, verified appointments only",
+    "wouldRebookAsked": "asked after the appointment",
+    "insufficientShort": "not enough data yet",
+    "unit": {
+      "booking": "booking",
+      "noShow": "did not show"
+    },
+    "meter": {
+      "first": "1st incident",
+      "alert": "notice from {{n}}",
+      "pause": "booking pause from {{n}}"
+    },
+    "chart": {
+      "took": "took place",
+      "noShow": "no-show (user or you)",
+      "cancelled": "cancelled"
+    },
+    "trendsNote": "Monthly trend from Growth; area and country likewise. Essential shows the facts above without a trend; CSV export from Global. The same facts on every plan.",
+    "bySelf": "by you"
   },
   "magicAction": {
     "partnerBadge": "Provider",
@@ -834,6 +863,73 @@
       "titleLabel": "Your role",
       "confirm": "Accept version {{version}}",
       "cancel": "Cancel"
+    },
+    "mandate": {
+      "newVersion": "New version {{version}} is available. Your acceptance of version {{old}} still applies; please read and accept again.",
+      "reviewNote": "Version {{version}}. Legal review of this text is still in progress. If it changes, we will present the new version to you again.",
+      "sections": [
+        {
+          "title": "1. What this is about",
+          "items": [
+            "With this declaration you allow CompliHub360 to collect the amounts listed in section 2 from the payment method you have stored with our payment service provider, Stripe. Your card details are held exclusively by Stripe; CompliHub360 neither sees nor stores them."
+          ]
+        },
+        {
+          "title": "2. Which amounts",
+          "intro": "Only these two, nothing else:",
+          "items": [
+            "Your subscription invoice for the plan you chose, at the billing interval you selected when you subscribed.",
+            "The lead fee for a booking a company makes with you. It is charged per booking, and the amount is shown in your account under “Billing” before every booking."
+          ]
+        },
+        {
+          "title": "3. When we charge",
+          "items": [
+            "Subscription invoice: You receive the invoice with 14 days to pay and can pay it yourself. If it is still open on the due date, we tell you by email and in your account. After that we attempt to collect from your stored payment method on the 1st, 3rd and 6th day after the due date, at most once per day. If you pay in the meantime, no further attempt is made.",
+            "Lead fee: at the moment of booking, before the company is shown your contact details."
+          ]
+        },
+        {
+          "title": "4. How much",
+          "items": [
+            "The subscription invoice equals the plan price you confirmed when you subscribed or last changed plans. A plan change or cancellation takes effect at the end of the current period.",
+            "The lead fee depends on the size of the enquiry and on your plan. You see the amount and how it is calculated under “Billing” before every booking; your plan’s discounts are already deducted.",
+            "Platform credit issued to you (for example after a missed appointment) is offset against your next subscription invoice. It is not paid out."
+          ]
+        },
+        {
+          "title": "5. If a charge does not succeed",
+          "items": [
+            "Lead fee: The booking does not go ahead. No fee arises, and the company is not shown any of your details. You remain visible and can check the payment method or store another one. Until then you do not accept new bookings.",
+            "Subscription invoice: The invoice stays open and the deadline stays as it is. You can pay yourself at any time. If the invoice is still open 7 days after the due date, new bookings pause until it is paid. You remain visible even then.",
+            "CompliHub360 charges no fee of its own for a failed attempt. Whether your card issuer charges fees depends on your agreement with them."
+          ]
+        },
+        {
+          "title": "6. If we reverse something",
+          "items": [
+            "If a booking does not go ahead after a charge has already succeeded (for example because the same slot was taken at the same moment), we refund the lead fee to the same payment method on our own initiative. You do not need to do anything; the transaction appears in your billing history."
+          ]
+        },
+        {
+          "title": "7. Revocation",
+          "items": [
+            "You can revoke this mandate at any time in your account under “Settings”. From then on we charge nothing further and you accept no new bookings until you accept a current version again. Invoices that arose before the revocation remain due and are paid by you."
+          ]
+        },
+        {
+          "title": "8. What we record",
+          "items": [
+            "For every acceptance we store the version and language of this text, the name and role of the person accepting, the time, and a technical reference. A new version does not replace an old one retroactively: for every booking it remains verifiable which version applied at that time."
+          ]
+        },
+        {
+          "title": "9. Changes",
+          "items": [
+            "If we change this text in a point that affects you, we present the new version to you for acceptance. Until you accept it, we charge nothing new beyond what the old version allows."
+          ]
+        }
+      ]
     },
     "submit": {
       "missingTitle": "Still missing",

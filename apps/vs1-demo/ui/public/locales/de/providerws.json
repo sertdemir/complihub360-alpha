@@ -337,7 +337,7 @@
     "actionOpenRq": "{{id}} öffnen →"
   },
   "performance": {
-    "title": "Performance",
+    "title": "Ihre <accent>Performance</accent>.",
     "subtitle": "Was aus Ihren Buchungen folgt. Jede Zahl nennt ihre Basis und ihren Zeitraum; eine Quote steht erst ab fünf Buchungen. Das Ranking sieht genau diese Fakten — in jedem Tarif dieselben.",
     "range": "Letzte {{days}} Tage · {{bookings}} Buchungen",
     "policy": "Regel-Fassung {{version}}",
@@ -397,7 +397,36 @@
     "appealDecided": {
       "lifted": "Die Pause wurde am {{date}} aufgehoben. Buchungen sind wieder möglich.",
       "upheld": "Das Team hat die Pause am {{date}} bestätigt. Sie bleibt bis zur Aufhebung durch das Team."
-    }
+    },
+    "compareNote": "Pfeile vergleichen mit den {{days}} Tagen davor",
+    "trend": {
+      "vsPrevious": "vs. {{days}} Tage davor",
+      "same": "wie in den {{days}} Tagen davor",
+      "noPrevious": "kein Vergleichszeitraum",
+      "pp": "{{value}} Pp"
+    },
+    "basisBookings": "{{counted}} Buchungen",
+    "rateFrom": "Quote ab {{need}} Buchungen",
+    "ratingBasis": "von 5 · aus {{count}} Bewertungen",
+    "ratingAfterBooking": "nach Buchung, nur verifizierte Termine",
+    "wouldRebookAsked": "Frage nach dem Termin",
+    "insufficientShort": "noch zu wenig Daten",
+    "unit": {
+      "booking": "Buchung",
+      "noShow": "nicht erschienen"
+    },
+    "meter": {
+      "first": "1. Vorfall",
+      "alert": "Hinweis ab {{n}}",
+      "pause": "Buchungspause ab {{n}}"
+    },
+    "chart": {
+      "took": "stattgefunden",
+      "noShow": "No-Show (Nutzer oder Sie)",
+      "cancelled": "abgesagt"
+    },
+    "trendsNote": "Monatsverlauf ab Growth; Bereich und Land ebenso. Essential zeigt die Fakten oben ohne Verlauf; CSV-Export ab Global. Dieselben Fakten in jedem Tarif.",
+    "bySelf": "durch Sie"
   },
   "magicAction": {
     "partnerBadge": "Anbieter",
@@ -806,6 +835,73 @@
       "titleLabel": "Ihre Funktion",
       "confirm": "Fassung {{version}} annehmen",
       "cancel": "Abbrechen"
+    },
+    "mandate": {
+      "newVersion": "Neue Fassung {{version}} liegt vor. Ihre Annahme der Fassung {{old}} gilt weiter; bitte lesen und erneut annehmen.",
+      "reviewNote": "Fassung {{version}}. Die Rechtsprüfung dieses Textes läuft noch. Ändert er sich, legen wir Ihnen die neue Fassung erneut vor.",
+      "sections": [
+        {
+          "title": "1. Worum es geht",
+          "items": [
+            "Mit dieser Erklärung erlauben Sie CompliHub360, die in Abschnitt 2 genannten Beträge über das Zahlungsmittel einzuziehen, das Sie bei unserem Zahlungsdienstleister Stripe hinterlegt haben. Ihre Kartendaten liegen ausschließlich bei Stripe; CompliHub360 sieht und speichert sie nicht."
+          ]
+        },
+        {
+          "title": "2. Welche Beträge",
+          "intro": "Nur diese beiden, nichts anderes:",
+          "items": [
+            "Ihre Abo-Rechnung für den gewählten Tarif, in dem Turnus, den Sie beim Abschluss gewählt haben.",
+            "Die Lead-Gebühr für eine Buchung, die ein Unternehmen bei Ihnen vornimmt. Sie fällt je Buchung an und steht vor jeder Buchung mit Betrag in Ihrem Konto unter „Abrechnung“."
+          ]
+        },
+        {
+          "title": "3. Wann wir belasten",
+          "items": [
+            "Abo-Rechnung: Sie erhalten die Rechnung mit 14 Tagen Zahlungsziel und können sie selbst bezahlen. Ist sie am Fälligkeitstag noch offen, sagen wir Ihnen das per E-Mail und in Ihrem Konto. Danach versuchen wir den Einzug über Ihr hinterlegtes Zahlungsmittel am 1., 3. und 6. Tag nach Fälligkeit, je Tag höchstens einmal. Bezahlen Sie zwischendurch selbst, entfällt jeder weitere Versuch.",
+            "Lead-Gebühr: im Moment der Buchung, bevor dem Unternehmen Ihre Kontaktdaten gezeigt werden."
+          ]
+        },
+        {
+          "title": "4. Wie viel",
+          "items": [
+            "Die Abo-Rechnung entspricht dem Tarifpreis, den Sie beim Abschluss oder beim letzten Wechsel bestätigt haben. Ein Tarifwechsel oder eine Kündigung wirkt zum Ende der laufenden Periode.",
+            "Die Lead-Gebühr richtet sich nach der Größe der Anfrage und Ihrem Tarif. Betrag und Berechnung sehen Sie vor jeder Buchung unter „Abrechnung“; Rabatte Ihres Tarifs sind bereits abgezogen.",
+            "Plattform-Guthaben, das Ihnen gutgeschrieben wurde (zum Beispiel nach einem nicht wahrgenommenen Termin), verrechnen wir mit Ihrer nächsten Abo-Rechnung. Es wird nicht ausgezahlt."
+          ]
+        },
+        {
+          "title": "5. Wenn eine Belastung nicht gelingt",
+          "items": [
+            "Lead-Gebühr: Dann kommt die Buchung nicht zustande. Es entsteht keine Gebühr, und dem Unternehmen werden keine Daten von Ihnen gezeigt. Sie bleiben weiterhin sichtbar und können das Zahlungsmittel prüfen oder ein anderes hinterlegen. Bis dahin nehmen Sie keine neuen Buchungen an.",
+            "Abo-Rechnung: Die Rechnung bleibt offen, die Frist bleibt, wie sie ist. Sie können jederzeit selbst bezahlen. Ist die Rechnung 7 Tage nach Fälligkeit noch offen, pausieren neue Buchungen, bis sie bezahlt ist. Sie bleiben auch dann sichtbar.",
+            "CompliHub360 erhebt für einen gescheiterten Versuch keine eigene Gebühr. Ob Ihr Kartenanbieter Gebühren erhebt, richtet sich nach Ihrem Vertrag mit ihm."
+          ]
+        },
+        {
+          "title": "6. Wenn wir etwas rückgängig machen",
+          "items": [
+            "Kommt eine Buchung nach erfolgter Belastung doch nicht zustande (zum Beispiel, weil derselbe Termin gleichzeitig vergeben wurde), erstatten wir die Lead-Gebühr von selbst auf dasselbe Zahlungsmittel. Sie müssen dafür nichts tun; der Vorgang steht in Ihrem Abrechnungsverlauf."
+          ]
+        },
+        {
+          "title": "7. Widerruf",
+          "items": [
+            "Sie können dieses Mandat jederzeit in Ihrem Konto unter „Einstellungen“ widerrufen. Ab dann belasten wir nichts mehr und Sie nehmen keine neuen Buchungen an, bis Sie eine aktuelle Fassung erneut annehmen. Rechnungen, die vor dem Widerruf entstanden sind, bleiben fällig und bezahlen Sie selbst."
+          ]
+        },
+        {
+          "title": "8. Was wir festhalten",
+          "items": [
+            "Zu jeder Annahme speichern wir Fassung und Sprache dieses Textes, Name und Rolle der annehmenden Person, Zeitpunkt und eine technische Referenz. Eine neue Fassung ersetzt die alte nicht rückwirkend: Für jede Buchung bleibt nachvollziehbar, welche Fassung zu diesem Zeitpunkt galt."
+          ]
+        },
+        {
+          "title": "9. Änderungen",
+          "items": [
+            "Ändern wir diesen Text in einem Punkt, der Sie betrifft, legen wir Ihnen die neue Fassung zur Annahme vor. Bis Sie sie annehmen, belasten wir nichts Neues über die alte Fassung hinaus."
+          ]
+        }
+      ]
     },
     "submit": {
       "missingTitle": "Das fehlt noch",

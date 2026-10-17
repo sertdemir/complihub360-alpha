@@ -1083,6 +1083,13 @@ paths:
         `reviews` gerechnet: Buchungen, stattgefunden, No-Shows beider Seiten,
         Absagen, Bewertung aus Buchungen, offene Widersprueche, Vorfaelle im
         Fenster. Quoten (`rate`) erst ab `rate_min_bookings`, sonst null.
+        `previous` traegt dieselben Fakten fuer das Fenster unmittelbar davor
+        (gleich lang, endet vor `performance.from`), nach denselben Regeln;
+        es ist immer gesetzt, ohne Buchungen dort mit Nullen und null-Quoten.
+        Deltas rechnet der Server nicht — die Oberflaeche bildet Richtung
+        und Differenz und zeigt keinen Pfeil, wenn eines der beiden Fenster
+        unter `rate_min_bookings` liegt. `?format=csv` exportiert nur das
+        laufende Fenster.
         `analytics.level` kommt aus dem Tarif: `enhanced` liefert `trends`
         (Bereich, Land, Monat), `advanced` zusaetzlich `?format=csv` (eine
         Zeile je Buchung, ohne Nutzerdaten). Die Fakten sind in jedem Tarif
@@ -1093,7 +1100,13 @@ paths:
         - { name: key, in: path, required: true, schema: { type: string } }
         - { name: format, in: query, required: false, schema: { type: string, enum: [csv] } }
       responses:
-        '200': { description: "`{ performance, analytics, trends?, enforcement }` oder text/csv" }
+        '200':
+          description: "`{ performance, previous, analytics, trends?, enforcement }` oder text/csv"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProviderPerformanceResponse' }
+            text/csv:
+              schema: { type: string }
         '403': { description: "`ANALYTICS_LEVEL` — CSV nur ab advanced" }
 
   /provider/{key}/overview:
@@ -1651,7 +1664,8 @@ paths:
         (dieselben Bereiche als Codes, das UI uebersetzt sie), `provider_website`
         erst nach Offenlegung. `provider_paused`: der kommende Termin liegt in
         einem Bereich, den der Anbieter nach einem wesentlichen Ereignis
-        pausiert hat (Change-Control, Canvas F V1). Phase 5: `no_show_by`,
+        pausiert hat (Change-Control, Canvas F V1). `reviewed`: der Nutzer hat
+        diesen Termin schon bewertet (Canvas E1, 15.10.2026). Phase 5: `no_show_by`,
         `no_show_reported_at`, `dispute_status`, `dispute_open_until`,
         `rebook_deadline`, `rebook_open`, `rebooked_from`, `reschedule_count`,
         `reschedule_limit`, `attendance_reportable` — nie Band, Gebuehr oder
@@ -2126,6 +2140,91 @@ components:
       schema:
         type: string
   schemas:
+    PerformanceCounted:
+      type: object
+      description: Eine Zahl mit ihrer Basis; `rate` nur, wenn die Stichprobe reicht (Spec A §17).
+      required: [count, rate, of]
+      properties:
+        count: { type: integer }
+        rate: { type: number, nullable: true, description: 'Anteil an `of`, 0..1; null unter `rate_min_bookings`.' }
+        of: { type: integer }
+    PerformanceFacts:
+      type: object
+      description: >-
+        Buchungs-Fakten eines Zeitfensters (ADR-0009). Kein Score, kein Rang;
+        fehlende Daten bleiben null statt angenommen.
+      required: [policy_version, window_days, from, to, bookings, rate_min_bookings, rates_shown, attended, user_no_show, provider_no_show, cancelled_by_provider, cancelled_by_user, disputes_open, incidents, rating, would_use_again, upcoming]
+      properties:
+        policy_version: { type: integer }
+        window_days: { type: integer }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
+        bookings: { type: integer, description: Buchungen mit Termin im Fenster, alle Status. }
+        rate_min_bookings: { type: integer }
+        rates_shown: { type: boolean, description: '`bookings >= rate_min_bookings`.' }
+        attended: { $ref: '#/components/schemas/PerformanceCounted' }
+        user_no_show: { $ref: '#/components/schemas/PerformanceCounted' }
+        provider_no_show: { $ref: '#/components/schemas/PerformanceCounted' }
+        cancelled_by_provider: { $ref: '#/components/schemas/PerformanceCounted' }
+        cancelled_by_user: { $ref: '#/components/schemas/PerformanceCounted' }
+        disputes_open: { type: integer, description: Offene Widersprueche auf Buchungen bis `to`. }
+        incidents:
+          type: object
+          required: [count, window_days, alert_at, pause_at]
+          properties:
+            count: { type: integer }
+            window_days: { type: integer }
+            alert_at: { type: integer }
+            pause_at: { type: integer }
+        rating:
+          type: object
+          description: Nur aus verifizierten Nutzer-Bewertungen zu Buchungen, Stand `to`.
+          required: [average, count, min_count]
+          properties:
+            average: { type: number, nullable: true }
+            count: { type: integer }
+            min_count: { type: integer }
+        would_use_again: { $ref: '#/components/schemas/PerformanceCounted' }
+        upcoming: { type: integer, description: Bestaetigte Termine nach `to`. }
+    PerformanceTrendRow:
+      type: object
+      required: [key, bookings, attended, user_no_show, provider_no_show, cancelled]
+      properties:
+        key: { type: string }
+        bookings: { type: integer }
+        attended: { type: integer }
+        user_no_show: { type: integer }
+        provider_no_show: { type: integer }
+        cancelled: { type: integer }
+    ProviderPerformanceResponse:
+      type: object
+      required: [ok, providerKey, performance, previous, analytics, enforcement]
+      properties:
+        ok: { type: boolean }
+        providerKey: { type: string }
+        performance: { $ref: '#/components/schemas/PerformanceFacts' }
+        previous:
+          allOf: [ { $ref: '#/components/schemas/PerformanceFacts' } ]
+          description: >-
+            Das Fenster unmittelbar vor `performance` — gleich lang, endet vor
+            `performance.from`. Immer gesetzt; ohne Buchungen dort Nullen und
+            null-Quoten. Keine Deltas: die UI rechnet Richtung und Differenz.
+        analytics:
+          type: object
+          required: [level, trends, export]
+          properties:
+            level: { type: string, enum: [basic, enhanced, advanced] }
+            trends: { type: boolean }
+            export: { type: boolean }
+        trends:
+          type: object
+          description: Nur ab `enhanced`.
+          properties:
+            area: { type: array, items: { $ref: '#/components/schemas/PerformanceTrendRow' } }
+            country: { type: array, items: { $ref: '#/components/schemas/PerformanceTrendRow' } }
+            month: { type: array, items: { $ref: '#/components/schemas/PerformanceTrendRow' } }
+        enforcement: { type: object, nullable: true, description: Offene Massnahme nach Spec A §24, sonst null. }
+        correlationId: { type: string }
     PublicRef:
       type: string
       pattern: '^[0-9a-f]{12}$'

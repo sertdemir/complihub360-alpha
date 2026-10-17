@@ -1,6 +1,6 @@
 # CompliHub360 · Payment Mandate for Providers — Draft, version 2026-10
 
-**As of: 15 October 2026 · Status: draft for legal review · replaces version `billing_authorization 2026-09` once approved**
+**As of: 15 October 2026 · Status: draft for legal review · live in the acceptance dialog as version `2026-10` since 15 October 2026 (interim, operator's decision) · replaces the text-less version `2026-09`; the product shows “CompliHub360” where this draft says `[Operator]` until sign-off**
 
 > **Not legal advice.** This draft comes from product engineering. It states
 > what the platform actually does today, in words a provider is meant to read

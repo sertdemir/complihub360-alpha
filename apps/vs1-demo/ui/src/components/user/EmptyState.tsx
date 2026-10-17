@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { WORKSPACE_CARD } from '../ui/Card';
 
 // ─── Erstzustand ─────────────────────────────────────────────────────────────
 // Eine Komponente fuer alle vier Flaechen des Arbeitsbereichs (Dashboard,
@@ -25,7 +26,9 @@ import { Button } from '../ui/Button';
 // Kein Raster aus Nullen: vier Kacheln mit 0 sehen aus wie ein Defekt und
 // sagen nichts darueber, was als Naechstes zu tun waere.
 
-const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
+// Seit 2026-10-16 die geteilte Workspace-Karte (Card.tsx) — eine Quelle fuer
+// User- und Provider-Bereich.
+const CARD = WORKSPACE_CARD;
 
 export interface EmptyStateStep {
   title: string;

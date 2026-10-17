@@ -96,12 +96,30 @@ export interface PerformanceFacts {
 
 const rate = (count: number, of: number, min: number): Counted => ({ count, rate: of >= min && of > 0 ? Math.round((count / of) * 1000) / 1000 : null, of });
 
+/** Ein Zeitfenster der Fakten, ISO, beide Grenzen einschliesslich. */
+export interface FactsWindow { from: string; to: string }
+
+/**
+ * Das Fenster unmittelbar vor `facts` — gleich lang, endet eine Millisekunde
+ * vor dessen Beginn, damit keine Buchung in beiden Fenstern zaehlt.
+ */
+export function previousWindow(facts: Pick<PerformanceFacts, 'from' | 'window_days'>): FactsWindow {
+    const to = Date.parse(facts.from) - 1;
+    return { from: new Date(to - facts.window_days * 86_400_000).toISOString(), to: new Date(to).toISOString() };
+}
+
+/**
+ * Fakten eines Fensters. Ohne `window` ist es das laufende: die letzten
+ * `policy.windowDays` Tage bis `nowIso`. Mit `window` dieselbe Rechnung,
+ * verschoben: Buchungen und Vorfaelle im Fenster; Bewertung, offene
+ * Widersprueche und kommende Termine mit dem Stand zum Fensterende `to`.
+ */
 export function computePerformance(input: {
-    bookings: BookingFact[]; incidents: IncidentFact[]; reviews: ReviewFact[]; policy: PerformancePolicy; nowIso?: string;
+    bookings: BookingFact[]; incidents: IncidentFact[]; reviews: ReviewFact[]; policy: PerformancePolicy; nowIso?: string; window?: FactsWindow;
 }): PerformanceFacts {
     const { policy } = input;
-    const now = input.nowIso ? Date.parse(input.nowIso) : Date.now();
-    const from = now - policy.windowDays * 86_400_000;
+    const now = input.window ? Date.parse(input.window.to) : input.nowIso ? Date.parse(input.nowIso) : Date.now();
+    const from = input.window ? Date.parse(input.window.from) : now - policy.windowDays * 86_400_000;
     const inWindow = input.bookings.filter((b) => { const t = Date.parse(b.slot_start); return t >= from && t <= now; });
     const n = inWindow.length;
     const min = policy.rateMinBookings;
@@ -110,10 +128,10 @@ export function computePerformance(input: {
     const providerNoShow = inWindow.filter((b) => b.status === 'no_show' && (b.no_show_by === 'provider' || !b.no_show_by)).length;
     const cancelledProvider = inWindow.filter((b) => b.status === 'cancelled' && b.cancelled_by === 'provider').length;
     const cancelledUser = inWindow.filter((b) => b.status === 'cancelled' && b.cancelled_by === 'user').length;
-    const disputesOpen = input.bookings.filter((b) => b.dispute_status === 'open').length;
+    const disputesOpen = input.bookings.filter((b) => b.dispute_status === 'open' && Date.parse(b.slot_start) <= now).length;
     const incFrom = now - policy.incidentWindowDays * 86_400_000;
     const incidents = input.incidents.filter((i) => { const t = Date.parse(i.recorded_at); return t >= incFrom && t <= now; }).length;
-    const verified = input.reviews.filter((r) => (r.from_role ?? 'user') === 'user' && r.verified !== false && r.rating != null);
+    const verified = input.reviews.filter((r) => (r.from_role ?? 'user') === 'user' && r.verified !== false && r.rating != null && Date.parse(r.created_at) <= now);
     const avg = verified.length ? Math.round((verified.reduce((s, r) => s + Number(r.rating), 0) / verified.length) * 10) / 10 : null;
     const again = verified.filter((r) => Array.isArray(r.categories) && r.categories.includes('would_use_again')).length;
     const upcoming = input.bookings.filter((b) => b.status === 'confirmed' && Date.parse(b.slot_start) > now).length;

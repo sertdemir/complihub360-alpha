@@ -705,6 +705,13 @@ export interface ProviderPerformanceResponse {
     ok: true;
     providerKey: string;
     performance: PerformanceFacts;
+    /**
+     * Dasselbe fuer das Fenster unmittelbar davor (gleich lang, endet vor
+     * `performance.from`). Immer gesetzt; ohne Buchungen dort stehen Nullen
+     * und null-Quoten. Richtung und Differenz rechnet die UI — und zeigt
+     * keinen Pfeil, wenn eines der Fenster unter `rate_min_bookings` liegt.
+     */
+    previous: PerformanceFacts;
     analytics: { level: AnalyticsLevel; trends: boolean; export: boolean };
     trends?: { area: PerformanceTrendRow[]; country: PerformanceTrendRow[]; month: PerformanceTrendRow[] };
     enforcement: ProviderEnforcement | null;

@@ -115,12 +115,16 @@ jobs:
       - name: Run Tests
         run: npm run test --workspaces --if-present
 
-      - name: Navigation smoke (production build, real chromium)
+      - name: E2E — Navigation smoke (production build) + Kernfluesse (Mock-API)
         # Nach "Run Build", weil der Preview-Server dist/ ausliefert — und das
         # ist der Punkt: zweimal hat ein gruener jsdom-Test behauptet, der
         # Tastaturvertrag von NavMenu halte, waehrend er auf der gebauten Seite
-        # nicht hielt. Chromium ist oben schon installiert, der Lauf kostet
-        # rund 10 Sekunden. Was er nachweislich faengt und was nicht, steht in
-        # playwright.config.ts.
+        # nicht hielt. Chromium ist oben schon installiert. Was der Smoke
+        # nachweislich faengt und was nicht, steht in playwright.config.ts.
+        # Seit 2026-10-15 laeuft daneben das Projekt "flows": ein zweiter
+        # Server (`vite dev` mit VITE_MOCK_API=1) und die Kernfluesse Nutzer
+        # (Wizard → Risk Map → Buchung → Bestaetigung, Fehlerfall), Anbieter
+        # (Leads, Abrechnung, Annahmen) und Admin (Gate) in echtem Chromium —
+        # ohne Backend, Supabase oder Stripe. Rund eine Minute.
         run: npm run test:e2e
         working-directory: apps/vs1-demo/ui

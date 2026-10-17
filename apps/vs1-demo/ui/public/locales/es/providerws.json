@@ -337,7 +337,7 @@
     "actionOpenRq": "Abrir {{id}} →"
   },
   "performance": {
-    "title": "Rendimiento",
+    "title": "Su <accent>rendimiento</accent>.",
     "subtitle": "Lo que se desprende de sus reservas. Cada cifra indica su base y su periodo; una tasa aparece solo a partir de cinco reservas. El ranking ve exactamente estos hechos, iguales en todos los planes.",
     "range": "Últimos {{days}} días · {{bookings}} reservas",
     "policy": "Versión de reglas {{version}}",
@@ -397,7 +397,36 @@
     "appealDecided": {
       "lifted": "La pausa se levantó el {{date}}. Las reservas vuelven a estar abiertas.",
       "upheld": "El equipo confirmó la pausa el {{date}}. Se mantiene hasta que el equipo la levante."
-    }
+    },
+    "compareNote": "Las flechas comparan con los {{days}} días anteriores",
+    "trend": {
+      "vsPrevious": "frente a los {{days}} días anteriores",
+      "same": "igual que los {{days}} días anteriores",
+      "noPrevious": "sin periodo de comparación",
+      "pp": "{{value}} pp"
+    },
+    "basisBookings": "{{counted}} reservas",
+    "rateFrom": "tasa a partir de {{need}} reservas",
+    "ratingBasis": "de 5 · de {{count}} valoraciones",
+    "ratingAfterBooking": "tras la reserva, solo citas verificadas",
+    "wouldRebookAsked": "pregunta tras la cita",
+    "insufficientShort": "aún pocos datos",
+    "unit": {
+      "booking": "reserva",
+      "noShow": "no se presentó"
+    },
+    "meter": {
+      "first": "1.º incidente",
+      "alert": "aviso a partir de {{n}}",
+      "pause": "pausa de reservas a partir de {{n}}"
+    },
+    "chart": {
+      "took": "celebradas",
+      "noShow": "ausencia (usuario o usted)",
+      "cancelled": "canceladas"
+    },
+    "trendsNote": "Evolución mensual a partir de Growth; área y país también. Essential muestra los hechos de arriba sin evolución; exportación CSV a partir de Global. Los mismos hechos en todos los planes.",
+    "bySelf": "por usted"
   },
   "magicAction": {
     "partnerBadge": "Proveedor",
@@ -806,6 +835,73 @@
       "titleLabel": "Su cargo",
       "confirm": "Aceptar la versión {{version}}",
       "cancel": "Cancelar"
+    },
+    "mandate": {
+      "newVersion": "Hay una nueva versión {{version}}. Su aceptación de la versión {{old}} sigue vigente; léala y acéptela de nuevo.",
+      "reviewNote": "Versión {{version}}. La revisión jurídica de este texto sigue en curso. Si cambia, le presentaremos la nueva versión de nuevo.",
+      "sections": [
+        {
+          "title": "1. De qué se trata",
+          "items": [
+            "Con esta declaración autoriza a CompliHub360 a cobrar los importes indicados en la sección 2 mediante el método de pago que ha guardado en nuestro proveedor de servicios de pago, Stripe. Los datos de su tarjeta los guarda exclusivamente Stripe; CompliHub360 no los ve ni los almacena."
+          ]
+        },
+        {
+          "title": "2. Qué importes",
+          "intro": "Solo estos dos, nada más:",
+          "items": [
+            "Su factura de suscripción por el plan elegido, con la periodicidad que seleccionó al contratar.",
+            "La tarifa por lead de una reserva que una empresa realiza con usted. Se cobra por reserva y el importe se muestra en su cuenta, en «Facturación», antes de cada reserva."
+          ]
+        },
+        {
+          "title": "3. Cuándo cobramos",
+          "items": [
+            "Factura de suscripción: Recibe la factura con 14 días para pagar y puede pagarla usted mismo. Si en la fecha de vencimiento sigue abierta, se lo comunicamos por correo electrónico y en su cuenta. Después intentamos el cobro con su método de pago guardado el día 1, 3 y 6 tras el vencimiento, como máximo una vez al día. Si paga entretanto, no se realiza ningún intento más.",
+            "Tarifa por lead: en el momento de la reserva, antes de que la empresa vea sus datos de contacto."
+          ]
+        },
+        {
+          "title": "4. Cuánto",
+          "items": [
+            "La factura de suscripción corresponde al precio del plan que confirmó al contratar o en el último cambio. Un cambio de plan o una cancelación surte efecto al final del periodo en curso.",
+            "La tarifa por lead depende del tamaño de la consulta y de su plan. Antes de cada reserva ve el importe y su cálculo en «Facturación»; los descuentos de su plan ya están aplicados.",
+            "El crédito de plataforma que se le haya abonado (por ejemplo tras una cita no atendida) se compensa con su siguiente factura de suscripción. No se paga en efectivo."
+          ]
+        },
+        {
+          "title": "5. Si un cobro no se completa",
+          "items": [
+            "Tarifa por lead: La reserva no se lleva a cabo. No se genera ninguna tarifa y la empresa no ve ninguno de sus datos. Usted sigue visible y puede comprobar el método de pago o guardar otro. Hasta entonces no acepta nuevas reservas.",
+            "Factura de suscripción: La factura sigue abierta y el plazo no cambia. Puede pagar usted mismo en cualquier momento. Si la factura sigue abierta 7 días después del vencimiento, las nuevas reservas quedan en pausa hasta que se pague. Incluso entonces sigue visible.",
+            "CompliHub360 no cobra ninguna tarifa propia por un intento fallido. Si el emisor de su tarjeta cobra comisiones depende de su contrato con él."
+          ]
+        },
+        {
+          "title": "6. Si revertimos algo",
+          "items": [
+            "Si una reserva no se lleva a cabo después de un cobro ya realizado (por ejemplo porque la misma hora se asignó al mismo tiempo), devolvemos la tarifa por lead al mismo método de pago por iniciativa propia. No tiene que hacer nada; la operación aparece en su historial de facturación."
+          ]
+        },
+        {
+          "title": "7. Revocación",
+          "items": [
+            "Puede revocar este mandato en cualquier momento en su cuenta, en «Configuración». A partir de entonces no cobramos nada más y usted no acepta nuevas reservas hasta que acepte de nuevo una versión vigente. Las facturas emitidas antes de la revocación siguen siendo exigibles y las paga usted."
+          ]
+        },
+        {
+          "title": "8. Qué registramos",
+          "items": [
+            "De cada aceptación guardamos la versión y el idioma de este texto, el nombre y el cargo de la persona que acepta, la fecha y hora y una referencia técnica. Una nueva versión no sustituye a la anterior con efecto retroactivo: para cada reserva sigue siendo verificable qué versión estaba vigente en ese momento."
+          ]
+        },
+        {
+          "title": "9. Cambios",
+          "items": [
+            "Si modificamos este texto en un punto que le afecta, le presentamos la nueva versión para su aceptación. Hasta que la acepte, no cobramos nada nuevo más allá de lo que permite la versión anterior."
+          ]
+        }
+      ]
     },
     "submit": {
       "missingTitle": "Aún falta",

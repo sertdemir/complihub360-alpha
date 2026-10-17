@@ -38,6 +38,16 @@ import { defineConfig, devices } from '@playwright/test';
 // dist/, nicht den Dev-Server.
 
 const PORT = Number(process.env.E2E_PORT || 4173);
+// ─── Kernfluss-E2E gegen den Dev-Server mit Mock-API (seit 2026-10-15) ───────
+// Zweites Projekt, zweiter Server: `VITE_MOCK_API=1 vite` beantwortet /api/v1/*
+// aus dem eingebauten Datensatz (src/mock/demoApi.ts), der Demo-Login kommt aus
+// localStorage. Damit laufen Wizard → Risk Map → Buchung → Bestaetigung und die
+// Anbieter- und Admin-Flaechen in einem echten Chromium, ohne Backend, Supabase
+// oder Stripe — deterministisch und in CI. Was das NICHT prueft: die
+// Belastung bei Stripe, die Engine, RLS. Dafuer gibt es die API-Suite und den
+// Staging-Testlauf von Hand (docs/stripe-setup.md). Der Mock laeuft nur unter
+// `vite dev`, deshalb kein Preview-Build wie beim Navigations-Smoke.
+const FLOWS_PORT = Number(process.env.E2E_FLOWS_PORT || 4174);
 
 export default defineConfig({
   testDir: './e2e',
@@ -54,11 +64,23 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  webServer: {
-    command: `npx vite preview --port ${PORT} --strictPort`,
-    url: `http://localhost:${PORT}/en`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-  },
+  projects: [
+    { name: 'chromium', testIgnore: /flows\//, use: { ...devices['Desktop Chrome'] } },
+    { name: 'flows', testMatch: /flows\/.*\.spec\.ts/, use: { ...devices['Desktop Chrome'], baseURL: `http://localhost:${FLOWS_PORT}` } },
+  ],
+  webServer: [
+    {
+      command: `npx vite preview --port ${PORT} --strictPort`,
+      url: `http://localhost:${PORT}/en`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+    },
+    {
+      command: `npx vite --port ${FLOWS_PORT} --strictPort`,
+      url: `http://localhost:${FLOWS_PORT}/en`,
+      env: { VITE_MOCK_API: '1' },
+      reuseExistingServer: !process.env.CI,
+      timeout: 90_000,
+    },
+  ],
 });
