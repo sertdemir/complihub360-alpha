@@ -420,21 +420,49 @@ async function materialEvent(req: IncomingMessage, res: ServerResponse, correlat
     // Was vorher galt, VOR dem Pausieren festgehalten — damit die Freigabe
     // genau diesen Stand wiederherstellt.
     const before = targets.map((sv) => ({ id: sv.id, status: sv.status as string }));
+    // Punkt 2 (17.10.2026): erst die Meldung, dann die Pause. Vorher wurden
+    // die Leistungen pausiert und die Meldung danach geschrieben — scheiterte
+    // das Schreiben, waren Leistungen pausiert, ohne dass das Pruefteam davon
+    // wusste, und der zweite Versuch des Anbieters legte eine zweite Meldung an.
+    // Jetzt steht die Meldung zuerst. Ein erneuter Versuch fuer dasselbe
+    // Ereignis und Datum innerhalb von 15 Minuten nimmt die offene Meldung
+    // wieder auf: noch nicht pausierte Leistungen kommen dazu, der alte Stand
+    // bleibt, wie er beim ersten Versuch war.
+    const open = ((await supabaseApi.select('provider_change_requests', { provider_key: providerKey, change_type: 'material_event', status: 'submitted' }, { order: 'submitted_at.desc', limit: 20 })) as any[])
+        .find((c) => c.event_type === eventType && c.occurred_on === occurredOn && Date.now() - Date.parse(c.submitted_at) < 15 * 60_000);
+    let request: any;
+    if (open) {
+        const priorBefore: Array<{ id: string; status: string }> = open.old_value?.services ?? [];
+        const mergedBefore = [...priorBefore, ...before.filter((b) => !priorBefore.some((p) => p.id === b.id))];
+        const affected = mergedBefore.map((b) => b.id);
+        await supabaseApi.update('provider_change_requests', { id: open.id }, {
+            old_value: { services: mergedBefore },
+            new_value: { ...(open.new_value ?? {}), services: affected.map((id) => ({ id, status: 'paused' })) },
+            affected_service_ids: affected, pauses_affected_services: affected.length > 0,
+            provider_note: str(d.note, 1000) || open.provider_note || null,
+        });
+        request = { ...open, affected_service_ids: affected, new_value: { ...(open.new_value ?? {}) } };
+    } else {
+        const rows = await supabaseApi.insert('provider_change_requests', {
+            provider_key: providerKey, service_id: null, change_type: 'material_event', field_path: null,
+            old_value: { services: before },
+            new_value: { services: targets.map((sv) => ({ id: sv.id, status: 'paused' })) },
+            deadline_class: 'immediate_24h', effect: 'pause', status: 'submitted',
+            pauses_affected_services: targets.length > 0, event_type: eventType, occurred_on: occurredOn,
+            affected_service_ids: targets.map((sv) => sv.id), provider_note: str(d.note, 1000) || null,
+            applied_at: now, submitted_at: now,
+        }) as any[];
+        request = rows?.[0] ?? { id: null, affected_service_ids: targets.map((sv) => sv.id), new_value: {} };
+    }
     for (const sv of targets) await supabaseApi.update('provider_services', { id: sv.id }, { status: 'paused', status_since: now, updated_at: now });
-    const rows = await supabaseApi.insert('provider_change_requests', {
-        provider_key: providerKey, service_id: null, change_type: 'material_event', field_path: null,
-        old_value: { services: before },
-        new_value: { services: targets.map((sv) => ({ id: sv.id, status: 'paused' })) },
-        deadline_class: 'immediate_24h', effect: 'pause', status: 'submitted',
-        pauses_affected_services: targets.length > 0, event_type: eventType, occurred_on: occurredOn,
-        affected_service_ids: targets.map((sv) => sv.id), provider_note: str(d.note, 1000) || null,
-        applied_at: now, submitted_at: now,
-    }) as any[];
+    const pausedIds: string[] = request.affected_service_ids ?? targets.map((sv) => sv.id);
     await reviewLog({ providerKey, subject: 'application', action: 'material_event', to: `${eventType}:${targets.length}`, actorId: caller.userId, actorKind: 'provider' });
     // Canvas F V1: wer einen kommenden Termin in einem pausierten Bereich hat,
     // erfaehrt es per Mail — ohne Grund, mit kostenfreier Absage und Mensch.
     let notified = 0;
-    if (targets.length) {
+    // Mails nur einmal je Meldung: ein Wiederholungsversuch nach einem Fehler
+    // vor dem Versand holt sie nach, einer nach erfolgreichem Versand nicht.
+    if (pausedIds.length && !request.new_value?.users_notified_at) {
         const paused = (await pausedAreasByProvider(providerKey)).get(providerKey);
         const upcoming = ((await supabaseApi.select('scheduling', { provider_key: providerKey }, { limit: 500 })) as any[])
             .filter((b) => b.slot_start > now && b.status !== 'cancelled');
@@ -446,8 +474,11 @@ async function materialEvent(req: IncomingMessage, res: ServerResponse, correlat
             notified++;
         }
     }
-    await supabaseApi.insert('event_log', { type: 'provider_material_event', payload: { providerKey, eventType, paused: targets.map((sv) => sv.id) } });
-    json(res, 201, { ok: true, change_request_id: rows?.[0]?.id ?? null, paused_service_ids: targets.map((sv) => sv.id), users_notified: notified, correlationId });
+    if (request.id && pausedIds.length && !request.new_value?.users_notified_at) {
+        await supabaseApi.update('provider_change_requests', { id: request.id }, { new_value: { services: pausedIds.map((id) => ({ id, status: 'paused' })), users_notified_at: new Date().toISOString() } });
+    }
+    await supabaseApi.insert('event_log', { type: 'provider_material_event', payload: { providerKey, eventType, paused: pausedIds, change_request_id: request.id ?? null } });
+    json(res, 201, { ok: true, change_request_id: request.id ?? null, paused_service_ids: pausedIds, users_notified: notified, correlationId });
 }
 
 // ─── Leistungen (2B: Stamm) ──────────────────────────────────────────────────

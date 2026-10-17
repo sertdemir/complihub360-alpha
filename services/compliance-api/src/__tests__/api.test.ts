@@ -2982,6 +2982,43 @@ describe('Change-Control fuer aktive Partner (§18–20)', () => {
         expect(svc.status).toBe('approved');
     });
 
+    it('ein wesentliches Ereignis: erst die Meldung, dann die Pause; ein zweiter Versuch legt keine zweite an (Punkt 2)', async () => {
+        // Vorher pausierte der Server zuerst und schrieb die Meldung danach.
+        // Scheiterte das Schreiben, waren Leistungen pausiert, ohne dass das
+        // Pruefteam davon wusste; der zweite Versuch legte eine zweite an.
+        const svc = seedActivePartner();
+        const { supabaseApi } = await import('../supabase.js');
+        const orig = supabaseApi.update.bind(supabaseApi);
+        const update = vi.spyOn(supabaseApi, 'update').mockImplementation(async (table: string, ...rest: any[]) => {
+            if (table === 'provider_services' && !update.mock.calls.slice(0, -1).some((c) => c[0] === 'provider_services')) throw new Error('Supabase update failed: timeout');
+            return (orig as any)(table, ...rest);
+        });
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        try {
+            const body = JSON.stringify({ event_type: 'insurance_lost', occurred_on: '2026-09-30', service_ids: [svc.id] });
+            const erst = await own('/material-event', { method: 'POST', body });
+            expect(erst.status).toBe(500);
+            // Die Meldung steht, auch wenn das Pausieren scheiterte
+            expect(changes()).toHaveLength(1);
+            expect(changes()[0]).toMatchObject({ status: 'submitted', affected_service_ids: [svc.id] });
+            expect(changes()[0].old_value.services).toEqual([{ id: svc.id, status: 'approved' }]);
+
+            const zweit = await own('/material-event', { method: 'POST', body });
+            expect(zweit.status).toBe(201);
+            expect(zweit.body.change_request_id).toBe(changes()[0].id);
+            expect(svc.status).toBe('paused');
+            expect(changes()).toHaveLength(1);
+            // Der alte Stand bleibt der vom ersten Versuch
+            expect(changes()[0].old_value.services).toEqual([{ id: svc.id, status: 'approved' }]);
+
+            // Noch ein Versuch nach Erfolg: weiter genau eine Meldung
+            const dritt = await own('/material-event', { method: 'POST', body });
+            expect(dritt.status).toBe(201);
+            expect(changes()).toHaveLength(1);
+            expect(changes()[0].new_value.users_notified_at).toBeTruthy();
+        } finally { update.mockRestore(); log.mockRestore(); }
+    });
+
     it('dry_run sagt vorher, was wartet und was sofort gilt — ohne zu schreiben (B V2)', async () => {
         const svc = seedActivePartner();
         const r = await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, completion_days_estimate: 10, capacity_status: 'limited', dry_run: true }) });
