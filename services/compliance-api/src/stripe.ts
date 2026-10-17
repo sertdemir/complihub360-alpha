@@ -21,6 +21,33 @@ export function isStripeConfigured(): boolean {
     return !!process.env.STRIPE_SECRET_KEY;
 }
 
+/**
+ * Wie lange ein Stripe-Aufruf hoechstens dauern darf. Vorher gab es keine
+ * Grenze — eine haengende Verbindung hielt die Buchung offen, bis das
+ * Betriebssystem aufgab (Silent-Failure-Befund B1, 2026-10-16). 20 s sind
+ * reichlich fuer eine Belastung und kurz genug, dass der Nutzer eine Antwort
+ * bekommt, solange er noch auf der Seite ist.
+ */
+export const STRIPE_TIMEOUT_MS = (() => {
+    const n = Number(process.env.STRIPE_TIMEOUT_MS);
+    return Number.isFinite(n) && n >= 1000 ? n : 20_000;
+})();
+
+/**
+ * Der Aufruf ist unterwegs gescheitert — Timeout, Verbindungsabbruch, keine
+ * lesbare Antwort. Ob Stripe ihn verarbeitet hat, weiss niemand. Von einem
+ * `StripeError` (Stripe HAT geantwortet) unterschieden, weil die Belastung
+ * beide Faelle verschieden verbuchen muss.
+ */
+export class StripeTransportError extends Error {
+    readonly path: string;
+    constructor(path: string, cause: unknown) {
+        super(`Stripe ${path}: ${cause instanceof Error ? cause.message : String(cause)}`, { cause });
+        this.name = 'StripeTransportError';
+        this.path = path;
+    }
+}
+
 /** Ein Stripe-Fehler, der sagt, ob die Karte oder Stripe das Problem war. */
 export class StripeError extends Error {
     readonly status: number;
@@ -51,11 +78,17 @@ export async function stripeRequest(
     const headers: Record<string, string> = { 'Authorization': `Bearer ${stripeKey}` };
     if (method === 'POST') headers['Content-Type'] = 'application/x-www-form-urlencoded';
     if (opts.idempotencyKey) headers['Idempotency-Key'] = opts.idempotencyKey;
-    const resp = await fetch(url, {
-        method,
-        headers,
-        ...(method === 'POST' && params ? { body: new URLSearchParams(params).toString() } : {}),
-    });
+    let resp: Response;
+    try {
+        resp = await fetch(url, {
+            method,
+            headers,
+            signal: AbortSignal.timeout(STRIPE_TIMEOUT_MS),
+            ...(method === 'POST' && params ? { body: new URLSearchParams(params).toString() } : {}),
+        });
+    } catch (err) {
+        throw new StripeTransportError(path, err);
+    }
     const body = await resp.json().catch(() => null) as Record<string, any> | null;
     if (!resp.ok) throw new StripeError(path, resp.status, body);
     return body ?? {};
@@ -128,11 +161,23 @@ export async function getCustomerBilling(customerId: string): Promise<CustomerBi
 
 export type ChargeFailureReason =
     | 'card_declined' | 'insufficient_funds' | 'expired_card' | 'authentication_required'
-    | 'no_payment_method' | 'stripe_error';
+    | 'no_payment_method' | 'stripe_error' | 'outcome_unknown';
 
+/**
+ * Drei Arten von „nicht ok":
+ *   card    — Stripe hat geantwortet, die Karte hat nicht gezahlt.
+ *   stripe  — Stripe hat geantwortet, aber mit einem Fehler, der nicht die
+ *             Karte ist (Konfiguration, ungueltige Anfrage). Es wurde NICHTS
+ *             belastet.
+ *   unknown — Keine verwertbare Antwort (Timeout, Abbruch, 5xx). Die Belastung
+ *             KANN durchgegangen sein. Befund B1: wer das als `failed`
+ *             verbucht, erstattet nie und belastet beim naechsten Versuch ein
+ *             zweites Mal. Der Aufrufer sperrt den Anbieter, bis
+ *             `findPaymentIntentForLedger` die Wahrheit nachgeschaut hat.
+ */
 export type ChargeResult =
     | { ok: true; paymentIntentId: string; status: 'succeeded' }
-    | { ok: false; kind: 'card' | 'stripe'; reason: ChargeFailureReason; stripeRef: string | null; detail: string };
+    | { ok: false; kind: 'card' | 'stripe' | 'unknown'; reason: ChargeFailureReason; stripeRef: string | null; detail: string };
 
 /**
  * Off-session belasten, synchron bestaetigt. Der Idempotency-Key ist die
@@ -178,8 +223,43 @@ export async function createPaymentIntent(args: {
         if (err instanceof StripeError && err.code === 'resource_missing' && /payment_method/.test(err.message)) {
             return { ok: false, kind: 'card', reason: 'no_payment_method', stripeRef: null, detail: err.message };
         }
+        // Unterwegs verloren oder Stripe selbst gestoert: Ausgang offen.
+        if (err instanceof StripeTransportError || (err instanceof StripeError && err.status >= 500)) {
+            return { ok: false, kind: 'unknown', reason: 'outcome_unknown', stripeRef: null, detail: err.message };
+        }
         return { ok: false, kind: 'stripe', reason: 'stripe_error', stripeRef: null, detail: err instanceof Error ? err.message : String(err) };
     }
+}
+
+export type FoundPaymentIntent = { id: string; status: string } | null;
+
+/**
+ * Nachschau fuer einen offenen Ausgang: Gibt es bei Stripe einen
+ * PaymentIntent mit `metadata.ledger_id` = Ledger-Zeile?
+ *
+ * Bewusst die LISTE des Kunden (stark konsistent) und nicht die Suche (bis zu
+ * einer Minute Verzug) und nicht ein zweiter POST mit demselben
+ * Idempotency-Key — der wuerde die Belastung JETZT ausloesen, falls die erste
+ * nie ankam, und es gibt keine Buchung mehr, zu der sie gehoert. Diese
+ * Funktion bewegt kein Geld.
+ *
+ * `null` heisst: in den Intents des Kunden seit `createdAfter` findet sich
+ * nichts zu dieser Ledger-Zeile — die Belastung hat Stripe nie erreicht.
+ */
+export async function findPaymentIntentForLedger(args: { customerId: string; ledgerId: string; createdAfter: Date }): Promise<FoundPaymentIntent> {
+    const since = Math.floor(args.createdAfter.getTime() / 1000) - 300;
+    let startingAfter: string | null = null;
+    for (let page = 0; page < 5; page++) {
+        const params: Record<string, string> = { customer: args.customerId, 'created[gte]': String(since), limit: '100' };
+        if (startingAfter) params.starting_after = startingAfter;
+        const list = await stripeRequest('GET', 'payment_intents', params);
+        const data: any[] = Array.isArray(list.data) ? list.data : [];
+        const hit = data.find((pi) => pi?.metadata?.ledger_id === args.ledgerId);
+        if (hit) return { id: String(hit.id), status: String(hit.status || '') };
+        if (!list.has_more || !data.length) return null;
+        startingAfter = String(data[data.length - 1].id);
+    }
+    return null;
 }
 
 function mapDecline(code: string | null, declineCode: string | null): ChargeFailureReason {
