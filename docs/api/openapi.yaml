@@ -931,7 +931,9 @@ paths:
         Liest Stripe (Default-Zahlungsmittel, Rechnungsdaten), Abo, Mandat
         (`billing_authorization`), ueberfaellige Rechnungen und die letzte
         gescheiterte Belastung und setzt `billing_ready` mit Gruenden
-        (Spec A §21.1 plus `payment_failed`). Laeuft beim Rueckweg aus dem
+        (Spec A §21.1 plus `payment_failed` und `payment_unresolved`, letzteres
+        solange eine Belastung mit offenem Ausgang auf den Abgleich wartet).
+        Laeuft beim Rueckweg aus dem
         Portal (`?from=portal`) und auf Knopfdruck; nie im Buchungspfad.
         Nur fuer Mitglieder des Anbieters, Admin oder Server-Key.
       security: [ { bearerAuth: [] } ]
@@ -1652,7 +1654,7 @@ paths:
         '400': { description: "Eingabe (`VALIDATION_ERROR`) oder Opportunity fehlt (`OPPORTUNITY_REQUIRED`, `AREA_NOT_OFFERED`, `SERVICE_NOT_FOUND`)" }
         '404': { description: Unbekannter Ref, nicht matchbar oder fremde Sitzung }
         '409': { description: "`BILLING_NOT_READY` (nicht zahlungsbereit, nichts versucht) · `ACKNOWLEDGEMENT_OUTDATED` (mit `current_version`) · `SLOT_TAKEN` · `BOOKING_NOT_COMPLETED` (Belastung gescheitert, Grund `provider_billing`, keine Buchung)" }
-        '502': { description: Zahlungsdienst nicht erreichbar (`BILLING_ERROR`); keine Buchung, Anbieter unberuehrt }
+        '502': { description: "Zahlungsdienst nicht erreichbar (`BILLING_ERROR`); keine Buchung. Hat Stripe mit einem Fehler geantwortet, bleibt der Anbieter unberuehrt. Kam keine verwertbare Antwort (Timeout, Abbruch, 5xx — Befund B1), steht die Belastung im Ledger als `unknown`, der Anbieter traegt `payment_unresolved`, bis der Watcher den Ausgang mit Stripe abgeglichen hat (und eine Belastung ohne Buchung erstattet)." }
 
   /bookings:
     get:

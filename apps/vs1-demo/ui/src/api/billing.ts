@@ -99,7 +99,8 @@ export async function fetchBillingPreview(providerKey?: string): Promise<Billing
 // sperrt die Buchung, nie die Sichtbarkeit (§14).
 export type BillingBlockReason =
   | 'no_payment_method' | 'incomplete_billing_info' | 'inactive_subscription'
-  | 'withdrawn_authorization' | 'overdue_invoice' | 'account_paused' | 'payment_failed';
+  | 'withdrawn_authorization' | 'overdue_invoice' | 'account_paused' | 'payment_failed'
+  | 'payment_unresolved';
 
 export interface BillingReadiness {
   ready: boolean;

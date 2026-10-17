@@ -2,6 +2,8 @@
 
 **Stand: 16.10.2026 · Status: Befundliste, nichts geändert · aus dem Beta-Plan (28.10.) vorgezogen**
 
+**Fortschritt:** B1 behoben (2026-10-18). Reihenfolge wie vorgeschlagen, Geld zuerst.
+
 Zwei lesende Durchgänge mit dem Projekt-Agenten `silent-failure-hunter`
 (`.claude/agents/silent-failure-hunter.md`), Stichproben der schwersten
 Befunde am Code bestätigt. Geprüft: `leadCharge.ts`, `stripe.ts`, `billing.ts`,
@@ -34,7 +36,7 @@ ein `catch` mit Log statt leer, ein Timeout). Die drei größeren: B1 (Ausgang
 
 | Nr. | Schwere | Stelle | Befund |
 |---|---|---|---|
-| B1 | hoch | `stripe.ts:54-61`, `leadCharge.ts:212-231`, `index.ts:1871-1875` | Stripe-`fetch` ohne Timeout. Netzabbruch **nach** Capture wird als `failed`/502 verbucht, kein Refund; der Retry des Nutzers belastet mit neuem Ledger-Key ein zweites Mal. |
+| B1 | hoch | `stripe.ts:54-61`, `leadCharge.ts:212-231`, `index.ts:1871-1875` | Stripe-`fetch` ohne Timeout. Netzabbruch **nach** Capture wird als `failed`/502 verbucht, kein Refund; der Retry des Nutzers belastet mit neuem Ledger-Key ein zweites Mal. **Behoben 2026-10-18:** Timeout, Ausgang `unknown`, Sperre `payment_unresolved`, Abgleich-Tick mit Erstattung (ADR-0005 „Offen"). |
 | B2 | hoch | `index.ts:1915-1925` | Scheitert die Erstattung, bleibt nur ein `event_log`-Insert mit `.catch(() => {})`; Ledger bleibt `captured`, kein Log, keine Admin-Spur. Umgekehrt wird eine **gelungene** Erstattung als `lead_charge_reversed_failed` protokolliert, wenn der Payment-Event-Insert danach wirft. |
 | B3 | hoch | `index.ts:1958-1971`, `2004-2007` | Nach erfolgreichem Scheduling-Insert sind vier `event_log`-Inserts ungeschützt; wirft einer, bekommt der Nutzer 500, obwohl Buchung, Belastung und Offenlegung stehen — und `lead.revealed` fehlt im Audit. |
 | B4 | hoch | `billing.ts:408` vs. `443-451`, `554`, `672` | `quoteLeadFee` findet den Plan nur bei exakter `plan_version`; `loadPricingConfig` behält je Code nur die neueste. Nach einem Versionssprung im Katalog zahlen alle Bestandsabos still den vollen Preis. Unsicher, ob schon ausgelöst. |
