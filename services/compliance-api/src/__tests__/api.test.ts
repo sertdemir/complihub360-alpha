@@ -4432,6 +4432,55 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         expect(db.provider_credits).toHaveLength(1);
     });
 
+    // ─── B6: Guthaben vor der Frist ─────────────────────────────────────────
+    it('B6: wirft der Guthaben-Insert, bleibt die Frist offen und der naechste Tick holt das Guthaben nach', async () => {
+        seedProvider(); seedMember(); seedUsers();
+        const ledger = seedLedger();
+        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(15 * 24), rebook_deadline: dayStr(-1), lead_ledger_id: ledger.id });
+        const { supabaseApi } = await import('../supabase.js');
+        const realInsert = supabaseApi.insert;
+        const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+            if (table === 'provider_credits') throw new Error('connection reset');
+            return realInsert(table, data);
+        });
+        try {
+            const r = await tick(false);
+            expect(r.body.summary).toMatchObject({ creditsIssued: 0, rebookDeadlinesClosed: 0 });
+        } finally { spy.mockRestore(); }
+        // Vorher: credit_decided_at gesetzt, Guthaben weg. Jetzt: Frist offen, nichts verloren.
+        expect(db.scheduling[0].credit_decided_at).toBeUndefined();
+        expect(db.provider_credits ?? []).toHaveLength(0);
+        expect((db.notifications ?? []).filter((n) => n.type === 'credit_issued')).toHaveLength(0);
+        const r2 = await tick(false);
+        expect(r2.body.summary).toMatchObject({ creditsIssued: 1, rebookDeadlinesClosed: 1 });
+        expect(db.provider_credits).toEqual([expect.objectContaining({ booking_id: b.id, amount_cents: 4023 })]);
+        expect(db.scheduling[0].credit_decided_at).toBeTruthy();
+    });
+
+    it('B6: Guthaben steht schon (Abbruch nach dem Insert) → Frist wird geschlossen, nichts doppelt, keine zweite Meldung', async () => {
+        seedProvider(); seedMember(); seedUsers();
+        const ledger = seedLedger();
+        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(15 * 24), rebook_deadline: dayStr(-1), lead_ledger_id: ledger.id });
+        (db.provider_credits ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', amount_cents: 4023, currency: 'USD', reason: 'user_no_rebook_30pct', ledger_id: ledger.id, booking_id: b.id, created_at: past(1) });
+        const { supabaseApi } = await import('../supabase.js');
+        const realInsert = supabaseApi.insert;
+        // Der Test-Store kennt keinen Unique-Index — die Verletzung kommt hier von Hand.
+        const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+            if (table === 'provider_credits' && (db.provider_credits ?? []).some((c: any) => c.booking_id === data.booking_id && c.amount_cents > 0)) {
+                throw new Error('duplicate key value violates unique constraint "provider_credits_booking_uq" (23505)');
+            }
+            return realInsert(table, data);
+        });
+        try {
+            const r = await tick(false);
+            expect(r.body.summary).toMatchObject({ creditsIssued: 1, rebookDeadlinesClosed: 1 });
+        } finally { spy.mockRestore(); }
+        expect(db.provider_credits).toHaveLength(1);
+        expect(db.scheduling[0].credit_decided_at).toBeTruthy();
+        expect((db.notifications ?? []).filter((n) => n.type === 'credit_issued')).toHaveLength(0);
+        expect(db.event_log.find((e) => e.type === 'lead.credit_issued')?.payload).toMatchObject({ bookingId: b.id, resumed: true });
+    });
+
     it('Nutzer-Absage mit Lead-Gebuehr oeffnet die Neubuchungsfrist, ohne No-Show zu werden', async () => {
         seedProvider(); seedMember();
         const ledger = seedLedger();

@@ -166,15 +166,36 @@ export async function runRebookTick(shadow: boolean, nowIso = new Date().toISOSt
                 counts.deadlinesClosed++; if (amount > 0) counts.creditsIssued++;
                 continue;
             }
-            // Erst die Frist schliessen (einmalig), dann das Guthaben: der
-            // Unique-Index auf provider_credits.booking_id faengt den Rest.
-            await supabaseApi.update('scheduling', { id: b.id }, { credit_decided_at: nowIso, updated_at: nowIso });
-            counts.deadlinesClosed++;
+            // B6 (2026-10-18): ERST das Guthaben, DANN die Frist schliessen.
+            // Vorher stand `credit_decided_at`, bevor provider_credits geschrieben
+            // war — warf der Insert, war das 30-%-Guthaben endgueltig weg, denn
+            // die Zeile galt als entschieden. Jetzt bleibt die Frist offen, wenn
+            // das Guthaben nicht steht, und der naechste Tick versucht es erneut.
+            // Der Unique-Index provider_credits_booking_uq macht den zweiten
+            // Versuch idempotent: steht die Zeile schon (Abbruch nach dem
+            // Insert), wird nur noch die Frist geschlossen.
             if (amount > 0 && ledger) {
-                await supabaseApi.insert('provider_credits', {
-                    provider_key: b.provider_key, amount_cents: amount, currency: ledger.currency ?? 'USD', reason: 'user_no_rebook_30pct',
-                    ledger_id: ledger.id, booking_id: b.id, note: `${policy.creditPct} % of ${ledger.final_fee_cents} · ${isUserCancellation(b) ? 'cancelled by user, ' : ''}no rebooking by ${deadline}`,
-                });
+                let alreadyIssued = false;
+                try {
+                    await supabaseApi.insert('provider_credits', {
+                        provider_key: b.provider_key, amount_cents: amount, currency: ledger.currency ?? 'USD', reason: 'user_no_rebook_30pct',
+                        ledger_id: ledger.id, booking_id: b.id, note: `${policy.creditPct} % of ${ledger.final_fee_cents} · ${isUserCancellation(b) ? 'cancelled by user, ' : ''}no rebooking by ${deadline}`,
+                    });
+                } catch (insErr) {
+                    if (!/23505|duplicate|unique/i.test(String(insErr))) throw insErr; // Frist bleibt offen, naechster Tick
+                    alreadyIssued = true;
+                }
+                await supabaseApi.update('scheduling', { id: b.id }, { credit_decided_at: nowIso, updated_at: nowIso });
+                counts.deadlinesClosed++;
+                if (alreadyIssued) {
+                    // Der letzte Tick hatte das Guthaben geschrieben und brach danach ab:
+                    // nichts doppelt melden, nur die Luecke protokollieren.
+                    structuredLog('warn', 'Credit already issued — closing deadline only', { correlationId: 'watchers', route: 'watchers/rebook', bookingId: b.id, providerKey: b.provider_key } as Record<string, unknown>);
+                    await supabaseApi.insert('event_log', { type: 'lead.credit_issued', payload: { bookingId: b.id, providerKey: b.provider_key, ledgerId: ledger.id, creditCents: amount, currency: ledger.currency ?? 'USD', pct: policy.creditPct, resumed: true } })
+                        .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId: 'watchers', errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'lead.credit_issued', detail: String(e).slice(0, 200) } as Record<string, unknown>));
+                    counts.creditsIssued++;
+                    continue;
+                }
                 // Spur im Ledger: eine credit-Zeile, die auf die Belastung zeigt (append-only, Spec B "credit history").
                 await supabaseApi.insert('provider_lead_ledger', {
                     kind: 'credit', provider_key: b.provider_key, user_id: ledger.user_id ?? null, booking_id: b.id, refers_to: ledger.id,
@@ -183,7 +204,10 @@ export async function runRebookTick(shadow: boolean, nowIso = new Date().toISOSt
                     plan_code_at_charge: ledger.plan_code_at_charge ?? null, plan_version_at_charge: ledger.plan_version_at_charge ?? null,
                     discount_sequence: ledger.discount_sequence ?? null, discount_pct: ledger.discount_pct ?? 0, final_fee_cents: amount,
                     currency: ledger.currency ?? 'USD', payment_status: 'n/a', policy_version: ledger.policy_version,
-                }).catch(() => { /* das Guthaben steht; die Ledger-Spur ist Dokumentation */ });
+                }).catch((e) => {
+                    // Das Guthaben steht; die Ledger-Spur ist Dokumentation — aber ihr Fehlen muss jemand sehen.
+                    structuredLog('error', 'Ledger credit row failed', { correlationId: 'watchers', errorCode: 'ERR_LEDGER_CREDIT_ROW', severity: 'error', bookingId: b.id, ledgerId: ledger!.id, detail: String(e).slice(0, 200) } as Record<string, unknown>);
+                });
                 await supabaseApi.insert('event_log', { type: 'lead.credit_issued', payload: { bookingId: b.id, providerKey: b.provider_key, ledgerId: ledger.id, creditCents: amount, currency: ledger.currency ?? 'USD', pct: policy.creditPct } });
                 const prov = await providerRow(b.provider_key);
                 for (const m of await membersOf(b.provider_key)) {
@@ -192,6 +216,8 @@ export async function runRebookTick(shadow: boolean, nowIso = new Date().toISOSt
                 await sendCreditIssuedMail({ to: prov?.contact_email ?? null, providerKey: b.provider_key, bookingId: b.id, amountCents: amount, currency: ledger.currency ?? 'USD', pct: policy.creditPct, locale: prov?.languages?.[0], cause: isUserCancellation(b) ? 'cancelled' : 'no_show' });
                 counts.creditsIssued++;
             } else {
+                await supabaseApi.update('scheduling', { id: b.id }, { credit_decided_at: nowIso, updated_at: nowIso });
+                counts.deadlinesClosed++;
                 await supabaseApi.insert('event_log', { type: 'rebook_deadline_closed', payload: { bookingId: b.id, providerKey: b.provider_key, noShowBy: b.no_show_by, creditCents: 0 } });
             }
         } catch {
