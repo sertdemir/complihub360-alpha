@@ -5408,6 +5408,22 @@ describe('Privacy Critical Tests (Checklist v1.0)', () => {
         expect(JSON.stringify(p.body.bookings[0])).not.toContain('Anfragefirma');
     });
 
+    it('P4: der Ersteller und der Server-Key sehen die Anfrage weiter vollstaendig', async () => {
+        seedProvider(); seedMember();
+        const engId = randomUUID();
+        (db.engagement_requests ??= []).push({ id: engId, provider_key: 'test-kanzlei', user_id: USER_ID, session_id: 'sess-1', requester_email: 'ich@firma.example', category: 'tax-vat', country: 'DE', structured_answers: { company: 'Eigene Firma', turnover: 'high' }, created_at: '2026-10-01T08:00:00Z' });
+        const eigene = await api(`/api/v1/engagement/${engId}`, { auth: 'jwt' });
+        expect(eigene.status).toBe(200);
+        expect(eigene.body.engagement).toMatchObject({ user_id: USER_ID, session_id: 'sess-1', requester_email: 'ich@firma.example', structured_answers: { company: 'Eigene Firma', turnover: 'high' } });
+        const server = await api(`/api/v1/engagement/${engId}`, { auth: 'key' });
+        expect(server.body.engagement.requester_email).toBe('ich@firma.example');
+        // Die Anbieterseite: Inhalt ja, Identitaet nein — auch nicht ueber structured_answers.
+        const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+        const anbieter = await asUser(memberJwt, `/api/v1/engagement/${engId}`);
+        expect(anbieter.body.engagement.structured_answers).toEqual({ turnover: 'high' });
+        expect(JSON.stringify(anbieter.body)).not.toMatch(/ich@firma|Eigene Firma|sess-1/);
+    });
+
     it('#8 Anfrage-Thread: nur Ersteller und Anbieter-Mitglieder, und jeder nur als die eigene Seite', async () => {
         seedProvider(); seedMember();
         const engId = randomUUID();
@@ -5421,7 +5437,15 @@ describe('Privacy Critical Tests (Checklist v1.0)', () => {
         expect(db.engagement_messages ?? []).toHaveLength(0);
         // Das Mitglied des Anbieters liest und schreibt als Anbieter, nicht als Nutzer.
         const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
-        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}`)).status).toBe(200);
+        const alsAnbieter = await asUser(memberJwt, `/api/v1/engagement/${engId}`);
+        expect(alsAnbieter.status).toBe(200);
+        // P4: die Anbieterseite sieht die Anfrage ohne Identitaet des Nutzers — Offenlegung ist Sache der Buchung.
+        expect(alsAnbieter.body.engagement).toMatchObject({ id: engId, provider_key: 'test-kanzlei', category: 'tax-vat', country: 'DE' });
+        expect(alsAnbieter.body.engagement.user_id).toBeUndefined();
+        expect(alsAnbieter.body.engagement.session_id).toBeUndefined();
+        expect(alsAnbieter.body.engagement.requester_email).toBeUndefined();
+        expect(alsAnbieter.body.engagement.structured_answers.company).toBeUndefined();
+        expect(JSON.stringify(alsAnbieter.body)).not.toContain('Fremde Firma');
         expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'user', body: 'x' }) })).status).toBe(404);
         expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'provider', body: 'Antwort' }) })).status).toBe(201);
         await settle();
@@ -5747,5 +5771,44 @@ describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Lim
         expect(r.body.events.map((e: any) => e.type)).toEqual(['booking.created']);
         expect(JSON.stringify(r.body)).not.toContain(key);
         expect((await asJwt(USER_JWT, '/api/v1/provider/test-kanzlei/api-access/log')).status).toBe(404);
+    });
+});
+
+// ─── P8: Retention-Loeschung wird auditiert ──────────────────────────────────
+describe('Retention api_request_log (P8): Audit-Ereignis, Fehler zaehlen statt abbrechen', () => {
+    const tage = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+    it('loescht die alten Zeilen, laesst die frischen, schreibt retention_deleted mit Tabelle, Anzahl und Stichtag', async () => {
+        (db.api_request_log ??= []).push(
+            { id: randomUUID(), client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(120) },
+            { id: randomUUID(), client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(95) },
+            { id: randomUUID(), client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(10) },
+        );
+        const { runApiRequestLogRetentionTick } = await import('../apiRoutes.js');
+        expect(await runApiRequestLogRetentionTick(true)).toEqual({ deleted: 2, errors: 0 });   // Shadow zaehlt nur
+        expect(db.api_request_log).toHaveLength(3);
+        expect(await runApiRequestLogRetentionTick(false)).toEqual({ deleted: 2, errors: 0 });
+        expect(db.api_request_log).toHaveLength(1);
+        const ev = db.event_log.find((e) => e.type === 'retention_deleted');
+        expect(ev?.payload).toMatchObject({ table: 'api_request_log', count: 2, errors: 0, retention_days: 90 });
+        expect(typeof ev?.payload.cutoff).toBe('string');
+    });
+    it('ein Fehler mitten in der Schleife zaehlt und bricht nicht ab', async () => {
+        const a = randomUUID(), b = randomUUID();
+        (db.api_request_log ??= []).push(
+            { id: a, client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(120) },
+            { id: b, client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(100) },
+        );
+        const { supabaseApi } = await import('../supabase.js');
+        const realRemove = supabaseApi.remove;
+        const spy = vi.spyOn(supabaseApi, 'remove').mockImplementation(async (table: string, match: any) => {
+            if (match.id === a) throw new Error('row locked');
+            return realRemove(table, match);
+        });
+        try {
+            const { runApiRequestLogRetentionTick } = await import('../apiRoutes.js');
+            expect(await runApiRequestLogRetentionTick(false)).toEqual({ deleted: 1, errors: 1 });
+        } finally { spy.mockRestore(); }
+        expect(db.api_request_log.map((r: any) => r.id)).toEqual([a]);
+        expect(db.event_log.find((e) => e.type === 'retention_deleted')?.payload).toMatchObject({ count: 1, errors: 1 });
     });
 });

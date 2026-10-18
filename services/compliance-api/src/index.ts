@@ -407,6 +407,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     /** Schritt 4 (#8): welche Seite der Aufrufer an einer Anfrage ist —
      *  'user' (Ersteller), 'provider' (Mitglied des Anbieters), 'server'
      *  (Server-Key oder Admin) oder null (fremd). */
+    /** P4: die Anfrage, wie die Anbieterseite sie sieht — ohne Identitaet des Nutzers. */
+    const engagementForProvider = (eng: Record<string, unknown>): Record<string, unknown> => {
+        const { user_id: _u, session_id: _s, requester_email: _e, ...rest } = eng as Record<string, unknown> & { user_id?: unknown; session_id?: unknown; requester_email?: unknown };
+        void _u; void _s; void _e;
+        const IDENTITY_KEYS = new Set(['company', 'company_name', 'email', 'requester_email', 'name', 'contact_name', 'phone', 'website', 'vat_id']);
+        const answers = rest.structured_answers && typeof rest.structured_answers === 'object' && !Array.isArray(rest.structured_answers)
+            ? Object.fromEntries(Object.entries(rest.structured_answers as Record<string, unknown>).filter(([k]) => !IDENTITY_KEYS.has(k.toLowerCase())))
+            : rest.structured_answers;
+        return { ...rest, structured_answers: answers };
+    };
     const engagementSide = async (eng: Record<string, unknown>): Promise<'user' | 'provider' | 'server' | null> => {
         if (authViaApiKey || authIsAdmin) return 'server';
         if (authUserId && eng.user_id === authUserId) return 'user';
@@ -2857,9 +2867,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 return;
             }
             const messages = await supabaseApi.select('engagement_messages', { engagement_id: engagementId }, { order: 'created_at.asc', limit: 100 });
+            // P4 (2026-10-18): die Anbieterseite bekam die rohe Zeile — user_id,
+            // session_id, requester_email, company — vor jeder Offenlegung. Die
+            // Offenlegung gehoert zur Buchung (Spec B Schritt 5), nicht zur
+            // Anfrage. Der Anbieter liest die Anfrage ohne Identitaet des Nutzers;
+            // Ersteller und Server-Key sehen weiter alles.
+            const engagement = seite === 'provider' ? engagementForProvider(eng[0]) : eng[0];
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, engagement: eng[0], messages }));
+            res.end(JSON.stringify({ ok: true, engagement, messages }));
         } catch {
             structuredLog('error', 'Engagement detail failed', { correlationId, errorCode: 'ERR_ENGAGEMENT_DETAIL', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });

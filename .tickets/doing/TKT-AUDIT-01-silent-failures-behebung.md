@@ -63,7 +63,14 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
 
 ### 3 · Audit und Offenlegung
 
-- [ ] P4 · [ ] P1 · [ ] P2 · [ ] P5 · [ ] P7 · [ ] P8 (P3 = B2)
+- [x] **P4** `GET /engagement/:id` auf der Anbieterseite ohne `user_id`, `session_id`, `requester_email` und ohne
+  Identitätsschlüssel in `structured_answers` (`engagementForProvider`); Ersteller und Server-Key wie bisher.
+- [x] **P1** Assistant: Sitzungen nicht ladbar → 502 `ASSISTANT_CONTEXT_UNAVAILABLE`, kein Modellaufruf (DNA).
+- [x] **P2** Assistant: Audit `assistant_chat` VOR dem Modellaufruf; scheitert es → 502 `ASSISTANT_AUDIT_UNAVAILABLE`.
+- [x] **P5** Assistant: `redactText(strict)` auf Frage, Verlauf, Sitzungs-Labels. Dazu **P14**: Timeout 20 s an beiden Modellaufrufen.
+- [x] **P7** mit B10 erledigt (`logEvent`).
+- [x] **P8** Retention `api_request_log`: `retention_deleted` {table, count, errors, cutoff}, per-Zeile `try/catch`, `errors` im Watcher.
+- P3 = B2 (erledigt).
 
 ### 4 · Kleinkram mit klarer Korrektur
 

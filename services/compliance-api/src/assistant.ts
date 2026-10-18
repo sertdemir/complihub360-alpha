@@ -4,6 +4,12 @@ import { supabaseApi } from "./supabase.js";
 import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
+import { redactText } from "@complihub360/redaction";
+
+/** P14: kein Modellaufruf ohne Grenze — eine haengende Verbindung hielt die Anfrage offen, bis das Betriebssystem aufgab. */
+const MODEL_TIMEOUT_MS = 20_000;
+/** P5: was an das Modell geht, ist vorher deterministisch redigiert (Regex-Profile, keine KI). */
+const scrub = (text: string): string => redactText(text, { profile: 'strict' }).sanitizedText;
 
 // ─── VAT assistant (chatbot plan phase ②) ─────────────────────────────────────
 // RAG over knowledge_chunks (vector 768, match_knowledge_chunks RPC) plus the
@@ -63,6 +69,7 @@ async function embedQuery(apiKey: string, text: string): Promise<number[]> {
     const res = await fetch(`${GEMINI_BASE}/${EMBED_MODEL}:embedContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
         body: JSON.stringify({ content: { parts: [{ text }] }, taskType: 'RETRIEVAL_QUERY', outputDimensionality: EMBED_DIMS }),
     });
     const body = await res.json() as { embedding?: { values?: number[] }; error?: { message?: string } };
@@ -80,6 +87,7 @@ async function generate(apiKey: string, system: string, history: Array<{ role: s
     const res = await fetch(`${GEMINI_BASE}/${GEN_MODEL}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
         body: JSON.stringify({
             system_instruction: { parts: [{ text: system }] },
             contents,
@@ -160,25 +168,43 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
                 return;
             }
             const d = JSON.parse(raw || '{}') as { message?: unknown; country?: unknown; history?: unknown; domain?: unknown; session_ids?: unknown };
-            const message = typeof d.message === 'string' ? d.message.trim() : '';
-            if (message.length < 3 || message.length > 2000) {
+            const rawMessage = typeof d.message === 'string' ? d.message.trim() : '';
+            if (rawMessage.length < 3 || rawMessage.length > 2000) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'message must be 3-2000 characters', correlationId }));
                 return;
             }
             const country = typeof d.country === 'string' && SUPPORTED_COUNTRIES.has(d.country.toUpperCase())
                 ? d.country.toUpperCase() : null;
+            // P5: Frage und Verlauf gehen nur redigiert an das Modell. Die
+            // Redaction ist deterministisch (packages/redaction) und derselbe
+            // Filter, den Mailer und Nachrichten-Route benutzen.
+            const message = scrub(rawMessage);
             const history = Array.isArray(d.history)
                 ? (d.history as Array<{ role?: unknown; content?: unknown }>)
                     .filter((m) => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
-                    .map((m) => ({ role: m.role as string, content: m.content as string }))
+                    .map((m) => ({ role: m.role as string, content: scrub(m.content as string) }))
                 : [];
 
             // Bereichs-Kontext (Bereichsseite): nur fuer angemeldete Nutzer, nur
             // fuer bekannte Slugs. session_ids grenzen weiter ein.
             const domain = typeof d.domain === 'string' && DOMAIN_SLUGS.has(d.domain) ? d.domain : null;
             const sessionIds = Array.isArray(d.session_ids) ? d.session_ids.filter((x): x is string => typeof x === 'string').slice(0, 20) : undefined;
-            const scoped = domain ? await loadDomainSessions(identity.userId ?? '', domain, sessionIds).catch(() => ({ active: [], archived: 0 })) : null;
+            // P1: antwortet die Datenbank nicht, gibt es KEINEN Kontext — und
+            // keine Antwort. Vorher wurde der Fehler zu „keine Sitzungen", und
+            // das Modell sagte dem Nutzer selbstsicher, er habe keine Pflichten.
+            // DNA: Unsicherheit wird nie hinter sicherer Sprache versteckt.
+            let scoped: Awaited<ReturnType<typeof loadDomainSessions>> | null = null;
+            if (domain) {
+                try {
+                    scoped = await loadDomainSessions(identity.userId ?? '', domain, sessionIds);
+                } catch (err) {
+                    structuredLog('error', 'Assistant: session context unavailable', { correlationId, errorCode: 'ERR_ASSISTANT_CONTEXT', severity: 'error', domain, detail: String(err).slice(0, 200) });
+                    res.writeHead(502, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'ASSISTANT_CONTEXT_UNAVAILABLE', message: 'Your saved sessions could not be loaded right now, so the assistant cannot answer about your obligations. Please try again in a moment.', correlationId }));
+                    return;
+                }
+            }
             const scopedMarkets = scoped
                 ? [...new Set(scoped.active.flatMap((s) => [s.country, ...s.markets].filter((m): m is string => !!m)))]
                 : [];
@@ -218,7 +244,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
                 if (wissen.length) contextParts.push(`AREA KNOWLEDGE · ${DOMAIN_LABEL[domain]} (engine entries; EU-level where marked):\n${wissen.join('\n')}`);
                 const eigene = (scoped?.active ?? []).flatMap((s) =>
                     s.obligations.map((o) =>
-                        `- [session "${s.label || s.id.slice(0, 8)}" · markets ${[s.country, ...s.markets].filter(Boolean).join(', ') || '—'}] ${o.label}: severity ${o.severity}; status ${o.status}${o.due ? `; cadence/due ${o.due}` : ''}${typeof o.dueDays === 'number' ? ` (in ${o.dueDays} days)` : ''}; markets ${o.markets.length ? o.markets.join(', ') : 'EU-wide'}${o.source ? `; source ${o.source}` : o.sourceScope === 'placeholder' ? '; source: no named statute on file (coverage gap — do not name one)' : ''}`));
+                        `- [session "${scrub(String(s.label || s.id.slice(0, 8))).slice(0, 60)}" · markets ${[s.country, ...s.markets].filter(Boolean).join(', ') || '—'}] ${o.label}: severity ${o.severity}; status ${o.status}${o.due ? `; cadence/due ${o.due}` : ''}${typeof o.dueDays === 'number' ? ` (in ${o.dueDays} days)` : ''}; markets ${o.markets.length ? o.markets.join(', ') : 'EU-wide'}${o.source ? `; source ${o.source}` : o.sourceScope === 'placeholder' ? '; source: no named statute on file (coverage gap — do not name one)' : ''}`));
                 contextParts.push(eigene.length
                     ? `OWN OBLIGATIONS (from the user's saved sessions, this area only):\n${eigene.join('\n')}`
                     : 'OWN OBLIGATIONS: the user has no saved session covering this area yet.');
@@ -232,13 +258,23 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             });
             const userTurn = `CONTEXT:\n${contextParts.join('\n\n') || '(no matching context found)'}\n\nQUESTION:\n${message}`;
 
-            const answer = await generate(apiKey, domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
+            // P2: der Grenzuebertritt zur AI wird VOR dem Aufruf auditiert — ohne
+            // Nachrichteninhalt (Umfang und Abdeckung). Kann das Audit nicht
+            // geschrieben werden, findet der Aufruf nicht statt: ein Grenzuebertritt
+            // ohne Spur ist keiner, den wir machen (.agents/rules, Privacy).
+            try {
+                await supabaseApi.insert('event_log', {
+                    type: 'assistant_chat',
+                    payload: { country: factsFor, domain, chunks: chunks.length, message_chars: rawMessage.length, redacted: message !== rawMessage, sessions: scoped?.active.length ?? 0 },
+                });
+            } catch (err) {
+                structuredLog('error', 'Assistant: audit write failed — model call refused', { correlationId, errorCode: 'ERR_ASSISTANT_AUDIT', severity: 'error', detail: String(err).slice(0, 200) });
+                res.writeHead(502, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'ASSISTANT_AUDIT_UNAVAILABLE', message: 'The assistant is briefly unavailable. Please try again in a moment.', correlationId }));
+                return;
+            }
 
-            // Log usage without message content (privacy) — volume + coverage only.
-            await supabaseApi.insert('event_log', {
-                type: 'assistant_chat',
-                payload: { country: factsFor, domain, chunks: chunks.length, message_chars: message.length },
-            }).catch(() => { /* non-blocking */ });
+            const answer = await generate(apiKey, domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
 
             const sources = [
                 ...(domain ? [{ label: `CompliHub area knowledge · ${DOMAIN_LABEL[domain]}`, kind: 'area', name: DOMAIN_LABEL[domain] }] : []),
