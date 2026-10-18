@@ -180,7 +180,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             res.setHeader('x-llm-provider', `${llm.id}:${llm.chatModel}`);
 
             // Nur Treffer desselben Embedding-Modells wie die Frage — die RPC
-            // filtert VOR dem LIMIT (20261018000100). Waehrend der
+            // filtert VOR dem LIMIT (20261018090000). Waehrend der
             // Neu-Einbettung liegen alte und neue Vektoren nebeneinander, und
             // ein Fremdvektor ergibt Zufallsaehnlichkeit. sameEmbedModel bleibt
             // als zweite Sicherung, falls die Migration fehlt.

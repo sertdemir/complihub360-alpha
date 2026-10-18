@@ -6,7 +6,7 @@ Reihenfolge einhalten. Bis Schritt 4 antwortet der Assistent unverändert über 
 
 ## 0. Migration VOR dem Merge einspielen
 
-`20261018000100_match_chunks_embed_model.sql` ersetzt `match_knowledge_chunks` durch eine Fassung mit dem Parameter `embed_model`. Der neue Code schickt ihn mit. **Läuft der Code vor der Migration, findet PostgREST die Funktion nicht und der Assistent antwortet 502.** Deshalb zuerst auf Staging (und Beta) einspielen, dann mergen. Die Migration ist rückwärtsverträglich: Der alte Code ruft mit drei Argumenten und bekommt dasselbe Ergebnis wie bisher.
+`20261018090000_match_chunks_embed_model.sql` ersetzt `match_knowledge_chunks` durch eine Fassung mit dem Parameter `embed_model`. Der neue Code schickt ihn mit. **Läuft der Code vor der Migration, findet PostgREST die Funktion nicht und der Assistent antwortet 502.** Deshalb zuerst auf Staging (und Beta) einspielen, dann mergen. Die Migration ist rückwärtsverträglich: Der alte Code ruft mit drei Argumenten und bekommt dasselbe Ergebnis wie bisher.
 
 ## 1. Scaleway-Zugang anlegen
 
