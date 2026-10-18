@@ -255,7 +255,8 @@ export async function handleExtRoutes(req: IncomingMessage, res: ServerResponse,
 
     if (req.method === 'GET' && path === '/api/v1/ext/invoices') {
         if (!hasScope(client, 'billing:read')) { scopeDenied(res, correlationId, 'billing:read'); return true; }
-        const rows = (await supabaseApi.select('invoices', { provider_key: client.provider_key }, { order: 'period.desc', limit: 24 })) as Json[];
+        const rows = ((await supabaseApi.select('invoices', { provider_key: client.provider_key }, { order: 'period.desc', limit: 24 })) as Array<Record<string, unknown>>)
+            .filter((r) => r.status !== 'draft') as Json[]; // B7: Entwuerfe sind noch keine Rechnung
         json(res, 200, {
             ok: true,
             invoices: rows.map((i) => ({ id: i.id, invoice_number: i.invoice_number ?? null, period: i.period, amount_cents: i.amount_cents, currency: i.currency, status: i.status, issued_at: i.issued_at ?? null, due_at: i.due_at ?? null, paid_at: i.paid_at ?? null })),

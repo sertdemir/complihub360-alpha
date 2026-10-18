@@ -4471,6 +4471,139 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         expect(vertippt.body.errorCode).toBe('PROVIDER_NOT_FOUND');
     });
 
+    // ─── B7: Monatslauf in Schritten, wieder aufnehmbar, je Anbieter abgesichert ───
+    describe('Monatslauf (B7): DB-Zeile vor dem Finalisieren, Wiederaufnahme statt zweiter Rechnung, ein Fehler stoppt nicht alle', () => {
+        const period = () => new Date().toISOString().slice(0, 7);
+        const live = (extra: object = {}) => api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: JSON.stringify({ period: period(), dry_run: false, ...extra }) });
+        /** Ein kleiner Stripe: legt Rechnungen an, zaehlt Aufrufe, kann an einer Stelle scheitern. */
+        function fakeStripe(opts: { failOn?: RegExp; failFor?: string } = {}) {
+            const invoices = new Map<string, { id: string; status: string; items: number }>();
+            const calls: string[] = [];
+            let n = 0;
+            stripeMock.stripeRequest.mockImplementation(async (method: string, path: string, params: any) => {
+                calls.push(`${method} ${path}`);
+                if (opts.failOn?.test(path) && (!opts.failFor || JSON.stringify(params ?? {}).includes(opts.failFor) || path.includes(opts.failFor))) throw new Error(`stripe down at ${path}`);
+                if (method === 'POST' && path === 'invoices') { const id = `in_test_${++n}`; invoices.set(id, { id, status: 'draft', items: 0 }); return { id }; }
+                if (method === 'POST' && path === 'invoiceitems') { invoices.get(String(params.invoice))!.items++; return { id: 'ii_x' }; }
+                const m = /^invoices\/(in_[a-z0-9_]+)(?:\/(finalize|send))?$/.exec(path);
+                if (m) {
+                    const inv = invoices.get(m[1])!;
+                    if (m[2] === 'finalize') { inv.status = 'open'; return { id: inv.id, number: `CH-${inv.id}`, status: 'open', total: 9900, due_date: 1800000000, hosted_invoice_url: 'https://pay.example/x', invoice_pdf: 'https://pay.example/x.pdf' }; }
+                    if (m[2] === 'send') return { id: inv.id };
+                    return { id: inv.id, status: inv.status, total: inv.status === 'open' ? 9900 : 0, lines: { data: new Array(inv.items).fill({}) }, number: inv.status === 'open' ? `CH-${inv.id}` : undefined, due_date: 1800000000 };
+                }
+                throw new Error(`unmocked stripe call: ${path}`);
+            });
+            return { invoices, calls };
+        }
+        function zweiAbos() {
+            seedProvider({ billing_ready: true, stripe_customer_id: 'cus_test' }); seedPricing();
+            seedProvider({ provider_key: 'andere-kanzlei', name: 'Andere Kanzlei', stripe_customer_id: 'cus_andere' });
+            seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+            seedSubscription('andere-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        }
+
+        it('Happy Path: Zeile steht als draft VOR dem Finalisieren und wird danach open', async () => {
+            zweiAbos();
+            const { calls } = fakeStripe();
+            const { supabaseApi } = await import('../supabase.js');
+            const seen: string[] = [];
+            const realInsert = supabaseApi.insert;
+            const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+                if (table === 'invoices') seen.push(`insert:${data.status}:${calls.filter((c) => /finalize/.test(c)).length}`);
+                return realInsert(table, data);
+            });
+            try {
+                const r = await live({ provider: 'test-kanzlei' });
+                expect(r.status).toBe(200);
+                expect(r.body.errors).toBe(0);
+                expect(r.body.results[0]).toMatchObject({ provider: 'test-kanzlei', invoice: 'CH-in_test_1', total_cents: 9900 });
+            } finally { spy.mockRestore(); }
+            // Der Insert kam als draft, bevor irgendein finalize lief.
+            expect(seen).toEqual(['insert:draft:0']);
+            expect(db.invoices).toHaveLength(1);
+            expect(db.invoices[0]).toMatchObject({ status: 'open', invoice_number: 'CH-in_test_1', stripe_invoice_id: 'in_test_1', hosted_invoice_url: 'https://pay.example/x' });
+            expect(calls.filter((c) => c === 'POST invoices')).toHaveLength(1);
+            expect(calls).toContain('POST invoices/in_test_1/send');
+        });
+
+        it('Abbruch nach dem Stripe-Create: der naechste Lauf nimmt den draft auf — keine zweite Stripe-Rechnung', async () => {
+            zweiAbos();
+            const first = fakeStripe({ failOn: /invoiceitems/ });
+            const r1 = await live({ provider: 'test-kanzlei' });
+            expect(r1.status).toBe(200);
+            expect(r1.body.errors).toBe(1);
+            expect(r1.body.results[0]).toMatchObject({ provider: 'test-kanzlei', error: 'issue_failed' });
+            expect(db.invoices).toHaveLength(1);
+            expect(db.invoices[0]).toMatchObject({ status: 'draft', stripe_invoice_id: 'in_test_1' });
+            expect(db.event_log.map((e: any) => e.type)).toContain('invoice_run_failed');
+            // Entwuerfe sind fuer den Anbieter keine Rechnung.
+            const list = await api('/api/v1/provider/test-kanzlei/invoices', { auth: 'key' });
+            expect(list.body.invoices).toHaveLength(0);
+            // Zweiter Lauf: Stripe ist wieder da.
+            const second = fakeStripe();
+            second.invoices.set('in_test_1', { id: 'in_test_1', status: 'draft', items: 0 });
+            const r2 = await live({ provider: 'test-kanzlei' });
+            expect(r2.body.errors).toBe(0);
+            expect(r2.body.results[0]).toMatchObject({ provider: 'test-kanzlei', invoice: 'CH-in_test_1', resumed: true });
+            expect(second.calls.filter((c) => c === 'POST invoices')).toHaveLength(0);
+            expect(second.calls.filter((c) => c === 'POST invoiceitems')).toHaveLength(1);
+            expect(db.invoices).toHaveLength(1);
+            expect(db.invoices[0].status).toBe('open');
+            void first;
+        });
+
+        it('Abbruch nach dem Finalisieren: Wiederaufnahme schickt nicht noch einmal, zieht nur die Zeile nach', async () => {
+            zweiAbos();
+            fakeStripe({ failOn: /\/send$/ });
+            // send schlaegt fehl → Rechnung ist finalisiert, Zeile wird trotzdem open (send-Fehler ist nicht fatal).
+            const r1 = await live({ provider: 'test-kanzlei' });
+            expect(r1.body.errors).toBe(0);
+            expect(db.invoices[0].status).toBe('open');
+            expect(db.event_log.map((e: any) => e.type)).toContain('invoice_send_failed');
+            // Simuliere den Fall „finalisiert, aber Update der Zeile kam nicht an": Zeile wieder auf draft.
+            db.invoices[0].status = 'draft';
+            const again = fakeStripe();
+            again.invoices.set('in_test_1', { id: 'in_test_1', status: 'open', items: 2 });
+            const r2 = await live({ provider: 'test-kanzlei' });
+            expect(r2.body.results[0]).toMatchObject({ resumed: true, invoice: 'CH-in_test_1' });
+            expect(again.calls).not.toContain('POST invoices/in_test_1/send');
+            expect(again.calls).not.toContain('POST invoices/in_test_1/finalize');
+            expect(db.invoices[0].status).toBe('open');
+        });
+
+        it('ein Anbieter scheitert, der andere wird trotzdem abgerechnet', async () => {
+            zweiAbos();
+            fakeStripe({ failOn: /^invoices$/, failFor: 'andere-kanzlei' });
+            const r = await live();
+            expect(r.status).toBe(200);
+            expect(r.body.errors).toBe(1);
+            const byKey = Object.fromEntries(r.body.results.map((x: any) => [x.provider, x]));
+            expect(byKey['andere-kanzlei']).toMatchObject({ error: 'issue_failed' });
+            expect(byKey['test-kanzlei']).toMatchObject({ invoice: expect.stringMatching(/^CH-in_test_/) });
+            expect(db.invoices.filter((i: any) => i.status === 'open')).toHaveLength(1);
+        });
+
+        it('Guthaben wird bei Wiederaufnahme nur einmal verbraucht', async () => {
+            zweiAbos();
+            (db.provider_credits ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', amount_cents: 2000, currency: 'USD', reason: 'user_no_rebook_30pct', created_at: new Date().toISOString() });
+            fakeStripe({ failOn: /finalize/ });
+            await live({ provider: 'test-kanzlei' });
+            expect(db.invoices[0].status).toBe('draft');
+            expect(db.invoices[0].line_items).toHaveLength(2);
+            expect(db.provider_credits.filter((c: any) => c.reason === 'consumed')).toHaveLength(0);
+            const second = fakeStripe();
+            second.invoices.set('in_test_1', { id: 'in_test_1', status: 'draft', items: 2 });
+            await live({ provider: 'test-kanzlei' });
+            expect(db.provider_credits.filter((c: any) => c.reason === 'consumed')).toHaveLength(1);
+            expect(db.provider_credits.find((c: any) => c.reason === 'consumed').amount_cents).toBe(-2000);
+            // Ein dritter Lauf: schon ausgestellt, nichts doppelt.
+            const r3 = await live({ provider: 'test-kanzlei' });
+            expect(r3.body.results[0]).toMatchObject({ skipped: 'already invoiced' });
+            expect(db.provider_credits.filter((c: any) => c.reason === 'consumed')).toHaveLength(1);
+        });
+    });
+
     it('Monatslauf verrechnet Guthaben bis zur Rechnungssumme (dry_run) und zeigt es in der Vorschau', async () => {
         seedProvider({ billing_ready: true }); seedPricing(); seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
         (db.provider_credits ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', amount_cents: 4023, currency: 'USD', reason: 'user_no_rebook_30pct', created_at: past(1) });
