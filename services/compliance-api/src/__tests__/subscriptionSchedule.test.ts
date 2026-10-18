@@ -19,6 +19,9 @@ const db: { subs: Zeile[]; services: Zeile[]; cats: Zeile[]; events: Zeile[]; me
 const treffer = (rows: Zeile[], f: Record<string, any>) =>
     rows.filter((r) => Object.entries(f ?? {}).every(([k, v]) => r[k] === v));
 
+/** B5: der naechste Insert in provider_subscriptions scheitert — einmal. */
+const stoerung = { insertFails: 0 };
+
 vi.mock('../supabase.js', () => ({
     supabaseApi: {
         select: async (t: string, f: any) => {
@@ -30,6 +33,7 @@ vi.mock('../supabase.js', () => ({
             return [];
         },
         insert: async (t: string, row: Zeile) => {
+            if (t === 'provider_subscriptions' && stoerung.insertFails > 0) { stoerung.insertFails--; throw new Error('connection reset'); }
             if (t === 'provider_subscriptions') { const r = { id: `s${db.subs.length + 1}`, ...row }; db.subs.push(r); return [r]; }
             db.events.push({ t, ...row });
             return [row];
@@ -275,6 +279,48 @@ describe('Der Waechter-Lauf fuehrt zum Stichtag aus', () => {
         const neu = db.subs[1];
         expect(neu.plan_code).toBe('global');
         expect(neu.current_period_end > '2027-01-15').toBe(true);
+    });
+
+    // ─── B5: der Wechsel darf den Anbieter nie ohne Abo lassen ────────────────
+    it('B5: wirft der Insert des Nachfolgers, bleibt das alte Abo samt Vormerkung stehen — der naechste Tick holt nach', async () => {
+        abo();
+        await scheduleSubscriptionChange({ providerKey: 'kanzlei', planCode: 'global', cadence: 'monthly', source: 'provider_self_serve' });
+        stoerung.insertFails = 1;
+        const r1 = await runSubscriptionPeriodTick(false, new Date('2026-11-01T12:00:00Z'));
+        expect(r1).toMatchObject({ executed: 0, errors: 1 });
+        // Vorher: status 'ended', Vormerkung geleert, kein Nachfolger — der Anbieter ohne Abo.
+        expect(db.subs).toHaveLength(1);
+        expect(db.subs[0]).toMatchObject({ status: 'active', scheduled_action: 'plan_change', scheduled_plan_code: 'global' });
+        expect(db.subs[0].ended_at).toBeFalsy();
+        const r2 = await runSubscriptionPeriodTick(false, new Date('2026-11-01T13:00:00Z'));
+        expect(r2).toMatchObject({ executed: 1, errors: 0 });
+        expect(db.subs).toHaveLength(2);
+        expect(db.subs[0]).toMatchObject({ status: 'ended', scheduled_action: null });
+        expect(db.subs[1]).toMatchObject({ status: 'active', plan_code: 'global' });
+    });
+
+    it('B5: Nachfolger steht schon (Abbruch nach dem Insert) → nur das alte Abo wird beendet, kein dritter Eintrag', async () => {
+        abo();
+        await scheduleSubscriptionChange({ providerKey: 'kanzlei', planCode: 'global', cadence: 'monthly', source: 'provider_self_serve' });
+        db.subs.push({ id: 's-nachfolger', provider_key: 'kanzlei', plan_code: 'global', plan_version: 1, cadence: 'monthly', status: 'active',
+            current_period_start: '2026-11-01', current_period_end: '2026-12-01', renewal_date: '2026-12-01', started_at: '2026-11-01T00:00:00Z', ended_at: null, scheduled_action: null });
+        const r = await runSubscriptionPeriodTick(false, new Date('2026-11-01T12:00:00Z'));
+        expect(r.executed).toBe(1);
+        expect(db.subs).toHaveLength(2);
+        expect(db.subs[0].status).toBe('ended');
+        expect(db.subs[1]).toMatchObject({ id: 's-nachfolger', status: 'active' });
+    });
+
+    it('B5: ein Fehler bei einem Abo stoppt nicht die anderen', async () => {
+        abo();
+        await scheduleSubscriptionChange({ providerKey: 'kanzlei', planCode: 'global', cadence: 'monthly', source: 'provider_self_serve' });
+        abo({ id: 's2', provider_key: 'andere', current_period_start: '2026-09-01', current_period_end: '2026-10-01', renewal_date: '2026-10-01' });
+        stoerung.insertFails = 1;
+        const r = await runSubscriptionPeriodTick(false, new Date('2026-11-01T12:00:00Z'));
+        expect(r.errors).toBe(1);
+        // Das zweite Abo wurde trotzdem gerollt.
+        expect(r.rolled).toBe(1);
+        expect(db.subs.find((x) => x.id === 's2')!.current_period_start > '2026-10-01').toBe(true);
     });
 
     it('zaehlt im Schattenlauf, schreibt aber nicht', async () => {

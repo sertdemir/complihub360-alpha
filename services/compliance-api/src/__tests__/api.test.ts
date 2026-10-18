@@ -1391,6 +1391,47 @@ describe('Einzug offener Abo-Rechnungen in der Kulanzfrist (B2a)', () => {
         expect((await run()).attempts).toBe(0);
     });
 
+    // ─── B11: der Marker kommt nach der Aktion ──────────────────────────────
+    it('B11: wirft der Einzug (kein Kartenfehler), bleibt die Stufe ohne Marker — der naechste Tick am selben Tag versucht es erneut', async () => {
+        process.env.INVOICE_RETRY_ENABLED = '1';
+        offen(-1);
+        stripeMock.stripeRequest.mockRejectedValueOnce(new Error('ECONNRESET'));
+        const r1 = await run();
+        // Die Nachricht ging raus (Tag 0 gilt), der Versuch an Tag 1 nicht: kein Marker fuer Stufe 1.
+        expect(r1).toMatchObject({ notices: 1, attempts: 0, paid: 0, errors: 1 });
+        expect(db.event_log.filter((e: any) => e.type === 'invoice_retry' && e.payload.stage === 1)).toHaveLength(0);
+        expect(db.event_log.map((e: any) => e.type)).toContain('invoice_retry_error');
+        expect(db.invoices[0].status).toBe('open');
+        // Stripe ist wieder da: derselbe Idempotency-Key, die Stufe wird nachgeholt, nicht uebersprungen.
+        stripeMock.stripeRequest.mockImplementation(async (_m: string, path: string) => {
+            expect(path).toBe('invoices/in_test_1/pay');
+            return { status: 'paid', status_transitions: { paid_at: 1791600000 } };
+        });
+        const r2 = await run();
+        expect(r2).toMatchObject({ notices: 0, attempts: 1, paid: 1, errors: 0 });
+        expect(db.invoices[0].status).toBe('paid');
+        expect(db.event_log.filter((e: any) => e.type === 'invoice_retry' && e.payload.stage === 1)).toHaveLength(1);
+    });
+
+    it('B11: wirft die Vorab-Nachricht, bleibt auch sie ohne Marker und wird nachgeholt', async () => {
+        process.env.INVOICE_RETRY_ENABLED = '1';
+        offen(0);
+        const { supabaseApi } = await import('../supabase.js');
+        const realSelect = supabaseApi.select;
+        const spy = vi.spyOn(supabaseApi, 'select').mockImplementation(async (table: string, match: any, opts?: any) => {
+            if (table === 'provider_members') throw new Error('db hiccup');
+            return realSelect(table, match, opts);
+        });
+        try {
+            const r1 = await run();
+            expect(r1).toMatchObject({ notices: 0, errors: 1 });
+            expect(db.event_log.filter((e: any) => e.type === 'invoice_retry' && e.payload.stage === 'notice')).toHaveLength(0);
+        } finally { spy.mockRestore(); }
+        const r2 = await run();
+        expect(r2).toMatchObject({ notices: 1, errors: 0 });
+        expect(db.event_log.filter((e: any) => e.type === 'invoice_retry' && e.payload.stage === 'notice')).toHaveLength(1);
+    });
+
     it('nach der Frist wird nicht mehr versucht', async () => {
         process.env.INVOICE_RETRY_ENABLED = '1';
         offen(-9);

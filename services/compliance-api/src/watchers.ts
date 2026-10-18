@@ -355,6 +355,7 @@ export async function runWatcherTick(): Promise<TickSummary> {
     try {
         const sp = await runSubscriptionPeriodTick(shadow);
         summary.subscriptionPeriodsRolled = sp.rolled;
+        summary.errors += sp.errors;
     } catch { summary.errors++; }
 
     // "Gilt ab": faellige geplante Konditionsaenderungen uebernehmen
