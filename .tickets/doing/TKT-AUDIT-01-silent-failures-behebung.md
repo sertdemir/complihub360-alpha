@@ -45,7 +45,11 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
 
 ### 2 · Zustände, die kippen und nie wiederkommen
 
-- [ ] B5 · [ ] B11 · [ ] B12 · [ ] B9 · [ ] B10 · [ ] B13
+- [x] **B5** Tarifwechsel am Stichtag: altes Abo beendet, bevor das neue steht.
+  `executeSchedule`: erst der Nachfolger (ein schon vorhandener wird wiederverwendet), dann Ende und Leeren
+  der Vormerkung. Wirft der Insert, bleibt das alte Abo samt Vormerkung stehen, der nächste Tick holt nach.
+  `runSubscriptionPeriodTick` mit per-Zeile `try/catch`, `errors` im Ergebnis und im Watcher-Summary.
+- [ ] B11 · [ ] B12 · [ ] B9 · [ ] B10 · [ ] B13
 
 ### 3 · Audit und Offenlegung
 
