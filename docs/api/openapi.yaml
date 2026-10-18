@@ -2348,7 +2348,17 @@ components:
           example: INTERNAL
         message:
           type: string
-          description: Kurz und ohne interne Details.
+          description: >-
+            Kurz und ohne interne Details. Nur fuer Logs und Entwickler: die
+            Oberflaeche zeigt ihn nie (Punkt 2, 17.10.2026) — sie uebersetzt
+            `errorCode` und nimmt fuer Unbekanntes einen allgemeinen Satz.
+        field:
+          type: string
+          description: >-
+            Bei `VALIDATION_ERROR`, wo ein Formular den Satz an ein Feld setzt:
+            das bemaengelte Feld (`new_email`, `name`, `occurred_on`,
+            `country_code`, `accepted_by_name`). Ersetzt den Textvergleich auf
+            `message` im Client.
         correlationId:
           type: string
   securitySchemes:

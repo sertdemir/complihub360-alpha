@@ -3214,7 +3214,10 @@ describe('Change-Control fuer aktive Partner (§18–20)', () => {
         const zweite = { id: randomUUID(), provider_key: 'neue-kanzlei', service_code: 'data-privacy', service_name: 'DSGVO', status: 'limited' };
         db.provider_services.push(zweite);
         const morgen = new Date(Date.now() + 86400_000).toISOString().slice(0, 10);
-        expect((await own('/material-event', { method: 'POST', body: JSON.stringify({ event_type: 'insurance_lost', occurred_on: morgen, service_ids: 'all' }) })).status).toBe(400);
+        const zukunft = await own('/material-event', { method: 'POST', body: JSON.stringify({ event_type: 'insurance_lost', occurred_on: morgen, service_ids: 'all' }) });
+        expect(zukunft.status).toBe(400);
+        // Punkt 2: das Feld steht im Fehler, der Client vergleicht keinen Text
+        expect(zukunft.body).toMatchObject({ errorCode: 'VALIDATION_ERROR', field: 'occurred_on' });
         expect((await own('/material-event', { method: 'POST', body: JSON.stringify({ event_type: 'insurance_lost', occurred_on: '2026-09-30' }) })).status).toBe(400);
 
         const r = await own('/material-event', { method: 'POST', body: JSON.stringify({ event_type: 'insurance_lost', occurred_on: '2026-09-30', service_ids: [svc.id] }) });
@@ -3231,6 +3234,55 @@ describe('Change-Control fuer aktive Partner (§18–20)', () => {
         expect((await adminApi(`/api/v1/admin/review/neue-kanzlei/change/${ev.id}`, { method: 'POST', body: JSON.stringify({ decision: 'approve' }) })).status).toBe(400);
         expect((await adminApi(`/api/v1/admin/review/neue-kanzlei/change/${ev.id}`, { method: 'POST', body: JSON.stringify({ decision: 'resume' }) })).status).toBe(200);
         expect(svc.status).toBe('approved');
+    });
+
+    it('E-Mail aendern: Fehler tragen Code und Feld, die Oberflaeche braucht keinen Text (Punkt 2)', async () => {
+        seedActivePartner();
+        const p = (db.providers as any[]).find((x) => x.provider_key === 'neue-kanzlei');
+        p.contact_email = 'kanzlei@neue-kanzlei.example';
+        const kaputt = await own('/change-email', { method: 'POST', body: JSON.stringify({ new_email: 'kanzlei@' }) });
+        expect(kaputt.status).toBe(400);
+        expect(kaputt.body).toMatchObject({ errorCode: 'VALIDATION_ERROR', field: 'new_email' });
+        const gleich = await own('/change-email', { method: 'POST', body: JSON.stringify({ new_email: 'Kanzlei@neue-kanzlei.example' }) });
+        expect(gleich.status).toBe(409);
+        expect(gleich.body.errorCode).toBe('SAME_ADDRESS');
+    });
+
+    it('ein wesentliches Ereignis: erst die Meldung, dann die Pause; ein zweiter Versuch legt keine zweite an (Punkt 2)', async () => {
+        // Vorher pausierte der Server zuerst und schrieb die Meldung danach.
+        // Scheiterte das Schreiben, waren Leistungen pausiert, ohne dass das
+        // Pruefteam davon wusste; der zweite Versuch legte eine zweite an.
+        const svc = seedActivePartner();
+        const { supabaseApi } = await import('../supabase.js');
+        const orig = supabaseApi.update.bind(supabaseApi);
+        const update = vi.spyOn(supabaseApi, 'update').mockImplementation(async (table: string, ...rest: any[]) => {
+            if (table === 'provider_services' && !update.mock.calls.slice(0, -1).some((c) => c[0] === 'provider_services')) throw new Error('Supabase update failed: timeout');
+            return (orig as any)(table, ...rest);
+        });
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        try {
+            const body = JSON.stringify({ event_type: 'insurance_lost', occurred_on: '2026-09-30', service_ids: [svc.id] });
+            const erst = await own('/material-event', { method: 'POST', body });
+            expect(erst.status).toBe(500);
+            // Die Meldung steht, auch wenn das Pausieren scheiterte
+            expect(changes()).toHaveLength(1);
+            expect(changes()[0]).toMatchObject({ status: 'submitted', affected_service_ids: [svc.id] });
+            expect(changes()[0].old_value.services).toEqual([{ id: svc.id, status: 'approved' }]);
+
+            const zweit = await own('/material-event', { method: 'POST', body });
+            expect(zweit.status).toBe(201);
+            expect(zweit.body.change_request_id).toBe(changes()[0].id);
+            expect(svc.status).toBe('paused');
+            expect(changes()).toHaveLength(1);
+            // Der alte Stand bleibt der vom ersten Versuch
+            expect(changes()[0].old_value.services).toEqual([{ id: svc.id, status: 'approved' }]);
+
+            // Noch ein Versuch nach Erfolg: weiter genau eine Meldung
+            const dritt = await own('/material-event', { method: 'POST', body });
+            expect(dritt.status).toBe(201);
+            expect(changes()).toHaveLength(1);
+            expect(changes()[0].new_value.users_notified_at).toBeTruthy();
+        } finally { update.mockRestore(); log.mockRestore(); }
     });
 
     it('dry_run sagt vorher, was wartet und was sofort gilt — ohne zu schreiben (B V2)', async () => {

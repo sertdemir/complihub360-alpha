@@ -59,7 +59,6 @@
     "done": "Done",
     "cancel": "Cancel",
     "sendVerification": "Send verification",
-    "errorFallback": "Request failed — try again.",
     "sentPrefix": "Verification sent to ",
     "sentSuffix": ". The change applies once the link is clicked — it works one time and expires after 1 hour.",
     "untilThenPrefix": "Until then, ",
@@ -68,7 +67,12 @@
     "newAddress": "New address",
     "notePrefix": "We send a confirmation link to the ",
     "noteNew": "new",
-    "noteSuffix": " address — nothing changes until it's clicked. Request routing, reminders and invoices follow the new address afterwards."
+    "noteSuffix": " address — nothing changes until it's clicked. Request routing, reminders and invoices follow the new address afterwards.",
+    "sameAddress": "This is already your contact address.",
+    "sendFailed": {
+      "heading": "We couldn’t send the verification link",
+      "message": "Your contact address is unchanged. Please try again. If the problem continues, contact support."
+    }
   },
   "addMarket": {
     "eyebrow": "COVERAGE",
@@ -793,7 +797,8 @@
         "limited": "Partly approved",
         "paused": "Paused",
         "retired": "Retired"
-      }
+      },
+      "addFailed": "We couldn’t add the service"
     },
     "coverageStatus": {
       "pending": "Requested",
@@ -1054,7 +1059,14 @@
       "serviceCodeUnknown": "This service code is not in our list. Please check the spelling, for example tax-vat.returns.",
       "countryCode": "Please enter a two-letter country code, for example AT.",
       "countryListed": "{{country}} is already listed for this service. Please enter a different country.",
-      "agreementName": "Please enter your name to accept."
+      "agreementName": "Please enter your name to accept.",
+      "serviceExists": "This service is already in your list.",
+      "serviceCodeFixed": "The category of a service can’t be changed. Retire this service and add a new one instead.",
+      "serviceRetired": "This service has been retired and can no longer be edited."
+    },
+    "saveFailed": {
+      "heading": "We couldn’t save your changes",
+      "message": "Your entries are still here. Please try again. If the problem continues, contact support."
     }
   },
   "verification": {
@@ -1186,7 +1198,11 @@
       "done_one": "Reported. {{count}} service is paused; our review team will get in touch.",
       "done_other": "Reported. {{count}} services are paused; our review team will get in touch.",
       "doneNone": "Reported. Our review team will get in touch.",
-      "dateInvalid": "Please choose the date it happened — today or earlier."
+      "dateInvalid": "Please choose the date it happened — today or earlier.",
+      "sendFailed": {
+        "heading": "We couldn’t report the change",
+        "message": "Your entries are still here. Please try again. If the problem continues, contact support."
+      }
     }
   },
   "identity": {

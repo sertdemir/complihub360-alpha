@@ -2181,7 +2181,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const name = typeof d.name === 'string' ? d.name.trim() : '';
                 if (!name) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'name required', correlationId }));
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'name', message: 'name required', correlationId }));
                     return;
                 }
                 const providerKey = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
@@ -2474,7 +2474,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const newEmail = typeof d.new_email === 'string' ? d.new_email.trim().toLowerCase() : '';
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(newEmail)) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'new_email must be a valid address', correlationId }));
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'new_email', message: 'new_email must be a valid address', correlationId }));
                     return;
                 }
                 const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as
