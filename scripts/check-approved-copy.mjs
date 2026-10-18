@@ -366,22 +366,24 @@ const klartext = (html) => html
   .replace(/\s+/g, ' ')
   .trim();
 const MAIL_FUSS = 'CompliHub360 — Always on your side.';
+// Seit 18.10.2026 (PR #334, token_hash) gilt der Link in jedem Browser; der
+// Satz "Open it in the same browser" ist gestrichen (Nutzer, 18.10.2026).
 const MAIL_HINWEIS = 'This link works once and expires after 30 minutes.';
 const MAILS = {
   confirmation: {
     subject: 'Confirm your email for CompliHub360',
-    saetze: ['Confirm your email.', 'Welcome to CompliHub360. Confirm your email address to activate your account. If you started a Risk Map before signing up, you’ll find it in your workspace.', 'Confirm email →', MAIL_HINWEIS, 'Open it in the same browser you signed up in.', 'Didn’t sign up? Ignore this email. No account will be activated.', MAIL_FUSS, 'You received this email because an account was created with this address on complihub360.com.'],
+    saetze: ['Confirm your email.', 'Welcome to CompliHub360. Confirm your email address to activate your account. If you started a Risk Map before signing up, you’ll find it in your workspace.', 'Confirm email →', MAIL_HINWEIS, 'Didn’t sign up? Ignore this email. No account will be activated.', MAIL_FUSS, 'You received this email because an account was created with this address on complihub360.com.'],
   },
   magic_link: {
     subject: 'Your CompliHub360 sign-in link',
-    saetze: ['Your sign-in link.', 'Use the button below to sign in to CompliHub360. No password needed. This link is your key, so please don’t forward it.', 'Sign in to CompliHub360 →', MAIL_HINWEIS, 'Open it in the same browser you requested it from.', 'Didn’t request this? Ignore this email. Nobody can sign in without the link.', MAIL_FUSS, 'You received this email because a sign-in link was requested for this address on complihub360.com.'],
+    saetze: ['Your sign-in link.', 'Use the button below to sign in to CompliHub360. No password needed. This link is your key, so please don’t forward it.', 'Sign in to CompliHub360 →', MAIL_HINWEIS, 'Didn’t request this? Ignore this email. Nobody can sign in without the link.', MAIL_FUSS, 'You received this email because a sign-in link was requested for this address on complihub360.com.'],
   },
   recovery: {
     subject: 'Reset your CompliHub360 password',
-    saetze: ['Reset your password.', 'We received a request to reset the password for your CompliHub360 account. Choose a new one with the button below.', 'Set a new password →', MAIL_HINWEIS, 'Open it in the same browser you requested it from.', 'Didn’t request this? Ignore this email. Your password stays as it is.', MAIL_FUSS, 'You received this email because a password reset was requested for this address on complihub360.com.'],
+    saetze: ['Reset your password.', 'We received a request to reset the password for your CompliHub360 account. Choose a new one with the button below.', 'Set a new password →', MAIL_HINWEIS, 'Didn’t request this? Ignore this email. Your password stays as it is.', MAIL_FUSS, 'You received this email because a password reset was requested for this address on complihub360.com.'],
   },
 };
-const MAIL_VERBOTEN = [/partner matches are waiting/i, /orchestration layer/i, /e-mail/i, /short time/i, /securely/i];
+const MAIL_VERBOTEN = [/partner matches are waiting/i, /orchestration layer/i, /e-mail/i, /short time/i, /securely/i, /same browser/i];
 const authCfg = JSON.parse(readFileSync(resolve(MAIL_DIR, 'supabase-auth.json'), 'utf8'));
 if (authCfg.otp_expiry_seconds !== 1800) fehler.push(`Auth-Mails: otp_expiry_seconds ist ${authCfg.otp_expiry_seconds}, die Mails sagen „30 minutes" (Wahl D1)`);
 for (const [art, soll] of Object.entries(MAILS)) {
