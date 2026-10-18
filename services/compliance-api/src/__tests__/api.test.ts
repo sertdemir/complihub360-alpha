@@ -97,6 +97,16 @@ vi.mock('../supabase.js', () => ({
                 const u = (db.auth_users ?? []).find((x) => x.id === params.p_user_id && !x.deleted_at && x.email_confirmed_at);
                 return u ? u.email : null;
             }
+            // B9: der atomare Zaehler aus 20261018000300.
+            if (fn === 'increment_discount_counter') {
+                if (rpcFail.has(fn)) { rpcFail.delete(fn); throw new Error('rpc unavailable'); }
+                const store = (db.provider_discount_counter ??= []);
+                const step = Math.max(0, Number(params.p_increment ?? 1));
+                const hit = store.find((r) => r.provider_key === params.p_provider_key && r.cycle_start === params.p_cycle_start);
+                if (hit) { hit.used = Number(hit.used ?? 0) + step; hit.updated_at = new Date().toISOString(); return hit.used; }
+                store.push({ provider_key: params.p_provider_key, cycle_start: params.p_cycle_start, used: step, updated_at: new Date().toISOString() });
+                return step;
+            }
             throw new Error(`unmocked rpc in test store: ${fn}`);
         },
     },
@@ -108,6 +118,8 @@ const { uploaded } = vi.hoisted(() => ({ uploaded: new Set<string>() }));
 // Stripe (Phase 4): kein Netz im Test. Alles, was api.stripe.com erreichen
 // koennte, geht durch stripe.ts — und das hier ersetzt es als Ganzes. Nicht
 // globalThis.fetch: darueber spricht die Suite mit dem eigenen Server.
+/** B9/B10/B13-Tests: ein RPC-Name hier drin scheitert beim naechsten Aufruf einmal. */
+const { rpcFail } = vi.hoisted(() => ({ rpcFail: new Set<string>() }));
 const { stripeMock } = vi.hoisted(() => ({
     stripeMock: {
         configured: true,
@@ -1050,6 +1062,51 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
             seedSubscription('test-kanzlei', 'growth', { plan_version: 1, current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
             const run = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: JSON.stringify({ period: new Date().toISOString().slice(0, 7), dry_run: true, provider: 'test-kanzlei' }) });
             expect(run.body.results[0]).toMatchObject({ dry_run: true, total_cents: 9900 });
+        });
+    });
+
+    // ─── B9 / B10: Zaehler atomar, Sperre nie stumm ───────────────────────
+    describe('Zaehler und Sperre (B9, B10)', () => {
+        it('B9: der Zaehler wird per RPC atomar erhoeht; eine am Lead haengende Folgebuchung zaehlt nicht', async () => {
+            const { session } = seedBookable();
+            (db.provider_discount_counter ??= []).push({ provider_key: 'test-kanzlei', cycle_start: '2020-01-01', used: 1 });
+            expect((await book(standardBody(session))).status).toBe(201);
+            expect(db.provider_discount_counter[0].used).toBe(2);
+            // Derselbe Nutzer binnen 30 Tagen: Phase 5 haengt die Buchung an den Lead — kein zweites Ledger, kein Schritt.
+            expect((await book(standardBody(session, { slot_start: new Date(Date.now() + 8 * 86_400_000).toISOString() }))).status).toBe(201);
+            expect(db.provider_discount_counter[0].used).toBe(2);
+            expect(db.provider_lead_ledger).toHaveLength(1);
+        });
+
+        it('B9: scheitert der Zaehler, bleibt die Buchung bestehen — aber das Ereignis steht', async () => {
+            const { session } = seedBookable();
+            rpcFail.add('increment_discount_counter');
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            expect(db.scheduling).toHaveLength(1);
+            expect(db.event_log.find((e) => e.type === 'discount_counter_failed')?.payload).toMatchObject({ providerKey: 'test-kanzlei', step: 1 });
+        });
+
+        it('B10: wirft das providers-Update in recordPaymentFailure, antwortet die Route trotzdem 409 und der Fehler steht im Protokoll', async () => {
+            const { session } = seedBookable();
+            stripeMock.createPaymentIntent.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', stripeRef: 'pi_fail', detail: 'generic_decline' });
+            const { supabaseApi } = await import('../supabase.js');
+            const realUpdate = supabaseApi.update;
+            const spy = vi.spyOn(supabaseApi, 'update').mockImplementation(async (table: string, match: any, data: any) => {
+                if (table === 'providers') throw new Error('db timeout');
+                return realUpdate(table, match, data);
+            });
+            try {
+                const r = await book(standardBody(session));
+                // Vorher: 500 „Scheduling create failed" — falsch und ohne Spur.
+                expect(r.status).toBe(409);
+                expect(r.body.errorCode).toBe('BOOKING_NOT_COMPLETED');
+            } finally { spy.mockRestore(); }
+            expect(db.event_log.find((e) => e.type === 'lead_payment_failed_record_error')?.payload).toMatchObject({ step: 'block_provider' });
+            // Die uebrigen Schritte liefen weiter: Ereignis, Benachrichtigung, Mail.
+            expect(db.event_log.map((e) => e.type)).toContain('lead_payment_failed');
+            expect(db.notifications).toEqual([expect.objectContaining({ user_id: MEMBER_ID, type: 'payment_failed' })]);
+            expect(db.event_log.some((e) => e.type === 'email_outbox' && e.payload.kind === 'payment_failed_provider')).toBe(true);
         });
     });
 
@@ -4504,6 +4561,25 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         const again = await tick(false);
         expect(again.body.summary).toMatchObject({ creditsIssued: 0, rebookDeadlinesClosed: 0 });
         expect(db.provider_credits).toHaveLength(1);
+    });
+
+    // ─── B13: Anbieter-No-Show wird nie stumm verschluckt ───────────────────
+    it('B13: scheitert der Vorfall nach der No-Show-Meldung des Nutzers, bleibt die 200 — aber die Luecke steht im Protokoll', async () => {
+        seedProvider(); seedMember();
+        const b = seedBooking({ status: 'completed', slot_start: past(5), slot_end: past(4.5) });
+        const { supabaseApi } = await import('../supabase.js');
+        const realInsert = supabaseApi.insert;
+        const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+            if (table === 'provider_performance_incidents') throw new Error('incidents table locked');
+            return realInsert(table, data);
+        });
+        try {
+            const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'no_show' }) });
+            expect(r.status).toBe(200);
+        } finally { spy.mockRestore(); }
+        expect(db.scheduling[0].status).toBe('no_show');
+        expect(db.event_log.find((e) => e.type === 'provider_no_show_record_failed')?.payload).toMatchObject({ bookingId: b.id, providerKey: 'test-kanzlei' });
+        expect(db.provider_performance_incidents ?? []).toHaveLength(0);
     });
 
     // ─── B6: Guthaben vor der Frist ─────────────────────────────────────────

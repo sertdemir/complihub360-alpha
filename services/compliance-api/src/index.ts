@@ -1678,7 +1678,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });
                 // Phase 5: no_show aus dieser Route heisst "der Anbieter kam nicht"
                 // — Vorfall statt Guthaben (Spec B "provider no-show").
-                if (status === 'no_show') await recordProviderNoShow({ ...b, id: bookingId }, authUserId, correlationId).catch(() => {});
+                // B13: der Nutzer meldet, dass der Anbieter fehlte. Der Statuswechsel
+                // steht; faellt der Vorfall danach aus (Zeile, Benachrichtigung,
+                // Serienpruefung), bleibt die 200 — aber die Luecke wird sichtbar,
+                // statt in einem leeren catch zu verschwinden.
+                if (status === 'no_show') {
+                    await recordProviderNoShow({ ...b, id: bookingId }, authUserId, correlationId).catch(async (err) => {
+                        structuredLog('error', 'Provider no-show could not be recorded', { correlationId, errorCode: 'ERR_PROVIDER_NO_SHOW', severity: 'error', bookingId, providerKey: b.provider_key, detail: String(err).slice(0, 200) } as any);
+                        await supabaseApi.insert('event_log', { type: 'provider_no_show_record_failed', payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, error: String(err).slice(0, 200) } })
+                            .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'provider_no_show_record_failed', detail: String(e).slice(0, 200) } as any));
+                    });
+                }
                 if (status === 'cancelled') {
                     // Bis hierher blieb der Termin im Anbieterkalender stehen:
                     // abgesagt im System, gebucht im Kalender. Derselbe Fehler
@@ -2004,9 +2014,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     }
 
                     if (quote.enabled && !linkedRoot) {
-                        await supabaseApi.upsert('provider_discount_counter', 'provider_key,cycle_start', {
-                            provider_key: providerKey, cycle_start: cycleStart, used: quote.counterUsedAfter, updated_at: sharingAt,
-                        }).catch(() => {});
+                        // B9: die Datenbank zaehlt — atomar, ohne Read-before-write. Zwei
+                        // parallele Buchungen koennen so den Zaehler nicht mehr um eins zu
+                        // niedrig hinterlassen. (Welche Rabattstufe DIESE Buchung bekam,
+                        // stand schon fest, als die Belastung lief — das bleibt.) Ein
+                        // Fehler hier kippt die Buchung nicht, aber er wird gesehen.
+                        const step = Math.max(0, quote.counterUsedAfter - used);
+                        try {
+                            await supabaseApi.rpc('increment_discount_counter', { p_provider_key: providerKey, p_cycle_start: cycleStart, p_increment: step });
+                        } catch (cntErr) {
+                            structuredLog('error', 'Discount counter increment failed', { correlationId, errorCode: 'ERR_DISCOUNT_COUNTER', severity: 'error', providerKey, cycleStart, step, detail: String(cntErr).slice(0, 200) } as any);
+                            await supabaseApi.insert('event_log', { type: 'discount_counter_failed', payload: { providerKey, cycleStart, step, ledgerId: charge.ledgerId, error: String(cntErr).slice(0, 200) } })
+                                .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'discount_counter_failed', detail: String(e).slice(0, 200) } as any));
+                        }
                     }
                     // Kalendereintrag beim Anbieter. BEWUSST nach dem Insert und
                     // bewusst nicht fatal: Die Buchung ist bezahlt und gilt — ein
