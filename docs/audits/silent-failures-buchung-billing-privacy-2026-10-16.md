@@ -2,7 +2,7 @@
 
 **Stand: 16.10.2026 · Status: Befundliste, nichts geändert · aus dem Beta-Plan (28.10.) vorgezogen**
 
-**Fortschritt:** B1, B2, B8, B7, B6, B4 behoben (2026-10-18) — Block „Geld“ abgeschlossen. Block „Zustände“: B5, B11, B12 (via B7), B9, B10, B13 behoben — abgeschlossen. Reihenfolge wie vorgeschlagen, Geld zuerst.
+**Fortschritt:** B1, B2, B8, B7, B6, B4 behoben (2026-10-18) — Block „Geld“ abgeschlossen. Block „Zustände“: B5, B11, B12 (via B7), B9, B10, B13 behoben — abgeschlossen. Block „Audit und Offenlegung“: P4, P1, P2, P5, P7 (via B10), P8 behoben, dazu P14. Reihenfolge wie vorgeschlagen, Geld zuerst.
 
 Zwei lesende Durchgänge mit dem Projekt-Agenten `silent-failure-hunter`
 (`.claude/agents/silent-failure-hunter.md`), Stichproben der schwersten
@@ -80,20 +80,20 @@ ein `catch` mit Log statt leer, ein Timeout). Die drei größeren: B1 (Ausgang
 
 | Nr. | Schwere | Stelle | Befund |
 |---|---|---|---|
-| P1 | hoch | `assistant.ts:181` | DB-Fehler beim Laden der Sitzungen wird zu „keine Sitzungen"; die AI sagt dem Nutzer selbstsicher, er habe keine gespeicherten Pflichten. **DNA: Unsicherheit hinter sicherer Sprache.** |
-| P2 | hoch | `assistant.ts:238-241` | Audit `assistant_chat` für den AI-Grenzübertritt per `.catch(() => {})` verschluckt, kein Log. |
+| P1 | hoch | `assistant.ts:181` | DB-Fehler beim Laden der Sitzungen wird zu „keine Sitzungen"; die AI sagt dem Nutzer selbstsicher, er habe keine gespeicherten Pflichten. **DNA: Unsicherheit hinter sicherer Sprache.** **Behoben 2026-10-18:** 502 `ASSISTANT_CONTEXT_UNAVAILABLE`, kein Modellaufruf, `structuredLog('error')`. |
+| P2 | hoch | `assistant.ts:238-241` | Audit `assistant_chat` für den AI-Grenzübertritt per `.catch(() => {})` verschluckt, kein Log. **Behoben 2026-10-18:** Audit vor dem Aufruf; scheitert es, 502 `ASSISTANT_AUDIT_UNAVAILABLE` und kein Aufruf. |
 | P3 | hoch | `index.ts:1917-1928` | = B2, aus Privacy-Sicht: bei Slot-Kollision nach gescheiterter Erstattung bleibt gar keine Spur. |
-| P4 | hoch | `index.ts:2762-2765` | `GET /engagement/:id` gibt der Anbieterseite die rohe Zeile mit `user_id`, `session_id`, `requester_email`, `company` vor jeder Offenlegung. Die Pipeline ist seit Phase 6 stillgelegt, die Route antwortet weiter. |
-| P5 | mittel | `assistant.ts:162-235` | Nutzerfrage, Historie und Sitzungs-Labels gehen ohne deterministische Redaction an das Modell; `redactText` existiert und wird im Mailer benutzt, hier nicht. |
+| P4 | hoch | `index.ts:2762-2765` | `GET /engagement/:id` gibt der Anbieterseite die rohe Zeile mit `user_id`, `session_id`, `requester_email`, `company` vor jeder Offenlegung. Die Pipeline ist seit Phase 6 stillgelegt, die Route antwortet weiter. **Behoben 2026-10-18:** `engagementForProvider` — ohne `user_id`, `session_id`, `requester_email` und ohne Identitätsschlüssel in `structured_answers`; Ersteller und Server-Key unverändert. |
+| P5 | mittel | `assistant.ts:162-235` | Nutzerfrage, Historie und Sitzungs-Labels gehen ohne deterministische Redaction an das Modell; `redactText` existiert und wird im Mailer benutzt, hier nicht. **Behoben 2026-10-18:** `redactText(…, strict)` auf Frage, Verlauf und Sitzungs-Labels (gekürzt auf 60). |
 | P6 | mittel | `packages/storage/src/auditLog.ts:19-24` | Das „immutable Audit Log" ist ein `console.log`; `queryEvents` liefert `[]`; `RawVault.getRawDocument` liefert `"MOCK_RAW_DATA"`. Kein Produktivcode importiert das Paket, aber die Stubs bestehen still. |
-| P7 | mittel | `leadCharge.ts:254-257` | Audit `lead_payment_failed` fire-and-forget mit leerem `catch`; Glocke und Mail laufen trotzdem. |
-| P8 | mittel | `apiRoutes.ts:120-127`, `watchers.ts:383` | Retention-Löschung `api_request_log` ohne Audit-Event; Fehler mitten in der Schleife nur `errors++`. |
+| P7 | mittel | `leadCharge.ts:254-257` | Audit `lead_payment_failed` fire-and-forget mit leerem `catch`; Glocke und Mail laufen trotzdem. **Erledigt mit B10 (2026-10-18):** `logEvent` mit Log statt leerem `catch`. |
+| P8 | mittel | `apiRoutes.ts:120-127`, `watchers.ts:383` | Retention-Löschung `api_request_log` ohne Audit-Event; Fehler mitten in der Schleife nur `errors++`. **Behoben 2026-10-18:** `retention_deleted` mit Tabelle, Anzahl, Fehlern, Stichtag; per-Zeile `try/catch`. |
 | P9 | mittel | `index.ts:3213-3216` | `console.error` mit rohem PostgREST-Fehler (kann Spaltenwerte tragen); jeder Fehler wird 400 „Invalid payload". |
 | P10 | niedrig | `index.ts:1034, 1047, 1222, 1229` | `region` geht in Detail und `/bookings` unmaskiert raus, `/search` maskiert; Altbestand mit Identität in der Region ist vor der Buchung sichtbar. |
 | P11 | niedrig | `anonymity.ts:64-75` | Nur `provider_key`/`pseudonym_label` hart gesperrt; `name`, `website_url`, `contact_email`, `vat_id`, `stripe_customer_id` hängen allein am Register. |
 | P12 | niedrig | `index.ts:2064-2073` | Review-Text ohne `identityScan` gespeichert; nur das Lese-Netz fängt ihn. |
 | P13 | niedrig | `mailer.ts:430-434, 699, 760, 805, 897` | `email_failed` trägt Empfängeradresse plus ungekappten Fehlertext ins `event_log`. |
-| P14 | niedrig | `assistant.ts:63, 80` | Modell-`fetch` ohne Timeout. |
+| P14 | niedrig | `assistant.ts:63, 80` | Modell-`fetch` ohne Timeout. **Behoben 2026-10-18 (mit P5):** `AbortSignal.timeout(20_000)` an beiden Modellaufrufen. |
 
 ### Vorschläge B
 
