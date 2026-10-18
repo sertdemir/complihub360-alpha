@@ -11,7 +11,7 @@ import { CalendarPanel } from '../../components/provider/CalendarPanel';
 import { AvailabilityPanel } from '../../components/provider/AvailabilityPanel';
 import { ApiAccessPanel } from '../../components/provider/ApiAccessPanel';
 import { InboxAddress } from '../../components/contact/SendStates';
-import { AVAILABILITY_EVENT, fetchCoverage, setAvailability, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
+import { fetchCoverage, setAvailability, syncAvailability, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
 import { fetchApplication } from '../../api/application';
 import { CONTACT_INBOX, failureOf, sendContact, type SendFailure } from '../../api/contact';
 import { identityFindingsOf, identityHintFrom } from '../../api/client';
@@ -87,14 +87,14 @@ export function SettingsPage() {
   const [apiEligible, setApiEligible] = useState(false);
 
   useEffect(() => {
+    // Die Kopfzeile schaltet denselben Zustand — beide Stellen zeigen dasselbe.
+    // Ein Umschalten dort ist neuer als die Zeile, die hier noch laedt.
+    const sync = syncAvailability(setAvail);
     fetchCoverage().then((c) => {
       if (c.contact_email) setContactEmail(c.contact_email);
-      setAvail(c.availability ?? 'available');
+      sync.loaded(c.availability ?? 'available');
     }).catch(() => {});
-    // Die Kopfzeile schaltet denselben Zustand — beide Stellen zeigen dasselbe.
-    const onSync = (e: Event) => setAvail((e as CustomEvent<'available' | 'ooo'>).detail);
-    window.addEventListener(AVAILABILITY_EVENT, onSync);
-    return () => window.removeEventListener(AVAILABILITY_EVENT, onSync);
+    return sync.stop;
   }, []);
 
   useEffect(() => {

@@ -15,7 +15,9 @@ const api = vi.hoisted(() => ({
   sendContact: vi.fn(),
 }));
 
-vi.mock('../../api/provider', () => ({
+vi.mock('../../api/provider', async (importOriginal) => ({
+  // Echt: der Gleichlauf mit der Kopfzeile ist Teil dessen, was hier geprueft wird.
+  syncAvailability: (await importOriginal<typeof import('../../api/provider')>()).syncAvailability,
   AVAILABILITY_EVENT: 'ch360:availability',
   fetchCoverage: () => api.fetchCoverage(),
   setAvailability: (s: string) => api.setAvailability(s),
@@ -131,11 +133,24 @@ describe('SettingsPage · C2 · Pausieren speichert wirklich', () => {
 
   it('uebernimmt den Zustand aus der Kopfzeile', async () => {
     render(<SettingsPage />);
-    // Erst wenn die Anbieter-Zeile da ist — sonst ueberschreibt sie das
-    // Ereignis aus der Kopfzeile, sobald sie spaeter eintrifft.
     await readyButton('settings.pauseButton');
     window.dispatchEvent(new CustomEvent('ch360:availability', { detail: 'ooo' }));
     expect(await screen.findByText('settings.pausedBannerTitle')).toBeInTheDocument();
+  });
+
+  // Bis 18.10.2026: kam die Anbieter-Zeile erst nach dem Umschalten in der
+  // Kopfzeile, setzte sie die Pause hier still auf "available" zurueck.
+  it('laesst eine spaet geladene Zeile das Umschalten in der Kopfzeile nicht zuruecksetzen', async () => {
+    let liefern: (c: typeof COVERAGE) => void = () => {};
+    api.fetchCoverage.mockImplementation(() => new Promise((r) => { liefern = r; }));
+    render(<SettingsPage />);
+    window.dispatchEvent(new CustomEvent('ch360:availability', { detail: 'ooo' }));
+    expect(await screen.findByText('settings.pausedBannerTitle')).toBeInTheDocument();
+    liefern(COVERAGE); // availability: 'available' — aelter als das Umschalten
+    await screen.findByRole('button', { name: 'settings.deleteButton' });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'settings.deleteButton' })).toBeEnabled());
+    expect(screen.getByText('settings.pausedBannerTitle')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'settings.resume' })).toBeInTheDocument();
   });
 });
 
