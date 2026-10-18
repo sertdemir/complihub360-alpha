@@ -107,8 +107,8 @@
     "paid": "Bezahlt",
     "lineItems": "Positionen",
     "total": "Gesamt",
-    "failedNote": "Zahlung fehlgeschlagen — bitte erneut versuchen oder die Zahlungsmethode unter Abrechnung aktualisieren, um eine Workspace-Sperre zu vermeiden.",
-    "pricingNote": "Preismodell: 92 € pro bestätigtem Mandat · 2 € pro Affiliate-Klick · 0 € Abo.",
+    "failedNote": "Die Zahlung ist nicht durchgegangen. Sie können die Rechnung begleichen oder Ihr Zahlungsmittel unter Abrechnung ändern. Ihr Profil bleibt sichtbar; Buchungen pausieren nur, wenn die Rechnung 7 Tage nach Fälligkeit noch offen ist.",
+    "pricingNote": "Preismodell: Ihr Plan-Abo plus eine Lead-Gebühr je Buchung nach deren Opportunity-Band — Plan-Rabatte bereits abgezogen. Details unter Abrechnung.",
     "payAtStripe": "Rechnung bei Stripe bezahlen",
     "viewAtStripe": "Bei Stripe ansehen"
   },

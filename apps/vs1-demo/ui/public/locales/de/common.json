@@ -133,10 +133,10 @@
     "counsel": {
       "overline": "Für In-House Counsel",
       "title": "Verteidigbare Erkenntnisse. Sichere Orchestrierung.",
-      "body": "Juristen fordern strikte Datenschutzmaßnahmen und null KI-Halluzinationen. CompliHub360 ist eine sichere, EU-KI-Gesetz-bereite Infrastrukturschicht, die Rechtsrecherche beschleunigt und externe Mandate sicher strukturiert.",
+      "body": "Juristen brauchen strikten Datenschutz und Ausgaben, die sich nachvollziehen lassen. CompliHub360 ist eine datenschutzorientierte Schicht, gebaut mit Blick auf den EU AI Act: Sie strukturiert Recherche und externe Mandate, und jede Aussage trägt ihre Quelle.",
       "cta": "Sichere Recherche testen",
-      "benefit1Title": "Null Halluzinationen",
-      "benefit1Desc": "Jede Zusammenfassung, jedes Risikolabel und jeder Tipp ist direkt durch Links zu offiziellen, validierten Rechtsquellen und Behörden belegt. Keine erfundenen Behauptungen.",
+      "benefit1Title": "Quellengebundene Ausgaben",
+      "benefit1Desc": "Jede Zusammenfassung, jedes Risikolabel und jeder Hinweis verlinkt auf die offizielle Quelle, auf der er beruht. Wo wir keine Quelle haben, sagen wir das, statt die Lücke zu füllen.",
       "benefit2Title": "Datenschutz-zuerst-Architektur",
       "benefit2Desc": "Dokumente werden durch eine lokale PII-Schwärzungs-Pipeline geleitet. Namen, E-Mails und Telefonnummern werden vor jeder KI-Verarbeitung maskiert.",
       "benefit3Title": "Strukturierte Engagement-Dossiers",
@@ -152,7 +152,7 @@
       "stage4Desc": "Quellengestützte Zusammenfassung",
       "codeCommentBefore": "// Vor der Schwärzung",
       "codeCommentAfter": "// Nach der Schwärzung",
-      "stat1Label": "PII vor KI maskiert",
+      "stat1Label": "Eingaben durchlaufen das Redaktions-Gate",
       "stat2Label": "Quellenverknüpfte Ausgaben",
       "railSub": "Belegte Aussagen, maskierte Daten"
     },

@@ -576,28 +576,28 @@
     "rows": [
       {
         "title": "OSS quarterly return",
-        "detail": "Last filed: Q1 2025 · Penalty: €5,000 + 1%/mo · UStG §18i",
+        "detail": "Last filed: Q1 2025 · Next return due · UStG §18i",
         "market": "DE · NL",
         "due": "Apr 30",
         "dueSub": "6 days"
       },
       {
         "title": "VAT registration — UK",
-        "detail": "Post-Brexit threshold check · up to €20,000 · VATA §3",
+        "detail": "Post-Brexit threshold check · VATA §3",
         "market": "UK",
         "due": "May 15",
         "dueSub": "21 days"
       },
       {
         "title": "EPR packaging registration (LUCID)",
-        "detail": "Producer status to confirm · up to €50,000 · VerpackG",
+        "detail": "Producer status to confirm · VerpackG",
         "market": "DE",
         "due": "May 02",
         "dueSub": "8 days"
       },
       {
         "title": "EPR registration renewal (PackUK)",
-        "detail": "Last filed: Apr 2024 · 4% of UK revenue · Packaging Regs",
+        "detail": "Last filed: Apr 2024 · Renewal due · Packaging Regs",
         "market": "UK",
         "due": "May 15",
         "dueSub": "21 days"
@@ -654,28 +654,28 @@
     "rows": [
       {
         "title": "OSS quarterly return",
-        "detail": "Last filed: Q1 2025 · Penalty: €5,000 + 1%/month · UStG §18i (OSS)",
+        "detail": "Last filed: Q1 2025 · Next return due · UStG §18i (OSS)",
         "market": "DE · NL",
         "due": "Apr 30",
         "dueSub": "6 days"
       },
       {
         "title": "VAT registration — UK",
-        "detail": "Post-Brexit threshold check needed · Penalty: up to €20,000 · UK VATA 1994 §3",
+        "detail": "Post-Brexit threshold check needed · UK VATA 1994 §3",
         "market": "UK",
         "due": "May 15",
         "dueSub": "21 days"
       },
       {
         "title": "EPR packaging registration (LUCID)",
-        "detail": "Producer status to confirm · Penalty: up to €50,000 · VerpackG Art. 9 Abs. 1",
+        "detail": "Producer status to confirm before first shipment · VerpackG §9",
         "market": "DE",
         "due": "May 02",
         "dueSub": "8 days"
       },
       {
         "title": "EPR registration renewal (PackUK)",
-        "detail": "Last filed: Apr 2024 · Penalty: 4% of UK revenue · UK Packaging Regs. 2023 §7",
+        "detail": "Last filed: Apr 2024 · Renewal due · UK Packaging Regs. 2023 §7",
         "market": "UK",
         "due": "May 15",
         "dueSub": "21 days"
@@ -703,7 +703,7 @@
       },
       {
         "title": "Beneficial-owner update",
-        "detail": "Last filed: Mar 2025 · Penalty: €1,000–5,000 · GwG §20 Abs. 1",
+        "detail": "Last filed: Mar 2025 · Update due · GwG §20 Abs. 1",
         "market": "DE",
         "due": "Jun 30",
         "dueSub": "ongoing"

@@ -107,8 +107,8 @@
     "paid": "Ödendi",
     "lineItems": "Kalemler",
     "total": "Toplam",
-    "failedNote": "Ödeme başarısız oldu — çalışma alanı kilidini önlemek için Faturalama bölümünden yeniden deneyin veya ödeme yönteminizi güncelleyin.",
-    "pricingNote": "Fiyatlandırma modeli: onaylanan görev başına 92 € · affiliate tıklaması başına 2 € · 0 € abonelik.",
+    "failedNote": "Ödeme gerçekleşmedi. Faturayı ödeyebilir veya Faturalama bölümünden ödeme yönteminizi değiştirebilirsiniz. Profiliniz görünür kalır; rezervasyonlar yalnızca fatura vade tarihinden 7 gün sonra hâlâ açıksa duraklar.",
+    "pricingNote": "Fiyatlandırma modeli: plan aboneliğiniz artı her rezervasyon için fırsat bandına göre bir lead ücreti — plan indirimleri düşülmüş. Ayrıntılar Faturalama'da.",
     "payAtStripe": "Faturayı Stripe’da öde",
     "viewAtStripe": "Stripe’da görüntüle"
   },

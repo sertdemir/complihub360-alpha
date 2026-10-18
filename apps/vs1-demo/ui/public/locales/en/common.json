@@ -135,10 +135,10 @@
     "counsel": {
       "overline": "For In-House Counsel",
       "title": "Defensible Intelligence. Secure Orchestration.",
-      "body": "Legal professionals demand strict data privacy and zero AI hallucinations. CompliHub360 is a secure, EU-AI-Act ready infrastructure layer that accelerates legal research and safely structures external mandates.",
+      "body": "Legal professionals need strict data privacy and output they can trace. CompliHub360 is a privacy-first layer built with the EU AI Act in view: it structures research and external mandates, and every statement carries its source.",
       "cta": "Try Secure Research",
-      "benefit1Title": "Zero Hallucinations",
-      "benefit1Desc": "Every summary, risk label, and tip is directly backed by links to official, validated legal sources and authorities. No invented claims.",
+      "benefit1Title": "Source-bound output",
+      "benefit1Desc": "Every summary, risk label and tip links to the official source it rests on. Where we hold no source, we say so instead of filling the gap.",
       "benefit2Title": "Privacy-First Architecture",
       "benefit2Desc": "Documents pass through a local PII Redaction Pipeline. Names, emails, and phone numbers are masked before any AI processing.",
       "benefit3Title": "Structured Engagement Dossiers",
@@ -154,7 +154,7 @@
       "stage4Desc": "Source-backed summary",
       "codeCommentBefore": "// Before redaction",
       "codeCommentAfter": "// After redaction",
-      "stat1Label": "PII masked before AI",
+      "stat1Label": "Inputs pass the redaction gate",
       "stat2Label": "Source-linked outputs",
       "railSub": "Sourced statements, masked data"
     },
