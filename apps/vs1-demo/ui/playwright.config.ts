@@ -58,7 +58,15 @@ export default defineConfig({
   // Keine Retries. Ein Test, der beim zweiten Versuch gruen wird, hat ein
   // Problem gefunden — nur eben keines, das jemand dann noch anschaut.
   retries: 0,
-  workers: process.env.CI ? 2 : undefined,
+  // Ein Worker. Der Mock-Zustand (src/mock/demoApi.ts) lebt im Vite-Dev-Server
+  // und ist fuer alle Tests derselbe; `resetMock()` im beforeEach eines Tests
+  // raeumt den Zustand weg, in dem ein parallel laufender Test gerade steht.
+  // Zweimal in CI gesehen (2026-10-18, PR #348 und #350): user-booking.spec
+  // Test 22 scheitert an der Drawer-Ueberschrift, waehrend Test 23 derselben
+  // Datei auf dem zweiten Worker laeuft — lokal, sequenziell, 9/9 gruen.
+  // Parallelitaet wuerde eigenen Mock-Zustand je Worker brauchen; bis dahin
+  // ist ein Worker die ehrliche Einstellung.
+  workers: 1,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: `http://localhost:${PORT}`,

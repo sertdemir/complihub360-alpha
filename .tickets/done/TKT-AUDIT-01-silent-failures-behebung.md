@@ -1,7 +1,7 @@
 ---
 title: "Silent-Failure-Befunde beheben (Buchung, Abrechnung, Privacy)"
 assignee: "Claude (Umsetzung) · Nutzer (Review je PR)"
-status: review
+status: done
 ---
 
 # Silent-Failure-Befunde beheben
