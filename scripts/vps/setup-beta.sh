@@ -80,7 +80,10 @@ services:
       - traefik.http.routers.complihub-beta.rule=Host(\`$HOST_NAME\`)
       - traefik.http.routers.complihub-beta.entrypoints=websecure
       - traefik.http.routers.complihub-beta.tls.certresolver=letsencrypt
-      - traefik.http.routers.complihub-beta.middlewares=complihub-beta-auth,complihub-noindex
+      # noindex zuerst: Die Wand antwortet selbst mit 401 und reicht die Anfrage
+      # nicht weiter. Steht noindex dahinter, fehlt der Header genau auf der
+      # Antwort, die Suchmaschinen sehen (deploy-beta.yml prueft das).
+      - traefik.http.routers.complihub-beta.middlewares=complihub-noindex,complihub-beta-auth
       - traefik.http.middlewares.complihub-beta-auth.basicauth.users=$HASH
       - traefik.http.services.complihub-beta.loadbalancer.server.port=80
 YAML
