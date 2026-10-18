@@ -8,7 +8,8 @@ import { Banner } from '../../components/ui/Banner';
 import { Logo } from '../../components/ui/Logo';
 import { FormErrorSummary, focusField, type FormError } from '../../components/ui/FormErrorSummary';
 import { FieldError, errorAria } from '../../components/ui/FieldError';
-import { ApiError, apiFetch } from '../../api/client';
+import { apiFetch } from '../../api/client';
+import { errorFieldOf } from '../../lib/serverErrors';
 import { DOMAINS } from '../../lib/domains';
 import type { BillingModel } from '../../api/provider';
 
@@ -73,8 +74,9 @@ export function ProviderIntakePage() {
       });
       setState('done');
     } catch (err) {
-      // Der Server bemaengelt den Namen (400 "name required"): der Satz steht am Feld.
-      if (err instanceof ApiError && err.status === 400 && /name/i.test(err.message)) {
+      // Der Server bemaengelt den Namen: der Satz steht am Feld. Erkannt am
+      // Feld im Fehler, nicht am Server-Text (Punkt 2).
+      if (errorFieldOf(err) === 'name') {
         setServerName(true); setState('idle'); focusField('intake-name'); return;
       }
       setState('error');

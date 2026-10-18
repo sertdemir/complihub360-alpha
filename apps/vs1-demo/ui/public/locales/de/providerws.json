@@ -58,7 +58,6 @@
     "done": "Fertig",
     "cancel": "Abbrechen",
     "sendVerification": "Verifizierung senden",
-    "errorFallback": "Anfrage fehlgeschlagen — bitte erneut versuchen.",
     "sentPrefix": "Verifizierung gesendet an ",
     "sentSuffix": ". Die Änderung greift erst nach Klick auf den Link — er funktioniert einmalig und läuft nach 1 Stunde ab.",
     "untilThenPrefix": "Bis dahin bleibt ",
@@ -67,7 +66,12 @@
     "newAddress": "Neue Adresse",
     "notePrefix": "Wir senden einen Bestätigungslink an die ",
     "noteNew": "neue",
-    "noteSuffix": " Adresse — bis zum Klick ändert sich nichts. Anfragen-Routing, Erinnerungen und Rechnungen folgen danach der neuen Adresse."
+    "noteSuffix": " Adresse — bis zum Klick ändert sich nichts. Anfragen-Routing, Erinnerungen und Rechnungen folgen danach der neuen Adresse.",
+    "sameAddress": "Das ist bereits Ihre Kontaktadresse.",
+    "sendFailed": {
+      "heading": "Wir konnten den Bestätigungslink nicht senden",
+      "message": "Ihre Kontaktadresse bleibt unverändert. Bitte versuchen Sie es erneut. Wenn das Problem bleibt, wenden Sie sich an den Support."
+    }
   },
   "addMarket": {
     "eyebrow": "ABDECKUNG",
@@ -736,7 +740,8 @@
         "limited": "Teilweise freigegeben",
         "paused": "Pausiert",
         "retired": "Stillgelegt"
-      }
+      },
+      "addFailed": "Wir konnten die Leistung nicht hinzufügen"
     },
     "coverageStatus": {
       "pending": "Beantragt",
@@ -988,6 +993,15 @@
       "plannedFrom": "geplant ab {{date}}",
       "plannedShort": "Änderung geplant",
       "withdrawFields": "Zurückziehen: {{fields}}"
+    },
+    "errors": {
+      "serviceExists": "Diese Leistung steht bereits in Ihrer Liste.",
+      "serviceCodeFixed": "Die Kategorie einer Leistung lässt sich nicht ändern. Beenden Sie diese Leistung und legen Sie stattdessen eine neue an.",
+      "serviceRetired": "Diese Leistung ist beendet und kann nicht mehr bearbeitet werden."
+    },
+    "saveFailed": {
+      "heading": "Wir konnten Ihre Änderungen nicht speichern",
+      "message": "Ihre Angaben sind noch da. Bitte versuchen Sie es erneut. Wenn das Problem bleibt, wenden Sie sich an den Support."
     }
   },
   "verification": {
@@ -1118,7 +1132,11 @@
       "cancel": "Abbrechen",
       "done_one": "Gemeldet. {{count}} Leistung ist pausiert, unser Prüfteam meldet sich bei Ihnen.",
       "done_other": "Gemeldet. {{count}} Leistungen sind pausiert, unser Prüfteam meldet sich bei Ihnen.",
-      "doneNone": "Gemeldet. Unser Prüfteam meldet sich bei Ihnen."
+      "doneNone": "Gemeldet. Unser Prüfteam meldet sich bei Ihnen.",
+      "sendFailed": {
+        "heading": "Wir konnten die Änderung nicht melden",
+        "message": "Ihre Angaben sind noch da. Bitte versuchen Sie es erneut. Wenn das Problem bleibt, wenden Sie sich an den Support."
+      }
     }
   },
   "identity": {

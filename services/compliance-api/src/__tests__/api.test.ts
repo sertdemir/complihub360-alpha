@@ -2963,7 +2963,10 @@ describe('Change-Control fuer aktive Partner (§18–20)', () => {
         const zweite = { id: randomUUID(), provider_key: 'neue-kanzlei', service_code: 'data-privacy', service_name: 'DSGVO', status: 'limited' };
         db.provider_services.push(zweite);
         const morgen = new Date(Date.now() + 86400_000).toISOString().slice(0, 10);
-        expect((await own('/material-event', { method: 'POST', body: JSON.stringify({ event_type: 'insurance_lost', occurred_on: morgen, service_ids: 'all' }) })).status).toBe(400);
+        const zukunft = await own('/material-event', { method: 'POST', body: JSON.stringify({ event_type: 'insurance_lost', occurred_on: morgen, service_ids: 'all' }) });
+        expect(zukunft.status).toBe(400);
+        // Punkt 2: das Feld steht im Fehler, der Client vergleicht keinen Text
+        expect(zukunft.body).toMatchObject({ errorCode: 'VALIDATION_ERROR', field: 'occurred_on' });
         expect((await own('/material-event', { method: 'POST', body: JSON.stringify({ event_type: 'insurance_lost', occurred_on: '2026-09-30' }) })).status).toBe(400);
 
         const r = await own('/material-event', { method: 'POST', body: JSON.stringify({ event_type: 'insurance_lost', occurred_on: '2026-09-30', service_ids: [svc.id] }) });
@@ -2980,6 +2983,18 @@ describe('Change-Control fuer aktive Partner (§18–20)', () => {
         expect((await adminApi(`/api/v1/admin/review/neue-kanzlei/change/${ev.id}`, { method: 'POST', body: JSON.stringify({ decision: 'approve' }) })).status).toBe(400);
         expect((await adminApi(`/api/v1/admin/review/neue-kanzlei/change/${ev.id}`, { method: 'POST', body: JSON.stringify({ decision: 'resume' }) })).status).toBe(200);
         expect(svc.status).toBe('approved');
+    });
+
+    it('E-Mail aendern: Fehler tragen Code und Feld, die Oberflaeche braucht keinen Text (Punkt 2)', async () => {
+        seedActivePartner();
+        const p = (db.providers as any[]).find((x) => x.provider_key === 'neue-kanzlei');
+        p.contact_email = 'kanzlei@neue-kanzlei.example';
+        const kaputt = await own('/change-email', { method: 'POST', body: JSON.stringify({ new_email: 'kanzlei@' }) });
+        expect(kaputt.status).toBe(400);
+        expect(kaputt.body).toMatchObject({ errorCode: 'VALIDATION_ERROR', field: 'new_email' });
+        const gleich = await own('/change-email', { method: 'POST', body: JSON.stringify({ new_email: 'Kanzlei@neue-kanzlei.example' }) });
+        expect(gleich.status).toBe(409);
+        expect(gleich.body.errorCode).toBe('SAME_ADDRESS');
     });
 
     it('ein wesentliches Ereignis: erst die Meldung, dann die Pause; ein zweiter Versuch legt keine zweite an (Punkt 2)', async () => {

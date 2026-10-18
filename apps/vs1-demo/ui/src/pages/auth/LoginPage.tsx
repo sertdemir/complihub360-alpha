@@ -11,6 +11,7 @@ import { clearExpired, readExpired, rememberReturnTo } from "../../lib/sessionEx
 import { Banner } from "../../components/ui/Banner";
 import { FormErrorSummary, focusField } from "../../components/ui/FormErrorSummary";
 import { FieldError, FIELD_ERROR_CLASS, errorAria } from "../../components/ui/FieldError";
+import { authFailureFrom, type AuthFailure } from "../../lib/serverErrors";
 
 // ─── Auth · die Anmeldeseite ─────────────────────────────────────────────────
 // Im hellen Kleid seit 2026-08-28 (Nutzer-Entscheidung, Canvas "Login-Seite":
@@ -225,20 +226,26 @@ export function LoginPage() {
     }, []);
 
     // ── Echte Supabase-Auth (mit Dev-Fallback, wenn die Umgebung fehlt) ───────
-    const [authError, setAuthError] = useState<string | null>(null);
+    // Punkt 2 (Wahl A3, 17.10.2026): nie der Supabase-Text, sondern die Lage —
+    // falsches Passwort, nicht bestaetigt (mit „Send link again“), zu viele
+    // Versuche oder unbekannt. Vorher stand „Invalid login credentials“
+    // woertlich im Banner, englisch auch in de/es/tr.
+    type LoginNotice = Exclude<AuthFailure, 'weakPassword' | 'samePassword' | 'exists'> | 'resent';
+    const [authError, setAuthError] = useState<LoginNotice | null>(null);
     const callbackUrl = `${window.location.origin}/${lang}/auth/callback`;
     const resetUrl = `${window.location.origin}/${lang}/reset-password`;
 
-    // Supabase reicht bei manchen Fehlern eine leere Nachricht durch — dann
-    // stand im Banner woertlich "{}" (Befund 2026-08-30, Magic-Link bei
-    // kaputtem SMTP). Eine unlesbare Fehlermeldung ist schlimmer als eine
-    // allgemeine: sie sieht aus wie ein Anzeigefehler und nicht wie ein
-    // Hinweis. Kurze oder klammerartige Werte fallen deshalb auf einen
-    // uebersetzten Satz zurueck.
-    const readableError = (raw: string | null | undefined): string => {
-        const m = (raw ?? "").trim();
-        if (!m || m === "{}" || m === "[]" || m.length < 3) return t("login.validation.unknownError");
-        return m;
+    // Auch eine leere oder unlesbare Supabase-Meldung (Befund 2026-08-30:
+    // woertlich "{}") landet so beim allgemeinen Satz.
+    const readableError = (err: { code?: string; status?: number } | null | undefined): LoginNotice => {
+        const f = authFailureFrom(err);
+        return f === 'credentials' || f === 'unconfirmed' || f === 'rateLimit' ? f : 'unknown';
+    };
+    const resendConfirmation = async () => {
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (!sb) return;
+        const { error } = await sb.auth.resend({ type: "signup", email, options: { emailRedirectTo: callbackUrl } });
+        setAuthError(error ? readableError(error) : "resent");
     };
 
     const handleMagicLink = async () => {
@@ -251,7 +258,7 @@ export function LoginPage() {
         // muss dort ankommen (AuthCallbackPage liest ihn).
         rememberReturnTo(redirectTarget);
         const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: callbackUrl } });
-        if (error) { setAuthError(readableError(error.message)); return; }
+        if (error) { setAuthError(readableError(error)); return; }
         setView("magic-sent");
     };
 
@@ -263,7 +270,7 @@ export function LoginPage() {
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { finishLogin("partner"); return; }
         const { error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) { setAuthError(readableError(error.message)); return; }
+        if (error) { setAuthError(readableError(error)); return; }
         clearExpired();
         navigate(redirectTarget || `/${lang}/provider-dashboard`);
     };
@@ -287,7 +294,7 @@ export function LoginPage() {
         if (!sb) { finishLogin(role); return; }
         rememberReturnTo(redirectTarget);
         const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl } });
-        if (error) setAuthError(readableError(error.message));
+        if (error) setAuthError(readableError(error));
     };
 
     const switchMode = (m: Mode) => {
@@ -298,9 +305,20 @@ export function LoginPage() {
     // Eingabe steht im Split, Meldung zentriert — siehe Kopfkommentar.
     const isMessage = view === "magic-sent" || view === "reset-sent" || view === "error";
 
-    const errorBanner = authError ? (
+    const errorBanner = authError === "resent" ? (
+        <div role="status" className="mb-5 flex items-start gap-2 rounded-lg border border-brand/40 bg-brand-light px-4 py-2.5 text-body-xs text-fg">
+            <Mail size={15} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden /> {t("authErrors.resent")}
+        </div>
+    ) : authError ? (
         <div role="alert" className="mb-5 flex items-start gap-2 rounded-lg border border-error-500/30 bg-error-bg px-4 py-2.5 text-body-xs text-error-700">
-            <AlertTriangle size={15} className="mt-0.5 shrink-0" aria-hidden /> {authError}
+            <AlertTriangle size={15} className="mt-0.5 shrink-0" aria-hidden />
+            <span>
+                <strong className="font-semibold">{t(`authErrors.${authError}.heading`)}</strong>{" "}
+                {t(`authErrors.${authError}.message`)}
+                {authError === "unconfirmed" && (
+                    <> <button type="button" onClick={resendConfirmation} className="font-semibold underline underline-offset-2">{t("authErrors.unconfirmed.resend")}</button></>
+                )}
+            </span>
         </div>
     ) : null;
 

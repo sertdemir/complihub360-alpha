@@ -58,7 +58,6 @@
     "done": "Tamam",
     "cancel": "İptal",
     "sendVerification": "Doğrulama gönder",
-    "errorFallback": "İstek başarısız oldu — lütfen tekrar deneyin.",
     "sentPrefix": "Doğrulama şu adrese gönderildi: ",
     "sentSuffix": ". Değişiklik bağlantıya tıklandığında uygulanır — bağlantı tek seferliktir ve 1 saat sonra geçerliliğini yitirir.",
     "untilThenPrefix": "O zamana kadar ",
@@ -67,7 +66,12 @@
     "newAddress": "Yeni adres",
     "notePrefix": "Onay bağlantısını ",
     "noteNew": "yeni",
-    "noteSuffix": " adrese göndeririz — tıklanana kadar hiçbir şey değişmez. Sonrasında talep yönlendirme, hatırlatmalar ve faturalar yeni adresi izler."
+    "noteSuffix": " adrese göndeririz — tıklanana kadar hiçbir şey değişmez. Sonrasında talep yönlendirme, hatırlatmalar ve faturalar yeni adresi izler.",
+    "sameAddress": "Bu zaten iletişim adresiniz.",
+    "sendFailed": {
+      "heading": "Doğrulama bağlantısını gönderemedik",
+      "message": "İletişim adresiniz değişmedi. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
+    }
   },
   "addMarket": {
     "eyebrow": "KAPSAM",
@@ -736,7 +740,8 @@
         "limited": "Kısmen onaylandı",
         "paused": "Duraklatıldı",
         "retired": "Devre dışı"
-      }
+      },
+      "addFailed": "Hizmeti ekleyemedik"
     },
     "coverageStatus": {
       "pending": "Talep edildi",
@@ -988,6 +993,15 @@
       "plannedFrom": "{{date}} tarihinden itibaren planlandı",
       "plannedShort": "Değişiklik planlandı",
       "withdrawFields": "Geri çek: {{fields}}"
+    },
+    "errors": {
+      "serviceExists": "Bu hizmet zaten listenizde.",
+      "serviceCodeFixed": "Bir hizmetin kategorisi değiştirilemez. Bu hizmeti sonlandırın ve yerine yeni bir hizmet ekleyin.",
+      "serviceRetired": "Bu hizmet sonlandırıldı ve artık düzenlenemez."
+    },
+    "saveFailed": {
+      "heading": "Değişikliklerinizi kaydedemedik",
+      "message": "Girdiğiniz bilgiler hâlâ burada. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
     }
   },
   "verification": {
@@ -1118,7 +1132,11 @@
       "cancel": "Vazgeç",
       "done_one": "Bildirildi. {{count}} hizmet duraklatıldı; inceleme ekibimiz sizinle iletişime geçecek.",
       "done_other": "Bildirildi. {{count}} hizmet duraklatıldı; inceleme ekibimiz sizinle iletişime geçecek.",
-      "doneNone": "Bildirildi. İnceleme ekibimiz sizinle iletişime geçecek."
+      "doneNone": "Bildirildi. İnceleme ekibimiz sizinle iletişime geçecek.",
+      "sendFailed": {
+        "heading": "Değişikliği bildiremedik",
+        "message": "Girdiğiniz bilgiler hâlâ burada. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
+      }
     }
   },
   "identity": {

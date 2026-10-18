@@ -6,6 +6,7 @@ import { Logo } from "../../components/ui/Logo";
 import { getSupabase, isSupabaseConfigured } from "../../lib/supabase";
 import { FormErrorSummary, focusField, type FormError } from "../../components/ui/FormErrorSummary";
 import { errorAria } from "../../components/ui/FieldError";
+import { authFailureFrom } from "../../lib/serverErrors";
 
 // Landing target for the password-reset email link. Supabase establishes a
 // short-lived recovery session from the link, so updateUser({ password }) sets
@@ -18,7 +19,10 @@ export function ResetPasswordPage() {
     const [password, setPassword] = useState("");
     const [confirm, setConfirm] = useState("");
     const [showPw, setShowPw] = useState(false);
+    // Punkt 2 (Wahl A3, 17.10.2026): nie der Supabase-Text; ein zu schwaches
+    // oder unveraendertes Passwort steht am Feld.
     const [error, setError] = useState<string | null>(null);
+    const [serverPw, setServerPw] = useState<null | "weakPassword" | "samePassword">(null);
     const [done, setDone] = useState(false);
 
     // Regel V2 (11.10.2026): beide Regeln auf einmal, je am Feld und gesammelt
@@ -33,7 +37,8 @@ export function ResetPasswordPage() {
         return errs;
     };
     const errors = tried ? fieldErrors() : [];
-    const errFor = (id: string) => errors.find((x) => x.id === id)?.message;
+    const errFor = (id: string) => errors.find((x) => x.id === id)?.message
+        ?? (id === "reset-password" && serverPw ? t(`authErrors.${serverPw}`) : undefined);
 
     const submit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,7 +49,12 @@ export function ResetPasswordPage() {
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { setError(t("reset.errors.notConfigured")); return; }
         const { error } = await sb.auth.updateUser({ password });
-        if (error) { setError(error.message); return; }
+        if (error) {
+            const f = authFailureFrom(error);
+            if (f === "weakPassword" || f === "samePassword") { setServerPw(f); focusField("reset-password"); return; }
+            setError(t(f === "rateLimit" ? "authErrors.rateLimit.heading" : "authErrors.resetUnknown.heading") + " " + t(f === "rateLimit" ? "authErrors.rateLimit.message" : "authErrors.resetUnknown.message"));
+            return;
+        }
         setDone(true);
         setTimeout(() => navigate(`/${lang}/login`, { replace: true }), 1600);
     };
@@ -80,7 +90,7 @@ export function ResetPasswordPage() {
                                     type={showPw ? "text" : "password"}
                                     autoComplete="new-password"
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    onChange={(e) => { setPassword(e.target.value); setServerPw(null); }}
                                     placeholder="••••••••••"
                                     className={"w-full rounded-xl border bg-[#0a1019] px-4 py-3.5 pr-16 text-[15px] text-white outline-none transition-colors placeholder:text-white/35 focus:border-emerald-400/50 " + (errFor("reset-password") ? "border-rose-400/70" : "border-white/12")}
                                     {...errorAria("reset-password", !!errFor("reset-password"))}

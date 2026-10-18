@@ -402,7 +402,7 @@ async function materialEvent(req: IncomingMessage, res: ServerResponse, correlat
     }
     const occurredOn = str(d.occurred_on, 10);
     if (!occurredOn || !/^\d{4}-\d{2}-\d{2}$/.test(occurredOn) || occurredOn > new Date().toISOString().slice(0, 10)) {
-        json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'occurred_on must be a date (YYYY-MM-DD), not in the future', correlationId }); return;
+        json(res, 400, { errorCode: 'VALIDATION_ERROR', field: 'occurred_on', message: 'occurred_on must be a date (YYYY-MM-DD), not in the future', correlationId }); return;
     }
     if (d.service_ids !== 'all' && !(Array.isArray(d.service_ids) && d.service_ids.every(isUuid))) {
         json(res, 400, { errorCode: 'VALIDATION_ERROR', message: "service_ids must be 'all' or a list of service ids", correlationId }); return;
@@ -644,7 +644,7 @@ async function putCoverage(req: IncomingMessage, res: ServerResponse, correlatio
     for (const raw of Array.isArray(d.countries) ? d.countries : []) {
         const cc = typeof raw === 'string' ? raw : raw?.country_code;
         const jur = typeof raw === 'object' && raw ? str(raw.jurisdiction_code, 20) || null : null;
-        if (!isCountry(cc)) { json(res, 400, { errorCode: 'VALIDATION_ERROR', message: `country_code must be ISO-2 upper case: ${String(cc)}`, correlationId }); return; }
+        if (!isCountry(cc)) { json(res, 400, { errorCode: 'VALIDATION_ERROR', field: 'country_code', message: `country_code must be ISO-2 upper case: ${String(cc)}`, correlationId }); return; }
         if (!wanted.some((w) => w.country_code === cc && w.jurisdiction_code === jur)) wanted.push({ country_code: cc, jurisdiction_code: jur });
     }
     const current = (await supabaseApi.select('provider_service_coverage', { service_id: serviceId }, { limit: 200 })) as any[];
@@ -819,7 +819,7 @@ async function acceptAgreement(req: IncomingMessage, res: ServerResponse, correl
     if (!type || !AGREEMENT_TYPES.has(type)) { json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'agreement_type invalid', correlationId }); return; }
     if (!version) { json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'version required', correlationId }); return; }
     const name = str(d.accepted_by_name, 160);
-    if (!name) { json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'accepted_by_name required', correlationId }); return; }
+    if (!name) { json(res, 400, { errorCode: 'VALIDATION_ERROR', field: 'accepted_by_name', message: 'accepted_by_name required', correlationId }); return; }
     const language = (str(d.language, 2) || 'en').toLowerCase();
     const now = new Date().toISOString();
     // Eine neue Fassung loest die alte ab, loescht sie aber nicht: der Stand zum

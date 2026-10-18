@@ -7,8 +7,10 @@ import { Checkbox } from '../ui/Checkbox';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { FormField } from '../ui/FormField';
-import { ApiError } from '../../api/client';
+import { referenceOf } from '../../api/client';
 import { FieldError, errorAria } from '../ui/FieldError';
+import { FailureNote } from '../ui/FailureNote';
+import { errorFieldOf } from '../../lib/serverErrors';
 import { focusField } from '../ui/FormErrorSummary';
 import { MATERIAL_EVENTS, reportMaterialEvent, type MaterialEvent, type MatrixRow } from '../../api/application';
 
@@ -18,6 +20,12 @@ import { MATERIAL_EVENTS, reportMaterialEvent, type MaterialEvent, type MatrixRo
 // die Freigabe, §28). Kein Ton der Drohung: wer meldet, handelt richtig.
 // Keine Leistung zu waehlen ist erlaubt — ein nicht haltbarer Termin
 // pausiert nichts, das Pruefteam meldet sich.
+//
+// Punkt 2 (Wahl W1 · C3, 17.10.2026): kein Server-Text mehr. Scheitert das
+// Melden, steht der Hinweis ueber den Knoepfen, die Eingaben bleiben. Die
+// Copy behauptet bewusst nicht „nichts pausiert“ — der Server schreibt zwar
+// seit diesem Stand erst die Meldung, aber ein Abbruch danach ist moeglich;
+// ein erneuter Versuch nimmt die offene Meldung wieder auf.
 
 export function MaterialEventCard({ services, onReported }: { services: MatrixRow[]; onReported: () => void | Promise<void> }) {
   const { t, i18n } = useTranslation('providerws');
@@ -30,7 +38,7 @@ export function MaterialEventCard({ services, onReported }: { services: MatrixRo
   const [picked, setPicked] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [failed, setFailed] = useState<{ reference: { id: string; at: string } | null } | null>(null);
   // V2 (11.10.2026): das Ereignis ist das eine Pflichtfeld. Der Knopf bleibt
   // aktiv; fehlt die Wahl, steht der Satz an der Gruppe und der Fokus geht
   // aufs erste Ereignis. Bis hierher war der Knopf grau und der Satz
@@ -46,15 +54,15 @@ export function MaterialEventCard({ services, onReported }: { services: MatrixRo
   const submit = async () => {
     if (busy) return;
     if (!event) { setEventError(true); focusField('material-event'); return; }
-    setBusy(true); setErr(null); setDateError(false);
+    setBusy(true); setFailed(null); setDateError(false);
     try {
       const r = await reportMaterialEvent({ event_type: event, occurred_on: since, service_ids: picked, note: note.trim() || undefined });
       setDone(r.paused_service_ids.length ? t('verification.materialEvent.done', { count: r.paused_service_ids.length }) : t('verification.materialEvent.doneNone'));
       setOpen(false); setEvent(null); setPicked([]); setNote('');
       await onReported();
     } catch (e) {
-      if (e instanceof ApiError && e.status === 400 && /occurred_on/.test(e.message)) { setDateError(true); focusField('material-since'); }
-      else setErr(e instanceof Error ? e.message : t('application.saveError'));
+      if (errorFieldOf(e) === 'occurred_on') { setDateError(true); focusField('material-since'); }
+      else setFailed({ reference: referenceOf(e) });
     }
     finally { setBusy(false); }
   };
@@ -95,10 +103,10 @@ export function MaterialEventCard({ services, onReported }: { services: MatrixRo
           <p className="rounded-md bg-surface-secondary px-3 py-2.5 text-[12.5px] leading-relaxed text-fg-secondary">
             {picked.length ? t('verification.materialEvent.effect') : t('verification.materialEvent.effectNone')} {t('verification.materialEvent.thanks')}
           </p>
-          {err && <p role="alert" className="text-[12px] text-error-700 dark:text-red-300">{err}</p>}
+          {failed && <FailureNote heading={t('verification.materialEvent.sendFailed.heading')} message={t('verification.materialEvent.sendFailed.message')} reference={failed.reference} />}
           <div className="flex gap-2">
-            <Button size="sm" disabled={busy} onClick={submit}>{picked.length ? t('verification.materialEvent.submit') : t('verification.materialEvent.submitNone')}</Button>
-            <Button size="sm" variant="ghost" disabled={busy} onClick={() => { setOpen(false); setEventError(false); setDateError(false); setErr(null); }}>{t('verification.materialEvent.cancel')}</Button>
+            <Button size="sm" disabled={busy} onClick={submit}>{failed ? t('common:states.actions.tryAgain') : picked.length ? t('verification.materialEvent.submit') : t('verification.materialEvent.submitNone')}</Button>
+            <Button size="sm" variant="ghost" disabled={busy} onClick={() => { setOpen(false); setEventError(false); setDateError(false); setFailed(null); }}>{t('verification.materialEvent.cancel')}</Button>
           </div>
         </div>
       )}

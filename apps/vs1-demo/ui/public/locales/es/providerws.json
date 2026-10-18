@@ -58,7 +58,6 @@
     "done": "Hecho",
     "cancel": "Cancelar",
     "sendVerification": "Enviar verificación",
-    "errorFallback": "La solicitud falló — inténtelo de nuevo.",
     "sentPrefix": "Verificación enviada a ",
     "sentSuffix": ". El cambio se aplica al hacer clic en el enlace — funciona una sola vez y caduca en 1 hora.",
     "untilThenPrefix": "Hasta entonces, ",
@@ -67,7 +66,12 @@
     "newAddress": "Nueva dirección",
     "notePrefix": "Enviamos un enlace de confirmación a la ",
     "noteNew": "nueva",
-    "noteSuffix": " dirección — nada cambia hasta que se haga clic. Después, el enrutamiento de solicitudes, los recordatorios y las facturas siguen la nueva dirección."
+    "noteSuffix": " dirección — nada cambia hasta que se haga clic. Después, el enrutamiento de solicitudes, los recordatorios y las facturas siguen la nueva dirección.",
+    "sameAddress": "Esta ya es su dirección de contacto.",
+    "sendFailed": {
+      "heading": "No pudimos enviar el enlace de verificación",
+      "message": "Su dirección de contacto no ha cambiado. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
+    }
   },
   "addMarket": {
     "eyebrow": "COBERTURA",
@@ -736,7 +740,8 @@
         "limited": "Aprobado en parte",
         "paused": "En pausa",
         "retired": "Retirado"
-      }
+      },
+      "addFailed": "No pudimos añadir el servicio"
     },
     "coverageStatus": {
       "pending": "Solicitado",
@@ -988,6 +993,15 @@
       "plannedFrom": "programado a partir del {{date}}",
       "plannedShort": "Cambio programado",
       "withdrawFields": "Retirar: {{fields}}"
+    },
+    "errors": {
+      "serviceExists": "Este servicio ya está en su lista.",
+      "serviceCodeFixed": "La categoría de un servicio no se puede cambiar. Retire este servicio y añada uno nuevo.",
+      "serviceRetired": "Este servicio se ha retirado y ya no se puede editar."
+    },
+    "saveFailed": {
+      "heading": "No pudimos guardar sus cambios",
+      "message": "Sus datos siguen aquí. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
     }
   },
   "verification": {
@@ -1118,7 +1132,11 @@
       "cancel": "Cancelar",
       "done_one": "Comunicado. {{count}} servicio está en pausa; nuestro equipo de revisión se pondrá en contacto.",
       "done_other": "Comunicado. {{count}} servicios están en pausa; nuestro equipo de revisión se pondrá en contacto.",
-      "doneNone": "Comunicado. Nuestro equipo de revisión se pondrá en contacto."
+      "doneNone": "Comunicado. Nuestro equipo de revisión se pondrá en contacto.",
+      "sendFailed": {
+        "heading": "No pudimos notificar el cambio",
+        "message": "Sus datos siguen aquí. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
+      }
     }
   },
   "identity": {
