@@ -33,7 +33,10 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
   wird beim nächsten Lauf wieder aufgenommen, nie neu ausgestellt; Anbieterlisten zeigen keine Entwürfe.
   Je Anbieter `try/catch` → Ergebniszeile `error: issue_failed`, `errors` in der Antwort, `invoice_run_failed`.
   Migration `20261018000200` (Status `draft`), pgTAP 19.
-- [ ] **B6** 30-%-Guthaben: `credit_decided_at` vor dem Insert.
+- [x] **B6** 30-%-Guthaben: `credit_decided_at` vor dem Insert.
+  Reihenfolge gedreht: erst `provider_credits`, dann `credit_decided_at`. Nicht-Unique-Fehler lässt die
+  Frist offen (nächster Tick versucht es erneut); Unique-Verletzung = Guthaben steht schon → nur die Frist
+  schließen, `lead.credit_issued` mit `resumed: true`, keine zweite Meldung. Ledger-Spur ohne leeres `catch`.
 - [ ] **B4** `quoteLeadFee` findet den Plan nur bei exakter `plan_version`.
 
 ### 2 · Zustände, die kippen und nie wiederkommen
