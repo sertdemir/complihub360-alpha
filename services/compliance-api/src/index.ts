@@ -1042,7 +1042,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     ? Math.round((usableReviews.reduce((sum: number, r: any) => sum + Number(r.rating), 0) / usableReviews.length) * 10) / 10 : null;
                 // Ohne Listenposition gibt es keinen Buchstaben — das Detail traegt
                 // nur die Beschreibung; den Buchstaben kennt die aufrufende Liste.
-                const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), p.region ?? null);
+                // P10: die Region traegt bei Altbestand die Identitaet ("Kanzlei
+                // Schmidt, Hamburg") — vor der Offenlegung nur maskiert, wie in /search.
+                const regionShown = revealed ? (p.region ?? null) : (typeof p.region === 'string' ? maskIdentity(p.region, identityCtx(p)) : null);
+                const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), regionShown);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
                     ok: true,
@@ -1055,7 +1058,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         // sie in der Sprache des Nutzers zeigt — `descriptor`
                         // traegt die englischen Taxonomie-Namen.
                         area_codes: [...areas].sort(),
-                        descriptor_region: p.region ?? null,
+                        descriptor_region: regionShown,
                         // Freigegebene Leistungsnamen aus der View — nicht die
                         // Selbstauskunft aus `categories`.
                         specializations,
@@ -1249,14 +1252,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const bookings = rows.map((b: any) => {
                     const p = byKey[b.provider_key] || {};
                     const areas = [...new Set(viewAll.filter((r: any) => r.provider_key === b.provider_key).map((r: any) => r.area_code as string).filter(Boolean))];
-                    const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), p.region ?? null);
+                    // P10: Region vor der Offenlegung maskiert, wie in /search.
+                    const regionShown = b.identity_revealed ? (p.region ?? null) : (typeof p.region === 'string' ? maskIdentity(p.region, identityCtx(p)) : null);
+                    const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), regionShown);
                     return {
                         id: b.id,
                         public_ref: p.public_ref ?? null,
                         provider_name: b.identity_revealed ? (p.name ?? 'Verified Provider') : 'Verified Provider',
                         provider_descriptor: title.descriptor,
                         provider_area_codes: [...areas].sort(),
-                        provider_region: p.region ?? null,
+                        provider_region: regionShown,
                         identity_revealed: !!b.identity_revealed,
                         // Affiliate 1b: the provider's website is a POST-BOOKING
                         // reveal only — never before, to preserve stage-1/2 anonymity.
@@ -1825,11 +1830,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     if (!p || !view.length) { fail(404, 'NOT_FOUND', 'Provider not found'); return; }
                     // Buchbar heisst matchbar UND zahlungsbereit (Spec A §21.1). Das
                     // Gate sperrt die Buchung, nie das Matching (§14).
+                    // B14: der Nutzer-Draht nennt den Zahlungszustand des Anbieters
+                    // nicht — ein neutraler Code, dieselbe Lage wie bei einer Pause.
                     if (!view.some((r: any) => r.bookable_chargeable)) {
-                        fail(409, 'BILLING_NOT_READY', 'This provider cannot take bookings yet'); return;
+                        fail(409, 'PROVIDER_NOT_BOOKABLE', 'This provider cannot take bookings at the moment'); return;
                     }
                     // Pausiert (C2): etwa aus einem alten Tab. Fuer den Nutzer dieselbe
-                    // neutrale Lage wie BILLING_NOT_READY — mit anderen Anbietern.
+                    // neutrale Lage wie PROVIDER_NOT_BOOKABLE — mit anderen Anbietern.
                     if (isPaused(p)) { fail(409, 'PROVIDER_PAUSED', 'This provider is not taking new bookings right now'); return; }
                     // Phase 6: Buchungspause (§24) sperrt die Buchung — nie das
                     // Matching. Derselbe neutrale Fehler: der Nutzer erfaehrt keinen Grund.
@@ -1934,7 +1941,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         }
                         if (!customerId || !paymentMethodId) {
                             await syncBillingReadiness(providerKey).catch(() => null);
-                            fail(409, 'BILLING_NOT_READY', 'This provider cannot take bookings yet'); return;
+                            fail(409, 'PROVIDER_NOT_BOOKABLE', 'This provider cannot take bookings at the moment'); return;
                         }
                     }
 
@@ -1964,8 +1971,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     if (charge.outcome === 'failed') {
                         if (charge.result.kind === 'card') {
                             await recordPaymentFailure({ providerKey, ledgerId: charge.ledgerId, result: charge.result, paymentMethodId, correlationId });
-                            // Neutral und ohne Decline-Code: das liegt nicht am Nutzer.
-                            fail(409, 'BOOKING_NOT_COMPLETED', 'The booking could not be completed. This is not on your side — the provider has been informed.', { reason: 'provider_billing' });
+                            // Neutral, ohne Decline-Code und ohne Grund (B14): das liegt
+                            // nicht am Nutzer, und mehr muss er nicht wissen.
+                            fail(409, 'BOOKING_NOT_COMPLETED', 'The booking could not be completed. This is not on your side — the provider has been informed.');
                         } else {
                             await supabaseApi.insert('event_log', { type: 'lead_payment_error', payload: { providerKey, ledgerId: charge.ledgerId, detail: charge.result.detail.slice(0, 200) } }).catch(() => {});
                             structuredLog('error', 'Lead charge failed at Stripe', { correlationId, errorCode: 'ERR_LEAD_CHARGE', severity: 'error', route: req.url });
@@ -2060,20 +2068,33 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             await supabaseApi.insert('event_log', { type: 'calendar_event_failed', payload: { bookingId: booking.id, providerKey, slotStart } }).catch(() => {});
                         }
                     }
-                    await supabaseApi.insert('event_log', { type: 'scheduling_confirmed', payload: { bookingId: booking.id, providerKey, userId: authUserId, slotStart, ledgerId: charge.ledgerId } });
+                    // B3: Buchung, Belastung und Offenlegung stehen. Ein Ereignis,
+                    // das nicht geschrieben werden kann, macht daraus keinen Fehler
+                    // fuer den Nutzer — es wird geloggt und als Luecke benannt.
+                    // `lead.revealed` zuerst: das ist die Spur der Offenlegung.
+                    const audit = async (type: string, payload: Record<string, unknown>) => {
+                        try { await supabaseApi.insert('event_log', { type, payload }); }
+                        catch (err) {
+                            structuredLog('error', 'Booking audit event failed', {
+                                correlationId, errorCode: 'ERR_AUDIT_EVENT', severity: 'error', route: req.url,
+                                detail: `${type}: ${String(err).slice(0, 200)}`,
+                            });
+                        }
+                    };
+                    await audit('lead.revealed', {
+                        bookingId: booking.id, providerKey, userId: authUserId, sharedFields: [...SHARED_FIELDS_V1],
+                        acknowledgementVersion: ack.version, sharingConfirmedAt: sharingAt,
+                    });
+                    await audit('scheduling_confirmed', { bookingId: booking.id, providerKey, userId: authUserId, slotStart, ledgerId: charge.ledgerId });
                     if (linkedRoot) {
-                        await supabaseApi.insert('event_log', { type: 'booking_linked_to_lead', payload: { bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId, rootBookingId: linkedRoot.id } });
+                        await audit('booking_linked_to_lead', { bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId, rootBookingId: linkedRoot.id });
                         // Eine offene Frist ist damit erfuellt — ohne Guthaben.
                         if (linkedRoot.rebook_deadline && !linkedRoot.credit_decided_at) await supabaseApi.update('scheduling', { id: linkedRoot.id }, { credit_decided_at: sharingAt }).catch(() => {});
-                    } else await supabaseApi.insert('event_log', { type: 'provider_lead_charged', payload: {
+                    } else await audit('provider_lead_charged', {
                         bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId,
                         band: quote.band, finalFeeCents: quote.finalFeeCents, currency: quote.currency,
                         paymentIntentId: charge.outcome === 'captured' ? charge.paymentIntentId : null, feeEnabled: quote.enabled,
-                    } });
-                    await supabaseApi.insert('event_log', { type: 'lead.revealed', payload: {
-                        bookingId: booking.id, providerKey, userId: authUserId, sharedFields: [...SHARED_FIELDS_V1],
-                        acknowledgementVersion: ack.version, sharingConfirmedAt: sharingAt,
-                    } });
+                    });
                     // Der Anbieter erfaehrt es im Dashboard und per Mail; beides ohne Nutzeridentitaet im Text.
                     (async () => {
                         const members = (await supabaseApi.select('provider_members', { provider_key: providerKey }, { limit: 20 })) as Array<{ user_id: string }>;
@@ -2166,6 +2187,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         return;
                     }
                     const providerKey: string = booking.provider_key;
+                    const reviewBody = typeof d.body === 'string' ? d.body.slice(0, 2000) : null;
+                    // P12: Bewertungen sind vor der Buchung lesbar — der Name des
+                    // Anbieters darf nicht ueber den Mandanten hineinkommen. Das
+                    // Lese-Netz (maskIdentity) bleibt fuer den Altbestand.
+                    if (reviewBody) {
+                        const prov = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0];
+                        const findings = scanFields({ body: reviewBody }, identityCtx(prov));
+                        if (findings.length) { identityRejection(res, correlationId, findings); return; }
+                    }
                     await supabaseApi.insert('reviews', {
                         booking_id: d.booking_id,
                         provider_key: providerKey,
@@ -2173,7 +2203,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         to_role: fromRole === 'user' ? 'provider' : 'user',
                         rating,
                         categories: Array.isArray(d.categories) ? d.categories : [],
-                        body: typeof d.body === 'string' ? d.body.slice(0, 2000) : null,
+                        body: reviewBody,
                         verified: true, // jetzt begruendet: an eine gehaltene Buchung gebunden
                     });
                     if (fromRole === 'user') {
@@ -3246,8 +3276,20 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         let body = '';
         req.on('data', (chunk: any) => body += chunk.toString());
         req.on('end', async () => {
+            // P9: ein unlesbarer Body ist 400 — alles danach (Datenbank, Tokens)
+            // ist 500 und wird strukturiert geloggt, ohne den rohen Fehler
+            // (PostgREST nennt darin Spaltenwerte, also Nutzerdaten).
+            let requestData: any;
             try {
-                const requestData = JSON.parse(body);
+                requestData = JSON.parse(body);
+                if (!requestData || typeof requestData !== 'object' || typeof requestData.provider_key !== 'string' || !requestData.provider_key) throw new Error('provider_key required');
+            } catch {
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'BAD_REQUEST', message: 'Invalid payload: provider_key required', correlationId }));
+                return;
+            }
+            try {
                 // Note: The ID generation will be handled by the DB via uuid_generate_v4()
                 // so we don't strictly need to generate it, but we can generate one to return it immediately
                 const crypto = await import('crypto');
@@ -3339,9 +3381,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: engagementId, status: 'created', magicLinks }));
             } catch (err) {
-                console.error("Engagement request error:", err);
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'BAD_REQUEST', message: 'Invalid payload or DB error' }));
+                structuredLog('error', 'Engagement create failed', {
+                    correlationId, errorCode: 'ERR_ENGAGEMENT_CREATE', severity: 'error', route: req.url,
+                    detail: err instanceof Error ? err.message.slice(0, 200) : String(err).slice(0, 200),
+                });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'The request could not be saved. Please try again.', correlationId }));
             }
         });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/provider/magic/')) {

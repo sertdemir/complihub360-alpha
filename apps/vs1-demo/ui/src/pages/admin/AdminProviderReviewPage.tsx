@@ -162,7 +162,7 @@ export function AdminProviderReviewPage() {
                   {gate.billing.blocks_chargeable_booking.filter((r) => r !== 'not_ready').length > 0 && (
                     <> — {gate.billing.blocks_chargeable_booking.filter((r) => r !== 'not_ready').map((r) => GATE_LABEL[`billing.${r}`] ?? r).join(' · ')}</>
                   )}
-                  . This does not block activation: billing readiness blocks the chargeable booking, not the status (Spec A §21.1). A booking attempt answers 409 BILLING_NOT_READY.
+                  . This does not block activation: billing readiness blocks the chargeable booking, not the status (Spec A §21.1). A booking attempt answers 409 PROVIDER_NOT_BOOKABLE (the user does not see the reason).
                 </div>
               )}
               <div className="flex flex-wrap items-center gap-2">
