@@ -27,7 +27,12 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
   gleich); Ledger-Spalte `request_key` mit Unique `(user_id, request_key)`. Wiederholung nach
   Erfolg → dieselbe 201 (`replay: true`); Zeile ohne Buchung oder 23505 → 409 `BOOKING_IN_PROGRESS`
   ohne Stripe. Migration `20261018000100`, pgTAP 18, Mock mit Gedächtnis je Session.
-- [ ] **B7** Monatslauf: Stripe-Rechnung vor DB-Zeile; outer `catch {}` bricht den Lauf ab.
+- [x] **B7** Monatslauf: Stripe-Rechnung vor DB-Zeile; outer `catch {}` bricht den Lauf ab.
+  `issueInvoiceFor` in `billing.ts`: Stripe-Create → Zeile `draft` (mit `stripe_invoice_id`) → Positionen
+  → finalisieren → senden → Zeile `open` → Guthaben (einmal, Notiz trägt die Stripe-Kennung). Ein `draft`
+  wird beim nächsten Lauf wieder aufgenommen, nie neu ausgestellt; Anbieterlisten zeigen keine Entwürfe.
+  Je Anbieter `try/catch` → Ergebniszeile `error: issue_failed`, `errors` in der Antwort, `invoice_run_failed`.
+  Migration `20261018000200` (Status `draft`), pgTAP 19.
 - [ ] **B6** 30-%-Guthaben: `credit_decided_at` vor dem Insert.
 - [ ] **B4** `quoteLeadFee` findet den Plan nur bei exakter `plan_version`.
 

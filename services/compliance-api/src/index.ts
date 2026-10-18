@@ -2360,7 +2360,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const providerKey = (req.url || '').split('/')[4];
         try {
             await syncOpenInvoices(providerKey).catch(() => { /* list still renders */ });
-            const invoices = await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 });
+            const all = (await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 })) as any[];
+            // B7: ein `draft` ist bei Stripe angelegt, aber noch keine Rechnung an
+            // den Anbieter — der naechste Monatslauf nimmt ihn auf. Nicht zeigen.
+            const invoices = all.filter((r) => r.status !== 'draft');
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, invoices }));

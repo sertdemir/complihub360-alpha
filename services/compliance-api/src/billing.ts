@@ -506,6 +506,152 @@ export async function getDiscountCounter(providerKey: string, cycleStart: string
 // POST /api/v1/admin/billing/run — {period?: 'YYYY-MM', dry_run?: boolean}.
 // Stellt die ABO-Rechnungen der Periode aus. Leads laufen nicht hier: die
 // werden je Buchung belastet und stehen im Ledger. Server-Key only.
+// ─── B7: eine Rechnung je Anbieter, in Schritten, wieder aufnehmbar ──────────
+//
+// Reihenfolge seit 2026-10-18: Stripe-Rechnung anlegen → eigene Zeile als
+// `draft` (mit stripe_invoice_id) → Positionen → finalisieren → senden →
+// Zeile auf `open` heben → Guthaben verbuchen. Bricht es irgendwo ab, kennt
+// die Datenbank die Rechnung schon; der naechste Lauf findet den `draft` und
+// macht dort weiter, statt bei Stripe eine zweite auszustellen (Befund B7).
+
+interface IssueInput {
+    providerKey: string;
+    plan: PlanConfig;
+    line: ChargeLine;
+    period: string;
+    dryRun: boolean;
+    correlationId: string;
+}
+
+interface InvoiceRow {
+    id: string;
+    status?: string;
+    stripe_invoice_id?: string | null;
+    line_items?: ChargeLine[] | null;
+    invoice_number?: string | null;
+}
+
+async function issueInvoiceFor(i: IssueInput): Promise<Record<string, unknown>> {
+    const { providerKey, plan, line, period } = i;
+    const existing = (await supabaseApi.select('invoices', { provider_key: providerKey, period }, { limit: 5 })) as InvoiceRow[];
+    const issued = existing.find((r) => r.stripe_invoice_id && r.status !== 'draft');
+    if (issued) return { provider: providerKey, skipped: 'already invoiced' };
+    const draft = existing.find((r) => r.stripe_invoice_id && r.status === 'draft') ?? null;
+
+    // Phase 5 (Spec B: Plattform-Guthaben statt Barerstattung): offenes
+    // Guthaben wird mit dieser Rechnung verrechnet, hoechstens bis zur
+    // Rechnungssumme; der Rest bleibt stehen. Bei einer Wiederaufnahme
+    // gelten die Zeilen des Entwurfs — die hat Stripe (teilweise) schon.
+    let lines: ChargeLine[];
+    if (draft && Array.isArray(draft.line_items) && draft.line_items.length) {
+        lines = draft.line_items;
+    } else {
+        const creditRows = (await supabaseApi.select('provider_credits', { provider_key: providerKey }, { limit: 1000 })) as Array<{ amount_cents?: number }>;
+        const creditBalance = creditRows.reduce((sum, c) => sum + (c.amount_cents || 0), 0);
+        const creditApplied = Math.max(0, Math.min(creditBalance, line.amount_cents));
+        lines = creditApplied > 0
+            ? [line, { label: `Platform credit applied · ${period}`, qty: 1, unit_cents: -creditApplied, amount_cents: -creditApplied }]
+            : [line];
+    }
+    const creditLine = lines.find((l) => l.amount_cents < 0) ?? null;
+    const creditApplied = creditLine ? -creditLine.amount_cents : 0;
+    const totalCents = lines.reduce((sum, l) => sum + l.amount_cents, 0);
+    if (i.dryRun) {
+        return { provider: providerKey, dry_run: true, total_cents: totalCents, currency: plan.currency, lines, credit_applied_cents: creditApplied, ...(draft ? { resumes_draft: draft.stripe_invoice_id } : {}) };
+    }
+
+    const currency = plan.currency.toLowerCase();
+    const customerId = await ensureStripeCustomer(providerKey);
+    let invoiceId: string;
+    let rowId: string;
+    let resumed = false;
+    if (draft) {
+        invoiceId = String(draft.stripe_invoice_id);
+        rowId = draft.id;
+        resumed = true;
+    } else {
+        const invoice = await stripeRequest('POST', 'invoices', {
+            customer: customerId,
+            collection_method: 'send_invoice',
+            days_until_due: '14',
+            currency,
+            description: `CompliHub360 subscription · ${period}`,
+            'metadata[provider_key]': providerKey,
+            'metadata[period]': period,
+            'metadata[plan_code]': plan.code,
+        });
+        invoiceId = String(invoice.id);
+        // SOFORT festhalten — bevor Positionen, Finalisierung oder Versand
+        // scheitern koennen. Die Nummer ist vorerst die Stripe-Kennung (UNIQUE).
+        const inserted = (await supabaseApi.insert('invoices', {
+            provider_key: providerKey,
+            invoice_number: invoiceId,
+            period,
+            amount_cents: totalCents,
+            currency: plan.currency,
+            status: 'draft',
+            line_items: lines,
+            stripe_invoice_id: invoiceId,
+        })) as Array<{ id: string }>;
+        rowId = inserted?.[0]?.id;
+        if (!rowId) throw new Error('invoice draft insert returned no id');
+    }
+
+    // Stand bei Stripe: was fehlt noch?
+    const current = await stripeRequest('GET', `invoices/${invoiceId}`) as {
+        status?: string; total?: number; lines?: { data?: unknown[] };
+    };
+    const hasItems = (current.lines?.data?.length ?? 0) > 0;
+    if (current.status === 'draft' && !hasItems) {
+        for (const l of lines) {
+            await stripeRequest('POST', 'invoiceitems', { customer: customerId, invoice: invoiceId, amount: String(l.amount_cents), currency, description: l.label });
+        }
+    }
+    let finalized: { id: string; number?: string; status?: string; total?: number; hosted_invoice_url?: string; invoice_pdf?: string; due_date?: number };
+    if (current.status === 'draft') {
+        finalized = await stripeRequest('POST', `invoices/${invoiceId}/finalize`) as typeof finalized;
+        // send_invoice verschickt nur ueber den expliziten send-Call;
+        // ein Fehler dort darf die ausgestellte Rechnung nicht verlieren.
+        try {
+            await stripeRequest('POST', `invoices/${invoiceId}/send`);
+        } catch (sendErr) {
+            structuredLog('error', 'Invoice send failed', { correlationId: i.correlationId, errorCode: 'ERR_INVOICE_SEND', severity: 'error', providerKey, invoiceId, detail: String(sendErr).slice(0, 200) } as any);
+            await supabaseApi.insert('event_log', { type: 'invoice_send_failed', payload: { providerKey, invoiceId, error: String(sendErr).slice(0, 200) } })
+                .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId: i.correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'invoice_send_failed', detail: String(e).slice(0, 200) } as any));
+        }
+    } else {
+        // Schon finalisiert (der letzte Lauf brach nach dem Finalisieren ab):
+        // nichts mehr schicken, nur die Zeile nachziehen.
+        finalized = await stripeRequest('GET', `invoices/${invoiceId}`) as typeof finalized;
+    }
+    await supabaseApi.update('invoices', { id: rowId }, {
+        invoice_number: finalized.number || invoiceId,
+        amount_cents: finalized.total ?? totalCents,
+        status: 'open',
+        line_items: lines,
+        due_at: finalized.due_date ? new Date(finalized.due_date * 1000).toISOString() : null,
+        hosted_invoice_url: finalized.hosted_invoice_url ?? null,
+        invoice_pdf: finalized.invoice_pdf ?? null,
+    });
+    if (creditApplied > 0) {
+        // Verbrauch als negative Zeile — die Summe ueber provider_credits bleibt
+        // die Wahrheit. Bei Wiederaufnahme nicht doppelt: die Notiz traegt die
+        // Stripe-Kennung.
+        const consumed = (await supabaseApi.select('provider_credits', { provider_key: providerKey, reason: 'consumed' }, { limit: 500 })) as Array<{ note?: string | null }>;
+        if (!consumed.some((c) => String(c.note ?? '').includes(invoiceId))) {
+            await supabaseApi.insert('provider_credits', {
+                provider_key: providerKey, amount_cents: -creditApplied, currency: plan.currency, reason: 'consumed',
+                note: `Applied to invoice ${finalized.number || invoiceId} (${invoiceId}) · ${period}`,
+            });
+        }
+    }
+    await supabaseApi.insert('event_log', {
+        type: 'invoice_issued',
+        payload: { providerKey, period, plan: plan.code, total_cents: finalized.total ?? totalCents, credit_applied_cents: creditApplied, stripe_invoice_id: invoiceId, resumed },
+    }).catch((e) => structuredLog('error', 'event_log insert failed', { correlationId: i.correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'invoice_issued', detail: String(e).slice(0, 200) } as any));
+    return { provider: providerKey, invoice: finalized.number || invoiceId, total_cents: finalized.total ?? totalCents, credit_applied_cents: creditApplied, ...(resumed ? { resumed: true } : {}) };
+}
+
 export function handleBillingRun(req: IncomingMessage, res: ServerResponse, correlationId: string, isAdminKey: boolean): void {
     let raw = '';
     req.on('data', (chunk: Buffer) => { raw += chunk.toString(); if (raw.length > 4_000) req.destroy(); });
@@ -550,6 +696,7 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
             const cfg = await loadPricingConfig();
             const subs = (await supabaseApi.select('provider_subscriptions', onlyProvider ? { provider_key: onlyProvider } : {}, { limit: 5000 })) as any[];
             const results: Array<Record<string, unknown>> = [];
+            let errors = 0;
             for (const row of subs) {
                 if (row.ended_at) continue;
                 const sub: Subscription = {
@@ -563,91 +710,23 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                 const line = subscriptionChargeForPeriod(sub, plan, period);
                 if (!line || !plan) continue;
                 const providerKey = sub.providerKey;
-                const existing = (await supabaseApi.select('invoices', { provider_key: providerKey, period }, { limit: 5 })) as
-                    Array<{ stripe_invoice_id?: string | null }>;
-                if (existing.some((r) => r.stripe_invoice_id)) {
-                    results.push({ provider: providerKey, skipped: 'already invoiced' });
-                    continue;
-                }
-                // Phase 5 (Spec B: Plattform-Guthaben statt Barerstattung): offenes
-                // Guthaben wird mit dieser Rechnung verrechnet, hoechstens bis zur
-                // Rechnungssumme; der Rest bleibt stehen.
-                const creditRows = (await supabaseApi.select('provider_credits', { provider_key: providerKey }, { limit: 1000 })) as Array<{ amount_cents?: number }>;
-                const creditBalance = creditRows.reduce((sum, c) => sum + (c.amount_cents || 0), 0);
-                const creditApplied = Math.max(0, Math.min(creditBalance, line.amount_cents));
-                const creditLine: ChargeLine | null = creditApplied > 0
-                    ? { label: `Platform credit applied · ${period}`, qty: 1, unit_cents: -creditApplied, amount_cents: -creditApplied }
-                    : null;
-                const lines = creditLine ? [line, creditLine] : [line];
-                const totalCents = line.amount_cents - creditApplied;
-                if (dryRun) {
-                    results.push({ provider: providerKey, dry_run: true, total_cents: totalCents, currency: plan.currency, lines, credit_applied_cents: creditApplied });
-                    continue;
-                }
-                const currency = plan.currency.toLowerCase();
-                const customerId = await ensureStripeCustomer(providerKey);
-                const invoice = await stripeRequest('POST', 'invoices', {
-                    customer: customerId,
-                    collection_method: 'send_invoice',
-                    days_until_due: '14',
-                    currency,
-                    description: `CompliHub360 subscription · ${period}`,
-                    'metadata[provider_key]': providerKey,
-                    'metadata[period]': period,
-                    'metadata[plan_code]': plan.code,
-                });
-                const invoiceId = String(invoice.id);
-                await stripeRequest('POST', 'invoiceitems', {
-                    customer: customerId, invoice: invoiceId,
-                    amount: String(line.amount_cents), currency, description: line.label,
-                });
-                if (creditLine) {
-                    await stripeRequest('POST', 'invoiceitems', {
-                        customer: customerId, invoice: invoiceId,
-                        amount: String(creditLine.amount_cents), currency, description: creditLine.label,
-                    });
-                }
-                const finalized = await stripeRequest('POST', `invoices/${invoiceId}/finalize`) as {
-                    id: string; number?: string; status?: string; total?: number;
-                    hosted_invoice_url?: string; invoice_pdf?: string; due_date?: number;
-                };
-                // send_invoice verschickt nur ueber den expliziten send-Call;
-                // ein Fehler dort darf die ausgestellte Rechnung nicht verlieren.
+                // B7: ein Fehler bei EINEM Anbieter beendet nicht den Lauf fuer alle
+                // anderen. Er steht als Ergebniszeile, im Log und im event_log.
                 try {
-                    await stripeRequest('POST', `invoices/${invoiceId}/send`);
-                } catch (sendErr) {
-                    await supabaseApi.insert('event_log', { type: 'invoice_send_failed', payload: { providerKey, invoiceId, error: String(sendErr) } }).catch(() => { /* non-blocking */ });
+                    results.push(await issueInvoiceFor({ providerKey, plan, line, period, dryRun, correlationId }));
+                } catch (err) {
+                    errors++;
+                    structuredLog('error', 'Billing run: provider failed', { correlationId, errorCode: 'ERR_BILLING_RUN_PROVIDER', severity: 'error', providerKey, period, detail: String(err).slice(0, 300) } as any);
+                    await supabaseApi.insert('event_log', { type: 'invoice_run_failed', payload: { providerKey, period, error: String(err).slice(0, 300) } })
+                        .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'invoice_run_failed', detail: String(e).slice(0, 200) } as any));
+                    results.push({ provider: providerKey, error: 'issue_failed', detail: String(err).slice(0, 200) });
                 }
-                await supabaseApi.insert('invoices', {
-                    provider_key: providerKey,
-                    invoice_number: finalized.number || invoiceId,
-                    period,
-                    amount_cents: finalized.total ?? totalCents,
-                    currency: plan.currency,
-                    status: 'open',
-                    line_items: lines,
-                    due_at: finalized.due_date ? new Date(finalized.due_date * 1000).toISOString() : null,
-                    stripe_invoice_id: finalized.id,
-                    hosted_invoice_url: finalized.hosted_invoice_url ?? null,
-                    invoice_pdf: finalized.invoice_pdf ?? null,
-                });
-                if (creditApplied > 0) {
-                    // Verbrauch als negative Zeile — die Summe ueber provider_credits bleibt die Wahrheit.
-                    await supabaseApi.insert('provider_credits', {
-                        provider_key: providerKey, amount_cents: -creditApplied, currency: plan.currency, reason: 'consumed',
-                        note: `Applied to invoice ${finalized.number || invoiceId} · ${period}`,
-                    }).catch(() => { /* non-blocking: steht im invoice_issued-Event */ });
-                }
-                await supabaseApi.insert('event_log', {
-                    type: 'invoice_issued',
-                    payload: { providerKey, period, plan: plan.code, total_cents: finalized.total ?? totalCents, credit_applied_cents: creditApplied },
-                }).catch(() => { /* non-blocking */ });
-                results.push({ provider: providerKey, invoice: finalized.number || invoiceId, total_cents: finalized.total ?? totalCents, credit_applied_cents: creditApplied });
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, period, only_provider: onlyProvider, providers: results.length, results, correlationId }));
-        } catch {
-            structuredLog('error', 'Billing run failed', { correlationId, errorCode: 'ERR_BILLING_RUN', severity: 'error', route: '/api/v1/admin/billing/run' });
+            res.end(JSON.stringify({ ok: true, period, only_provider: onlyProvider, providers: results.length, errors, results, correlationId }));
+        } catch (err) {
+            // Nur noch, was VOR der Schleife scheitert (Body, Konfiguration, Abo-Liste).
+            structuredLog('error', 'Billing run failed', { correlationId, errorCode: 'ERR_BILLING_RUN', severity: 'error', route: '/api/v1/admin/billing/run', detail: String(err).slice(0, 300) } as any);
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'BILLING_ERROR', message: 'Billing run failed', correlationId }));
         }
