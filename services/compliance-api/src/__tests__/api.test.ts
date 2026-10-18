@@ -97,6 +97,16 @@ vi.mock('../supabase.js', () => ({
                 const u = (db.auth_users ?? []).find((x) => x.id === params.p_user_id && !x.deleted_at && x.email_confirmed_at);
                 return u ? u.email : null;
             }
+            // B9: der atomare Zaehler aus 20261018000300.
+            if (fn === 'increment_discount_counter') {
+                if (rpcFail.has(fn)) { rpcFail.delete(fn); throw new Error('rpc unavailable'); }
+                const store = (db.provider_discount_counter ??= []);
+                const step = Math.max(0, Number(params.p_increment ?? 1));
+                const hit = store.find((r) => r.provider_key === params.p_provider_key && r.cycle_start === params.p_cycle_start);
+                if (hit) { hit.used = Number(hit.used ?? 0) + step; hit.updated_at = new Date().toISOString(); return hit.used; }
+                store.push({ provider_key: params.p_provider_key, cycle_start: params.p_cycle_start, used: step, updated_at: new Date().toISOString() });
+                return step;
+            }
             throw new Error(`unmocked rpc in test store: ${fn}`);
         },
     },
@@ -108,6 +118,8 @@ const { uploaded } = vi.hoisted(() => ({ uploaded: new Set<string>() }));
 // Stripe (Phase 4): kein Netz im Test. Alles, was api.stripe.com erreichen
 // koennte, geht durch stripe.ts — und das hier ersetzt es als Ganzes. Nicht
 // globalThis.fetch: darueber spricht die Suite mit dem eigenen Server.
+/** B9/B10/B13-Tests: ein RPC-Name hier drin scheitert beim naechsten Aufruf einmal. */
+const { rpcFail } = vi.hoisted(() => ({ rpcFail: new Set<string>() }));
 const { stripeMock } = vi.hoisted(() => ({
     stripeMock: {
         configured: true,
@@ -148,6 +160,19 @@ const { nylasAuthMock } = vi.hoisted(() => ({ nylasAuthMock: { exchangeCode: vi.
 vi.mock('../nylasAuth.js', async (importOriginal) => {
     const real = await importOriginal<typeof import('../nylasAuth.js')>();
     return { ...real, exchangeCode: (...a: any[]) => nylasAuthMock.exchangeCode(...a), revokeGrant: (...a: any[]) => nylasAuthMock.revokeGrant(...a) };
+});
+// Engine: echt, ausser ein Test setzt `engineFault.error` — dann wirft sie,
+// wie bei einem Fehler im Laenderprofil.
+const { engineFault } = vi.hoisted(() => ({ engineFault: { error: null as Error | null } }));
+vi.mock('@complihub/compliance-engine', async (importOriginal) => {
+    const real = await importOriginal<typeof import('@complihub/compliance-engine')>();
+    return {
+        ...real,
+        generateRelevantSubdomains: (...a: Parameters<typeof real.generateRelevantSubdomains>) => {
+            if (engineFault.error) throw engineFault.error;
+            return real.generateRelevantSubdomains(...a);
+        },
+    };
 });
 vi.mock('../storage.js', async (importOriginal) => {
     const real = await importOriginal<typeof import('../storage.js')>();
@@ -500,6 +525,80 @@ describe('POST /api/v1/search', () => {
         expect(r.status).toBe(200);
         expect(r.body.laws).toEqual([]);
         expect(r.body.providers).toHaveLength(1);
+    });
+
+    // Bis 2026-10-18 holte /search ueber match_knowledge_chunks mit einem
+    // konstanten Vektor fuenf beliebige Abschnitte des EY-Leitfadens und gab
+    // sie als `tutorials` woertlich an jeden Gast. Der Korpus ist intern
+    // (20261011000100). Die RPC antwortet hier MIT Text, damit ein
+    // zurueckkehrender Aufruf nicht still am Mock scheitert, sondern auffaellt.
+    it('reads nothing from the knowledge corpus and puts no corpus text on the wire', async () => {
+        seedProvider();
+        const KORPUS = 'EY-KORPUS-WORTLAUT-7f3a: Germany VAT registration threshold …';
+        const { supabaseApi } = await import('../supabase.js');
+        const rpc = vi.spyOn(supabaseApi, 'rpc').mockImplementation(async (fn: string) =>
+            fn === 'match_knowledge_chunks' ? [{ id: 'chunk-1', content: KORPUS, metadata: { country: 'DE' }, similarity: 0.9 }] : null);
+        const select = vi.spyOn(supabaseApi, 'select');
+        try {
+            const r = await api('/api/v1/search', {
+                method: 'POST',
+                auth: 'none',
+                body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+            });
+            expect(r.status).toBe(200);
+            expect(rpc.mock.calls.map((c) => c[0])).not.toContain('match_knowledge_chunks');
+            expect(select.mock.calls.map((c) => c[0])).not.toContain('knowledge_chunks');
+            expect(JSON.stringify(r.body)).not.toContain('EY-KORPUS-WORTLAUT');
+            // Die Felder sind weg, nicht nur leer — keine Oberflaeche las sie.
+            expect(r.body).not.toHaveProperty('tutorials');
+            expect(r.body).not.toHaveProperty('articles');
+            expect(r.body).not.toHaveProperty('tips');
+            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'overview_summary', 'providers']);
+            // Erfolg: kein Fehlersignal, keine Referenz im Koerper.
+            expect(r.body.laws_status).toBe('ok');
+        } finally {
+            rpc.mockRestore();
+            select.mockRestore();
+        }
+    });
+
+    // Ein Engine-Fehler laesst die Suche weiterlaufen (Anbieter kommen trotzdem),
+    // aber nicht mehr still: strukturierte Zeile mit Referenz-ID und Laendern.
+    it('logs an engine failure as a structured error with the correlation id', async () => {
+        seedProvider();
+        engineFault.error = new Error('profile DE: subdomain map corrupt');
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            const REF = '7a1c2e3f-4b5d-4c6e-8f90-a1b2c3d4e5f6';
+            const res = await fetch(`${BASE}/api/v1/search`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json', 'x-correlation-id': REF },
+                body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+            });
+            const body = await res.json();
+            expect(res.status).toBe(200);
+            expect(body.laws).toEqual([]);
+            expect(body.providers).toHaveLength(1);
+            expect(JSON.stringify(body)).not.toContain('subdomain map corrupt');
+            // Leere `laws` heissen hier "nicht geprueft", nicht "nichts gefunden" —
+            // und die Antwort sagt das, mit der Referenz fuer "Technical details".
+            expect(body.laws_status).toBe('failed');
+            expect(body.correlationId).toBe(REF);
+            expect(body.overview_summary).toMatch(/could not assess/);
+
+            const zeile = log.mock.calls.map((c) => String(c[0])).find((l) => l.includes('Compliance engine failed'));
+            expect(zeile).toBeDefined();
+            const eintrag = JSON.parse(zeile!);
+            expect(eintrag).toMatchObject({ level: 'error', correlationId: REF, errorCode: 'ERR_SEARCH_ENGINE', route: '/api/v1/search', countries: ['DE'] });
+            expect(eintrag.detail).toContain('subdomain map corrupt');
+            // Kein unstrukturierter Rest mehr daneben.
+            expect(warn.mock.calls.some((c) => String(c[0]).includes('compliance-engine'))).toBe(false);
+        } finally {
+            engineFault.error = null;
+            log.mockRestore();
+            warn.mockRestore();
+        }
     });
 });
 
@@ -1050,6 +1149,51 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
             seedSubscription('test-kanzlei', 'growth', { plan_version: 1, current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
             const run = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: JSON.stringify({ period: new Date().toISOString().slice(0, 7), dry_run: true, provider: 'test-kanzlei' }) });
             expect(run.body.results[0]).toMatchObject({ dry_run: true, total_cents: 9900 });
+        });
+    });
+
+    // ─── B9 / B10: Zaehler atomar, Sperre nie stumm ───────────────────────
+    describe('Zaehler und Sperre (B9, B10)', () => {
+        it('B9: der Zaehler wird per RPC atomar erhoeht; eine am Lead haengende Folgebuchung zaehlt nicht', async () => {
+            const { session } = seedBookable();
+            (db.provider_discount_counter ??= []).push({ provider_key: 'test-kanzlei', cycle_start: '2020-01-01', used: 1 });
+            expect((await book(standardBody(session))).status).toBe(201);
+            expect(db.provider_discount_counter[0].used).toBe(2);
+            // Derselbe Nutzer binnen 30 Tagen: Phase 5 haengt die Buchung an den Lead — kein zweites Ledger, kein Schritt.
+            expect((await book(standardBody(session, { slot_start: new Date(Date.now() + 8 * 86_400_000).toISOString() }))).status).toBe(201);
+            expect(db.provider_discount_counter[0].used).toBe(2);
+            expect(db.provider_lead_ledger).toHaveLength(1);
+        });
+
+        it('B9: scheitert der Zaehler, bleibt die Buchung bestehen — aber das Ereignis steht', async () => {
+            const { session } = seedBookable();
+            rpcFail.add('increment_discount_counter');
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            expect(db.scheduling).toHaveLength(1);
+            expect(db.event_log.find((e) => e.type === 'discount_counter_failed')?.payload).toMatchObject({ providerKey: 'test-kanzlei', step: 1 });
+        });
+
+        it('B10: wirft das providers-Update in recordPaymentFailure, antwortet die Route trotzdem 409 und der Fehler steht im Protokoll', async () => {
+            const { session } = seedBookable();
+            stripeMock.createPaymentIntent.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', stripeRef: 'pi_fail', detail: 'generic_decline' });
+            const { supabaseApi } = await import('../supabase.js');
+            const realUpdate = supabaseApi.update;
+            const spy = vi.spyOn(supabaseApi, 'update').mockImplementation(async (table: string, match: any, data: any) => {
+                if (table === 'providers') throw new Error('db timeout');
+                return realUpdate(table, match, data);
+            });
+            try {
+                const r = await book(standardBody(session));
+                // Vorher: 500 „Scheduling create failed" — falsch und ohne Spur.
+                expect(r.status).toBe(409);
+                expect(r.body.errorCode).toBe('BOOKING_NOT_COMPLETED');
+            } finally { spy.mockRestore(); }
+            expect(db.event_log.find((e) => e.type === 'lead_payment_failed_record_error')?.payload).toMatchObject({ step: 'block_provider' });
+            // Die uebrigen Schritte liefen weiter: Ereignis, Benachrichtigung, Mail.
+            expect(db.event_log.map((e) => e.type)).toContain('lead_payment_failed');
+            expect(db.notifications).toEqual([expect.objectContaining({ user_id: MEMBER_ID, type: 'payment_failed' })]);
+            expect(db.event_log.some((e) => e.type === 'email_outbox' && e.payload.kind === 'payment_failed_provider')).toBe(true);
         });
     });
 
@@ -4551,6 +4695,25 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         expect(db.provider_credits).toHaveLength(1);
     });
 
+    // ─── B13: Anbieter-No-Show wird nie stumm verschluckt ───────────────────
+    it('B13: scheitert der Vorfall nach der No-Show-Meldung des Nutzers, bleibt die 200 — aber die Luecke steht im Protokoll', async () => {
+        seedProvider(); seedMember();
+        const b = seedBooking({ status: 'completed', slot_start: past(5), slot_end: past(4.5) });
+        const { supabaseApi } = await import('../supabase.js');
+        const realInsert = supabaseApi.insert;
+        const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+            if (table === 'provider_performance_incidents') throw new Error('incidents table locked');
+            return realInsert(table, data);
+        });
+        try {
+            const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'no_show' }) });
+            expect(r.status).toBe(200);
+        } finally { spy.mockRestore(); }
+        expect(db.scheduling[0].status).toBe('no_show');
+        expect(db.event_log.find((e) => e.type === 'provider_no_show_record_failed')?.payload).toMatchObject({ bookingId: b.id, providerKey: 'test-kanzlei' });
+        expect(db.provider_performance_incidents ?? []).toHaveLength(0);
+    });
+
     // ─── B6: Guthaben vor der Frist ─────────────────────────────────────────
     it('B6: wirft der Guthaben-Insert, bleibt die Frist offen und der naechste Tick holt das Guthaben nach', async () => {
         seedProvider(); seedMember(); seedUsers();
@@ -5290,6 +5453,22 @@ describe('Privacy Critical Tests (Checklist v1.0)', () => {
         expect(JSON.stringify(p.body.bookings[0])).not.toContain('Anfragefirma');
     });
 
+    it('P4: der Ersteller und der Server-Key sehen die Anfrage weiter vollstaendig', async () => {
+        seedProvider(); seedMember();
+        const engId = randomUUID();
+        (db.engagement_requests ??= []).push({ id: engId, provider_key: 'test-kanzlei', user_id: USER_ID, session_id: 'sess-1', requester_email: 'ich@firma.example', category: 'tax-vat', country: 'DE', structured_answers: { company: 'Eigene Firma', turnover: 'high' }, created_at: '2026-10-01T08:00:00Z' });
+        const eigene = await api(`/api/v1/engagement/${engId}`, { auth: 'jwt' });
+        expect(eigene.status).toBe(200);
+        expect(eigene.body.engagement).toMatchObject({ user_id: USER_ID, session_id: 'sess-1', requester_email: 'ich@firma.example', structured_answers: { company: 'Eigene Firma', turnover: 'high' } });
+        const server = await api(`/api/v1/engagement/${engId}`, { auth: 'key' });
+        expect(server.body.engagement.requester_email).toBe('ich@firma.example');
+        // Die Anbieterseite: Inhalt ja, Identitaet nein — auch nicht ueber structured_answers.
+        const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+        const anbieter = await asUser(memberJwt, `/api/v1/engagement/${engId}`);
+        expect(anbieter.body.engagement.structured_answers).toEqual({ turnover: 'high' });
+        expect(JSON.stringify(anbieter.body)).not.toMatch(/ich@firma|Eigene Firma|sess-1/);
+    });
+
     it('#8 Anfrage-Thread: nur Ersteller und Anbieter-Mitglieder, und jeder nur als die eigene Seite', async () => {
         seedProvider(); seedMember();
         const engId = randomUUID();
@@ -5303,7 +5482,15 @@ describe('Privacy Critical Tests (Checklist v1.0)', () => {
         expect(db.engagement_messages ?? []).toHaveLength(0);
         // Das Mitglied des Anbieters liest und schreibt als Anbieter, nicht als Nutzer.
         const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
-        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}`)).status).toBe(200);
+        const alsAnbieter = await asUser(memberJwt, `/api/v1/engagement/${engId}`);
+        expect(alsAnbieter.status).toBe(200);
+        // P4: die Anbieterseite sieht die Anfrage ohne Identitaet des Nutzers — Offenlegung ist Sache der Buchung.
+        expect(alsAnbieter.body.engagement).toMatchObject({ id: engId, provider_key: 'test-kanzlei', category: 'tax-vat', country: 'DE' });
+        expect(alsAnbieter.body.engagement.user_id).toBeUndefined();
+        expect(alsAnbieter.body.engagement.session_id).toBeUndefined();
+        expect(alsAnbieter.body.engagement.requester_email).toBeUndefined();
+        expect(alsAnbieter.body.engagement.structured_answers.company).toBeUndefined();
+        expect(JSON.stringify(alsAnbieter.body)).not.toContain('Fremde Firma');
         expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'user', body: 'x' }) })).status).toBe(404);
         expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'provider', body: 'Antwort' }) })).status).toBe(201);
         await settle();
@@ -5629,5 +5816,44 @@ describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Lim
         expect(r.body.events.map((e: any) => e.type)).toEqual(['booking.created']);
         expect(JSON.stringify(r.body)).not.toContain(key);
         expect((await asJwt(USER_JWT, '/api/v1/provider/test-kanzlei/api-access/log')).status).toBe(404);
+    });
+});
+
+// ─── P8: Retention-Loeschung wird auditiert ──────────────────────────────────
+describe('Retention api_request_log (P8): Audit-Ereignis, Fehler zaehlen statt abbrechen', () => {
+    const tage = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+    it('loescht die alten Zeilen, laesst die frischen, schreibt retention_deleted mit Tabelle, Anzahl und Stichtag', async () => {
+        (db.api_request_log ??= []).push(
+            { id: randomUUID(), client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(120) },
+            { id: randomUUID(), client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(95) },
+            { id: randomUUID(), client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(10) },
+        );
+        const { runApiRequestLogRetentionTick } = await import('../apiRoutes.js');
+        expect(await runApiRequestLogRetentionTick(true)).toEqual({ deleted: 2, errors: 0 });   // Shadow zaehlt nur
+        expect(db.api_request_log).toHaveLength(3);
+        expect(await runApiRequestLogRetentionTick(false)).toEqual({ deleted: 2, errors: 0 });
+        expect(db.api_request_log).toHaveLength(1);
+        const ev = db.event_log.find((e) => e.type === 'retention_deleted');
+        expect(ev?.payload).toMatchObject({ table: 'api_request_log', count: 2, errors: 0, retention_days: 90 });
+        expect(typeof ev?.payload.cutoff).toBe('string');
+    });
+    it('ein Fehler mitten in der Schleife zaehlt und bricht nicht ab', async () => {
+        const a = randomUUID(), b = randomUUID();
+        (db.api_request_log ??= []).push(
+            { id: a, client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(120) },
+            { id: b, client_id: 'c1', provider_key: 'test-kanzlei', method: 'GET', route: '/ext/invoices', status: 200, at: tage(100) },
+        );
+        const { supabaseApi } = await import('../supabase.js');
+        const realRemove = supabaseApi.remove;
+        const spy = vi.spyOn(supabaseApi, 'remove').mockImplementation(async (table: string, match: any) => {
+            if (match.id === a) throw new Error('row locked');
+            return realRemove(table, match);
+        });
+        try {
+            const { runApiRequestLogRetentionTick } = await import('../apiRoutes.js');
+            expect(await runApiRequestLogRetentionTick(false)).toEqual({ deleted: 1, errors: 1 });
+        } finally { spy.mockRestore(); }
+        expect(db.api_request_log.map((r: any) => r.id)).toEqual([a]);
+        expect(db.event_log.find((e) => e.type === 'retention_deleted')?.payload).toMatchObject({ count: 1, errors: 1 });
     });
 });

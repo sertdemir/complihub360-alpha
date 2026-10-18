@@ -57,6 +57,16 @@ paths:
                     type: array
                     items: { $ref: '#/components/schemas/AnonProviderCard' }
                   laws: { type: array, items: { type: object } }
+                  laws_status:
+                    type: string
+                    enum: [ok, failed]
+                    description: >-
+                      `failed`: die Compliance-Engine hat nicht gerechnet. `laws` ist
+                      dann leer, weil nichts geprueft wurde, nicht weil nichts gilt.
+                      Die Ursache steht im Server-Log unter `correlationId`.
+                  correlationId:
+                    type: string
+                    description: Nur bei `laws_status = failed`. Dieselbe ID wie im Header `x-correlation-id`.
                   coverage: { $ref: '#/components/schemas/SearchCoverage' }
         '400':
           description: Body ist kein JSON (`INVALID_JSON`)
@@ -369,6 +379,13 @@ paths:
         und der Versuch steht als `access_denied` im Ereignislog.
         `POST /engagement/{id}/message` gilt dasselbe, und jeder schreibt nur
         als die eigene Seite (`author`).
+
+        P4 (2026-10-18): die Anbieterseite (Mitglied des Anbieters) erhaelt die
+        Anfrage OHNE `user_id`, `session_id`, `requester_email` und ohne
+        Identitaetsschluessel in `structured_answers` (company, email, name,
+        phone, website, vat_id) — die Offenlegung gehoert zur Buchung (Spec B
+        Schritt 5), nicht zur Anfrage. Ersteller und Server-Key sehen die
+        vollstaendige Zeile.
       parameters:
         - in: path
           name: id
@@ -377,7 +394,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Status retrieved
+          description: "`{ engagement, messages[] }` — fuer die Anbieterseite ohne Nutzeridentitaet (P4)"
 
   /provider/magic/{token}:
     get:

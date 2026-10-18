@@ -408,6 +408,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     /** Schritt 4 (#8): welche Seite der Aufrufer an einer Anfrage ist —
      *  'user' (Ersteller), 'provider' (Mitglied des Anbieters), 'server'
      *  (Server-Key oder Admin) oder null (fremd). */
+    /** P4: die Anfrage, wie die Anbieterseite sie sieht — ohne Identitaet des Nutzers. */
+    const engagementForProvider = (eng: Record<string, unknown>): Record<string, unknown> => {
+        const { user_id: _u, session_id: _s, requester_email: _e, ...rest } = eng as Record<string, unknown> & { user_id?: unknown; session_id?: unknown; requester_email?: unknown };
+        void _u; void _s; void _e;
+        const IDENTITY_KEYS = new Set(['company', 'company_name', 'email', 'requester_email', 'name', 'contact_name', 'phone', 'website', 'vat_id']);
+        const answers = rest.structured_answers && typeof rest.structured_answers === 'object' && !Array.isArray(rest.structured_answers)
+            ? Object.fromEntries(Object.entries(rest.structured_answers as Record<string, unknown>).filter(([k]) => !IDENTITY_KEYS.has(k.toLowerCase())))
+            : rest.structured_answers;
+        return { ...rest, structured_answers: answers };
+    };
     const engagementSide = async (eng: Record<string, unknown>): Promise<'user' | 'provider' | 'server' | null> => {
         if (authViaApiKey || authIsAdmin) return 'server';
         if (authUserId && eng.user_id === authUserId) return 'user';
@@ -1679,7 +1689,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });
                 // Phase 5: no_show aus dieser Route heisst "der Anbieter kam nicht"
                 // — Vorfall statt Guthaben (Spec B "provider no-show").
-                if (status === 'no_show') await recordProviderNoShow({ ...b, id: bookingId }, authUserId, correlationId).catch(() => {});
+                // B13: der Nutzer meldet, dass der Anbieter fehlte. Der Statuswechsel
+                // steht; faellt der Vorfall danach aus (Zeile, Benachrichtigung,
+                // Serienpruefung), bleibt die 200 — aber die Luecke wird sichtbar,
+                // statt in einem leeren catch zu verschwinden.
+                if (status === 'no_show') {
+                    await recordProviderNoShow({ ...b, id: bookingId }, authUserId, correlationId).catch(async (err) => {
+                        structuredLog('error', 'Provider no-show could not be recorded', { correlationId, errorCode: 'ERR_PROVIDER_NO_SHOW', severity: 'error', bookingId, providerKey: b.provider_key, detail: String(err).slice(0, 200) } as any);
+                        await supabaseApi.insert('event_log', { type: 'provider_no_show_record_failed', payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, error: String(err).slice(0, 200) } })
+                            .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'provider_no_show_record_failed', detail: String(e).slice(0, 200) } as any));
+                    });
+                }
                 if (status === 'cancelled') {
                     // Bis hierher blieb der Termin im Anbieterkalender stehen:
                     // abgesagt im System, gebucht im Kalender. Derselbe Fehler
@@ -2005,9 +2025,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     }
 
                     if (quote.enabled && !linkedRoot) {
-                        await supabaseApi.upsert('provider_discount_counter', 'provider_key,cycle_start', {
-                            provider_key: providerKey, cycle_start: cycleStart, used: quote.counterUsedAfter, updated_at: sharingAt,
-                        }).catch(() => {});
+                        // B9: die Datenbank zaehlt — atomar, ohne Read-before-write. Zwei
+                        // parallele Buchungen koennen so den Zaehler nicht mehr um eins zu
+                        // niedrig hinterlassen. (Welche Rabattstufe DIESE Buchung bekam,
+                        // stand schon fest, als die Belastung lief — das bleibt.) Ein
+                        // Fehler hier kippt die Buchung nicht, aber er wird gesehen.
+                        const step = Math.max(0, quote.counterUsedAfter - used);
+                        try {
+                            await supabaseApi.rpc('increment_discount_counter', { p_provider_key: providerKey, p_cycle_start: cycleStart, p_increment: step });
+                        } catch (cntErr) {
+                            structuredLog('error', 'Discount counter increment failed', { correlationId, errorCode: 'ERR_DISCOUNT_COUNTER', severity: 'error', providerKey, cycleStart, step, detail: String(cntErr).slice(0, 200) } as any);
+                            await supabaseApi.insert('event_log', { type: 'discount_counter_failed', payload: { providerKey, cycleStart, step, ledgerId: charge.ledgerId, error: String(cntErr).slice(0, 200) } })
+                                .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'discount_counter_failed', detail: String(e).slice(0, 200) } as any));
+                        }
                     }
                     // Kalendereintrag beim Anbieter. BEWUSST nach dem Insert und
                     // bewusst nicht fatal: Die Buchung ist bezahlt und gilt — ein
@@ -2852,9 +2882,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 return;
             }
             const messages = await supabaseApi.select('engagement_messages', { engagement_id: engagementId }, { order: 'created_at.asc', limit: 100 });
+            // P4 (2026-10-18): die Anbieterseite bekam die rohe Zeile — user_id,
+            // session_id, requester_email, company — vor jeder Offenlegung. Die
+            // Offenlegung gehoert zur Buchung (Spec B Schritt 5), nicht zur
+            // Anfrage. Der Anbieter liest die Anfrage ohne Identitaet des Nutzers;
+            // Ersteller und Server-Key sehen weiter alles.
+            const engagement = seite === 'provider' ? engagementForProvider(eng[0]) : eng[0];
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, engagement: eng[0], messages }));
+            res.end(JSON.stringify({ ok: true, engagement, messages }));
         } catch {
             structuredLog('error', 'Engagement detail failed', { correlationId, errorCode: 'ERR_ENGAGEMENT_DETAIL', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -3523,6 +3559,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 //    unknown country must not kill the search (providers are
                 //    still scored; laws just come back empty).
                 let engineResults: EnrichedSubdomain[] = [];
+                // Hat die Engine gerechnet? `laws: []` heisst sonst zweierlei —
+                // "nichts gefunden" und "nicht geprueft" —, und die Risk Map
+                // zeigte beides als Entwarnung (DNA §4.5).
+                let engineFailed = false;
                 // All requested markets the engine knows a profile for; unknown
                 // codes are dropped rather than killing the whole search.
                 const requestedMarkets: string[] = Array.isArray(requestData.structured_answers?.markets)
@@ -3548,26 +3588,32 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         });
                     }
                 } catch (engineErr) {
-                    console.warn('compliance-engine country profile missing:', String(engineErr));
-                }
-
-                // 2. Vector Search (RAG) - Query PostgreSQL pgvector
-                // Stub embedding since backend currently lacks an active LLM API integration for live vectors
-                const queryEmbedding = new Array(768).fill(0.01);
-
-                // Wrap the rpc in try/catch to gracefully handle empty DB tables mapping to empty arrays
-                let knowledgeMatches: any[] = [];
-                try {
-                    const rpcResponse = await supabaseApi.rpc('match_knowledge_chunks', {
-                        query_embedding: queryEmbedding,
-                        match_threshold: 0.1,
-                        match_count: 5
+                    engineFailed = true;
+                    // Unbekannte Laender sind oben schon herausgefiltert — wer
+                    // hier landet, hat einen Engine-Fehler, und der Nutzer sieht
+                    // eine Risk Map ohne Pflichten. Bis 2026-10-18 stand das nur
+                    // als console.warn ohne Referenz-ID im Log.
+                    structuredLog('error', 'Compliance engine failed', {
+                        correlationId,
+                        errorCode: 'ERR_SEARCH_ENGINE',
+                        severity: 'error',
+                        route: '/api/v1/search',
+                        countries: engineCountries,
+                        detail: String(engineErr).slice(0, 500),
                     });
-                    knowledgeMatches = (rpcResponse as any)?.data as any[] || rpcResponse as any[] || [];
-                    if (!Array.isArray(knowledgeMatches)) knowledgeMatches = [];
-                } catch (e) {
-                    console.warn("RPC match_knowledge_chunks fail:", e);
                 }
+
+                // 2. Kein Korpus-Abruf. Bis 2026-10-18 stand hier eine "RAG"-Suche
+                //    ueber match_knowledge_chunks mit einem konstanten Vektor
+                //    (0.01 × 768): fuenf beliebige Abschnitte des EY Global VAT
+                //    Guide, ohne Bezug zur Anfrage, woertlich als `tutorials` an
+                //    jeden Gast — an RLS und an 20261011000100 vorbei. Keine
+                //    Oberflaeche las das Feld; ein Fehler ging still in
+                //    console.warn. Der Korpus ist interne Grundlage des
+                //    Assistenten (assistant.ts) und verlaesst die API nie im
+                //    Wortlaut. Wer hier wieder Wissen anbietet, braucht ein echtes
+                //    Anfrage-Embedding (embed_model, ADR-0011), eine auditierte
+                //    Grenze fuer die Wizard-Daten und liefert hoechstens Labels.
 
                 // 3. Fetch, score and anonymize matched providers.
                 //    Ranking = 0.6·Relevance + 0.3·Quality + 0.1·Priority (spec §6).
@@ -3763,12 +3809,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
-                    // Says what the payload IS. The knowledge-chunk lookup above
-                    // still runs on a stub embedding and the assistant that would
-                    // ground a real summary is feature-flagged off, so the string
-                    // must not claim a synthesis that does not happen: everything
-                    // below `laws` comes out of the deterministic engine.
-                    overview_summary: "Obligations identified by the compliance engine for the requested markets and domains.",
+                    // Says what the payload IS. There is no corpus lookup on this
+                    // route and the assistant that would ground a real summary is
+                    // feature-flagged off, so the string must not claim a
+                    // synthesis that does not happen: everything below `laws`
+                    // comes out of the deterministic engine.
+                    overview_summary: engineFailed
+                        ? "The compliance engine could not assess the requested markets. Obligations are missing, not absent."
+                        : "Obligations identified by the compliance engine for the requested markets and domains.",
+                    // 'failed': die Engine hat nicht gerechnet, `laws` ist leer,
+                    // weil nichts geprueft wurde. Die Risk Map zeigt dann
+                    // riskMapFailed mit dieser Referenz-ID, nicht "keine
+                    // Pflichten". Die Anbieter bleiben drin (die Bereichsseite
+                    // braucht nur sie); ob sie erscheinen, entscheidet die Flaeche.
+                    laws_status: engineFailed ? 'failed' : 'ok',
+                    ...(engineFailed ? { correlationId } : {}),
                     providers: anonProviders,
                     // Bereich × Markt: deckt ein freigegebener Anbieter das ab?
                     // Nur Booleans je Zelle — kein Anbieter, keine Anzahl.
@@ -3816,9 +3871,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         applies_from: r.appliesFrom ?? null,
                         state: r.focus ? 'confirmed' : 'likely',
                     })),
-                    tutorials: knowledgeMatches.map((m: any) => ({ id: m.id, content: m.content })),
-                    articles: [],
-                    tips: []
                 }));
             } catch (err) {
                 // Bis 2026-09-22: `400 { error: String(err) }` fuer JEDEN Fehler —

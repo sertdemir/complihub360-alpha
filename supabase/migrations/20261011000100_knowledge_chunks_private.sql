@@ -9,7 +9,10 @@
 -- Abschnitt. Gefunden beim Vorbereiten der Beta-Datenbank (10.10.2026).
 --
 -- Gelesen wird der Korpus nur von der API, mit dem Service-Role-Key
--- (assistant.ts, /search ueber match_knowledge_chunks). Der umgeht RLS. Also:
+-- (assistant.ts ueber match_knowledge_chunks). Der umgeht RLS. Also:
+-- [Nachtrag 18.10.2026, nur Kommentar: /search las den Korpus bis dahin
+-- ebenfalls, mit einem konstanten Vektor, und gab die Abschnitte im Wortlaut
+-- an Gaeste — am Schutz hier vorbei. Seit #338 liest /search ihn nicht mehr.]
 -- Policy weg (RLS bleibt an = deny-all fuer anon/authenticated), und die
 -- RPC nur noch fuer service_role — sonst liefert sie per Embedding-Suche
 -- dieselben Abschnitte, an der Tabelle vorbei.

@@ -116,14 +116,33 @@ export async function logApiRequest(a: { client: ApiClientRow; method: string; u
     }
 }
 
-/** Protokollzeilen aelter als 90 Tage loeschen (Watcher). Liefert die Anzahl. */
-export async function runApiRequestLogRetentionTick(shadow: boolean): Promise<number> {
+/**
+ * Protokollzeilen aelter als 90 Tage loeschen (Watcher).
+ *
+ * P8 (2026-10-18): eine Retention-Loeschung ist ein Grenzuebertritt (Privacy-
+ * Regeln: Retention-Loeschung wird auditiert) — nach der Schleife steht
+ * `retention_deleted` mit Tabelle, Anzahl und Stichtag im event_log. Ein
+ * Fehler mitten in der Schleife zaehlt, bricht sie aber nicht ab; was stehen
+ * blieb, nimmt der naechste Tick. Muster fuer kuenftige Retention-Ticks.
+ */
+export async function runApiRequestLogRetentionTick(shadow: boolean): Promise<{ deleted: number; errors: number }> {
     const cutoff = new Date(Date.now() - API_REQUEST_LOG_RETENTION_DAYS * 86_400_000).toISOString();
     const old = (await supabaseApi.select('api_request_log', {}, { order: 'at.asc', limit: 500 })) as Array<{ id: string; at: string }>;
     const stale = old.filter((r) => r.at < cutoff);
-    if (shadow) return stale.length;
-    for (const r of stale) await supabaseApi.remove('api_request_log', { id: r.id });
-    return stale.length;
+    if (shadow) return { deleted: stale.length, errors: 0 };
+    let deleted = 0, errors = 0;
+    for (const r of stale) {
+        try { await supabaseApi.remove('api_request_log', { id: r.id }); deleted++; }
+        catch (err) {
+            errors++;
+            structuredLog('error', 'Retention delete failed', { correlationId: 'watchers', errorCode: 'ERR_RETENTION', severity: 'error', table: 'api_request_log', rowId: r.id, detail: String(err).slice(0, 200) });
+        }
+    }
+    if (deleted > 0 || errors > 0) {
+        await supabaseApi.insert('event_log', { type: 'retention_deleted', payload: { table: 'api_request_log', count: deleted, errors, cutoff, retention_days: API_REQUEST_LOG_RETENTION_DAYS } })
+            .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId: 'watchers', errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'retention_deleted', detail: String(e).slice(0, 200) }));
+    }
+    return { deleted, errors };
 }
 
 // ─── /api/v1/ext/* ───────────────────────────────────────────────────────────

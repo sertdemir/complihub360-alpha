@@ -54,11 +54,23 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
   Stufe offen, Ereignis `invoice_retry_error`, der nächste Tick am selben Tag holt nach; der
   Idempotency-Key je Stufe bei Stripe verhindert eine doppelte Belastung. Shadow: Marker ist die Aktion.
   `log` im Versuch ohne leeres `catch`.
-- [ ] B12 · [ ] B9 · [ ] B10 · [ ] B13
+- [x] **B12** Guthaben-Verbrauch hinter `.catch(() => {})` — erledigt mit B7 (`issueInvoiceFor`, einmal je Rechnung).
+- [x] **B9** Rabattzähler Read-before-write: RPC `increment_discount_counter` (Migration `20261018000300`, pgTAP 20),
+  Fehler → `discount_counter_failed`. Die Rabattstufe dieser Buchung stand schon vor der Belastung fest.
+- [x] **B10** `recordPaymentFailure` wirft bis in die Route: jeder Schritt einzeln, `lead_payment_failed_record_error`
+  mit `step`, die Route antwortet immer 409 `BOOKING_NOT_COMPLETED`.
+- [x] **B13** `recordProviderNoShow(...).catch(() => {})`: Fehler geloggt, Ereignis `provider_no_show_record_failed`, 200 bleibt.
 
 ### 3 · Audit und Offenlegung
 
-- [ ] P4 · [ ] P1 · [ ] P2 · [ ] P5 · [ ] P7 · [ ] P8 (P3 = B2)
+- [x] **P4** `GET /engagement/:id` auf der Anbieterseite ohne `user_id`, `session_id`, `requester_email` und ohne
+  Identitätsschlüssel in `structured_answers` (`engagementForProvider`); Ersteller und Server-Key wie bisher.
+- [x] **P1** Assistant: Sitzungen nicht ladbar → 502 `ASSISTANT_CONTEXT_UNAVAILABLE`, kein Modellaufruf (DNA).
+- [x] **P2** Assistant: Audit `assistant_chat` VOR dem Modellaufruf; scheitert es → 502 `ASSISTANT_AUDIT_UNAVAILABLE`.
+- [x] **P5** Assistant: `redactText(strict)` auf Frage, Verlauf, Sitzungs-Labels. Dazu **P14**: Timeout 20 s an beiden Modellaufrufen.
+- [x] **P7** mit B10 erledigt (`logEvent`).
+- [x] **P8** Retention `api_request_log`: `retention_deleted` {table, count, errors, cutoff}, per-Zeile `try/catch`, `errors` im Watcher.
+- P3 = B2 (erledigt).
 
 ### 4 · Kleinkram mit klarer Korrektur
 

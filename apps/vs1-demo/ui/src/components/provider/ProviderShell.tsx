@@ -13,7 +13,7 @@ import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
 import { ApplicationStatusBanner } from './ApplicationStatusBanner';
 import { fetchProviderBookings } from '../../api/bookings';
 import { fetchPartnerNotifications } from '../../api/partnerNotifications';
-import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, fetchMyProvider } from '../../api/provider';
+import { fetchCoverage, setAvailability, syncAvailability, fetchMyProvider } from '../../api/provider';
 import { useAuthStore } from '../../store/useAuthStore';
 import { isMockApi } from '../../lib/supabase';
 
@@ -120,13 +120,14 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   // "verified" — a not-yet-vetted provider sees "Pending".
   const [vetted, setVetted] = useState(true);
   useEffect(() => {
+    // Ein Umschalten (hier oder in den Einstellungen) ist neuer als die Zeile,
+    // die noch laedt — sie setzt es nicht zurueck.
+    const sync = syncAvailability(setAvail);
     fetchCoverage().then((c) => {
-      if (c.availability) setAvail(c.availability);
+      if (c.availability) sync.loaded(c.availability);
       if (c.partner_status) setVetted(c.partner_status === 'active');
     }).catch(() => {});
-    const onSync = (e: Event) => setAvail((e as CustomEvent<'available' | 'ooo'>).detail);
-    window.addEventListener(AVAILABILITY_EVENT, onSync);
-    return () => window.removeEventListener(AVAILABILITY_EVENT, onSync);
+    return sync.stop;
   }, []);
   const togglAvailability = () => {
     if (availability === 'available') {
