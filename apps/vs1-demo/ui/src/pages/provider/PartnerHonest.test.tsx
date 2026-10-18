@@ -133,7 +133,7 @@ describe('Abdeckung (D1)', () => {
     api.fetchCoverage.mockResolvedValue({ provider_key: 'k', name: 'n', countries_supported: ['DE', 'NL'], languages: ['DE'], sla_target_confirm_hours: 24 });
     const { container } = page(<CoveragePage />);
     expect(await screen.findByText('USt-Voranmeldung')).toBeInTheDocument();
-    expect(container.querySelector('[data-cell="tax-vat:DE"]')?.textContent).toBe('common:states.partner.coverage.approved');
+    expect(container.querySelector('[data-cell="tax-vat:DE"]')?.textContent).toBe('states.partner.coverage.approved');
     // NL steht in countries_supported, aber nicht in der Freigabe — also nicht in der Matrix.
     expect(container.querySelector('[data-cell="tax-vat:NL"]')).toBeNull();
     expect(screen.queryByText(/addMarket/)).not.toBeInTheDocument();
