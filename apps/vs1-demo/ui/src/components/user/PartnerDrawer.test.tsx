@@ -21,6 +21,7 @@ vi.mock('../../api/bookings', () => ({
   fetchAcknowledgement: (...a: unknown[]) => fetchAcknowledgement(...a),
   createBooking: vi.fn(),
   bookingFailureFrom: () => ({ kind: 'generic' }),
+  newBookingRequestId: () => 'req-test-00000001',
 }));
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key, i18n: { resolvedLanguage: 'en' } }),

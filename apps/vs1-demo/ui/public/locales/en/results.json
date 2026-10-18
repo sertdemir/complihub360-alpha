@@ -209,6 +209,10 @@
         "title": "The booking could not be completed.",
         "body": "This is not on your side: a requirement on the provider's side is missing right now. Your appointment is not booked and nothing was shared. The provider has been informed."
       },
+      "in_progress": {
+        "title": "Your booking is already being processed.",
+        "body": "The same request reached us twice, probably from a double click. Nothing was booked twice and nothing was charged twice. Wait a moment, then check your appointments or try again."
+      },
       "slot_taken": {
         "title": "This slot has just been taken.",
         "body": "Someone else booked it a moment ago. Your appointment is not booked and nothing was shared — pick another slot."

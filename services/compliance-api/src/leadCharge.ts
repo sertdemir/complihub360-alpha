@@ -166,6 +166,8 @@ export function currentAcknowledgement(rows: AcknowledgementRow[], lang: string,
 // ─── Die Belastung ───────────────────────────────────────────────────────────
 
 export type ChargeOutcome =
+    /** B8: derselbe Buchungsversuch laeuft schon (Unique auf user_id + request_key) — nichts geschrieben, nichts belastet. */
+    | { ledgerId: null; outcome: 'duplicate' }
     | { ledgerId: string; outcome: 'captured'; paymentIntentId: string }
     | { ledgerId: string; outcome: 'n/a' }
     | { ledgerId: string; outcome: 'failed'; result: Extract<ChargeResult, { ok: false }> }
@@ -181,10 +183,14 @@ export async function chargeLeadFee(input: {
     paymentMethodId: string | null;
     receiptEmail?: string | null;
     correlationId: string;
+    /** B8: Schluessel des Buchungsversuchs vom Client; eindeutig je Nutzer. */
+    requestKey?: string | null;
 }): Promise<ChargeOutcome> {
     const { quote, opp } = input;
     const chargeable = quote.enabled && quote.finalFeeCents > 0;
-    const inserted = (await supabaseApi.insert('provider_lead_ledger', {
+    let inserted: Array<{ id: string }>;
+    try {
+        inserted = (await supabaseApi.insert('provider_lead_ledger', {
         kind: 'charge',
         provider_key: input.providerKey,
         user_id: input.userId,
@@ -203,10 +209,17 @@ export async function chargeLeadFee(input: {
         currency: quote.currency,
         payment_status: chargeable ? 'pending' : 'n/a',
         policy_version: quote.policyVersion,
+        request_key: input.requestKey ?? null,
         // Explizit, nicht per Default: der Abgleich (B1) misst daran das Alter
         // der Zeile, und der Test-Store kennt keine Defaults.
         created_at: new Date().toISOString(),
-    })) as Array<{ id: string }>;
+        })) as Array<{ id: string }>;
+    } catch (err) {
+        // Der Zwilling war schneller: dieselbe Anfrage desselben Nutzers hat
+        // ihre Zeile schon. Kein Stripe-Aufruf, keine zweite Belastung.
+        if (input.requestKey && /23505|duplicate|unique/i.test(String(err))) return { ledgerId: null, outcome: 'duplicate' };
+        throw err;
+    }
     const ledgerId = inserted?.[0]?.id;
     if (!ledgerId) throw new Error('ledger insert returned no id');
     if (!chargeable) return { ledgerId, outcome: 'n/a' };
@@ -328,6 +341,25 @@ export async function recordPaymentUnresolved(args: {
     } as any);
     await markPaymentUnresolved(args.providerKey, args.ledgerId, args.correlationId);
     await logEvent('lead_payment_unresolved', { providerKey: args.providerKey, ledgerId: args.ledgerId, detail: args.result.detail.slice(0, 200) }, args.correlationId);
+}
+
+// ─── B8: derselbe Buchungsversuch, noch einmal ───────────────────────────────
+
+export type ReplayLookup =
+    | { kind: 'none' }
+    /** Die Buchung zu diesem Versuch steht schon — dieselbe Antwort noch einmal. */
+    | { kind: 'booked'; ledgerId: string; booking: any }
+    /** Die Zeile steht, aber (noch) keine Buchung: der Zwilling laeuft, oder der Versuch ist gescheitert. */
+    | { kind: 'in_progress'; ledgerId: string };
+
+/** Was ein Nutzer mit diesem `request_id` schon ausgeloest hat. */
+export async function lookupRequest(userId: string, requestKey: string): Promise<ReplayLookup> {
+    const rows = (await supabaseApi.select('provider_lead_ledger', { user_id: userId, request_key: requestKey }, { limit: 1 })) as any[];
+    const ledger = rows[0];
+    if (!ledger) return { kind: 'none' };
+    const booked = (await supabaseApi.select('scheduling', { lead_ledger_id: ledger.id, user_id: userId }, { limit: 1 })) as any[];
+    if (booked[0]) return { kind: 'booked', ledgerId: String(ledger.id), booking: booked[0] };
+    return { kind: 'in_progress', ledgerId: String(ledger.id) };
 }
 
 // ─── B2: eine Belastung ohne Buchung zurueckgeben ────────────────────────────

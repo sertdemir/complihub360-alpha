@@ -954,6 +954,72 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         });
     });
 
+    // ─── B8: derselbe Versuch zweimal ───────────────────────────────────────
+    describe('Ein Schluessel je Versuch (B8): Wiederholung bekommt dieselbe Buchung, der Zwilling 409, nie zwei Belastungen', () => {
+        it('Wiederholung nach Erfolg: dieselbe Buchung, replay: true, Stripe genau einmal, ein Ledger', async () => {
+            const { session } = seedBookable();
+            const r1 = await book(standardBody(session, { request_id: 'req-doppelklick-0001' }));
+            expect(r1.status).toBe(201);
+            const r2 = await book(standardBody(session, { request_id: 'req-doppelklick-0001' }));
+            expect(r2.status).toBe(201);
+            expect(r2.body.replay).toBe(true);
+            expect(r2.body.booking.id).toBe(r1.body.booking.id);
+            expect(r2.body.booking).toMatchObject({ slot_start: r1.body.booking.slot_start, shared_fields: r1.body.booking.shared_fields, topic: r1.body.booking.topic, user_discount: r1.body.booking.user_discount });
+            expect(r2.body.provider_identity.name).toBe(r1.body.provider_identity.name);
+            expect(stripeMock.createPaymentIntent).toHaveBeenCalledTimes(1);
+            expect(db.provider_lead_ledger).toHaveLength(1);
+            expect(db.provider_lead_ledger[0].request_key).toBe('req-doppelklick-0001');
+            expect(db.scheduling).toHaveLength(1);
+            // Kein Ledger-, Stripe- oder Gebuehrenfeld auf dem Nutzer-Draht.
+            expect(JSON.stringify(r2.body)).not.toMatch(/"\w*(fee|band|ledger|stripe)\w*":/i);
+        });
+
+        it('Zwilling laeuft (Zeile ohne Buchung): 409 BOOKING_IN_PROGRESS, kein Stripe-Aufruf, keine zweite Zeile', async () => {
+            const { session } = seedBookable();
+            (db.provider_lead_ledger ??= []).push({ id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', user_id: USER_ID, request_key: 'req-doppelklick-0002', payment_status: 'pending', final_fee_cents: 8910, created_at: new Date().toISOString() });
+            const r = await book(standardBody(session, { request_id: 'req-doppelklick-0002' }));
+            expect(r.status).toBe(409);
+            expect(r.body.errorCode).toBe('BOOKING_IN_PROGRESS');
+            expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+            expect(db.provider_lead_ledger).toHaveLength(1);
+            expect(db.scheduling ?? []).toHaveLength(0);
+        });
+
+        it('Rennen am Insert (Unique-Verletzung): 409 ohne Stripe — der Zwilling hat die Zeile', async () => {
+            const { session } = seedBookable();
+            const { supabaseApi } = await import('../supabase.js');
+            const realInsert = supabaseApi.insert;
+            const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+                if (table === 'provider_lead_ledger') throw new Error('duplicate key value violates unique constraint "provider_lead_ledger_request_key_uq" (23505)');
+                return realInsert(table, data);
+            });
+            try {
+                const r = await book(standardBody(session, { request_id: 'req-doppelklick-0003' }));
+                expect(r.status).toBe(409);
+                expect(r.body.errorCode).toBe('BOOKING_IN_PROGRESS');
+            } finally { spy.mockRestore(); }
+            expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+        });
+
+        it('ohne request_id bleibt alles wie vorher; ein ungueltiger ist 400', async () => {
+            const { session } = seedBookable();
+            const bad = await book(standardBody(session, { request_id: 'kurz' }));
+            expect(bad.status).toBe(400);
+            expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+            const ok = await book(standardBody(session));
+            expect(ok.status).toBe(201);
+            expect(db.provider_lead_ledger[0].request_key).toBeNull();
+        });
+
+        it('der Schluessel eines anderen Nutzers ist keine Wiederholung', async () => {
+            const { session } = seedBookable();
+            (db.provider_lead_ledger ??= []).push({ id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', user_id: randomUUID(), request_key: 'req-doppelklick-0004', payment_status: 'pending', final_fee_cents: 8910, created_at: new Date().toISOString() });
+            const r = await book(standardBody(session, { request_id: 'req-doppelklick-0004' }));
+            expect(r.status).toBe(201);
+            expect(stripeMock.createPaymentIntent).toHaveBeenCalledTimes(1);
+        });
+    });
+
     it('Neutralitaet: Essential und Global bekommen fuer dieselbe Opportunity dasselbe Band und dieselbe Standardgebuehr', async () => {
         seedPricing(); seedAcknowledgement(); seedUserDiscountPolicy();
         const a = seedProvider({ provider_key: 'ess-kanzlei', name: 'Essential Kanzlei', stripe_customer_id: 'cus_a' });

@@ -209,6 +209,10 @@
         "title": "Die Buchung konnte nicht abgeschlossen werden.",
         "body": "Das liegt nicht an Ihnen: Auf Seiten des Anbieters fehlt gerade eine Voraussetzung. Ihr Termin ist nicht gebucht, es wurde nichts geteilt. Der Anbieter wurde informiert."
       },
+      "in_progress": {
+        "title": "Ihre Buchung wird bereits verarbeitet.",
+        "body": "Dieselbe Anfrage hat uns zweimal erreicht, vermutlich durch einen Doppelklick. Es wurde nichts doppelt gebucht und nichts doppelt belastet. Warten Sie einen Moment, prüfen Sie dann Ihre Termine oder versuchen Sie es erneut."
+      },
       "slot_taken": {
         "title": "Dieser Termin ist gerade vergeben worden.",
         "body": "Jemand anderes hat ihn vor einem Moment gebucht. Ihr Termin ist nicht gebucht, es wurde nichts geteilt — wählen Sie einen anderen Termin."

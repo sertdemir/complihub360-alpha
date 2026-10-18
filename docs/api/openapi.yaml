@@ -1646,6 +1646,7 @@ paths:
                 acknowledgement_version: { type: string, description: Die Fassung aus GET /acknowledgement, die der Nutzer gesehen hat }
                 language: { type: string, maxLength: 2 }
                 session_id: { type: string, format: uuid, description: Eigene Sitzung; liefert Bereiche und Maerkte fuer das Band }
+                request_id: { type: string, minLength: 8, maxLength: 64, pattern: '^[A-Za-z0-9_-]+$', description: "B8: Schluessel dieses Buchungsversuchs, je Nutzer eindeutig. Eine Wiederholung mit demselben Schluessel erzeugt keine zweite Belastung: steht die Buchung, kommt dieselbe 201 noch einmal (`replay: true`); laeuft der Zwilling noch, 409 `BOOKING_IN_PROGRESS`." }
                 area_code: { type: string, description: Bereich, falls keine Sitzung; muss im Angebot des Anbieters sein }
                 countries: { type: array, items: { type: string } }
                 service_id: { type: string, format: uuid }
@@ -1653,7 +1654,7 @@ paths:
         '201': { description: "`{ booking: { id, public_ref, slot_start, slot_end, status, acknowledgement_version, shared_fields[], user_discount: { pct, policy_version } | null, rebooked_from, topic: { area_code, countries[] }, shared_snapshot: { email, company_name, message, topic } }, provider_identity: { name, website_url, contact_email } }` — `topic` ist das Thema, das der Anbieter mit dem Lead sieht; die Bestaetigung nennt es neben den shared_fields. `shared_snapshot` (Schritt 4, B1) ist Wert fuer Wert, was geteilt wurde (`scheduling.shared_snapshot`); ein Feld ausserhalb von `shared_fields` ist null." }
         '400': { description: "Eingabe (`VALIDATION_ERROR`) oder Opportunity fehlt (`OPPORTUNITY_REQUIRED`, `AREA_NOT_OFFERED`, `SERVICE_NOT_FOUND`)" }
         '404': { description: Unbekannter Ref, nicht matchbar oder fremde Sitzung }
-        '409': { description: "`BILLING_NOT_READY` (nicht zahlungsbereit, nichts versucht) · `ACKNOWLEDGEMENT_OUTDATED` (mit `current_version`) · `SLOT_TAKEN` · `BOOKING_NOT_COMPLETED` (Belastung gescheitert, Grund `provider_billing`, keine Buchung)" }
+        '409': { description: "`BILLING_NOT_READY` (nicht zahlungsbereit, nichts versucht) · `ACKNOWLEDGEMENT_OUTDATED` (mit `current_version`) · `SLOT_TAKEN` · `BOOKING_NOT_COMPLETED` (Belastung gescheitert, Grund `provider_billing`, keine Buchung) · `BOOKING_IN_PROGRESS` (derselbe `request_id` laeuft schon oder ist ohne Buchung geblieben; nichts belastet)" }
         '502': { description: "Zahlungsdienst nicht erreichbar (`BILLING_ERROR`); keine Buchung. Hat Stripe mit einem Fehler geantwortet, bleibt der Anbieter unberuehrt. Kam keine verwertbare Antwort (Timeout, Abbruch, 5xx — Befund B1), steht die Belastung im Ledger als `unknown`, der Anbieter traegt `payment_unresolved`, bis der Watcher den Ausgang mit Stripe abgeglichen hat (und eine Belastung ohne Buchung erstattet)." }
 
   /bookings:
