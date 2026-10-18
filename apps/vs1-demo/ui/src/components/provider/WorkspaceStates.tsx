@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, CalendarCheck, Inbox } from 'lucide-react';
+import { ArrowRight, CalendarCheck, Globe, Inbox } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { WORKSPACE_CARD } from '../ui/Card';
 import { TechnicalDetails } from '../results/RiskMapState';
@@ -158,7 +158,7 @@ export function ReadinessEmpty({
   kind,
   items,
 }: {
-  kind: 'appointments' | 'requests';
+  kind: 'appointments' | 'requests' | 'coverage';
   items: ReadinessItem[] | null;
 }) {
   const { t, i18n } = useTranslation('common');
@@ -168,8 +168,14 @@ export function ReadinessEmpty({
   // Grammatik des User-EmptyState — Icon, Serif-Titel, Hinweis, Erklaerung,
   // drei Spalten, EINE Aktion rechts unten — mit der Bereitschaft als Spalten
   // (Zustand ✓/! statt Nummer). Die erste offene Sache mit Weg wird die Aktion.
-  const open = items?.find((it) => !it.done && it.action) ?? null;
-  const Icon = kind === 'appointments' ? CalendarCheck : Inbox;
+  // `coverage` (Abdeckung, Figma 3804:529): noch keine freigegebene Leistung —
+  // ohne Bereitschaftsliste, der eine Weg fuehrt zur Verifizierung.
+  const coverage = kind === 'coverage';
+  const open = items?.find((it) => !it.done && it.action)
+    ?? (coverage ? { action: { to: 'verification', label: t('states.partner.empty.coverageAction') } } : null);
+  const Icon = kind === 'appointments' ? CalendarCheck : coverage ? Globe : Inbox;
+  const closing = t(coverage ? 'states.partner.empty.coverageClosing' : 'states.partner.empty.closing');
+  const how = t(coverage ? 'states.partner.empty.coverageHow' : 'states.partner.empty.howBookingWorks');
   return (
     <div className={`${WORKSPACE_CARD} mx-auto max-w-[720px] px-9 py-8`}>
       <div className="flex items-center gap-3.5">
@@ -178,10 +184,10 @@ export function ReadinessEmpty({
         </span>
         <div className="min-w-0">
           <h2 className="font-serif text-[20px] font-bold leading-tight text-fg">{t(`states.partner.empty.${kind}`)}</h2>
-          <p className="mt-0.5 text-body-2xs text-fg-tertiary">{t('states.partner.empty.closing')}</p>
+          <p className="mt-0.5 text-body-2xs text-fg-tertiary">{closing}</p>
         </div>
       </div>
-      <p className="mt-[18px] text-body-xs leading-relaxed text-fg-secondary [text-wrap:pretty]">{t('states.partner.empty.howBookingWorks')}</p>
+      <p className="mt-[18px] text-body-xs leading-relaxed text-fg-secondary [text-wrap:pretty]">{how}</p>
       {items && (
         <ul className="mt-[22px] grid gap-5 border-t border-stroke-subtle pt-[22px] sm:grid-cols-3">
           {items.map((it) => (

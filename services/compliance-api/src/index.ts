@@ -1887,6 +1887,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const cycleStart = cycleStartFor(sub, now);
                     const used = await getDiscountCounter(providerKey, cycleStart);
                     const quote = quoteLeadFee(cfg, sub, opp.opp, used, now);
+                    if (sub && !quote.planVersionExact) {
+                        // B4: Konfigurationsluecke, kein Normalfall — der Rabatt der juengsten
+                        // Version greift, aber jemand muss sehen, dass der Katalog die
+                        // gebundene Version nicht mehr fuehrt.
+                        structuredLog('warn', 'Subscription plan version missing from catalog — using latest', { correlationId, errorCode: 'PLAN_VERSION_FALLBACK', severity: 'warning', providerKey, planCode: sub.planCode, planVersion: sub.planVersion, usedVersion: quote.planVersion } as any);
+                        await supabaseApi.insert('event_log', { type: 'plan_version_fallback', payload: { providerKey, planCode: sub.planCode, planVersion: sub.planVersion, usedVersion: quote.planVersion } })
+                            .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'plan_version_fallback', detail: String(e).slice(0, 200) } as any));
+                    }
                     const policies = (await supabaseApi.select('user_discount_policy', {}, { limit: 50 })) as any[];
                     const today = now.toISOString().slice(0, 10);
                     const policy = policies.filter((r) => String(r.effective_from) <= today).sort((a, b) => b.version - a.version)[0] ?? null;
@@ -2360,7 +2368,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const providerKey = (req.url || '').split('/')[4];
         try {
             await syncOpenInvoices(providerKey).catch(() => { /* list still renders */ });
-            const invoices = await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 });
+            const all = (await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 })) as any[];
+            // B7: ein `draft` ist bei Stripe angelegt, aber noch keine Rechnung an
+            // den Anbieter — der naechste Monatslauf nimmt ihn auf. Nicht zeigen.
+            const invoices = all.filter((r) => r.status !== 'draft');
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, invoices }));

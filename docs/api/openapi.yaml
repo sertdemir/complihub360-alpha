@@ -1213,6 +1213,13 @@ paths:
         Stellt je aktivem Abo die Abo-Zeile der Periode als Stripe-Rechnung aus
         (monatlich jede Periode, jaehrlich im Jubilaeumsmonat). Leads laufen
         NICHT hier — sie werden je Buchung belastet und stehen im Ledger.
+
+        Seit B7 (2026-10-18) in Schritten und wieder aufnehmbar: Stripe-Create →
+        eigene Zeile als `draft` → Positionen → finalisieren → senden → `open`.
+        Ein `draft` aus einem abgebrochenen Lauf wird beim naechsten Lauf
+        fortgesetzt (`resumed: true`), nie neu ausgestellt. Ein Fehler bei
+        einem Anbieter steht als Ergebniszeile `error: issue_failed`; die
+        anderen werden weiter abgerechnet.
       requestBody:
         content:
           application/json:
@@ -1224,7 +1231,7 @@ paths:
                 provider: { type: string, description: 'Optional ein Anbieter-Schluessel — nur dessen Abo wird abgerechnet (gezielte Tests, Workflow billing-run.yml)' }
       responses:
         '200':
-          description: "Ergebnis je Anbieter, dazu `only_provider`"
+          description: "Ergebnis je Anbieter (`invoice` | `skipped` | `dry_run` | `error`), dazu `only_provider` und `errors` (Zahl der gescheiterten Anbieter)"
         '400':
           description: provider ist kein Anbieter-Schluessel
         '403':
@@ -2112,7 +2119,7 @@ paths:
       summary: Rechnungen (Scope billing:read)
       security: [ { apiKeyAuth: [] } ]
       responses:
-        '200': { description: "`{ invoices[]: { id, invoice_number, period, amount_cents, currency, status, issued_at, due_at, paid_at } }` — ohne Positionen" }
+        '200': { description: "`{ invoices[]: { id, invoice_number, period, amount_cents, currency, status, issued_at, due_at, paid_at } }` — ohne Positionen, ohne `draft` (B7: bei Stripe angelegt, noch nicht finalisiert)" }
         '403': { description: API_SCOPE_FORBIDDEN }
 
   /ext/credits:

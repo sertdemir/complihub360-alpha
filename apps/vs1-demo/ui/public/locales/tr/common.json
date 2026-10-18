@@ -2127,7 +2127,11 @@
         "howBookingWorks": "Bir şirket sizi sonuçlarda seçip uygun zamanlarınızdan birini rezerve ettiğinde bir randevu oluşur. Bunun mümkün olması için:",
         "closing": "Ne sıklıkla rezerve edildiğiniz, alanlarınızdaki talebe bağlıdır. Tarifeniz bunu değiştirmez.",
         "invoicesHeading": "Henüz fatura yok",
-        "invoicesMessage": "Bir tarife faturalandırıldığında faturalarınız burada görünür."
+        "invoicesMessage": "Bir tarife faturalandırıldığında faturalarınız burada görünür.",
+        "coverage": "Henüz onaylanmış hizmet yok",
+        "coverageClosing": "İnceleme ekibimiz bir ülke için ilk hizmetinizi onayladığında matris dolar.",
+        "coverageHow": "İnceleme ekibimiz belgelerinizi kontrol ediyor. Bir hizmet onaylandığında, sonuçlarda bu hizmet için görünür ve rezervasyon alabilirsiniz.",
+        "coverageAction": "Doğrulamaya git"
       },
       "readiness": {
         "verified": "Doğrulama tamamlandı",
@@ -2151,15 +2155,27 @@
         "thresholdNote": "Bir veya iki talebe dayanan bir oran sizin hakkınızda pek bir şey söylemez. Bu yüzden oranı beş talepten itibaren gösteriyoruz."
       },
       "coverage": {
-        "heading": "Nerede görünüyorsunuz",
+        "heading": "Nerede <accent>görünüyorsunuz</accent>.",
         "message": "İnceleme ekibimizin onayladığı şekilde. Değiştirmek için değişikliği Hizmetler altında gönderin. İncelemeden sonra geçerli olur.",
         "approved": "onaylandı",
         "underReview": "inceleniyor",
         "notRequested": "talep edilmedi",
         "languages": "Diller",
         "responseTime": "Yanıt süresi",
-        "hours": "{{hours}} saat",
-        "submitChange": "Değişiklik gönderin"
+        "hours": "Onay için {{hours}} saat",
+        "submitChange": "Değişiklik gönderin",
+        "matrixTitle": "Onaylanan hizmetler",
+        "services_one": "{{count}} hizmet",
+        "services_other": "{{count}} hizmet",
+        "countries_one": "{{count}} ülke",
+        "countries_other": "{{count}} ülke",
+        "service": "Hizmet",
+        "matrixHint": "Eşleştirme de bu matrisi okur. Tire, o ülkede şu anda onaylanmamış bir hizmeti gösterir.",
+        "matchingTitle": "Eşleştirme için",
+        "matchingSub": "Sonuçlarda şirketlere gösterilir",
+        "availability": "Erişilebilirlik",
+        "available": "Müsait",
+        "ooo": "Ofis dışında"
       },
       "profileUnavailable": "Kaydedilmiş profilinize şu anda ulaşılamıyor. Profil yüklendiğinde kaydetme yeniden çalışır."
     }

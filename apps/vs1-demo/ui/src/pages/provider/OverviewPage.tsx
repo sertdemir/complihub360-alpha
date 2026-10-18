@@ -7,6 +7,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
 import { SectionHead } from '../../components/ui/SectionHead';
+import { Fact } from '../../components/ui/Fact';
 import { DateMark } from '../../components/ui/DateMark';
 import { useWorkspaceData } from '../../lib/useWorkspaceData';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -206,14 +207,3 @@ function AccountCard({ data, t, locale }: { data: ProviderOverviewResponse; t: T
   );
 }
 
-function Fact({ label, note, children }: { label: string; note?: string | null; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-3 border-t border-stroke-subtle py-2.5 first:border-t-0">
-      <dt className="text-fg-secondary">{label}</dt>
-      <dd className="flex items-center gap-2 text-right">
-        {children}
-        {note && <span className="text-[11px] text-fg-tertiary">{note}</span>}
-      </dd>
-    </div>
-  );
-}

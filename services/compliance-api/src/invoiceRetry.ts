@@ -79,24 +79,44 @@ export async function runInvoiceRetryTick(shadow: boolean, now = new Date()): Pr
             const d = daysPastDue(inv.due_at, now);
             if (d < 0 || d > cfg.curePeriodDays) continue;
 
+            // B11 (2026-10-18): der Marker kommt NACH der Aktion. Vorher stand er
+            // davor — warf sendNotice oder attempt, galt die Stufe als erledigt,
+            // und ein Einzugstag entfiel still. Jetzt bleibt die Stufe ohne
+            // Marker offen, der naechste Tick (am selben Tag) versucht es
+            // erneut; der Stripe-Aufruf traegt denselben Idempotency-Key je
+            // Stufe, ein Abbruch zwischen Zahlung und Marker belastet also nicht
+            // doppelt. Im Schattenlauf gibt es keine Aktion — da ist der
+            // Marker die Aktion.
+            const marker = (stage: string | number) =>
+                supabaseApi.insert('event_log', { type: `invoice_retry${suffix}`, payload: { invoiceId: inv.id, providerKey: inv.provider_key, stage } });
+
             // Tag 0 und spaeter: einmal Bescheid geben, bevor zum ersten Mal versucht wird.
             if (!done.has(`${inv.id}:notice`)) {
-                await supabaseApi.insert('event_log', { type: `invoice_retry${suffix}`, payload: { invoiceId: inv.id, providerKey: inv.provider_key, stage: 'notice' } });
+                if (!shadow) await sendNotice(inv, cfg.curePeriodDays);
+                await marker('notice');
                 done.add(`${inv.id}:notice`);
                 out.notices++;
-                if (!shadow) await sendNotice(inv, cfg.curePeriodDays);
             }
 
             const stage = retryStage(inv.due_at, now, cfg.curePeriodDays);
             if (stage === null || done.has(`${inv.id}:${stage}`)) continue;
-            await supabaseApi.insert('event_log', { type: `invoice_retry${suffix}`, payload: { invoiceId: inv.id, providerKey: inv.provider_key, stage } });
+            if (shadow) {
+                await marker(stage);
+                done.add(`${inv.id}:${stage}`);
+                out.attempts++;
+                continue;
+            }
+            const paid = await attempt(inv, stage);
+            await marker(stage);
             done.add(`${inv.id}:${stage}`);
             out.attempts++;
-            if (shadow) continue;
-            if (await attempt(inv, stage)) out.paid++;
+            if (paid) out.paid++;
         } catch (err) {
             out.errors++;
-            structuredLog('error', 'Invoice retry failed', { correlationId: 'watchers', route: 'watchers/invoice-retry', severity: 'error', errorCode: 'ERR_INVOICE_RETRY', detail: String(err).slice(0, 200) } as Record<string, unknown>);
+            structuredLog('error', 'Invoice retry failed', { correlationId: 'watchers', route: 'watchers/invoice-retry', severity: 'error', errorCode: 'ERR_INVOICE_RETRY', invoiceId: inv.id, providerKey: inv.provider_key, detail: String(err).slice(0, 200) } as Record<string, unknown>);
+            // Sichtbar im Protokoll — und ohne Marker: die Stufe bleibt offen.
+            await supabaseApi.insert('event_log', { type: 'invoice_retry_error', payload: { invoiceId: inv.id, providerKey: inv.provider_key, error: String(err).slice(0, 200) } })
+                .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId: 'watchers', errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'invoice_retry_error', detail: String(e).slice(0, 200) } as Record<string, unknown>));
         }
     }
     return out;
@@ -122,7 +142,8 @@ async function attempt(inv: InvoiceRow, stage: number): Promise<boolean> {
     const prov = ((await supabaseApi.select('providers', { provider_key: inv.provider_key }, { limit: 1 })) as any[])[0];
     const customerId = prov?.stripe_customer_id ? String(prov.stripe_customer_id) : null;
     const pmId = customerId ? (await getCustomerBilling(customerId)).defaultPaymentMethodId : null;
-    const log = (type: string, extra: Record<string, unknown>) => supabaseApi.insert('event_log', { type, payload: { invoiceId: inv.id, providerKey: inv.provider_key, stage, ...extra } }).catch(() => {});
+    const log = (type: string, extra: Record<string, unknown>) => supabaseApi.insert('event_log', { type, payload: { invoiceId: inv.id, providerKey: inv.provider_key, stage, ...extra } })
+        .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId: 'watchers', errorCode: 'ERR_EVENT_LOG', severity: 'error', type, invoiceId: inv.id, detail: String(e).slice(0, 200) } as Record<string, unknown>));
     if (!pmId) { await log('invoice_retry_skipped', { reason: 'no_payment_method' }); return false; }
     try {
         const paid = await stripeRequest('POST', `invoices/${inv.stripe_invoice_id}/pay`, { payment_method: pmId, off_session: 'true' },
