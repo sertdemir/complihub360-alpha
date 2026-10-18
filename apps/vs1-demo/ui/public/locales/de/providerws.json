@@ -227,7 +227,8 @@
       "withdrawn_authorization": "Das Zahlungsmandat wurde widerrufen. Bestätigen Sie die aktuelle Fassung, um weiterzumachen.",
       "overdue_invoice": "Eine Rechnung ist überfällig. Bezahlen Sie sie im Portal.",
       "account_paused": "Ihr Konto ist pausiert.",
-      "payment_failed": "Die letzte Lead-Belastung ist gescheitert. Ein anderes Zahlungsmittel hebt die Sperre auf — dieselbe Karte nicht."
+      "payment_failed": "Die letzte Lead-Belastung ist gescheitert. Ein anderes Zahlungsmittel hebt die Sperre auf — dieselbe Karte nicht.",
+      "payment_unresolved": "Eine Belastung wird noch mit dem Zahlungsdienst abgeglichen. Buchungen laufen von selbst wieder an, sobald das geklärt ist — meist innerhalb weniger Minuten."
     },
     "graceTitleOne": "Eine Rechnung ist offen",
     "graceTitleMany": "{{n}} Rechnungen sind offen",
@@ -341,7 +342,7 @@
     "actionOpenRq": "{{id}} öffnen →"
   },
   "performance": {
-    "title": "Performance",
+    "title": "Ihre <accent>Performance</accent>.",
     "subtitle": "Was aus Ihren Buchungen folgt. Jede Zahl nennt ihre Basis und ihren Zeitraum; eine Quote steht erst ab fünf Buchungen. Das Ranking sieht genau diese Fakten — in jedem Tarif dieselben.",
     "range": "Letzte {{days}} Tage · {{bookings}} Buchungen",
     "policy": "Regel-Fassung {{version}}",
@@ -401,7 +402,36 @@
     "appealDecided": {
       "lifted": "Die Pause wurde am {{date}} aufgehoben. Buchungen sind wieder möglich.",
       "upheld": "Das Team hat die Pause am {{date}} bestätigt. Sie bleibt bis zur Aufhebung durch das Team."
-    }
+    },
+    "compareNote": "Pfeile vergleichen mit den {{days}} Tagen davor",
+    "trend": {
+      "vsPrevious": "vs. {{days}} Tage davor",
+      "same": "wie in den {{days}} Tagen davor",
+      "noPrevious": "kein Vergleichszeitraum",
+      "pp": "{{value}} Pp"
+    },
+    "basisBookings": "{{counted}} Buchungen",
+    "rateFrom": "Quote ab {{need}} Buchungen",
+    "ratingBasis": "von 5 · aus {{count}} Bewertungen",
+    "ratingAfterBooking": "nach Buchung, nur verifizierte Termine",
+    "wouldRebookAsked": "Frage nach dem Termin",
+    "insufficientShort": "noch zu wenig Daten",
+    "unit": {
+      "booking": "Buchung",
+      "noShow": "nicht erschienen"
+    },
+    "meter": {
+      "first": "1. Vorfall",
+      "alert": "Hinweis ab {{n}}",
+      "pause": "Buchungspause ab {{n}}"
+    },
+    "chart": {
+      "took": "stattgefunden",
+      "noShow": "No-Show (Nutzer oder Sie)",
+      "cancelled": "abgesagt"
+    },
+    "trendsNote": "Monatsverlauf ab Growth; Bereich und Land ebenso. Essential zeigt die Fakten oben ohne Verlauf; CSV-Export ab Global. Dieselben Fakten in jedem Tarif.",
+    "bySelf": "durch Sie"
   },
   "magicAction": {
     "partnerBadge": "Anbieter",
@@ -1420,7 +1450,10 @@
     "credit": "Guthaben",
     "creditNote": "wird mit der nächsten Rechnung verrechnet",
     "evidenceExpiring": "Nachweis {{type}}",
-    "until": "bis {{date}}"
+    "until": "bis {{date}}",
+    "greeting": "Willkommen zurück, <accent>{{name}}</accent>.",
+    "greetingNoName": "Willkommen zurück.",
+    "seeAll": "Alle anzeigen"
   },
   "apiAccess": {
     "title": "Integration (API)",

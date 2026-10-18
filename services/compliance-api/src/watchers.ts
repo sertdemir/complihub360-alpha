@@ -1,7 +1,7 @@
 import * as crypto from "node:crypto";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
-import { runBillingReadinessTick } from "./leadCharge.js";
+import { runBillingReadinessTick, runChargeReconcileTick } from "./leadCharge.js";
 import { runInvoiceRetryTick } from "./invoiceRetry.js";
 import { runApiRequestLogRetentionTick } from "./apiRoutes.js";
 import { runSubscriptionPeriodTick } from "./subscriptions.js";
@@ -91,6 +91,9 @@ export interface TickSummary {
     scheduledChangesApplied: number;
     scheduledChangesStale: number;
     billingChanged: number;
+    /** B1: offene Belastungsausgaenge, die mit Stripe abgeglichen wurden. */
+    chargesReconciled: number;
+    chargesRefunded: number;
     appointmentReminders: number;
     rebookReminders: number;
     creditsIssued: number;
@@ -189,7 +192,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, providerCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0, apiRequestLogPruned: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, providerCoveredNotices: 0, billingSynced: 0, billingChanged: 0, chargesReconciled: 0, chargesRefunded: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0, apiRequestLogPruned: 0 };
 
     let engagements: Engagement[];
     try {
@@ -334,6 +337,15 @@ export async function runWatcherTick(): Promise<TickSummary> {
         summary.billingSynced = br.synced;
         summary.billingChanged = br.changed;
         summary.errors += br.errors;
+    } catch { summary.errors++; }
+
+    // B1: Belastungen ohne verwertbare Stripe-Antwort nachschauen und, wo
+    // Stripe belastet hat, erstatten (leadCharge.ts). Shadow schreibt Marker.
+    try {
+        const rc = await runChargeReconcileTick(shadow);
+        summary.chargesReconciled = rc.checked;
+        summary.chargesRefunded = rc.refunded;
+        summary.errors += rc.errors;
     } catch { summary.errors++; }
 
     // Abo-Perioden fortschreiben: ohne diesen Pass bliebe

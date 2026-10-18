@@ -209,6 +209,10 @@
         "title": "Rezervasyon tamamlanamadı.",
         "body": "Bu sizden kaynaklanmıyor: Şu anda sağlayıcı tarafında bir koşul eksik. Randevunuz alınmadı, hiçbir şey paylaşılmadı. Sağlayıcı bilgilendirildi."
       },
+      "in_progress": {
+        "title": "Rezervasyonunuz zaten işleniyor.",
+        "body": "Aynı istek bize iki kez ulaştı, muhtemelen çift tıklama nedeniyle. Hiçbir şey iki kez rezerve edilmedi ve iki kez tahsil edilmedi. Bir an bekleyin, ardından randevularınızı kontrol edin veya yeniden deneyin."
+      },
       "slot_taken": {
         "title": "Bu saat az önce dolduruldu.",
         "body": "Başka biri biraz önce rezerve etti. Randevunuz alınmadı, hiçbir şey paylaşılmadı — başka bir saat seçin."

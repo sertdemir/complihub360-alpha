@@ -59,6 +59,7 @@ export function BookingFailureCard({ failure, onOtherProvider, onRetry, onReread
   const reason = k === 'slot_taken' ? t('schedule.fail.slot_taken.title')
     : k === 'acknowledgement_outdated' ? t('schedule.fail.acknowledgement_outdated.title')
     : k === 'not_completed' ? t('schedule.fail.reasonProvider')
+    : k === 'in_progress' ? t('schedule.fail.in_progress.title')
     : null;
   const primary = k === 'slot_taken' ? { label: t('schedule.fail.pickOtherSlot'), onClick: onPickSlot }
     : k === 'acknowledgement_outdated' ? { label: t('schedule.fail.reread'), onClick: onReread }

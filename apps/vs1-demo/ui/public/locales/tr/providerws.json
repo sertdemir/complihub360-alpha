@@ -227,7 +227,8 @@
       "withdrawn_authorization": "Ödeme yetkisi geri çekildi. Devam etmek için güncel sürümü onaylayın.",
       "overdue_invoice": "Vadesi geçmiş bir fatura var. Portalda ödeyin.",
       "account_paused": "Hesabınız duraklatıldı.",
-      "payment_failed": "Son lead tahsilatı başarısız oldu. Farklı bir ödeme yöntemi engeli kaldırır — aynı kart kaldırmaz."
+      "payment_failed": "Son lead tahsilatı başarısız oldu. Farklı bir ödeme yöntemi engeli kaldırır — aynı kart kaldırmaz.",
+      "payment_unresolved": "Yakın tarihli bir tahsilat ödeme hizmetiyle hâlâ doğrulanıyor. Çözüldüğünde rezervasyonlar kendiliğinden devam eder, genellikle birkaç dakika içinde."
     },
     "graceTitleOne": "Bir fatura açık",
     "graceTitleMany": "{{n}} fatura açık",
@@ -341,7 +342,7 @@
     "actionOpenRq": "{{id}} aç →"
   },
   "performance": {
-    "title": "Performans",
+    "title": "<accent>Performansınız</accent>.",
     "subtitle": "Randevularınızdan çıkan sonuçlar. Her sayı dayanağını ve dönemini belirtir; oranlar yalnızca beş randevudan itibaren görünür. Sıralama tam olarak bu verileri görür; her planda aynıdır.",
     "range": "Son {{days}} gün · {{bookings}} randevu",
     "policy": "Kural sürümü {{version}}",
@@ -401,7 +402,36 @@
     "appealDecided": {
       "lifted": "Duraklatma {{date}} tarihinde kaldırıldı. Rezervasyonlar yeniden açık.",
       "upheld": "Ekip duraklatmayı {{date}} tarihinde onayladı. Ekip kaldırana kadar sürer."
-    }
+    },
+    "compareNote": "Oklar önceki {{days}} günle karşılaştırır",
+    "trend": {
+      "vsPrevious": "önceki {{days}} güne göre",
+      "same": "önceki {{days}} günle aynı",
+      "noPrevious": "karşılaştırma dönemi yok",
+      "pp": "{{value}} puan"
+    },
+    "basisBookings": "{{counted}} randevu",
+    "rateFrom": "oran {{need}} randevudan itibaren",
+    "ratingBasis": "5 üzerinden · {{count}} değerlendirmeden",
+    "ratingAfterBooking": "randevu sonrası, yalnızca doğrulanmış randevular",
+    "wouldRebookAsked": "randevu sonrası soru",
+    "insufficientShort": "henüz yeterli veri yok",
+    "unit": {
+      "booking": "randevu",
+      "noShow": "gelmedi"
+    },
+    "meter": {
+      "first": "1. olay",
+      "alert": "{{n}} ile uyarı",
+      "pause": "{{n}} ile rezervasyon duraklaması"
+    },
+    "chart": {
+      "took": "gerçekleşti",
+      "noShow": "gelmeme (kullanıcı veya siz)",
+      "cancelled": "iptal"
+    },
+    "trendsNote": "Aylık seyir Growth’tan itibaren; alan ve ülke de öyle. Essential yukarıdaki verileri seyir olmadan gösterir; CSV dışa aktarma Global’den itibaren. Her planda aynı veriler.",
+    "bySelf": "sizin tarafınızdan"
   },
   "magicAction": {
     "partnerBadge": "Sağlayıcı",
@@ -1316,7 +1346,10 @@
     "credit": "Alacak",
     "creditNote": "bir sonraki faturanızdan düşülür",
     "evidenceExpiring": "Belge {{type}}",
-    "until": "{{date}} tarihine kadar"
+    "until": "{{date}} tarihine kadar",
+    "greeting": "Tekrar hoş geldiniz, <accent>{{name}}</accent>.",
+    "greetingNoName": "Tekrar hoş geldiniz.",
+    "seeAll": "Tümünü gör"
   },
   "partnerNotif": {
     "hours_one": "{{count}} saat",

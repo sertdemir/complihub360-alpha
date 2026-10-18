@@ -6,6 +6,8 @@ import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { UserShell } from '../../components/user/UserShell';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
+import { WORKSPACE_CARD } from '../../components/ui/Card';
+import { SectionHead as SharedSectionHead } from '../../components/ui/SectionHead';
 import { Segment } from '../../components/compliance-areas';
 import { UnitGrid, unitsPer, useCountUp, useEntered, EASE } from '../../components/ui/Stats';
 import { EmptyState } from '../../components/user/EmptyState';
@@ -50,7 +52,9 @@ const REST_CLS = 'bg-unit-rest';
 const DONE_CLS = 'bg-unit-done ring-1 ring-inset ring-unit-done-line';
 const SESS_GRID = 'grid grid-cols-[minmax(0,1.5fr)_104px_minmax(172px,1.3fr)_92px_auto] items-center gap-4';
 const MARKT_CHIP = 'rounded-full border border-stroke px-[7px] py-[1px] text-[10.5px] font-bold text-fg';
-const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
+// Seit 2026-10-16 die geteilte Workspace-Karte (Card.tsx), die auch der
+// Provider-Bereich traegt.
+const CARD = WORKSPACE_CARD;
 
 /** Hochzaehlende Zahl (Z2) — dieselbe Kurve wie die Ringe vorher. */
 function CountUp({ value, on, className }: { value: number; on: boolean; className?: string }) {
@@ -58,19 +62,12 @@ function CountUp({ value, on, className }: { value: number; on: boolean; classNa
   return <span className={className} aria-label={String(value)}>{n}</span>;
 }
 
+/** Der Abschnittskopf ist seit 2026-10-16 geteilt (components/ui/SectionHead);
+ *  hier nur der Adapter mit dem userws-Link-Text und dem relativen Ziel. */
 function SectionHead({ title, count, to, extra }: { title: string; count?: string; to: string; extra?: ReactNode }) {
   const { t, i18n } = useTranslation('userws');
   const base = `/${i18n.resolvedLanguage || 'en'}`;
-  return (
-    <div className="mb-3 flex items-baseline gap-2">
-      <h2 className="text-body-md font-bold text-fg">{title}</h2>
-      {count && <span className="text-body-xs font-bold text-fg-brand">{count}</span>}
-      {extra}
-      <Link to={`${base}/${to}`} className="ml-auto text-body-2xs text-fg-secondary underline-offset-2 hover:underline">
-        {t('shared.seeAll')}
-      </Link>
-    </div>
-  );
+  return <SharedSectionHead title={title} count={count} extra={extra} action={{ label: t('shared.seeAll'), to: `${base}/${to}` }} />;
 }
 
 // ─── Daten ────────────────────────────────────────────────────────────────────

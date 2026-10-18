@@ -671,8 +671,12 @@ function acknowledgement(lang: string) {
 // beide Seiten Namen und Kontakt bekommen. Seit Phase 4 nur mit der Fassung
 // der Bestaetigung; die 15:30-Termine spielen den Fall durch, dass die Karte
 // des Anbieters nicht belastet werden kann (409 ohne Buchung, Canvas 2A).
+/** B8: Schluessel der Versuche, die schon eine Buchung haben (Mock-Gedaechtnis je Session). */
+const SEEN_REQUESTS = new Map<string, unknown>();
 function createBooking(body: unknown) {
-  const d = (body ?? {}) as { public_ref?: unknown; slot_start?: unknown; message?: unknown; acknowledgement_version?: unknown; area_code?: unknown; countries?: unknown };
+  const d = (body ?? {}) as { public_ref?: unknown; slot_start?: unknown; message?: unknown; acknowledgement_version?: unknown; area_code?: unknown; countries?: unknown; request_id?: unknown };
+  // Wiederholung desselben Versuchs: dieselbe Antwort, keine zweite Buchung.
+  if (typeof d.request_id === 'string' && SEEN_REQUESTS.has(d.request_id)) return { ...(SEEN_REQUESTS.get(d.request_id) as object), replay: true };
   const ref = typeof d.public_ref === 'string' ? d.public_ref : '';
   const key = keyOfRef(ref);
   const slot = typeof d.slot_start === 'string' ? d.slot_start : '';
@@ -692,7 +696,7 @@ function createBooking(body: unknown) {
   }
   const end = new Date(at.getTime() + 30 * 60 * 1000).toISOString();
   const mockTopic = { area_code: typeof d.area_code === 'string' && d.area_code ? d.area_code : 'tax-vat', countries: Array.isArray(d.countries) && d.countries.length ? (d.countries as string[]) : ['DE'] };
-  return {
+  const confirmation = {
     ok: true,
     booking: { id: `m0ck-new-${ref}`, public_ref: ref, slot_start: slot, slot_end: end, status: 'confirmed', acknowledgement_version: ACK_VERSION, shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1 },
       // Wie der Server: das Thema des Leads (deriveOpportunity, vereinfacht).
@@ -701,6 +705,8 @@ function createBooking(body: unknown) {
       shared_snapshot: { ...DEMO_SHARED_PREVIEW, message: typeof d.message === 'string' && d.message.trim() ? d.message.trim() : null, topic: mockTopic } },
     provider_identity: identity,
   };
+  if (typeof d.request_id === 'string') SEEN_REQUESTS.set(d.request_id, confirmation);
+  return confirmation;
 }
 
 function providerSlots() {
@@ -1225,6 +1231,7 @@ function adminApiDecide(id: string, body: Record<string, unknown>) {
 // sie nie.
 const INITIAL_MOCK_STATE = JSON.stringify({ ATT, STATUS_OVERRIDE, READINESS, AVAIL, API_STATE });
 export function resetMockState(): void {
+  SEEN_REQUESTS.clear();
   const init = JSON.parse(INITIAL_MOCK_STATE) as { ATT: typeof ATT; STATUS_OVERRIDE: typeof STATUS_OVERRIDE; READINESS: typeof READINESS; AVAIL: typeof AVAIL; API_STATE: typeof API_STATE };
   for (const k of Object.keys(ATT)) delete ATT[k];
   Object.assign(ATT, init.ATT);

@@ -229,7 +229,8 @@
       "withdrawn_authorization": "The billing authorisation has been withdrawn. Accept the current version to continue.",
       "overdue_invoice": "An invoice is overdue. Pay it in the portal.",
       "account_paused": "Your account is paused.",
-      "payment_failed": "The last lead charge failed. A different payment method lifts this — the same card does not."
+      "payment_failed": "The last lead charge failed. A different payment method lifts this — the same card does not.",
+      "payment_unresolved": "A recent charge is still being confirmed with the payment service. Bookings resume on their own once it is settled, usually within a few minutes."
     },
     "graceTitleOne": "One invoice is open",
     "graceTitleMany": "{{n}} invoices are open",
@@ -343,7 +344,7 @@
     "actionOpenRq": "Open {{id}} →"
   },
   "performance": {
-    "title": "Performance",
+    "title": "Your <accent>performance</accent>.",
     "subtitle": "What follows from your bookings. Every number names its basis and period; a rate appears only from five bookings. Ranking sees exactly these facts — the same on every plan.",
     "range": "Last {{days}} days · {{bookings}} bookings",
     "policy": "Policy version {{version}}",
@@ -404,7 +405,36 @@
       "lifted": "The pause was lifted on {{date}}. Bookings are open again.",
       "upheld": "The team upheld the pause on {{date}}. It stays until the team lifts it."
     },
-    "appealTooShort": "Please explain your appeal in at least 10 characters."
+    "appealTooShort": "Please explain your appeal in at least 10 characters.",
+    "compareNote": "Arrows compare with the {{days}} days before",
+    "trend": {
+      "vsPrevious": "vs. previous {{days}} days",
+      "same": "same as the {{days}} days before",
+      "noPrevious": "no comparison period",
+      "pp": "{{value}} pp"
+    },
+    "basisBookings": "{{counted}} bookings",
+    "rateFrom": "rate from {{need}} bookings",
+    "ratingBasis": "out of 5 · from {{count}} reviews",
+    "ratingAfterBooking": "after booking, verified appointments only",
+    "wouldRebookAsked": "asked after the appointment",
+    "insufficientShort": "not enough data yet",
+    "unit": {
+      "booking": "booking",
+      "noShow": "did not show"
+    },
+    "meter": {
+      "first": "1st incident",
+      "alert": "notice from {{n}}",
+      "pause": "booking pause from {{n}}"
+    },
+    "chart": {
+      "took": "took place",
+      "noShow": "no-show (user or you)",
+      "cancelled": "cancelled"
+    },
+    "trendsNote": "Monthly trend from Growth; area and country likewise. Essential shows the facts above without a trend; CSV export from Global. The same facts on every plan.",
+    "bySelf": "by you"
   },
   "magicAction": {
     "partnerBadge": "Provider",
@@ -1457,7 +1487,10 @@
     "credit": "Credit",
     "creditNote": "applied to your next invoice",
     "evidenceExpiring": "Evidence {{type}}",
-    "until": "until {{date}}"
+    "until": "until {{date}}",
+    "greeting": "Welcome back, <accent>{{name}}</accent>.",
+    "greetingNoName": "Welcome back.",
+    "seeAll": "See all"
   },
   "apiAccess": {
     "title": "Integration (API)",

@@ -21,6 +21,7 @@ vi.mock('../api/bookings', () => ({
   fetchAcknowledgement: vi.fn().mockResolvedValue({ version: 'booking-ack-v1', language: 'en', body: 'a\n\nb\n\nc', sharedFields: ['email'], userDiscount: { pct: 10, policyVersion: 1 }, lines: ['a', 'b', 'c'] }),
   createBooking: (...a: unknown[]) => createBooking(...a),
   bookingFailureFrom: () => ({ kind: 'generic' }),
+  newBookingRequestId: () => 'req-test-00000001',
 }));
 // t() gibt den Schluessel zurueck: geprueft wird die Verdrahtung, nicht die Copy.
 vi.mock('react-i18next', () => ({
@@ -121,7 +122,7 @@ describe('ProviderSchedulePage · Sitzung', () => {
     await openReview();
     confirmAndBook();
     await waitFor(() => expect(createBooking).toHaveBeenCalled());
-    expect(createBooking.mock.calls[0][2]).toMatchObject({ sessionId: 's-123', acknowledgementVersion: 'booking-ack-v1' });
+    expect(createBooking.mock.calls[0][2]).toMatchObject({ sessionId: 's-123', acknowledgementVersion: 'booking-ack-v1', requestId: 'req-test-00000001' });
   });
 
   it('erfindet keine Sitzung, wenn keine da ist', async () => {

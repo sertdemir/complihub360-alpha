@@ -73,7 +73,8 @@ export type BillingBlockReason =
     | 'withdrawn_authorization'
     | 'overdue_invoice'
     | 'account_paused'
-    | 'payment_failed';      // Phase 4: letzte Lead-Belastung mit dem aktuellen Zahlungsmittel gescheitert
+    | 'payment_failed'       // Phase 4: letzte Lead-Belastung mit dem aktuellen Zahlungsmittel gescheitert
+    | 'payment_unresolved';  // B1 (2026-10): eine Belastung ohne verwertbare Stripe-Antwort wartet auf den Abgleich
 
 /** Ergebnis einer Nachweispruefung (Spec §7). */
 export type EvidenceResult =
@@ -471,7 +472,8 @@ export interface UserDiscountPolicy {
     effective_from: string;
 }
 
-export type LeadLedgerPaymentStatus = 'pending' | 'authorized' | 'captured' | 'failed' | 'refunded' | 'n/a';
+/** `unknown` (B1): Stripe hat nicht verwertbar geantwortet; der Watcher gleicht ab und schreibt danach `failed` oder `captured` + `refunded`. */
+export type LeadLedgerPaymentStatus = 'pending' | 'authorized' | 'captured' | 'failed' | 'refunded' | 'unknown' | 'n/a';
 
 /** Was ein Lead den Anbieter gekostet hat — Spec B "standard fee, discount, final charge". */
 export interface ProviderBookingLead {

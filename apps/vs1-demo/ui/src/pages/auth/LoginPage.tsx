@@ -8,6 +8,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { SystemFooter } from "../../components/auth/SystemFooter";
 import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled, isGoogleLoginEnabled } from "../../lib/supabase";
 import { clearExpired, readExpired, rememberReturnTo } from "../../lib/sessionExpiry";
+import { SUPPORT_EMAIL } from "../../lib/contact";
 import { Banner } from "../../components/ui/Banner";
 import { FormErrorSummary, focusField } from "../../components/ui/FormErrorSummary";
 import { FieldError, FIELD_ERROR_CLASS, errorAria } from "../../components/ui/FieldError";
@@ -42,9 +43,9 @@ const GoogleIcon = () => (
 
 type Mode = "user" | "partner";
 type View = "form" | "magic-sent" | "forgot" | "reset-sent" | "error";
-type ErrKind = "expired" | "invalid" | "rate-limited";
+type ErrKind = "expired" | "invalid" | "unredeemable" | "rate-limited";
 
-const ERR_KINDS: ErrKind[] = ["expired", "invalid", "rate-limited"];
+const ERR_KINDS: ErrKind[] = ["expired", "invalid", "unredeemable", "rate-limited"];
 const errKey = (k: ErrKind) => (k === "rate-limited" ? "rateLimited" : k);
 
 // Gold hebt EIN Wort je Headline hervor — dieselbe Rolle wie <GoldWord> auf der
@@ -53,15 +54,6 @@ const goldComponents = {
     br: <br />,
     gold: <span className="text-accent-700 dark:text-fg-accent-strong" />,
 };
-
-/** Wie in LegalPages.tsx und auf der Kontaktseite: sichtbar offen statt erfunden. */
-function Placeholder({ children }: { children: React.ReactNode }) {
-    return (
-        <span className="rounded bg-warning-bg px-1.5 py-0.5 font-mono text-[0.85em] text-warning-700 ring-1 ring-inset ring-warning-500/30">
-            [{children}]
-        </span>
-    );
-}
 
 const FIELD =
     "mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35";
@@ -591,15 +583,13 @@ export function LoginPage() {
                                         </form>
                                     </div>
 
-                                    {/* TODO(contact-live): Support-Adresse und die echte Request-ID
-                                        einsetzen. Bis dahin stehen beide als Platzhalter da, statt
-                                        eine erfundene Kennung wie "req_8f24b1c" auszugeben. */}
+                                    {/* Die Request-ID fehlt, bis es eine echte gibt — eine
+                                        erfundene Kennung wie "req_8f24b1c" waere schlimmer als keine. */}
                                     <p className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-body-2xs text-fg-tertiary">
                                         <span>{t("login.left.error.supportLabel")}:</span>
-                                        <Placeholder>support@…</Placeholder>
-                                        <span className="text-stroke">·</span>
-                                        <span>{t("login.left.error.requestLabel")}</span>
-                                        <Placeholder>Request-ID</Placeholder>
+                                        <a href={`mailto:${SUPPORT_EMAIL}`} className="text-fg-secondary underline underline-offset-2 hover:text-fg">
+                                            {SUPPORT_EMAIL}
+                                        </a>
                                     </p>
                                     <BackToSignIn onClick={() => setView("form")} />
                                 </>

@@ -42,6 +42,16 @@ Billing Portal write, Checkout Sessions write):
 | Refunds | **write** | Kompensation, wenn der Buchungs-Insert nach dem Capture scheitert |
 | Payment Methods | **read** | der Kunden-Aufruf expandiert `invoice_settings.default_payment_method`, und `billing/sync` listet die angehängten Karten (`GET payment_methods?customer=…`), weil das Portal eine neue Karte anhängt, aber nicht als Standard setzt — der Sync macht sie dann dazu (`POST customers/:id`, Customers write; Befund Staging 2026-10-05); ein Restricted Key darf nur expandieren, worauf er selbst Leserecht hat — ohne dieses Recht antwortet Stripe `permission_error`, und `billing/sync` meldet 502 (Befund Staging 2026-10-04) |
 
+## B1 (2026-10-18): Timeout und Abgleich — kein neues Recht, eine Variable
+
+Der Stripe-Aufruf hat jetzt ein Timeout: `STRIPE_TIMEOUT_MS` (Default 20000,
+Minimum 1000) in der VPS-`.env`, nirgends sonst. Kommt in dieser Zeit keine
+verwertbare Antwort, gilt die Belastung als `unknown`, und der Watcher gleicht
+sie über `GET payment_intents?customer=…&created[gte]=…` ab (ADR-0005
+„Offen", Orphan-Charge). Das Lesen der Liste ist durch **PaymentIntents write**
+abgedeckt; die Erstattung einer Belastung ohne Buchung durch **Refunds write**.
+Beides ist seit Phase 4 gesetzt — nichts zu tun im Dashboard.
+
 ## ADR-0008 A2 (2026-10-10): „Karte erneut prüfen" — ein Recht mehr
 
 `POST /provider/:key/billing/recheck` fragt bei der Bank nach, ob das
