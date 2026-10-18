@@ -1328,7 +1328,10 @@
     "credit": "Crédito",
     "creditNote": "se aplica en su próxima factura",
     "evidenceExpiring": "Documento {{type}}",
-    "until": "hasta el {{date}}"
+    "until": "hasta el {{date}}",
+    "greeting": "Bienvenido de nuevo, <accent>{{name}}</accent>.",
+    "greetingNoName": "Bienvenido de nuevo.",
+    "seeAll": "Ver todo"
   },
   "partnerNotif": {
     "hours_one": "{{count}} hora",

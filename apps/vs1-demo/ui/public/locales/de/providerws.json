@@ -1432,7 +1432,10 @@
     "credit": "Guthaben",
     "creditNote": "wird mit der nächsten Rechnung verrechnet",
     "evidenceExpiring": "Nachweis {{type}}",
-    "until": "bis {{date}}"
+    "until": "bis {{date}}",
+    "greeting": "Willkommen zurück, <accent>{{name}}</accent>.",
+    "greetingNoName": "Willkommen zurück.",
+    "seeAll": "Alle anzeigen"
   },
   "apiAccess": {
     "title": "Integration (API)",

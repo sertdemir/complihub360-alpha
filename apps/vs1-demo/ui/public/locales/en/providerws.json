@@ -1471,7 +1471,10 @@
     "credit": "Credit",
     "creditNote": "applied to your next invoice",
     "evidenceExpiring": "Evidence {{type}}",
-    "until": "until {{date}}"
+    "until": "until {{date}}",
+    "greeting": "Welcome back, <accent>{{name}}</accent>.",
+    "greetingNoName": "Welcome back.",
+    "seeAll": "See all"
   },
   "apiAccess": {
     "title": "Integration (API)",
