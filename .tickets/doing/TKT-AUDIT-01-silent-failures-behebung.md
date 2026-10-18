@@ -49,7 +49,12 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
   `executeSchedule`: erst der Nachfolger (ein schon vorhandener wird wiederverwendet), dann Ende und Leeren
   der Vormerkung. Wirft der Insert, bleibt das alte Abo samt Vormerkung stehen, der nächste Tick holt nach.
   `runSubscriptionPeriodTick` mit per-Zeile `try/catch`, `errors` im Ergebnis und im Watcher-Summary.
-- [ ] B11 · [ ] B12 · [ ] B9 · [ ] B10 · [ ] B13
+- [x] **B11** Einzugs-Tick: Marker vor der Aktion.
+  Marker (`invoice_retry` je Stufe) erst nach `sendNotice` bzw. `attempt`. Wirft die Aktion, bleibt die
+  Stufe offen, Ereignis `invoice_retry_error`, der nächste Tick am selben Tag holt nach; der
+  Idempotency-Key je Stufe bei Stripe verhindert eine doppelte Belastung. Shadow: Marker ist die Aktion.
+  `log` im Versuch ohne leeres `catch`.
+- [ ] B12 · [ ] B9 · [ ] B10 · [ ] B13
 
 ### 3 · Audit und Offenlegung
 
