@@ -101,6 +101,9 @@ test('privacy: erkennt die OpenAI-kompatiblen EU-Endpunkte (Scaleway, IONOS)', (
     "await fetch(`${base}/v1/embeddings`);\n",
     "const base = 'https://openai.inference.de-txl.ionos.com/v1';\n",
     'const key = process.env.LLM_API_KEY;\n',
+    "import { resolveLlm } from './llm.js';\n",
+    "import { sameEmbedModel } from '../llm.js';\n",
+    'const llm = resolveLlm();\n',
   ]) {
     assert.ok(checkPrivacy('services/x/src/new.ts', 'Write', { content: raw + ai }, ''), ai);
   }

@@ -4,6 +4,10 @@ Entscheidung: [ADR-0011](../decisions/ADR-0011-sprachmodell-scaleway-offene-mode
 
 Reihenfolge einhalten. Bis Schritt 4 antwortet der Assistent unverändert über Gemini.
 
+## 0. Migration VOR dem Merge einspielen
+
+`20261018000100_match_chunks_embed_model.sql` ersetzt `match_knowledge_chunks` durch eine Fassung mit dem Parameter `embed_model`. Der neue Code schickt ihn mit. **Läuft der Code vor der Migration, findet PostgREST die Funktion nicht und der Assistent antwortet 502.** Deshalb zuerst auf Staging (und Beta) einspielen, dann mergen. Die Migration ist rückwärtsverträglich: Der alte Code ruft mit drei Argumenten und bekommt dasselbe Ergebnis wie bisher.
+
 ## 1. Scaleway-Zugang anlegen
 
 1. Konto bei Scaleway anlegen, Projekt „complihub360" wählen oder anlegen.
@@ -53,13 +57,31 @@ Am Ende steht `✓ … chunks ingested with qwen3-embedding-8b`. Prüfen:
 select metadata->>'embed_model' as model, count(*) from knowledge_chunks group by 1;
 ```
 
-Es darf nur noch `qwen3-embedding-8b` stehen.
+Es darf nur noch `qwen3-embedding-8b` stehen. Pro Land darf es nur einen Lauf geben:
+
+```sql
+select metadata->>'country' as land, count(distinct metadata->>'ingest_run') as laeufe, count(*)
+from knowledge_chunks group by 1 order by 1;
+```
+
+`laeufe` muss überall 1 sein. Ein Abbruch mitten im Lauf lässt die alten Chunks stehen; einfach neu starten.
+
+Die Kennung im Ingest (`LLM_EMBED_MODEL` oder Standard `qwen3-embedding-8b`) muss **exakt** der auf dem Server entsprechen. Weicht sie ab, findet der Assistent keinen Chunk und schreibt `ERR_ASSISTANT_CORPUS` ins Log; im `event_log` steht dann `corpus_missing: true`.
 
 ## 6. Prüfbogen gegen Staging, dann Gemini abschalten
 
-1. Prüfbogen gegen Staging laufen lassen, jetzt mit Korpus.
-2. Ist er sauber: `GEMINI_API_KEY` aus `/docker/complihub-api/.env` entfernen, Container neu starten, den Schlüssel in der Google-Konsole widerrufen.
-3. Google aus der Subprozessor-Liste streichen.
+1. Prüfbogen gegen Staging laufen lassen, jetzt mit Korpus. Im Kopf des Bogens muss überall `openai-compatible:…` stehen, sonst hat noch Gemini geantwortet.
+2. **Schwelle kalibrieren:** `match_threshold` 0.4 stammt aus der Gemini-Zeit. Nach dem Lauf die Werte `top_similarity` im `event_log` ansehen:
+
+   ```sql
+   select payload->>'top_similarity' as top, payload->>'chunks' as chunks, created_at
+   from event_log where type = 'assistant_chat' and payload->>'provider' = 'openai-compatible'
+   order by created_at desc limit 20;
+   ```
+
+   Liegen passende Treffer deutlich über oder unter 0.4, `MATCH_THRESHOLD` in `assistant.ts` anpassen.
+3. Ist er sauber: `GEMINI_API_KEY` aus `/docker/complihub-api/.env` entfernen, Container neu starten, den Schlüssel in der Google-Konsole widerrufen.
+4. Google aus der Subprozessor-Liste streichen.
 
 ## 7. Aufräumen im Code
 

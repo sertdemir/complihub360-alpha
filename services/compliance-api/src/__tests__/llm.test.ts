@@ -124,6 +124,11 @@ describe('OpenAI-compatible provider (Scaleway)', () => {
         await expect(llm().generate('S', [], 'Q')).rejects.toThrow();
     });
 
+    it('refuses a truncated answer instead of shipping half of it', async () => {
+        fetchMock.mockResolvedValue(ok({ choices: [{ message: { content: 'Die Schwelle liegt bei' }, finish_reason: 'length' }] }));
+        await expect(llm().generate('S', [], 'Q')).rejects.toThrow(/truncated/);
+    });
+
     it('strips a trailing slash from a custom base URL', async () => {
         fetchMock.mockResolvedValue(ok({ data: [{ embedding: new Array(768).fill(1) }] }));
         await resolveLlm({ LLM_API_KEY: 'k', LLM_BASE_URL: 'https://openai.inference.de-txl.ionos.com/v1/' })!.embedQuery('x');

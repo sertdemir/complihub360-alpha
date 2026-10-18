@@ -4,7 +4,7 @@ import { supabaseApi } from "./supabase.js";
 import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
-import { resolveLlm, sameEmbedModel } from './llm.js';
+import { resolveLlm, sameEmbedModel, type LlmProvider } from './llm.js';
 
 // ─── VAT assistant (chatbot plan phase ②) ─────────────────────────────────────
 // RAG over knowledge_chunks (vector 768, match_knowledge_chunks RPC) plus the
@@ -88,13 +88,45 @@ Rules — follow ALL of them:
 7. Where the AREA KNOWLEDGE marks an entry as EU-level without a national source, say that the national text is not on file.`;
 }
 
+const MATCH_THRESHOLD = 0.4;
+const MATCH_COUNT = 6;
+
+// Audit ohne Frageinhalt. Bleibt nicht-blockierend, aber nie still: ein
+// verlorener Eintrag ist ein fehlender Nachweis, welcher Verarbeiter die
+// Frage gesehen hat (privacy-audit-required).
+async function logAssistantEvent(payload: Record<string, unknown>, correlationId: string): Promise<void> {
+    await supabaseApi.insert('event_log', { type: 'assistant_chat', payload }).catch((err: unknown) => {
+        structuredLog('warn', 'Assistant audit event not written', { correlationId, errorCode: 'ERR_ASSISTANT_AUDIT', severity: 'warn', detail: String(err).slice(0, 200) });
+    });
+}
+
+// Hat der Korpus ueberhaupt Chunks dieses Modells? Nur gefragt, wenn eine
+// Suche leer bleibt — dann ist "nichts Passendes" von "falsch oder gar nicht
+// eingebettet" zu unterscheiden (z. B. LLM_EMBED_MODEL auf dem Server weicht
+// von der Kennung im Ingest ab). Ergebnis je Modell 10 Minuten gemerkt.
+const corpusCheck = new Map<string, { has: boolean; at: number }>();
+async function corpusHasModel(model: string, vector: number[]): Promise<boolean> {
+    const hit = corpusCheck.get(model);
+    if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit.has;
+    const rows = (await supabaseApi.rpc('match_knowledge_chunks', {
+        query_embedding: vector, match_threshold: -1, match_count: 1, embed_model: model,
+    })) as unknown[];
+    const has = Array.isArray(rows) && rows.length > 0;
+    corpusCheck.set(model, { has, at: Date.now() });
+    return has;
+}
+
 export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, correlationId: string, ip: string, identity: CallerIdentity): void {
     let raw = '';
     req.on('data', (chunk: Buffer) => { raw += chunk.toString(); if (raw.length > 32_000) req.destroy(); });
     req.on('end', async () => {
         res.setHeader('x-correlation-id', correlationId);
+        // Fuer den Fehlerfall: was schon an den Anbieter ging, wird auch dann auditiert.
+        let llm: LlmProvider | null = null;
+        let audit: Record<string, unknown> | null = null;
+        let stage = 'init';
         try {
-            const llm = resolveLlm();
+            llm = resolveLlm();
             if (!llm) {
                 res.writeHead(503, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'ASSISTANT_NOT_CONFIGURED', message: 'The assistant is not connected yet', correlationId }));
@@ -142,15 +174,31 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
 
             // Retrieval: vector search over the corpus + structured facts —
             // der Korpus ist Umsatzsteuer, also nur im USt-Bereich.
-            // Nur Treffer, die mit demselben Modell eingebettet wurden wie die
-            // Frage: Waehrend der Neu-Einbettung liegen alte und neue Vektoren
-            // nebeneinander, und ein Fremdvektor ergibt Zufallsaehnlichkeit.
-            const chunks = vatScope
-                ? ((await supabaseApi.rpc('match_knowledge_chunks', {
-                    query_embedding: await llm.embedQuery(country ? `[${country}] ${message}` : message), match_threshold: 0.4, match_count: 6,
-                })) as Array<{ content: string; metadata: { country?: string; section?: string; embed_model?: string } | null; similarity: number }>)
-                    .filter((c) => sameEmbedModel(c.metadata, llm.embedModel))
-                : [];
+            // Ab hier sieht der Anbieter die Frage: Audit-Grundlage festhalten.
+            // provider/modelle: welcher Unterauftragsverarbeiter die Daten gesehen hat.
+            audit = { domain, message_chars: message.length, provider: llm.id, model: llm.chatModel, embed_model: llm.embedModel };
+            res.setHeader('x-llm-provider', `${llm.id}:${llm.chatModel}`);
+
+            // Nur Treffer desselben Embedding-Modells wie die Frage — die RPC
+            // filtert VOR dem LIMIT (20261018000100). Waehrend der
+            // Neu-Einbettung liegen alte und neue Vektoren nebeneinander, und
+            // ein Fremdvektor ergibt Zufallsaehnlichkeit. sameEmbedModel bleibt
+            // als zweite Sicherung, falls die Migration fehlt.
+            let chunks: Array<{ content: string; metadata: { country?: string; section?: string; embed_model?: string } | null; similarity: number }> = [];
+            let corpusMissing = false;
+            const embedModel = llm.embedModel;
+            if (vatScope) {
+                stage = 'embed';
+                const vector = await llm.embedQuery(country ? `[${country}] ${message}` : message);
+                stage = 'retrieve';
+                chunks = ((await supabaseApi.rpc('match_knowledge_chunks', {
+                    query_embedding: vector, match_threshold: MATCH_THRESHOLD, match_count: MATCH_COUNT, embed_model: llm.embedModel,
+                })) as typeof chunks).filter((c) => sameEmbedModel(c.metadata, embedModel));
+                if (!chunks.length && !(await corpusHasModel(llm.embedModel, vector))) {
+                    corpusMissing = true;
+                    structuredLog('warn', 'Assistant corpus has no chunks for the embed model', { correlationId, errorCode: 'ERR_ASSISTANT_CORPUS', severity: 'warn', detail: llm.embedModel });
+                }
+            }
 
             // `factsFor` kann seit 20260917000000 eine Region tragen ('US-CA'),
             // nicht nur ein Land. Abgefragt wird weiter ueber `country_code` —
@@ -192,14 +240,14 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             });
             const userTurn = `CONTEXT:\n${contextParts.join('\n\n') || '(no matching context found)'}\n\nQUESTION:\n${message}`;
 
+            stage = 'generate';
             const answer = await llm.generate(domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
 
-            // Log usage without message content (privacy) — volume + coverage only.
-            await supabaseApi.insert('event_log', {
-                type: 'assistant_chat',
-                // provider/model: welcher Unterauftragsverarbeiter die (Frage-)Daten gesehen hat.
-                payload: { country: factsFor, domain, chunks: chunks.length, message_chars: message.length, provider: llm.id, model: llm.chatModel },
-            }).catch(() => { /* non-blocking */ });
+            // Ohne Frageinhalt — Volumen, Abdeckung und Kalibrierung der Schwelle.
+            await logAssistantEvent({
+                ...audit, outcome: 'ok', country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
+                top_similarity: chunks[0] ? Math.round(chunks[0].similarity * 1000) / 1000 : null,
+            }, correlationId);
 
             const sources = [
                 ...(domain ? [{ label: `CompliHub area knowledge · ${DOMAIN_LABEL[domain]}`, kind: 'area', name: DOMAIN_LABEL[domain] }] : []),
@@ -210,8 +258,13 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             ];
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, answer, sources, correlationId }));
-        } catch {
-            structuredLog('error', 'Assistant chat failed', { correlationId, errorCode: 'ERR_ASSISTANT', severity: 'error', route: '/api/v1/assistant/chat' });
+        } catch (err) {
+            // Ursache ins Log (gekappt, ohne Frage), nach aussen nur die ID.
+            structuredLog('error', 'Assistant chat failed', {
+                correlationId, errorCode: 'ERR_ASSISTANT', severity: 'error', route: '/api/v1/assistant/chat',
+                detail: `${stage}${llm ? ` · ${llm.id}` : ''} · ${String(err).slice(0, 300)}`,
+            });
+            if (audit) await logAssistantEvent({ ...audit, outcome: 'error', stage }, correlationId);
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'ASSISTANT_ERROR', message: 'Assistant request failed', correlationId }));
         }

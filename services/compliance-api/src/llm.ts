@@ -121,9 +121,9 @@ function trimHistory(history: ChatTurn[]): ChatTurn[] {
 type ApiBody = {
     error?: { message?: string }; message?: string; detail?: string;
     data?: Array<{ embedding?: unknown }>;
-    choices?: Array<{ message?: { content?: unknown } }>;
+    choices?: Array<{ message?: { content?: unknown }; finish_reason?: string }>;
     embedding?: { values?: unknown };
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
 };
 
 async function postJson(url: string, headers: Record<string, string>, payload: unknown): Promise<{ ok: boolean; status: number; body: ApiBody }> {
@@ -168,6 +168,9 @@ export function openAiCompatible(cfg: { apiKey: string; baseUrl: string; chatMod
             });
             const text = body?.choices?.[0]?.message?.content;
             if (!ok || typeof text !== 'string' || !text.trim()) throw new Error(`generate: ${errorText(body, status)}`);
+            // Abgeschnitten fehlt oft genau der Schluss: die Grenze oder der
+            // Weg zum Partner. Lieber sichtbar scheitern als halb antworten.
+            if (body.choices?.[0]?.finish_reason === 'length') throw new Error('generate: answer truncated (finish_reason=length)');
             return toPlainText(text);
         },
     };
@@ -202,6 +205,7 @@ function geminiLegacy(apiKey: string): LlmProvider {
             });
             const text = (body?.candidates?.[0]?.content?.parts ?? []).map((p) => p.text || '').join('');
             if (!ok || !text) throw new Error(`Gemini generate: ${errorText(body, status)}`);
+            if (body.candidates?.[0]?.finishReason === 'MAX_TOKENS') throw new Error('Gemini generate: answer truncated (MAX_TOKENS)');
             return toPlainText(text);
         },
     };

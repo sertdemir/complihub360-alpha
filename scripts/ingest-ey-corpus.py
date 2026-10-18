@@ -18,7 +18,8 @@ Usage:
   LLM_API_KEY=... python3 scripts/ingest-ey-corpus.py [path-to-pdf]
 
 Reads SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY from .env.staging (repo root).
-Re-running replaces each country's chunks (delete + insert per country).
+Re-running replaces each country's chunks (insert the new run, then delete
+older rows of that country — an aborted run never leaves a country empty).
 """
 import json
 import os
@@ -193,6 +194,7 @@ def main():
     print(f"embedding with {emb['model']}")
 
     chapters = load_chapters()
+    run = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
     total = 0
     for code, text in chapters.items():
         chunks = chunk_chapter(code, text)
@@ -200,12 +202,20 @@ def main():
         for i in range(0, len(chunks), emb['batch']):
             embeddings += emb['fn'](emb, [c['content'] for c in chunks[i:i + emb['batch']]])
             time.sleep(1)  # stay friendly to the rate limit
-        rows = [{'content': c['content'], 'metadata': {**c['metadata'], 'embed_model': emb['model']}, 'embedding': e}
+        rows = [{'content': c['content'],
+                 'metadata': {**c['metadata'], 'embed_model': emb['model'], 'ingest_run': run},
+                 'embedding': e}
                 for c, e in zip(chunks, embeddings)]
-        # Replace this country's chunks atomically enough for a reference corpus.
-        supabase(sb_url, sb_key, 'DELETE', f'knowledge_chunks?metadata-%3E%3Ecountry=eq.{code}')
+        # Insert first, then drop this country's older rows. A run that dies
+        # midway leaves the old chunks in place (plus a partial new set that
+        # the next run replaces) instead of an empty country.
         for i in range(0, len(rows), 50):
             supabase(sb_url, sb_key, 'POST', 'knowledge_chunks', rows[i:i + 50])
+        # Two plain filters instead of one or=(): rows from before ingest_run
+        # existed (null) and rows from any other run. SQL `<>` skips nulls.
+        for older in ('is.null', f'neq.{run}'):
+            supabase(sb_url, sb_key, 'DELETE',
+                     f'knowledge_chunks?metadata-%3E%3Ecountry=eq.{code}&metadata-%3E%3Eingest_run={older}')
         total += len(rows)
         print(f'{code}: {len(rows)} chunks')
     print(f"✓ {total} chunks ingested with {emb['model']}")
