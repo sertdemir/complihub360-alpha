@@ -22,7 +22,7 @@ import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, revokeGrant, settingsUrl } from "./nylasAuth.js";
 import { notify, notifyProviderMembers, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
-import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recordPaymentUnresolved, reverseOrphanCharge, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
+import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recordPaymentUnresolved, reverseOrphanCharge, lookupRequest, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
 import { loadAttendancePolicy, findRecentLead, rebookDeadline } from "./attendance.js";
 import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
 import { handleProviderPerformance, handleProviderOverview, handleEnforcementAppeal, handleAdminEnforcement } from "./performanceRoutes.js";
@@ -1795,6 +1795,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     }
                     if (Date.parse(slotStart) < Date.now()) { fail(400, 'VALIDATION_ERROR', 'slot_start is in the past'); return; }
                     if (!ackVersion) { fail(400, 'VALIDATION_ERROR', 'acknowledgement_version required'); return; }
+                    // B8: der Schluessel des Versuchs. Optional (alte Clients, Enterprise-API).
+                    const requestKey = typeof d.request_id === 'string' && /^[A-Za-z0-9_-]{8,64}$/.test(d.request_id) ? d.request_id : null;
+                    if (d.request_id !== undefined && !requestKey) { fail(400, 'VALIDATION_ERROR', 'request_id must be 8–64 characters [A-Za-z0-9_-]'); return; }
 
                     const p = await resolveRef(ref);
                     const view = p ? await matchableRows(p.provider_key) : [];
@@ -1812,6 +1815,37 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const gate = bookingOpen({ availability: (p as any).availability, booking_paused_at: (p as any).booking_paused_at });
                     if (!gate.open) { fail(409, gate.reason === 'paused' ? 'BOOKING_PAUSED' : 'PROVIDER_UNAVAILABLE', 'This provider cannot take bookings at the moment'); return; }
                     const providerKey = p.provider_key as string;
+
+                    // B8: Wiederholung desselben Versuchs (Netz weg nach der Antwort,
+                    // Doppelklick). Steht die Buchung schon, bekommt der Client
+                    // dieselbe Antwort noch einmal — keine zweite Zeile, keine
+                    // zweite Belastung. Laeuft der Zwilling noch, 409 ohne Stripe.
+                    if (requestKey) {
+                        const seen = await lookupRequest(authUserId, requestKey);
+                        if (seen.kind === 'booked') {
+                            const b = seen.booking;
+                            const snap = b.shared_snapshot ?? null;
+                            res.writeHead(201, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({
+                                ok: true,
+                                replay: true,
+                                booking: {
+                                    id: b.id, public_ref: ref, slot_start: b.slot_start, slot_end: b.slot_end, status: b.status,
+                                    acknowledgement_version: b.acknowledgement_version, shared_fields: b.shared_fields ?? [],
+                                    user_discount: b.user_discount_pct != null ? { pct: b.user_discount_pct, policy_version: b.user_discount_policy_version ?? null } : null,
+                                    rebooked_from: b.rebooked_from ?? null,
+                                    topic: snap?.topic ?? null,
+                                    shared_snapshot: snap,
+                                },
+                                provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
+                                correlationId,
+                            }));
+                            return;
+                        }
+                        if (seen.kind === 'in_progress') {
+                            fail(409, 'BOOKING_IN_PROGRESS', 'This booking is already being processed. Please wait a moment.'); return;
+                        }
+                    }
 
                     // Die Fassung, die der Nutzer gesehen hat, muss die gueltige sein.
                     const ackRows = (await supabaseApi.select('booking_acknowledgements', {}, { limit: 100 })) as any[];
@@ -1881,8 +1915,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         : await chargeLeadFee({
                             providerKey, userId: authUserId, quote, opp: opp.opp,
                             customerId: p.stripe_customer_id ? String(p.stripe_customer_id) : null, paymentMethodId,
-                            receiptEmail: p.contact_email ?? null, correlationId,
+                            receiptEmail: p.contact_email ?? null, correlationId, requestKey,
                         });
+                    if (charge.outcome === 'duplicate') {
+                        // B8: der Zwilling hat die Zeile — nichts belastet, nichts geschrieben.
+                        fail(409, 'BOOKING_IN_PROGRESS', 'This booking is already being processed. Please wait a moment.'); return;
+                    }
                     if (charge.outcome === 'unknown') {
                         // B1: keine verwertbare Antwort. Nicht „gescheitert" — die
                         // Karte kann belastet sein. Anbieter gesperrt, bis der

@@ -209,6 +209,10 @@
         "title": "No se pudo completar la reserva.",
         "body": "No depende de usted: en este momento falta un requisito por parte del proveedor. Su cita no está reservada y no se ha compartido nada. El proveedor ha sido informado."
       },
+      "in_progress": {
+        "title": "Su reserva ya se está procesando.",
+        "body": "La misma solicitud nos llegó dos veces, probablemente por un doble clic. No se reservó nada dos veces ni se cobró nada dos veces. Espere un momento, luego revise sus citas o inténtelo de nuevo."
+      },
       "slot_taken": {
         "title": "Esta franja acaba de ser ocupada.",
         "body": "Otra persona la reservó hace un momento. Su cita no está reservada y no se ha compartido nada — elija otra franja."
