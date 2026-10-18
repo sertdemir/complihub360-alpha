@@ -2127,7 +2127,11 @@
         "howBookingWorks": "Se crea una cita cuando una empresa le selecciona en los resultados y reserva uno de sus horarios disponibles. Para que eso sea posible:",
         "closing": "La frecuencia de las reservas depende de la demanda en sus áreas. Su plan no influye en ello.",
         "invoicesHeading": "Todavía no hay facturas",
-        "invoicesMessage": "Sus facturas aparecerán aquí cuando se haya facturado un plan."
+        "invoicesMessage": "Sus facturas aparecerán aquí cuando se haya facturado un plan.",
+        "coverage": "Aún no hay servicios aprobados",
+        "coverageClosing": "La matriz se completa cuando nuestro equipo de revisión apruebe su primer servicio para un país.",
+        "coverageHow": "Nuestro equipo de revisión está comprobando sus documentos. En cuanto se apruebe un servicio, aparecerá para él en los resultados y podrá recibir reservas.",
+        "coverageAction": "Ir a la verificación"
       },
       "readiness": {
         "verified": "Verificación completada",
@@ -2151,15 +2155,27 @@
         "thresholdNote": "Una tasa basada en una o dos solicitudes dice poco de usted. Por eso la mostramos a partir de cinco solicitudes."
       },
       "coverage": {
-        "heading": "Dónde aparece",
+        "heading": "Dónde <accent>aparece</accent>.",
         "message": "Según lo aprobado por nuestro equipo de revisión. Para cambiarlo, envíe el cambio en Servicios. Se aplica tras la revisión.",
         "approved": "aprobado",
         "underReview": "en revisión",
         "notRequested": "no solicitado",
         "languages": "Idiomas",
         "responseTime": "Tiempo de respuesta",
-        "hours": "{{hours}} horas",
-        "submitChange": "Enviar un cambio"
+        "hours": "{{hours}} horas para confirmar",
+        "submitChange": "Enviar un cambio",
+        "matrixTitle": "Servicios aprobados",
+        "services_one": "{{count}} servicio",
+        "services_other": "{{count}} servicios",
+        "countries_one": "{{count}} país",
+        "countries_other": "{{count}} países",
+        "service": "Servicio",
+        "matrixHint": "El matching también lee esta matriz. Un guion marca un servicio que actualmente no está aprobado en ese país.",
+        "matchingTitle": "Para el matching",
+        "matchingSub": "Se muestra a las empresas en los resultados",
+        "availability": "Disponibilidad",
+        "available": "Disponible",
+        "ooo": "Ausente"
       },
       "profileUnavailable": "No se puede acceder a su perfil guardado en este momento. Podrá volver a guardar cuando se haya cargado."
     }

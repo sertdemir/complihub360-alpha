@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { useApiData } from '../lib/useApiData';
-import { fetchSlots, fetchAcknowledgement, createBooking, bookingFailureFrom, type BookingAcknowledgement, type BookingFailure } from '../api/bookings';
+import { fetchSlots, fetchAcknowledgement, createBooking, newBookingRequestId, bookingFailureFrom, type BookingAcknowledgement, type BookingFailure } from '../api/bookings';
 import { Button } from '../components/ui/Button';
 import { Banner } from '../components/ui/Banner';
 import { AcknowledgementList, BookingFailureCard } from '../components/user/BookingAcknowledgement';
@@ -81,12 +81,15 @@ export function ProviderSchedulePage() {
     return [...m.entries()].slice(0, 5);
   }, [slots, df]);
 
+  // B8: ein Schluessel je Versuch (siehe PartnerDrawer).
+  const requestIdRef = useRef<string | null>(null);
   const book = async () => {
     if (!selected || !ack) return;
     setState('sending');
     setFailure(null);
+    requestIdRef.current ??= newBookingRequestId();
     try {
-      const res = await createBooking(key, selected, { message: message.trim() || undefined, acknowledgementVersion: ack.version, language: locale, sessionId: sessionId ?? undefined });
+      const res = await createBooking(key, selected, { message: message.trim() || undefined, acknowledgementVersion: ack.version, language: locale, sessionId: sessionId ?? undefined, requestId: requestIdRef.current });
       setReviewOpen(false);
       // E3: dieselbe Bestaetigungsseite wie aus der Schublade. Den Titel des
       // Anbieters kennt diese Seite nicht — der Buchstabe faellt dann weg,
@@ -104,7 +107,9 @@ export function ProviderSchedulePage() {
       // Anbieters, der nichts davon weiss. Ein Fehler sagt jetzt, dass nicht
       // gebucht wurde — in dem Satz, der zur Lage passt.
       setReviewOpen(false);
-      setFailure(bookingFailureFrom(err));
+      const f = bookingFailureFrom(err);
+      if (f.kind !== 'in_progress') requestIdRef.current = null;
+      setFailure(f);
       setState('idle');
     }
   };

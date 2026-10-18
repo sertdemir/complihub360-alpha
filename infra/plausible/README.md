@@ -26,6 +26,11 @@ keine Events — in Entwicklung, Tests und unkonfigurierten Builds.
 Staging-Klicks unter die echten Zahlen. Gesetzt wird sie in `.env.staging`
 (`PLAUSIBLE_DOMAIN`) bzw. als Repository-Variable für die CI.
 
+**Die Beta hat ebenfalls eine eigene Site** (seit 18.10.2026): Repository-Variable
+`BETA_PLAUSIBLE_DOMAIN` = `beta.complihub360.com`, in Plausible als Site angelegt.
+`deploy-beta.yml` nimmt den Host aus `PLAUSIBLE_HOST`. Ist die Variable leer,
+bleibt Plausible in der Beta aus.
+
 ## Scrolltiefe
 
 `src/lib/analytics.ts` meldet `Scroll Depth` bei 25 / 50 / 75 / 90 %, einmal je

@@ -87,6 +87,15 @@ describe('ReadinessEmpty', () => {
     expect(screen.getByText('states.partner.empty.closing')).toBeInTheDocument();
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
+
+  it('Abdeckung: eigene Copy, kein Bereitschafts-Raster, der eine Weg zur Verifizierung', () => {
+    render(<MemoryRouter><ReadinessEmpty kind="coverage" items={null} /></MemoryRouter>);
+    expect(screen.getByText('states.partner.empty.coverage')).toBeInTheDocument();
+    expect(screen.getByText('states.partner.empty.coverageHow')).toBeInTheDocument();
+    expect(screen.getByText('states.partner.empty.coverageClosing')).toBeInTheDocument();
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /states.partner.empty.coverageAction/ })).toBeInTheDocument();
+  });
 });
 
 describe('LoadFailedState (A2)', () => {

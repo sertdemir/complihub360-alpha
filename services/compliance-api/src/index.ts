@@ -22,14 +22,14 @@ import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, revokeGrant, settingsUrl } from "./nylasAuth.js";
 import { notify, notifyProviderMembers, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
-import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recordPaymentUnresolved, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
+import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recordPaymentUnresolved, reverseOrphanCharge, lookupRequest, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
 import { loadAttendancePolicy, findRecentLead, rebookDeadline } from "./attendance.js";
 import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
 import { handleProviderPerformance, handleProviderOverview, handleEnforcementAppeal, handleAdminEnforcement } from "./performanceRoutes.js";
 import { authenticateApiClient, clientRateLimiter, setRateLimitHeaders, logApiRequest, handleExtRoutes, handleProviderApiAccess, handleAdminApiAccess } from "./apiRoutes.js";
 import { looksLikeApiKey } from "./apiClients.js";
 import { loadPerformancePolicy, qualityFactor, availabilitySlots, bookingOpen, validateAvailabilityHours, validTimezone, incidentsInWindow } from "./performance.js";
-import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent, StripeError } from "./stripe.js";
+import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, StripeError } from "./stripe.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
@@ -1795,6 +1795,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     }
                     if (Date.parse(slotStart) < Date.now()) { fail(400, 'VALIDATION_ERROR', 'slot_start is in the past'); return; }
                     if (!ackVersion) { fail(400, 'VALIDATION_ERROR', 'acknowledgement_version required'); return; }
+                    // B8: der Schluessel des Versuchs. Optional (alte Clients, Enterprise-API).
+                    const requestKey = typeof d.request_id === 'string' && /^[A-Za-z0-9_-]{8,64}$/.test(d.request_id) ? d.request_id : null;
+                    if (d.request_id !== undefined && !requestKey) { fail(400, 'VALIDATION_ERROR', 'request_id must be 8–64 characters [A-Za-z0-9_-]'); return; }
 
                     const p = await resolveRef(ref);
                     const view = p ? await matchableRows(p.provider_key) : [];
@@ -1812,6 +1815,37 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const gate = bookingOpen({ availability: (p as any).availability, booking_paused_at: (p as any).booking_paused_at });
                     if (!gate.open) { fail(409, gate.reason === 'paused' ? 'BOOKING_PAUSED' : 'PROVIDER_UNAVAILABLE', 'This provider cannot take bookings at the moment'); return; }
                     const providerKey = p.provider_key as string;
+
+                    // B8: Wiederholung desselben Versuchs (Netz weg nach der Antwort,
+                    // Doppelklick). Steht die Buchung schon, bekommt der Client
+                    // dieselbe Antwort noch einmal — keine zweite Zeile, keine
+                    // zweite Belastung. Laeuft der Zwilling noch, 409 ohne Stripe.
+                    if (requestKey) {
+                        const seen = await lookupRequest(authUserId, requestKey);
+                        if (seen.kind === 'booked') {
+                            const b = seen.booking;
+                            const snap = b.shared_snapshot ?? null;
+                            res.writeHead(201, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({
+                                ok: true,
+                                replay: true,
+                                booking: {
+                                    id: b.id, public_ref: ref, slot_start: b.slot_start, slot_end: b.slot_end, status: b.status,
+                                    acknowledgement_version: b.acknowledgement_version, shared_fields: b.shared_fields ?? [],
+                                    user_discount: b.user_discount_pct != null ? { pct: b.user_discount_pct, policy_version: b.user_discount_policy_version ?? null } : null,
+                                    rebooked_from: b.rebooked_from ?? null,
+                                    topic: snap?.topic ?? null,
+                                    shared_snapshot: snap,
+                                },
+                                provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
+                                correlationId,
+                            }));
+                            return;
+                        }
+                        if (seen.kind === 'in_progress') {
+                            fail(409, 'BOOKING_IN_PROGRESS', 'This booking is already being processed. Please wait a moment.'); return;
+                        }
+                    }
 
                     // Die Fassung, die der Nutzer gesehen hat, muss die gueltige sein.
                     const ackRows = (await supabaseApi.select('booking_acknowledgements', {}, { limit: 100 })) as any[];
@@ -1853,6 +1887,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const cycleStart = cycleStartFor(sub, now);
                     const used = await getDiscountCounter(providerKey, cycleStart);
                     const quote = quoteLeadFee(cfg, sub, opp.opp, used, now);
+                    if (sub && !quote.planVersionExact) {
+                        // B4: Konfigurationsluecke, kein Normalfall — der Rabatt der juengsten
+                        // Version greift, aber jemand muss sehen, dass der Katalog die
+                        // gebundene Version nicht mehr fuehrt.
+                        structuredLog('warn', 'Subscription plan version missing from catalog — using latest', { correlationId, errorCode: 'PLAN_VERSION_FALLBACK', severity: 'warning', providerKey, planCode: sub.planCode, planVersion: sub.planVersion, usedVersion: quote.planVersion } as any);
+                        await supabaseApi.insert('event_log', { type: 'plan_version_fallback', payload: { providerKey, planCode: sub.planCode, planVersion: sub.planVersion, usedVersion: quote.planVersion } })
+                            .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'plan_version_fallback', detail: String(e).slice(0, 200) } as any));
+                    }
                     const policies = (await supabaseApi.select('user_discount_policy', {}, { limit: 50 })) as any[];
                     const today = now.toISOString().slice(0, 10);
                     const policy = policies.filter((r) => String(r.effective_from) <= today).sort((a, b) => b.version - a.version)[0] ?? null;
@@ -1881,8 +1923,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         : await chargeLeadFee({
                             providerKey, userId: authUserId, quote, opp: opp.opp,
                             customerId: p.stripe_customer_id ? String(p.stripe_customer_id) : null, paymentMethodId,
-                            receiptEmail: p.contact_email ?? null, correlationId,
+                            receiptEmail: p.contact_email ?? null, correlationId, requestKey,
                         });
+                    if (charge.outcome === 'duplicate') {
+                        // B8: der Zwilling hat die Zeile — nichts belastet, nichts geschrieben.
+                        fail(409, 'BOOKING_IN_PROGRESS', 'This booking is already being processed. Please wait a moment.'); return;
+                    }
                     if (charge.outcome === 'unknown') {
                         // B1: keine verwertbare Antwort. Nicht „gescheitert" — die
                         // Karte kann belastet sein. Anbieter gesperrt, bis der
@@ -1945,14 +1991,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         if (!booking?.id) throw new Error('scheduling insert returned no row');
                     } catch (insErr) {
                         // Belastet, aber keine Buchung: erstatten und protokollieren.
+                        // B2: jeder Schritt einzeln, nichts hinter `.catch(() => {})`;
+                        // bleibt etwas halb, sperrt `payment_unresolved` den Anbieter
+                        // und der Abgleich-Tick holt die Erstattung nach.
                         if (charge.outcome === 'captured') {
-                            try {
-                                await refundPaymentIntent(charge.paymentIntentId, `${charge.ledgerId}:refund`);
-                                await supabaseApi.insert('provider_lead_ledger_payment_events', { ledger_id: charge.ledgerId, status: 'refunded', stripe_ref: charge.paymentIntentId, detail: 'booking insert failed' });
-                                await supabaseApi.insert('event_log', { type: 'lead_charge_reversed', payload: { providerKey, ledgerId: charge.ledgerId, paymentIntentId: charge.paymentIntentId } });
-                            } catch (refErr) {
-                                await supabaseApi.insert('event_log', { type: 'lead_charge_reversed_failed', payload: { providerKey, ledgerId: charge.ledgerId, paymentIntentId: charge.paymentIntentId, error: String(refErr).slice(0, 200) } }).catch(() => {});
-                            }
+                            await reverseOrphanCharge({ providerKey, ledgerId: charge.ledgerId, paymentIntentId: charge.paymentIntentId, reason: 'booking insert failed', correlationId });
                         }
                         const dup = /23505|duplicate|unique/i.test(String(insErr));
                         if (dup) fail(409, 'SLOT_TAKEN', 'This slot has just been taken');
@@ -2146,7 +2189,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const name = typeof d.name === 'string' ? d.name.trim() : '';
                 if (!name) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'name required', correlationId }));
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'name', message: 'name required', correlationId }));
                     return;
                 }
                 const providerKey = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
@@ -2325,7 +2368,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const providerKey = (req.url || '').split('/')[4];
         try {
             await syncOpenInvoices(providerKey).catch(() => { /* list still renders */ });
-            const invoices = await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 });
+            const all = (await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 })) as any[];
+            // B7: ein `draft` ist bei Stripe angelegt, aber noch keine Rechnung an
+            // den Anbieter — der naechste Monatslauf nimmt ihn auf. Nicht zeigen.
+            const invoices = all.filter((r) => r.status !== 'draft');
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, invoices }));
@@ -2439,7 +2485,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const newEmail = typeof d.new_email === 'string' ? d.new_email.trim().toLowerCase() : '';
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(newEmail)) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'new_email must be a valid address', correlationId }));
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'new_email', message: 'new_email must be a valid address', correlationId }));
                     return;
                 }
                 const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as

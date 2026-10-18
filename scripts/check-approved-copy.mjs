@@ -198,7 +198,12 @@ const VORLAGE = {
       "howBookingWorks": "An appointment is created when a business selects you in the results and books one of your available times. For that to be possible:",
       "closing": "How often you’re booked depends on demand in your areas. Your plan doesn’t change that.",
       "invoicesHeading": "No invoices yet",
-      "invoicesMessage": "Your invoices appear here once a plan has been billed."
+      "invoicesMessage": "Your invoices appear here once a plan has been billed.",
+      // Sechste Abnahme (Abdeckung, 18.10.2026): noch keine freigegebene Leistung.
+      "coverage": "No approved service yet",
+      "coverageClosing": "The matrix fills in once our review team has approved your first service for a country.",
+      "coverageHow": "Our review team is checking your documents. Once a service is approved, you appear for it in the results and can be booked.",
+      "coverageAction": "Go to verification"
     },
     "readiness": {
       "verified": "Verification completed",
@@ -221,16 +226,34 @@ const VORLAGE = {
       "belowThreshold": "from 5 requests",
       "thresholdNote": "A rate based on one or two requests says little about you. That’s why we show it from five requests."
     },
+    // ── Sechste Abnahme: Angleich der Abdeckung an das User-Dashboard
+    // (Canvas A1–A8), Figma „Provider · Abdeckung (So 18.10.)" mit NOTE
+    // 3804:600 („Neue oder geänderte Copy (zur Abnahme)"), Review-OK
+    // 18.10.2026 („Die Abdeckung passt"). Titel mit Goldwort als <accent>,
+    // Matrix als Karte mit Kopf, Zähler und Hinweisband, Karte „For matching",
+    // Reaktionszeit mit Bezug, Leerzustand ohne Freigabe (empty.coverage*).
     "coverage": {
-      "heading": "Where you appear",
+      "heading": "Where you <accent>appear</accent>.",
       "message": "As approved by our review team. To change it, submit the change under Services. It applies after review.",
       "approved": "approved",
       "underReview": "under review",
       "notRequested": "not requested",
       "languages": "Languages",
       "responseTime": "Response time",
-      "hours": "{{hours}} hours",
-      "submitChange": "Submit a change"
+      "hours": "{{hours}} hours to confirm",
+      "submitChange": "Submit a change",
+      "matrixTitle": "Approved services",
+      "services_one": "{{count}} service",
+      "services_other": "{{count}} services",
+      "countries_one": "{{count}} country",
+      "countries_other": "{{count}} countries",
+      "service": "Service",
+      "matrixHint": "Matching reads this matrix too. A dash marks a service that is currently not approved in that country.",
+      "matchingTitle": "For matching",
+      "matchingSub": "Shown to companies in the results",
+      "availability": "Availability",
+      "available": "Available",
+      "ooo": "Out of office"
     },
     "profileUnavailable": "Your saved profile can’t be reached right now. Saving works again once it has loaded."
   }
@@ -366,22 +389,24 @@ const klartext = (html) => html
   .replace(/\s+/g, ' ')
   .trim();
 const MAIL_FUSS = 'CompliHub360 — Always on your side.';
+// Seit 18.10.2026 (PR #334, token_hash) gilt der Link in jedem Browser; der
+// Satz "Open it in the same browser" ist gestrichen (Nutzer, 18.10.2026).
 const MAIL_HINWEIS = 'This link works once and expires after 30 minutes.';
 const MAILS = {
   confirmation: {
     subject: 'Confirm your email for CompliHub360',
-    saetze: ['Confirm your email.', 'Welcome to CompliHub360. Confirm your email address to activate your account. If you started a Risk Map before signing up, you’ll find it in your workspace.', 'Confirm email →', MAIL_HINWEIS, 'Open it in the same browser you signed up in.', 'Didn’t sign up? Ignore this email. No account will be activated.', MAIL_FUSS, 'You received this email because an account was created with this address on complihub360.com.'],
+    saetze: ['Confirm your email.', 'Welcome to CompliHub360. Confirm your email address to activate your account. If you started a Risk Map before signing up, you’ll find it in your workspace.', 'Confirm email →', MAIL_HINWEIS, 'Didn’t sign up? Ignore this email. No account will be activated.', MAIL_FUSS, 'You received this email because an account was created with this address on complihub360.com.'],
   },
   magic_link: {
     subject: 'Your CompliHub360 sign-in link',
-    saetze: ['Your sign-in link.', 'Use the button below to sign in to CompliHub360. No password needed. This link is your key, so please don’t forward it.', 'Sign in to CompliHub360 →', MAIL_HINWEIS, 'Open it in the same browser you requested it from.', 'Didn’t request this? Ignore this email. Nobody can sign in without the link.', MAIL_FUSS, 'You received this email because a sign-in link was requested for this address on complihub360.com.'],
+    saetze: ['Your sign-in link.', 'Use the button below to sign in to CompliHub360. No password needed. This link is your key, so please don’t forward it.', 'Sign in to CompliHub360 →', MAIL_HINWEIS, 'Didn’t request this? Ignore this email. Nobody can sign in without the link.', MAIL_FUSS, 'You received this email because a sign-in link was requested for this address on complihub360.com.'],
   },
   recovery: {
     subject: 'Reset your CompliHub360 password',
-    saetze: ['Reset your password.', 'We received a request to reset the password for your CompliHub360 account. Choose a new one with the button below.', 'Set a new password →', MAIL_HINWEIS, 'Open it in the same browser you requested it from.', 'Didn’t request this? Ignore this email. Your password stays as it is.', MAIL_FUSS, 'You received this email because a password reset was requested for this address on complihub360.com.'],
+    saetze: ['Reset your password.', 'We received a request to reset the password for your CompliHub360 account. Choose a new one with the button below.', 'Set a new password →', MAIL_HINWEIS, 'Didn’t request this? Ignore this email. Your password stays as it is.', MAIL_FUSS, 'You received this email because a password reset was requested for this address on complihub360.com.'],
   },
 };
-const MAIL_VERBOTEN = [/partner matches are waiting/i, /orchestration layer/i, /e-mail/i, /short time/i, /securely/i];
+const MAIL_VERBOTEN = [/partner matches are waiting/i, /orchestration layer/i, /e-mail/i, /short time/i, /securely/i, /same browser/i];
 const authCfg = JSON.parse(readFileSync(resolve(MAIL_DIR, 'supabase-auth.json'), 'utf8'));
 if (authCfg.otp_expiry_seconds !== 1800) fehler.push(`Auth-Mails: otp_expiry_seconds ist ${authCfg.otp_expiry_seconds}, die Mails sagen „30 minutes" (Wahl D1)`);
 for (const [art, soll] of Object.entries(MAILS)) {
@@ -392,7 +417,11 @@ for (const [art, soll] of Object.entries(MAILS)) {
   try { text = klartext(readFileSync(resolve(MAIL_DIR, eintrag.file), 'utf8')); } catch { fehler.push(`Auth-Mails: ${eintrag.file} fehlt`); continue; }
   for (const satz of soll.saetze) if (!text.includes(satz)) fehler.push(`Auth-Mails: ${eintrag.file} — fehlt wortgleich: „${satz}"`);
   for (const m of MAIL_VERBOTEN) if (m.test(text)) fehler.push(`Auth-Mails: ${eintrag.file} — ersetzt und nicht mehr erlaubt: ${m}`);
-  if (!/\{\{ \.ConfirmationURL \}\}/.test(readFileSync(resolve(MAIL_DIR, eintrag.file), 'utf8'))) fehler.push(`Auth-Mails: ${eintrag.file} — {{ .ConfirmationURL }} fehlt`);
+  // Seit 18.10.2026 traegt der Knopf einen token_hash statt {{ .ConfirmationURL }}:
+  // Der PKCE-Link liess sich nur im anfordernden Browser einloesen (lib/authLink.ts).
+  const typ = art === 'recovery' ? 'recovery' : 'email';
+  const link = `href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=${typ}"`;
+  if (!readFileSync(resolve(MAIL_DIR, eintrag.file), 'utf8').includes(link)) fehler.push(`Auth-Mails: ${eintrag.file} — Link fehlt: ${link}`);
 }
 
 // 6. Verfuegbarkeit (Checklist v1.0, Schritt 5, Wording-Abnahme 10.10.2026):

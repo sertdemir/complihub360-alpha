@@ -10,6 +10,9 @@ import type { ReactNode } from 'react';
 const api = vi.hoisted(() => ({ fetchOverview: vi.fn() }));
 vi.mock('../../components/provider/ProviderShell', () => ({ ProviderShell: ({ children }: { children: ReactNode }) => <>{children}</> }));
 vi.mock('../../api/performance', async (orig) => ({ ...(await orig<typeof import('../../api/performance')>()), fetchOverview: () => api.fetchOverview() }));
+// Die Begruessung liest den Firmennamen aus /me/provider (Angleich 18.10.);
+// ohne Mock liefe der Aufruf ins Leere und fuellte das Protokoll mit ECONNREFUSED.
+vi.mock('../../api/provider', () => ({ fetchMyProvider: () => Promise.resolve({ provider_key: 'k', role: 'owner', name: 'Testkanzlei', lifecycle_status: 'active' }) }));
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (k: string, o?: Record<string, unknown>) => (o && 'count' in o ? `${k}:${String(o.count)}` : k), i18n: { resolvedLanguage: 'en' } }),
   Trans: ({ i18nKey }: { i18nKey: string }) => <>{i18nKey}</>,

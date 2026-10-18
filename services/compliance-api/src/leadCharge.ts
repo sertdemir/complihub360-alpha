@@ -166,6 +166,8 @@ export function currentAcknowledgement(rows: AcknowledgementRow[], lang: string,
 // ─── Die Belastung ───────────────────────────────────────────────────────────
 
 export type ChargeOutcome =
+    /** B8: derselbe Buchungsversuch laeuft schon (Unique auf user_id + request_key) — nichts geschrieben, nichts belastet. */
+    | { ledgerId: null; outcome: 'duplicate' }
     | { ledgerId: string; outcome: 'captured'; paymentIntentId: string }
     | { ledgerId: string; outcome: 'n/a' }
     | { ledgerId: string; outcome: 'failed'; result: Extract<ChargeResult, { ok: false }> }
@@ -181,10 +183,14 @@ export async function chargeLeadFee(input: {
     paymentMethodId: string | null;
     receiptEmail?: string | null;
     correlationId: string;
+    /** B8: Schluessel des Buchungsversuchs vom Client; eindeutig je Nutzer. */
+    requestKey?: string | null;
 }): Promise<ChargeOutcome> {
     const { quote, opp } = input;
     const chargeable = quote.enabled && quote.finalFeeCents > 0;
-    const inserted = (await supabaseApi.insert('provider_lead_ledger', {
+    let inserted: Array<{ id: string }>;
+    try {
+        inserted = (await supabaseApi.insert('provider_lead_ledger', {
         kind: 'charge',
         provider_key: input.providerKey,
         user_id: input.userId,
@@ -203,10 +209,17 @@ export async function chargeLeadFee(input: {
         currency: quote.currency,
         payment_status: chargeable ? 'pending' : 'n/a',
         policy_version: quote.policyVersion,
+        request_key: input.requestKey ?? null,
         // Explizit, nicht per Default: der Abgleich (B1) misst daran das Alter
         // der Zeile, und der Test-Store kennt keine Defaults.
         created_at: new Date().toISOString(),
-    })) as Array<{ id: string }>;
+        })) as Array<{ id: string }>;
+    } catch (err) {
+        // Der Zwilling war schneller: dieselbe Anfrage desselben Nutzers hat
+        // ihre Zeile schon. Kein Stripe-Aufruf, keine zweite Belastung.
+        if (input.requestKey && /23505|duplicate|unique/i.test(String(err))) return { ledgerId: null, outcome: 'duplicate' };
+        throw err;
+    }
     const ledgerId = inserted?.[0]?.id;
     if (!ledgerId) throw new Error('ledger insert returned no id');
     if (!chargeable) return { ledgerId, outcome: 'n/a' };
@@ -285,6 +298,37 @@ export async function recordPaymentFailure(args: {
  * Watcher-Tick das auf, und ein Alarm fuer eine Minute Unsicherheit waere
  * Laerm. Die Spur steht im event_log und im strukturierten Log.
  */
+/** Ein Ereignis protokollieren, ohne dass ein Fehler dabei den Aufrufer kippt — aber nie still. */
+async function logEvent(type: string, payload: Record<string, unknown>, correlationId: string): Promise<void> {
+    try {
+        await supabaseApi.insert('event_log', { type, payload });
+    } catch (err) {
+        structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type, detail: String(err).slice(0, 200) } as any);
+    }
+}
+
+/**
+ * Den Anbieter mit `payment_unresolved` sperren. Die Sperre ist der Schutz
+ * vor der Doppelbelastung UND der Marker, den der Abgleich-Tick sucht.
+ * Scheitert sie, muss das jemand sehen.
+ */
+async function markPaymentUnresolved(providerKey: string, ledgerId: string, correlationId: string): Promise<void> {
+    try {
+        const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+        const p = rows[0];
+        if (!p) return;
+        const reasons = new Set<string>(Array.isArray(p.billing_block_reasons) ? p.billing_block_reasons : []);
+        reasons.add('payment_unresolved');
+        await supabaseApi.update('providers', { provider_key: providerKey }, {
+            billing_ready: false, billing_block_reasons: Array.from(reasons), billing_synced_at: new Date().toISOString(),
+        });
+    } catch (err) {
+        structuredLog('error', 'Could not block provider for unresolved charge', {
+            correlationId, errorCode: 'ERR_LEAD_CHARGE_UNRESOLVED_BLOCK', severity: 'error', providerKey, ledgerId, detail: String(err).slice(0, 200),
+        } as any);
+    }
+}
+
 export async function recordPaymentUnresolved(args: {
     providerKey: string;
     ledgerId: string;
@@ -295,40 +339,108 @@ export async function recordPaymentUnresolved(args: {
         correlationId: args.correlationId, errorCode: 'ERR_LEAD_CHARGE_UNKNOWN', severity: 'error',
         providerKey: args.providerKey, ledgerId: args.ledgerId, detail: args.result.detail.slice(0, 200),
     } as any);
-    try {
-        const rows = (await supabaseApi.select('providers', { provider_key: args.providerKey }, { limit: 1 })) as any[];
-        const p = rows[0];
-        if (p) {
-            const reasons = new Set<string>(Array.isArray(p.billing_block_reasons) ? p.billing_block_reasons : []);
-            reasons.add('payment_unresolved');
-            await supabaseApi.update('providers', { provider_key: args.providerKey }, {
-                billing_ready: false, billing_block_reasons: Array.from(reasons), billing_synced_at: new Date().toISOString(),
-            });
-        }
-    } catch (err) {
-        // Die Sperre ist der Schutz vor der Doppelbelastung. Scheitert sie,
-        // muss das jemand sehen — der Abgleich-Tick sperrt beim naechsten
-        // Durchgang nach (er sieht die offene Ledger-Zeile).
-        structuredLog('error', 'Could not block provider after unknown charge outcome', {
-            correlationId: args.correlationId, errorCode: 'ERR_LEAD_CHARGE_UNKNOWN_BLOCK', severity: 'error',
-            providerKey: args.providerKey, ledgerId: args.ledgerId, detail: String(err).slice(0, 200),
-        } as any);
-    }
-    await supabaseApi.insert('event_log', {
-        type: 'lead_payment_unresolved',
-        payload: { providerKey: args.providerKey, ledgerId: args.ledgerId, detail: args.result.detail.slice(0, 200) },
-    }).catch((err) => {
-        structuredLog('error', 'event_log insert failed', { correlationId: args.correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'lead_payment_unresolved', detail: String(err).slice(0, 200) } as any);
-    });
+    await markPaymentUnresolved(args.providerKey, args.ledgerId, args.correlationId);
+    await logEvent('lead_payment_unresolved', { providerKey: args.providerKey, ledgerId: args.ledgerId, detail: args.result.detail.slice(0, 200) }, args.correlationId);
 }
 
-/** Die Ledger-Zeilen eines Anbieters, deren juengstes Ereignis `unknown` ist. */
-export async function unresolvedLedgers(providerKey: string): Promise<Array<{ id: string; created_at: string }>> {
+// ─── B8: derselbe Buchungsversuch, noch einmal ───────────────────────────────
+
+export type ReplayLookup =
+    | { kind: 'none' }
+    /** Die Buchung zu diesem Versuch steht schon — dieselbe Antwort noch einmal. */
+    | { kind: 'booked'; ledgerId: string; booking: any }
+    /** Die Zeile steht, aber (noch) keine Buchung: der Zwilling laeuft, oder der Versuch ist gescheitert. */
+    | { kind: 'in_progress'; ledgerId: string };
+
+/** Was ein Nutzer mit diesem `request_id` schon ausgeloest hat. */
+export async function lookupRequest(userId: string, requestKey: string): Promise<ReplayLookup> {
+    const rows = (await supabaseApi.select('provider_lead_ledger', { user_id: userId, request_key: requestKey }, { limit: 1 })) as any[];
+    const ledger = rows[0];
+    if (!ledger) return { kind: 'none' };
+    const booked = (await supabaseApi.select('scheduling', { lead_ledger_id: ledger.id, user_id: userId }, { limit: 1 })) as any[];
+    if (booked[0]) return { kind: 'booked', ledgerId: String(ledger.id), booking: booked[0] };
+    return { kind: 'in_progress', ledgerId: String(ledger.id) };
+}
+
+// ─── B2: eine Belastung ohne Buchung zurueckgeben ────────────────────────────
+//
+// Befund B2 (2026-10-16): scheiterte die Erstattung, blieb nur ein
+// event_log-Insert hinter `.catch(() => {})` — Ledger `captured`, kein Log,
+// keine Spur fuer irgendwen. Und warf nach einer GELUNGENEN Erstattung der
+// Payment-Event-Insert, hiess das Ereignis `lead_charge_reversed_failed`, obwohl
+// das Geld laengst zurueck war.
+//
+// Jetzt: Erstattung → Payment-Event `refunded` → event_log, jeder Schritt
+// einzeln. Was danach noch halb ist (Erstattung nicht durch, oder durch, aber
+// nicht verbucht), bekommt `payment_unresolved` am Anbieter — und damit den
+// Abgleich-Tick, der eine `captured`-Zeile ohne Buchung erneut erstattet (mit
+// demselben Idempotency-Key, also ohne zweites Geld) und die Ereignisse
+// nachschreibt.
+
+export type ReversalOutcome = 'refunded' | 'refunded_unrecorded' | 'refund_failed';
+
+export async function reverseOrphanCharge(args: {
+    providerKey: string;
+    ledgerId: string;
+    paymentIntentId: string;
+    reason: string;
+    correlationId: string;
+    reconciled?: boolean;
+}): Promise<ReversalOutcome> {
+    const { providerKey, ledgerId, paymentIntentId, correlationId } = args;
+    let refundId: string;
+    try {
+        refundId = (await refundPaymentIntent(paymentIntentId, `${ledgerId}:refund`)).refundId;
+    } catch (err) {
+        structuredLog('error', 'Refund of orphan lead charge failed', {
+            correlationId, errorCode: 'ERR_LEAD_REFUND', severity: 'error', providerKey, ledgerId, paymentIntentId, detail: String(err).slice(0, 200),
+        } as any);
+        await logEvent('lead_charge_reversed_failed', { providerKey, ledgerId, paymentIntentId, reason: args.reason, error: String(err).slice(0, 200) }, correlationId);
+        await markPaymentUnresolved(providerKey, ledgerId, correlationId);
+        return 'refund_failed';
+    }
+    try {
+        await supabaseApi.insert('provider_lead_ledger_payment_events', { ledger_id: ledgerId, status: 'refunded', stripe_ref: paymentIntentId, detail: `${args.reason}, refund ${refundId}`.slice(0, 200) });
+    } catch (err) {
+        // Das Geld ist zurueck, das Ledger weiss es nicht. Kein
+        // `reversed_failed` — das waere eine Luege. Der Tick holt es nach.
+        structuredLog('error', 'Refund succeeded but ledger event insert failed', {
+            correlationId, errorCode: 'ERR_LEAD_REFUND_UNRECORDED', severity: 'error', providerKey, ledgerId, paymentIntentId, refundId, detail: String(err).slice(0, 200),
+        } as any);
+        await logEvent('lead_charge_reversed', { providerKey, ledgerId, paymentIntentId, refundId, reason: args.reason, reconciled: !!args.reconciled, ledgerEventWritten: false }, correlationId);
+        await markPaymentUnresolved(providerKey, ledgerId, correlationId);
+        return 'refunded_unrecorded';
+    }
+    await logEvent('lead_charge_reversed', { providerKey, ledgerId, paymentIntentId, refundId, reason: args.reason, reconciled: !!args.reconciled }, correlationId);
+    return 'refunded';
+}
+
+export interface UnresolvedLedger {
+    id: string;
+    created_at: string;
+    /** `unknown`: Stripe-Antwort fehlt (B1). `orphan`: belastet, aber keine Buchung dazu (B2). */
+    kind: 'unknown' | 'orphan';
+    paymentIntentId: string | null;
+}
+
+/**
+ * Die Ledger-Zeilen eines Anbieters, die der Abgleich klaeren muss: juengstes
+ * Ereignis `unknown` — oder `captured` ohne Buchung, die auf die Zeile zeigt
+ * (`scheduling.lead_ledger_id`; Neubuchungen zeigen auf dieselbe Wurzel).
+ */
+export async function unresolvedLedgers(providerKey: string): Promise<UnresolvedLedger[]> {
     const pending = (await supabaseApi.select('provider_lead_ledger', { provider_key: providerKey, payment_status: 'pending' }, { order: 'created_at.desc', limit: 50 })) as any[];
-    const out: Array<{ id: string; created_at: string }> = [];
+    const out: UnresolvedLedger[] = [];
     for (const row of pending) {
         const events = (await supabaseApi.select('provider_lead_ledger_payment_events', { ledger_id: row.id }, { limit: 50 })) as any[];
-        if (resolveLedgerStatus(row, events) === 'unknown') out.push({ id: String(row.id), created_at: String(row.created_at ?? '') });
+        const status = resolveLedgerStatus(row, events);
+        if (status === 'unknown') { out.push({ id: String(row.id), created_at: String(row.created_at ?? ''), kind: 'unknown', paymentIntentId: null }); continue; }
+        if (status === 'captured') {
+            const booked = (await supabaseApi.select('scheduling', { lead_ledger_id: row.id }, { limit: 1 })) as any[];
+            if (booked.length) continue;
+            const captured = events.find((e) => e.status === 'captured');
+            out.push({ id: String(row.id), created_at: String(row.created_at ?? ''), kind: 'orphan', paymentIntentId: captured?.stripe_ref ? String(captured.stripe_ref) : null });
+        }
     }
     return out;
 }
@@ -561,6 +673,10 @@ export async function runBillingReadinessTick(shadow: boolean, batch = 25): Prom
 //   sonst / nichts  → Ereignis `failed` (Stripe hat nicht belastet oder den
 //                     Aufruf nie bekommen).
 //
+// Seit B2 nimmt er auch `captured`-Zeilen OHNE Buchung (orphan): die
+// Erstattung im Buchungspfad ist gescheitert oder nicht verbucht worden. Er
+// erstattet erneut mit demselben Key (kein zweites Geld) und schreibt nach.
+//
 // Danach wird die Zahlungsbereitschaft neu berechnet; `payment_unresolved`
 // faellt weg, sobald keine offene Zeile mehr da ist. Zeilen juenger als
 // RECONCILE_MIN_AGE_MS bleiben liegen: der urspruengliche Aufruf koennte noch
@@ -592,10 +708,21 @@ export async function runChargeReconcileTick(shadow: boolean, now = new Date()):
                     resolvedAll = false;
                     continue;
                 }
+                if (row.kind === 'orphan') {
+                    // B2: belastet, keine Buchung, Erstattung (noch) nicht verbucht.
+                    // Derselbe Idempotency-Key wie beim ersten Versuch — Stripe
+                    // gibt dieselbe Erstattung zurueck, falls sie schon durch war.
+                    out.checked++;
+                    if (!row.paymentIntentId) { resolvedAll = false; structuredLog('error', 'Orphan charge without payment intent ref', { correlationId: 'watchers', errorCode: 'ERR_CHARGE_RECONCILE', severity: 'error', providerKey, ledgerId: row.id } as any); continue; }
+                    const r = await reverseOrphanCharge({ providerKey, ledgerId: row.id, paymentIntentId: row.paymentIntentId, reason: 'reconciled: captured without booking', correlationId: 'watchers', reconciled: true });
+                    if (r === 'refunded') { out.refunded++; await logEvent('lead_charge_reconciled', { providerKey, ledgerId: row.id, found: true, status: 'captured', outcome: 'refunded' }, 'watchers'); }
+                    else resolvedAll = false;
+                    continue;
+                }
                 if (!p.stripe_customer_id) {
                     // Ohne Kunden kann Stripe nichts belastet haben.
                     await supabaseApi.insert('provider_lead_ledger_payment_events', { ledger_id: row.id, status: 'failed', stripe_ref: null, detail: 'reconciled: no stripe customer' });
-                    await supabaseApi.insert('event_log', { type: 'lead_charge_reconciled', payload: { providerKey, ledgerId: row.id, found: false, outcome: 'failed' } });
+                    await logEvent('lead_charge_reconciled', { providerKey, ledgerId: row.id, found: false, outcome: 'failed' }, 'watchers');
                     out.checked++; out.failed++;
                     continue;
                 }
@@ -604,16 +731,14 @@ export async function runChargeReconcileTick(shadow: boolean, now = new Date()):
                 if (found && found.status === 'succeeded') {
                     // Erst festhalten, dass belastet wurde — dann erstatten.
                     // Stuerzt es dazwischen ab, sieht der naechste Tick eine
-                    // `captured`-Zeile ohne Buchung und erstattet mit demselben Key.
+                    // `captured`-Zeile ohne Buchung (orphan) und erstattet mit demselben Key.
                     await supabaseApi.insert('provider_lead_ledger_payment_events', { ledger_id: row.id, status: 'captured', stripe_ref: found.id, detail: 'reconciled after unknown outcome' });
-                    const refund = await refundPaymentIntent(found.id, `${row.id}:refund`);
-                    await supabaseApi.insert('provider_lead_ledger_payment_events', { ledger_id: row.id, status: 'refunded', stripe_ref: found.id, detail: `reconciled: no booking, refund ${refund.refundId}` });
-                    await supabaseApi.insert('event_log', { type: 'lead_charge_reversed', payload: { providerKey, ledgerId: row.id, paymentIntentId: found.id, refundId: refund.refundId, reconciled: true } });
-                    await supabaseApi.insert('event_log', { type: 'lead_charge_reconciled', payload: { providerKey, ledgerId: row.id, found: true, status: found.status, outcome: 'refunded' } });
-                    out.refunded++;
+                    const r = await reverseOrphanCharge({ providerKey, ledgerId: row.id, paymentIntentId: found.id, reason: 'reconciled: no booking', correlationId: 'watchers', reconciled: true });
+                    if (r === 'refunded') { out.refunded++; await logEvent('lead_charge_reconciled', { providerKey, ledgerId: row.id, found: true, status: found.status, outcome: 'refunded' }, 'watchers'); }
+                    else resolvedAll = false;
                 } else {
                     await supabaseApi.insert('provider_lead_ledger_payment_events', { ledger_id: row.id, status: 'failed', stripe_ref: found?.id ?? null, detail: found ? `reconciled: stripe status ${found.status}` : 'reconciled: not found at stripe' });
-                    await supabaseApi.insert('event_log', { type: 'lead_charge_reconciled', payload: { providerKey, ledgerId: row.id, found: !!found, status: found?.status ?? null, outcome: 'failed' } });
+                    await logEvent('lead_charge_reconciled', { providerKey, ledgerId: row.id, found: !!found, status: found?.status ?? null, outcome: 'failed' }, 'watchers');
                     out.failed++;
                 }
             }

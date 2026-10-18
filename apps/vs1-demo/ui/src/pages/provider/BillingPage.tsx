@@ -5,6 +5,7 @@ import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Banner } from '../../components/ui/Banner';
 import { Button } from '../../components/ui/Button';
 import { KPICard } from '../../components/ui/Cards';
+import { WORKSPACE_CARD } from '../../components/ui/Card';
 import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
 import { Tag } from '../../components/ui/Tag';
 import { InvoiceDetailDrawer } from '../../components/provider/InvoiceDetailDrawer';
@@ -351,7 +352,7 @@ export function BillingPage() {
           {inv.state === 'loading' && <div aria-busy="true" className="h-24 animate-pulse rounded-xl bg-surface-secondary/60 motion-reduce:animate-none" />}
           {inv.state === 'error' && <LoadFailedState surface="invoices" error={inv.error} onRetry={inv.reload} section />}
           {inv.state === 'ready' && invoices.length === 0 && (
-            <div className="rounded-xl border border-dashed border-stroke bg-surface-secondary/60 px-6 py-5">
+            <div className={`${WORKSPACE_CARD} px-6 py-5`} data-empty="invoices">
               <p className="text-[15px] font-semibold text-fg">{t('common:states.partner.empty.invoicesHeading')}</p>
               <p className="mt-1 text-body-sm text-fg-secondary">{t('common:states.partner.empty.invoicesMessage')}</p>
             </div>

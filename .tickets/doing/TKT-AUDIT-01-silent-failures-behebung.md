@@ -18,15 +18,43 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
   Timeout (`STRIPE_TIMEOUT_MS`), Ausgang `unknown` im Ledger, Sperre `payment_unresolved`,
   Abgleich-Tick `runChargeReconcileTick` (Liste der PaymentIntents, Erstattung ohne Buchung).
   Migration `20261018000000`, pgTAP 17, ADR-0005 „Offen" aktualisiert.
-- [ ] **B2** Erstattung scheitert unsichtbar / gelungene Erstattung als Fehler protokolliert.
-- [ ] **B8** Doppelklick → zwei Ledger-Zeilen, zwei PaymentIntents.
-- [ ] **B7** Monatslauf: Stripe-Rechnung vor DB-Zeile; outer `catch {}` bricht den Lauf ab.
-- [ ] **B6** 30-%-Guthaben: `credit_decided_at` vor dem Insert.
-- [ ] **B4** `quoteLeadFee` findet den Plan nur bei exakter `plan_version`.
+- [x] **B2** Erstattung scheitert unsichtbar / gelungene Erstattung als Fehler protokolliert.
+  `reverseOrphanCharge` in `leadCharge.ts`: Refund → Ledger-Ereignis → event_log, jeder Schritt
+  einzeln mit `structuredLog('error')`; was halb bleibt, sperrt `payment_unresolved`, und der
+  Abgleich-Tick erstattet `captured` ohne Buchung mit demselben Idempotency-Key nach. Keine Migration.
+- [x] **B8** Doppelklick → zwei Ledger-Zeilen, zwei PaymentIntents.
+  Client schickt `request_id` je Versuch (`newBookingRequestId`, nach Fehler neu, bei „läuft noch“
+  gleich); Ledger-Spalte `request_key` mit Unique `(user_id, request_key)`. Wiederholung nach
+  Erfolg → dieselbe 201 (`replay: true`); Zeile ohne Buchung oder 23505 → 409 `BOOKING_IN_PROGRESS`
+  ohne Stripe. Migration `20261018000100`, pgTAP 18, Mock mit Gedächtnis je Session.
+- [x] **B7** Monatslauf: Stripe-Rechnung vor DB-Zeile; outer `catch {}` bricht den Lauf ab.
+  `issueInvoiceFor` in `billing.ts`: Stripe-Create → Zeile `draft` (mit `stripe_invoice_id`) → Positionen
+  → finalisieren → senden → Zeile `open` → Guthaben (einmal, Notiz trägt die Stripe-Kennung). Ein `draft`
+  wird beim nächsten Lauf wieder aufgenommen, nie neu ausgestellt; Anbieterlisten zeigen keine Entwürfe.
+  Je Anbieter `try/catch` → Ergebniszeile `error: issue_failed`, `errors` in der Antwort, `invoice_run_failed`.
+  Migration `20261018000200` (Status `draft`), pgTAP 19.
+- [x] **B6** 30-%-Guthaben: `credit_decided_at` vor dem Insert.
+  Reihenfolge gedreht: erst `provider_credits`, dann `credit_decided_at`. Nicht-Unique-Fehler lässt die
+  Frist offen (nächster Tick versucht es erneut); Unique-Verletzung = Guthaben steht schon → nur die Frist
+  schließen, `lead.credit_issued` mit `resumed: true`, keine zweite Meldung. Ledger-Spur ohne leeres `catch`.
+- [x] **B4** `quoteLeadFee` findet den Plan nur bei exakter `plan_version`.
+  `PricingConfig.planVersions` hält alle geltenden Versionen; `planFor(cfg, sub)` liefert die gebundene
+  Version, sonst die jüngste des Codes mit `exact: false`. `quoteLeadFee` trägt `planVersionExact`; die
+  Buchung loggt und protokolliert `plan_version_fallback`. Monatslauf und Vorschau rechnen die gebundene
+  Version (ein Abo zahlt, was es abgeschlossen hat; Versionswechsel über den geplanten Wechsel).
 
 ### 2 · Zustände, die kippen und nie wiederkommen
 
-- [ ] B5 · [ ] B11 · [ ] B12 · [ ] B9 · [ ] B10 · [ ] B13
+- [x] **B5** Tarifwechsel am Stichtag: altes Abo beendet, bevor das neue steht.
+  `executeSchedule`: erst der Nachfolger (ein schon vorhandener wird wiederverwendet), dann Ende und Leeren
+  der Vormerkung. Wirft der Insert, bleibt das alte Abo samt Vormerkung stehen, der nächste Tick holt nach.
+  `runSubscriptionPeriodTick` mit per-Zeile `try/catch`, `errors` im Ergebnis und im Watcher-Summary.
+- [x] **B11** Einzugs-Tick: Marker vor der Aktion.
+  Marker (`invoice_retry` je Stufe) erst nach `sendNotice` bzw. `attempt`. Wirft die Aktion, bleibt die
+  Stufe offen, Ereignis `invoice_retry_error`, der nächste Tick am selben Tag holt nach; der
+  Idempotency-Key je Stufe bei Stripe verhindert eine doppelte Belastung. Shadow: Marker ist die Aktion.
+  `log` im Versuch ohne leeres `catch`.
+- [ ] B12 · [ ] B9 · [ ] B10 · [ ] B13
 
 ### 3 · Audit und Offenlegung
 
