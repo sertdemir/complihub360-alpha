@@ -71,7 +71,16 @@ export interface FeeEligibilityException {
 }
 
 export interface PricingConfig {
+    /** Je Code die juengste geltende Version — fuer Katalog, Neuabschluss, Anzeige. */
     plans: PlanConfig[];
+    /**
+     * B4 (2026-10-18): ALLE geltenden Versionen. Ein Abo ist an (code, version)
+     * gebunden (FK provider_subscriptions → plan_catalog); nach einem
+     * Versionssprung im Katalog muss die alte Version weiter auffindbar sein,
+     * sonst zahlt das Bestandsabo still den vollen Lead-Preis. Optional, damit
+     * Tests mit flachem `plans` weiter gehen: fehlt es, gilt `plans`.
+     */
+    planVersions?: PlanConfig[];
     bands: BandConfig[];
     rules: BandRule[];
     feeExceptions: FeeEligibilityException[];
@@ -402,6 +411,8 @@ export interface LeadFeeQuote {
     currency: string;
     planCode: PlanCode | null;
     planVersion: number | null;
+    /** B4: false, wenn die gebundene Planversion nicht im Katalog stand und die juengste des Codes galt. */
+    planVersionExact: boolean;
     discountPct: number;
     discountSequence: number | null;
     finalFeeCents: number;
@@ -410,10 +421,25 @@ export interface LeadFeeQuote {
     policyVersion: string;
 }
 
+/**
+ * Der Plan eines Abos — B4: erst die GEBUNDENE Version (code, version), sonst
+ * die juengste des Codes. `exact: false` heisst: die gebundene Version steht
+ * nicht (mehr) im geltenden Katalog; der Aufrufer protokolliert das, denn es
+ * ist ein Konfigurationsfehler, kein Normalfall. Nie still der volle Preis.
+ */
+export function planFor(cfg: PricingConfig, sub: Subscription | null): { plan: PlanConfig | null; exact: boolean } {
+    if (!sub) return { plan: null, exact: true };
+    const all = cfg.planVersions ?? cfg.plans;
+    const exact = all.find((p) => p.code === sub.planCode && p.version === sub.planVersion) ?? null;
+    if (exact) return { plan: exact, exact: true };
+    const latest = cfg.plans.find((p) => p.code === sub.planCode) ?? null;
+    return { plan: latest, exact: latest === null };
+}
+
 export function quoteLeadFee(
     cfg: PricingConfig, sub: Subscription | null, opp: LeadOpportunity, counterUsed: number, today: Date = new Date(),
 ): LeadFeeQuote {
-    const plan = sub ? cfg.plans.find((p) => p.code === sub.planCode && p.version === sub.planVersion) ?? null : null;
+    const { plan, exact: planVersionExact } = planFor(cfg, sub);
     const { band } = computeLeadBand(opp, cfg.rules);
     const bandCfg = cfg.bands.find((b) => b.band === band);
     if (!bandCfg) throw new Error(`lead_band_config: Band ${band} fehlt`);
@@ -426,7 +452,7 @@ export function quoteLeadFee(
         band, bandLabel: bandCfg.label, bandVersion: bandCfg.version,
         standardFeeCents: enabled ? bandCfg.feeCents : 0,
         currency: bandCfg.currency,
-        planCode: plan?.code ?? null, planVersion: plan?.version ?? null,
+        planCode: plan?.code ?? null, planVersion: plan?.version ?? null, planVersionExact,
         discountPct: disc.discountPct, discountSequence: disc.discountSequence,
         finalFeeCents: disc.finalFeeCents, counterUsedAfter: disc.counterUsedAfter,
         cycleStart: cycleStartFor(sub, today),
@@ -457,7 +483,16 @@ export async function loadPricingConfig(): Promise<PricingConfig> {
         }
         return Array.from(by.values());
     };
+    const toPlan = (p: any): PlanConfig => ({
+        code: p.code, version: p.version, label: p.label, currency: p.currency,
+        monthlyCents: p.monthly_cents, annualCents: p.annual_cents,
+        categoryAllowance: p.category_allowance ?? null,
+        leadDiscountPct: p.lead_discount_pct, leadDiscountCount: p.lead_discount_count,
+        includedBlogArticles: p.included_blog_articles, apiEligible: !!p.api_eligible,
+        analyticsLevel: p.analytics_level,
+    });
     return {
+        planVersions: plans.filter((p) => !p.effective_from || String(p.effective_from) <= now).map(toPlan),
         plans: latest(plans, 'code').map((p) => ({
             code: p.code, version: p.version, label: p.label, currency: p.currency,
             monthlyCents: p.monthly_cents, annualCents: p.annual_cents,
@@ -706,7 +741,9 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     startedAt: String(row.started_at),
                     renewalDate: row.renewal_date ? String(row.renewal_date) : null,
                 };
-                const plan = cfg.plans.find((p) => p.code === sub.planCode) ?? null;
+                // B4: die gebundene Version, nicht die juengste — ein Abo zahlt, was es
+                // abgeschlossen hat; ein Versionswechsel laeuft ueber den geplanten Wechsel.
+                const { plan } = planFor(cfg, sub);
                 const line = subscriptionChargeForPeriod(sub, plan, period);
                 if (!line || !plan) continue;
                 const providerKey = sub.providerKey;
@@ -756,7 +793,7 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
         // Die Kulanzfrist gehoert in die Antwort, nicht nur in die Sperre: der
         // Anbieter soll das Sperrdatum sehen, BEVOR es eintritt (ADR-0006, A2).
         const overdue = overdueState(openInvoices, cfg.curePeriodDays, now);
-        const plan = sub ? cfg.plans.find((p) => p.code === sub.planCode) ?? null : null;
+        const { plan } = planFor(cfg, sub); // B4: gebundene Version zuerst
         const cycleStart = cycleStartFor(sub, now);
         const used = await getDiscountCounter(providerKey, cycleStart);
         const subLine = subscriptionChargeForPeriod(sub, plan, period);

@@ -37,7 +37,11 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
   Reihenfolge gedreht: erst `provider_credits`, dann `credit_decided_at`. Nicht-Unique-Fehler lässt die
   Frist offen (nächster Tick versucht es erneut); Unique-Verletzung = Guthaben steht schon → nur die Frist
   schließen, `lead.credit_issued` mit `resumed: true`, keine zweite Meldung. Ledger-Spur ohne leeres `catch`.
-- [ ] **B4** `quoteLeadFee` findet den Plan nur bei exakter `plan_version`.
+- [x] **B4** `quoteLeadFee` findet den Plan nur bei exakter `plan_version`.
+  `PricingConfig.planVersions` hält alle geltenden Versionen; `planFor(cfg, sub)` liefert die gebundene
+  Version, sonst die jüngste des Codes mit `exact: false`. `quoteLeadFee` trägt `planVersionExact`; die
+  Buchung loggt und protokolliert `plan_version_fallback`. Monatslauf und Vorschau rechnen die gebundene
+  Version (ein Abo zahlt, was es abgeschlossen hat; Versionswechsel über den geplanten Wechsel).
 
 ### 2 · Zustände, die kippen und nie wiederkommen
 

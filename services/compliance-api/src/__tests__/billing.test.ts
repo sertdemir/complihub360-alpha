@@ -6,7 +6,7 @@ vi.mock('../supabase.js', () => ({ supabaseApi: {} }));
 
 import {
     annualPriceCents, computeLeadBand, applyMonthlyDiscount, categoryAllowanceCheck,
-    leadFeeEnabled, subscriptionChargeForPeriod, quoteLeadFee, LEAD_FEE_POLICY_VERSION,
+    leadFeeEnabled, subscriptionChargeForPeriod, quoteLeadFee, planFor, LEAD_FEE_POLICY_VERSION,
     billingReadiness, resolveLedgerStatus,
     type PlanConfig, type BandRule, type PricingConfig, type Subscription,
 } from '../billing.js';
@@ -250,6 +250,41 @@ describe('quoteLeadFee — das Angebot, das die Buchung ausfuehrt', () => {
         expect(e.standardFeeCents).toBe(g.standardFeeCents);
         expect(e.finalFeeCents).toBe(9900);
         expect(g.finalFeeCents).toBe(8415);
+    });
+});
+
+// ─── B4: die gebundene Planversion ───────────────────────────────────────────
+
+describe('planFor — die Version, an die das Abo gebunden ist (B4)', () => {
+    const GROWTH_V2 = plan({ ...GROWTH, version: 2, leadDiscountPct: 0, leadDiscountCount: 0, monthlyCents: 12900 });
+    const CFG2: PricingConfig = { ...CFG, plans: [ESSENTIAL, GROWTH_V2, GLOBAL], planVersions: [ESSENTIAL, GROWTH, GROWTH_V2, GLOBAL] };
+    const opp = { areaCode: 'tax-vat', subcategories: [], countries: ['DE'] };
+
+    it('findet die gebundene Version, auch wenn der Katalog schon eine neuere fuehrt', () => {
+        expect(planFor(CFG2, sub({ planVersion: 1 }))).toEqual({ plan: GROWTH, exact: true });
+        expect(planFor(CFG2, sub({ planVersion: 2 }))).toEqual({ plan: GROWTH_V2, exact: true });
+    });
+    it('Bestandsabo v1 behaelt seinen Rabatt nach dem Versionssprung — vorher zahlte es still den vollen Preis', () => {
+        const q = quoteLeadFee(CFG2, sub({ planVersion: 1 }), opp, 0, new Date('2026-09-20'));
+        expect(q).toMatchObject({ planCode: 'growth', planVersion: 1, planVersionExact: true, discountPct: 10, finalFeeCents: 8910 });
+        const q2 = quoteLeadFee(CFG2, sub({ planVersion: 2 }), opp, 0, new Date('2026-09-20'));
+        expect(q2).toMatchObject({ planVersion: 2, planVersionExact: true, discountPct: 0, finalFeeCents: 9900 });
+    });
+    it('unbekannte Version: juengste des Codes, aber als nicht exakt markiert', () => {
+        expect(planFor(CFG2, sub({ planVersion: 7 }))).toEqual({ plan: GROWTH_V2, exact: false });
+        const q = quoteLeadFee(CFG2, sub({ planVersion: 7 }), opp, 0, new Date('2026-09-20'));
+        expect(q).toMatchObject({ planVersion: 2, planVersionExact: false });
+    });
+    it('ohne planVersions (flache Konfiguration) wie bisher; ohne Abo null und exakt', () => {
+        expect(planFor(CFG, sub({}))).toEqual({ plan: GROWTH, exact: true });
+        expect(planFor(CFG, null)).toEqual({ plan: null, exact: true });
+        expect(planFor(CFG, sub({ planCode: 'global', planVersion: 3 }))).toEqual({ plan: GLOBAL, exact: false });
+    });
+    it('der Monatspreis folgt der gebundenen Version', () => {
+        const { plan: v1 } = planFor(CFG2, sub({ planVersion: 1 }));
+        const { plan: v2 } = planFor(CFG2, sub({ planVersion: 2 }));
+        expect(subscriptionChargeForPeriod(sub({ planVersion: 1 }), v1, '2026-10')?.amount_cents).toBe(9900);
+        expect(subscriptionChargeForPeriod(sub({ planVersion: 2 }), v2, '2026-10')?.amount_cents).toBe(12900);
     });
 });
 

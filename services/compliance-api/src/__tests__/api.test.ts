@@ -1020,6 +1020,39 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         });
     });
 
+    // ─── B4: Versionssprung im Katalog ──────────────────────────────────────
+    describe('Planversion (B4): ein Bestandsabo behaelt seine Version, eine fehlende wird gemeldet', () => {
+        const growthV2 = () => (db.plan_catalog ??= []).push({ code: 'growth', version: 2, label: 'Growth', currency: 'USD', monthly_cents: 12900, annual_cents: 129000, category_allowance: 5, lead_discount_pct: 0, lead_discount_count: 0, included_blog_articles: 1, api_eligible: false, analytics_level: 'enhanced', effective_from: '2026-10-01' });
+
+        it('Growth v2 im Katalog, Abo auf v1: der Lead bekommt weiter 10 %, Ledger traegt Version 1', async () => {
+            const { session } = seedBookable();           // seedSubscription: plan_version 1
+            growthV2();
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            const ledger = db.provider_lead_ledger[0];
+            expect(ledger).toMatchObject({ plan_code_at_charge: 'growth', plan_version_at_charge: 1, discount_pct: 10, final_fee_cents: 8910 });
+            expect(stripeMock.createPaymentIntent.mock.calls[0][0].amountCents).toBe(8910);
+            expect(db.event_log.map((e) => e.type)).not.toContain('plan_version_fallback');
+        });
+
+        it('Abo auf einer Version, die der Katalog nicht fuehrt: juengste greift, Ereignis plan_version_fallback', async () => {
+            const { session } = seedBookable();
+            growthV2();
+            db.provider_subscriptions[0].plan_version = 9;
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            expect(db.provider_lead_ledger[0]).toMatchObject({ plan_code_at_charge: 'growth', plan_version_at_charge: 2, discount_pct: 0, final_fee_cents: 9900 });
+            expect(db.event_log.find((e) => e.type === 'plan_version_fallback')?.payload).toMatchObject({ providerKey: 'test-kanzlei', planCode: 'growth', planVersion: 9, usedVersion: 2 });
+        });
+
+        it('Monatslauf (dry_run) rechnet die gebundene Version ab, nicht die juengste', async () => {
+            seedProvider({ billing_ready: true }); seedPricing(); growthV2();
+            seedSubscription('test-kanzlei', 'growth', { plan_version: 1, current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+            const run = await api('/api/v1/admin/billing/run', { method: 'POST', auth: 'key', body: JSON.stringify({ period: new Date().toISOString().slice(0, 7), dry_run: true, provider: 'test-kanzlei' }) });
+            expect(run.body.results[0]).toMatchObject({ dry_run: true, total_cents: 9900 });
+        });
+    });
+
     it('Neutralitaet: Essential und Global bekommen fuer dieselbe Opportunity dasselbe Band und dieselbe Standardgebuehr', async () => {
         seedPricing(); seedAcknowledgement(); seedUserDiscountPolicy();
         const a = seedProvider({ provider_key: 'ess-kanzlei', name: 'Essential Kanzlei', stripe_customer_id: 'cus_a' });
