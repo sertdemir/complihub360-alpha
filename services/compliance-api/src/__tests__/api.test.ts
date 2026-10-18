@@ -501,6 +501,39 @@ describe('POST /api/v1/search', () => {
         expect(r.body.laws).toEqual([]);
         expect(r.body.providers).toHaveLength(1);
     });
+
+    // Bis 2026-10-18 holte /search ueber match_knowledge_chunks mit einem
+    // konstanten Vektor fuenf beliebige Abschnitte des EY-Leitfadens und gab
+    // sie als `tutorials` woertlich an jeden Gast. Der Korpus ist intern
+    // (20261011000100). Die RPC antwortet hier MIT Text, damit ein
+    // zurueckkehrender Aufruf nicht still am Mock scheitert, sondern auffaellt.
+    it('reads nothing from the knowledge corpus and puts no corpus text on the wire', async () => {
+        seedProvider();
+        const KORPUS = 'EY-KORPUS-WORTLAUT-7f3a: Germany VAT registration threshold …';
+        const { supabaseApi } = await import('../supabase.js');
+        const rpc = vi.spyOn(supabaseApi, 'rpc').mockImplementation(async (fn: string) =>
+            fn === 'match_knowledge_chunks' ? [{ id: 'chunk-1', content: KORPUS, metadata: { country: 'DE' }, similarity: 0.9 }] : null);
+        const select = vi.spyOn(supabaseApi, 'select');
+        try {
+            const r = await api('/api/v1/search', {
+                method: 'POST',
+                auth: 'none',
+                body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+            });
+            expect(r.status).toBe(200);
+            expect(rpc.mock.calls.map((c) => c[0])).not.toContain('match_knowledge_chunks');
+            expect(select.mock.calls.map((c) => c[0])).not.toContain('knowledge_chunks');
+            expect(JSON.stringify(r.body)).not.toContain('EY-KORPUS-WORTLAUT');
+            // Die Felder sind weg, nicht nur leer — keine Oberflaeche las sie.
+            expect(r.body).not.toHaveProperty('tutorials');
+            expect(r.body).not.toHaveProperty('articles');
+            expect(r.body).not.toHaveProperty('tips');
+            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'overview_summary', 'providers']);
+        } finally {
+            rpc.mockRestore();
+            select.mockRestore();
+        }
+    });
 });
 
 // ─── Referenz-ID ("Technical details", Canvas-Wahl B3) ────────────────────────
