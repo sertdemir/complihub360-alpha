@@ -17,7 +17,7 @@ import { fetchDashboard, type DashboardData } from '../../api/dashboard';
 import type { SearchProfile } from '../../components/wizard/WizardContext';
 import { generateRiskMapPdf } from '../../lib/riskMapPdf';
 import { liveObligations, riskMapStats, pdfObligations } from '../ResultsRiskMap';
-import { runSearch } from '../../api/search';
+import { lawsOf, runSearch } from '../../api/search';
 import { Banner } from '../../components/ui/Banner';
 import { DOMAINS } from '../../lib/domains';
 import { SLUG_TO_I18N } from './AnfragenTab';
@@ -177,7 +177,8 @@ export function SessionsPage() {
     setExportNote({ kind: 'busy', row: r });
     try {
       const res = await runSearch({ country: r.profile.country, categories: r.categories as SearchProfile['categories'] });
-      const laws = (res.laws ?? []).filter((l) => l.severity);
+      // Engine nicht gerechnet → 'failed', nicht 'none' (keine PDF als Entwarnung).
+      const laws = lawsOf(res).filter((l) => l.severity);
       if (!laws.length) { setExportNote({ kind: 'none', row: r }); return; }
       const rows = liveObligations(laws, tResults, i18n.language, locale);
       await generateRiskMapPdf({

@@ -57,6 +57,16 @@ paths:
                     type: array
                     items: { $ref: '#/components/schemas/AnonProviderCard' }
                   laws: { type: array, items: { type: object } }
+                  laws_status:
+                    type: string
+                    enum: [ok, failed]
+                    description: >-
+                      `failed`: die Compliance-Engine hat nicht gerechnet. `laws` ist
+                      dann leer, weil nichts geprueft wurde, nicht weil nichts gilt.
+                      Die Ursache steht im Server-Log unter `correlationId`.
+                  correlationId:
+                    type: string
+                    description: Nur bei `laws_status = failed`. Dieselbe ID wie im Header `x-correlation-id`.
                   coverage: { $ref: '#/components/schemas/SearchCoverage' }
         '400':
           description: Body ist kein JSON (`INVALID_JSON`)

@@ -161,6 +161,19 @@ vi.mock('../nylasAuth.js', async (importOriginal) => {
     const real = await importOriginal<typeof import('../nylasAuth.js')>();
     return { ...real, exchangeCode: (...a: any[]) => nylasAuthMock.exchangeCode(...a), revokeGrant: (...a: any[]) => nylasAuthMock.revokeGrant(...a) };
 });
+// Engine: echt, ausser ein Test setzt `engineFault.error` — dann wirft sie,
+// wie bei einem Fehler im Laenderprofil.
+const { engineFault } = vi.hoisted(() => ({ engineFault: { error: null as Error | null } }));
+vi.mock('@complihub/compliance-engine', async (importOriginal) => {
+    const real = await importOriginal<typeof import('@complihub/compliance-engine')>();
+    return {
+        ...real,
+        generateRelevantSubdomains: (...a: Parameters<typeof real.generateRelevantSubdomains>) => {
+            if (engineFault.error) throw engineFault.error;
+            return real.generateRelevantSubdomains(...a);
+        },
+    };
+});
 vi.mock('../storage.js', async (importOriginal) => {
     const real = await importOriginal<typeof import('../storage.js')>();
     return {
@@ -512,6 +525,80 @@ describe('POST /api/v1/search', () => {
         expect(r.status).toBe(200);
         expect(r.body.laws).toEqual([]);
         expect(r.body.providers).toHaveLength(1);
+    });
+
+    // Bis 2026-10-18 holte /search ueber match_knowledge_chunks mit einem
+    // konstanten Vektor fuenf beliebige Abschnitte des EY-Leitfadens und gab
+    // sie als `tutorials` woertlich an jeden Gast. Der Korpus ist intern
+    // (20261011000100). Die RPC antwortet hier MIT Text, damit ein
+    // zurueckkehrender Aufruf nicht still am Mock scheitert, sondern auffaellt.
+    it('reads nothing from the knowledge corpus and puts no corpus text on the wire', async () => {
+        seedProvider();
+        const KORPUS = 'EY-KORPUS-WORTLAUT-7f3a: Germany VAT registration threshold …';
+        const { supabaseApi } = await import('../supabase.js');
+        const rpc = vi.spyOn(supabaseApi, 'rpc').mockImplementation(async (fn: string) =>
+            fn === 'match_knowledge_chunks' ? [{ id: 'chunk-1', content: KORPUS, metadata: { country: 'DE' }, similarity: 0.9 }] : null);
+        const select = vi.spyOn(supabaseApi, 'select');
+        try {
+            const r = await api('/api/v1/search', {
+                method: 'POST',
+                auth: 'none',
+                body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+            });
+            expect(r.status).toBe(200);
+            expect(rpc.mock.calls.map((c) => c[0])).not.toContain('match_knowledge_chunks');
+            expect(select.mock.calls.map((c) => c[0])).not.toContain('knowledge_chunks');
+            expect(JSON.stringify(r.body)).not.toContain('EY-KORPUS-WORTLAUT');
+            // Die Felder sind weg, nicht nur leer — keine Oberflaeche las sie.
+            expect(r.body).not.toHaveProperty('tutorials');
+            expect(r.body).not.toHaveProperty('articles');
+            expect(r.body).not.toHaveProperty('tips');
+            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'overview_summary', 'providers']);
+            // Erfolg: kein Fehlersignal, keine Referenz im Koerper.
+            expect(r.body.laws_status).toBe('ok');
+        } finally {
+            rpc.mockRestore();
+            select.mockRestore();
+        }
+    });
+
+    // Ein Engine-Fehler laesst die Suche weiterlaufen (Anbieter kommen trotzdem),
+    // aber nicht mehr still: strukturierte Zeile mit Referenz-ID und Laendern.
+    it('logs an engine failure as a structured error with the correlation id', async () => {
+        seedProvider();
+        engineFault.error = new Error('profile DE: subdomain map corrupt');
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            const REF = '7a1c2e3f-4b5d-4c6e-8f90-a1b2c3d4e5f6';
+            const res = await fetch(`${BASE}/api/v1/search`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json', 'x-correlation-id': REF },
+                body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+            });
+            const body = await res.json();
+            expect(res.status).toBe(200);
+            expect(body.laws).toEqual([]);
+            expect(body.providers).toHaveLength(1);
+            expect(JSON.stringify(body)).not.toContain('subdomain map corrupt');
+            // Leere `laws` heissen hier "nicht geprueft", nicht "nichts gefunden" —
+            // und die Antwort sagt das, mit der Referenz fuer "Technical details".
+            expect(body.laws_status).toBe('failed');
+            expect(body.correlationId).toBe(REF);
+            expect(body.overview_summary).toMatch(/could not assess/);
+
+            const zeile = log.mock.calls.map((c) => String(c[0])).find((l) => l.includes('Compliance engine failed'));
+            expect(zeile).toBeDefined();
+            const eintrag = JSON.parse(zeile!);
+            expect(eintrag).toMatchObject({ level: 'error', correlationId: REF, errorCode: 'ERR_SEARCH_ENGINE', route: '/api/v1/search', countries: ['DE'] });
+            expect(eintrag.detail).toContain('subdomain map corrupt');
+            // Kein unstrukturierter Rest mehr daneben.
+            expect(warn.mock.calls.some((c) => String(c[0]).includes('compliance-engine'))).toBe(false);
+        } finally {
+            engineFault.error = null;
+            log.mockRestore();
+            warn.mockRestore();
+        }
     });
 });
 

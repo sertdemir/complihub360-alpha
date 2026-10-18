@@ -3528,6 +3528,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 //    unknown country must not kill the search (providers are
                 //    still scored; laws just come back empty).
                 let engineResults: EnrichedSubdomain[] = [];
+                // Hat die Engine gerechnet? `laws: []` heisst sonst zweierlei —
+                // "nichts gefunden" und "nicht geprueft" —, und die Risk Map
+                // zeigte beides als Entwarnung (DNA §4.5).
+                let engineFailed = false;
                 // All requested markets the engine knows a profile for; unknown
                 // codes are dropped rather than killing the whole search.
                 const requestedMarkets: string[] = Array.isArray(requestData.structured_answers?.markets)
@@ -3553,26 +3557,32 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         });
                     }
                 } catch (engineErr) {
-                    console.warn('compliance-engine country profile missing:', String(engineErr));
-                }
-
-                // 2. Vector Search (RAG) - Query PostgreSQL pgvector
-                // Stub embedding since backend currently lacks an active LLM API integration for live vectors
-                const queryEmbedding = new Array(768).fill(0.01);
-
-                // Wrap the rpc in try/catch to gracefully handle empty DB tables mapping to empty arrays
-                let knowledgeMatches: any[] = [];
-                try {
-                    const rpcResponse = await supabaseApi.rpc('match_knowledge_chunks', {
-                        query_embedding: queryEmbedding,
-                        match_threshold: 0.1,
-                        match_count: 5
+                    engineFailed = true;
+                    // Unbekannte Laender sind oben schon herausgefiltert — wer
+                    // hier landet, hat einen Engine-Fehler, und der Nutzer sieht
+                    // eine Risk Map ohne Pflichten. Bis 2026-10-18 stand das nur
+                    // als console.warn ohne Referenz-ID im Log.
+                    structuredLog('error', 'Compliance engine failed', {
+                        correlationId,
+                        errorCode: 'ERR_SEARCH_ENGINE',
+                        severity: 'error',
+                        route: '/api/v1/search',
+                        countries: engineCountries,
+                        detail: String(engineErr).slice(0, 500),
                     });
-                    knowledgeMatches = (rpcResponse as any)?.data as any[] || rpcResponse as any[] || [];
-                    if (!Array.isArray(knowledgeMatches)) knowledgeMatches = [];
-                } catch (e) {
-                    console.warn("RPC match_knowledge_chunks fail:", e);
                 }
+
+                // 2. Kein Korpus-Abruf. Bis 2026-10-18 stand hier eine "RAG"-Suche
+                //    ueber match_knowledge_chunks mit einem konstanten Vektor
+                //    (0.01 × 768): fuenf beliebige Abschnitte des EY Global VAT
+                //    Guide, ohne Bezug zur Anfrage, woertlich als `tutorials` an
+                //    jeden Gast — an RLS und an 20261011000100 vorbei. Keine
+                //    Oberflaeche las das Feld; ein Fehler ging still in
+                //    console.warn. Der Korpus ist interne Grundlage des
+                //    Assistenten (assistant.ts) und verlaesst die API nie im
+                //    Wortlaut. Wer hier wieder Wissen anbietet, braucht ein echtes
+                //    Anfrage-Embedding (embed_model, ADR-0011), eine auditierte
+                //    Grenze fuer die Wizard-Daten und liefert hoechstens Labels.
 
                 // 3. Fetch, score and anonymize matched providers.
                 //    Ranking = 0.6·Relevance + 0.3·Quality + 0.1·Priority (spec §6).
@@ -3768,12 +3778,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
-                    // Says what the payload IS. The knowledge-chunk lookup above
-                    // still runs on a stub embedding and the assistant that would
-                    // ground a real summary is feature-flagged off, so the string
-                    // must not claim a synthesis that does not happen: everything
-                    // below `laws` comes out of the deterministic engine.
-                    overview_summary: "Obligations identified by the compliance engine for the requested markets and domains.",
+                    // Says what the payload IS. There is no corpus lookup on this
+                    // route and the assistant that would ground a real summary is
+                    // feature-flagged off, so the string must not claim a
+                    // synthesis that does not happen: everything below `laws`
+                    // comes out of the deterministic engine.
+                    overview_summary: engineFailed
+                        ? "The compliance engine could not assess the requested markets. Obligations are missing, not absent."
+                        : "Obligations identified by the compliance engine for the requested markets and domains.",
+                    // 'failed': die Engine hat nicht gerechnet, `laws` ist leer,
+                    // weil nichts geprueft wurde. Die Risk Map zeigt dann
+                    // riskMapFailed mit dieser Referenz-ID, nicht "keine
+                    // Pflichten". Die Anbieter bleiben drin (die Bereichsseite
+                    // braucht nur sie); ob sie erscheinen, entscheidet die Flaeche.
+                    laws_status: engineFailed ? 'failed' : 'ok',
+                    ...(engineFailed ? { correlationId } : {}),
                     providers: anonProviders,
                     // Bereich × Markt: deckt ein freigegebener Anbieter das ab?
                     // Nur Booleans je Zelle — kein Anbieter, keine Anzahl.
@@ -3821,9 +3840,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         applies_from: r.appliesFrom ?? null,
                         state: r.focus ? 'confirmed' : 'likely',
                     })),
-                    tutorials: knowledgeMatches.map((m: any) => ({ id: m.id, content: m.content })),
-                    articles: [],
-                    tips: []
                 }));
             } catch (err) {
                 // Bis 2026-09-22: `400 { error: String(err) }` fuer JEDEN Fehler —
