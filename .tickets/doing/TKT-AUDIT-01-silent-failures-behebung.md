@@ -18,7 +18,10 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
   Timeout (`STRIPE_TIMEOUT_MS`), Ausgang `unknown` im Ledger, Sperre `payment_unresolved`,
   Abgleich-Tick `runChargeReconcileTick` (Liste der PaymentIntents, Erstattung ohne Buchung).
   Migration `20261018000000`, pgTAP 17, ADR-0005 „Offen" aktualisiert.
-- [ ] **B2** Erstattung scheitert unsichtbar / gelungene Erstattung als Fehler protokolliert.
+- [x] **B2** Erstattung scheitert unsichtbar / gelungene Erstattung als Fehler protokolliert.
+  `reverseOrphanCharge` in `leadCharge.ts`: Refund → Ledger-Ereignis → event_log, jeder Schritt
+  einzeln mit `structuredLog('error')`; was halb bleibt, sperrt `payment_unresolved`, und der
+  Abgleich-Tick erstattet `captured` ohne Buchung mit demselben Idempotency-Key nach. Keine Migration.
 - [ ] **B8** Doppelklick → zwei Ledger-Zeilen, zwei PaymentIntents.
 - [ ] **B7** Monatslauf: Stripe-Rechnung vor DB-Zeile; outer `catch {}` bricht den Lauf ab.
 - [ ] **B6** 30-%-Guthaben: `credit_decided_at` vor dem Insert.

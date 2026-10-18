@@ -874,6 +874,86 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         expect(db.scheduling ?? []).toHaveLength(0);
     });
 
+    // ─── B2: die Erstattung selbst darf nicht still scheitern ───────────────
+    describe('Kompensation sichtbar (B2): Refund-Fehler sperrt, Abgleich holt nach; gelungene Erstattung heisst nie failed', () => {
+        const insertFailing = async (pred: (table: string, data: any) => boolean) => {
+            const { supabaseApi } = await import('../supabase.js');
+            const realInsert = supabaseApi.insert;
+            return vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+                if (pred(table, data)) throw new Error(`injected failure on ${table}`);
+                return realInsert(table, data);
+            });
+        };
+
+        it('Refund scheitert: Ereignis reversed_failed, Ledger bleibt captured, Anbieter payment_unresolved; der Tick erstattet spaeter mit demselben Key', async () => {
+            const { session } = seedBookable();
+            (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+            stripeMock.refundPaymentIntent.mockRejectedValueOnce(new Error('Stripe refunds: 502'));
+            const spy = await insertFailing((t) => t === 'scheduling');
+            try {
+                const r = await book(standardBody(session));
+                expect(r.status).toBe(500);
+            } finally { spy.mockRestore(); }
+            const ledger = db.provider_lead_ledger[0];
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured']);
+            expect(db.event_log.map((e) => e.type)).toContain('lead_charge_reversed_failed');
+            expect(db.event_log.map((e) => e.type)).not.toContain('lead_charge_reversed');
+            expect(db.providers[0].billing_block_reasons).toEqual(['payment_unresolved']);
+            // Der Abgleich sieht die captured-Zeile ohne Buchung und erstattet — ohne Stripe-Nachschau.
+            const { runChargeReconcileTick, RECONCILE_MIN_AGE_MS } = await import('../leadCharge.js');
+            const later = new Date(Date.now() + RECONCILE_MIN_AGE_MS + 1000);
+            expect(await runChargeReconcileTick(false, later)).toEqual({ checked: 1, refunded: 1, failed: 0, errors: 0 });
+            expect(stripeMock.findPaymentIntentForLedger).not.toHaveBeenCalled();
+            expect(stripeMock.refundPaymentIntent).toHaveBeenLastCalledWith('pi_test_1', `${ledger.id}:refund`);
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured', 'refunded']);
+            expect(db.event_log.filter((e) => e.type === 'lead_charge_reversed')).toHaveLength(1);
+            expect(db.providers[0].billing_block_reasons).toEqual([]);
+        });
+
+        it('Refund gelingt, Ledger-Ereignis scheitert: KEIN reversed_failed, Sperre bis der Tick nachschreibt', async () => {
+            const { session } = seedBookable();
+            (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+            const spy = await insertFailing((t, d) => t === 'scheduling' || (t === 'provider_lead_ledger_payment_events' && d?.status === 'refunded'));
+            try {
+                const r = await book(standardBody(session));
+                expect(r.status).toBe(500);
+            } finally { spy.mockRestore(); }
+            expect(stripeMock.refundPaymentIntent).toHaveBeenCalledTimes(1);
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured']);
+            expect(db.event_log.map((e) => e.type)).not.toContain('lead_charge_reversed_failed');
+            expect(db.event_log.find((e) => e.type === 'lead_charge_reversed')?.payload).toMatchObject({ ledgerEventWritten: false });
+            expect(db.providers[0].billing_block_reasons).toEqual(['payment_unresolved']);
+            const { runChargeReconcileTick, RECONCILE_MIN_AGE_MS } = await import('../leadCharge.js');
+            expect(await runChargeReconcileTick(false, new Date(Date.now() + RECONCILE_MIN_AGE_MS + 1000))).toEqual({ checked: 1, refunded: 1, failed: 0, errors: 0 });
+            // Zweiter Refund-Aufruf mit demselben Key: Stripe liefert dieselbe Erstattung, kein zweites Geld.
+            expect(stripeMock.refundPaymentIntent).toHaveBeenCalledTimes(2);
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured', 'refunded']);
+            expect(db.providers[0].billing_block_reasons).toEqual([]);
+        });
+
+        it('event_log nicht erreichbar: die Erstattung laeuft trotzdem und wird im Ledger verbucht', async () => {
+            const { session } = seedBookable();
+            const spy = await insertFailing((t) => t === 'scheduling' || t === 'event_log');
+            try {
+                const r = await book(standardBody(session));
+                expect(r.status).toBe(500);
+            } finally { spy.mockRestore(); }
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured', 'refunded']);
+            expect(db.providers[0].billing_block_reasons ?? []).toEqual([]);
+        });
+
+        it('eine bezahlte Buchung ist kein Orphan: der Tick laesst sie in Ruhe', async () => {
+            const { session } = seedBookable();
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            // Nur Anbieter mit payment_unresolved werden geprueft — erzwingen wir die Pruefung:
+            db.providers[0].billing_block_reasons = ['payment_unresolved'];
+            const { unresolvedLedgers } = await import('../leadCharge.js');
+            expect(await unresolvedLedgers('test-kanzlei')).toEqual([]);
+            expect(stripeMock.refundPaymentIntent).not.toHaveBeenCalled();
+        });
+    });
+
     it('Neutralitaet: Essential und Global bekommen fuer dieselbe Opportunity dasselbe Band und dieselbe Standardgebuehr', async () => {
         seedPricing(); seedAcknowledgement(); seedUserDiscountPolicy();
         const a = seedProvider({ provider_key: 'ess-kanzlei', name: 'Essential Kanzlei', stripe_customer_id: 'cus_a' });
