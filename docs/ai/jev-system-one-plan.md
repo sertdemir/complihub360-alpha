@@ -2,6 +2,7 @@
 title: "Jev (TypeSafe AI) — Einsatzplan für CompliHub360"
 status: proposal
 date: 2026-10-17
+updated: 2026-10-18
 owner: Sertan (Entscheidung) · Claude (Entwurf)
 touches: [ai-behaviour, wizard, privacy, provider-matching-intake]
 ---
@@ -14,13 +15,21 @@ touches: [ai-behaviour, wizard, privacy, provider-matching-intake]
 > sondern darin, **als schneller Reflex vor und hinter dem Sprachmodell**
 > die DNA technisch durchzusetzen: richtig routen, Grenzen prüfen,
 > den Weg zum Menschen öffnen.
+>
+> **Stand 2026-10-18, nach Lektüre der Primärquellen:** Jev läuft in den USA.
+> Nutzerfragen an Jev würden genau den Transfer zurückbringen, den ADR-0011
+> mit Scaleway abgeschafft hat. Deshalb starten wir mit den internen
+> Einsatzfeldern ohne Nutzerdaten; alles mit Nutzerbezug wartet auf eine
+> belastbare Transfergrundlage (§7).
 
 ## 1. Was Jev ist — Faktenlage
 
-Quellen: TypeSafe-Launch-Post (15.09.2026) und Sekundärquellen. Die Seiten
-von typesafe.ai und das YouTube-Video waren aus der Remote-Umgebung nicht
-abrufbar (Netzwerk-Policy). Alles Folgende stammt aus Suchergebnissen und
-ist **vor der Umsetzung gegen die Primärdoku zu prüfen**.
+Quellen, am 2026-10-18 im Original gelesen: der
+[Launch-Post](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
+vom 15.09.2026 samt FAQ und die
+[Datenschutzerklärung](https://typesafe.ai/privacy-policy). Noch nicht
+erreichbar sind `docs.typesafe.ai` (Netzwerk-Policy) und der Inhalt des
+Videos (§1b). Angaben ohne Primärbeleg sind als *sekundär* markiert.
 
 | Merkmal | Stand |
 |---|---|
@@ -28,23 +37,46 @@ ist **vor der Umsetzung gegen die Primärdoku zu prüfen**.
 | Input | Text, JSON oder Text-Arrays als **State** plus **typisierte Fragen** |
 | Fragetypen | Choice (max. 255 Optionen), Score, Null/„Noul" |
 | Output | typisierte Werte **mit Wahrscheinlichkeit / Konfidenz** — kein Fließtext |
-| Kontext | 64k Tokens je Request, davon 32k für State plus längste Frage |
+| Kontext | 64k Tokens je Request, davon 32k für State plus längste Frage *(sekundär)* |
 | Latenz (Herstellerangabe) | 70–500 ms, gegenüber 3–329 s bei Frontier-LLMs |
 | Preis (Herstellerangabe) | 0,042 $ je 1 Mio. Input-Tokens, Output kostenlos |
-| Limits | 250k Tokens/s, 1.200 Requests/min (Default) |
+| Limits | 250k Tokens/s, 1.200 Requests/min (Default) *(sekundär)* |
 | Endpunkt | `jev-latest`, `/v1/systemone`; auch über Vercel AI Gateway (Jev 1.14 seit 15.10.2026), OpenRouter u. a. |
-| Training auf Kundendaten | laut Datenschutzerklärung nein |
-| Hosting | **widersprüchlich**: eine Quelle nennt USA ohne EU-Residenz, eine andere einen Dienst in Frankreich |
-| Datenhaltung | „so lange wie nötig", Zero Data Retention nur Enterprise auf Anfrage |
-| Zertifizierungen | SOC 2 / ISO 27001 nicht bestätigt |
+| Architektur | eigene Modellarchitektur, paralleler Sampler, Training „Reinforcement Learning for Calibrated Decisions" (RLCD). Laut FAQ „weder klein noch ein LLM" |
+| Training auf Kundendaten | **nein**, Datenschutzerklärung: kein Training und kein Fine-Tuning auf Input; FAQ: alle Trainingsdaten selbst erzeugt |
+| Hosting | **USA.** Datenschutzerklärung: „The Services are hosted in the United States"; Launch-Post: Dienst an der US-Westküste. Die frühere Angabe „Frankreich" war falsch |
+| Transfergrundlage EU→USA | **in der Datenschutzerklärung nicht genannt** (weder Standardvertragsklauseln noch Data Privacy Framework) |
+| Datenhaltung | „so lange wie vernünftigerweise nötig … oder zur Unterstützung unserer geschäftlichen Zwecke"; Löschung auf Anfrage. Zero Data Retention nur Enterprise auf Anfrage *(sekundär)* |
+| Vom Hersteller genannte Zwecke | klassifizieren, routen, bewerten, extrahieren, verzweigen; Map-Reduce über große Datenmengen; Echtzeit; **„Verify everything": bewerten, prüfen, Guardrails, Jailbreak-Erkennung bei Prompts und Ausgaben von LLMs** |
+| Zertifizierungen | SOC 2 / ISO 27001 nirgends belegt |
 | Reifegrad | Early Access; Preise, Limits und Modell-IDs ändern sich wöchentlich |
 
 **Kritische Einordnung.** Die Spitzenwerte („193,6× schneller, 444,6× günstiger")
-sind Herstellerbenchmarks auf System-One-förmigen Aufgaben. Eine unabhängige
+sind Herstellerbenchmarks auf System-One-förmigen Aufgaben. TypeSafe selbst
+nennt die Grenzen: Die Werte liegen „am oberen Ende realer Gewinne", die
+Workflows stammen vom eigenen Team, und Referenz ist der Mittelwert aus
+GPT-6 Astra und Fable 5.1. Öffentliche Benchmarks veröffentlicht TypeSafe
+bewusst nicht und empfiehlt eigene Evals; das deckt sich mit unserem Goldset.
+„Kann nicht halluzinieren" heißt dort: keine Typfehler, nicht keine
+Fehlurteile. Eine unabhängige
 Auswertung von Nutzerberichten kommt auf einen Median von etwa 7×. Ein Test
 fand, dass Jev in 16 % der Fälle dem richtigen Label die Wahrscheinlichkeit
 null gab. Typisierte Ausgabe verhindert Schemafehler, **nicht Fehlurteile**.
 Konsequenz: Jev bekommt bei uns nur Entscheidungen mit sicherem Rückfallweg.
+
+## 1b. Das Video
+
+„Jev: Das kann das KI-Modell wirklich (10 Use Cases)" vom Kanal Julian Ivanov
+(KI-Automatisierung). Titel und Kanal sind über die öffentliche
+oEmbed-Schnittstelle bestätigt. Den Inhalt liefert YouTube an Server nur nach
+Login; das wird nicht umgangen. Für eine Auswertung bitte das Transkript
+einfügen (YouTube → „Transkript anzeigen").
+
+Sekundäre Zusammenfassungen ähnlicher „10 Use Cases"-Listen nennen
+Ticket-Routing, Betrugs-Scoring, Moderation, Guardrails für andere Modelle,
+Re-Ranking von Empfehlungen und dynamische Preise. **Die letzten beiden sind
+für uns tabu** (§4): Ranking bleibt erklärbar und deterministisch (ADR-0009),
+Preise variieren nicht nach Modellurteil.
 
 ## 2. Die Prämisse „Jev steuert die Plattform und gibt alle Antworten"
 
@@ -168,6 +200,8 @@ Fit-Indikatoren erklärbar.
 | Provider-Ranking, Match-Prozent | Fairness und Erklärbarkeit, ADR-0009 |
 | Preise, Gating, Paywalls, Abo-Status | geschäftskritisch, deterministisch |
 | Upsell-Targeting, „Kaufneigung" | DNA: Respekt variiert nie nach kommerziellem Wert |
+| Re-Ranking, dynamische Preise | in Jev-Use-Case-Listen üblich, bei uns ausgeschlossen: Fairness, ADR-0009, DNA |
+| Nutzerinhalte, solange keine Transfergrundlage EU→USA vorliegt | ADR-0011 hält Fragen in der EU; §7 |
 | Antworttexte | kann Jev nicht |
 
 ## 5. Architektur
@@ -203,9 +237,13 @@ themenfremde Fragen keinen Embedding- und Modell-Lauf mehr auslösen.
 
 ## 7. Datenschutz und Recht — vor dem ersten produktiven Request
 
-- [ ] DPA mit SCCs und UK-Addendum anfordern und prüfen
-- [ ] Hosting-Region klären (USA vs. Frankreich — Quellen widersprechen sich)
-- [ ] Zero Data Retention vertraglich vereinbaren
+**Geklärt:** Hosting ist USA (Datenschutzerklärung). Damit ist jeder Request
+mit Nutzerinhalt ein Drittlandtransfer. Seit ADR-0011 laufen die
+Assistent-Fragen in der EU; Jev auf Nutzerinhalten würde das wieder aufheben.
+
+- [ ] Transfergrundlage schriftlich: DPA mit Standardvertragsklauseln oder Zertifizierung unter dem Data Privacy Framework, dazu UK-Addendum
+- [ ] EU-Region erfragen. Gibt es eine, entfällt der Transfer
+- [ ] Zero Data Retention vertraglich vereinbaren, die öffentliche Klausel „zur Unterstützung geschäftlicher Zwecke" reicht nicht
 - [ ] DSFA (Datenschutz-Folgenabschätzung) für Triage und Guard
 - [ ] Subprozessor-Liste und Datenschutzerklärung ergänzen
 - [ ] AI-Feature-Registry und Transparenzseite (EU AI Act) um Jev erweitern
@@ -215,14 +253,16 @@ themenfremde Fragen keinen Embedding- und Modell-Lauf mehr auslösen.
 
 | Phase | Inhalt | Ergebnis | Gate zur nächsten Phase |
 |---|---|---|---|
-| **0 · Klären** (1 Woche) | Punkte aus §7, Playground-Test mit synthetischen Fragen in 4 Sprachen, ADR-0012 | Go/No-Go | DPA ok, Sprachen tragfähig |
-| **1 · Shadow** (2 Wochen) | `decision-layer` + Triage + Guard laufen **parallel ohne Wirkung**, nur Logging | Messdaten | Ziele unten erreicht |
-| **2 · Guard live** | Answer Guard fail-closed aktiv | DNA-Grenzen zur Laufzeit geprüft | 2 Wochen ohne Fehlalarm-Häufung |
-| **3 · Triage live** | Bereichserkennung mit Bestätigungs-Chips, Handoff-Angebot | weniger Klicks, Weg zum Menschen sichtbar | UI-Workflow durchlaufen |
-| **4 · Wizard + Intake** | Vorausfüllen, Kategorie für Anfragen | kürzerer Wizard | Abbruchrate sinkt, Korrekturrate < 15 % |
-| **5 · Intern** | Korpus-Tagging, Änderungs-Relevanz, Moderation | weniger Handarbeit | — |
+| **0 · Klären** (1 Woche) | Early Access, Fragen aus §7 an TypeSafe, ADR-0012 | Go/No-Go je Datenklasse | Antwort zu Transfer und Speicherung liegt vor |
+| **1 · Intern** (ohne Nutzerdaten) | Korpus-Tagging, Änderungs-Relevanz neuer Rechtsquellen; Goldset-Test der Sprachen DE, EN, ES, TR an synthetischen Fragen | erster echter Nutzen, Messdaten zur Qualität | Qualität trägt |
+| **2 · Shadow** | `decision-layer` + Triage + Guard **parallel ohne Wirkung**, nur Logging | Messdaten | **Transfergrundlage + DSFA liegen vor**; Ziele unten erreicht |
+| **3 · Guard live** | Answer Guard fail-closed aktiv | DNA-Grenzen zur Laufzeit geprüft | 2 Wochen ohne Fehlalarm-Häufung |
+| **4 · Triage live** | Bereichserkennung mit Bestätigungs-Chips, Handoff-Angebot | weniger Klicks, Weg zum Menschen sichtbar | UI-Workflow durchlaufen |
+| **5 · Wizard + Intake** | Vorausfüllen, Kategorie für Anfragen | kürzerer Wizard | Abbruchrate sinkt, Korrekturrate < 15 % |
 
-Phase 5 kann parallel ab Phase 1 laufen, weil sie keine Userdaten berührt.
+Phase 1 startet zuerst, weil sie keine Nutzerdaten berührt. Gibt TypeSafe
+keine tragfähige Transfergrundlage, endet der Plan dort. Das ist ein
+vollwertiges Ergebnis, kein Scheitern.
 
 **Messziele Shadow-Phase** (gegen ein handgelabeltes Goldset von ~200 Fragen):
 
@@ -264,7 +304,7 @@ eine bewusste Entscheidung.
 
 ## 10. Nächste konkrete Schritte
 
-1. Early-Access-Zugang bei TypeSafe beantragen, DPA und ZDR anfragen.
-2. Goldset anlegen: 200 echte Fragetypen (synthetisch, ohne PII) in 4 Sprachen, je mit Bereich, Land, Anliegen.
-3. ADR-0012 „Decision Layer mit System-One-Modell" schreiben.
-4. `packages/decision-layer` mit Stub und Tests, danach Shadow-Integration in `assistant.ts`.
+1. Early Access bei TypeSafe beantragen und dabei schriftlich fragen: Transfergrundlage, EU-Region, Speicherdauer, Zero Data Retention.
+2. Goldset für Phase 1 anlegen: synthetische Korpus-Abschnitte und Rechtsquellen-Meldungen, ohne PII.
+3. ADR-0012 „Decision Layer mit System-One-Modell" schreiben, mit der Datenklassen-Grenze aus §7.
+4. `packages/decision-layer` mit Stub und Tests, erster Einsatz im Ingest-Skript für das Korpus-Tagging.
