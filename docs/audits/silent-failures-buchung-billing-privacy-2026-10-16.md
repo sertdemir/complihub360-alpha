@@ -2,7 +2,7 @@
 
 **Stand: 16.10.2026 · Status: Befundliste, nichts geändert · aus dem Beta-Plan (28.10.) vorgezogen**
 
-**Fortschritt:** B1, B2, B8, B7, B6, B4 behoben (2026-10-18) — Block „Geld“ abgeschlossen. Block „Zustände“: B5, B11 behoben. Reihenfolge wie vorgeschlagen, Geld zuerst.
+**Fortschritt:** B1, B2, B8, B7, B6, B4 behoben (2026-10-18) — Block „Geld“ abgeschlossen. Block „Zustände“: B5, B11, B12 (via B7), B9, B10, B13 behoben — abgeschlossen. Reihenfolge wie vorgeschlagen, Geld zuerst.
 
 Zwei lesende Durchgänge mit dem Projekt-Agenten `silent-failure-hunter`
 (`.claude/agents/silent-failure-hunter.md`), Stichproben der schwersten
@@ -44,11 +44,11 @@ ein `catch` mit Log statt leer, ein Timeout). Die drei größeren: B1 (Ausgang
 | B6 | hoch | `attendanceWatch.ts:171-177` | `credit_decided_at` wird gesetzt, **bevor** `provider_credits` eingefügt wird; wirft der Insert, ist das 30-%-Guthaben endgültig weg. **Behoben 2026-10-18:** erst `provider_credits` (Unique auf `booking_id` macht es idempotent), dann `credit_decided_at`; bei Abbruch bleibt die Frist offen und der nächste Tick holt nach. |
 | B7 | hoch | `billing.ts:558-563`, `581-625`, `641-645` | Monatslauf: Stripe-Rechnung finalisiert und gesendet, DB-Zeile erst danach; scheitert sie, stellt der nächste Lauf eine zweite aus. Outer `catch {}` ohne Detail bricht den Lauf für alle weiteren Anbieter ab. **Behoben 2026-10-18:** `issueInvoiceFor` — Zeile als `draft` direkt nach dem Stripe-Create, Wiederaufnahme beim nächsten Lauf (Positionen, Finalisieren, Senden nur was fehlt), Guthaben einmal; je Anbieter `try/catch` mit Ergebniszeile, Log und `invoice_run_failed`. |
 | B8 | mittel | `index.ts:1806-1815`, `1859-1865`; `leadCharge.ts:184-219` | Zwei parallele Requests (Doppelklick, Client-Retry) passieren beide Prüfungen, zwei Ledger-Zeilen, zwei PaymentIntents; nur der Refund-Pfad (B2) kompensiert. **Behoben 2026-10-18:** `request_id` vom Client, `request_key` am Ledger (Unique je Nutzer), Wiederholung bekommt dieselbe Buchung (`replay: true`), Zwilling 409 `BOOKING_IN_PROGRESS` ohne Stripe. |
-| B9 | mittel | `index.ts:1933-1935`, `1834` | Rabattzähler: Upsert mit `.catch(() => {})`, Read-before-write ohne Sperre; dieselbe Rabattstufe mehrfach. |
-| B10 | mittel | `leadCharge.ts:248-257`, `index.ts:1868` | `recordPaymentFailure`: wirft das `providers`-Update, antwortet der Handler 500 „Scheduling create failed"; Anbieter weder gesperrt noch informiert. |
+| B9 | mittel | `index.ts:1933-1935`, `1834` | Rabattzähler: Upsert mit `.catch(() => {})`, Read-before-write ohne Sperre; dieselbe Rabattstufe mehrfach. **Behoben 2026-10-18:** RPC `increment_discount_counter` (atomar, `used = used + n RETURNING used`), Fehler → `discount_counter_failed` statt leerem `catch`. |
+| B10 | mittel | `leadCharge.ts:248-257`, `index.ts:1868` | `recordPaymentFailure`: wirft das `providers`-Update, antwortet der Handler 500 „Scheduling create failed"; Anbieter weder gesperrt noch informiert. **Behoben 2026-10-18:** jeder Schritt in `recordPaymentFailure` einzeln abgesichert (`lead_payment_failed_record_error` mit `step`), Route antwortet immer 409. |
 | B11 | mittel | `invoiceRetry.ts:84-96` | Marker vor der Aktion; wirft `sendNotice` oder `attempt`, gilt die Stufe als erledigt — ein Einzugstag entfällt still. **Behoben 2026-10-18:** Marker nach der Aktion; ein Fehler lässt die Stufe offen (`invoice_retry_error`), der nächste Tick holt nach — Stripe-Idempotency-Key je Stufe verhindert doppelte Belastung. |
-| B12 | mittel | `billing.ts:628-631` | Guthaben-Verbrauch mit `.catch(() => {})`: scheitert er, wird dasselbe Guthaben im nächsten Monat erneut verrechnet. |
-| B13 | mittel | `index.ts:1661` | `recordProviderNoShow(...).catch(() => {})`: Nutzer meldet Anbieter-No-Show, bekommt 200; Vorfall und Benachrichtigung können komplett entfallen. |
+| B12 | mittel | `billing.ts:628-631` | Guthaben-Verbrauch mit `.catch(() => {})`: scheitert er, wird dasselbe Guthaben im nächsten Monat erneut verrechnet. **Erledigt mit B7 (2026-10-18):** der Verbrauch steht in `issueInvoiceFor` ohne leeres `catch`, einmal je Rechnung (Notiz trägt die Stripe-Kennung). |
+| B13 | mittel | `index.ts:1661` | `recordProviderNoShow(...).catch(() => {})`: Nutzer meldet Anbieter-No-Show, bekommt 200; Vorfall und Benachrichtigung können komplett entfallen. **Behoben 2026-10-18:** Fehler geloggt und als `provider_no_show_record_failed` festgehalten; 200 bleibt. |
 | B14 | niedrig | `index.ts:1785`, `1854`, `1870` | Nutzer-Draht erhält `BILLING_NOT_READY` und `reason: 'provider_billing'` — verrät den Zahlungszustand des Anbieters; ADR-0005 sieht einen neutralen Code vor. |
 | B15 | niedrig | `stripe.ts:175` | `stripeRef` bei Kartenfehler immer `null` (`paymentIntentId` existiert auf `StripeError` nicht; Stripe liefert `error.payment_intent.id`). |
 
