@@ -68,7 +68,7 @@ const IN_REVIEW: ReadonlySet<LifecycleStatus> = new Set(['submitted', 'under_ver
  *  widerrufenes Mandat, offene Rechnung …) nennt /billing mit eigenem Satz.
  *  Hier faellt die Zeile dann weg — „Noch kein Zahlungsmittel" waere bei einer
  *  hinterlegten, aber abgelehnten Karte falsch, „hinterlegt ✓" ebenso. */
-const PAYMENT_OK_UNLESS = new Set(['payment_failed', 'withdrawn_authorization']);
+const PAYMENT_OK_UNLESS = new Set(['payment_failed', 'payment_unresolved', 'withdrawn_authorization']);
 
 export type ReadinessKey = 'verification' | 'plan' | 'payment';
 

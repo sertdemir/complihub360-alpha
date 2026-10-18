@@ -274,7 +274,8 @@ export function cycleStartFor(sub: Subscription | null, today: Date): string {
 
 export type BillingBlockReason =
     | 'no_payment_method' | 'incomplete_billing_info' | 'inactive_subscription'
-    | 'withdrawn_authorization' | 'overdue_invoice' | 'account_paused' | 'payment_failed';
+    | 'withdrawn_authorization' | 'overdue_invoice' | 'account_paused' | 'payment_failed'
+    | 'payment_unresolved';
 
 export interface ReadinessInput {
     hasDefaultPaymentMethod: boolean;
@@ -286,6 +287,12 @@ export interface ReadinessInput {
     paused: boolean;
     /** Die letzte Belastung scheiterte UND das Zahlungsmittel ist noch dasselbe. */
     lastPaymentFailed: boolean;
+    /**
+     * Eine Belastung mit offenem Ausgang (B1): Stripe hat nicht verwertbar
+     * geantwortet, und der Abgleich steht noch aus. Solange sperrt sie die
+     * Buchung — sonst belastet der naechste Versuch ein zweites Mal.
+     */
+    unresolvedCharge: boolean;
 }
 
 /**
@@ -370,6 +377,7 @@ export function billingReadiness(i: ReadinessInput): { ready: boolean; reasons: 
     if (i.overdueInvoices > 0) reasons.push('overdue_invoice');
     if (i.paused) reasons.push('account_paused');
     if (i.lastPaymentFailed) reasons.push('payment_failed');
+    if (i.unresolvedCharge) reasons.push('payment_unresolved');
     return { ready: reasons.length === 0, reasons };
 }
 

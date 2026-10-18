@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // wird es nicht gebraucht.
 vi.mock('../supabase.js', () => ({ supabaseApi: {} }));
 
+import { createPaymentIntent, findPaymentIntentForLedger, StripeTransportError, stripeRequest } from '../stripe.js';
 import { getCustomerBilling } from '../stripe.js';
 
 // getCustomerBilling spricht Stripe direkt ueber `fetch`; hier gibt es keinen
@@ -72,5 +73,75 @@ describe('getCustomerBilling', () => {
         expect(r.defaultPaymentMethodId).toBeNull();
         expect(r.promotedDefault).toBe(false);
         expect(f.calls.map((c) => c.method)).toEqual(['GET', 'GET']);
+    });
+});
+
+// ─── B1: der dritte Ausgang ──────────────────────────────────────────────────
+
+describe('createPaymentIntent — card, stripe oder unknown', () => {
+    const realFetch = globalThis.fetch;
+    const args = { customerId: 'cus_a', paymentMethodId: 'pm_1', amountCents: 9900, currency: 'USD', description: 'lead', metadata: { ledger_id: 'led_1' }, idempotencyKey: 'led_1' };
+    beforeEach(() => { process.env.STRIPE_SECRET_KEY = 'rk_test_unit'; });
+    afterEach(() => { globalThis.fetch = realFetch; delete process.env.STRIPE_SECRET_KEY; });
+
+    it('Verbindungsabbruch: Ausgang unbekannt, nicht gescheitert', async () => {
+        globalThis.fetch = vi.fn(async () => { throw new TypeError('fetch failed: ECONNRESET'); }) as unknown as typeof fetch;
+        const r = await createPaymentIntent(args);
+        expect(r).toMatchObject({ ok: false, kind: 'unknown', reason: 'outcome_unknown' });
+    });
+
+    it('Timeout: der Aufruf traegt ein AbortSignal, und der Abbruch ist unbekannt', async () => {
+        const f = vi.fn(async (_u: string, init?: RequestInit) => {
+            expect(init?.signal).toBeInstanceOf(AbortSignal);
+            const e = new Error('The operation was aborted due to timeout'); e.name = 'TimeoutError'; throw e;
+        });
+        globalThis.fetch = f as unknown as typeof fetch;
+        const r = await createPaymentIntent(args);
+        expect(r).toMatchObject({ ok: false, kind: 'unknown' });
+        await expect(stripeRequest('GET', 'customers/cus_a')).rejects.toBeInstanceOf(StripeTransportError);
+    });
+
+    it('5xx von Stripe: unbekannt — die Belastung kann durch sein', async () => {
+        globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({ error: { message: 'internal', type: 'api_error' } }), { status: 502 })) as unknown as typeof fetch;
+        const r = await createPaymentIntent(args);
+        expect(r).toMatchObject({ ok: false, kind: 'unknown' });
+    });
+
+    it('4xx ohne Karte: stripe — Stripe hat geantwortet, nichts belastet', async () => {
+        globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({ error: { message: 'No such customer', type: 'invalid_request_error', code: 'resource_missing' } }), { status: 404 })) as unknown as typeof fetch;
+        const r = await createPaymentIntent(args);
+        expect(r).toMatchObject({ ok: false, kind: 'stripe', reason: 'stripe_error' });
+    });
+
+    it('Karte abgelehnt bleibt card', async () => {
+        globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({ error: { message: 'declined', type: 'card_error', code: 'card_declined', decline_code: 'insufficient_funds' } }), { status: 402 })) as unknown as typeof fetch;
+        const r = await createPaymentIntent(args);
+        expect(r).toMatchObject({ ok: false, kind: 'card', reason: 'insufficient_funds' });
+    });
+});
+
+describe('findPaymentIntentForLedger — Nachschau ohne Geldbewegung', () => {
+    const realFetch = globalThis.fetch;
+    beforeEach(() => { process.env.STRIPE_SECRET_KEY = 'rk_test_unit'; });
+    afterEach(() => { globalThis.fetch = realFetch; delete process.env.STRIPE_SECRET_KEY; });
+
+    it('findet den Intent ueber metadata.ledger_id, blaettert bei Bedarf, und sendet nur GETs', async () => {
+        const f = stripeFetch({
+            'GET https://api.stripe.com/v1/payment_intents?customer=cus_a&created%5Bgte%5D=': (call) => call.url.includes('starting_after=pi_1')
+                ? { data: [{ id: 'pi_2', status: 'succeeded', metadata: { ledger_id: 'led_x' } }], has_more: false }
+                : { data: [{ id: 'pi_1', status: 'succeeded', metadata: { ledger_id: 'other' } }], has_more: true },
+        });
+        globalThis.fetch = f.fn as unknown as typeof fetch;
+        const r = await findPaymentIntentForLedger({ customerId: 'cus_a', ledgerId: 'led_x', createdAfter: new Date('2026-10-16T10:00:00Z') });
+        expect(r).toEqual({ id: 'pi_2', status: 'succeeded' });
+        expect(f.calls.map((c) => c.method)).toEqual(['GET', 'GET']);
+        // Fuenf Minuten Puffer vor der Ledger-Zeile.
+        expect(f.calls[0].url).toContain(`created%5Bgte%5D=${Math.floor(Date.parse('2026-10-16T10:00:00Z') / 1000) - 300}`);
+    });
+
+    it('nichts gefunden: null — Stripe hat den Aufruf nie bekommen', async () => {
+        const f = stripeFetch({ 'GET https://api.stripe.com/v1/payment_intents': () => ({ data: [], has_more: false }) });
+        globalThis.fetch = f.fn as unknown as typeof fetch;
+        expect(await findPaymentIntentForLedger({ customerId: 'cus_a', ledgerId: 'led_x', createdAfter: new Date() })).toBeNull();
     });
 });

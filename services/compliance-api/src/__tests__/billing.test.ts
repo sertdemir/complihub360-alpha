@@ -255,8 +255,8 @@ describe('quoteLeadFee — das Angebot, das die Buchung ausfuehrt', () => {
 
 // ─── Phase 4: Zahlungsbereitschaft und Ledger-Status ─────────────────────────
 
-describe('billingReadiness — die sechs Gruende aus §21.1 plus payment_failed', () => {
-    const alles = { hasDefaultPaymentMethod: true, billingInfoComplete: true, subscriptionStatus: 'active' as const, authorizationAccepted: true, overdueInvoices: 0, paused: false, lastPaymentFailed: false };
+describe('billingReadiness — die sechs Gruende aus §21.1 plus payment_failed und payment_unresolved', () => {
+    const alles = { hasDefaultPaymentMethod: true, billingInfoComplete: true, subscriptionStatus: 'active' as const, authorizationAccepted: true, overdueInvoices: 0, paused: false, lastPaymentFailed: false, unresolvedCharge: false };
     it('alles da: bereit, keine Gruende', () => {
         expect(billingReadiness(alles)).toEqual({ ready: true, reasons: [] });
     });
@@ -269,6 +269,8 @@ describe('billingReadiness — die sechs Gruende aus §21.1 plus payment_failed'
         expect(billingReadiness({ ...alles, overdueInvoices: 2 }).reasons).toEqual(['overdue_invoice']);
         expect(billingReadiness({ ...alles, paused: true }).reasons).toEqual(['account_paused']);
         expect(billingReadiness({ ...alles, lastPaymentFailed: true }).reasons).toEqual(['payment_failed']);
+        // B1: eine Belastung ohne verwertbare Antwort sperrt, bis der Abgleich sie aufloest.
+        expect(billingReadiness({ ...alles, unresolvedCharge: true }).reasons).toEqual(['payment_unresolved']);
     });
     it('past_due ist kein inaktives Abo — die ueberfaellige Rechnung ist der Grund', () => {
         expect(billingReadiness({ ...alles, subscriptionStatus: 'past_due', overdueInvoices: 1 }).reasons).toEqual(['overdue_invoice']);

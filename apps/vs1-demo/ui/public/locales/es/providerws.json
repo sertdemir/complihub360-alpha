@@ -223,7 +223,8 @@
       "withdrawn_authorization": "La autorización de cobro ha sido retirada. Acepte la versión actual para continuar.",
       "overdue_invoice": "Hay una factura vencida. Páguela en el portal.",
       "account_paused": "Su cuenta está en pausa.",
-      "payment_failed": "El último cobro de lead falló. Otro método de pago levanta el bloqueo — la misma tarjeta no."
+      "payment_failed": "El último cobro de lead falló. Otro método de pago levanta el bloqueo — la misma tarjeta no.",
+      "payment_unresolved": "Un cobro reciente todavía se está confirmando con el servicio de pagos. Las reservas se reanudan por sí solas en cuanto quede resuelto, normalmente en pocos minutos."
     },
     "graceTitleOne": "Hay una factura pendiente",
     "graceTitleMany": "Hay {{n}} facturas pendientes",
