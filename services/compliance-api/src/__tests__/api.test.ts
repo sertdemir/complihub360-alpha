@@ -2291,6 +2291,27 @@ describe('Identitaets-Scan an den Schreibrouten (Phase 3)', () => {
         expect(r.body.updated).not.toContain('pseudonym_label');
         expect(db.providers[0].pseudonym_label).toBe('Verifizierte Steuerkanzlei · Norddeutschland');
     });
+
+    it('PATCH /profile: active_since laeuft ueber die Bewerbung — 400 am Feld, nichts gespeichert (Punkt 3)', async () => {
+        seedProvider();
+        const r = await api('/api/v1/provider/test-kanzlei/profile', { method: 'PATCH', auth: 'key', body: JSON.stringify({ region: 'Hamburg', active_since: 2001 }) });
+        expect(r.status).toBe(400);
+        expect(r.body).toMatchObject({ errorCode: 'VALIDATION_ERROR', field: 'active_since' });
+        expect(db.providers[0].active_since).toBe(2015);
+        expect(db.providers[0].region).toBe('Norddeutschland');
+    });
+
+    it('POST /provider/intake: ungueltiges active_since → 400 am Feld, kein Anbieter angelegt (Punkt 3)', async () => {
+        for (const bad of [15, new Date().getUTCFullYear() + 1, '2013', 2013.5]) {
+            const r = await api('/api/v1/provider/intake', { method: 'POST', auth: 'key', body: JSON.stringify({ name: 'Intake Kanzlei GmbH', active_since: bad }) });
+            expect(r.status, String(bad)).toBe(400);
+            expect(r.body).toMatchObject({ errorCode: 'VALIDATION_ERROR', field: 'active_since' });
+        }
+        expect((db.providers ?? []).some((p: any) => p.name === 'Intake Kanzlei GmbH')).toBe(false);
+        const ok = await api('/api/v1/provider/intake', { method: 'POST', auth: 'key', body: JSON.stringify({ name: 'Intake Kanzlei GmbH', active_since: 2012 }) });
+        expect(ok.status).toBe(201);
+        expect(db.providers.find((p: any) => p.name === 'Intake Kanzlei GmbH').active_since).toBe(2012);
+    });
 });
 
 describe('POST /api/v1/admin/watchers/tick', () => {
@@ -3363,6 +3384,30 @@ describe('Change-Control fuer aktive Partner (§18–20)', () => {
         expect(db.providers[0].name).toBe('Neue Kanzlei Partner GmbH');
         expect(db.provider_confidential[0].representative_name).toBe('Ben Beispiel');
         expect(changes()).toEqual([expect.objectContaining({ effect: 'applied', field_path: 'name,representative_name', change_type: 'legal_name,responsible_professional', applied_at: expect.any(String) })]);
+    });
+
+    it('„Aktiv seit": neues Jahr gilt sofort, mit Pruefvorgang; geleert heisst nicht mehr anzeigen (Punkt 3)', async () => {
+        seedActivePartner();
+        db.providers[0].active_since = 2013;
+        const r = await own('/application', { method: 'PATCH', body: JSON.stringify({ active_since: 2010 }) });
+        expect(r.status).toBe(200);
+        expect(db.providers[0].active_since).toBe(2010);
+        expect(changes()).toEqual([expect.objectContaining({ effect: 'applied', field_path: 'active_since', change_type: 'track_record' })]);
+        const leer = await own('/application', { method: 'PATCH', body: JSON.stringify({ active_since: null }) });
+        expect(leer.status).toBe(200);
+        expect(db.providers[0].active_since).toBeNull();
+    });
+
+    it('„Aktiv seit": kein Jahr von 1900 bis heute → 400 am Feld, der alte Wert bleibt (Punkt 3)', async () => {
+        seedActivePartner();
+        db.providers[0].active_since = 2013;
+        for (const bad of [15, 1899, new Date().getUTCFullYear() + 1, '2013', 2013.5, true]) {
+            const r = await own('/application', { method: 'PATCH', body: JSON.stringify({ name: 'Neue Kanzlei GmbH', active_since: bad }) });
+            expect(r.status, String(bad)).toBe(400);
+            expect(r.body).toMatchObject({ errorCode: 'VALIDATION_ERROR', field: 'active_since' });
+        }
+        expect(db.providers[0].active_since).toBe(2013);
+        expect(changes()).toHaveLength(0);
     });
 
     it('legt vor der Aktivierung keinen Vorgang an', async () => {

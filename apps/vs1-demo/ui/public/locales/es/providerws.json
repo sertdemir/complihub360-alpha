@@ -467,8 +467,8 @@
     "deleteConfirmLabel": "Solicitar eliminación",
     "sectionMatchmaking": "Matchmaking",
     "matchmakingTitle": "Perfil de matchmaking",
-    "matchmakingSub": "Lo que ven los usuarios antes de reservar (tarjeta anónima) y en tu página de detalle. Editable en cualquier momento.",
-    "billingModelLabel": "Modelo de facturación — aparece en tu tarjeta anónima",
+    "matchmakingSub": "Lo que ven los usuarios antes de reservar (tarjeta anónima) y en su página de detalle. Editable en cualquier momento.",
+    "billingModelLabel": "Modelo de facturación — aparece en su tarjeta anónima",
     "billingModel": {
       "abo": "Suscripción",
       "hourly": "Por horas",
@@ -477,7 +477,7 @@
     },
     "regionLabel": "Región",
     "activeSinceLabel": "Activo desde",
-    "pricingTableLabel": "Tabla de precios — visible en tu página de detalle",
+    "pricingTableLabel": "Tabla de precios — visible en su página de detalle",
     "pricingAddRow": "+ Añadir fila",
     "pricingRemoveRow": "Eliminar fila",
     "pricingServicePh": "Servicio",
@@ -560,7 +560,10 @@
         "sat": "Sá",
         "sun": "Do"
       }
-    }
+    },
+    "activeSinceReadonly": "«Activo desde» forma parte de sus datos verificados, como el nombre de su empresa. Lo cambia a través de su solicitud.",
+    "activeSinceNone": "No se muestra",
+    "previewActiveSince": "activo desde {{year}}"
   },
   "termine": {
     "title": "Citas y <accent>leads</accent>.",
@@ -686,7 +689,16 @@
       "email": "Correo de contacto",
       "website": "Sitio web",
       "languages": "Idiomas (separados por comas)",
-      "region": "Región"
+      "region": "Región",
+      "activeSince": "Activo desde",
+      "activeSincePh": "p. ej., 2015",
+      "activeSinceHint": "Año en que empezó a ofrecer estos servicios. Déjelo vacío para no mostrarlo.",
+      "activeSinceInvalid": "Indique un año entre 1900 y {{max}}, por ejemplo 2015.",
+      "reviewNote": "Los cambios en el nombre de la empresa, el sitio web y «Activo desde» se aplican de inmediato. Nuestro equipo de revisión los comprueba en un plazo de 3 días hábiles.",
+      "activeSinceRemoved": {
+        "heading": "Guardado",
+        "message": "«Activo desde» ya no se muestra a los usuarios."
+      }
     },
     "legal": {
       "note": "Solo nuestro equipo de revisión ve estos datos. Nunca aparecen en su tarjeta.",

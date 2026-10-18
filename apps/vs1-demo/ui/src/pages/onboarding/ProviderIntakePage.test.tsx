@@ -17,7 +17,8 @@ const page = () => render(<MemoryRouter initialEntries={['/intake?token=tok']}><
 const submit = () => screen.getByRole('button', { name: 'intake.submit' });
 
 describe('ProviderIntakePage · V2', () => {
-  beforeEach(() => apiFetch.mockReset());
+  // Block-Body: ein zurueckgegebener Mock wuerde als Aufraeumer nach dem Test aufgerufen.
+  beforeEach(() => { apiFetch.mockReset(); });
 
   it('laesst den Knopf aktiv und nennt beim Absenden beide fehlenden Angaben', () => {
     page();
@@ -61,5 +62,42 @@ describe('ProviderIntakePage · V2', () => {
     fireEvent.click(submit());
     await waitFor(() => expect(apiFetch).toHaveBeenCalledWith('/api/v1/provider/intake', expect.objectContaining({ method: 'POST' })));
     expect(await screen.findByText('intake.doneTitle')).toBeInTheDocument();
+  });
+
+  const fillRequired = () => {
+    fireEvent.change(document.getElementById('intake-name')!, { target: { value: 'Studio Bianchi' } });
+    fireEvent.click(document.getElementById('intake-statutes')!);
+  };
+  const since = () => document.getElementById('intake-active-since') as HTMLInputElement;
+
+  it('„Aktiv seit": kein Jahr von 1900 bis heute steht am Feld, nichts geht ab (Punkt 3)', () => {
+    page();
+    fillRequired();
+    expect(screen.getByLabelText('settings.activeSinceLabel')).toBe(since());
+    fireEvent.change(since(), { target: { value: 'seit 2015' } });
+    fireEvent.click(submit());
+    expect(document.getElementById('intake-active-since-error')).toHaveTextContent('application.account.activeSinceInvalid');
+    expect(since()).toHaveFocus();
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it('„Aktiv seit": leer geht als null ab, ein Jahr als Zahl', async () => {
+    apiFetch.mockResolvedValue({ ok: true });
+    page();
+    fillRequired();
+    fireEvent.change(since(), { target: { value: '2015' } });
+    fireEvent.click(submit());
+    await waitFor(() => expect(apiFetch).toHaveBeenCalled());
+    expect(JSON.parse(apiFetch.mock.calls[0][1].body)).toMatchObject({ active_since: 2015 });
+  });
+
+  it('„Aktiv seit": lehnt der Server ab, steht der Satz am Feld', async () => {
+    const { ApiError } = await import('../../api/client');
+    apiFetch.mockRejectedValue(new ApiError('raw', 400, 'r', undefined, { errorCode: 'VALIDATION_ERROR', field: 'active_since' }));
+    page();
+    fillRequired();
+    fireEvent.click(submit());
+    expect(await screen.findByText('application.account.activeSinceInvalid')).toBeInTheDocument();
+    expect(since()).toHaveFocus();
   });
 });

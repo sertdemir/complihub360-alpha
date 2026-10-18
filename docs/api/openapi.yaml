@@ -1294,6 +1294,14 @@ paths:
                 contact_email: { type: string, format: email }
                 website_url: { type: string }
                 languages: { type: array, items: { type: string } }
+                active_since:
+                  type: integer
+                  nullable: true
+                  minimum: 1900
+                  description: >-
+                    Jahr, seit dem der Anbieter die Leistungen anbietet (Karte: "active since 2013"); bis zum laufenden
+                    Jahr (UTC). `null` = nicht mehr anzeigen. Alles andere → 400 VALIDATION_ERROR mit `field: active_since`.
+                    Gepruefte Angabe (Change-Control `track_record`); PATCH /provider/{key}/profile nimmt sie nicht an.
                 entity_type: { type: string }
                 registration_number: { type: string }
                 registered_address: { type: string }
@@ -1307,7 +1315,7 @@ paths:
                 dry_run: { type: boolean, description: "true → nichts schreiben, nur die Aufteilung zurueckgeben: `{ dry_run, instant[], review[], held[] }` (Canvas B V2)" }
       responses:
         '200': { description: "`{ updated[], held[], change_request_ids[] }` — held nennt die Felder, die auf Freigabe warten" }
-        '400': { description: Kein gueltiges Feld }
+        '400': { description: "Kein gueltiges Feld, oder VALIDATION_ERROR mit `field` (active_since, country_code …)" }
         '409': { description: Konto beendet (ACCOUNT_CLOSED) }
 
   /provider/{key}/services:

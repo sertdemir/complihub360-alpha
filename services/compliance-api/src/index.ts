@@ -39,6 +39,7 @@ import { handleSubscriptionGet, handleSubscriptionSelect, handleSubscriptionSche
 import { handleProviderReview } from "./providerReview.js";
 import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpact.js";
 import { plannedPrices } from "./changeSchedule.js";
+import { readActiveSince } from "./activeSince.js";
 import { redactText } from "@complihub360/redaction";
 import {
     loadVisibility, maskIdentity, publicTitle, rankBasis, requiredFor, scanFields, serializeProvider, verificationDepth,
@@ -2222,6 +2223,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'name', message: 'name required', correlationId }));
                     return;
                 }
+                // Punkt 3: ein Jahr von 1900 bis heute oder nichts — am Feld benannt.
+                const since = readActiveSince(d.active_since);
+                if (since === 'invalid') {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'active_since', message: 'active_since must be a year from 1900 to the current year, or null', correlationId }));
+                    return;
+                }
                 const providerKey = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
                 // Phase 3: Freitexte, die ein Nutzer vor der Buchung sieht, duerfen
                 // keine Identitaet tragen. Gefunden wird benannt, nicht still
@@ -2254,7 +2262,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // pseudonym_label wird nicht mehr angenommen: der Titel vor der
                     // Buchung entsteht in der API (anonymity.ts).
                     region: d.region ?? null,
-                    active_since: Number.isInteger(d.active_since) ? d.active_since : null,
+                    active_since: since?.value ?? null,
                     // Dossier fuer die Partnerseite: bisher zaehlte der Intake die
                     // Nachweise nur fuer das Event-Log und warf sie dann weg. Jetzt
                     // werden sie gespeichert — sonst bleibt die Karte "Qualifikation"
@@ -2370,7 +2378,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const findings = scanFields({ region: patch.region, pricing_table: patch.pricing_table }, identityCtx(own[0]));
                     if (findings.length) { identityRejection(res, correlationId, findings); return; }
                 }
-                if (Number.isInteger(d.active_since)) patch.active_since = d.active_since;
+                // Punkt 3 (O2): „Aktiv seit" ist eine gepruefte Angabe und laeuft
+                // ueber die Bewerbung (Change-Control). Hier wuerde es ungeprueft
+                // live gehen — deshalb benannt abgelehnt, nicht still verworfen.
+                if (d.active_since !== undefined) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'active_since', message: 'active_since is changed through the application', correlationId }));
+                    return;
+                }
                 if (Object.keys(patch).length === 0) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'No valid profile fields', correlationId }));

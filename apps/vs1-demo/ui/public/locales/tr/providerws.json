@@ -467,8 +467,8 @@
     "deleteConfirmLabel": "Silme talep et",
     "sectionMatchmaking": "Eşleştirme",
     "matchmakingTitle": "Eşleştirme profili",
-    "matchmakingSub": "Kullanıcıların rezervasyondan önce (anonim kart) ve detay sayfanda gördükleri. Her zaman düzenlenebilir.",
-    "billingModelLabel": "Faturalama modeli — anonim kartında görünür",
+    "matchmakingSub": "Kullanıcıların rezervasyondan önce (anonim kart) ve detay sayfanızda gördükleri. Her zaman düzenlenebilir.",
+    "billingModelLabel": "Faturalama modeli — anonim kartınızda görünür",
     "billingModel": {
       "abo": "Abonelik",
       "hourly": "Saatlik",
@@ -477,7 +477,7 @@
     },
     "regionLabel": "Bölge",
     "activeSinceLabel": "Şu tarihten beri aktif",
-    "pricingTableLabel": "Fiyat tablosu — detay sayfanda görünür",
+    "pricingTableLabel": "Fiyat tablosu — detay sayfanızda görünür",
     "pricingAddRow": "+ Satır ekle",
     "pricingRemoveRow": "Satırı kaldır",
     "pricingServicePh": "Hizmet",
@@ -560,7 +560,10 @@
         "sat": "Cmt",
         "sun": "Paz"
       }
-    }
+    },
+    "activeSinceReadonly": "“Şu tarihten beri aktif”, şirket adınız gibi doğrulanmış bilgilerinizden biridir. Bunu başvurunuz üzerinden değiştirirsiniz.",
+    "activeSinceNone": "Gösterilmiyor",
+    "previewActiveSince": "{{year}} yılından beri aktif"
   },
   "termine": {
     "title": "Randevular ve <accent>lead'ler</accent>.",
@@ -686,7 +689,16 @@
       "email": "İletişim e-postası",
       "website": "Web sitesi",
       "languages": "Diller (virgülle ayrılmış)",
-      "region": "Bölge"
+      "region": "Bölge",
+      "activeSince": "Şu tarihten beri aktif",
+      "activeSincePh": "ör. 2015",
+      "activeSinceHint": "Bu hizmetleri sunmaya başladığınız yıl. Gösterilmesini istemiyorsanız boş bırakın.",
+      "activeSinceInvalid": "Lütfen 1900 ile {{max}} arasında bir yıl girin, örneğin 2015.",
+      "reviewNote": "Şirket adı, web sitesi ve “Şu tarihten beri aktif” alanındaki değişiklikler hemen geçerli olur. İnceleme ekibimiz bunları 3 iş günü içinde kontrol eder.",
+      "activeSinceRemoved": {
+        "heading": "Kaydedildi",
+        "message": "“Şu tarihten beri aktif” bilgisi artık kullanıcılara gösterilmiyor."
+      }
     },
     "legal": {
       "note": "Bu bilgileri yalnızca inceleme ekibimiz görür. Kartınızda asla görünmez.",
