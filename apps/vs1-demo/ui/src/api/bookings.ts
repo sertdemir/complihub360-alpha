@@ -384,6 +384,11 @@ export interface CreateBookingOptions {
    *  2026-10-09: USt-Buchung von der Bereichsseite als DE+NL berechnet). */
   areaCode?: string;
   countries?: string[];
+  /** B8: Schluessel dieses Buchungsversuchs. Derselbe Schluessel bei einer
+   *  Wiederholung (Doppelklick, Netz weg nach der Antwort) erzeugt keine
+   *  zweite Belastung — der Server antwortet mit derselben Buchung oder 409
+   *  BOOKING_IN_PROGRESS. `newBookingRequestId()` liefert einen. */
+  requestId?: string;
 }
 
 export async function createBooking(publicRef: string, slotStart: string, opts: CreateBookingOptions): Promise<BookingConfirmation> {
@@ -394,8 +399,17 @@ export async function createBooking(publicRef: string, slotStart: string, opts: 
       public_ref: publicRef, slot_start: slotStart, message: opts.message || undefined,
       acknowledgement_version: opts.acknowledgementVersion, language: opts.language || undefined, session_id: opts.sessionId || undefined,
       area_code: opts.areaCode || undefined, countries: opts.countries?.length ? opts.countries : undefined,
+      request_id: opts.requestId || undefined,
     }),
   });
+}
+
+/** Ein Schluessel je Buchungsversuch (B8). Nach einem Fehler neu ziehen — ein
+ *  neuer Versuch ist ein neuer Versuch; nur die Wiederholung desselben teilt ihn. */
+export function newBookingRequestId(): string {
+  const c = globalThis.crypto;
+  if (c && typeof c.randomUUID === 'function') return c.randomUUID();
+  return `req-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
 }
 
 /** Die Faelle, die eine Oberflaeche unterscheiden muss — alles andere ist
@@ -407,6 +421,8 @@ export async function createBooking(publicRef: string, slotStart: string, opts: 
 export type BookingFailure =
   | { kind: 'not_completed' }
   | { kind: 'slot_taken' }
+  /** B8: derselbe Versuch laeuft gerade (Doppelklick) — kurz warten, dann erneut. */
+  | { kind: 'in_progress' }
   | { kind: 'acknowledgement_outdated'; currentVersion: string | null }
   | { kind: 'generic' };
 
@@ -415,6 +431,7 @@ export function bookingFailureFrom(err: unknown): BookingFailure {
   const code = String(err.body.errorCode ?? '');
   if (code === 'BOOKING_NOT_COMPLETED' || code === 'BILLING_NOT_READY' || code === 'PROVIDER_PAUSED') return { kind: 'not_completed' };
   if (code === 'SLOT_TAKEN') return { kind: 'slot_taken' };
+  if (code === 'BOOKING_IN_PROGRESS') return { kind: 'in_progress' };
   if (code === 'ACKNOWLEDGEMENT_OUTDATED') return { kind: 'acknowledgement_outdated', currentVersion: typeof err.body.current_version === 'string' ? err.body.current_version : null };
   return { kind: 'generic' };
 }

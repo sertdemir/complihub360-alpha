@@ -22,7 +22,11 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
   `reverseOrphanCharge` in `leadCharge.ts`: Refund → Ledger-Ereignis → event_log, jeder Schritt
   einzeln mit `structuredLog('error')`; was halb bleibt, sperrt `payment_unresolved`, und der
   Abgleich-Tick erstattet `captured` ohne Buchung mit demselben Idempotency-Key nach. Keine Migration.
-- [ ] **B8** Doppelklick → zwei Ledger-Zeilen, zwei PaymentIntents.
+- [x] **B8** Doppelklick → zwei Ledger-Zeilen, zwei PaymentIntents.
+  Client schickt `request_id` je Versuch (`newBookingRequestId`, nach Fehler neu, bei „läuft noch“
+  gleich); Ledger-Spalte `request_key` mit Unique `(user_id, request_key)`. Wiederholung nach
+  Erfolg → dieselbe 201 (`replay: true`); Zeile ohne Buchung oder 23505 → 409 `BOOKING_IN_PROGRESS`
+  ohne Stripe. Migration `20261018000100`, pgTAP 18, Mock mit Gedächtnis je Session.
 - [ ] **B7** Monatslauf: Stripe-Rechnung vor DB-Zeile; outer `catch {}` bricht den Lauf ab.
 - [ ] **B6** 30-%-Guthaben: `credit_decided_at` vor dem Insert.
 - [ ] **B4** `quoteLeadFee` findet den Plan nur bei exakter `plan_version`.

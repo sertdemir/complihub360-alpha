@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRequestContext } from '../../lib/requestContext';
@@ -14,7 +14,7 @@ import { focusField } from '../ui/FormErrorSummary';
 import { FieldError, errorAria } from '../ui/FieldError';
 import { ApiError } from '../../api/client';
 import {
-  bookingFailureFrom, createBooking, fetchAcknowledgement, fetchProviderDetail, fetchSlots,
+  bookingFailureFrom, createBooking, newBookingRequestId, fetchAcknowledgement, fetchProviderDetail, fetchSlots,
   type BookingAcknowledgement, type BookingFailure, type ProviderDetail,
 } from '../../api/bookings';
 import type { AnonProvider } from '../../api/search';
@@ -104,6 +104,9 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [failure, setFailure] = useState<BookingFailure | null>(null);
+  // B8: ein Schluessel je Versuch; bleibt bei einem Doppelklick derselbe, wird
+  // nach einem Fehler neu gezogen.
+  const requestIdRef = useRef<string | null>(null);
   const [ack, setAck] = useState<BookingAcknowledgement | null>(null);
   const [ackKey, setAckKey] = useState(0);
   const [slotsKey, setSlotsKey] = useState(0);
@@ -183,6 +186,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
     if (!selected || !ack) return;
     setSending(true);
     setFailure(null);
+    requestIdRef.current ??= newBookingRequestId();
     try {
       const res = await createBooking(key, selected, {
         message: message.trim() || undefined,
@@ -191,6 +195,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
         sessionId: sessionId ?? undefined,
         areaCode: opportunity?.areaCode,
         countries: opportunity?.countries,
+        requestId: requestIdRef.current,
       });
       // Die Liste dahinter erfaehrt es sofort — ohne Neuladen, ohne dass der
       // Mandant die Schublade schliessen und suchen muss.
@@ -209,7 +214,10 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
       // Kein erfundener Anbieter als Rueckfall: der Termin ist nicht gebucht,
       // und genau das steht dann da — in dem Satz, der zur Lage passt.
       setReviewOpen(false);
-      setFailure(bookingFailureFrom(err));
+      const f = bookingFailureFrom(err);
+      // Ein neuer Versuch ist ein neuer Versuch — ausser der alte laeuft noch.
+      if (f.kind !== 'in_progress') requestIdRef.current = null;
+      setFailure(f);
     }
     setSending(false);
   };
