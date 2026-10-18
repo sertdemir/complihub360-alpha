@@ -115,6 +115,7 @@ const { stripeMock } = vi.hoisted(() => ({
         createPaymentIntent: vi.fn(),
         refundPaymentIntent: vi.fn(),
         verifyPaymentMethod: vi.fn(),
+        findPaymentIntentForLedger: vi.fn(),
         stripeRequest: vi.fn(),
     },
 }));
@@ -127,6 +128,7 @@ vi.mock('../stripe.js', async (importOriginal) => {
         createPaymentIntent: (...a: any[]) => stripeMock.createPaymentIntent(...a),
         refundPaymentIntent: (...a: any[]) => stripeMock.refundPaymentIntent(...a),
         verifyPaymentMethod: (...a: any[]) => stripeMock.verifyPaymentMethod(...a),
+        findPaymentIntentForLedger: (...a: any[]) => stripeMock.findPaymentIntentForLedger(...a),
         stripeRequest: (...a: any[]) => stripeMock.stripeRequest(...a),
         ensureStripeCustomer: async (key: string) => `cus_${key}`,
     };
@@ -137,6 +139,7 @@ function resetStripe() {
     stripeMock.createPaymentIntent.mockReset().mockResolvedValue({ ok: true, paymentIntentId: 'pi_test_1', status: 'succeeded' });
     stripeMock.refundPaymentIntent.mockReset().mockResolvedValue({ refundId: 're_test_1' });
     stripeMock.verifyPaymentMethod.mockReset().mockResolvedValue({ ok: true, setupIntentId: 'seti_test_1' });
+    stripeMock.findPaymentIntentForLedger.mockReset().mockResolvedValue(null);
     stripeMock.stripeRequest.mockReset().mockImplementation(async (_m: string, path: string) => { throw new Error(`unmocked stripe call: ${path}`); });
 }
 // Nylas Hosted Auth: kein Netz im Test. Nur Tausch und Widerruf sprechen mit
@@ -707,6 +710,108 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         expect(db.notifications ?? []).toHaveLength(0);
     });
 
+    // ─── B1: keine verwertbare Antwort von Stripe ───────────────────────────
+    describe('Ausgang unbekannt (B1): kein failed, Anbieter gesperrt, Abgleich erstattet', () => {
+        const unknown = { ok: false, kind: 'unknown', reason: 'outcome_unknown', stripeRef: null, detail: 'Stripe payment_intents: timeout' };
+
+        it('502, keine Buchung, Ledger-Ereignis unknown, payment_unresolved am Anbieter, kein Alarm an den Anbieter', async () => {
+            const { session } = seedBookable();
+            stripeMock.createPaymentIntent.mockResolvedValue(unknown);
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(502);
+            expect(r.body.errorCode).toBe('BILLING_ERROR');
+            expect(db.scheduling ?? []).toHaveLength(0);
+            const ledger = db.provider_lead_ledger[0];
+            expect(ledger.payment_status).toBe('pending');
+            expect(db.provider_lead_ledger_payment_events.map((e) => e.status)).toEqual(['unknown']);
+            expect(db.providers[0].billing_ready).toBe(false);
+            expect(db.providers[0].billing_block_reasons).toEqual(['payment_unresolved']);
+            expect(db.providers[0].last_payment_failure).toBeUndefined();
+            expect(db.event_log.map((e) => e.type)).toContain('lead_payment_unresolved');
+            expect(db.event_log.map((e) => e.type)).not.toContain('lead_payment_failed');
+            expect(db.notifications ?? []).toHaveLength(0);
+            // Der Nutzer-Draht nennt weder Ledger noch Stripe.
+            expect(JSON.stringify(r.body)).not.toMatch(/ledger|stripe|payment_intent/i);
+        });
+
+        it('der zweite Versuch des Nutzers scheitert am Gate — keine zweite Belastung', async () => {
+            const { session } = seedBookable();
+            stripeMock.createPaymentIntent.mockResolvedValue(unknown);
+            await book(standardBody(session));
+            // Die View spiegelt billing_ready (Staging: Spalte aus providers).
+            (db.matchable_provider_services ?? []).forEach((r: any) => { r.bookable_chargeable = false; });
+            const r2 = await book(standardBody(session));
+            expect(r2.status).toBe(409);
+            expect(stripeMock.createPaymentIntent).toHaveBeenCalledTimes(1);
+            expect(db.provider_lead_ledger).toHaveLength(1);
+        });
+
+        it('die Zahlungsbereitschaft bleibt gesperrt, solange die Zeile offen ist', async () => {
+            const { session } = seedBookable();
+            (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+            stripeMock.createPaymentIntent.mockResolvedValue(unknown);
+            await book(standardBody(session));
+            const { syncBillingReadiness } = await import('../leadCharge.js');
+            const r = await syncBillingReadiness('test-kanzlei');
+            expect(r?.ready).toBe(false);
+            expect(r?.reasons).toEqual(['payment_unresolved']);
+        });
+
+        it('Abgleich: Stripe hat belastet → captured, erstattet, refunded; Sperre faellt', async () => {
+            const { session } = seedBookable();
+            (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+            stripeMock.createPaymentIntent.mockResolvedValue(unknown);
+            await book(standardBody(session));
+            const ledger = db.provider_lead_ledger[0];
+            const { runChargeReconcileTick, RECONCILE_MIN_AGE_MS } = await import('../leadCharge.js');
+            // Zu jung: liegen lassen.
+            expect(await runChargeReconcileTick(false, new Date())).toEqual({ checked: 0, refunded: 0, failed: 0, errors: 0 });
+            expect(stripeMock.findPaymentIntentForLedger).not.toHaveBeenCalled();
+            const later = new Date(Date.now() + RECONCILE_MIN_AGE_MS + 1000);
+            // Shadow: nur Marker.
+            expect(await runChargeReconcileTick(true, later)).toEqual({ checked: 1, refunded: 0, failed: 0, errors: 0 });
+            expect(db.event_log.map((e) => e.type)).toContain('lead_charge_reconcile_shadow');
+            expect(db.providers[0].billing_block_reasons).toEqual(['payment_unresolved']);
+            // Scharf.
+            stripeMock.findPaymentIntentForLedger.mockResolvedValue({ id: 'pi_found', status: 'succeeded' });
+            expect(await runChargeReconcileTick(false, later)).toEqual({ checked: 1, refunded: 1, failed: 0, errors: 0 });
+            expect(stripeMock.findPaymentIntentForLedger.mock.calls[0][0]).toMatchObject({ customerId: 'cus_test', ledgerId: ledger.id });
+            expect(stripeMock.refundPaymentIntent).toHaveBeenCalledWith('pi_found', `${ledger.id}:refund`);
+            expect(db.provider_lead_ledger_payment_events.filter((e) => e.ledger_id === ledger.id).map((e) => e.status)).toEqual(['unknown', 'captured', 'refunded']);
+            expect(db.event_log.map((e) => e.type)).toEqual(expect.arrayContaining(['lead_charge_reversed', 'lead_charge_reconciled']));
+            expect(db.providers[0].billing_block_reasons).toEqual([]);
+            expect(db.providers[0].billing_ready).toBe(true);
+            // Ein weiterer Tick findet nichts mehr.
+            expect(await runChargeReconcileTick(false, later)).toEqual({ checked: 0, refunded: 0, failed: 0, errors: 0 });
+        });
+
+        it('Abgleich: nichts bei Stripe → failed, keine Erstattung, Sperre faellt', async () => {
+            const { session } = seedBookable();
+            (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+            stripeMock.createPaymentIntent.mockResolvedValue(unknown);
+            await book(standardBody(session));
+            const { runChargeReconcileTick, RECONCILE_MIN_AGE_MS } = await import('../leadCharge.js');
+            const r = await runChargeReconcileTick(false, new Date(Date.now() + RECONCILE_MIN_AGE_MS + 1000));
+            expect(r).toEqual({ checked: 1, refunded: 0, failed: 1, errors: 0 });
+            expect(stripeMock.refundPaymentIntent).not.toHaveBeenCalled();
+            expect(db.provider_lead_ledger_payment_events.map((e) => e.status)).toEqual(['unknown', 'failed']);
+            expect(db.providers[0].billing_block_reasons).toEqual([]);
+        });
+
+        it('Abgleich: Stripe-Fehler beim Nachschauen → Zeile bleibt offen, Sperre bleibt, Fehler gezaehlt', async () => {
+            const { session } = seedBookable();
+            stripeMock.createPaymentIntent.mockResolvedValue(unknown);
+            await book(standardBody(session));
+            stripeMock.findPaymentIntentForLedger.mockRejectedValue(new Error('timeout'));
+            const { runChargeReconcileTick, RECONCILE_MIN_AGE_MS } = await import('../leadCharge.js');
+            const r = await runChargeReconcileTick(false, new Date(Date.now() + RECONCILE_MIN_AGE_MS + 1000));
+            // Die Nachschau kam nicht durch — nichts geprueft, ein Fehler, nichts geschrieben.
+            expect(r).toEqual({ checked: 0, refunded: 0, failed: 0, errors: 1 });
+            expect(db.provider_lead_ledger_payment_events.map((e) => e.status)).toEqual(['unknown']);
+            expect(db.providers[0].billing_block_reasons).toEqual(['payment_unresolved']);
+        });
+    });
+
     it('Fassung fehlt oder veraltet: 400 / 409 mit der gueltigen Version, kein Ledger', async () => {
         const { session } = seedBookable();
         const r1 = await book(standardBody(session, { acknowledgement_version: undefined }));
@@ -767,6 +872,86 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured', 'refunded']);
         expect(db.event_log.map((e) => e.type)).toContain('lead_charge_reversed');
         expect(db.scheduling ?? []).toHaveLength(0);
+    });
+
+    // ─── B2: die Erstattung selbst darf nicht still scheitern ───────────────
+    describe('Kompensation sichtbar (B2): Refund-Fehler sperrt, Abgleich holt nach; gelungene Erstattung heisst nie failed', () => {
+        const insertFailing = async (pred: (table: string, data: any) => boolean) => {
+            const { supabaseApi } = await import('../supabase.js');
+            const realInsert = supabaseApi.insert;
+            return vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+                if (pred(table, data)) throw new Error(`injected failure on ${table}`);
+                return realInsert(table, data);
+            });
+        };
+
+        it('Refund scheitert: Ereignis reversed_failed, Ledger bleibt captured, Anbieter payment_unresolved; der Tick erstattet spaeter mit demselben Key', async () => {
+            const { session } = seedBookable();
+            (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+            stripeMock.refundPaymentIntent.mockRejectedValueOnce(new Error('Stripe refunds: 502'));
+            const spy = await insertFailing((t) => t === 'scheduling');
+            try {
+                const r = await book(standardBody(session));
+                expect(r.status).toBe(500);
+            } finally { spy.mockRestore(); }
+            const ledger = db.provider_lead_ledger[0];
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured']);
+            expect(db.event_log.map((e) => e.type)).toContain('lead_charge_reversed_failed');
+            expect(db.event_log.map((e) => e.type)).not.toContain('lead_charge_reversed');
+            expect(db.providers[0].billing_block_reasons).toEqual(['payment_unresolved']);
+            // Der Abgleich sieht die captured-Zeile ohne Buchung und erstattet — ohne Stripe-Nachschau.
+            const { runChargeReconcileTick, RECONCILE_MIN_AGE_MS } = await import('../leadCharge.js');
+            const later = new Date(Date.now() + RECONCILE_MIN_AGE_MS + 1000);
+            expect(await runChargeReconcileTick(false, later)).toEqual({ checked: 1, refunded: 1, failed: 0, errors: 0 });
+            expect(stripeMock.findPaymentIntentForLedger).not.toHaveBeenCalled();
+            expect(stripeMock.refundPaymentIntent).toHaveBeenLastCalledWith('pi_test_1', `${ledger.id}:refund`);
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured', 'refunded']);
+            expect(db.event_log.filter((e) => e.type === 'lead_charge_reversed')).toHaveLength(1);
+            expect(db.providers[0].billing_block_reasons).toEqual([]);
+        });
+
+        it('Refund gelingt, Ledger-Ereignis scheitert: KEIN reversed_failed, Sperre bis der Tick nachschreibt', async () => {
+            const { session } = seedBookable();
+            (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+            const spy = await insertFailing((t, d) => t === 'scheduling' || (t === 'provider_lead_ledger_payment_events' && d?.status === 'refunded'));
+            try {
+                const r = await book(standardBody(session));
+                expect(r.status).toBe(500);
+            } finally { spy.mockRestore(); }
+            expect(stripeMock.refundPaymentIntent).toHaveBeenCalledTimes(1);
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured']);
+            expect(db.event_log.map((e) => e.type)).not.toContain('lead_charge_reversed_failed');
+            expect(db.event_log.find((e) => e.type === 'lead_charge_reversed')?.payload).toMatchObject({ ledgerEventWritten: false });
+            expect(db.providers[0].billing_block_reasons).toEqual(['payment_unresolved']);
+            const { runChargeReconcileTick, RECONCILE_MIN_AGE_MS } = await import('../leadCharge.js');
+            expect(await runChargeReconcileTick(false, new Date(Date.now() + RECONCILE_MIN_AGE_MS + 1000))).toEqual({ checked: 1, refunded: 1, failed: 0, errors: 0 });
+            // Zweiter Refund-Aufruf mit demselben Key: Stripe liefert dieselbe Erstattung, kein zweites Geld.
+            expect(stripeMock.refundPaymentIntent).toHaveBeenCalledTimes(2);
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured', 'refunded']);
+            expect(db.providers[0].billing_block_reasons).toEqual([]);
+        });
+
+        it('event_log nicht erreichbar: die Erstattung laeuft trotzdem und wird im Ledger verbucht', async () => {
+            const { session } = seedBookable();
+            const spy = await insertFailing((t) => t === 'scheduling' || t === 'event_log');
+            try {
+                const r = await book(standardBody(session));
+                expect(r.status).toBe(500);
+            } finally { spy.mockRestore(); }
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured', 'refunded']);
+            expect(db.providers[0].billing_block_reasons ?? []).toEqual([]);
+        });
+
+        it('eine bezahlte Buchung ist kein Orphan: der Tick laesst sie in Ruhe', async () => {
+            const { session } = seedBookable();
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            // Nur Anbieter mit payment_unresolved werden geprueft — erzwingen wir die Pruefung:
+            db.providers[0].billing_block_reasons = ['payment_unresolved'];
+            const { unresolvedLedgers } = await import('../leadCharge.js');
+            expect(await unresolvedLedgers('test-kanzlei')).toEqual([]);
+            expect(stripeMock.refundPaymentIntent).not.toHaveBeenCalled();
+        });
     });
 
     it('Neutralitaet: Essential und Global bekommen fuer dieselbe Opportunity dasselbe Band und dieselbe Standardgebuehr', async () => {

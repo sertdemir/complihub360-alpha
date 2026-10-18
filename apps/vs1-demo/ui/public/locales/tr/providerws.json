@@ -223,7 +223,8 @@
       "withdrawn_authorization": "Ödeme yetkisi geri çekildi. Devam etmek için güncel sürümü onaylayın.",
       "overdue_invoice": "Vadesi geçmiş bir fatura var. Portalda ödeyin.",
       "account_paused": "Hesabınız duraklatıldı.",
-      "payment_failed": "Son lead tahsilatı başarısız oldu. Farklı bir ödeme yöntemi engeli kaldırır — aynı kart kaldırmaz."
+      "payment_failed": "Son lead tahsilatı başarısız oldu. Farklı bir ödeme yöntemi engeli kaldırır — aynı kart kaldırmaz.",
+      "payment_unresolved": "Yakın tarihli bir tahsilat ödeme hizmetiyle hâlâ doğrulanıyor. Çözüldüğünde rezervasyonlar kendiliğinden devam eder, genellikle birkaç dakika içinde."
     },
     "graceTitleOne": "Bir fatura açık",
     "graceTitleMany": "{{n}} fatura açık",
@@ -1327,7 +1328,10 @@
     "credit": "Alacak",
     "creditNote": "bir sonraki faturanızdan düşülür",
     "evidenceExpiring": "Belge {{type}}",
-    "until": "{{date}} tarihine kadar"
+    "until": "{{date}} tarihine kadar",
+    "greeting": "Tekrar hoş geldiniz, <accent>{{name}}</accent>.",
+    "greetingNoName": "Tekrar hoş geldiniz.",
+    "seeAll": "Tümünü gör"
   },
   "partnerNotif": {
     "hours_one": "{{count}} saat",

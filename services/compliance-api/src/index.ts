@@ -22,14 +22,14 @@ import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, revokeGrant, settingsUrl } from "./nylasAuth.js";
 import { notify, notifyProviderMembers, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
-import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
+import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recordPaymentUnresolved, reverseOrphanCharge, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
 import { loadAttendancePolicy, findRecentLead, rebookDeadline } from "./attendance.js";
 import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
 import { handleProviderPerformance, handleProviderOverview, handleEnforcementAppeal, handleAdminEnforcement } from "./performanceRoutes.js";
 import { authenticateApiClient, clientRateLimiter, setRateLimitHeaders, logApiRequest, handleExtRoutes, handleProviderApiAccess, handleAdminApiAccess } from "./apiRoutes.js";
 import { looksLikeApiKey } from "./apiClients.js";
 import { loadPerformancePolicy, qualityFactor, availabilitySlots, bookingOpen, validateAvailabilityHours, validTimezone, incidentsInWindow } from "./performance.js";
-import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent, StripeError } from "./stripe.js";
+import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, StripeError } from "./stripe.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
@@ -1883,6 +1883,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             customerId: p.stripe_customer_id ? String(p.stripe_customer_id) : null, paymentMethodId,
                             receiptEmail: p.contact_email ?? null, correlationId,
                         });
+                    if (charge.outcome === 'unknown') {
+                        // B1: keine verwertbare Antwort. Nicht „gescheitert" — die
+                        // Karte kann belastet sein. Anbieter gesperrt, bis der
+                        // Abgleich (Watcher) nachgeschaut hat; eine Erstattung, falls
+                        // noetig, kommt von dort. Fuer den Nutzer: nichts gebucht,
+                        // nichts zu zahlen, derselbe Anbieter ist gleich nicht
+                        // waehlbar — damit nicht zweimal belastet wird.
+                        await recordPaymentUnresolved({ providerKey, ledgerId: charge.ledgerId, result: charge.result, correlationId });
+                        fail(502, 'BILLING_ERROR', 'The payment service did not answer. Nothing has been booked; this provider is unavailable for a short while. You can choose another provider or try later.');
+                        return;
+                    }
                     if (charge.outcome === 'failed') {
                         if (charge.result.kind === 'card') {
                             await recordPaymentFailure({ providerKey, ledgerId: charge.ledgerId, result: charge.result, paymentMethodId, correlationId });
@@ -1934,14 +1945,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         if (!booking?.id) throw new Error('scheduling insert returned no row');
                     } catch (insErr) {
                         // Belastet, aber keine Buchung: erstatten und protokollieren.
+                        // B2: jeder Schritt einzeln, nichts hinter `.catch(() => {})`;
+                        // bleibt etwas halb, sperrt `payment_unresolved` den Anbieter
+                        // und der Abgleich-Tick holt die Erstattung nach.
                         if (charge.outcome === 'captured') {
-                            try {
-                                await refundPaymentIntent(charge.paymentIntentId, `${charge.ledgerId}:refund`);
-                                await supabaseApi.insert('provider_lead_ledger_payment_events', { ledger_id: charge.ledgerId, status: 'refunded', stripe_ref: charge.paymentIntentId, detail: 'booking insert failed' });
-                                await supabaseApi.insert('event_log', { type: 'lead_charge_reversed', payload: { providerKey, ledgerId: charge.ledgerId, paymentIntentId: charge.paymentIntentId } });
-                            } catch (refErr) {
-                                await supabaseApi.insert('event_log', { type: 'lead_charge_reversed_failed', payload: { providerKey, ledgerId: charge.ledgerId, paymentIntentId: charge.paymentIntentId, error: String(refErr).slice(0, 200) } }).catch(() => {});
-                            }
+                            await reverseOrphanCharge({ providerKey, ledgerId: charge.ledgerId, paymentIntentId: charge.paymentIntentId, reason: 'booking insert failed', correlationId });
                         }
                         const dup = /23505|duplicate|unique/i.test(String(insErr));
                         if (dup) fail(409, 'SLOT_TAKEN', 'This slot has just been taken');

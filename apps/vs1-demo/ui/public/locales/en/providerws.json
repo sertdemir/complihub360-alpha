@@ -225,7 +225,8 @@
       "withdrawn_authorization": "The billing authorisation has been withdrawn. Accept the current version to continue.",
       "overdue_invoice": "An invoice is overdue. Pay it in the portal.",
       "account_paused": "Your account is paused.",
-      "payment_failed": "The last lead charge failed. A different payment method lifts this — the same card does not."
+      "payment_failed": "The last lead charge failed. A different payment method lifts this — the same card does not.",
+      "payment_unresolved": "A recent charge is still being confirmed with the payment service. Bookings resume on their own once it is settled, usually within a few minutes."
     },
     "graceTitleOne": "One invoice is open",
     "graceTitleMany": "{{n}} invoices are open",
@@ -1470,7 +1471,10 @@
     "credit": "Credit",
     "creditNote": "applied to your next invoice",
     "evidenceExpiring": "Evidence {{type}}",
-    "until": "until {{date}}"
+    "until": "until {{date}}",
+    "greeting": "Welcome back, <accent>{{name}}</accent>.",
+    "greetingNoName": "Welcome back.",
+    "seeAll": "See all"
   },
   "apiAccess": {
     "title": "Integration (API)",
