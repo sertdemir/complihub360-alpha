@@ -120,7 +120,10 @@ jobs:
           # Google-Login aus, bis im Beta-Projekt ein eigener OAuth-Client steht
           # (lib/supabase.ts, isGoogleLoginEnabled). Einschalten: '1'.
           VITE_AUTH_GOOGLE: ''
-          VITE_PLAUSIBLE_DOMAIN: ''
+          # Plausible (cookielos, ohne Personenbezug) als eigene Site, damit
+          # Beta-Zahlen nicht in Staging landen. Leer = aus (index.html).
+          VITE_PLAUSIBLE_DOMAIN: ${{ vars.BETA_PLAUSIBLE_DOMAIN }}
+          VITE_PLAUSIBLE_HOST: ${{ vars.PLAUSIBLE_HOST }}
           VITE_SITE_ORIGIN: ''
         run: |
           npm run build --workspace apps/vs1-demo/ui
