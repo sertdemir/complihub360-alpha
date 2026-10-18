@@ -139,7 +139,9 @@ Dokument im Video ist ein Dummy mit erfundenen Werten. Nie ein echtes Kundendoku
 |---|---|---|
 | Stimme | ElevenLabs Professional Voice Clone (ab Creator) | 30 min saubere Aufnahme, gleicher Raum, gleiches Mikro; ergibt EN/DE/ES/TR |
 | Gesicht | HeyGen Avatar IV/V Digital Twin | 2–5 min Trainingsvideo frontal mit Einwilligungs-Satz; Alternativen Captions Mirage, Synthesia |
-| Bild & Cinematic | Higgsfield (Soul ID) + Google AI Pro (Veo 3.1, Nano Banana) | Midjourney erst bei regelmäßigem Bedarf an Stil-Stills |
+| Bild & Cinematic | **ArtCraft** (Web-App, beim Gründer eingerichtet): Nano Banana, FLUX, Seedream, Kling, Veo, Seedance, Sora, Midjourney in einer Oberfläche, 2D-Komposition + 3D-Szenenbau | Higgsfield nur für Soul-ID-Figurkonsistenz; Google AI Pro und Midjourney entfallen im Pilot |
+
+**ArtCraft:** kein offizielles API, kein MCP (Repo `storytold/artcraft`, Stand 10/2026). Weg im Pilot: Prompt und Szenenbau von Claude als Text, Generierung in ArtCraft, Export in einen Drive-Ordner oder eine Figma-Seite, die Claude lesen kann. Automatisierung erst mit API oder einer lokalen Session mit Browser-Steuerung.
 
 **Anbindungen:** Figma → Jitter (Plugin) · Figma → AE (Lottie/AEUX) · ElevenLabs API → HeyGen API via **n8n** (bereits im Stack) für Vier-Sprachen-Fassungen · Claude für Skripte, Untertitel, DNA-Check · Resolve → Captions → Instagram (1080×1920) / YouTube (3840×2160).
 
@@ -151,7 +153,7 @@ Dokument im Video ist ein Dummy mit erfundenen Werten. Nie ein echtes Kundendoku
 
 | Stufe | Summe | Enthalten |
 |---|---|---|
-| **1 · Pilotmonat** | **≈ 115 $** | ElevenLabs Creator 22 · HeyGen Creator 29 · Google AI Pro 20 · Jitter Pro ≈ 19 · Captions Max 25 · Resolve 0 |
+| **1 · Pilotmonat** | **≈ 95 $ + ArtCraft-Credits** | ElevenLabs Creator 22 · HeyGen Creator 29 · ArtCraft Credits je Modell (Plan beim Gründer) · Jitter Pro ≈ 19 · Captions Max 25 · Resolve 0 |
 | **2 · Produktion** | **≈ 255 $** | Stufe 1 + After Effects 23 · Higgsfield Plus ≈ 59 · Midjourney Standard 30 · Descript Creator 35 (−25 Captions, wenn Descript übernimmt) |
 | **3 · Skalierung** | **≈ 450–600 $** | HeyGen Business 149 + Sitze · ElevenLabs Pro 99 · Higgsfield Ultra ≈ 99–129 · Runway Pro 35 · Rive Cadet 17/Sitz |
 
