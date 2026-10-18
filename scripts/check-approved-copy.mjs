@@ -392,7 +392,11 @@ for (const [art, soll] of Object.entries(MAILS)) {
   try { text = klartext(readFileSync(resolve(MAIL_DIR, eintrag.file), 'utf8')); } catch { fehler.push(`Auth-Mails: ${eintrag.file} fehlt`); continue; }
   for (const satz of soll.saetze) if (!text.includes(satz)) fehler.push(`Auth-Mails: ${eintrag.file} — fehlt wortgleich: „${satz}"`);
   for (const m of MAIL_VERBOTEN) if (m.test(text)) fehler.push(`Auth-Mails: ${eintrag.file} — ersetzt und nicht mehr erlaubt: ${m}`);
-  if (!/\{\{ \.ConfirmationURL \}\}/.test(readFileSync(resolve(MAIL_DIR, eintrag.file), 'utf8'))) fehler.push(`Auth-Mails: ${eintrag.file} — {{ .ConfirmationURL }} fehlt`);
+  // Seit 18.10.2026 traegt der Knopf einen token_hash statt {{ .ConfirmationURL }}:
+  // Der PKCE-Link liess sich nur im anfordernden Browser einloesen (lib/authLink.ts).
+  const typ = art === 'recovery' ? 'recovery' : 'email';
+  const link = `href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=${typ}"`;
+  if (!readFileSync(resolve(MAIL_DIR, eintrag.file), 'utf8').includes(link)) fehler.push(`Auth-Mails: ${eintrag.file} — Link fehlt: ${link}`);
 }
 
 // 6. Verfuegbarkeit (Checklist v1.0, Schritt 5, Wording-Abnahme 10.10.2026):

@@ -78,6 +78,12 @@ API spricht. Mit der Beta-Env zeigen die Mails damit auf den Beta-Bucket.
   | Magic Link | Your CompliHub360 sign-in link | `supabase-magic-link.html` |
   | Reset Password | Reset your CompliHub360 password | `supabase-reset-password.html` |
 
+  Der Knopf in jeder Vorlage zeigt auf `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=…`
+  und nicht auf `{{ .ConfirmationURL }}` (seit 18.10.2026). Der PKCE-Link ließ
+  sich nur in dem Browser einlösen, der ihn angefordert hatte. Den
+  token_hash löst die App selbst ein (`lib/authLink.ts`), und das klappt in
+  jedem Browser. Gilt für Beta **und** Staging.
+
   Vor dem Einfügen in jeder Datei die Logo-URL auf
   `https://<beta-ref>.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png`
   ändern (Projekt-Referenz tauschen). Die Texte sind abgenommen (Canvas
