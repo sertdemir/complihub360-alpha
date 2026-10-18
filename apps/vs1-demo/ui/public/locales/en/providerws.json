@@ -579,7 +579,10 @@
         "sat": "Sat",
         "sun": "Sun"
       }
-    }
+    },
+    "activeSinceReadonly": "“Active since” is part of your checked details, like your company name. You change it in your application.",
+    "activeSinceNone": "Not shown",
+    "previewActiveSince": "active since {{year}}"
   },
   "termine": {
     "title": "Appointments & <accent>leads</accent>.",
@@ -713,7 +716,16 @@
       "email": "Contact email",
       "website": "Website",
       "languages": "Languages (comma-separated)",
-      "region": "Region"
+      "region": "Region",
+      "activeSince": "Active since",
+      "activeSincePh": "e.g. 2015",
+      "activeSinceHint": "Year you started offering these services. Leave empty to hide it.",
+      "activeSinceInvalid": "Please enter a year between 1900 and {{max}}, for example 2015.",
+      "reviewNote": "Changes to company name, website and “active since” go live right away. Our review team checks them within 3 business days.",
+      "activeSinceRemoved": {
+        "heading": "Saved",
+        "message": "“Active since” is no longer shown to users."
+      }
     },
     "legal": {
       "note": "Only our review team sees these details. They never appear on your card.",

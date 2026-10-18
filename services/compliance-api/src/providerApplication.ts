@@ -8,6 +8,7 @@ import { checkVatId } from './vies.js';
 import { sendServicePausedMail } from './mailer.js';
 import { bookingAffected, localeFromCountry, pausedAreasByProvider, requestOf } from './changeImpact.js';
 import { scanFields, type IdentityContext } from './anonymity.js';
+import { readActiveSince } from './activeSince.js';
 import {
     EVIDENCE_ALLOWED_MIME, EVIDENCE_BUCKET, EVIDENCE_MAX_BYTES, evidenceObjectPath, objectInfo, signedUploadUrl,
 } from './storage.js';
@@ -222,7 +223,11 @@ async function patchApplication(req: IncomingMessage, res: ServerResponse, corre
     const email = str(d.contact_email, 200); if (email) pub.contact_email = email.toLowerCase();
     const langs = strList(d.languages, 20); if (langs) pub.languages = langs;
     const region = str(d.region, 80); if (region !== undefined) pub.region = region || null;
-    if (Number.isInteger(d.active_since)) pub.active_since = d.active_since;
+    // Punkt 3: ein Jahr von 1900 bis heute oder null (= nicht anzeigen); alles
+    // andere ist ein Fehler am Feld statt eines stillen Verwerfens.
+    const since = readActiveSince(d.active_since);
+    if (since === 'invalid') { json(res, 400, { errorCode: 'VALIDATION_ERROR', field: 'active_since', message: 'active_since must be a year from 1900 to the current year, or null', correlationId }); return; }
+    if (since) pub.active_since = since.value;
     const workMode = str(d.work_mode, 120); if (workMode !== undefined) pub.work_mode = workMode || null;
     const billingCountry = str(d.billing_country, 2); if (billingCountry && isCountry(billingCountry.toUpperCase())) pub.billing_country = billingCountry.toUpperCase();
 

@@ -303,7 +303,7 @@ function recheckReadiness() {
 // Pausieren (Canvas C2): Kopfzeile und Einstellungen schalten denselben Wert.
 let MOCK_AVAILABILITY: 'available' | 'ooo' = 'available';
 function partnerCoverage() {
-  return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: MOCK_AVAILABILITY, ooo_until: null, partner_status: 'active', contact_email: 'kanzlei@schmidt-partner.example', billing_model: 'mixed', region: 'Norddeutschland', active_since: 2009, pricing_table: [{ service: 'USt-Voranmeldung (monatlich)', price: 'ab 180 € / Monat' }, { service: 'OSS-Registrierung', price: 'ab 450 € einmalig' }] } };
+  return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: MOCK_AVAILABILITY, ooo_until: null, partner_status: 'active', contact_email: 'kanzlei@schmidt-partner.example', billing_model: 'mixed', region: 'Norddeutschland', active_since: mockActiveSince(), pricing_table: [{ service: 'USt-Voranmeldung (monatlich)', price: 'ab 180 € / Monat' }, { service: 'OSS-Registrierung', price: 'ab 450 € einmalig' }] } };
 }
 const monat = (offset: number) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + offset); return d.toISOString().slice(0, 7); };
 // Pricing v2 (ADR-0003): Tarif + Leads nach Band, Rabatt auf die ersten Leads
@@ -898,6 +898,19 @@ function p2Confidential() {
 // Re-Verifizierung steht in zehn Tagen an — dieselbe Zeile, die die
 // Admin-Queue als "reverification_due" fuehrt.
 const SP = { vat: uuid(61, 8), epr: uuid(62, 8), priv: uuid(63, 8), ev1: uuid(71, 8), ev2: uuid(72, 8), ev3: uuid(73, 8), ev4: uuid(74, 8), ev5: uuid(75, 8) };
+// Punkt 3: das Kapitel Konto behaelt, was gespeichert wurde — sonst stuende
+// nach „„Aktiv seit" entfernt" wieder das alte Jahr da. Prueft wie der Server.
+const ACCOUNT_OVERRIDE: Record<string, unknown> = {};
+function patchAccountMock(body: Record<string, unknown>) {
+  const v = body.active_since;
+  if (v !== undefined && v !== null && !(typeof v === 'number' && Number.isInteger(v) && v >= 1900 && v <= new Date().getUTCFullYear())) {
+    return { __status: 400, errorCode: 'VALIDATION_ERROR', field: 'active_since', message: 'active_since must be a year from 1900 to the current year, or null' };
+  }
+  for (const k of ['name', 'contact_email', 'website_url', 'languages', 'region', 'active_since']) if (body[k] !== undefined) ACCOUNT_OVERRIDE[k] = body[k];
+  return { ok: true, updated: Object.keys(body), held: [], change_request_ids: [] };
+}
+const mockActiveSince = () => ('active_since' in ACCOUNT_OVERRIDE ? ACCOUNT_OVERRIDE.active_since as number | null : 2013);
+
 function spProvider() {
   return { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', website_url: 'https://schmidt-partner.example', contact_email: 'kanzlei@schmidt-partner.example', languages: ['de', 'en'], region: 'Hamburg', active_since: 2013, vat_id: 'DE287654321', vat_id_status: 'valid', vat_id_checked_at: iso(-60, 9, 0), billing_country: 'DE', work_mode: 'remote · Portal', lifecycle_status: 'active', lifecycle_status_since: iso(-355, 10, 0), lifecycle_status_reason: null,
     // Dieselbe Zahlungsbereitschaft wie die Abrechnungsvorschau — sonst meldet
@@ -957,7 +970,7 @@ function spConfidential() {
 function p2Application(key?: string) {
   if (key === PARTNER_KEY) {
     const done = { complete: true, missing: [] as string[] };
-    return { ok: true, provider: spProvider(), confidential: spConfidential(),
+    return { ok: true, provider: { ...spProvider(), ...ACCOUNT_OVERRIDE }, confidential: spConfidential(),
       chapters: { account: done, legal: done, services: done, evidence: done, agreements: done, submit: { ready: false, missing: [] } },
       services: spServices(), checklist: spChecklist(), evidence: spEvidence(), agreements: spAgreements(), open_requests: [] };
   }
@@ -1232,6 +1245,7 @@ function adminApiDecide(id: string, body: Record<string, unknown>) {
 const INITIAL_MOCK_STATE = JSON.stringify({ ATT, STATUS_OVERRIDE, READINESS, AVAIL, API_STATE });
 export function resetMockState(): void {
   SEEN_REQUESTS.clear();
+  for (const k of Object.keys(ACCOUNT_OVERRIDE)) delete ACCOUNT_OVERRIDE[k];
   const init = JSON.parse(INITIAL_MOCK_STATE) as { ATT: typeof ATT; STATUS_OVERRIDE: typeof STATUS_OVERRIDE; READINESS: typeof READINESS; AVAIL: typeof AVAIL; API_STATE: typeof API_STATE };
   for (const k of Object.keys(ATT)) delete ATT[k];
   Object.assign(ATT, init.ATT);
@@ -1362,6 +1376,7 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'session' && p.length === 2 && method === 'PATCH') return patchSession(p[1], body);
   if (p[0] === 'notifications' && p[1] === 'read') return { ok: true, marked: 3 };
   // Phase 2 · schreibende Aufrufe: plausible Antworten, keine Aenderung am Datensatz.
+  if (p[0] === 'provider' && p[2] === 'application' && !p[3] && method === 'PATCH') return patchAccountMock(body);
   if (p[0] === 'provider' && p[2] === 'services' && p[3] && !p[4] && method === 'PATCH') return serviceChange(p[3], body);
   if (p[0] === 'provider' && p[2] === 'changes' && p[3] && method === 'DELETE') return { ok: true, status: 'withdrawn' };
   if (p[0] === 'provider' && p[2] === 'material-event') return { ok: true, change_request_id: uuid(97, 7), paused_service_ids: Array.isArray(body.service_ids) ? body.service_ids : spServices().map((x) => x.id), users_notified: 1 };

@@ -116,7 +116,8 @@ export interface MatchmakingProfile {
   active_since: number | null;
 }
 
-export async function updateMatchmakingProfile(patch: Partial<MatchmakingProfile>, providerKey?: string): Promise<void> {
+/** Ohne `active_since`: das Jahr laeuft ueber die Bewerbung (Change-Control, Punkt 3); der Server lehnt es hier ab. */
+export async function updateMatchmakingProfile(patch: Omit<Partial<MatchmakingProfile>, 'active_since'>, providerKey?: string): Promise<void> {
   await apiFetch(`/api/v1/provider/${providerKey ?? await myProviderKey()}/profile`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

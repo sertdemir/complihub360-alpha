@@ -467,8 +467,8 @@
     "deleteConfirmLabel": "Löschung anfragen",
     "sectionMatchmaking": "Matchmaking",
     "matchmakingTitle": "Matchmaking-Profil",
-    "matchmakingSub": "Was User vor der Buchung sehen (anonyme Card) und auf deiner Detail-Seite. Jederzeit änderbar.",
-    "billingModelLabel": "Abrechnungs-Modell — erscheint auf deiner anonymen Card",
+    "matchmakingSub": "Was Nutzer vor der Buchung sehen (anonyme Karte) und auf Ihrer Detailseite. Jederzeit änderbar.",
+    "billingModelLabel": "Abrechnungsmodell — erscheint auf Ihrer anonymen Karte",
     "billingModel": {
       "abo": "Abomodell",
       "hourly": "Stundenbasis",
@@ -477,12 +477,12 @@
     },
     "regionLabel": "Region",
     "activeSinceLabel": "Aktiv seit",
-    "pricingTableLabel": "Preistabelle — sichtbar auf deiner Detail-Seite",
+    "pricingTableLabel": "Preistabelle — sichtbar auf Ihrer Detailseite",
     "pricingAddRow": "+ Zeile hinzufügen",
     "pricingRemoveRow": "Zeile entfernen",
     "pricingServicePh": "Leistung",
     "pricingPricePh": "Preis",
-    "pricingNoteV2": "Auf der Listing-Card erscheint kein konkreter Preis — nur das Abrechnungs-Modell. Die volle Tabelle zeigt der (abgerechnete) Detail-Open.",
+    "pricingNoteV2": "Auf der Karte in der Ergebnisliste erscheint kein konkreter Preis — nur das Abrechnungsmodell. Die volle Tabelle zeigt die (abgerechnete) Detailansicht.",
     "matchmakingSave": "Matchmaking-Profil speichern",
     "matchmakingSaved": "Gespeichert.",
     "previewTitle": "So erscheinen Sie vor der Buchung",
@@ -560,7 +560,10 @@
         "sat": "Sa",
         "sun": "So"
       }
-    }
+    },
+    "activeSinceReadonly": "„Aktiv seit“ gehört zu Ihren geprüften Angaben, wie Ihr Firmenname. Sie ändern es über die Bewerbung.",
+    "activeSinceNone": "Nicht angezeigt",
+    "previewActiveSince": "aktiv seit {{year}}"
   },
   "termine": {
     "title": "Termine & <accent>Leads</accent>.",
@@ -686,7 +689,16 @@
       "email": "Kontakt-E-Mail",
       "website": "Website",
       "languages": "Sprachen (kommagetrennt)",
-      "region": "Region"
+      "region": "Region",
+      "activeSince": "Aktiv seit",
+      "activeSincePh": "z. B. 2015",
+      "activeSinceHint": "Das Jahr, seit dem Sie diese Leistungen anbieten. Leer lassen, um es nicht anzuzeigen.",
+      "activeSinceInvalid": "Bitte geben Sie ein Jahr zwischen 1900 und {{max}} an, zum Beispiel 2015.",
+      "reviewNote": "Änderungen an Firmenname, Website und „Aktiv seit“ gelten sofort. Unser Prüfteam sieht sie sich innerhalb von 3 Werktagen an.",
+      "activeSinceRemoved": {
+        "heading": "Gespeichert",
+        "message": "„Aktiv seit“ wird Nutzern nicht mehr angezeigt."
+      }
     },
     "legal": {
       "note": "Diese Angaben sieht nur unser Prüfteam. Sie erscheinen nie auf Ihrer Karte.",
