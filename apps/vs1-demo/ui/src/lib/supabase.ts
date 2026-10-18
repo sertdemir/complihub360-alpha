@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { readAuthLinkParams, setAuthLinkFailure, stripAuthLinkParams } from './authLink';
 
 // Public, browser-safe Supabase values. The ANON key is designed to be public;
 // the SERVICE_ROLE key must NEVER appear in any VITE_ variable.
@@ -64,19 +65,38 @@ let clientPromise: Promise<SupabaseClient | null> | null = null;
  * Asynchron, weil das SDK nachgeladen wird — Aufrufer, die vorher `supabase`
  * synchron lasen, muessen awaiten.
  */
+/**
+ * Loest einen token_hash aus einem Mail-Link ein, bevor irgendwer den Client
+ * bekommt. Das SDK kennt diese Parameter nicht von selbst (detectSessionInUrl
+ * deckt nur PKCE-Codes und Tokens im Hash ab). Anders als ein PKCE-Code geht
+ * der token_hash in jedem Browser — darum steht er in den Mail-Vorlagen.
+ * Siehe lib/authLink.ts.
+ */
+async function redeemTokenHash(client: SupabaseClient): Promise<SupabaseClient> {
+  if (typeof window === 'undefined') return client;
+  const link = readAuthLinkParams(window.location.search, window.location.hash);
+  if (link.kind !== 'token_hash') return client;
+  const { error } = await client.auth.verifyOtp({ token_hash: link.tokenHash, type: link.type });
+  if (error) setAuthLinkFailure(error.code === 'otp_expired' ? 'expired' : 'invalid');
+  window.history.replaceState(window.history.state, '', stripAuthLinkParams(window.location.href));
+  return client;
+}
+
 export function getSupabase(): Promise<SupabaseClient | null> {
   if (!isSupabaseConfigured) return Promise.resolve(null);
   if (!clientPromise) {
-    clientPromise = import('@supabase/supabase-js').then(({ createClient }) =>
-      createClient(url as string, anonKey as string, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true, // consume magic-link / OAuth tokens from the URL
-          flowType: 'pkce',
-        },
-      }),
-    );
+    clientPromise = import('@supabase/supabase-js')
+      .then(({ createClient }) =>
+        createClient(url as string, anonKey as string, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true, // consume OAuth / PKCE codes from the URL
+            flowType: 'pkce',
+          },
+        }),
+      )
+      .then(redeemTokenHash);
   }
   return clientPromise;
 }
