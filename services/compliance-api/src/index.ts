@@ -3497,6 +3497,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 //    unknown country must not kill the search (providers are
                 //    still scored; laws just come back empty).
                 let engineResults: EnrichedSubdomain[] = [];
+                // Hat die Engine gerechnet? `laws: []` heisst sonst zweierlei —
+                // "nichts gefunden" und "nicht geprueft" —, und die Risk Map
+                // zeigte beides als Entwarnung (DNA §4.5).
+                let engineFailed = false;
                 // All requested markets the engine knows a profile for; unknown
                 // codes are dropped rather than killing the whole search.
                 const requestedMarkets: string[] = Array.isArray(requestData.structured_answers?.markets)
@@ -3522,6 +3526,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         });
                     }
                 } catch (engineErr) {
+                    engineFailed = true;
                     // Unbekannte Laender sind oben schon herausgefiltert — wer
                     // hier landet, hat einen Engine-Fehler, und der Nutzer sieht
                     // eine Risk Map ohne Pflichten. Bis 2026-10-18 stand das nur
@@ -3747,7 +3752,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // feature-flagged off, so the string must not claim a
                     // synthesis that does not happen: everything below `laws`
                     // comes out of the deterministic engine.
-                    overview_summary: "Obligations identified by the compliance engine for the requested markets and domains.",
+                    overview_summary: engineFailed
+                        ? "The compliance engine could not assess the requested markets. Obligations are missing, not absent."
+                        : "Obligations identified by the compliance engine for the requested markets and domains.",
+                    // 'failed': die Engine hat nicht gerechnet, `laws` ist leer,
+                    // weil nichts geprueft wurde. Die Risk Map zeigt dann
+                    // riskMapFailed mit dieser Referenz-ID, nicht "keine
+                    // Pflichten". Die Anbieter bleiben drin (die Bereichsseite
+                    // braucht nur sie); ob sie erscheinen, entscheidet die Flaeche.
+                    laws_status: engineFailed ? 'failed' : 'ok',
+                    ...(engineFailed ? { correlationId } : {}),
                     providers: anonProviders,
                     // Bereich × Markt: deckt ein freigegebener Anbieter das ab?
                     // Nur Booleans je Zelle — kein Anbieter, keine Anzahl.

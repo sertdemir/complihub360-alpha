@@ -6,7 +6,7 @@ import type { PenaltyCeiling } from '@complihub/compliance-engine';
 import { describeCeiling, penaltyText } from '../lib/penaltyCeiling';
 import { cadenceLabel, obligationLabel } from '../lib/obligationText';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
-import { runSearch, type AnonProvider, type SearchCoverage, type SearchLaw } from '../api/search';
+import { lawsOf, runSearch, type AnonProvider, type SearchCoverage, type SearchLaw } from '../api/search';
 import { coverageGaps, isLimitedCoverage } from '../lib/matchState';
 import { LimitedCoverageCard, OneMatchGuest, ProviderStateHead } from '../components/results/ProviderStates';
 import { useApiData } from '../lib/useApiData';
@@ -336,7 +336,10 @@ export function ResultsRiskMap() {
       } catch { /* fall back to the local profile */ }
     }
     const res = await runSearch(query);
-    return { providers: res.providers, laws: res.laws ?? [], coverage: res.coverage, session, query };
+    // Engine nicht gerechnet → riskMapFailed mit Referenz, nicht "keine
+    // Pflichten" und auch keine Anbieter ohne die Pflichten dazu.
+    const laws = lawsOf(res);
+    return { providers: res.providers, laws, coverage: res.coverage, session, query };
   }, { providers: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
   // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Bis 2026-09-22
   // stand hier beim Laden und bei einem API-Fehler eine Design-Fixture mit drei

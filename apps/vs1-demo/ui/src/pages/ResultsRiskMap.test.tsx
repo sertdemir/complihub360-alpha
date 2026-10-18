@@ -26,7 +26,12 @@ const FORMER_FIXTURE_TITLE = 'OSS quarterly return';
 // competing with what is actually due.
 
 const runSearch = vi.fn();
-vi.mock('../api/search', () => ({ runSearch: (...a: unknown[]) => runSearch(...a) }));
+// Nur die Suche ist gemockt; `lawsOf` bleibt echt — es entscheidet, ob eine
+// Antwort Pflichten traegt oder ein Engine-Ausfall ist.
+vi.mock('../api/search', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../api/search')>()),
+  runSearch: (...a: unknown[]) => runSearch(...a),
+}));
 const fetchSessions = vi.hoisted(() => vi.fn());
 vi.mock('../api/sessions', () => ({
   saveWizardSession: vi.fn().mockResolvedValue(undefined),
@@ -359,6 +364,21 @@ describe('ResultsRiskMap states as designed', () => {
     fireEvent.click(toggle);
     expect(await screen.findByText('ref-3f2b8c1e')).toBeInTheDocument();
     expect(screen.getByText('2026-09-22 14:32:07 UTC')).toBeInTheDocument();
+  });
+
+  // 18.10.2026: die Engine warf, /search antwortete 200 mit `laws: []` — und
+  // die Seite zeigte "No immediate requirements identified" plus Anbieter.
+  // Eine Entwarnung ueber eine Pruefung, die es nicht gab (DNA §4.5).
+  it('treats an engine failure as a failed Risk Map, with the reference — not as "no requirements"', async () => {
+    runSearch.mockResolvedValue({ providers: [prov('a', 87)], laws: [], laws_status: 'failed', correlationId: 'ref-engine-7c1d' });
+    renderPage();
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'common:states.riskMapFailed.heading' })).toBeInTheDocument();
+    expect(screen.queryByText('common:states.noRequirements.heading')).not.toBeInTheDocument();
+    // Keine Anbieter ohne die Pflichten, zu denen sie passen sollen.
+    expect(screen.queryAllByTestId('teaser-card')).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button', { name: 'common:states.technicalDetails' }));
+    expect(await screen.findByText('ref-engine-7c1d')).toBeInTheDocument();
   });
 
   it('shows no technical details when there is no reference to give', async () => {

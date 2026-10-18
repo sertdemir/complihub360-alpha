@@ -541,7 +541,9 @@ describe('POST /api/v1/search', () => {
             expect(r.body).not.toHaveProperty('tutorials');
             expect(r.body).not.toHaveProperty('articles');
             expect(r.body).not.toHaveProperty('tips');
-            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'overview_summary', 'providers']);
+            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'overview_summary', 'providers']);
+            // Erfolg: kein Fehlersignal, keine Referenz im Koerper.
+            expect(r.body.laws_status).toBe('ok');
         } finally {
             rpc.mockRestore();
             select.mockRestore();
@@ -567,6 +569,11 @@ describe('POST /api/v1/search', () => {
             expect(body.laws).toEqual([]);
             expect(body.providers).toHaveLength(1);
             expect(JSON.stringify(body)).not.toContain('subdomain map corrupt');
+            // Leere `laws` heissen hier "nicht geprueft", nicht "nichts gefunden" —
+            // und die Antwort sagt das, mit der Referenz fuer "Technical details".
+            expect(body.laws_status).toBe('failed');
+            expect(body.correlationId).toBe(REF);
+            expect(body.overview_summary).toMatch(/could not assess/);
 
             const zeile = log.mock.calls.map((c) => String(c[0])).find((l) => l.includes('Compliance engine failed'));
             expect(zeile).toBeDefined();
