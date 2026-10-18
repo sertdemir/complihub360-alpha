@@ -1328,7 +1328,10 @@
     "credit": "Alacak",
     "creditNote": "bir sonraki faturanızdan düşülür",
     "evidenceExpiring": "Belge {{type}}",
-    "until": "{{date}} tarihine kadar"
+    "until": "{{date}} tarihine kadar",
+    "greeting": "Tekrar hoş geldiniz, <accent>{{name}}</accent>.",
+    "greetingNoName": "Tekrar hoş geldiniz.",
+    "seeAll": "Tümünü gör"
   },
   "partnerNotif": {
     "hours_one": "{{count}} saat",
