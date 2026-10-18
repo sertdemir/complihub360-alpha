@@ -39,6 +39,20 @@ describe('serializeProvider — das Register entscheidet, nicht der Handler', ()
         expect(out.stripe_customer_id).toBeUndefined();
         expect(out.pricing_table).toBeUndefined();
     });
+    it('P11: name, website_url, contact_email kommen vor der Offenlegung nie durch, auch wenn das Register sie freigaebe', () => {
+        const offen = reg([['providers.name', 'anonymous'], ['providers.website_url', 'anonymous'], ['providers.contact_email', 'anonymous'], ['providers.region', 'anonymous']]);
+        const out = serializeProvider({ ...ROW, contact_email: 'geheim@testkanzlei.example' }, offen, 'anonymous');
+        expect(Object.keys(out).sort()).toEqual(['public_ref', 'region']);
+        // Nach der Offenlegung entscheidet wieder das Register.
+        expect(serializeProvider(ROW, offen, 'revealed').name).toBe('Testkanzlei Schmidt GmbH');
+    });
+    it('P11: stripe_customer_id und vat_id kommen in keiner Stufe durch', () => {
+        const offen = reg([['providers.stripe_customer_id', 'anonymous'], ['providers.vat_id', 'revealed']]);
+        const row = { ...ROW, vat_id: 'DE123456789' };
+        expect(serializeProvider(row, offen, 'anonymous').stripe_customer_id).toBeUndefined();
+        expect(serializeProvider(row, offen, 'revealed').stripe_customer_id).toBeUndefined();
+        expect(serializeProvider(row, offen, 'revealed').vat_id).toBeUndefined();
+    });
     it('provider_key und pseudonym_label kommen nie durch, auch wenn das Register sie freigaebe', () => {
         const offen = reg([['providers.provider_key', 'anonymous'], ['providers.pseudonym_label', 'anonymous']]);
         const out = serializeProvider(ROW, offen, 'anonymous');

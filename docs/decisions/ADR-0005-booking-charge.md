@@ -66,3 +66,7 @@ Drei Fragen ließ die Spec offen, und an ihnen unterscheidet sich die Arbeit mat
 - **Verantwortung, wenn etwas schiefgeht:** Erstattung und Protokoll bei Insert-Fehler; `lead_charge_reversed_failed` ruft den Menschen.
 - **Keine Transaktion entscheidet über Sichtbarkeit (§14):** `billing_ready` bleibt Spalte, kein Filter; pgTAP prüft, dass die View an keiner neuen Tabelle hängt.
 - **Derselbe Respekt für jedes Unternehmen:** Die 10 % gelten für jeden Nutzer, unabhängig vom Plan des Anbieters.
+
+## Nachtrag 2026-10-18 — neutraler Code auf dem Nutzer-Draht (Befund B14)
+
+Entscheidung 3 nannte den Grund `provider_billing` und den Code `BILLING_NOT_READY` auf dem Nutzer-Draht. Beides verriet den Zahlungszustand des Anbieters an jemanden, der ihn nichts angeht. Seit PR dieses Nachtrags antwortet `POST /scheduling` dem Nutzer mit 409 `PROVIDER_NOT_BOOKABLE` (nicht zahlungsbereit, nichts versucht) und 409 `BOOKING_NOT_COMPLETED` ohne `reason` (Belastung gescheitert). Der Grund steht weiter beim Anbieter (`billing_block_reasons`, `payment_failed`) und in der Readiness-Anzeige. Die Nutzer-Copy bleibt: „das liegt nicht an Ihnen".

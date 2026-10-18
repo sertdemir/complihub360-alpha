@@ -692,7 +692,7 @@ function createBooking(body: unknown) {
   }
   const at = new Date(slot);
   if (at.getHours() === 15 && at.getMinutes() === 30) {
-    return { __status: 409, errorCode: 'BOOKING_NOT_COMPLETED', message: 'The booking could not be completed. This is not on your side — the provider has been informed.', reason: 'provider_billing' };
+    return { __status: 409, errorCode: 'BOOKING_NOT_COMPLETED', message: 'The booking could not be completed. This is not on your side — the provider has been informed.' };
   }
   const end = new Date(at.getTime() + 30 * 60 * 1000).toISOString();
   const mockTopic = { area_code: typeof d.area_code === 'string' && d.area_code ? d.area_code : 'tax-vat', countries: Array.isArray(d.countries) && d.countries.length ? (d.countries as string[]) : ['DE'] };

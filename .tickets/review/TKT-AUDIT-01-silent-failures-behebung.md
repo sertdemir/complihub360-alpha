@@ -1,7 +1,7 @@
 ---
 title: "Silent-Failure-Befunde beheben (Buchung, Abrechnung, Privacy)"
 assignee: "Claude (Umsetzung) · Nutzer (Review je PR)"
-status: "doing"
+status: review
 ---
 
 # Silent-Failure-Befunde beheben
@@ -74,7 +74,17 @@ Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht
 
 ### 4 · Kleinkram mit klarer Korrektur
 
-- [ ] B3 · [ ] B14 · [ ] B15 · [ ] P9 · [ ] P10 · [ ] P11 · [ ] P12 · [ ] P13 · [ ] P14
+- [x] **B3** Ereignisse nach dem Buchungs-Insert einzeln abgefangen (`ERR_AUDIT_EVENT`), `lead.revealed` zuerst, immer 201.
+- [x] **B14** Nutzer-Draht: 409 `PROVIDER_NOT_BOOKABLE` statt `BILLING_NOT_READY`; `BOOKING_NOT_COMPLETED` ohne `reason`.
+- [x] **B15** `StripeError.paymentIntentId` aus `error.payment_intent.id` → `stripeRef` gefuellt.
+- [x] **P9** Engagement: 400 nur fuer den Body, sonst 500 + `structuredLog` (`ERR_ENGAGEMENT_CREATE`), kein Rohfehler.
+- [x] **P10** Region vor der Offenlegung maskiert — Detail und `/bookings` wie `/search`.
+- [x] **P11** `serializeProvider`: harte Deny-Liste (`stripe_customer_id`, `vat_id` nie; `name`, `website_url`, `contact_email` nicht vor der Offenlegung).
+- [x] **P12** Review-Text durch `scanFields` → 422 `IDENTITY_IN_TEXT`.
+- [x] **P13** `email_sent`/`email_failed` ohne Empfaenger, Fehler gekappt; Outbox behaelt den Empfaenger.
+- [x] **P14** mit P5 erledigt (Timeout an beiden Modellaufrufen).
+
+**Stand 2026-10-18: alle 29 Befunde behoben.** PRs #329, #331, #333, #339, #340, #342, #343, #345, #346 und dieser.
 
 ## DNA-Check
 
