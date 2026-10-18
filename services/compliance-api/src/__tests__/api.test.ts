@@ -781,8 +781,10 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         stripeMock.createPaymentIntent.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', stripeRef: 'pi_fail', detail: 'generic_decline' });
         const r = await book(standardBody(session));
         expect(r.status).toBe(409);
-        expect(r.body).toMatchObject({ errorCode: 'BOOKING_NOT_COMPLETED', reason: 'provider_billing' });
-        expect(JSON.stringify(r.body)).not.toMatch(/declin|card|stripe|Testkanzlei/i);
+        expect(r.body.errorCode).toBe('BOOKING_NOT_COMPLETED');
+        // B14: kein Grund auf dem Nutzer-Draht — der Zahlungszustand des Anbieters bleibt bei ihm.
+        expect(r.body.reason).toBeUndefined();
+        expect(JSON.stringify(r.body)).not.toMatch(/declin|card|stripe|billing|Testkanzlei/i);
         expect(db.scheduling ?? []).toHaveLength(0);
         expect(db.provider_discount_counter ?? []).toHaveLength(0);
         // Die Spur bleibt: Ledger pending, Ereignis failed.
@@ -933,12 +935,13 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         expect(db.provider_lead_ledger ?? []).toHaveLength(0);
     });
 
-    it('kein Zahlungsmittel hinterlegt: 409 BILLING_NOT_READY, kein Ledger, Grund am Anbieter', async () => {
+    it('kein Zahlungsmittel hinterlegt: 409 PROVIDER_NOT_BOOKABLE ohne Grund (B14), kein Ledger, Grund am Anbieter', async () => {
         const { session } = seedBookable();
         stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: null, paymentMethodLabel: null, email: null, billingInfoComplete: false, delinquent: false });
         const r = await book(standardBody(session));
         expect(r.status).toBe(409);
-        expect(r.body.errorCode).toBe('BILLING_NOT_READY');
+        expect(r.body.errorCode).toBe('PROVIDER_NOT_BOOKABLE');
+        expect(JSON.stringify(r.body)).not.toMatch(/billing|payment|stripe/i);
         expect(db.provider_lead_ledger ?? []).toHaveLength(0);
         expect(db.providers[0].billing_block_reasons).toEqual(expect.arrayContaining(['no_payment_method']));
     });
@@ -1152,6 +1155,41 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         });
     });
 
+    // ─── B3: Ereignisse nach der Buchung machen keinen Fehler fuer den Nutzer ──
+    describe('Ereignisse nach der Buchung (B3)', () => {
+        it('event_log nicht schreibbar: Buchung steht, 201, Luecke geloggt — kein 500, keine Doppelbelastung', async () => {
+            const { session } = seedBookable();
+            const { supabaseApi } = await import('../supabase.js');
+            const realInsert = supabaseApi.insert;
+            let kaputt = false;
+            const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+                if (table === 'scheduling') { const r = await realInsert(table, data); kaputt = true; return r; }
+                if (kaputt && table === 'event_log') throw new Error('event_log unavailable');
+                return realInsert(table, data);
+            });
+            try {
+                const r = await book(standardBody(session));
+                expect(r.status).toBe(201);
+                expect(r.body.booking.id).toBeDefined();
+            } finally { spy.mockRestore(); }
+            expect(db.scheduling).toHaveLength(1);
+            expect(stripeMock.createPaymentIntent).toHaveBeenCalledTimes(1);
+            expect(stripeMock.refundPaymentIntent).not.toHaveBeenCalled();
+            // Die Belastung ist verbucht (payment_event), nur das event_log fehlt.
+            expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured']);
+        });
+
+        it('die Offenlegung wird vor allem anderen protokolliert — lead.revealed ist das erste Ereignis nach dem Insert', async () => {
+            const { session } = seedBookable();
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            const types = db.event_log.map((e) => e.type);
+            expect(types.indexOf('lead.revealed')).toBeGreaterThan(-1);
+            expect(types.indexOf('lead.revealed')).toBeLessThan(types.indexOf('scheduling_confirmed'));
+            expect(types.indexOf('lead.revealed')).toBeLessThan(types.indexOf('provider_lead_charged'));
+        });
+    });
+
     // ─── B9 / B10: Zaehler atomar, Sperre nie stumm ───────────────────────
     describe('Zaehler und Sperre (B9, B10)', () => {
         it('B9: der Zaehler wird per RPC atomar erhoeht; eine am Lead haengende Folgebuchung zaehlt nicht', async () => {
@@ -1220,11 +1258,12 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         expect(r.status).toBe(404);
     });
 
-    it('409 mit Grund, wenn der Anbieter matchbar, aber nicht zahlungsbereit ist (§21.1)', async () => {
+    it('409 neutral, wenn der Anbieter matchbar, aber nicht zahlungsbereit ist (§21.1, B14)', async () => {
         seedBookable({ bookable: false });
         const r = await book({ public_ref: refOf('test-kanzlei'), slot_start: inAWeek(), acknowledgement_version: 'booking-ack-v1' });
         expect(r.status).toBe(409);
-        expect(r.body.errorCode).toBe('BILLING_NOT_READY');
+        expect(r.body.errorCode).toBe('PROVIDER_NOT_BOOKABLE');
+        expect(JSON.stringify(r.body)).not.toMatch(/billing|payment/i);
         expect(db.scheduling ?? []).toHaveLength(0);
         expect(db.provider_lead_ledger ?? []).toHaveLength(0);
     });
@@ -1761,6 +1800,25 @@ describe('POST /api/v1/reviews — nur aus einer gehaltenen Buchung', () => {
         expect(db.event_log.some((e) => e.type === 'review_submitted')).toBe(true);
     });
 
+    it('P12: ein Bewertungstext, der den Anbieter nennt, wird abgewiesen (422), nichts gespeichert', async () => {
+        seedProvider();
+        const b = seedBooking();
+        const r = await api('/api/v1/reviews', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ booking_id: b.id, from_role: 'user', rating: 5, body: 'Frau Schmidt von der Testkanzlei war super, siehe testkanzlei-schmidt.example' }),
+        });
+        expect(r.status).toBe(422);
+        expect(r.body.errorCode).toBe('IDENTITY_IN_TEXT');
+        expect(r.body.findings[0].field).toBe('body');
+        expect(db.reviews ?? []).toHaveLength(0);
+        // Ohne Namen geht es durch.
+        const ok = await api('/api/v1/reviews', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ booking_id: b.id, from_role: 'user', rating: 5, body: 'Schnelle, klare Beratung zur OSS-Registrierung.' }),
+        });
+        expect(ok.status).toBe(201);
+    });
+
     it('lehnt eine Bewertung ohne booking_id ab (400)', async () => {
         seedProvider();
         const r = await api('/api/v1/reviews', {
@@ -2205,6 +2263,25 @@ describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
         expect(d.area_codes).toEqual(['tax-vat']);
         expect(d.descriptor_region).toBe('Norddeutschland');
         expect(d.rank_basis.verification).toBe('independent');
+    });
+
+    it('P10: eine Region mit Identitaet ist im Detail und in den Terminen maskiert, wie in der Suche', async () => {
+        mitLeck();
+        db.providers[0].region = 'Hamburg, Testkanzlei Schmidt GmbH';
+        const d = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'jwt' });
+        expect(d.status).toBe(200);
+        sauber(d.body);
+        expect(d.body.detail.descriptor_region).toBe('Hamburg, […]');
+        expect(d.body.detail.descriptor).toContain('Hamburg, […]');
+        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: new Date().toISOString(), slot_end: new Date().toISOString(), status: 'confirmed', identity_revealed: false });
+        const b = await api('/api/v1/bookings', { auth: 'jwt' });
+        expect(b.status).toBe(200);
+        sauber(b.body);
+        expect(b.body.bookings[0].provider_region).toBe('Hamburg, […]');
+        // Nach der Offenlegung steht die Region offen.
+        db.scheduling[0].identity_revealed = true;
+        const o = await api('/api/v1/bookings', { auth: 'jwt' });
+        expect(o.body.bookings[0].provider_region).toBe('Hamburg, Testkanzlei Schmidt GmbH');
     });
 
     it('Bewertungen — ein Mandant, der den Anbieter nennt, verraet ihn nicht', async () => {
@@ -2860,6 +2937,26 @@ describe('Anfragen gehoeren ihrem Ersteller', () => {
             method: 'POST', auth: 'jwt',
             body: JSON.stringify({ provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', message: 'Bitte um Angebot', ...body }),
         });
+
+    it('P9: unlesbarer Body oder fehlender provider_key ist 400 — ein Datenbankfehler ist 500 ohne rohen Fehlertext', async () => {
+        seedProvider();
+        const kaputt = await api('/api/v1/engagement', { method: 'POST', auth: 'jwt', body: '{not json' });
+        expect(kaputt.status).toBe(400);
+        expect(kaputt.body.errorCode).toBe('BAD_REQUEST');
+        const ohne = await anlegen({ provider_key: undefined });
+        expect(ohne.status).toBe(400);
+        const { supabaseApi } = await import('../supabase.js');
+        const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string) => {
+            if (table === 'engagement_requests') throw new Error('PostgREST: null value in column "country" — row (geheim@kunde.example, Kunde GmbH)');
+            throw new Error('unexpected insert ' + table);
+        });
+        try {
+            const r = await anlegen();
+            expect(r.status).toBe(500);
+            expect(r.body.errorCode).toBe('INTERNAL');
+            expect(JSON.stringify(r.body)).not.toMatch(/geheim@|Kunde GmbH|PostgREST/);
+        } finally { spy.mockRestore(); }
+    });
 
     it('schreibt den Ersteller aus dem Token — ein fremdes user_id im Body zaehlt nicht', async () => {
         seedProvider();

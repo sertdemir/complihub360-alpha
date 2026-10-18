@@ -113,6 +113,12 @@ describe('createPaymentIntent — card, stripe oder unknown', () => {
         expect(r).toMatchObject({ ok: false, kind: 'stripe', reason: 'stripe_error' });
     });
 
+    it('B15: die Referenz des abgelehnten PaymentIntent kommt aus error.payment_intent.id', async () => {
+        globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({ error: { message: 'declined', type: 'card_error', code: 'card_declined', decline_code: 'generic_decline', payment_intent: { id: 'pi_declined_1', status: 'requires_payment_method' } } }), { status: 402 })) as unknown as typeof fetch;
+        const r = await createPaymentIntent(args);
+        expect(r).toMatchObject({ ok: false, kind: 'card', reason: 'card_declined', stripeRef: 'pi_declined_1' });
+    });
+
     it('Karte abgelehnt bleibt card', async () => {
         globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({ error: { message: 'declined', type: 'card_error', code: 'card_declined', decline_code: 'insufficient_funds' } }), { status: 402 })) as unknown as typeof fetch;
         const r = await createPaymentIntent(args);

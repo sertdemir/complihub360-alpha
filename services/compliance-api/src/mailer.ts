@@ -420,7 +420,7 @@ export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
             type: res.ok ? 'email_sent' : 'email_failed',
-            payload: { engagementId: m.engagementId, to: m.contactEmail, subject, providerId: (body as { id?: string }).id, status: res.status },
+            payload: { engagementId: m.engagementId, subject, providerId: (body as { id?: string }).id, status: res.status },
         });
     } catch (err) {
         // Delivery is best-effort; the engagement + tokens already exist.
@@ -430,7 +430,7 @@ export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
         try {
             await supabaseApi.insert('event_log', {
                 type: 'email_failed',
-                payload: { engagementId: m.engagementId, to: m.contactEmail, error: String(err) },
+                payload: { engagementId: m.engagementId, error: String(err).slice(0, 200) },
             });
         } catch { /* double fault — logged above */ }
     }
@@ -485,7 +485,7 @@ export async function sendEmailChangeMail(p: {
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
             type: res.ok ? 'email_sent' : 'email_failed',
-            payload: { providerKey: p.providerKey, to: p.newEmail, subject, providerId: (body as { id?: string }).id, status: res.status },
+            payload: { providerKey: p.providerKey, subject, providerId: (body as { id?: string }).id, status: res.status },
         });
     } catch {
         structuredLog('error', 'Email-change mail failed', {
@@ -689,14 +689,14 @@ export async function sendCancellationMail(p: {
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
             type: res.ok ? 'email_sent' : 'email_failed',
-            payload: { bookingId: p.bookingId, to: p.to, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: 'cancellation_provider' },
+            payload: { bookingId: p.bookingId, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: 'cancellation_provider' },
         });
     } catch (err) {
         structuredLog('error', 'Cancellation mail failed', {
             correlationId: p.correlationId ?? 'scheduling', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
         });
         try {
-            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { bookingId: p.bookingId, to: p.to, error: String(err), kind: 'cancellation_provider' } });
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { bookingId: p.bookingId, error: String(err).slice(0, 200), kind: 'cancellation_provider' } });
         } catch { /* double fault */ }
     }
 }
@@ -750,14 +750,14 @@ export async function sendRescheduleMail(p: {
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
             type: res.ok ? 'email_sent' : 'email_failed',
-            payload: { bookingId: p.bookingId, to: p.to, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: 'reschedule_provider' },
+            payload: { bookingId: p.bookingId, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: 'reschedule_provider' },
         });
     } catch (err) {
         structuredLog('error', 'Reschedule mail failed', {
             correlationId: p.correlationId ?? 'scheduling', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
         });
         try {
-            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { bookingId: p.bookingId, to: p.to, error: String(err), kind: 'reschedule_provider' } });
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { bookingId: p.bookingId, error: String(err).slice(0, 200), kind: 'reschedule_provider' } });
         } catch { /* double fault */ }
     }
 }
@@ -795,14 +795,14 @@ export async function sendReviewMail(p: {
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
             type: res.ok ? 'email_sent' : 'email_failed',
-            payload: { bookingId: p.bookingId, to: p.to, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: p.kind },
+            payload: { bookingId: p.bookingId, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: p.kind },
         });
     } catch (err) {
         structuredLog('error', 'Review mail failed', {
             correlationId: p.correlationId ?? 'watchers', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
         });
         try {
-            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { bookingId: p.bookingId, to: p.to, error: String(err), kind: p.kind } });
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { bookingId: p.bookingId, error: String(err).slice(0, 200), kind: p.kind } });
         } catch { /* double fault */ }
     }
 }
@@ -887,14 +887,14 @@ export async function sendVerificationMail(p: {
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
             type: res.ok ? 'email_sent' : 'email_failed',
-            payload: { providerKey: p.providerKey, to: p.to, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: `verification_${p.kind}` },
+            payload: { providerKey: p.providerKey, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: `verification_${p.kind}` },
         });
     } catch (err) {
         structuredLog('error', 'Verification mail failed', {
             correlationId: p.correlationId ?? 'review', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
         });
         try {
-            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { providerKey: p.providerKey, to: p.to, error: String(err), kind: `verification_${p.kind}` } });
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { providerKey: p.providerKey, error: String(err).slice(0, 200), kind: `verification_${p.kind}` } });
         } catch { /* double fault */ }
     }
 }
@@ -970,12 +970,12 @@ async function deliverProviderMail(p: { to: string | null; kind: string; ref: Re
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
             type: res.ok ? 'email_sent' : 'email_failed',
-            payload: { ...p.ref, to: p.to, subject: p.subject, providerId: (body as { id?: string }).id, status: res.status, kind: p.kind },
+            payload: { ...p.ref, subject: p.subject, providerId: (body as { id?: string }).id, status: res.status, kind: p.kind },
         });
     } catch (err) {
         structuredLog('error', 'Provider mail failed', { correlationId: p.correlationId ?? 'scheduling', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL' });
         try {
-            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { ...p.ref, to: p.to, error: String(err), kind: p.kind } });
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { ...p.ref, error: String(err).slice(0, 200), kind: p.kind } });
         } catch { /* double fault */ }
     }
 }
@@ -1197,14 +1197,14 @@ async function deliverRequestMail(p: { to: string | null; requestId: string; mar
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
             type: res.ok ? 'email_sent' : 'email_failed',
-            payload: { requestId: p.requestId, market: p.market, to: p.to, subject, providerId: (body as { id?: string }).id, status: res.status, kind },
+            payload: { requestId: p.requestId, market: p.market, subject, providerId: (body as { id?: string }).id, status: res.status, kind },
         });
     } catch (err) {
         structuredLog('error', kind === 'market_covered' ? 'Market covered mail failed' : 'Provider covered mail failed', {
             correlationId: 'watchers', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
         });
         try {
-            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { requestId: p.requestId, market: p.market, to: p.to, error: String(err), kind } });
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { requestId: p.requestId, market: p.market, error: String(err).slice(0, 200), kind } });
         } catch { /* double fault */ }
     }
 }

@@ -367,8 +367,16 @@ paths:
                 country:
                   type: string
       responses:
-        '200':
-          description: Engagement created
+        '201':
+          description: Engagement created — {ok, id, status, magicLinks}
+        '400':
+          description: >-
+            `BAD_REQUEST` — Body nicht lesbar oder `provider_key` fehlt. Seit
+            2026-10-18 (Befund P9) nur noch fuer den Body; ein Datenbankfehler
+            ist 500 `INTERNAL` und wird strukturiert geloggt, ohne den rohen
+            Fehlertext.
+        '500':
+          description: '`INTERNAL` — die Anfrage konnte nicht gespeichert werden; nichts davon erreicht den Client ausser der correlationId.'
 
   /engagement/{id}:
     get:
@@ -606,6 +614,12 @@ paths:
           description: Buchung unbekannt oder nicht die eigene
         '409':
           description: Termin noch nicht stattgefunden (BOOKING_NOT_HELD) oder schon bewertet (ALREADY_REVIEWED)
+        '422':
+          description: >-
+            `IDENTITY_IN_TEXT` — der Bewertungstext nennt den Anbieter (Name,
+            Domain, Registernummer). Bewertungen sind vor der Buchung lesbar;
+            die Identitaet darf nicht ueber den Mandanten hineinkommen (Befund
+            P12, 2026-10-18). `findings[]` wie bei den Dossier-Freitexten.
 
   # ─── Pricing v2 (ADR-0003, 2026-09-22) ─────────────────────────────────────
   # Plaene, Baender und Rabatte kommen aus plan_catalog / lead_band_config /
@@ -1580,7 +1594,7 @@ paths:
         `bookable_chargeable` sagt, ob gebucht werden kann — dieselbe Quelle wie
         der Buchungspfad (View-Spalte, gepflegt von syncBillingReadiness). Bei
         false zeigt die Oberflaeche KEINEN Buchen-Knopf, statt den Nutzer erst
-        beim Absenden mit 409 BILLING_NOT_READY abzuweisen (Nutzer-Entscheidung
+        beim Absenden mit 409 PROVIDER_NOT_BOOKABLE abzuweisen (Nutzer-Entscheidung
         2026-10-01, TKT-PROV-06).
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
@@ -1678,7 +1692,7 @@ paths:
         '201': { description: "`{ booking: { id, public_ref, slot_start, slot_end, status, acknowledgement_version, shared_fields[], user_discount: { pct, policy_version } | null, rebooked_from, topic: { area_code, countries[] }, shared_snapshot: { email, company_name, message, topic } }, provider_identity: { name, website_url, contact_email } }` — `topic` ist das Thema, das der Anbieter mit dem Lead sieht; die Bestaetigung nennt es neben den shared_fields. `shared_snapshot` (Schritt 4, B1) ist Wert fuer Wert, was geteilt wurde (`scheduling.shared_snapshot`); ein Feld ausserhalb von `shared_fields` ist null." }
         '400': { description: "Eingabe (`VALIDATION_ERROR`) oder Opportunity fehlt (`OPPORTUNITY_REQUIRED`, `AREA_NOT_OFFERED`, `SERVICE_NOT_FOUND`)" }
         '404': { description: Unbekannter Ref, nicht matchbar oder fremde Sitzung }
-        '409': { description: "`BILLING_NOT_READY` (nicht zahlungsbereit, nichts versucht) · `ACKNOWLEDGEMENT_OUTDATED` (mit `current_version`) · `SLOT_TAKEN` · `BOOKING_NOT_COMPLETED` (Belastung gescheitert, Grund `provider_billing`, keine Buchung) · `BOOKING_IN_PROGRESS` (derselbe `request_id` laeuft schon oder ist ohne Buchung geblieben; nichts belastet)" }
+        '409': { description: "`PROVIDER_NOT_BOOKABLE` (der Anbieter kann gerade keine Buchung annehmen; der Grund — Zahlungsbereitschaft — bleibt auf der Anbieterseite, Befund B14) · `ACKNOWLEDGEMENT_OUTDATED` (mit `current_version`) · `SLOT_TAKEN` · `BOOKING_NOT_COMPLETED` (Belastung gescheitert, keine Buchung, kein Grund auf dem Nutzer-Draht) · `BOOKING_IN_PROGRESS` (derselbe `request_id` laeuft schon oder ist ohne Buchung geblieben; nichts belastet)" }
         '502': { description: "Zahlungsdienst nicht erreichbar (`BILLING_ERROR`); keine Buchung. Hat Stripe mit einem Fehler geantwortet, bleibt der Anbieter unberuehrt. Kam keine verwertbare Antwort (Timeout, Abbruch, 5xx — Befund B1), steht die Belastung im Ledger als `unknown`, der Anbieter traegt `payment_unresolved`, bis der Watcher den Ausgang mit Stripe abgeglichen hat (und eine Belastung ohne Buchung erstattet)." }
 
   /bookings:
@@ -1773,7 +1787,7 @@ paths:
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       responses:
-        '200': { description: "gate {ok, missing[], target, approved_cells, total_cells, allowance, billing}. billing {ready, blocks_chargeable_booking[]} wird GEMELDET, nicht gesperrt: §21.1 sperrt die gebuehrenpflichtige Buchung (409 BILLING_NOT_READY an POST /scheduling), nicht die Aktivierung. Kein billing.* in missing[] (Nutzer-Entscheidung 2026-10-01, TKT-PROV-05)." }
+        '200': { description: "gate {ok, missing[], target, approved_cells, total_cells, allowance, billing}. billing {ready, blocks_chargeable_booking[]} wird GEMELDET, nicht gesperrt: §21.1 sperrt die gebuehrenpflichtige Buchung (409 PROVIDER_NOT_BOOKABLE an POST /scheduling — neutral fuer den Nutzer), nicht die Aktivierung. Kein billing.* in missing[] (Nutzer-Entscheidung 2026-10-01, TKT-PROV-05)." }
 
   /admin/review/{key}/evidence/{id}:
     post:

@@ -61,11 +61,20 @@ const ALLOWED: Record<Stage, ReadonlySet<VisibilityClass>> = {
  * wenn jemand das Register aendert — der Schluessel ist aus dem Namen gebildet
  * und damit selbst ein Identitaetsmerkmal. `public_ref` wird immer ausgegeben.
  */
+/** Nie auf dem Draht, in keiner Stufe — auch nicht, wenn das Register sie
+ *  freigibt: Abrechnungs- und Registerkennungen gehoeren niemandem ausser
+ *  dem Anbieter und uns (Befund P11). */
+const NEVER_SERIALIZED: ReadonlySet<string> = new Set(['provider_key', 'pseudonym_label', 'stripe_customer_id', 'vat_id']);
+/** Vor der Offenlegung nie — gleich, was im Register steht. Das Register
+ *  entscheidet ueber alles andere; diese drei SIND die Identitaet. */
+const IDENTITY_FIELDS: ReadonlySet<string> = new Set(['name', 'website_url', 'contact_email']);
+
 export function serializeProvider(row: Record<string, unknown>, reg: Register, stage: Stage): Record<string, unknown> {
     const out: Record<string, unknown> = {};
     const allowed = ALLOWED[stage];
     for (const [field, value] of Object.entries(row)) {
-        if (field === 'provider_key' || field === 'pseudonym_label') continue;
+        if (NEVER_SERIALIZED.has(field)) continue;
+        if (stage === 'anonymous' && IDENTITY_FIELDS.has(field)) continue;
         if (field === 'public_ref') { out.public_ref = value; continue; }
         const cls = reg.get(`providers.${field}`);
         if (cls && allowed.has(cls)) out[field] = value ?? null;

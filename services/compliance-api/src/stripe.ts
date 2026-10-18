@@ -54,13 +54,17 @@ export class StripeError extends Error {
     readonly code: string | null;
     readonly declineCode: string | null;
     readonly type: string | null;
-    constructor(path: string, status: number, body: { error?: { message?: string; code?: string; decline_code?: string; type?: string } } | null) {
+    /** Stripe haengt bei Kartenfehlern den angelegten PaymentIntent an
+     *  (`error.payment_intent.id`) — die Referenz fuer das Ledger (Befund B15). */
+    readonly paymentIntentId: string | null;
+    constructor(path: string, status: number, body: { error?: { message?: string; code?: string; decline_code?: string; type?: string; payment_intent?: { id?: string } } } | null) {
         super(`Stripe ${path}: ${body?.error?.message || status}`);
         this.name = 'StripeError';
         this.status = status;
         this.code = body?.error?.code ?? null;
         this.declineCode = body?.error?.decline_code ?? null;
         this.type = body?.error?.type ?? null;
+        this.paymentIntentId = typeof body?.error?.payment_intent?.id === 'string' ? body.error.payment_intent.id : null;
     }
     /** `card_error` ist die Karte; alles andere (Netz, 5xx, Konfiguration) ist Stripe oder wir. */
     get isCardError(): boolean { return this.type === 'card_error'; }
@@ -217,8 +221,7 @@ export async function createPaymentIntent(args: {
         return { ok: false, kind: 'card', reason: 'card_declined', stripeRef: String(pi.id), detail: status || 'unknown_status' };
     } catch (err) {
         if (err instanceof StripeError && err.isCardError) {
-            const ref = typeof (err as any).paymentIntentId === 'string' ? (err as any).paymentIntentId : null;
-            return { ok: false, kind: 'card', reason: mapDecline(err.code, err.declineCode), stripeRef: ref, detail: err.declineCode || err.code || err.message };
+            return { ok: false, kind: 'card', reason: mapDecline(err.code, err.declineCode), stripeRef: err.paymentIntentId, detail: err.declineCode || err.code || err.message };
         }
         if (err instanceof StripeError && err.code === 'resource_missing' && /payment_method/.test(err.message)) {
             return { ok: false, kind: 'card', reason: 'no_payment_method', stripeRef: null, detail: err.message };
