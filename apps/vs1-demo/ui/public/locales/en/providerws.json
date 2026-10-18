@@ -108,8 +108,8 @@
     "paid": "Paid",
     "lineItems": "Line items",
     "total": "Total",
-    "failedNote": "Payment failed — retry or update your payment method in Billing to avoid a workspace lock.",
-    "pricingNote": "Pricing model: €92 per confirmed engagement · €2 per affiliate click · €0 subscription.",
+    "failedNote": "Payment did not go through. You can pay the invoice or change your payment method in Billing. Your profile stays visible; bookings pause only if the invoice is still open 7 days after the due date.",
+    "pricingNote": "Pricing model: your plan subscription plus one lead fee per booking at its opportunity band — plan discounts already deducted. Details under Billing.",
     "payAtStripe": "Pay invoice at Stripe",
     "viewAtStripe": "View at Stripe"
   },

@@ -574,28 +574,28 @@
     "rows": [
       {
         "title": "Declaración trimestral OSS",
-        "detail": "Última presentación: Q1 2025 · Sanción: €5,000 + 1 %/mes · UStG §18i",
+        "detail": "Última presentación: Q1 2025 · Próxima declaración · UStG §18i",
         "market": "DE · NL",
         "due": "30 abr",
         "dueSub": "6 días"
       },
       {
         "title": "Registro de IVA — UK",
-        "detail": "Comprobación de umbral tras el Brexit · hasta €20,000 · VATA §3",
+        "detail": "Comprobación de umbral tras el Brexit · VATA §3",
         "market": "UK",
         "due": "15 may",
         "dueSub": "21 días"
       },
       {
         "title": "Registro RAP de envases (LUCID)",
-        "detail": "Condición de productor por confirmar · hasta €50,000 · VerpackG",
+        "detail": "Condición de productor por confirmar · VerpackG",
         "market": "DE",
         "due": "02 may",
         "dueSub": "8 días"
       },
       {
         "title": "Renovación del registro RAP (PackUK)",
-        "detail": "Última presentación: abr 2024 · 4 % de los ingresos UK · Packaging Regs",
+        "detail": "Última presentación: abr 2024 · Renovación pendiente · Packaging Regs",
         "market": "UK",
         "due": "15 may",
         "dueSub": "21 días"
@@ -652,28 +652,28 @@
     "rows": [
       {
         "title": "Declaración trimestral OSS",
-        "detail": "Última presentación: Q1 2025 · Sanción: €5,000 + 1 %/mes · UStG §18i (OSS)",
+        "detail": "Última presentación: Q1 2025 · Próxima declaración pendiente · UStG §18i (OSS)",
         "market": "DE · NL",
         "due": "30 abr",
         "dueSub": "6 días"
       },
       {
         "title": "Registro de IVA — UK",
-        "detail": "Se requiere comprobar el umbral tras el Brexit · Sanción: hasta €20,000 · UK VATA 1994 §3",
+        "detail": "Se requiere comprobar el umbral tras el Brexit · UK VATA 1994 §3",
         "market": "UK",
         "due": "15 may",
         "dueSub": "21 días"
       },
       {
         "title": "Registro RAP de envases (LUCID)",
-        "detail": "Condición de productor por confirmar · Sanción: hasta €50,000 · VerpackG Art. 9 Abs. 1",
+        "detail": "Condición de productor por confirmar antes del primer envío · VerpackG §9",
         "market": "DE",
         "due": "02 may",
         "dueSub": "8 días"
       },
       {
         "title": "Renovación del registro RAP (PackUK)",
-        "detail": "Última presentación: abr 2024 · Sanción: 4 % de los ingresos UK · UK Packaging Regs. 2023 §7",
+        "detail": "Última presentación: abr 2024 · Renovación pendiente · UK Packaging Regs. 2023 §7",
         "market": "UK",
         "due": "15 may",
         "dueSub": "21 días"
@@ -701,7 +701,7 @@
       },
       {
         "title": "Actualización de titulares reales",
-        "detail": "Última presentación: mar 2025 · Sanción: €1,000–5,000 · GwG §20 Abs. 1",
+        "detail": "Última presentación: mar 2025 · Actualización pendiente · GwG §20 Abs. 1",
         "market": "DE",
         "due": "30 jun",
         "dueSub": "continuo"

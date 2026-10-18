@@ -43,7 +43,7 @@ const { handleAssistantChat } = await import('../assistant.js');
 
 type Captured = { status: number; body: any };
 
-async function chat(payload: Record<string, unknown>): Promise<Captured> {
+async function chat(payload: Record<string, unknown>, identity: { userId: string; email: string } = { userId: 'user-1', email: 'u@example.com' }): Promise<Captured> {
     const req = new PassThrough() as unknown as import('http').IncomingMessage & PassThrough;
     const out: Captured = { status: 0, body: null };
     const res = {
@@ -55,7 +55,7 @@ async function chat(payload: Record<string, unknown>): Promise<Captured> {
         const origEnd = res.end.bind(res);
         (res as any).end = (chunk: string) => { origEnd(chunk); resolve(); };
     });
-    handleAssistantChat(req as any, res, 'corr-test', '127.0.0.1', { userId: 'user-1', email: 'u@example.com' });
+    handleAssistantChat(req as any, res, 'corr-test', '127.0.0.1', identity);
     req.end(JSON.stringify(payload));
     await done;
     return out;
@@ -125,5 +125,21 @@ describe('Assistant — Privacy-Befunde P1, P2, P5', () => {
         expect(sent).toContain('welche Pflichten habe ich');
         // Beide Aufrufe tragen eine Zeitgrenze (P14).
         for (const [, init] of gemini.mock.calls) expect((init as RequestInit).signal).toBeInstanceOf(AbortSignal);
+    });
+
+    it('DNA §5: der Systemprompt nennt die AI als AI, trennt klar von auslegungsbeduerftig, benennt Luecken und bleibt ruhig — in beiden Prompts', async () => {
+        for (const domain of [undefined, 'data-privacy']) {
+            gemini.mockClear();
+            // Eigener Nutzer: die fuenf freien Tagesfragen von user-1 sind nach den Tests oben verbraucht.
+            const r = await chat({ message: 'Which VAT registration thresholds apply to me?', ...(domain ? { domain } : {}) }, { userId: 'user-dna', email: 'dna@example.com' });
+            expect(r.status).toBe(200);
+            const generateCall = gemini.mock.calls.find(([u]) => String(u).includes(':generateContent'))!;
+            const sent = String((generateCall[1] as RequestInit).body);
+            expect(sent).toContain('You are an AI assistant, not a lawyer, tax adviser or customs specialist');
+            expect(sent).toContain('what depends on interpretation');
+            expect(sent).toContain('name the gap in one sentence');
+            expect(sent).toContain('stay calm and factual');
+            expect(sent).toContain('NOT legal or tax advice');
+        }
     });
 });

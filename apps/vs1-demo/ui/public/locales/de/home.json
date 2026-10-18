@@ -574,28 +574,28 @@
     "rows": [
       {
         "title": "OSS-Quartalsmeldung",
-        "detail": "Zuletzt eingereicht: Q1 2025 · Strafe: €5,000 + 1 %/Monat · UStG §18i",
+        "detail": "Zuletzt eingereicht: Q1 2025 · Nächste Meldung fällig · UStG §18i",
         "market": "DE · NL",
         "due": "30. Apr",
         "dueSub": "6 Tage"
       },
       {
         "title": "USt-Registrierung — UK",
-        "detail": "Schwellenprüfung nach dem Brexit · bis zu €20,000 · VATA §3",
+        "detail": "Schwellenprüfung nach dem Brexit · VATA §3",
         "market": "UK",
         "due": "15. Mai",
         "dueSub": "21 Tage"
       },
       {
         "title": "EPR-Verpackungsregistrierung (LUCID)",
-        "detail": "Herstellerstatus zu bestätigen · bis zu €50,000 · VerpackG",
+        "detail": "Herstellerstatus zu bestätigen · VerpackG",
         "market": "DE",
         "due": "02. Mai",
         "dueSub": "8 Tage"
       },
       {
         "title": "EPR-Registrierungsverlängerung (PackUK)",
-        "detail": "Zuletzt eingereicht: Apr 2024 · 4 % des UK-Umsatzes · Packaging Regs",
+        "detail": "Zuletzt eingereicht: Apr 2024 · Verlängerung fällig · Packaging Regs",
         "market": "UK",
         "due": "15. Mai",
         "dueSub": "21 Tage"
@@ -652,28 +652,28 @@
     "rows": [
       {
         "title": "OSS-Quartalsmeldung",
-        "detail": "Zuletzt eingereicht: Q1 2025 · Strafe: €5,000 + 1 %/Monat · UStG §18i (OSS)",
+        "detail": "Zuletzt eingereicht: Q1 2025 · Nächste Meldung fällig · UStG §18i (OSS)",
         "market": "DE · NL",
         "due": "30. Apr",
         "dueSub": "6 Tage"
       },
       {
         "title": "USt-Registrierung — UK",
-        "detail": "Schwellenprüfung nach dem Brexit erforderlich · Strafe: bis zu €20,000 · UK VATA 1994 §3",
+        "detail": "Schwellenprüfung nach dem Brexit erforderlich · UK VATA 1994 §3",
         "market": "UK",
         "due": "15. Mai",
         "dueSub": "21 Tage"
       },
       {
         "title": "EPR-Verpackungsregistrierung (LUCID)",
-        "detail": "Herstellerstatus zu bestätigen · Strafe: bis zu €50,000 · VerpackG Art. 9 Abs. 1",
+        "detail": "Herstellerstatus vor der ersten Lieferung bestätigen · VerpackG §9",
         "market": "DE",
         "due": "02. Mai",
         "dueSub": "8 Tage"
       },
       {
         "title": "EPR-Registrierungsverlängerung (PackUK)",
-        "detail": "Zuletzt eingereicht: Apr 2024 · Strafe: 4 % des UK-Umsatzes · UK Packaging Regs. 2023 §7",
+        "detail": "Zuletzt eingereicht: Apr 2024 · Verlängerung fällig · UK Packaging Regs. 2023 §7",
         "market": "UK",
         "due": "15. Mai",
         "dueSub": "21 Tage"
@@ -701,7 +701,7 @@
       },
       {
         "title": "Aktualisierung wirtschaftlich Berechtigter",
-        "detail": "Zuletzt gemeldet: Mär 2025 · Strafe: €1,000–5,000 · GwG §20 Abs. 1",
+        "detail": "Zuletzt gemeldet: Mär 2025 · Aktualisierung fällig · GwG §20 Abs. 1",
         "market": "DE",
         "due": "30. Jun",
         "dueSub": "laufend"

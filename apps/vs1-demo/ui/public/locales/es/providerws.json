@@ -107,8 +107,8 @@
     "paid": "Pagada",
     "lineItems": "Conceptos",
     "total": "Total",
-    "failedNote": "Pago fallido — reintente o actualice su método de pago en Facturación para evitar el bloqueo del workspace.",
-    "pricingNote": "Modelo de precios: 92 € por encargo confirmado · 2 € por clic de afiliado · 0 € de suscripción.",
+    "failedNote": "El pago no se ha completado. Puede pagar la factura o cambiar su método de pago en Facturación. Su perfil sigue visible; las reservas se pausan solo si la factura sigue abierta 7 días después del vencimiento.",
+    "pricingNote": "Modelo de precios: su suscripción al plan más una tarifa de lead por reserva según su banda de oportunidad — descuentos del plan ya aplicados. Detalles en Facturación.",
     "payAtStripe": "Pagar factura en Stripe",
     "viewAtStripe": "Ver en Stripe"
   },

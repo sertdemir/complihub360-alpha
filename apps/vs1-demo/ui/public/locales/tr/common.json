@@ -133,10 +133,10 @@
     "counsel": {
       "overline": "Kurum İçi Hukuk Danışmanları için",
       "title": "Savunulabilir zeka. Güvenli orkestrasyon.",
-      "body": "Hukuk profesyonelleri katı veri gizliliği ve sıfır yapay zeka halüsinasyonu talep eder. CompliHub360, hukuki araştırmayı hızlandıran ve harici görevleri güvenli şekilde yapılandıran güvenli, AB Yapay Zeka Yasası'na hazır bir altyapı katmanıdır.",
+      "body": "Hukuk profesyonelleri katı veri gizliliğine ve izlenebilir çıktılara ihtiyaç duyar. CompliHub360, AB Yapay Zeka Yasası göz önünde bulundurularak oluşturulmuş gizlilik odaklı bir katmandır: araştırmayı ve harici görevleri yapılandırır ve her ifade kaynağını taşır.",
       "cta": "Güvenli Araştırmayı Deneyin",
-      "benefit1Title": "Sıfır halüsinasyon",
-      "benefit1Desc": "Her özet, risk etiketi ve ipucu, resmi, doğrulanmış hukuki kaynaklara ve otoritelere bağlantılarla doğrudan desteklenmektedir. Uydurulmuş iddia yoktur.",
+      "benefit1Title": "Kaynağa bağlı çıktı",
+      "benefit1Desc": "Her özet, risk etiketi ve ipucu dayandığı resmi kaynağa bağlanır. Kaynağımız olmayan yerde boşluğu doldurmak yerine bunu söyleriz.",
       "benefit2Title": "Gizlilik öncelikli mimari",
       "benefit2Desc": "Belgeler yerel bir PII Düzeltme Hattı'ndan geçer. İsimler, e-postalar ve telefon numaraları herhangi bir yapay zeka işleminden önce maskelenir.",
       "benefit3Title": "Yapılandırılmış engagement dosyaları",
@@ -152,7 +152,7 @@
       "stage4Desc": "Kaynağa dayalı özet",
       "codeCommentBefore": "// Düzeltmeden önce",
       "codeCommentAfter": "// Düzeltmeden sonra",
-      "stat1Label": "Yapay zekadan önce maskelenen PII",
+      "stat1Label": "Girdiler redaksiyon kapısından geçer",
       "stat2Label": "Kaynağa bağlı çıktılar",
       "railSub": "Kaynaklı ifadeler, maskelenmiş veriler"
     },

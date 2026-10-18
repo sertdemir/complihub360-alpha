@@ -133,10 +133,10 @@
     "counsel": {
       "overline": "Para Asesores Jurídicos Internos",
       "title": "Inteligencia defendible. Orquestación segura.",
-      "body": "Los profesionales legales exigen privacidad estricta de datos y cero alucinaciones de IA. CompliHub360 es una capa de infraestructura segura y lista para la Ley de IA de la UE que acelera la investigación legal y estructura de forma segura los mandatos externos.",
+      "body": "Los profesionales legales necesitan una estricta privacidad de datos y resultados trazables. CompliHub360 es una capa centrada en la privacidad, construida con la Ley de IA de la UE en mente: estructura la investigación y los mandatos externos, y cada afirmación lleva su fuente.",
       "cta": "Probar la investigación segura",
-      "benefit1Title": "Cero alucinaciones",
-      "benefit1Desc": "Cada resumen, etiqueta de riesgo y consejo está respaldado directamente por enlaces a fuentes legales oficiales y validadas. Sin afirmaciones inventadas.",
+      "benefit1Title": "Resultados ligados a fuentes",
+      "benefit1Desc": "Cada resumen, etiqueta de riesgo y consejo enlaza con la fuente oficial en la que se basa. Donde no tenemos fuente, lo decimos en lugar de rellenar el hueco.",
       "benefit2Title": "Arquitectura de privacidad primero",
       "benefit2Desc": "Los documentos pasan por un Pipeline local de redacción de PII. Los nombres, correos electrónicos y números de teléfono se enmascaran antes de cualquier procesamiento de IA.",
       "benefit3Title": "Dossiers de engagement estructurados",
@@ -152,7 +152,7 @@
       "stage4Desc": "Resumen respaldado por fuentes",
       "codeCommentBefore": "// Antes de la redacción",
       "codeCommentAfter": "// Después de la redacción",
-      "stat1Label": "PII enmascarada antes de la IA",
+      "stat1Label": "Las entradas pasan por la puerta de redacción",
       "stat2Label": "Resultados vinculados a fuentes",
       "railSub": "Afirmaciones con fuente, datos enmascarados"
     },

@@ -574,28 +574,28 @@
     "rows": [
       {
         "title": "OSS üç aylık beyanı",
-        "detail": "Son beyan: Q1 2025 · Ceza: €5,000 + aylık %1 · UStG §18i",
+        "detail": "Son beyan: Q1 2025 · Sonraki beyan · UStG §18i",
         "market": "DE · NL",
         "due": "30 Nis",
         "dueSub": "6 gün"
       },
       {
         "title": "KDV kaydı — UK",
-        "detail": "Brexit sonrası eşik kontrolü · €20,000'a kadar · VATA §3",
+        "detail": "Brexit sonrası eşik kontrolü · VATA §3",
         "market": "UK",
         "due": "15 May",
         "dueSub": "21 gün"
       },
       {
         "title": "EPR ambalaj kaydı (LUCID)",
-        "detail": "Üretici statüsü doğrulanacak · €50,000'a kadar · VerpackG",
+        "detail": "Üretici statüsü doğrulanacak · VerpackG",
         "market": "DE",
         "due": "02 May",
         "dueSub": "8 gün"
       },
       {
         "title": "EPR kayıt yenilemesi (PackUK)",
-        "detail": "Son beyan: Nis 2024 · UK cirosunun %4'ü · Packaging Regs",
+        "detail": "Son beyan: Nis 2024 · Yenileme bekliyor · Packaging Regs",
         "market": "UK",
         "due": "15 May",
         "dueSub": "21 gün"
@@ -652,28 +652,28 @@
     "rows": [
       {
         "title": "OSS üç aylık beyanı",
-        "detail": "Son beyan: Q1 2025 · Ceza: €5,000 + aylık %1 · UStG §18i (OSS)",
+        "detail": "Son beyan: Q1 2025 · Sonraki beyan bekliyor · UStG §18i (OSS)",
         "market": "DE · NL",
         "due": "30 Nis",
         "dueSub": "6 gün"
       },
       {
         "title": "KDV kaydı — UK",
-        "detail": "Brexit sonrası eşik kontrolü gerekli · Ceza: €20,000'a kadar · UK VATA 1994 §3",
+        "detail": "Brexit sonrası eşik kontrolü gerekli · UK VATA 1994 §3",
         "market": "UK",
         "due": "15 May",
         "dueSub": "21 gün"
       },
       {
         "title": "EPR ambalaj kaydı (LUCID)",
-        "detail": "Üretici statüsü doğrulanacak · Ceza: €50,000'a kadar · VerpackG Art. 9 Abs. 1",
+        "detail": "İlk sevkiyattan önce üretici statüsü doğrulanacak · VerpackG §9",
         "market": "DE",
         "due": "02 May",
         "dueSub": "8 gün"
       },
       {
         "title": "EPR kayıt yenilemesi (PackUK)",
-        "detail": "Son beyan: Nis 2024 · Ceza: UK cirosunun %4'ü · UK Packaging Regs. 2023 §7",
+        "detail": "Son beyan: Nis 2024 · Yenileme bekliyor · UK Packaging Regs. 2023 §7",
         "market": "UK",
         "due": "15 May",
         "dueSub": "21 gün"
@@ -701,7 +701,7 @@
       },
       {
         "title": "Gerçek faydalanıcı güncellemesi",
-        "detail": "Son bildirim: Mar 2025 · Ceza: €1,000–5,000 · GwG §20 Abs. 1",
+        "detail": "Son bildirim: Mar 2025 · Güncelleme bekliyor · GwG §20 Abs. 1",
         "market": "DE",
         "due": "30 Haz",
         "dueSub": "sürekli"
