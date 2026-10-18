@@ -4,6 +4,7 @@ import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Tag } from '../../components/ui/Tag';
 import { Button } from '../../components/ui/Button';
 import { Drawer } from '../../components/ui/Drawer';
+import { Card } from '../../components/ui/Card';
 import { useWorkspaceData } from '../../lib/useWorkspaceData';
 import { LoadFailedState, ReadinessEmpty, useReadiness } from '../../components/provider/WorkspaceStates';
 import { money } from '../../api/billing';
@@ -68,6 +69,15 @@ interface Row {
 const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warning'> = {
   confirmed: 'success', completed: 'neutral', cancelled: 'error', no_show: 'warning',
 };
+
+// Angleich an das User-Dashboard (Figma „Provider · Termine & Leads (So 18.10.)",
+// 3793:263): Abschnitts-Eyebrows wie „Braucht Ihre Antwort" beim User,
+// Workspace-Karten, Baender auf elevate, Status-Tags in Versalien, Drawer-Kaesten
+// wie im User-Drawer.
+const EYEBROW = 'text-[10px] font-extrabold uppercase tracking-[0.09em]';
+const TAG_UP = 'text-[10.5px] font-extrabold uppercase tracking-[0.04em]';
+const DRAWER_BOX = 'rounded-lg border border-elevate/10 bg-elevate/[0.03] px-4 py-3';
+const DRAWER_EYEBROW = 'text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary';
 
 const BAND_LABEL: Record<1 | 2 | 3 | 4, string> = { 1: 'Focused', 2: 'Core', 3: 'Advanced', 4: 'Strategic' };
 
@@ -190,7 +200,7 @@ export function LeadsPage() {
       ? t('termine.leadDiscountCounter', { pct: l.discountPct, n: l.discountSequence })
       : l.feeEnabled ? t('termine.leadStandardFee') : t('termine.leadNoFee');
     return (
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-stroke bg-surface-secondary/60 px-5 py-2.5 text-[12px]">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-stroke-subtle bg-elevate/[0.03] px-6 py-2.5 text-[12px]">
         <span className="rounded-md bg-brand-light px-2 py-[2px] text-[11px] font-semibold uppercase tracking-[0.04em] text-fg-brand">
           {t('termine.leadBand', { band: l.band, label: BAND_LABEL[l.band] })}
         </span>
@@ -209,7 +219,7 @@ export function LeadsPage() {
     const issued = !!p?.proposalIssued;
     const shown = !!p?.discountShown;
     return (
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-stroke px-5 py-2.5">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-stroke-subtle bg-elevate/[0.03] px-6 py-2.5">
         <div className="min-w-0 flex-1">
           <p className="text-[12px] font-semibold text-fg">{t('termine.userDiscountTitle', { pct: r.userDiscountPct })}</p>
           <p className="text-[11px] text-fg-tertiary">{t('termine.userDiscountHint')}</p>
@@ -249,7 +259,7 @@ export function LeadsPage() {
       { key: 'platform_failure', title: t('termine.attPlatform'), body: t('termine.attPlatformBody') },
     ];
     return (
-      <div className="space-y-3 border-t border-stroke bg-surface-secondary/60 px-5 py-4">
+      <div className="space-y-3 border-t border-stroke-subtle bg-elevate/[0.03] px-6 py-4">
         <p className="text-[13px] font-semibold text-fg">{t('termine.attQuestion')}</p>
         <div id={`att-${r.id}`} role="radiogroup" aria-label={t('termine.attQuestion')} className="space-y-2"
           aria-invalid={attMissing === r.id || undefined} aria-describedby={attMissing === r.id ? `att-${r.id}-error` : undefined}>
@@ -298,23 +308,23 @@ export function LeadsPage() {
     else if (a.noShowBy === 'platform') key = 'termine.attLinePlatform';
     if (!key) return null;
     return (
-      <p className="border-t border-stroke px-5 py-2 text-[12px] text-fg-secondary">
+      <p className="border-t border-stroke-subtle bg-elevate/[0.03] px-6 py-2.5 text-[12px] text-fg-secondary">
         {t(key, { deadline: a.rebookDeadline ? dateOnly(a.rebookDeadline) : '' })}
       </p>
     );
   };
   const statusTag = (r: Row) => r.att.attendanceReportable
-    ? <Tag tone="warning">{t('termine.status.report_open')}</Tag>
+    ? <Tag tone="warning" className={TAG_UP}>{t('termine.status.report_open')}</Tag>
     : r.att.disputeStatus === 'open'
-      ? <Tag tone="warning">{t('termine.status.dispute_open')}</Tag>
-      : <Tag tone={STATUS_TONE[r.status]}>{t(`termine.status.${r.status}`)}</Tag>;
+      ? <Tag tone="warning" className={TAG_UP}>{t('termine.status.dispute_open')}</Tag>
+      : <Tag tone={STATUS_TONE[r.status]} className={TAG_UP}>{t(`termine.status.${r.status}`)}</Tag>;
 
   // 2 V1 (2026-10-01): Datumsmarke · Firma · Kontakt · Zeit, Dauer und Thema.
   const minuten = (r: Row) => (r.minutes ? t('termine.minutes', { count: r.minutes }) : '');
   const thema = (r: Row) => [bereich(r.category), r.countries.map(markt).join(', ')].filter(Boolean).join(' · ');
   const card = (r: Row) => (
-    <div key={r.id} className="overflow-hidden rounded-xl border border-stroke bg-surface-secondary/40">
-      <div className="flex items-center gap-4 px-5 py-4">
+    <Card key={r.id} styleVariant="workspace">
+      <div className="flex items-center gap-4 px-6 py-4">
       <DateMark iso={r.start} locale={locale} size="md" soon={r.id === upcoming[0]?.id} />
       <div className="min-w-0 flex-1">
         <p className={`truncate text-[15px] ${r.company ? 'font-semibold text-fg' : 'font-medium text-fg-tertiary'}`}>{r.company ?? t('termine.companyMissing')}</p>
@@ -332,7 +342,7 @@ export function LeadsPage() {
       {r.att.attendanceReportable ? attendanceBlock(r) : attendanceLine(r)}
       {leadLine(r)}
       {discountBlock(r)}
-    </div>
+    </Card>
   );
 
   return (
@@ -350,18 +360,18 @@ export function LeadsPage() {
           <>
             {reportOpen.length > 0 && (
               <>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-warning-800 dark:text-amber-300">{t('termine.reportOpen')} · {reportOpen.length}</p>
+                <p className={EYEBROW + ' text-warning-800 dark:text-amber-300'}>{t('termine.reportOpen')} · {reportOpen.length}</p>
                 <div className="space-y-2.5">{reportOpen.map(card)}</div>
               </>
             )}
-            <p className={`text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary ${reportOpen.length ? 'pt-2' : ''}`}>{t('termine.upcoming')}</p>
+            <p className={EYEBROW + ' text-fg-brand' + (reportOpen.length ? ' pt-3' : '')}>{t('termine.upcoming')}{upcoming.length ? ` · ${upcoming.length}` : ''}</p>
             {/* B3: noch nie ein Termin — der leere Zustand erklaert, wie einer
                 entsteht, und was dafuer fehlt. Gibt es vergangene, aber keine
                 kommenden, reicht die ruhige Zeile. */}
             <div className="space-y-2.5">{upcoming.length ? upcoming.map(card)
               : rows.length === 0 ? <ReadinessEmpty kind="appointments" items={readiness} />
               : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyUpcoming')}</p>}</div>
-            <p className="pt-2 text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.past')}</p>
+            <p className={EYEBROW + ' pt-3 text-fg-tertiary'}>{t('termine.past')}{past.length ? ` · ${past.length}` : ''}</p>
             <div className="space-y-2.5">{past.length ? past.map(card) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyPast')}</p>}</div>
           </>
         )}
@@ -375,19 +385,19 @@ export function LeadsPage() {
       >
         {dossierFor && (
           <div className="space-y-4">
-            <div className="rounded-lg border border-stroke bg-surface-secondary/40 px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.dossierContact')}</p>
+            <div className={DRAWER_BOX}>
+              <p className={DRAWER_EYEBROW}>{t('termine.dossierContact')}</p>
               <p className="mt-1 text-[14px] text-fg">{dossierFor.email}</p>
               <p className="text-[12px] text-fg-tertiary">{dossierFor.dateLine} · {dossierFor.timeLine}</p>
             </div>
-            <div className="rounded-lg border border-stroke bg-surface-secondary/40 px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.dossierContext')}</p>
+            <div className={DRAWER_BOX}>
+              <p className={DRAWER_EYEBROW}>{t('termine.dossierContext')}</p>
               <p className="mt-1 text-[13px] leading-relaxed text-fg-secondary">{dossierFor.meta}</p>
             </div>
             <p className="text-[12px] text-fg-tertiary">{t('termine.dossierNote')}</p>
             {dossierFor.status === 'completed' && (
-              <div className="rounded-lg border border-stroke bg-surface-secondary/40 px-4 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.rateLead')}</p>
+              <div className={DRAWER_BOX}>
+                <p className={DRAWER_EYEBROW}>{t('termine.rateLead')}</p>
                 {leadRated.has(dossierFor.id) ? (
                   <p className="mt-2 text-[12px] text-fg-brand">{t('termine.rated')}</p>
                 ) : (
@@ -397,7 +407,7 @@ export function LeadsPage() {
                         aria-describedby={ratingMissing ? 'lead-rating-error' : undefined}>
                         {[1, 2, 3, 4, 5].map((n) => (
                           <button key={n} type="button" aria-label={`${n}`} onClick={() => { setLeadRating(n); setRatingMissing(false); }}
-                            className={`text-[20px] leading-none ${n <= leadRating ? 'text-fg-accent' : 'text-white/20 hover:text-white/40'}`}>★</button>
+                            className={`text-[20px] leading-none ${n <= leadRating ? 'text-fg-accent' : 'text-stroke-strong hover:text-fg-tertiary'}`}>★</button>
                         ))}
                       </div>
                       <Button size="sm" variant="secondary" onClick={() => rateLead(dossierFor)}>OK</Button>
