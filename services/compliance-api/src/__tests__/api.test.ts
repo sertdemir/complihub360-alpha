@@ -149,6 +149,19 @@ vi.mock('../nylasAuth.js', async (importOriginal) => {
     const real = await importOriginal<typeof import('../nylasAuth.js')>();
     return { ...real, exchangeCode: (...a: any[]) => nylasAuthMock.exchangeCode(...a), revokeGrant: (...a: any[]) => nylasAuthMock.revokeGrant(...a) };
 });
+// Engine: echt, ausser ein Test setzt `engineFault.error` — dann wirft sie,
+// wie bei einem Fehler im Laenderprofil.
+const { engineFault } = vi.hoisted(() => ({ engineFault: { error: null as Error | null } }));
+vi.mock('@complihub/compliance-engine', async (importOriginal) => {
+    const real = await importOriginal<typeof import('@complihub/compliance-engine')>();
+    return {
+        ...real,
+        generateRelevantSubdomains: (...a: Parameters<typeof real.generateRelevantSubdomains>) => {
+            if (engineFault.error) throw engineFault.error;
+            return real.generateRelevantSubdomains(...a);
+        },
+    };
+});
 vi.mock('../storage.js', async (importOriginal) => {
     const real = await importOriginal<typeof import('../storage.js')>();
     return {
@@ -532,6 +545,40 @@ describe('POST /api/v1/search', () => {
         } finally {
             rpc.mockRestore();
             select.mockRestore();
+        }
+    });
+
+    // Ein Engine-Fehler laesst die Suche weiterlaufen (Anbieter kommen trotzdem),
+    // aber nicht mehr still: strukturierte Zeile mit Referenz-ID und Laendern.
+    it('logs an engine failure as a structured error with the correlation id', async () => {
+        seedProvider();
+        engineFault.error = new Error('profile DE: subdomain map corrupt');
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            const REF = '7a1c2e3f-4b5d-4c6e-8f90-a1b2c3d4e5f6';
+            const res = await fetch(`${BASE}/api/v1/search`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json', 'x-correlation-id': REF },
+                body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+            });
+            const body = await res.json();
+            expect(res.status).toBe(200);
+            expect(body.laws).toEqual([]);
+            expect(body.providers).toHaveLength(1);
+            expect(JSON.stringify(body)).not.toContain('subdomain map corrupt');
+
+            const zeile = log.mock.calls.map((c) => String(c[0])).find((l) => l.includes('Compliance engine failed'));
+            expect(zeile).toBeDefined();
+            const eintrag = JSON.parse(zeile!);
+            expect(eintrag).toMatchObject({ level: 'error', correlationId: REF, errorCode: 'ERR_SEARCH_ENGINE', route: '/api/v1/search', countries: ['DE'] });
+            expect(eintrag.detail).toContain('subdomain map corrupt');
+            // Kein unstrukturierter Rest mehr daneben.
+            expect(warn.mock.calls.some((c) => String(c[0]).includes('compliance-engine'))).toBe(false);
+        } finally {
+            engineFault.error = null;
+            log.mockRestore();
+            warn.mockRestore();
         }
     });
 });

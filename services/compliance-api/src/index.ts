@@ -3522,7 +3522,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         });
                     }
                 } catch (engineErr) {
-                    console.warn('compliance-engine country profile missing:', String(engineErr));
+                    // Unbekannte Laender sind oben schon herausgefiltert — wer
+                    // hier landet, hat einen Engine-Fehler, und der Nutzer sieht
+                    // eine Risk Map ohne Pflichten. Bis 2026-10-18 stand das nur
+                    // als console.warn ohne Referenz-ID im Log.
+                    structuredLog('error', 'Compliance engine failed', {
+                        correlationId,
+                        errorCode: 'ERR_SEARCH_ENGINE',
+                        severity: 'error',
+                        route: '/api/v1/search',
+                        countries: engineCountries,
+                        detail: String(engineErr).slice(0, 500),
+                    });
                 }
 
                 // 2. Kein Korpus-Abruf. Bis 2026-10-18 stand hier eine "RAG"-Suche
