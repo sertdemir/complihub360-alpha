@@ -15,7 +15,9 @@ const api = vi.hoisted(() => ({
   sendContact: vi.fn(),
 }));
 
-vi.mock('../../api/provider', () => ({
+vi.mock('../../api/provider', async (importOriginal) => ({
+  // Echt: der Gleichlauf mit der Kopfzeile ist Teil dessen, was hier geprueft wird.
+  syncAvailability: (await importOriginal<typeof import('../../api/provider')>()).syncAvailability,
   AVAILABILITY_EVENT: 'ch360:availability',
   fetchCoverage: () => api.fetchCoverage(),
   setAvailability: (s: string) => api.setAvailability(s),
@@ -63,6 +65,19 @@ beforeEach(() => {
   Element.prototype.scrollIntoView = vi.fn();
 });
 
+/** Pausieren und Loeschen sind gesperrt, bis die Anbieter-Zeile da ist
+ *  (`availability === null`, keine Kontaktadresse). `findByRole` findet den
+ *  Knopf schon gesperrt — ein Klick darauf verpufft. Unter Last in der CI
+ *  kam die Zeile spaeter, und der Bestaetigungsdialog blieb aus (18.10.2026).
+ *  Deshalb auf „bereit" warten, nicht nur auf „da". */
+async function readyButton(name: string) {
+  return waitFor(() => {
+    const button = screen.getByRole('button', { name });
+    expect(button).toBeEnabled();
+    return button;
+  });
+}
+
 describe('SettingsPage · B2 · Identitaet aus der Bewerbung', () => {
   it('zeigt Firmierung und Website aus der Bewerbung, nicht die fest eingetragene Kanzlei', async () => {
     render(<SettingsPage />);
@@ -98,7 +113,7 @@ describe('SettingsPage · C2 · Pausieren speichert wirklich', () => {
   it('schaltet availability auf ooo und zeigt danach den pausierten Zustand', async () => {
     api.setAvailability.mockResolvedValue(undefined);
     render(<SettingsPage />);
-    fireEvent.click(await screen.findByRole('button', { name: 'settings.pauseButton' }));
+    fireEvent.click(await readyButton('settings.pauseButton'));
     expect(screen.getByText('settings.pauseConfirmConsequence')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'confirm:settings.pauseConfirmLabel' }));
     await waitFor(() => expect(api.setAvailability).toHaveBeenCalledWith('ooo'));
@@ -109,7 +124,7 @@ describe('SettingsPage · C2 · Pausieren speichert wirklich', () => {
   it('meldet ein gescheitertes Speichern und bleibt beim alten Status', async () => {
     api.setAvailability.mockRejectedValue(new Error('500'));
     render(<SettingsPage />);
-    fireEvent.click(await screen.findByRole('button', { name: 'settings.pauseButton' }));
+    fireEvent.click(await readyButton('settings.pauseButton'));
     fireEvent.click(screen.getByRole('button', { name: 'confirm:settings.pauseConfirmLabel' }));
     expect(await screen.findByText('settings.availabilityFailed')).toBeInTheDocument();
     expect(screen.queryByText('settings.pausedBannerTitle')).not.toBeInTheDocument();
@@ -118,9 +133,24 @@ describe('SettingsPage · C2 · Pausieren speichert wirklich', () => {
 
   it('uebernimmt den Zustand aus der Kopfzeile', async () => {
     render(<SettingsPage />);
-    await screen.findByRole('button', { name: 'settings.pauseButton' });
+    await readyButton('settings.pauseButton');
     window.dispatchEvent(new CustomEvent('ch360:availability', { detail: 'ooo' }));
     expect(await screen.findByText('settings.pausedBannerTitle')).toBeInTheDocument();
+  });
+
+  // Bis 18.10.2026: kam die Anbieter-Zeile erst nach dem Umschalten in der
+  // Kopfzeile, setzte sie die Pause hier still auf "available" zurueck.
+  it('laesst eine spaet geladene Zeile das Umschalten in der Kopfzeile nicht zuruecksetzen', async () => {
+    let liefern: (c: typeof COVERAGE) => void = () => {};
+    api.fetchCoverage.mockImplementation(() => new Promise((r) => { liefern = r; }));
+    render(<SettingsPage />);
+    window.dispatchEvent(new CustomEvent('ch360:availability', { detail: 'ooo' }));
+    expect(await screen.findByText('settings.pausedBannerTitle')).toBeInTheDocument();
+    liefern(COVERAGE); // availability: 'available' — aelter als das Umschalten
+    await screen.findByRole('button', { name: 'settings.deleteButton' });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'settings.deleteButton' })).toBeEnabled());
+    expect(screen.getByText('settings.pausedBannerTitle')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'settings.resume' })).toBeInTheDocument();
   });
 });
 
@@ -130,7 +160,7 @@ describe('SettingsPage · D1 · Loeschung als Anfrage', () => {
     render(<SettingsPage />);
     await screen.findByText('Nordkanzlei Partnerschaft mbB');
     expect(screen.queryByText('settings.deleteSent')).not.toBeInTheDocument();
-    fireEvent.click(await screen.findByRole('button', { name: 'settings.deleteButton' }));
+    fireEvent.click(await readyButton('settings.deleteButton'));
     fireEvent.click(screen.getByRole('button', { name: 'confirm:settings.deleteConfirmLabel' }));
     expect(await screen.findByText('settings.deleteSent')).toBeInTheDocument();
     expect(api.sendContact).toHaveBeenCalledWith(expect.objectContaining({
@@ -143,7 +173,7 @@ describe('SettingsPage · D1 · Loeschung als Anfrage', () => {
     api.sendContact.mockRejectedValue({ status: 503 });
     render(<SettingsPage />);
     await screen.findByText('Nordkanzlei Partnerschaft mbB');
-    fireEvent.click(await screen.findByRole('button', { name: 'settings.deleteButton' }));
+    fireEvent.click(await readyButton('settings.deleteButton'));
     fireEvent.click(screen.getByRole('button', { name: 'confirm:settings.deleteConfirmLabel' }));
     expect(await screen.findByText('settings.deleteFailedTitle')).toBeInTheDocument();
     expect(screen.getByText('settings.deleteFailed.unavailable')).toBeInTheDocument();

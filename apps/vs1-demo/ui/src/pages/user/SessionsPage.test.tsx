@@ -38,7 +38,12 @@ vi.mock('../../api/sessions', () => ({
 vi.mock('../../api/dashboard', () => ({
   fetchDashboard: vi.fn().mockResolvedValue({ sessions: { items: [] }, obligations: { open: 0 } }),
 }));
-vi.mock('../../api/search', () => ({ runSearch: (...a: unknown[]) => runSearch(...a) }));
+// Nur die Suche ist gemockt; `lawsOf` bleibt echt — es entscheidet, ob eine
+// Antwort Pflichten traegt oder ein Engine-Ausfall ist.
+vi.mock('../../api/search', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../api/search')>()),
+  runSearch: (...a: unknown[]) => runSearch(...a),
+}));
 vi.mock('../../lib/riskMapPdf', () => ({ generateRiskMapPdf: (...a: unknown[]) => generateRiskMapPdf(...a) }));
 vi.mock('../../components/user/UserShell', () => ({ UserShell: ({ children }: { children: ReactNode }) => <>{children}</> }));
 // t() gibt den Schluessel zurueck (oder den defaultValue): geprueft wird, WELCHE
@@ -116,6 +121,17 @@ describe('SessionsPage · PDF-Export', () => {
 
     expect(await screen.findByText('common:states.riskMapFailed.heading')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'common:states.actions.tryAgain' })).toBeInTheDocument();
+    expect(generateRiskMapPdf).not.toHaveBeenCalled();
+  });
+
+  // Leere `laws` nach einem Engine-Ausfall sind kein "nichts gefunden".
+  it('meldet einen Engine-Ausfall als gescheitert, nicht als "keine Pflichten"', async () => {
+    runSearch.mockResolvedValue({ ...result([]), laws_status: 'failed', correlationId: 'ref-engine-7c1d' });
+    renderPage();
+    await exportTile(0);
+
+    expect(await screen.findByText('common:states.riskMapFailed.heading')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.noRequirements.heading')).not.toBeInTheDocument();
     expect(generateRiskMapPdf).not.toHaveBeenCalled();
   });
 

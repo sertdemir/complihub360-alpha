@@ -75,6 +75,26 @@ export function broadcastAvailability(status: 'available' | 'ooo') {
   window.dispatchEvent(new CustomEvent(AVAILABILITY_EVENT, { detail: status }));
 }
 
+/** Haelt einen Verfuegbarkeits-Zustand im Gleichlauf mit AVAILABILITY_EVENT.
+ *  Ein Ereignis ist neuer als jede noch laufende Ladung: trifft die
+ *  Anbieter-Zeile erst danach ein, ueberschreibt `loaded` es nicht mehr. Bis
+ *  2026-10-18 setzte eine spaete Zeile eine gerade gespeicherte Pause in
+ *  Einstellungen und Kopfzeile still zurueck. Nach `stop` wirkt nichts mehr. */
+export function syncAvailability(set: (status: 'available' | 'ooo') => void) {
+  let synced = false;
+  let stopped = false;
+  const onSync = (e: Event) => {
+    if (stopped) return;
+    synced = true;
+    set((e as CustomEvent<'available' | 'ooo'>).detail);
+  };
+  window.addEventListener(AVAILABILITY_EVENT, onSync);
+  return {
+    loaded: (status: 'available' | 'ooo') => { if (!synced && !stopped) set(status); },
+    stop: () => { stopped = true; window.removeEventListener(AVAILABILITY_EVENT, onSync); },
+  };
+}
+
 export async function setAvailability(status: 'available' | 'ooo', providerKey?: string): Promise<void> {
   const key = providerKey ?? await myProviderKey();
   await apiFetch(`/api/v1/provider/${key}/availability`, {
@@ -116,7 +136,8 @@ export interface MatchmakingProfile {
   active_since: number | null;
 }
 
-export async function updateMatchmakingProfile(patch: Partial<MatchmakingProfile>, providerKey?: string): Promise<void> {
+/** Ohne `active_since`: das Jahr laeuft ueber die Bewerbung (Change-Control, Punkt 3); der Server lehnt es hier ab. */
+export async function updateMatchmakingProfile(patch: Omit<Partial<MatchmakingProfile>, 'active_since'>, providerKey?: string): Promise<void> {
   await apiFetch(`/api/v1/provider/${providerKey ?? await myProviderKey()}/profile`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

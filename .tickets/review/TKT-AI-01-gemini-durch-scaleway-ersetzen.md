@@ -1,7 +1,7 @@
 ---
 title: "Assistent: Gemini durch offene Modelle über Scaleway ersetzen (ADR-0011)"
 assignee: "Nutzer (Entscheidung, Zugang, Prüfbogen) · Claude (Umsetzung)"
-status: "doing"
+status: "review"
 ---
 
 # Gemini durch Scaleway ersetzen
@@ -47,8 +47,10 @@ Die Hinweise des Bogens sind Form-Prüfungen, kein Gate (ADR-0002). Das Urteil t
 
 Aus dem Silent-Failure-Review 2026-10-18, Entscheidung beim Menschen:
 
-1. `loadDomainSessions(...).catch(() => leer)` macht aus einem Abruffehler „keine Sitzung in diesem Bereich". Die AI sagt dann sinngemäß, es gebe keine Pflichten. Berührt §5 „Unsicherheit nicht verstecken" und §6 „Risiko ehrlich".
+1. ~~`loadDomainSessions(...).catch(() => leer)` macht aus einem Abruffehler „keine Sitzung in diesem Bereich".~~ **Erledigt mit #346 (P1):** Abruffehler → 502 `ASSISTANT_CONTEXT_UNAVAILABLE`, beim Merge übernommen.
 2. `isSubscriber` macht aus jedem Fehler „kein Abo". Ein zahlender Pro-Kunde sieht dann nach fünf Fragen den Upsell. Berührt §6 „Vertrauen stärken statt ausgeben".
 3. `countUse` zählt vor dem Anbieter-Aufruf. Eigene 502 verbrauchen das Gratis-Kontingent und führen zur Paywall. Gehört zu Punkt 2.
 4. Ohne `country` bestimmt das Land des ersten Treffers die Fakten, die als „verified ground truth" in den Kontext gehen.
-5. Die Freitext-Frage geht unredigiert an den Anbieter (war mit Gemini genauso). Offen, ob das als Grenzübertritt im Sinn von `privacy-audit-required` gilt.
+5. ~~Die Freitext-Frage geht unredigiert an den Anbieter.~~ **Erledigt mit #346 (P5, P2):** Frage, Verlauf und Sitzungs-Labels werden deterministisch redigiert; das Audit steht fail-closed vor dem Aufruf. Beim Merge übernommen und vor den Embedding-Aufruf gezogen, weil schon der die Frage an den Anbieter schickt.
+
+Offen bleiben 2 bis 4 (Abo-Fallback, Zähler vor dem Aufruf, Länder-Fallback ohne `country`).

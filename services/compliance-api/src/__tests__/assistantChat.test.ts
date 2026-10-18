@@ -3,9 +3,9 @@ import { PassThrough } from 'node:stream';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 // Handler-Vertrag nach der Umstellung auf Scaleway (ADR-0011): die Suche
-// bleibt in einem Embedding-Modell, ein leerer Korpus fällt auf, und was an
-// den Anbieter ging, wird auch im Fehlerfall auditiert. Supabase und der
-// Anbieter sind gestubbt.
+// bleibt in einem Embedding-Modell, ein leerer Korpus fällt auf, der
+// Grenzübertritt ist VOR dem ersten Anbieter-Aufruf auditiert (P2, #346) und
+// der Ausgang danach. Supabase und der Anbieter sind gestubbt.
 
 const rpc = vi.fn();
 const insert = vi.fn();
@@ -31,6 +31,8 @@ function call(body: unknown, ip: string) {
 }
 
 const ok = (b: unknown) => ({ ok: true, status: 200, json: async () => b });
+type Row = [string, { type: string; payload: Record<string, unknown> }];
+const events = (type: string) => (insert.mock.calls as Row[]).filter(([t, r]) => t === 'event_log' && r.type === type).map(([, r]) => r.payload);
 const realFetch = globalThis.fetch;
 const fetchMock = vi.fn();
 let ipSeq = 0;
@@ -62,9 +64,10 @@ describe('assistant chat with the Scaleway provider', () => {
         expect(r.status).toBe(200);
         expect(r.headers['x-llm-provider']).toBe('openai-compatible:mistral-small-3.2-24b-instruct-2506');
         expect(rpc).toHaveBeenCalledWith('match_knowledge_chunks', expect.objectContaining({ embed_model: 'qwen3-embedding-8b', match_count: 6 }));
-        const [, audit] = (insert.mock.calls as Array<[string, { payload: Record<string, unknown> }]>).find(([t]) => t === 'event_log')!;
-        expect(audit.payload).toMatchObject({ outcome: 'ok', provider: 'openai-compatible', embed_model: 'qwen3-embedding-8b', chunks: 1, top_similarity: 0.712, corpus_missing: false });
-        expect(JSON.stringify(audit.payload)).not.toContain('Frankreich');
+        expect(events('assistant_chat')).toEqual([expect.objectContaining({ provider: 'openai-compatible', model: 'mistral-small-3.2-24b-instruct-2506', embed_model: 'qwen3-embedding-8b' })]);
+        const [result] = events('assistant_chat_result');
+        expect(result).toMatchObject({ outcome: 'ok', chunks: 1, top_similarity: 0.712, corpus_missing: false });
+        expect(JSON.stringify(insert.mock.calls)).not.toContain('Frankreich');
     });
 
     it('flags a corpus without chunks for the embed model instead of looking like "no match"', async () => {
@@ -75,8 +78,7 @@ describe('assistant chat with the Scaleway provider', () => {
 
         expect(r.status).toBe(200);
         expect(rpc.mock.calls[1][1]).toMatchObject({ match_threshold: -1, match_count: 1, embed_model: 'qwen3-embedding-8b' });
-        const [, audit] = (insert.mock.calls as Array<[string, { payload: Record<string, unknown> }]>).find(([t]) => t === 'event_log')!;
-        expect(audit.payload).toMatchObject({ chunks: 0, corpus_missing: true });
+        expect(events('assistant_chat_result')[0]).toMatchObject({ chunks: 0, corpus_missing: true });
     });
 
     it('still audits when the provider fails after it saw the question', async () => {
@@ -88,8 +90,16 @@ describe('assistant chat with the Scaleway provider', () => {
         expect(r.status).toBe(502);
         expect(r.body.errorCode).toBe('ASSISTANT_ERROR');
         expect(JSON.stringify(r.body)).not.toContain('overloaded');
-        const [, audit] = (insert.mock.calls as Array<[string, { payload: Record<string, unknown> }]>).find(([t]) => t === 'event_log')!;
-        expect(audit.payload).toMatchObject({ outcome: 'error', stage: 'generate', provider: 'openai-compatible' });
+        expect(events('assistant_chat')).toHaveLength(1);
+        expect(events('assistant_chat_result')[0]).toMatchObject({ outcome: 'error', stage: 'generate', provider: 'openai-compatible' });
+    });
+
+    it('refuses before the embedding call when the boundary audit cannot be written (P2)', async () => {
+        insert.mockRejectedValue(new Error('event_log down'));
+        const r = await call({ message: 'Schwelle in Frankreich?', country: 'FR' }, `10.0.4.${++ipSeq}`);
+        expect(r.status).toBe(502);
+        expect(r.body.errorCode).toBe('ASSISTANT_AUDIT_UNAVAILABLE');
+        expect(fetchMock).not.toHaveBeenCalled();
     });
 
     it('answers 503 without any key and sends nothing anywhere', async () => {

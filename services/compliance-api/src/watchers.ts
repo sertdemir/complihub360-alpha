@@ -393,7 +393,11 @@ export async function runWatcherTick(): Promise<TickSummary> {
     } catch { summary.errors++; }
 
     // Phase 7 (ADR-0010): das API-Protokoll haelt 90 Tage — danach weg.
-    try { summary.apiRequestLogPruned = await runApiRequestLogRetentionTick(shadow); } catch { summary.errors++; }
+    try {
+        const rt = await runApiRequestLogRetentionTick(shadow);
+        summary.apiRequestLogPruned = rt.deleted;
+        summary.errors += rt.errors;
+    } catch { summary.errors++; }
 
     // Markt-Update: angefragte Maerkte, die die Engine inzwischen prueft —
     // und angefragte Bereiche, die dort inzwischen ein Anbieter abdeckt.

@@ -119,6 +119,8 @@ export interface Application {
 
 export interface ApplicationPatch {
   name?: string; contact_email?: string; website_url?: string; languages?: string[]; region?: string;
+  /** Punkt 3: ein Jahr von 1900 bis heute; `null` = nicht mehr anzeigen. */
+  active_since?: number | null;
   entity_type?: string; registration_number?: string; registered_address?: string; operating_address?: string;
   tax_number?: string; representative_name?: string; representative_title?: string;
   insurance_provider?: string; insurance_type?: string; insurance_valid_until?: string;

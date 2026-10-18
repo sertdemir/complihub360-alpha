@@ -29,7 +29,8 @@ export const DEFAULT_BASE_URL = 'https://api.scaleway.ai/v1';
 export const DEFAULT_CHAT_MODEL = 'mistral-small-3.2-24b-instruct-2506';
 export const DEFAULT_EMBED_MODEL = 'qwen3-embedding-8b';
 
-const REQUEST_TIMEOUT_MS = 45_000;
+/** P14 (#346): kein Modellaufruf ohne Grenze. */
+const REQUEST_TIMEOUT_MS = 20_000;
 const HISTORY_TURNS = 6;
 const HISTORY_CHARS = 2000;
 

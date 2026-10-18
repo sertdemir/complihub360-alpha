@@ -26,6 +26,7 @@ import {
   type AgreementType, type Application, type ApplicationPatch, type ChangePreview, type ChecklistItem, type Evidence, type EvidenceType, type ProviderChange, type Service, type ServiceInput,
 } from '../../api/application';
 import { cn } from '../../lib/utils';
+import { activeSinceMax, parseActiveSince } from '../../lib/activeSince';
 
 // Speicherfehler ohne Server-Text (Punkt 2, Wahl L1 · C3): Zuordnung in
 // lib/serverErrors.ts, hier nur die Anzeige.
@@ -269,7 +270,7 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
   const { t } = useTranslation('providerws');
   const p = app.provider;
   const [editing, setEditing] = useState(!settled);
-  const [f, setF] = useState({ name: p.name ?? '', contact_email: p.contact_email ?? '', website_url: p.website_url ?? '', languages: (p.languages ?? []).join(', '), region: p.region ?? '' });
+  const [f, setF] = useState({ name: p.name ?? '', contact_email: p.contact_email ?? '', website_url: p.website_url ?? '', languages: (p.languages ?? []).join(', '), region: p.region ?? '', active_since: p.active_since != null ? String(p.active_since) : '' });
   const { save, state, label } = useSave(onSaved);
   const labels = { complete: t('application.state.complete'), open: t('application.state.open') };
   // V2 (11.10.2026): ein Entwurf darf luecken haben — was fuer die Einreichung
@@ -278,9 +279,16 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
   // Fokus dorthin. Nennt der Identitaets-Scan die Region, steht das dort.
   const [tried, setTried] = useState(false);
   const [regionHint, setRegionHint] = useState<string | null>(null);
+  // Punkt 3 (P1): „Aktiv seit" ist ein Jahr von 1900 bis heute oder leer
+  // (= nicht anzeigen). Was der Server trotzdem ablehnt, steht am selben Feld.
+  const [sinceServer, setSinceServer] = useState(false);
+  // L1: Wer das Jahr entfernt, liest, was jetzt gilt — auch nach dem Wechsel
+  // zurueck in die Leseansicht.
+  const [sinceRemoved, setSinceRemoved] = useState(false);
   const errorsOf = (): FormError[] => {
     const errs: FormError[] = [];
     if (f.contact_email.trim() && !EMAIL_RE.test(f.contact_email.trim())) errs.push({ id: 'app-account-contact_email', label: t('application.account.email'), message: t('common:contactSend.field.email') });
+    if (parseActiveSince(f.active_since) === 'invalid' || sinceServer) errs.push({ id: 'app-account-active_since', label: t('application.account.activeSince'), message: t('application.account.activeSinceInvalid', { max: activeSinceMax() }) });
     return errs;
   };
   const errors = tried ? errorsOf() : [];
@@ -291,13 +299,17 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
     const now = errorsOf();
     if (now.length) { focusField(now[0].id); return; }
     setRegionHint(null);
+    setSinceRemoved(false);
+    const since = parseActiveSince(f.active_since) as number | null;
     const ok = await save(
-      { name: f.name, contact_email: f.contact_email, website_url: f.website_url, languages: f.languages.split(',').map((s) => s.trim()).filter(Boolean), region: f.region },
+      { name: f.name, contact_email: f.contact_email, website_url: f.website_url, languages: f.languages.split(',').map((s) => s.trim()).filter(Boolean), region: f.region, active_since: since },
       (e) => {
+        if (errorFieldOf(e) === 'active_since') { setSinceServer(true); focusField('app-account-active_since'); return true; }
         if (identityFindingsOf(e)?.[0]?.field !== 'region') return false;
         setRegionHint(identityHintFrom(e, t)); focusField('app-account-region'); return true;
       },
     );
+    if (ok && since === null && p.active_since != null) setSinceRemoved(true);
     if (ok && settled) setEditing(false);
   };
   return (
@@ -308,6 +320,7 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
           { label: t('application.account.name'), value: p.name }, { label: t('application.account.email'), value: p.contact_email },
           { label: t('application.account.website'), value: p.website_url }, { label: t('application.account.region'), value: p.region },
           { label: t('application.account.languages'), value: (p.languages ?? []).join(', ') },
+          { label: t('application.account.activeSince'), value: p.active_since != null ? String(p.active_since) : null },
         ]} />
       ) : (<>
       <div className="grid gap-4 md:grid-cols-2">
@@ -327,11 +340,30 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
           <FieldError id="app-account-region" alert message={regionHint} />
         </FormField>
       </div>
+      {/* F1: Ziffern-Tastatur, hoechstens vier Zeichen, Label verknuepft. */}
+      <FormField label={t('application.account.activeSince')} htmlFor="app-account-active_since" className="max-w-[300px]"
+        helper={errFor('app-account-active_since') ? undefined : t('application.account.activeSinceHint')}>
+        <Input id="app-account-active_since" inputMode="numeric" maxLength={4} autoComplete="off" value={f.active_since}
+          placeholder={t('application.account.activeSincePh')} aria-describedby="app-account-active_since-msg"
+          onChange={(e) => { setF({ ...f, active_since: e.target.value }); setSinceServer(false); }}
+          error={!!errFor('app-account-active_since')} {...errorAria('app-account-active_since', !!errFor('app-account-active_since'))} />
+        <FieldError id="app-account-active_since" alert message={errFor('app-account-active_since')} />
+      </FormField>
+      {CONTROLLED.has(p.lifecycle_status) && <p className="text-[12px] leading-relaxed text-fg-tertiary">{t('application.account.reviewNote')}</p>}
       <div className="flex items-center gap-3">
         <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={onSave}>{label}</Button>
         {state === 'error' && <span role="alert" className="text-[12px] text-error-700 dark:text-red-300">{t('application.saveError')}</span>}
       </div>
       </>)}
+      {sinceRemoved && (
+        <div role="status" className="flex gap-2.5 rounded-lg border border-brand/40 bg-brand-light px-3.5 py-3">
+          <CheckCircle2 size={16} aria-hidden className="mt-0.5 shrink-0 text-fg-brand" />
+          <div className="text-[12.5px] leading-relaxed">
+            <p className="font-semibold text-fg">{t('application.account.activeSinceRemoved.heading')}</p>
+            <p className="text-fg-secondary">{t('application.account.activeSinceRemoved.message')}</p>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
