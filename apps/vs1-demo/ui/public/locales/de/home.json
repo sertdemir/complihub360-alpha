@@ -80,9 +80,10 @@
   },
   "heroWorld": {
     "title": {
-      "line2": "Vereinfacht."
+      "line2": "Wissen Sie, was zu tun ist.",
+      "line1": "Verstehen Sie, was für Ihr Unternehmen gilt."
     },
-    "lead": "Verstehen Sie Ihre Pflichten. Finden Sie die richtigen Fachleute. Bleiben Sie konform — überall, wo Sie verkaufen.",
+    "lead": "Ihre Pflichten in {{markets}} Märkten, jede mit Quelle. Die richtigen Fachleute, wenn Sie sie brauchen.",
     "ctaRiskMap": "Bedarf ermitteln",
     "ask": {
       "placeholder": "Beschreiben Sie Ihr Anliegen",
@@ -112,7 +113,7 @@
       },
       {
         "title": "Experten-Netzwerk",
-        "desc": "Verifizierte Fachleute, denen Sie vertrauen können."
+        "desc": "Fachleute, geprüft anhand von Nachweisen je Leistung und Markt."
       },
       {
         "title": "Smarte Technologie",
@@ -124,7 +125,7 @@
       },
       {
         "title": "Ihre Daten, geschützt",
-        "desc": "Sicherheit und Datenschutz auf Enterprise-Niveau."
+        "desc": "Anonyme Erhebung. Kennungen werden maskiert, bevor eine KI Ihren Text sieht."
       }
     ]
   },
@@ -550,7 +551,7 @@
     "drawerLabel": "Fortschritt speichern"
   },
   "riskMapPreview": {
-    "guestNote": "Gast-Map · läuft in 30 Min. ab",
+    "guestNote": "Gast-Map · 30 Min. gespeichert — sichern Sie sie, um sie zu behalten",
     "eyebrow": "Ihre Risk Map",
     "title": "Das gilt für Sie.",
     "stats": [
@@ -712,7 +713,7 @@
     "unlock": "Meine besten Matches mit kostenlosem Konto ansehen",
     "save": {
       "title": "Diese Map speichern. Anbieter freischalten.",
-      "subtitle": "Kostenloses Konto. Keine Kreditkarte. Founding-Member-Zugang bis zum Beta-Launch.",
+      "subtitle": "Kostenloses Konto. Keine Kreditkarte. Ihre Karte und Ihre Treffer bleiben gespeichert.",
       "cta": "Kostenloses Konto erstellen"
     },
     "statsCompact": [
@@ -1082,7 +1083,7 @@
       {
         "label": "Markenzeichen — Verified Provider",
         "title": "Ein leises Zeichen von Verantwortung.",
-        "desc": "Verified Provider sind geprüfte Berater, die gemeinsame Verantwortung für Ihre Sache übernehmen. Das goldene Zeichen ist Zurückhaltung, keine Werbung."
+        "desc": "Verified Provider sind geprüfte Berater, die für Ihre Sache in eigener beruflicher Verantwortung einstehen. Das goldene Zeichen ist Zurückhaltung, keine Werbung."
       }
     ],
     "demo": {
@@ -1153,12 +1154,12 @@
       "reqEprMeta": "EPR · Frankreich",
       "chipTaxIt": "STEUERN & UST · IT",
       "chipPackFr": "VERPACKUNG · FR",
-      "riskHigh": "● Hohes Risiko · Schwelle erreicht",
-      "riskMedium": "● Mittleres Risiko · Frist Q3",
+      "riskHigh": "● Hohe Priorität · Schwelle erreicht",
+      "riskMedium": "● Mittlere Priorität · fällig Q3",
       "chipMonitoring": "MONITORING",
       "chipRequest": "ANFRAGE",
       "chipSla": "SLA",
-      "feedThreshold": "Risikoschwelle erreicht · USt Italien",
+      "feedThreshold": "Schwelle erreicht · USt Italien",
       "feedReplied": "Anbieter hat geantwortet · Verifizierte Steuerkanzlei",
       "feedSla": "SLA-Erinnerung · Datenschutzkanzlei · UK",
       "time6h": "6 Std.",

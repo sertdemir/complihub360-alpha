@@ -1,6 +1,6 @@
 {
   "topbar": {
-    "guestBadge": "Guest map · expires in 30 min",
+    "guestBadge": "Guest map · kept for 30 min — save it to keep it",
     "backHome": "Back to start",
     "saveMap": "Save this map"
   },
@@ -65,7 +65,7 @@
   },
   "cta": {
     "title": "Save this map. Unlock the providers.",
-    "body": "Free account. No credit card. Founding-member access through Beta launch.",
+    "body": "Free account. No credit card. Your map and your matches stay saved.",
     "button": "Create free account"
   },
   "quote": {
@@ -187,7 +187,7 @@
     "pickSlot": "Pick a slot on the left.",
     "revealNote": "After booking, the provider's name and contact become visible — calendar invitation included.",
     "messagePh": "Briefly, what this is about (optional) …",
-    "confirmCta": "Book bindingly",
+    "confirmCta": "Confirm booking",
     "freeNote": "Free and without obligation · cancel any time",
     "doneEyebrow": "BOOKED",
     "doneTitle": "Your appointment is set.",

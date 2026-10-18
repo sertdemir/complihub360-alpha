@@ -80,10 +80,10 @@
   },
   "heroWorld": {
     "title": {
-      "line1": "Cross-border compliance.",
-      "line2": "Simplified."
+      "line1": "Understand what applies to your business.",
+      "line2": "Know what to do next."
     },
-    "lead": "Understand your obligations across {{markets}} markets. Find the right specialists. Stay compliant.",
+    "lead": "Your obligations in {{markets}} markets, each with its source. The right specialist when you need one.",
     "ctaRiskMap": "Assess My Needs",
     "ask": {
       "placeholder": "Describe what you need",
@@ -114,7 +114,7 @@
       },
       {
         "title": "Expert network",
-        "desc": "Verified specialists you can trust."
+        "desc": "Specialists checked against evidence for each service and market."
       },
       {
         "title": "Smart technology",
@@ -126,7 +126,7 @@
       },
       {
         "title": "Your data, protected",
-        "desc": "Enterprise-grade security and privacy."
+        "desc": "Anonymous assessment. Identifiers masked before any AI sees your text."
       }
     ]
   },
@@ -552,7 +552,7 @@
     "drawerLabel": "Save your progress"
   },
   "riskMapPreview": {
-    "guestNote": "Guest map · expires in 30 min",
+    "guestNote": "Guest map · kept for 30 min — save it to keep it",
     "eyebrow": "Your risk map",
     "title": "Here's what applies to you.",
     "stats": [
@@ -714,7 +714,7 @@
     "unlock": "See my best matches with a free account",
     "save": {
       "title": "Save this map. Unlock the providers.",
-      "subtitle": "Free account. No credit card. Founding-member access through Beta launch.",
+      "subtitle": "Free account. No credit card. Your map and your matches stay saved.",
       "cta": "Create free account"
     },
     "statsCompact": [
@@ -1108,7 +1108,7 @@
       {
         "label": "Brand mark — Verified Provider",
         "title": "A quiet sign of accountability.",
-        "desc": "Verified Providers are vetted advisors who accept shared responsibility for your matter. The gold mark is restraint, not promotion."
+        "desc": "Verified Providers are vetted advisors who answer for your matter under their own professional responsibility. The gold mark is restraint, not promotion."
       }
     ],
     "demo": {
@@ -1180,12 +1180,12 @@
       "reqEprMeta": "EPR · France",
       "chipTaxIt": "TAX & VAT · IT",
       "chipPackFr": "PACKAGING · FR",
-      "riskHigh": "● High risk · threshold reached",
-      "riskMedium": "● Medium risk · deadline Q3",
+      "riskHigh": "● High priority · threshold reached",
+      "riskMedium": "● Medium priority · due Q3",
       "chipMonitoring": "MONITORING",
       "chipRequest": "REQUEST",
       "chipSla": "SLA",
-      "feedThreshold": "Risk threshold reached · Italy VAT",
+      "feedThreshold": "Threshold reached · Italy VAT",
       "feedReplied": "Provider replied · Verified tax firm",
       "feedSla": "SLA reminder · Data protection firm · UK",
       "time6h": "6h",
