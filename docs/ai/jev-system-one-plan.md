@@ -51,7 +51,7 @@ Konsequenz: Jev bekommt bei uns nur Entscheidungen mit sicherem Rückfallweg.
 Diese Form empfehle ich **nicht**, aus vier Gründen:
 
 1. **Technisch:** Jev erzeugt keine Sätze. Antworten formuliert weiter ein
-   Sprachmodell (heute Gemini im VAT-Assistenten, `services/compliance-api/src/assistant.ts`).
+   Sprachmodell (seit ADR-0011 Mistral Small über Scaleway, `services/compliance-api/src/llm.ts`).
 2. **Privacy-Regel:** Die PII-Redaction muss deterministisch bleiben
    (`.agents/rules/privacy-redaction-deterministic.md`). Ein probabilistisches
    Modell darf sie weder ersetzen noch vor ihr sitzen.
@@ -74,7 +74,7 @@ Die empfohlene Form ist ein **Drei-Schichten-Modell**:
 │            → wohin gehört die Frage, ist die Antwort DNA-konform, │  immer mit Rückfallweg
 │              braucht es einen Menschen                         │
 ├───────────────────────────────────────────────────────────────┤
-│  SPRACHE   Gemini (später ggf. Claude)                         │  formuliert, erklärt
+│  SPRACHE   Mistral Small über Scaleway (ADR-0011)              │  formuliert, erklärt
 │            → die eigentliche Antwort, im Ton der DNA           │
 └───────────────────────────────────────────────────────────────┘
         davor immer: deterministische Redaction + Privacy-Gate + Audit
@@ -86,7 +86,7 @@ Jev wird damit zum **Türsteher und Lektor der DNA** — nicht zum Chef.
 
 ### A. Answer Guard — die DNA als Laufzeitprüfung (höchster Mehrwert)
 
-Jede Gemini-Antwort geht vor der Auslieferung durch Jev. State: Frage
+Jede Antwort des Sprachmodells geht vor der Auslieferung durch Jev. State: Frage
 (sanitized), Kontextauszug, Antwortentwurf. Typisierte Fragen:
 
 | Frage | Typ | DNA-Bezug |
@@ -104,7 +104,7 @@ Ist Jev nicht erreichbar, gilt die heutige Logik plus fester Hinweis — es wird
 nichts still durchgewunken.
 
 Warum Jev hier passt: 70–500 ms sind neben einer mehrsekündigen
-Gemini-Antwort kaum spürbar. Ein zweiter LLM-Aufruf als Prüfer würde die
+Modellantwort kaum spürbar. Ein zweiter LLM-Aufruf als Prüfer würde die
 Antwortzeit verdoppeln.
 
 ### B. Triage vor dem Assistenten
@@ -121,7 +121,7 @@ Was daraus folgt:
 
 - Bei **Beratungsbedarf** bietet die Antwort sichtbar den Weg zum Partner an,
   statt ihn hinter weiteren Fragen zu verstecken (DNA: keine Reibung vor dem Menschen).
-- Bei **Belastung** bekommt Gemini einen ruhigeren Ton-Hinweis, Humor ist aus.
+- Bei **Belastung** bekommt das Sprachmodell einen ruhigeren Ton-Hinweis, Humor ist aus.
 - **Themenfremdes** wird freundlich umgelenkt, ohne teuren RAG-Lauf.
 - Bei **niedriger Konfidenz** wird nicht geraten, sondern nachgefragt:
   „Geht es um Verpackung (EPR) oder um Umsatzsteuer?" — als Auswahl-Chips.
@@ -186,7 +186,7 @@ Fit-Indikatoren erklärbar.
   damit belegt.
 - **Timeout** 800 ms, danach Rückfallweg. Kein Retry im Request-Pfad.
 - **Secret** `TYPESAFE_API_KEY`; ohne Key antwortet die Schicht mit
-  „nicht konfiguriert", wie heute Gemini mit `ASSISTANT_NOT_CONFIGURED`.
+  „nicht konfiguriert", wie heute der Assistent mit `ASSISTANT_NOT_CONFIGURED`.
 
 ## 6. Kosten
 
@@ -199,7 +199,7 @@ Fit-Indikatoren erklärbar.
 | Kosten pro Tag | ~1,26 $ |
 
 Die Kosten sind vernachlässigbar. Einsparung entsteht zusätzlich, weil
-themenfremde Fragen keinen Embedding- und Gemini-Lauf mehr auslösen.
+themenfremde Fragen keinen Embedding- und Modell-Lauf mehr auslösen.
 
 ## 7. Datenschutz und Recht — vor dem ersten produktiven Request
 
@@ -215,7 +215,7 @@ themenfremde Fragen keinen Embedding- und Gemini-Lauf mehr auslösen.
 
 | Phase | Inhalt | Ergebnis | Gate zur nächsten Phase |
 |---|---|---|---|
-| **0 · Klären** (1 Woche) | Punkte aus §7, Playground-Test mit synthetischen Fragen in 4 Sprachen, ADR-0011 | Go/No-Go | DPA ok, Sprachen tragfähig |
+| **0 · Klären** (1 Woche) | Punkte aus §7, Playground-Test mit synthetischen Fragen in 4 Sprachen, ADR-0012 | Go/No-Go | DPA ok, Sprachen tragfähig |
 | **1 · Shadow** (2 Wochen) | `decision-layer` + Triage + Guard laufen **parallel ohne Wirkung**, nur Logging | Messdaten | Ziele unten erreicht |
 | **2 · Guard live** | Answer Guard fail-closed aktiv | DNA-Grenzen zur Laufzeit geprüft | 2 Wochen ohne Fehlalarm-Häufung |
 | **3 · Triage live** | Bereichserkennung mit Bestätigungs-Chips, Handoff-Angebot | weniger Klicks, Weg zum Menschen sichtbar | UI-Workflow durchlaufen |
@@ -266,5 +266,5 @@ eine bewusste Entscheidung.
 
 1. Early-Access-Zugang bei TypeSafe beantragen, DPA und ZDR anfragen.
 2. Goldset anlegen: 200 echte Fragetypen (synthetisch, ohne PII) in 4 Sprachen, je mit Bereich, Land, Anliegen.
-3. ADR-0011 „Decision Layer mit System-One-Modell" schreiben.
+3. ADR-0012 „Decision Layer mit System-One-Modell" schreiben.
 4. `packages/decision-layer` mit Stub und Tests, danach Shadow-Integration in `assistant.ts`.

@@ -3781,7 +3781,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/chat') {
         // Chatbot plan phase ②: RAG assistant over knowledge_chunks +
-        // jurisdiction_facts (assistant.ts). 503 until GEMINI_API_KEY is set.
+        // jurisdiction_facts (assistant.ts). 503 until LLM_API_KEY (Scaleway) or, during the transition, GEMINI_API_KEY is set.
         handleAssistantChat(req, res, correlationId, ip, { userId: authUserId, email: authEmail });
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/checkout') {
         // Phase ③: Stripe Checkout for Assistant Pro (12 $/month).

@@ -4,23 +4,17 @@ import { supabaseApi } from "./supabase.js";
 import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
+import { resolveLlm, sameEmbedModel } from './llm.js';
 
 // ─── VAT assistant (chatbot plan phase ②) ─────────────────────────────────────
 // RAG over knowledge_chunks (vector 768, match_knowledge_chunks RPC) plus the
-// structured jurisdiction_facts table. Gemini powers both sides: query
-// embeddings (text-embedding-004, 768 dims — matches the schema) and answer
-// generation. Returns 503 ASSISTANT_NOT_CONFIGURED until GEMINI_API_KEY is set
-// (same pattern as the Stripe billing portal). Answers are information, not
-// legal/tax advice (RDG/StBerG), and must never reproduce licensed source
-// text verbatim — the corpus is internal ground truth only.
-
-const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-// gemini-embedding-001 with outputDimensionality 768 matches the vector(768)
-// schema; truncated (non-3072) embeddings must be re-normalized for cosine.
-const EMBED_MODEL = 'gemini-embedding-001';
-const EMBED_DIMS = 768;
-// 'latest' alias — pinned models age out for new API projects (2.5-flash 404s).
-const GEN_MODEL = 'gemini-flash-latest';
+// structured jurisdiction_facts table. The model behind both sides comes from
+// llm.ts: Scaleway (Mistral Small + Qwen3-Embedding) once LLM_API_KEY is set,
+// Gemini only as the transition until then. Returns 503
+// ASSISTANT_NOT_CONFIGURED while neither key is set (same pattern as the
+// Stripe billing portal). Answers are information, not legal/tax advice
+// (RDG/StBerG), and must never reproduce licensed source text verbatim — the
+// corpus is internal ground truth only.
 
 const SUPPORTED_COUNTRIES = new Set(['DE', 'UK', 'NL', 'FR', 'IT', 'ES', 'US', 'TR', 'AT']);
 
@@ -57,44 +51,6 @@ async function isSubscriber(userKey: string | null): Promise<boolean> {
         // 24h grace past the period end covers renewal-webhook-less staging.
         return !row.current_period_end || new Date(row.current_period_end).getTime() + 24 * 60 * 60 * 1000 > Date.now();
     } catch { return false; }
-}
-
-async function embedQuery(apiKey: string, text: string): Promise<number[]> {
-    const res = await fetch(`${GEMINI_BASE}/${EMBED_MODEL}:embedContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: { parts: [{ text }] }, taskType: 'RETRIEVAL_QUERY', outputDimensionality: EMBED_DIMS }),
-    });
-    const body = await res.json() as { embedding?: { values?: number[] }; error?: { message?: string } };
-    if (!res.ok || !body.embedding?.values) throw new Error(`Gemini embed: ${body.error?.message || res.status}`);
-    const v = body.embedding.values;
-    const norm = Math.sqrt(v.reduce((s, x) => s + x * x, 0)) || 1;
-    return v.map((x) => x / norm);
-}
-
-async function generate(apiKey: string, system: string, history: Array<{ role: string; content: string }>, user: string): Promise<string> {
-    const contents = [
-        ...history.slice(-6).map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content.slice(0, 2000) }] })),
-        { role: 'user', parts: [{ text: user }] },
-    ];
-    const res = await fetch(`${GEMINI_BASE}/${GEN_MODEL}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            system_instruction: { parts: [{ text: system }] },
-            contents,
-            // Thinking models spend reasoning tokens from the same budget —
-            // 1024 truncated answers mid-sentence. The prompt caps prose length.
-            generationConfig: { temperature: 0.2, maxOutputTokens: 8192 },
-        }),
-    });
-    const body = await res.json() as {
-        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-        error?: { message?: string };
-    };
-    const text = body.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('') || '';
-    if (!res.ok || !text) throw new Error(`Gemini generate: ${body.error?.message || res.status}`);
-    return text.trim();
 }
 
 const SYSTEM_PROMPT = `You are the CompliHub360 compliance assistant for VAT / indirect-tax questions.
@@ -138,8 +94,8 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
     req.on('end', async () => {
         res.setHeader('x-correlation-id', correlationId);
         try {
-            const apiKey = process.env.GEMINI_API_KEY;
-            if (!apiKey) {
+            const llm = resolveLlm();
+            if (!llm) {
                 res.writeHead(503, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'ASSISTANT_NOT_CONFIGURED', message: 'The assistant is not connected yet', correlationId }));
                 return;
@@ -186,10 +142,14 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
 
             // Retrieval: vector search over the corpus + structured facts —
             // der Korpus ist Umsatzsteuer, also nur im USt-Bereich.
+            // Nur Treffer, die mit demselben Modell eingebettet wurden wie die
+            // Frage: Waehrend der Neu-Einbettung liegen alte und neue Vektoren
+            // nebeneinander, und ein Fremdvektor ergibt Zufallsaehnlichkeit.
             const chunks = vatScope
-                ? (await supabaseApi.rpc('match_knowledge_chunks', {
-                    query_embedding: await embedQuery(apiKey, country ? `[${country}] ${message}` : message), match_threshold: 0.4, match_count: 6,
-                })) as Array<{ content: string; metadata: { country?: string; section?: string } | null; similarity: number }>
+                ? ((await supabaseApi.rpc('match_knowledge_chunks', {
+                    query_embedding: await llm.embedQuery(country ? `[${country}] ${message}` : message), match_threshold: 0.4, match_count: 6,
+                })) as Array<{ content: string; metadata: { country?: string; section?: string; embed_model?: string } | null; similarity: number }>)
+                    .filter((c) => sameEmbedModel(c.metadata, llm.embedModel))
                 : [];
 
             // `factsFor` kann seit 20260917000000 eine Region tragen ('US-CA'),
@@ -232,12 +192,13 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             });
             const userTurn = `CONTEXT:\n${contextParts.join('\n\n') || '(no matching context found)'}\n\nQUESTION:\n${message}`;
 
-            const answer = await generate(apiKey, domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
+            const answer = await llm.generate(domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
 
             // Log usage without message content (privacy) — volume + coverage only.
             await supabaseApi.insert('event_log', {
                 type: 'assistant_chat',
-                payload: { country: factsFor, domain, chunks: chunks.length, message_chars: message.length },
+                // provider/model: welcher Unterauftragsverarbeiter die (Frage-)Daten gesehen hat.
+                payload: { country: factsFor, domain, chunks: chunks.length, message_chars: message.length, provider: llm.id, model: llm.chatModel },
             }).catch(() => { /* non-blocking */ });
 
             const sources = [
