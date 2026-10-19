@@ -143,7 +143,7 @@ function TableView({ selectedCountry }: Props) {
         <span>{t('compliance.matrix.area', 'Compliance Area')}</span>
         <span>{t('compliance.matrix.col.risk', 'Risk')}</span>
         <span>{t('compliance.matrix.col.time', 'Time to Act')}</span>
-        <span className="hidden sm:block">{t('compliance.matrix.col.fine', 'Typical Exposure')}</span>
+        <span className="hidden sm:block">{t('compliance.matrix.col.fine', 'Maximum penalty')}</span>
         <span className="hidden text-right sm:block">{t('compliance.matrix.col.proven', 'Proven')}</span>
       </div>
       {rows.map((row, i) => (
@@ -227,7 +227,7 @@ export function RiskShowcase({ selectedCountry }: Props) {
       <Reveal className="shrink-0 lg:w-[400px]">
         <SectionEyebrow tone="brand">{t('compliance.riskPanel.eyebrow', 'Weighted by the engine')}</SectionEyebrow>
         <h2 className="mt-2.5 font-serif text-[1.75rem] font-bold leading-tight tracking-tight text-fg lg:text-[2rem]">
-          {t('compliance.riskPanel.title', 'Where it burns first — computed for your market.')}
+          {t('compliance.riskPanel.title', 'What needs attention first — weighted for your market.')}
         </h2>
         <p className="mt-3.5 text-body leading-relaxed text-fg-secondary">
           {t(

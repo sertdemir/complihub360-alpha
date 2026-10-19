@@ -37,7 +37,7 @@
       "gold": "nicht",
       "post": " allein erledigen sollten."
     },
-    "subtitleDesktop": "CompliHub360 kartiert die Regeln, die für Ihre Geschäftstätigkeit in europäischen Märkten gelten, und verbindet Sie mit einem verifizierten Spezialisten, sobald etwas Umsetzung braucht. Sechs Minuten bis zu Ihrer ersten Risk Map. Kein Konto erforderlich.",
+    "subtitleDesktop": "CompliHub360 kartiert die Regeln, die für Ihre Geschäftstätigkeit in europäischen Märkten gelten, und verbindet Sie mit einem verifizierten Spezialisten, sobald etwas Umsetzung braucht. Etwa fünf Minuten bis zu Ihrer ersten Risk Map. Kein Konto erforderlich.",
     "subtitleMobile": "CompliHub360 kartiert die Regeln in europäischen Märkten und verbindet Sie mit einem verifizierten Spezialisten, sobald etwas Umsetzung braucht. Sechs Minuten bis zu Ihrer ersten Risk Map. Kein Konto erforderlich.",
     "cta": {
       "start": "Meinen Bedarf ermitteln",
@@ -49,7 +49,7 @@
       "Keine Kreditkarte",
       "Ergebnisse in Ihrem Browser"
     ],
-    "visualCaption": "Sechs Minuten · 4 Fragen · Kein Konto erforderlich",
+    "visualCaption": "Etwa fünf Minuten · 4 Fragen · Kein Konto erforderlich",
     "preview": {
       "context": "Cross-Border-Launch — DE → UK + NL",
       "steps": [
@@ -75,7 +75,7 @@
       "placeholder": "Beschreiben Sie Ihr Anliegen in eigenen Worten…",
       "answer": "Eine Compliance-Frage stellen",
       "guided": "Meinen Bedarf ermitteln",
-      "trust": "Kostenlos · anonym · in unter 3 Minuten"
+      "trust": "Kostenlos · anonym · etwa fünf Minuten"
     }
   },
   "heroWorld": {
@@ -785,15 +785,15 @@
     "steps": [
       {
         "title": "Assessment starten",
-        "desc": "4–5 Fragen. Unter 2 Minuten. Kein Konto nötig."
+        "desc": "Vier Fragen. Etwa fünf Minuten. Kein Konto nötig."
       },
       {
         "title": "Risk Map ansehen",
         "desc": "Anonyme Vorschau, strukturiert, mit Quellenangaben."
       },
       {
-        "title": "Registrieren, um Matches zu sehen",
-        "desc": "Das Anbieter-Matching ist registrierten Konten vorbehalten."
+        "title": "Karte speichern, um Matches zu sehen",
+        "desc": "Ein kostenloses Konto lässt uns Ihre Karte halten und Ihre Anfrage an den richtigen Anbieter geben. Keine Kreditkarte."
       },
       {
         "title": "Strukturierte Übergaben erhalten",

@@ -37,7 +37,7 @@
       "gold": "shouldn't",
       "post": " be doing alone."
     },
-    "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. Six minutes to your first risk map. No account required.",
+    "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. About five minutes to your first risk map. No account required.",
     "subtitleMobile": "CompliHub360 maps the rules across European markets, then connects you to a verified specialist when something needs hands. Six minutes to your first risk map. No account required.",
     "cta": {
       "start": "Assess My Needs",
@@ -49,7 +49,7 @@
       "No credit card",
       "Results in your browser"
     ],
-    "visualCaption": "Six minutes · 4 questions · No account required",
+    "visualCaption": "About five minutes · 4 questions · No account required",
     "preview": {
       "context": "Cross-border launch — DE → UK + NL",
       "steps": [
@@ -75,7 +75,7 @@
       "placeholder": "Describe your situation in your own words…",
       "answer": "Ask a Compliance Question",
       "guided": "Assess My Needs",
-      "trust": "Free · anonymous · under 3 minutes"
+      "trust": "Free · anonymous · about five minutes"
     }
   },
   "heroWorld": {
@@ -788,15 +788,15 @@
     "steps": [
       {
         "title": "Start your assessment",
-        "desc": "4–5 questions. Under 2 minutes. No account needed."
+        "desc": "Four questions. About five minutes. No account needed."
       },
       {
         "title": "See your risk map",
         "desc": "Anonymous preview, structured, source-cited."
       },
       {
-        "title": "Sign up to see matches",
-        "desc": "Provider matching is reserved for registered accounts."
+        "title": "Save your map to see matches",
+        "desc": "A free account lets us hold your map and send your request to the right provider. No credit card."
       },
       {
         "title": "Get structured handovers",
