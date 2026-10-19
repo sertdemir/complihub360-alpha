@@ -347,37 +347,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /engagement:
-    post:
-      summary: Create an engagement request
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [provider_key, message, country]
-              properties:
-                provider_key:
-                  type: string
-                message:
-                  type: string
-                structured_answers:
-                  type: object
-                country:
-                  type: string
-      responses:
-        '201':
-          description: Engagement created — {ok, id, status, magicLinks}
-        '400':
-          description: >-
-            `BAD_REQUEST` — Body nicht lesbar oder `provider_key` fehlt. Seit
-            2026-10-18 (Befund P9) nur noch fuer den Body; ein Datenbankfehler
-            ist 500 `INTERNAL` und wird strukturiert geloggt, ohne den rohen
-            Fehlertext.
-        '500':
-          description: '`INTERNAL` — die Anfrage konnte nicht gespeichert werden; nichts davon erreicht den Client ausser der correlationId.'
-
   /engagement/{id}:
     get:
       summary: Get engagement status
@@ -437,20 +406,6 @@ paths:
       responses:
         '200':
           description: Declined
-
-  /document/upload:
-    post:
-      summary: Upload a raw document
-      responses:
-        '200':
-          description: Uploaded
-
-  /document/request-ai:
-    post:
-      summary: Request AI processing for a document
-      responses:
-        '200':
-          description: Processed
 
   # ─── Anbieter-Identitaet und Ownership (Phase 0, 2026-09-22) ───────────────
   # Alle Anbieter-eigenen Routen /provider/{key}/(bookings|coverage|profile|
