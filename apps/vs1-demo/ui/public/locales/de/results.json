@@ -1,6 +1,6 @@
 {
   "topbar": {
-    "guestBadge": "Gast-Karte · läuft in 30 Min. ab",
+    "guestBadge": "Gast-Karte · 30 Min. gespeichert — sichern Sie sie, um sie zu behalten",
     "backHome": "Zurück zum Start",
     "saveMap": "Diese Karte speichern"
   },
@@ -65,7 +65,7 @@
   },
   "cta": {
     "title": "Karte speichern. Anbieter freischalten.",
-    "body": "Kostenloses Konto. Keine Kreditkarte. Founding-Member-Zugang bis zum Beta-Launch.",
+    "body": "Kostenloses Konto. Keine Kreditkarte. Ihre Karte und Ihre Treffer bleiben gespeichert.",
     "button": "Kostenloses Konto erstellen"
   },
   "quote": {
@@ -187,7 +187,7 @@
     "pickSlot": "Wählen Sie links einen Termin.",
     "revealNote": "Nach der Buchung werden Name und Kontakt des Anbieters sichtbar — die Kalendereinladung inklusive.",
     "messagePh": "Kurz zu Ihrem Anliegen (optional) …",
-    "confirmCta": "Verbindlich buchen",
+    "confirmCta": "Buchung bestätigen",
     "freeNote": "Kostenlos und unverbindlich · jederzeit stornierbar",
     "doneEyebrow": "GEBUCHT",
     "doneTitle": "Ihr Termin steht.",

@@ -80,9 +80,10 @@
   },
   "heroWorld": {
     "title": {
-      "line2": "Basitleştirildi."
+      "line2": "Sonraki adımı bilin.",
+      "line1": "İşletmeniz için neyin geçerli olduğunu anlayın."
     },
-    "lead": "Yükümlülüklerinizi anlayın. Doğru uzmanları bulun. Sattığınız her yerde uyumlu kalın.",
+    "lead": "{{markets}} pazardaki yükümlülükleriniz, her biri kaynağıyla. İhtiyaç duyduğunuzda doğru uzman.",
     "ctaRiskMap": "İhtiyacımı değerlendir",
     "ask": {
       "placeholder": "Talebinizi kısaca anlatın",
@@ -112,7 +113,7 @@
       },
       {
         "title": "Uzman ağı",
-        "desc": "Güvenebileceğiniz doğrulanmış uzmanlar."
+        "desc": "Her hizmet ve pazar için kanıtlarla doğrulanmış uzmanlar."
       },
       {
         "title": "Akıllı teknoloji",
@@ -124,7 +125,7 @@
       },
       {
         "title": "Verileriniz güvende",
-        "desc": "Kurumsal düzeyde güvenlik ve veri koruması."
+        "desc": "Anonim değerlendirme. Herhangi bir yapay zeka metninizi görmeden önce tanımlayıcılar maskelenir."
       }
     ]
   },
@@ -550,7 +551,7 @@
     "drawerLabel": "İlerlemenizi kaydedin"
   },
   "riskMapPreview": {
-    "guestNote": "Misafir haritası · 30 dk içinde sona erer",
+    "guestNote": "Misafir haritası · 30 dk saklanır — kalıcı olması için kaydedin",
     "eyebrow": "Risk Map'iniz",
     "title": "Size uygulananlar bunlar.",
     "stats": [
@@ -712,7 +713,7 @@
     "unlock": "En iyi eşleşmelerinizi ücretsiz hesapla görün",
     "save": {
       "title": "Bu haritayı kaydedin. Sağlayıcıların kilidini açın.",
-      "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Beta lansmanına kadar kurucu üye erişimi.",
+      "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Haritanız ve eşleşmeleriniz kayıtlı kalır.",
       "cta": "Ücretsiz hesap oluşturun"
     },
     "statsCompact": [
@@ -1082,7 +1083,7 @@
       {
         "label": "Marka işareti — Verified Provider",
         "title": "Sorumluluğun sessiz işareti.",
-        "desc": "Verified Provider'lar, dosyanız için ortak sorumluluk üstlenen, denetlenmiş danışmanlardır. Altın işaret özdenetimdir, tanıtım değil."
+        "desc": "Verified Provider'lar, dosyanız için kendi mesleki sorumlulukları altında hesap veren, denetlenmiş danışmanlardır. Altın işaret özdenetimdir, tanıtım değil."
       }
     ],
     "demo": {
@@ -1153,12 +1154,12 @@
       "reqEprMeta": "EPR · Fransa",
       "chipTaxIt": "VERGİ VE KDV · IT",
       "chipPackFr": "AMBALAJ · FR",
-      "riskHigh": "● Yüksek risk · eşik aşıldı",
-      "riskMedium": "● Orta risk · son tarih 3. çeyrek",
+      "riskHigh": "● Yüksek öncelik · eşik aşıldı",
+      "riskMedium": "● Orta öncelik · 3. çeyrekte",
       "chipMonitoring": "İZLEME",
       "chipRequest": "TALEP",
       "chipSla": "SLA",
-      "feedThreshold": "Risk eşiği aşıldı · İtalya KDV",
+      "feedThreshold": "Eşik aşıldı · İtalya KDV",
       "feedReplied": "Sağlayıcı yanıt verdi · Doğrulanmış vergi bürosu",
       "feedSla": "SLA hatırlatması · Veri koruma bürosu · Birleşik Krallık",
       "time6h": "6 sa",

@@ -6,7 +6,8 @@
 
 **Ergebnis:** 7 Blocker · 36 Änderungen · 31 Nits. Keine Stelle setzt Angst gezielt zur Conversion ein, keine konstruiert einen Bedarf, keine gibt die AI als Fachperson aus, keine variiert den Ton nach Unternehmensgröße. Die Blocker sind sachliche Falschaussagen (Gewissheit, die wir nicht haben), veraltete Demo-Texte und Bußgeldbeträge als Blickfang. Der große Rest trägt die DNA bereits gut — siehe „Was schon stimmt".
 
-**Status:** Befunde, keine Umsetzung. Copy wird erst nach der Wahl des Nutzers je Stelle geändert; DNA-Konflikte entscheidet der Mensch (CLAUDE.md „Bei Konflikt").
+**Status:** Befunde; Umsetzung nach Wahl des Nutzers je Stelle (DNA-Konflikte entscheidet der Mensch, CLAUDE.md „Bei Konflikt").
+**Umgesetzt:** alle 7 Blocker (PR #351, 2026-10-18) · die zehn Änderungen mit der größten Wirkung (PR #353, 2026-10-18): Hero-Titel und -Lead, Proofs 1 und 4, Gast-Countdown, „Founding-member", Brand-Code-Haftungssatz, Absage-Dialog, „Book bindingly", Status-Punkt im Auth-Footer, Risk → Priority im Nutzer-Workspace und Dashboard-Mock, Assistant-Intro und Prompt-Regeln 1/6/Bußgeld sowie die 402-Zeile. Offen: die übrigen Änderungen und die Nits.
 
 ---
 
