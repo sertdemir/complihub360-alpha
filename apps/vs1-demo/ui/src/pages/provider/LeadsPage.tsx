@@ -9,12 +9,13 @@ import { useWorkspaceData } from '../../lib/useWorkspaceData';
 import { LoadFailedState, ReadinessEmpty, useReadiness } from '../../components/provider/WorkspaceStates';
 import { money } from '../../api/billing';
 import {
-  fetchProviderBookings, reportProposal, reportAttendance, submitReview,
+  fetchProviderBookings, reportProposal, reportAttendance, submitReview, reviewFailureFrom,
   type AttendanceOutcome, type BookingAttendance, type BookingStatus, type LeadProposal, type ProviderBookingLead,
 } from '../../api/bookings';
 import { DateMark } from '../../components/ui/DateMark';
 import { useRequestContext } from '../../lib/requestContext';
 import { FieldError } from '../../components/ui/FieldError';
+import { FailureNote } from '../../components/ui/FailureNote';
 
 // ─── Provider · Termine & Leads ──────────────────────────────────────────────
 // Matchmaking v2: the booking IS the paid lead. The dossier (user identity +
@@ -64,6 +65,8 @@ interface Row {
   userDiscountPct: number | null;
   proposal: LeadProposal | null;
   att: BookingAttendance;
+  /** Hat der Anbieter den Lead schon bewertet (vom Server)? */
+  reviewed: boolean;
 }
 
 const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warning'> = {
@@ -107,6 +110,7 @@ export function LeadsPage() {
         userDiscountPct: b.userDiscountPct,
         proposal: b.proposal,
         att: b.attendance,
+        reviewed: b.reviewed,
       };
     });
   }, [locale]);
@@ -118,14 +122,30 @@ export function LeadsPage() {
   // appointment — feeds the internal lead-quality signal.
   const [leadRating, setLeadRating] = useState(0);
   const [leadRated, setLeadRated] = useState<Set<string>>(new Set());
-  // V2 (11.10.2026): „OK" bleibt aktiv; ohne Sterne steht der Satz an der
+  // V2 (11.10.2026): der Knopf bleibt aktiv; ohne Sterne steht der Satz an der
   // Sternreihe und der Fokus geht auf den ersten Stern.
   const [ratingMissing, setRatingMissing] = useState(false);
-  const rateLead = (r: Row) => {
+  // Wie die Nutzer-Bewertung (Punkt 1, R3/E1): „bewertet" erst nach dem OK
+  // des Servers. Bis 19.10.2026 stand „✓ Lead rated" sofort da, und ein
+  // Fehler verschwand in `.catch(() => {})` — der Anbieter hielt die
+  // Bewertung fuer gesendet. 409 ist kein Fehler, sondern ein Hinweis.
+  const [rateState, setRateState] = useState<'idle' | 'sending' | 'already' | 'notHeld' | { failed: { id: string; at: string } | null }>('idle');
+  const openDossier = (r: Row | null) => { setDossierFor(r); setLeadRating(0); setRatingMissing(false); setRateState('idle'); };
+  const rateLead = async (r: Row) => {
+    if (rateState === 'sending') return;
     if (leadRating < 1) { setRatingMissing(true); document.querySelector<HTMLElement>('#lead-rating button')?.focus(); return; }
     setRatingMissing(false);
-    setLeadRated((s) => new Set(s).add(r.id));
-    submitReview({ bookingId: r.id, fromRole: 'provider', rating: leadRating, categories: [] }).catch(() => {});
+    setRateState('sending');
+    try {
+      await submitReview({ bookingId: r.id, fromRole: 'provider', rating: leadRating, categories: [] });
+      setLeadRated((s) => new Set(s).add(r.id));
+      setRateState('idle');
+    } catch (e) {
+      const f = reviewFailureFrom(e);
+      if (f.kind === 'already_reviewed') { setLeadRated((s) => new Set(s).add(r.id)); setRateState('already'); }
+      else if (f.kind === 'not_held') setRateState('notHeld');
+      else setRateState({ failed: f.reference });
+    }
   };
 
   // Selbstauskunft je Lead: lokal sofort, dann an den Server. Antwortet er
@@ -336,7 +356,7 @@ export function LeadsPage() {
           {r.leadCharged && !r.lead && <span className="text-[11px] text-fg-tertiary">{t('termine.leadCharged')}</span>}
           {statusTag(r)}
         </div>
-        <Button size="sm" onClick={() => setDossierFor(r)}>{t('termine.openDossier')}</Button>
+        <Button size="sm" onClick={() => openDossier(r)}>{t('termine.openDossier')}</Button>
       </div>
       </div>
       {r.att.attendanceReportable ? attendanceBlock(r) : attendanceLine(r)}
@@ -379,7 +399,7 @@ export function LeadsPage() {
 
       <Drawer
         open={!!dossierFor}
-        onClose={() => { setDossierFor(null); setRatingMissing(false); }}
+        onClose={() => openDossier(null)}
         eyebrow={t('termine.dossierEyebrow')}
         title={dossierFor ? (dossierFor.company ?? t('termine.companyMissing')) : ''}
       >
@@ -398,21 +418,37 @@ export function LeadsPage() {
             {dossierFor.status === 'completed' && (
               <div className={DRAWER_BOX}>
                 <p className={DRAWER_EYEBROW}>{t('termine.rateLead')}</p>
-                {leadRated.has(dossierFor.id) ? (
-                  <p className="mt-2 text-[12px] text-fg-brand">{t('termine.rated')}</p>
+                {rateState === 'already' ? (
+                  <div role="status" className="mt-2 text-[12px] leading-relaxed">
+                    <p className="font-semibold text-fg">{t('termine.rateAlready.heading')}</p>
+                    <p className="text-fg-secondary">{t('termine.rateAlready.message')}</p>
+                  </div>
+                ) : rateState === 'notHeld' ? (
+                  <div role="status" className="mt-2 text-[12px] leading-relaxed">
+                    <p className="font-semibold text-fg">{t('termine.rateNotHeld.heading')}</p>
+                    <p className="text-fg-secondary">{t('termine.rateNotHeld.message')}</p>
+                  </div>
+                ) : dossierFor.reviewed || leadRated.has(dossierFor.id) ? (
+                  <p role="status" className="mt-2 text-[12px] text-fg-brand">{t('termine.rated')}</p>
                 ) : (
                   <>
                     <div className="mt-2 flex items-center gap-2">
                       <div id="lead-rating" className="flex items-center gap-1" role="group" aria-label={t('termine.rateLead')}
                         aria-describedby={ratingMissing ? 'lead-rating-error' : undefined}>
                         {[1, 2, 3, 4, 5].map((n) => (
-                          <button key={n} type="button" aria-label={`${n}`} onClick={() => { setLeadRating(n); setRatingMissing(false); }}
+                          <button key={n} type="button" aria-label={t('termine.rateStar', { n })} aria-pressed={n === leadRating}
+                            onClick={() => { setLeadRating(n); setRatingMissing(false); if (typeof rateState === 'object') setRateState('idle'); }}
                             className={`text-[20px] leading-none ${n <= leadRating ? 'text-fg-accent' : 'text-stroke-strong hover:text-fg-tertiary'}`}>★</button>
                         ))}
                       </div>
-                      <Button size="sm" variant="secondary" onClick={() => rateLead(dossierFor)}>OK</Button>
+                      <Button size="sm" variant="secondary" disabled={rateState === 'sending'} onClick={() => rateLead(dossierFor)}>
+                        {rateState === 'sending' ? '…' : typeof rateState === 'object' ? t('common:states.actions.tryAgain') : t('termine.rateSubmit')}
+                      </Button>
                     </div>
                     <FieldError id="lead-rating" alert message={ratingMissing ? t('termine.rateRequired') : null} className="mt-1.5" />
+                    {typeof rateState === 'object' && (
+                      <FailureNote className="mt-3" heading={t('termine.rateFailed.heading')} message={t('termine.rateFailed.message')} reference={rateState.failed} />
+                    )}
                   </>
                 )}
                 <p className="mt-2 text-[11px] text-fg-tertiary">{t('termine.rateNote')}</p>

@@ -590,7 +590,7 @@
     },
     "rateLead": "Lead bewerten",
     "rated": "✓ Lead bewertet",
-    "rateNote": "War der Lead qualifiziert? Deine Bewertung speist unsere interne Lead-Qualität.",
+    "rateNote": "War der Lead qualifiziert? Ihre Bewertung fließt in unsere interne Lead-Qualität ein.",
     "leadBand": "Band {{band}} · {{label}}",
     "leadDiscountCounter": "Tarif-Rabatt {{pct}} % · Lead {{n}} in diesem Zyklus",
     "leadStandardFee": "Standardgebühr · Kontingent verbraucht",
@@ -631,7 +631,22 @@
     "attLinePlatform": "Plattformfehler · der Nutzer kann bis {{deadline}} neu buchen",
     "attRebookedFrom": "Neubuchung zu einem früheren Termin · keine zweite Lead-Gebühr",
     "reportOpen": "Rückmeldung offen",
-    "proposalSaveFailed": "Nicht gespeichert. Bitte versuchen Sie es noch einmal."
+    "proposalSaveFailed": "Nicht gespeichert. Bitte versuchen Sie es noch einmal.",
+    "rateSubmit": "Bewertung senden",
+    "rateStar": "{{n}} von 5 Sternen",
+    "rateRequired": "Bitte wählen Sie eine Bewertung von 1 bis 5 Sternen.",
+    "rateFailed": {
+      "heading": "Wir konnten Ihre Bewertung nicht senden",
+      "message": "Ihre Sterne sind noch ausgewählt. Bitte versuchen Sie es erneut. Wenn das Problem bleibt, wenden Sie sich an den Support."
+    },
+    "rateAlready": {
+      "heading": "Sie haben diesen Lead bereits bewertet",
+      "message": "Ihre frühere Bewertung ist gespeichert. Jeder Lead kann einmal bewertet werden."
+    },
+    "rateNotHeld": {
+      "heading": "Dieser Lead kann noch nicht bewertet werden",
+      "message": "Bewertungen sind möglich, sobald der Termin stattgefunden hat."
+    }
   },
   "intake": {
     "inviteOnlyTitle": "Anbieter-Intake nur mit Einladung.",

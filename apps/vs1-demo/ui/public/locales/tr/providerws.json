@@ -590,7 +590,7 @@
     },
     "rateLead": "Bu lead'i değerlendir",
     "rated": "✓ Lead değerlendirildi",
-    "rateNote": "Lead nitelikli miydi? Puanın iç lead kalitemizi besler.",
+    "rateNote": "Lead nitelikli miydi? Puanınız iç lead kalitemizi besler.",
     "leadBand": "Bant {{band}} · {{label}}",
     "leadDiscountCounter": "Plan indirimi % {{pct}} · bu dönemin {{n}}. lead'i",
     "leadStandardFee": "Standart ücret · kontenjan doldu",
@@ -631,7 +631,22 @@
     "attLinePlatform": "Platform hatası · müşteri {{deadline}} tarihine kadar yeniden randevu alabilir",
     "attRebookedFrom": "Önceki bir randevunun yeniden ayırtılması · ikinci lead ücreti yok",
     "reportOpen": "Bildiriminiz bekleniyor",
-    "proposalSaveFailed": "Kaydedilmedi. Lütfen tekrar deneyin."
+    "proposalSaveFailed": "Kaydedilmedi. Lütfen tekrar deneyin.",
+    "rateSubmit": "Değerlendirmeyi gönder",
+    "rateStar": "5 üzerinden {{n}} yıldız",
+    "rateRequired": "Lütfen 1 ile 5 yıldız arasında bir puan seçin.",
+    "rateFailed": {
+      "heading": "Değerlendirmenizi gönderemedik",
+      "message": "Yıldızlarınız hâlâ seçili. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
+    },
+    "rateAlready": {
+      "heading": "Bu lead'i zaten değerlendirdiniz",
+      "message": "Önceki değerlendirmeniz kayıtlı. Her lead bir kez değerlendirilebilir."
+    },
+    "rateNotHeld": {
+      "heading": "Bu lead henüz değerlendirilemez",
+      "message": "Değerlendirme, randevu gerçekleştikten sonra mümkündür."
+    }
   },
   "intake": {
     "inviteOnlyTitle": "Sağlayıcı kaydı yalnızca davetle.",
