@@ -2949,44 +2949,38 @@ describe('Benachrichtigungen entstehen aus Vorgaengen', () => {
 
 
 describe('Anfragen gehoeren ihrem Ersteller', () => {
-    // Bis 2026-08-31 nahm POST /engagement die user_id aus dem BODY (und das
-    // Frontend schickte keine — alle UI-Anfragen gehoerten niemandem), und
+    // Bis 2026-08-31 nahm POST /engagement die user_id aus dem BODY, und
     // GET /requests lieferte mit leerem Filter die Anfragen ALLER Nutzer,
-    // samt requester_email und Firmenname. Diese Tests pinnen beides fest.
-    const anlegen = (body: Record<string, unknown> = {}) =>
-        api('/api/v1/engagement', {
-            method: 'POST', auth: 'jwt',
-            body: JSON.stringify({ provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', message: 'Bitte um Angebot', ...body }),
-        });
+    // samt requester_email und Firmenname. POST /engagement gibt es seit
+    // 2026-10-19 nicht mehr (siehe unten); die Liste bleibt festgepinnt.
 
-    it('P9: unlesbarer Body oder fehlender provider_key ist 400 — ein Datenbankfehler ist 500 ohne rohen Fehlertext', async () => {
+    it('POST /engagement gibt es nicht mehr: 404, keine Anfrage, keine Magic-Links, keine Mail', async () => {
+        // Die Route hatte keinen Client mehr, legte Anfragen an Buchung,
+        // Bestaetigungstext und Abrechnung vorbei an — und gab dem Aufrufer
+        // die rohen Magic-Link-Tokens des Anbieters zurueck (bestaetigen,
+        // antworten, ablehnen in dessen Namen).
         seedProvider();
-        const kaputt = await api('/api/v1/engagement', { method: 'POST', auth: 'jwt', body: '{not json' });
-        expect(kaputt.status).toBe(400);
-        expect(kaputt.body.errorCode).toBe('BAD_REQUEST');
-        const ohne = await anlegen({ provider_key: undefined });
-        expect(ohne.status).toBe(400);
-        const { supabaseApi } = await import('../supabase.js');
-        const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string) => {
-            if (table === 'engagement_requests') throw new Error('PostgREST: null value in column "country" — row (geheim@kunde.example, Kunde GmbH)');
-            throw new Error('unexpected insert ' + table);
+        const r = await api('/api/v1/engagement', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', message: 'Bitte um Angebot' }),
         });
-        try {
-            const r = await anlegen();
-            expect(r.status).toBe(500);
-            expect(r.body.errorCode).toBe('INTERNAL');
-            expect(JSON.stringify(r.body)).not.toMatch(/geheim@|Kunde GmbH|PostgREST/);
-        } finally { spy.mockRestore(); }
+        expect(r.status).toBe(404);
+        expect(r.body).not.toHaveProperty('magicLinks');
+        expect(db.engagement_requests ?? []).toEqual([]);
+        expect(db.magic_link_tokens ?? []).toEqual([]);
     });
 
-    it('schreibt den Ersteller aus dem Token — ein fremdes user_id im Body zaehlt nicht', async () => {
-        seedProvider();
-        const fremd = randomUUID();
-        const r = await anlegen({ user_id: fremd });
-        expect([200, 201]).toContain(r.status);
-        const row = (db.engagement_requests ?? []).find((e: any) => e.id === r.body.id);
-        expect(row.user_id).toBe(USER_ID);
-        expect(row.user_id).not.toBe(fremd);
+    it('POST /document/upload und /document/request-ai gibt es nicht mehr: 404, nichts gespeichert', async () => {
+        // Ohne Client; nahm user_id und engagement_id aus dem Body. Nachweise
+        // laufen ueber die Upload-URL der Bewerbung (packages/storage).
+        const up = await api('/api/v1/document/upload', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ filename: 'x.txt', text: 'Max Mustermann, max@example.com', userId: randomUUID(), consentAI: true }),
+        });
+        expect(up.status).toBe(404);
+        const ai = await api('/api/v1/document/request-ai', { method: 'POST', auth: 'jwt', body: JSON.stringify({ documentId: randomUUID() }) });
+        expect(ai.status).toBe(404);
+        expect(db.documents ?? []).toEqual([]);
     });
 
     it('listet nur die eigenen Anfragen, keine fremden', async () => {
