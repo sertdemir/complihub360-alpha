@@ -212,7 +212,11 @@ export function ApplicationPage() {
         )}
 
         {app && (
-          <div className="grid items-start gap-5 lg:grid-cols-[264px_1fr]">
+          // Mobil (19.10.2026): ohne Spaltenvorlage wuchs die eine Grid-Spalte
+          // auf die breiteste Zeile (Laender-Tabelle, ~720 px) — Navigation und
+          // Kapitel wurden abgeschnitten. minmax(0,1fr) haelt sie im Viewport,
+          // die Tabelle scrollt in ihrem Kasten.
+          <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[264px_minmax(0,1fr)]">
             {/* Kapitel-Navigation (1B) */}
             <aside className="lg:sticky lg:top-2">
               <Card styleVariant="outlined" className="p-2">
@@ -236,7 +240,7 @@ export function ApplicationPage() {
               <p className="mt-3 px-3 text-[12px] leading-relaxed text-fg-tertiary">{settled ? t('application.settled.navHint') : t('application.navHint')}</p>
             </aside>
 
-            <div className="space-y-4">
+            <div className="min-w-0 space-y-4">
               <section ref={(el) => { refs.current.account = el; }}><AccountPanel app={app} settled={settled} onSaved={reload} /></section>
               <section ref={(el) => { refs.current.legal = el; }}><LegalPanel app={app} settled={settled} onSaved={reload} /></section>
               <section ref={(el) => { refs.current.services = el; }}><ServicesPanel app={app} changes={changes} onChanged={reload} /></section>
@@ -597,11 +601,14 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
 
   return (
     <div className="rounded-lg border border-stroke">
-      <button type="button" onClick={onToggle} className="flex w-full items-center gap-3 px-4 py-3 text-left">
+      {/* Mobil (19.10.2026): ohne Umbruch quetschte die Zeile den Namen auf
+          drei Zeilen und schnitt Status und Laenderzahl rechts ab. Jetzt
+          rutscht die Statusgruppe als Ganzes in eine eigene Zeile. */}
+      <button type="button" onClick={onToggle} className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 text-left">
         <Chevron size={16} className="shrink-0 text-fg-tertiary" />
-        <span className="text-[14px] font-medium text-fg">{s.service_name}</span>
+        <span className="min-w-0 text-[14px] font-medium text-fg">{s.service_name}</span>
         <Tag tone="neutral">{s.service_code}</Tag>
-        <span className="ml-auto flex items-center gap-3">
+        <span className="ml-auto flex flex-wrap items-center gap-x-3 gap-y-1">
           {waiting ? <Badge tone="warning" size="sm">{t('application.change.pendingShort')}</Badge>
             : pendingRows.length > 0 && <Badge tone="info" size="sm">{t('application.change.plannedShort')}</Badge>}
           <Badge tone={SERVICE_TONE[s.status]} size="sm">{t(`application.services.status.${s.status}`)}</Badge>
@@ -647,7 +654,10 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
               )}
             </>
           )}
-          <div className="overflow-hidden rounded-md border border-stroke-subtle">
+          {/* Fuenf feste Spalten (~700 px): auf schmalen Bildschirmen scrollt die
+              Tabelle in ihrem Kasten, statt die Seite aufzuziehen. */}
+          <div className="overflow-x-auto rounded-md border border-stroke-subtle">
+            <div className="min-w-[640px]">
             <div className="grid grid-cols-[180px_160px_170px_1fr_40px] bg-surface-secondary px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">
               <span>{t('application.services.colCountry')}</span><span>{t('application.services.colJurisdiction')}</span><span>{t('application.services.colStatus')}</span><span>{t('application.services.colNote')}</span><span />
             </div>
@@ -660,6 +670,7 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
                 <button type="button" aria-label={t('application.services.remove')} disabled={busy} onClick={() => setCountries(codes.filter((x) => x !== c.country_code))} className="justify-self-end text-fg-tertiary hover:text-error-500"><Trash2 size={15} /></button>
               </div>
             ))}
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Input id={countryId} inputSize="sm" value={country} onChange={(e) => { setCountry(e.target.value.toUpperCase().slice(0, 2)); setCountryError(null); }}
@@ -956,11 +967,13 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
     return (
       <div key={a} className={cn('flex flex-wrap items-start gap-3 rounded-md border px-4 py-3', acc || !pflicht ? 'border-stroke-subtle' : 'border-warning-500/50')}>
         <Checkbox checked={!!acc} readOnly aria-label={t(`application.agreements.doc.${a}`)} className="mt-0.5" />
-        <div className="min-w-0 flex-1">
+        {/* Mobil (19.10.2026): mit Basis 0 schrumpfte der Text neben dem Button
+            auf ein Wort je Zeile. Ab 14rem bricht der Button unter den Text. */}
+        <div className="min-w-0 flex-[1_1_14rem]">
           <p className="text-[13px] font-medium text-fg">{t(`application.agreements.doc.${a}`)} <span className="ml-2 text-[11px] font-normal text-fg-tertiary">{t('application.agreements.version', { version: acc?.version ?? versionOf(a), language: (acc?.language ?? i18n.resolvedLanguage ?? 'en').toUpperCase() })}</span></p>
           <p className="text-[12px] text-fg-tertiary">{outdated ? t('application.mandate.newVersion', { version: versionOf(a), old: acc!.version }) : acc ? t('application.agreements.acceptedOn', { date: fmtDate(acc.accepted_at, locale), name: acc.accepted_by_name ?? '' }) : `${t('application.agreements.notAccepted')}${a === 'billing_authorization' ? ' ' + t('application.agreements.billingNote') : ''}`}</p>
         </div>
-        <Button size="sm" variant={acc && !outdated ? 'ghost' : 'secondary'} onClick={() => openModal(a)}>{acc && !outdated ? t('application.agreements.open') : t('application.agreements.accept')}</Button>
+        <Button size="sm" variant={acc && !outdated ? 'ghost' : 'secondary'} className="ml-8 sm:ml-0" onClick={() => openModal(a)}>{acc && !outdated ? t('application.agreements.open') : t('application.agreements.accept')}</Button>
       </div>
     );
   };

@@ -28,7 +28,10 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const s = BOX[size];
     const ic = Math.round(s * 0.7);
     return (
-      <label className={cn('inline-flex items-center gap-2', disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer', className)}>
+      // relative (19.10.2026): das versteckte Input ist absolut positioniert —
+      // ohne Bezugsrahmen hing es am <body> und verlaengerte in Scroll-Shells
+      // (Provider-Bereich) das Dokument um eine leere Flaeche.
+      <label className={cn('relative inline-flex items-center gap-2', disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer', className)}>
         <input type="checkbox" ref={innerRef} disabled={disabled} aria-invalid={error || undefined} className="peer sr-only" {...props} />
         <span
           style={{ width: s, height: s }}
