@@ -562,6 +562,28 @@ describe('POST /api/v1/search', () => {
         }
     });
 
+    // 19.10.2026 auf Staging ausgeloest: markets: ["toString"] galt als
+    // bekanntes Land (isKnownCountry pruefte mit `in`), die Engine warf, und
+    // jeder Gast bekam "We couldn't create your Risk Map". Geerbte Merkmale
+    // sind jetzt unbekannte Laender — die Suche rechnet mit dem Rest.
+    it('treats inherited object keys in markets as unknown countries, not as an engine failure', async () => {
+        seedProvider();
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        try {
+            const r = await api('/api/v1/search', {
+                method: 'POST',
+                auth: 'none',
+                body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE', 'toString', 'constructor', '__proto__'], domains: ['tax-vat'] } }),
+            });
+            expect(r.status).toBe(200);
+            expect(r.body.laws_status).toBe('ok');
+            expect(r.body.laws.length).toBeGreaterThan(0);
+            expect(log.mock.calls.some((c) => String(c[0]).includes('Compliance engine failed'))).toBe(false);
+        } finally {
+            log.mockRestore();
+        }
+    });
+
     // Ein Engine-Fehler laesst die Suche weiterlaufen (Anbieter kommen trotzdem),
     // aber nicht mehr still: strukturierte Zeile mit Referenz-ID und Laendern.
     it('logs an engine failure as a structured error with the correlation id', async () => {
