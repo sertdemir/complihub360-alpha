@@ -141,8 +141,12 @@ export function UserNotificationsPage() {
             er zaehlt. Verworfen wurden A (Unterzeile bleibt, kein Zaehler) und
             C (kompakte Postfach-Leiste ohne Serif-Titel: flacher, aber die
             Flaeche verliert den Auftritt der uebrigen Arbeitsbereich-Seiten). */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
+        {/* Umbruch statt Ueberlauf: auf 390 px passten Titel, Zaehler und
+            "Mark all as read" nicht in eine Zeile, der Knopf ragte 24 px ueber
+            den Rand und war abgeschnitten (Beta 20.10.2026). Jetzt rutscht er
+            in eine eigene Zeile, sobald der Platz fehlt. */}
+        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
               <span className="text-fg-accent-emphasis">{t('notifications.title')}</span>
             </h1>
