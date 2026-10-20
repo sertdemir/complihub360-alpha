@@ -298,7 +298,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
         } catch {
             structuredLog('error', 'Assistant chat failed', { correlationId, errorCode: 'ERR_ASSISTANT', severity: 'error', route: '/api/v1/assistant/chat' });
             res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'ASSISTANT_ERROR', message: 'Assistant request failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'ASSISTANT_ERROR', message: 'The assistant could not answer right now. Please try again in a moment.', correlationId }));
         }
     });
 }
@@ -352,7 +352,7 @@ export function handleAssistantCheckout(req: IncomingMessage, res: ServerRespons
         } catch {
             structuredLog('error', 'Assistant checkout failed', { correlationId, errorCode: 'ERR_ASSISTANT_CHECKOUT', severity: 'error', route: '/api/v1/assistant/checkout' });
             res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'The payment service did not respond right now. Please try again in a moment.', correlationId }));
         }
     });
 }
@@ -404,7 +404,7 @@ export function handleAssistantVerify(req: IncomingMessage, res: ServerResponse,
         } catch {
             structuredLog('error', 'Assistant verify failed', { correlationId, errorCode: 'ERR_ASSISTANT_VERIFY', severity: 'error', route: '/api/v1/assistant/verify' });
             res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'The payment service did not respond right now. Please try again in a moment.', correlationId }));
         }
     });
 }

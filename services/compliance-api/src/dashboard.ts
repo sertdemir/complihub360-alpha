@@ -190,7 +190,7 @@ export async function handleDashboard(
             correlationId, errorCode: 'ERR_DASHBOARD', severity: 'error', route: '/api/v1/dashboard',
         });
         res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Dashboard failed', correlationId }));
+        res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'The dashboard could not be loaded right now. Nothing was changed — please try again in a moment.', correlationId }));
     }
 }
 
