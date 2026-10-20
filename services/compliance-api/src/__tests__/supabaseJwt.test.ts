@@ -48,3 +48,33 @@ describe('checkSupabaseJwt', () => {
     expect((await checkSupabaseJwt('kein-token')).reason).toBe('malformed');
   });
 });
+
+describe('JWKS-Abruf unter Last (Beta 20.10.2026: fuenf Aufrufe, knownKeys 0)', () => {
+  it('parallele Aufrufe teilen EINEN Abruf und kommen alle durch', async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => { release = r; });
+    const fetchMock = vi.fn(async () => { await gate; return new Response(JSON.stringify({ keys: [jwk] }), { status: 200 }); });
+    vi.stubGlobal('fetch', fetchMock);
+    const token = es256('k1', { sub: 'u1', role: 'authenticated' });
+    const runs = Array.from({ length: 5 }, () => checkSupabaseJwt(token));
+    release();
+    const results = await Promise.all(runs);
+    expect(results.map((r) => r.reason)).toEqual([null, null, null, null, null]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('gescheiterter Abruf haelt den leeren Cache nicht fest und wird geloggt', async () => {
+    const fetchMock = vi.fn()
+      .mockRejectedValueOnce(new Error('ECONNRESET'))
+      .mockResolvedValue(new Response(JSON.stringify({ keys: [jwk] }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const token = es256('k1', { sub: 'u1', role: 'authenticated' });
+    // Erster Abruf scheitert (geloggt), die unbekannte kid loest sofort den
+    // zweiten aus — die 30-s-Bremse greift bei leerem Cache nicht.
+    expect((await checkSupabaseJwt(token)).reason).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(warn.mock.calls.some((c) => String(c[0]).includes('ERR_JWKS_FETCH'))).toBe(true);
+    warn.mockRestore();
+  });
+});
