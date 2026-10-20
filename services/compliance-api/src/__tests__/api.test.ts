@@ -1328,6 +1328,16 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(b.price_snapshot).toBeTruthy();
     });
 
+    it('GET /provider/:key/bookings sagt, ob der Anbieter den Lead schon bewertet hat — eine Nutzer-Bewertung zaehlt nicht', async () => {
+        const bookingId = await gebucht();
+        (db.reviews ??= []).push({ id: randomUUID(), booking_id: bookingId, provider_key: 'test-kanzlei', from_role: 'user', rating: 5 });
+        let b = (await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'key' })).body.bookings.find((x: any) => x.id === bookingId);
+        expect(b.reviewed).toBe(false);
+        db.reviews.push({ id: randomUUID(), booking_id: bookingId, provider_key: 'test-kanzlei', from_role: 'provider', rating: 4 });
+        b = (await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'key' })).body.bookings.find((x: any) => x.id === bookingId);
+        expect(b.reviewed).toBe(true);
+    });
+
     it('das Thema der Lead-Karte kommt aus dem Ledger, nicht aus einer aelteren Anfrage', async () => {
         const bookingId = await gebucht();
         // Eine fruehere Anfrage desselben Nutzers an diesen Anbieter, anderes Thema.

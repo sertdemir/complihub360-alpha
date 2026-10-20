@@ -87,10 +87,20 @@ const REBOOKED: Array<{ id: string; from: string; key: string; slot_start: strin
 // Punkt 1 (Canvas E1): Bewertungen des Nutzers je Buchung, wie der Server sie
 // ueber `reviewed` an der Termin-Liste meldet.
 const REVIEWED = new Set<string>();
+// Lead-Bewertungen des Anbieters (from_role=provider) — eigene Menge, wie beim Server.
+const PROVIDER_REVIEWED = new Set<string>();
 
 // POST /reviews wie der Server: einmal je Buchung, nur nach dem Termin.
 function submitReviewMock(body: Record<string, unknown>) {
   const id = String(body.booking_id ?? '');
+  if (body.from_role === 'provider') {
+    const lead = partnerBookings().find((x) => x.id === id);
+    if (!lead) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Booking not found' };
+    if (lead.status === 'cancelled' || (lead.status !== 'completed' && Date.parse(lead.slot_start) > Date.now())) return { __status: 409, errorCode: 'BOOKING_NOT_HELD', message: 'Reviews are possible after the consultation took place' };
+    if (PROVIDER_REVIEWED.has(id)) return { __status: 409, errorCode: 'ALREADY_REVIEWED', message: 'This booking has already been reviewed' };
+    PROVIDER_REVIEWED.add(id);
+    return { ok: true, __status: 201 };
+  }
   const row = bookings().find((x) => x.id === id);
   if (!row) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Booking not found' };
   const held = row.status !== 'cancelled' && (row.status === 'completed' || Date.parse(row.slot_start) <= Date.now());
@@ -261,7 +271,7 @@ function partnerBookings() {
   const k = (id: string, start: string, status: string, email: string, company: string | null, category: string, country: string, message: string, l: ReturnType<typeof lead> | null) => {
     const end = new Date(new Date(start).getTime() + 30 * 60_000).toISOString(); const st = STATUS_OVERRIDE[id] ?? status;
     return { id, slot_start: start, slot_end: end, status: st, lead_charged: true, user_email: email, user_company: company, category, country, message,
-       lead: l, user_discount_pct: l ? 10 : null, proposal: PROPOSALS[id] ?? null, acknowledgement_version: l ? 'booking-ack-v1' : null, price_snapshot: null, ...attendanceFields(id, st, end) };
+       lead: l, user_discount_pct: l ? 10 : null, proposal: PROPOSALS[id] ?? null, acknowledgement_version: l ? 'booking-ack-v1' : null, price_snapshot: null, reviewed: PROVIDER_REVIEWED.has(id), ...attendanceFields(id, st, end) };
   };
   return [
     k('m0ck-b02', iso(1, 9), 'confirmed', 'a.weber@acme-gmbh.example', 'Acme GmbH', 'product-packaging', 'DE', 'LUCID-Registrierung und Mengenmeldung für den Marktplatz-Start.', lead(2, 14900, 10, 3)),
@@ -1260,6 +1270,7 @@ export function resetMockState(): void {
   AVAIL.timezone = init.AVAIL.timezone;
   API_STATE.clients = init.API_STATE.clients;
   REVIEWED.clear();
+  PROVIDER_REVIEWED.clear();
 }
 
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {

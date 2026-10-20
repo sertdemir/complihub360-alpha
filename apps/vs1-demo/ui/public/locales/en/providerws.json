@@ -652,7 +652,21 @@
     "reportOpen": "Awaiting your report",
     "proposalSaveFailed": "Not saved. Please try again.",
     "attChoiceRequired": "Please choose how the appointment went.",
-    "rateRequired": "Please choose a rating from 1 to 5 stars."
+    "rateRequired": "Please choose a rating from 1 to 5 stars.",
+    "rateSubmit": "Send rating",
+    "rateStar": "{{n}} of 5 stars",
+    "rateFailed": {
+      "heading": "We couldn’t send your rating",
+      "message": "Your stars are still selected. Please try again. If the problem continues, contact support."
+    },
+    "rateAlready": {
+      "heading": "You’ve already rated this lead",
+      "message": "Your earlier rating is saved. Each lead can be rated once."
+    },
+    "rateNotHeld": {
+      "heading": "This lead can’t be rated yet",
+      "message": "Ratings are possible once the appointment has taken place."
+    }
   },
   "intake": {
     "inviteOnlyTitle": "Provider intake is invite-only.",

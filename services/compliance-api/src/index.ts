@@ -1488,6 +1488,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             const reports = (await supabaseApi.select('lead_proposal_reports', { provider_key: providerKey }, { limit: 500 })) as any[];
             const ledgerById: Record<string, any> = {}; ledgerRows.forEach((l: any) => { ledgerById[l.id] = l; });
             const reportByBooking: Record<string, any> = {}; reports.forEach((r: any) => { reportByBooking[r.booking_id] = r; });
+            // Lead-Bewertung (wie Punkt 1 beim Nutzer): ob der Anbieter den
+            // Lead schon bewertet hat, kommt vom Server. Vorher kannte das nur
+            // der Speicher der Seite — nach dem Neuladen standen die Sterne
+            // wieder da. Scheitert der Abgleich, bleiben die Termine lesbar;
+            // der Server antwortet dann ALREADY_REVIEWED, und die Seite sagt es.
+            const reviewedByProvider = new Set<string>();
+            try {
+                const revs = (await supabaseApi.select('reviews', { provider_key: providerKey, from_role: 'provider' }, { limit: 1000 })) as any[];
+                for (const r of revs) if (r.booking_id) reviewedByProvider.add(r.booking_id);
+            } catch {
+                structuredLog('warn', 'Provider reviewed flag lookup failed', { correlationId, errorCode: 'ERR_PROVIDER_BOOKINGS_REVIEWED', severity: 'warn', route: req.url });
+            }
             const bookings = rows.map((b: any) => {
                 const anfrage = b.user_id ? anfrageVon[b.user_id] : undefined;
                 const company = typeof anfrage?.structured_answers?.company === 'string' ? anfrage.structured_answers.company.trim() : '';
@@ -1519,6 +1531,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     } : null,
                     user_discount_pct: b.user_discount_pct ?? null,
                     proposal: rep ? { proposal_issued: !!rep.proposal_issued, discount_shown: !!rep.discount_shown, reported_at: rep.reported_at } : null,
+                    reviewed: reviewedByProvider.has(b.id),
                     ...attendanceFields(b, attPolicy, nowIso),
                 };
             });

@@ -590,7 +590,7 @@
     },
     "rateLead": "Valorar este lead",
     "rated": "✓ Lead valorado",
-    "rateNote": "¿El lead era cualificado? Tu valoración alimenta nuestra calidad interna de leads.",
+    "rateNote": "¿El lead era cualificado? Su valoración alimenta nuestra calidad interna de leads.",
     "leadBand": "Banda {{band}} · {{label}}",
     "leadDiscountCounter": "Descuento del plan {{pct}} % · lead {{n}} de este ciclo",
     "leadStandardFee": "Tarifa estándar · cupo agotado",
@@ -631,7 +631,22 @@
     "attLinePlatform": "Fallo de la plataforma · el cliente puede volver a reservar hasta el {{deadline}}",
     "attRebookedFrom": "Nueva reserva de una cita anterior · sin segunda tarifa de lead",
     "reportOpen": "Pendiente de su informe",
-    "proposalSaveFailed": "No se ha guardado. Inténtelo de nuevo."
+    "proposalSaveFailed": "No se ha guardado. Inténtelo de nuevo.",
+    "rateSubmit": "Enviar valoración",
+    "rateStar": "{{n}} de 5 estrellas",
+    "rateRequired": "Elija una valoración de 1 a 5 estrellas.",
+    "rateFailed": {
+      "heading": "No pudimos enviar su valoración",
+      "message": "Sus estrellas siguen seleccionadas. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
+    },
+    "rateAlready": {
+      "heading": "Ya ha valorado este lead",
+      "message": "Su valoración anterior está guardada. Cada lead puede valorarse una vez."
+    },
+    "rateNotHeld": {
+      "heading": "Este lead aún no se puede valorar",
+      "message": "Las valoraciones son posibles una vez celebrada la cita."
+    }
   },
   "intake": {
     "inviteOnlyTitle": "El alta de proveedores es solo por invitación.",
