@@ -439,18 +439,38 @@ export function TermsPage() {
 // ePrivacy or needs consent, is left to counsel.
 
 const STORAGE_KEYS: { name: string; scope: 'local' | 'session'; en: string; de: string }[] = [
+  // Anmeldung: schreibt das Supabase-SDK selbst (lib/supabase.ts, persistSession,
+  // flowType 'pkce'); „…" steht fuer die Projektkennung im Namen.
+  { name: 'sb-…-auth-token', scope: 'local',
+    en: 'Your sign-in. Keeps you signed in and is sent with each request so we know it is you. Removed when you sign out.',
+    de: 'Ihre Anmeldung. Hält Sie angemeldet und wird bei jeder Anfrage mitgeschickt, damit wir wissen, dass Sie es sind. Wird beim Abmelden entfernt.' },
+  { name: 'sb-…-auth-token-code-verifier', scope: 'local',
+    en: 'A one-time check value while you sign in with an e-mail link. Used once to complete the sign-in.',
+    de: 'Ein einmaliger Prüfwert, während Sie sich per E-Mail-Link anmelden. Wird einmal verwendet, um die Anmeldung abzuschließen.' },
+  { name: 'ch360_logout_at', scope: 'local',
+    en: 'When you last signed out, so other open tabs do not mistake it for an expired session. Only read for ten seconds.',
+    de: 'Zeitpunkt Ihrer letzten Abmeldung, damit andere offene Tabs sie nicht für eine abgelaufene Sitzung halten. Wird nur zehn Sekunden lang ausgewertet.' },
+  { name: 'ch360_return_to', scope: 'local',
+    en: 'The page you were on when your session expired, so you return there after signing in. Deleted once used, ignored after one hour.',
+    de: 'Die Seite, auf der Ihre Sitzung abgelaufen ist, damit Sie nach der Anmeldung dorthin zurückkehren. Wird nach Gebrauch gelöscht und nach einer Stunde nicht mehr beachtet.' },
+  { name: 'ch360_session_expired', scope: 'session',
+    en: 'A note that your session has expired, with your e-mail address, so the sign-in page can say so and fill in the address. Cleared when you close the tab.',
+    de: 'Ein Hinweis, dass Ihre Sitzung abgelaufen ist, mit Ihrer E-Mail-Adresse, damit die Anmeldeseite das sagen und die Adresse vorbelegen kann. Wird beim Schließen des Tabs verworfen.' },
   { name: 'ch360_last_profile', scope: 'local',
     en: 'Your most recent wizard answers, so the risk map can be restored when you come back.',
     de: 'Ihre zuletzt im Assistenten gemachten Angaben, damit die Risk Map beim Wiederkommen erhalten bleibt.' },
   { name: 'ch360_guest_key', scope: 'local',
     en: 'A random identifier that lets sessions be saved before you register. Not linked to a name or e-mail.',
     de: 'Eine Zufallskennung, mit der Sitzungen schon vor der Registrierung gespeichert werden. Ohne Bezug zu Name oder E-Mail.' },
-  { name: 'ch360_last_session_id', scope: 'local',
-    en: 'Points to the session you last saved, so it can be reopened.',
-    de: 'Verweist auf die zuletzt gespeicherte Sitzung, damit sie wieder geöffnet werden kann.' },
   { name: 'ch360_adopted_for', scope: 'local',
     en: 'Records that a guest session has already been transferred to your account, to avoid doing it twice.',
     de: 'Hält fest, dass eine Gast-Sitzung bereits Ihrem Konto zugeordnet wurde, damit das nicht doppelt geschieht.' },
+  { name: 'ch360_keep_waiting', scope: 'local',
+    en: 'Requests for which you chose “Keep Waiting”, so that reminder stays hidden. Only in this browser.',
+    de: 'Anfragen, bei denen Sie „Weiter warten“ gewählt haben, damit dieser Hinweis ausgeblendet bleibt. Nur in diesem Browser.' },
+  { name: 'ch360_booking_confirmed_<id>', scope: 'session',
+    en: 'The confirmation of a booking you have just made, including your message, so the page survives a reload. Cleared when you close the tab.',
+    de: 'Die Bestätigung einer gerade getätigten Buchung samt Ihrer Nachricht, damit die Seite ein Neuladen übersteht. Wird beim Schließen des Tabs verworfen.' },
   { name: 'ch360-theme', scope: 'local',
     en: 'Your light/dark mode choice.',
     de: 'Ihre Auswahl zwischen hellem und dunklem Erscheinungsbild.' },
@@ -460,12 +480,18 @@ const STORAGE_KEYS: { name: string; scope: 'local' | 'session'; en: string; de: 
   { name: 'ch360_assistant', scope: 'local',
     en: 'Switch for the VAT assistant, set only if you open a link carrying that parameter.',
     de: 'Schalter für den USt-Assistenten, wird nur gesetzt, wenn Sie einen Link mit diesem Parameter öffnen.' },
+  { name: 'c360_nav_domains_open', scope: 'local',
+    en: 'Whether the compliance areas in the side menu are expanded.',
+    de: 'Ob die Compliance-Bereiche im Seitenmenü aufgeklappt sind.' },
+  { name: 'c360_chunk_reload_at', scope: 'session',
+    en: 'When the page last reloaded itself after an update, so it never does so in a loop. Cleared when you close the tab.',
+    de: 'Zeitpunkt, zu dem sich die Seite nach einem Update zuletzt selbst neu geladen hat, damit das nie in einer Schleife geschieht. Wird beim Schließen des Tabs verworfen.' },
   { name: 'complihub360.compliance.country', scope: 'session',
     en: 'The country you selected on the compliance areas page. Cleared when you close the tab.',
     de: 'Das auf der Seite „Compliance-Bereiche" gewählte Land. Wird beim Schließen des Tabs verworfen.' },
   { name: 'demo_is_logged_in, demo_user_role, demo_user_name', scope: 'local',
-    en: 'Demo login state. Only written in demo mode, never in the production build.',
-    de: 'Zustand des Demo-Logins. Wird nur im Demo-Modus geschrieben, nie im Produktivstand.' },
+    en: 'Demo login state. Only written in demo mode, never in the production build. There, the role is sent along with requests.',
+    de: 'Zustand des Demo-Logins. Wird nur im Demo-Modus geschrieben, nie im Produktivstand. Dort wird die Rolle bei Anfragen mitgeschickt.' },
 ];
 
 function StorageTable({ de }: { de: boolean }) {
@@ -514,21 +540,24 @@ export function CookiePage() {
         <Section heading={t('cookies.headings.noCookies')}>
           <p>
             Wir binden kein Tracking, keine Werbenetzwerke und keine Analyse-Dienste ein, die Cookies setzen würden. Ihr
-            Verhalten auf der Seite wird nicht über Sitzungen oder Websites hinweg verfolgt.
+            Verhalten auf der Seite wird nicht über Sitzungen oder Websites hinweg verfolgt. Für Besuchszahlen nutzen wir
+            eine selbst betriebene Plausible-Instanz: Sie setzt keine Cookies und legt nichts in Ihrem Browser ab.
           </p>
         </Section>
         <Section heading={t('cookies.headings.storage')}>
           <p>
-            Die folgenden Einträge legt die Anwendung in Ihrem Browser ab. Sie verbleiben auf Ihrem Gerät und werden nicht
-            als solche an uns übertragen:
+            Die folgenden Einträge legt die Anwendung in Ihrem Browser ab. Zwei davon werden bei Anfragen mitgeschickt, weil
+            das ihre Aufgabe ist: Ihre Anmeldung und die Gast-Kennung. Alle anderen verlassen Ihr Gerät nicht — außer den
+            Demo-Einträgen, die es nur im Demo-Modus gibt.
           </p>
           <StorageTable de />
         </Section>
         <Section heading={t('cookies.headings.purposes')}>
           <p>
-            Alle Einträge dienen dem Betrieb: Sie erhalten Ihre Eingaben über einen Seitenwechsel hinweg, merken sich Ihre
-            Sprach- und Darstellungswahl und ermöglichen es, eine Sitzung schon vor der Registrierung zu speichern. Kein
-            Eintrag dient der Reichweitenmessung, der Profilbildung oder der Werbung.
+            Alle Einträge dienen dem Betrieb: Sie halten Sie angemeldet, bringen Sie nach einer abgelaufenen Sitzung an die
+            richtige Stelle zurück, erhalten Ihre Eingaben über einen Seitenwechsel hinweg, merken sich Ihre Sprach- und
+            Darstellungswahl und ermöglichen es, eine Sitzung schon vor der Registrierung zu speichern. Kein Eintrag dient
+            der Reichweitenmessung, der Profilbildung oder der Werbung.
           </p>
         </Section>
         <Section heading={t('cookies.headings.consent')}>
@@ -542,8 +571,8 @@ export function CookiePage() {
           <p>
             Sie können diese Daten jederzeit selbst entfernen, indem Sie in Ihrem Browser die Website-Daten für diese Domain
             löschen (in den meisten Browsern unter Einstellungen &rsaquo; Datenschutz &rsaquo; Website-Daten). Danach
-            starten Sie ohne gespeicherte Angaben, gespeicherte Sitzungen sind über Ihr Konto weiterhin erreichbar. Der
-            Eintrag mit sessionStorage verschwindet ohnehin, sobald Sie den Tab schließen.
+            starten Sie ohne gespeicherte Angaben und sind abgemeldet, gespeicherte Sitzungen sind über Ihr Konto weiterhin
+            erreichbar. Die Einträge mit sessionStorage verschwinden ohnehin, sobald Sie den Tab schließen.
           </p>
         </Section>
         <Section heading={t('cookies.headings.thirdParty')}>
@@ -572,21 +601,23 @@ export function CookiePage() {
       <Section heading={t('cookies.headings.noCookies')}>
         <p>
           We embed no tracking, no ad networks, and no analytics services that would set cookies. Your behaviour is not
-          followed across sessions or across sites.
+          followed across sessions or across sites. For visitor numbers we use a self-hosted Plausible instance: it sets no
+          cookies and stores nothing in your browser.
         </p>
       </Section>
       <Section heading={t('cookies.headings.storage')}>
         <p>
-          The application stores the following entries in your browser. They stay on your device and are not transmitted to
-          us as such:
+          The application stores the following entries in your browser. Two of them are sent along with requests, because
+          that is their job: your sign-in and the guest key. All others stay on your device, apart from the demo entries,
+          which only exist in demo mode.
         </p>
         <StorageTable de={false} />
       </Section>
       <Section heading={t('cookies.headings.purposes')}>
         <p>
-          Every entry serves operation: keeping your input across a page change, remembering your language and appearance
-          choice, and letting a session be saved before you register. None of them is used for audience measurement,
-          profiling, or advertising.
+          Every entry serves operation: keeping you signed in, bringing you back to the right place after an expired session,
+          keeping your input across a page change, remembering your language and appearance choice, and letting a session be
+          saved before you register. None of them is used for audience measurement, profiling, or advertising.
         </p>
       </Section>
       <Section heading={t('cookies.headings.consent')}>
@@ -599,8 +630,9 @@ export function CookiePage() {
       <Section heading={t('cookies.headings.manage')}>
         <p>
           You can remove this data yourself at any time by clearing the site data for this domain in your browser (in most
-          browsers under Settings &rsaquo; Privacy &rsaquo; Site data). You will then start with nothing stored; sessions you
-          saved remain reachable through your account. The sessionStorage entry disappears as soon as you close the tab.
+          browsers under Settings &rsaquo; Privacy &rsaquo; Site data). You will then start with nothing stored and signed out;
+          sessions you saved remain reachable through your account. The sessionStorage entries disappear as soon as you close
+          the tab.
         </p>
       </Section>
       <Section heading={t('cookies.headings.thirdParty')}>

@@ -37,7 +37,7 @@
       "gold": "gereken",
       "post": " uyum işleri."
     },
-    "subtitleDesktop": "CompliHub360, Avrupa pazarlarındaki operasyonlarınız için geçerli kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize altı dakika. Hesap gerekmez.",
+    "subtitleDesktop": "CompliHub360, Avrupa pazarlarındaki operasyonlarınız için geçerli kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize yaklaşık beş dakika. Hesap gerekmez.",
     "subtitleMobile": "CompliHub360, Avrupa pazarlarındaki kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize altı dakika. Hesap gerekmez.",
     "cta": {
       "start": "İhtiyaçlarımı değerlendir",
@@ -49,7 +49,7 @@
       "Kredi kartı gerekmez",
       "Sonuçlar tarayıcınızda"
     ],
-    "visualCaption": "Altı dakika · 4 soru · Hesap gerekmez",
+    "visualCaption": "Yaklaşık beş dakika · 4 soru · Hesap gerekmez",
     "preview": {
       "context": "Sınır ötesi lansman — DE → UK + NL",
       "steps": [
@@ -75,14 +75,15 @@
       "placeholder": "Durumunuzu kendi kelimelerinizle anlatın…",
       "answer": "Bir uyum sorusu sorun",
       "guided": "İhtiyaçlarımı değerlendir",
-      "trust": "Ücretsiz · anonim · 3 dakikadan kısa"
+      "trust": "Ücretsiz · anonim · yaklaşık beş dakika"
     }
   },
   "heroWorld": {
     "title": {
-      "line2": "Basitleştirildi."
+      "line2": "Sonraki adımı bilin.",
+      "line1": "İşletmeniz için neyin geçerli olduğunu anlayın."
     },
-    "lead": "Yükümlülüklerinizi anlayın. Doğru uzmanları bulun. Sattığınız her yerde uyumlu kalın.",
+    "lead": "{{markets}} pazardaki yükümlülükleriniz, her biri kaynağıyla. İhtiyaç duyduğunuzda doğru uzman.",
     "ctaRiskMap": "İhtiyacımı değerlendir",
     "ask": {
       "placeholder": "Talebinizi kısaca anlatın",
@@ -112,7 +113,7 @@
       },
       {
         "title": "Uzman ağı",
-        "desc": "Güvenebileceğiniz doğrulanmış uzmanlar."
+        "desc": "Her hizmet ve pazar için kanıtlarla doğrulanmış uzmanlar."
       },
       {
         "title": "Akıllı teknoloji",
@@ -124,7 +125,7 @@
       },
       {
         "title": "Verileriniz güvende",
-        "desc": "Kurumsal düzeyde güvenlik ve veri koruması."
+        "desc": "Anonim değerlendirme. Herhangi bir yapay zeka metninizi görmeden önce tanımlayıcılar maskelenir."
       }
     ]
   },
@@ -550,7 +551,7 @@
     "drawerLabel": "İlerlemenizi kaydedin"
   },
   "riskMapPreview": {
-    "guestNote": "Misafir haritası · 30 dk içinde sona erer",
+    "guestNote": "Misafir haritası · 30 dk saklanır — kalıcı olması için kaydedin",
     "eyebrow": "Risk Map'iniz",
     "title": "Size uygulananlar bunlar.",
     "stats": [
@@ -574,28 +575,28 @@
     "rows": [
       {
         "title": "OSS üç aylık beyanı",
-        "detail": "Son beyan: Q1 2025 · Ceza: €5,000 + aylık %1 · UStG §18i",
+        "detail": "Son beyan: Q1 2025 · Sonraki beyan · UStG §18i",
         "market": "DE · NL",
         "due": "30 Nis",
         "dueSub": "6 gün"
       },
       {
         "title": "KDV kaydı — UK",
-        "detail": "Brexit sonrası eşik kontrolü · €20,000'a kadar · VATA §3",
+        "detail": "Brexit sonrası eşik kontrolü · VATA §3",
         "market": "UK",
         "due": "15 May",
         "dueSub": "21 gün"
       },
       {
         "title": "EPR ambalaj kaydı (LUCID)",
-        "detail": "Üretici statüsü doğrulanacak · €50,000'a kadar · VerpackG",
+        "detail": "Üretici statüsü doğrulanacak · VerpackG",
         "market": "DE",
         "due": "02 May",
         "dueSub": "8 gün"
       },
       {
         "title": "EPR kayıt yenilemesi (PackUK)",
-        "detail": "Son beyan: Nis 2024 · UK cirosunun %4'ü · Packaging Regs",
+        "detail": "Son beyan: Nis 2024 · Yenileme bekliyor · Packaging Regs",
         "market": "UK",
         "due": "15 May",
         "dueSub": "21 gün"
@@ -652,28 +653,28 @@
     "rows": [
       {
         "title": "OSS üç aylık beyanı",
-        "detail": "Son beyan: Q1 2025 · Ceza: €5,000 + aylık %1 · UStG §18i (OSS)",
+        "detail": "Son beyan: Q1 2025 · Sonraki beyan bekliyor · UStG §18i (OSS)",
         "market": "DE · NL",
         "due": "30 Nis",
         "dueSub": "6 gün"
       },
       {
         "title": "KDV kaydı — UK",
-        "detail": "Brexit sonrası eşik kontrolü gerekli · Ceza: €20,000'a kadar · UK VATA 1994 §3",
+        "detail": "Brexit sonrası eşik kontrolü gerekli · UK VATA 1994 §3",
         "market": "UK",
         "due": "15 May",
         "dueSub": "21 gün"
       },
       {
         "title": "EPR ambalaj kaydı (LUCID)",
-        "detail": "Üretici statüsü doğrulanacak · Ceza: €50,000'a kadar · VerpackG Art. 9 Abs. 1",
+        "detail": "İlk sevkiyattan önce üretici statüsü doğrulanacak · VerpackG §9",
         "market": "DE",
         "due": "02 May",
         "dueSub": "8 gün"
       },
       {
         "title": "EPR kayıt yenilemesi (PackUK)",
-        "detail": "Son beyan: Nis 2024 · Ceza: UK cirosunun %4'ü · UK Packaging Regs. 2023 §7",
+        "detail": "Son beyan: Nis 2024 · Yenileme bekliyor · UK Packaging Regs. 2023 §7",
         "market": "UK",
         "due": "15 May",
         "dueSub": "21 gün"
@@ -701,7 +702,7 @@
       },
       {
         "title": "Gerçek faydalanıcı güncellemesi",
-        "detail": "Son bildirim: Mar 2025 · Ceza: €1,000–5,000 · GwG §20 Abs. 1",
+        "detail": "Son bildirim: Mar 2025 · Güncelleme bekliyor · GwG §20 Abs. 1",
         "market": "DE",
         "due": "30 Haz",
         "dueSub": "sürekli"
@@ -712,7 +713,7 @@
     "unlock": "En iyi eşleşmelerinizi ücretsiz hesapla görün",
     "save": {
       "title": "Bu haritayı kaydedin. Sağlayıcıların kilidini açın.",
-      "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Beta lansmanına kadar kurucu üye erişimi.",
+      "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Haritanız ve eşleşmeleriniz kayıtlı kalır.",
       "cta": "Ücretsiz hesap oluşturun"
     },
     "statsCompact": [
@@ -784,15 +785,15 @@
     "steps": [
       {
         "title": "Değerlendirmenizi başlatın",
-        "desc": "4–5 soru. 2 dakikadan kısa. Hesap gerekmez."
+        "desc": "Dört soru. Yaklaşık beş dakika. Hesap gerekmez."
       },
       {
         "title": "Risk Map'inizi görün",
         "desc": "Anonim ön izleme, yapılandırılmış, kaynak atıflı."
       },
       {
-        "title": "Eşleşmeleri görmek için kaydolun",
-        "desc": "Sağlayıcı eşleştirmesi kayıtlı hesaplara ayrılmıştır."
+        "title": "Eşleşmeleri görmek için haritanızı kaydedin",
+        "desc": "Ücretsiz bir hesap, haritanızı saklamamızı ve talebinizi doğru sağlayıcıya iletmemizi sağlar. Kredi kartı gerekmez."
       },
       {
         "title": "Yapılandırılmış devirler alın",
@@ -1082,7 +1083,7 @@
       {
         "label": "Marka işareti — Verified Provider",
         "title": "Sorumluluğun sessiz işareti.",
-        "desc": "Verified Provider'lar, dosyanız için ortak sorumluluk üstlenen, denetlenmiş danışmanlardır. Altın işaret özdenetimdir, tanıtım değil."
+        "desc": "Verified Provider'lar, dosyanız için kendi mesleki sorumlulukları altında hesap veren, denetlenmiş danışmanlardır. Altın işaret özdenetimdir, tanıtım değil."
       }
     ],
     "demo": {
@@ -1153,12 +1154,12 @@
       "reqEprMeta": "EPR · Fransa",
       "chipTaxIt": "VERGİ VE KDV · IT",
       "chipPackFr": "AMBALAJ · FR",
-      "riskHigh": "● Yüksek risk · eşik aşıldı",
-      "riskMedium": "● Orta risk · son tarih 3. çeyrek",
+      "riskHigh": "● Yüksek öncelik · eşik aşıldı",
+      "riskMedium": "● Orta öncelik · 3. çeyrekte",
       "chipMonitoring": "İZLEME",
       "chipRequest": "TALEP",
       "chipSla": "SLA",
-      "feedThreshold": "Risk eşiği aşıldı · İtalya KDV",
+      "feedThreshold": "Eşik aşıldı · İtalya KDV",
       "feedReplied": "Sağlayıcı yanıt verdi · Doğrulanmış vergi bürosu",
       "feedSla": "SLA hatırlatması · Veri koruma bürosu · Birleşik Krallık",
       "time6h": "6 sa",

@@ -58,7 +58,6 @@
     "done": "Hecho",
     "cancel": "Cancelar",
     "sendVerification": "Enviar verificación",
-    "errorFallback": "La solicitud falló — inténtelo de nuevo.",
     "sentPrefix": "Verificación enviada a ",
     "sentSuffix": ". El cambio se aplica al hacer clic en el enlace — funciona una sola vez y caduca en 1 hora.",
     "untilThenPrefix": "Hasta entonces, ",
@@ -67,7 +66,12 @@
     "newAddress": "Nueva dirección",
     "notePrefix": "Enviamos un enlace de confirmación a la ",
     "noteNew": "nueva",
-    "noteSuffix": " dirección — nada cambia hasta que se haga clic. Después, el enrutamiento de solicitudes, los recordatorios y las facturas siguen la nueva dirección."
+    "noteSuffix": " dirección — nada cambia hasta que se haga clic. Después, el enrutamiento de solicitudes, los recordatorios y las facturas siguen la nueva dirección.",
+    "sameAddress": "Esta ya es su dirección de contacto.",
+    "sendFailed": {
+      "heading": "No pudimos enviar el enlace de verificación",
+      "message": "Su dirección de contacto no ha cambiado. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
+    }
   },
   "addMarket": {
     "eyebrow": "COBERTURA",
@@ -103,8 +107,8 @@
     "paid": "Pagada",
     "lineItems": "Conceptos",
     "total": "Total",
-    "failedNote": "Pago fallido — reintente o actualice su método de pago en Facturación para evitar el bloqueo del workspace.",
-    "pricingNote": "Modelo de precios: 92 € por encargo confirmado · 2 € por clic de afiliado · 0 € de suscripción.",
+    "failedNote": "El pago no se ha completado. Puede pagar la factura o cambiar su método de pago en Facturación. Su perfil sigue visible; las reservas se pausan solo si la factura sigue abierta 7 días después del vencimiento.",
+    "pricingNote": "Modelo de precios: su suscripción al plan más una tarifa de lead por reserva según su banda de oportunidad — descuentos del plan ya aplicados. Detalles en Facturación.",
     "payAtStripe": "Pagar factura en Stripe",
     "viewAtStripe": "Ver en Stripe"
   },
@@ -266,47 +270,6 @@
     "failedTitle": "Este enlace ya no funciona.",
     "failedBody": "Ya se utilizó o ha caducado (los enlaces son válidos durante 1 hora). Solicite el cambio de nuevo desde Configuración — la dirección actual sigue activa.",
     "openSettings": "Abrir configuración"
-  },
-  "coverage": {
-    "title": "Cobertura",
-    "previewProfile": "Ver perfil público",
-    "viewRankingImpact": "Ver impacto en el ranking",
-    "subtitle": "Su perfil público + pesos de matching. Cada cambio afecta al ranking de búsqueda y al enrutamiento de leads en 60 segundos. Añadir un mercado activa una reverificación de 2 días laborables antes de publicarse.",
-    "rankBannerTitle": "Posición actual en búsqueda: #3 de 47 proveedores DE verificados · últimos 30 días",
-    "rankBannerBody": "Añadir mercados, eliminar dominios o cambiar el objetivo de SLA desplaza su ranking en ~60 s. Los mercados nuevos requieren una nueva verificación.",
-    "edit": "Editar",
-    "publicIdentityTitle": "Identidad pública",
-    "publicIdentitySub": "Cómo le ven los clientes en los resultados de búsqueda",
-    "marketsTitle": "Mercados cubiertos",
-    "marketsSub": "2 activos · añadir un mercado = reverificación de 2 días laborables + reindexación del ranking",
-    "marketGermany": "✓ Alemania · puesto #3 de 47",
-    "marketAustria": "✓ Austria · puesto #5 de 18",
-    "marketNetherlands": "Países Bajos",
-    "marketSwitzerland": "Suiza",
-    "pendingMarketChip": "⏳ {{code}} · verificación pendiente",
-    "addMarketChip": "+ Añadir mercado",
-    "domainsTitle": "Dominios de compliance gestionados",
-    "domainsSub": "3 activos · cada dominio tiene un peso de ranking independiente",
-    "domainVatTitle": "IVA e impuestos indirectos",
-    "domainVatMeta": "8 encargos activos · puesto #3",
-    "domainEprTitle": "Responsabilidad del productor",
-    "domainEprMeta": "3 activos · puesto #2 (nivel superior)",
-    "domainDatTitle": "Protección de datos",
-    "domainDatMeta": "1 activo · puesto #14 (mejorando)",
-    "expansionBannerTitle": "Expandirse a Customs & Excise (CST) desbloquearía la posición de aspirante al puesto #1",
-    "expansionBannerBody": "14 clientes ejecutaron Risk Maps el mes pasado con brechas de cobertura DE + CST · solo 4 proveedores cubren ambos · añadir CST > est. 18-24 k € MRR + probable top-3 en el dominio CST.",
-    "exploreExpansion": "Explorar expansión",
-    "languagesTitle": "Idiomas hablados",
-    "languagesSub": "Los clientes filtran proveedores por idioma · afecta al matching",
-    "slaTitle": "Objetivo de SLA",
-    "slaSub": "Con qué rapidez se compromete a confirmar · afecta directamente a su ranking",
-    "sla6hTitle": "Confirmar en 6 h",
-    "sla6hSub": "nivel superior",
-    "sla12hTitle": "Confirmar en 12 h",
-    "sla12hSub": "recomendado",
-    "sla24hTitle": "Confirmar en 24 h",
-    "sla24hSub": "estándar",
-    "slaNote": "Los objetivos más rápidos elevan su posición — pero incumplirlos daña su puntuación de calidad. Elija lo que pueda cumplir de forma fiable."
   },
   "notifications": {
     "title": "Notificaciones",
@@ -504,8 +467,8 @@
     "deleteConfirmLabel": "Solicitar eliminación",
     "sectionMatchmaking": "Matchmaking",
     "matchmakingTitle": "Perfil de matchmaking",
-    "matchmakingSub": "Lo que ven los usuarios antes de reservar (tarjeta anónima) y en tu página de detalle. Editable en cualquier momento.",
-    "billingModelLabel": "Modelo de facturación — aparece en tu tarjeta anónima",
+    "matchmakingSub": "Lo que ven los usuarios antes de reservar (tarjeta anónima) y en su página de detalle. Editable en cualquier momento.",
+    "billingModelLabel": "Modelo de facturación — aparece en su tarjeta anónima",
     "billingModel": {
       "abo": "Suscripción",
       "hourly": "Por horas",
@@ -514,7 +477,7 @@
     },
     "regionLabel": "Región",
     "activeSinceLabel": "Activo desde",
-    "pricingTableLabel": "Tabla de precios — visible en tu página de detalle",
+    "pricingTableLabel": "Tabla de precios — visible en su página de detalle",
     "pricingAddRow": "+ Añadir fila",
     "pricingRemoveRow": "Eliminar fila",
     "pricingServicePh": "Servicio",
@@ -597,7 +560,10 @@
         "sat": "Sá",
         "sun": "Do"
       }
-    }
+    },
+    "activeSinceReadonly": "«Activo desde» forma parte de sus datos verificados, como el nombre de su empresa. Lo cambia a través de su solicitud.",
+    "activeSinceNone": "No se muestra",
+    "previewActiveSince": "activo desde {{year}}"
   },
   "termine": {
     "title": "Citas y <accent>leads</accent>.",
@@ -723,7 +689,16 @@
       "email": "Correo de contacto",
       "website": "Sitio web",
       "languages": "Idiomas (separados por comas)",
-      "region": "Región"
+      "region": "Región",
+      "activeSince": "Activo desde",
+      "activeSincePh": "p. ej., 2015",
+      "activeSinceHint": "Año en que empezó a ofrecer estos servicios. Déjelo vacío para no mostrarlo.",
+      "activeSinceInvalid": "Indique un año entre 1900 y {{max}}, por ejemplo 2015.",
+      "reviewNote": "Los cambios en el nombre de la empresa, el sitio web y «Activo desde» se aplican de inmediato. Nuestro equipo de revisión los comprueba en un plazo de 3 días hábiles.",
+      "activeSinceRemoved": {
+        "heading": "Guardado",
+        "message": "«Activo desde» ya no se muestra a los usuarios."
+      }
     },
     "legal": {
       "note": "Solo nuestro equipo de revisión ve estos datos. Nunca aparecen en su tarjeta.",
@@ -766,7 +741,8 @@
         "limited": "Aprobado en parte",
         "paused": "En pausa",
         "retired": "Retirado"
-      }
+      },
+      "addFailed": "No pudimos añadir el servicio"
     },
     "coverageStatus": {
       "pending": "Solicitado",
@@ -1018,6 +994,15 @@
       "plannedFrom": "programado a partir del {{date}}",
       "plannedShort": "Cambio programado",
       "withdrawFields": "Retirar: {{fields}}"
+    },
+    "errors": {
+      "serviceExists": "Este servicio ya está en su lista.",
+      "serviceCodeFixed": "La categoría de un servicio no se puede cambiar. Retire este servicio y añada uno nuevo.",
+      "serviceRetired": "Este servicio se ha retirado y ya no se puede editar."
+    },
+    "saveFailed": {
+      "heading": "No pudimos guardar sus cambios",
+      "message": "Sus datos siguen aquí. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
     }
   },
   "verification": {
@@ -1148,7 +1133,11 @@
       "cancel": "Cancelar",
       "done_one": "Comunicado. {{count}} servicio está en pausa; nuestro equipo de revisión se pondrá en contacto.",
       "done_other": "Comunicado. {{count}} servicios están en pausa; nuestro equipo de revisión se pondrá en contacto.",
-      "doneNone": "Comunicado. Nuestro equipo de revisión se pondrá en contacto."
+      "doneNone": "Comunicado. Nuestro equipo de revisión se pondrá en contacto.",
+      "sendFailed": {
+        "heading": "No pudimos notificar el cambio",
+        "message": "Sus datos siguen aquí. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
+      }
     }
   },
   "identity": {

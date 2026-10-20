@@ -545,12 +545,14 @@ export async function withdrawScheduled(
  */
 async function executeSchedule(row: any, sched: ScheduledChange, heute: string): Promise<void> {
     const alt = `${row.plan_code}/${row.cadence}`;
-    await supabaseApi.update('provider_subscriptions', { id: row.id }, {
-        status: 'ended', ended_at: new Date().toISOString(),
-        scheduled_action: null, scheduled_plan_code: null, scheduled_plan_version: null,
-        scheduled_cadence: null, scheduled_effective_on: null, scheduled_requested_at: null,
-    });
 
+    // B5 (2026-10-18): ERST der Nachfolger, DANN das Ende. Vorher wurde das
+    // alte Abo beendet und die Vormerkung geleert, bevor das neue eingefuegt
+    // war — warf der Insert, stand der Anbieter ohne Abo, ohne Vormerkung,
+    // ohne Wiederholung und ohne Nachricht. Jetzt bleibt bei einem Fehler das
+    // alte Abo samt Vormerkung stehen, und der naechste Tick versucht es
+    // erneut. Gibt es den Nachfolger schon (Abbruch zwischen Insert und Ende),
+    // wird er wiederverwendet statt ein zweites Mal angelegt.
     if (sched.action === 'plan_change' && sched.planCode && sched.cadence) {
         // Der neue Zyklus beginnt am Stichtag, nicht heute: haengt der Lauf
         // nach, soll das Abo trotzdem ab dem Termin gelten, zu dem es
@@ -558,19 +560,35 @@ async function executeSchedule(row: any, sched: ScheduledChange, heute: string):
         const start = sched.effectiveOn;
         const roll = rollCycle(start, cycleEndFor(start), heute);
         const periode = roll ?? { start, end: cycleEndFor(start) };
-        const cfg = await loadPricingConfig();
-        const plan = cfg.plans.find((p) => p.code === sched.planCode);
-        await supabaseApi.insert('provider_subscriptions', {
-            provider_key: row.provider_key,
-            plan_code: sched.planCode,
-            plan_version: plan?.version ?? row.scheduled_plan_version ?? 1,
-            cadence: sched.cadence,
-            status: 'active',
-            current_period_start: periode.start,
-            current_period_end: periode.end,
-            renewal_date: renewalAfter(start, sched.cadence, heute),
-            source: row.source ?? 'provider_self_serve',
-        });
+        const vorhanden = (await supabaseApi.select('provider_subscriptions', { provider_key: row.provider_key, status: 'active' }, { limit: 10 })) as any[];
+        const nachfolger = vorhanden.find((r) => r.id !== row.id && !r.ended_at
+            && r.plan_code === sched.planCode && r.cadence === sched.cadence && String(r.current_period_start) >= start);
+        if (!nachfolger) {
+            const cfg = await loadPricingConfig();
+            const plan = cfg.plans.find((p) => p.code === sched.planCode);
+            await supabaseApi.insert('provider_subscriptions', {
+                provider_key: row.provider_key,
+                plan_code: sched.planCode,
+                plan_version: plan?.version ?? row.scheduled_plan_version ?? 1,
+                cadence: sched.cadence,
+                status: 'active',
+                current_period_start: periode.start,
+                current_period_end: periode.end,
+                renewal_date: renewalAfter(start, sched.cadence, heute),
+                source: row.source ?? 'provider_self_serve',
+            });
+        } else {
+            structuredLog('warn', 'Scheduled plan change: successor already present — closing the old subscription only', { correlationId: 'watchers', route: 'watchers/subscriptions', providerKey: row.provider_key, subscriptionId: String(row.id), successorId: String(nachfolger.id) } as Record<string, unknown>);
+        }
+    }
+
+    await supabaseApi.update('provider_subscriptions', { id: row.id }, {
+        status: 'ended', ended_at: new Date().toISOString(),
+        scheduled_action: null, scheduled_plan_code: null, scheduled_plan_version: null,
+        scheduled_cadence: null, scheduled_effective_on: null, scheduled_requested_at: null,
+    });
+
+    if (sched.action === 'plan_change' && sched.planCode && sched.cadence) {
         await reviewLog({
             providerKey: row.provider_key, subject: 'subscription', subjectId: String(row.id),
             action: 'subscription_change_executed', from: alt, to: `${sched.planCode}/${sched.cadence}`,
@@ -620,13 +638,16 @@ async function executeSchedule(row: any, sched: ScheduledChange, heute: string):
  */
 export async function runSubscriptionPeriodTick(
     shadow = false, now = new Date(),
-): Promise<{ checked: number; rolled: number; executed: number }> {
+): Promise<{ checked: number; rolled: number; executed: number; errors: number }> {
     const day = now.toISOString().slice(0, 10);
     const rows = (await supabaseApi.select('provider_subscriptions', {}, { limit: 5000 })) as any[];
-    let rolled = 0, checked = 0, executed = 0;
+    let rolled = 0, checked = 0, executed = 0, errors = 0;
     for (const row of rows) {
         if (row.ended_at || row.status === 'ended' || row.status === 'cancelled') continue;
         checked++;
+      // B5: ein Fehler bei EINER Zeile beendet nicht den Pass fuer alle anderen —
+      // und steht mit providerKey im Log, statt namenlos im Zaehler des Waechters.
+      try {
 
         // Faellige Vormerkung zuerst (ADR-0006 B2/C2). Der Stichtag ist
         // `renewal_date` und faellt bei jaehrlicher Zahlweise NICHT mit dem
@@ -657,8 +678,12 @@ export async function runSubscriptionPeriodTick(
             payload: { providerKey: row.provider_key, from: row.current_period_start, to: next.start },
         }).catch(() => { /* Protokoll ist Beiwerk */ });
         rolled++;
+      } catch (err) {
+        errors++;
+        structuredLog('error', 'Subscription tick failed for row', { correlationId: 'watchers', errorCode: 'ERR_SUBSCRIPTION_TICK', severity: 'error', route: 'watchers/subscriptions', providerKey: String(row.provider_key), subscriptionId: String(row.id), detail: String(err).slice(0, 200) } as Record<string, unknown>);
+      }
     }
-    return { checked, rolled, executed };
+    return { checked, rolled, executed, errors };
 }
 
 // ─── Routen ──────────────────────────────────────────────────────────────────

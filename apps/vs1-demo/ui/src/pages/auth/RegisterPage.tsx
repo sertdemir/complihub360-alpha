@@ -11,6 +11,7 @@ import { getSupabase, isSupabaseConfigured, isGoogleLoginEnabled } from "../../l
 import { DOMAINS, type DomainSlug } from "../../lib/domains";
 import { FormErrorSummary, focusField, type FormError } from "../../components/ui/FormErrorSummary";
 import { FieldError, FIELD_ERROR_CLASS, errorAria } from "../../components/ui/FieldError";
+import { authFailureFrom } from "../../lib/serverErrors";
 
 // ─── Auth · die Registrierung ────────────────────────────────────────────────
 // Im hellen Kleid seit 2026-08-28 (Nutzer-Entscheidung, Canvas "Register-Seite":
@@ -49,12 +50,12 @@ const GoogleIcon = () => (
 interface FormData {
     name: string; email: string; password: string; consent: boolean;
     companyName: string; industry: string; companySize: string; country: string; targetMarkets: string[];
-    complianceAreas: string[]; intent: string; urgency: string;
+    complianceAreas: string[]; intent: string;
 }
 const DEFAULT_DATA: FormData = {
     name: "", email: "", password: "", consent: false,
     companyName: "", industry: "", companySize: "", country: "", targetMarkets: [],
-    complianceAreas: [], intent: "", urgency: "",
+    complianceAreas: [], intent: "",
 };
 
 /* Option definitions carry stable values + i18n key segments; labels resolve
@@ -80,7 +81,6 @@ const INTENT_DEFS = [
     { value: "expert", tKey: "expert" },
     { value: "full-service", tKey: "fullService" },
 ] as const;
-const URGENCY_DEFS = ["today", "week", "month", "researching"] as const;
 
 const FIELD =
     "mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35";
@@ -194,7 +194,12 @@ export function RegisterPage() {
     const [step, setStep] = useState(0);
     const [data, setData] = useState<FormData>(DEFAULT_DATA);
     const [loading, setLoading] = useState(false);
-    const [authError, setAuthError] = useState<string | null>(null);
+    // Punkt 2 (Wahl A3, 17.10.2026): nie der Supabase-Text. Ein bestehendes
+    // Konto fuehrt zur selben Seite wie ein neues („Check your inbox“) — die
+    // Registrierung verraet nicht, welche Adressen es schon gibt. Ein zu
+    // schwaches Passwort steht am Feld.
+    const [authError, setAuthError] = useState<"rateLimit" | "registerUnknown" | null>(null);
+    const [weakPassword, setWeakPassword] = useState(false);
     const patch = (d: Partial<FormData>) => setData((prev) => ({ ...prev, ...d }));
 
     const countryOptions = COUNTRY_DEFS.map((c) => ({ value: c.value, label: `${c.flag} ${t(`register.countryNames.${c.value}`)}` }));
@@ -215,7 +220,8 @@ export function RegisterPage() {
         return errs;
     };
     const errors = tried && step === 0 ? accountErrors() : [];
-    const errFor = (id: string) => errors.find((e) => e.id === id)?.message;
+    const errFor = (id: string) => errors.find((e) => e.id === id)?.message
+        ?? (id === "reg-password" && weakPassword ? t("authErrors.weakPassword") : undefined);
 
     const next = () => {
         if (step === 0) {
@@ -252,12 +258,17 @@ export function RegisterPage() {
                     target_markets: data.targetMarkets,
                     compliance_areas: data.complianceAreas,
                     intent: data.intent,
-                    urgency: data.urgency,
                 },
             },
         });
         setLoading(false);
-        if (error) { setAuthError(error.message); return; }
+        if (error) {
+            const f = authFailureFrom(error);
+            if (f === "exists") { navigate(`/${lang}/verify-email`, { state: { email: data.email } }); return; }
+            if (f === "weakPassword") { setWeakPassword(true); setStep(0); setTimeout(() => focusField("reg-password"), 0); return; }
+            setAuthError(f === "rateLimit" ? "rateLimit" : "registerUnknown");
+            return;
+        }
         navigate(`/${lang}/verify-email`, { state: { email: data.email } });
     };
 
@@ -365,7 +376,7 @@ export function RegisterPage() {
 
                     {authError && (
                         <div role="alert" className="mb-5 rounded-lg border border-error-500/30 bg-error-bg px-4 py-2.5 text-body-xs text-error-700">
-                            {authError}
+                            <strong className="font-semibold">{t(`authErrors.${authError}.heading`)}</strong>{" "}{t(`authErrors.${authError}.message`)}
                         </div>
                     )}
 
@@ -399,7 +410,7 @@ export function RegisterPage() {
                                     )}
                                     <Field id="reg-name" label={t("register.nameLabel")} value={data.name} onChange={(v) => patch({ name: v })} placeholder={t("register.namePlaceholder")} autoComplete="name" error={errFor("reg-name")} />
                                     <Field id="reg-email" label={t("register.emailLabel")} type="email" value={data.email} onChange={(v) => patch({ email: v })} placeholder="name@unternehmen.de" autoComplete="email" error={errFor("reg-email")} />
-                                    <Field id="reg-password" label={t("register.passwordLabel")} type="password" value={data.password} onChange={(v) => patch({ password: v })} placeholder={t("register.passwordPlaceholder")} minLength={8} autoComplete="new-password" error={errFor("reg-password")} />
+                                    <Field id="reg-password" label={t("register.passwordLabel")} type="password" value={data.password} onChange={(v) => { patch({ password: v }); setWeakPassword(false); }} placeholder={t("register.passwordPlaceholder")} minLength={8} autoComplete="new-password" error={errFor("reg-password")} />
                                     <label htmlFor="reg-consent" className="mt-5 flex cursor-pointer items-start gap-3">
                                         <input
                                             id="reg-consent"
@@ -483,12 +494,9 @@ export function RegisterPage() {
                                             );
                                         })}
                                     </div>
-                                    <SegmentGroup
-                                        label={t("register.urgencyLabel")}
-                                        options={URGENCY_DEFS.map((k) => ({ value: k, label: t(`register.urgencyOptions.${k}`) }))}
-                                        selected={data.urgency ? [data.urgency] : []}
-                                        onChange={(v) => patch({ urgency: v[v.length - 1] ?? "" })}
-                                    />
+                                    {/* Bis 2026-10-19 stand hier „Dringlichkeit" (Sofort / Diese Woche / …).
+                                        Nichts auf der Nutzerseite hing daran — ein Feld zur Lead-Qualifizierung
+                                        im Moment der Anmeldung. „Ask only what matters" (DNA-Copy-Durchgang). */}
                                 </>
                             )}
                         </motion.div>

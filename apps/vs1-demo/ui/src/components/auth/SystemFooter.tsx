@@ -6,7 +6,7 @@ import { supportedLngs } from "../../i18n/config";
 // Extrahiert aus der LoginPage am 2026-08-28, als die Register-Seite dieselbe
 // Leiste brauchte — die Regel der geteilten FaqList: eine Komponente, kein
 // Nachbau. Dreigeteilt: Betriebsstatus links, Sprachen mittig, Rechtslinks
-// rechts.
+// rechts — der Betriebsstatus ist seit 2026-10-18 leer (siehe unten).
 //
 // Die Sprachen kommen aus supportedLngs und fuehren als echte Links auf
 // denselben Pfad in der anderen Sprache, wie im SiteFooter — die Leiste hatte
@@ -27,9 +27,11 @@ export function SystemFooter({ className = "" }: { className?: string }) {
 
     return (
         <div className={"flex flex-col gap-4 border-t border-stroke-subtle pt-5 text-body-2xs text-fg-tertiary sm:flex-row sm:items-center sm:justify-between " + className}>
-            <span className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-success-500" /> {t("login.footer.operational")}
-            </span>
+            {/* Bis 2026-10-18 stand hier ein gruener Punkt mit "All systems
+                operational" — ohne jeden Check dahinter. Eine Beruhigung, die
+                niemand einloesen konnte (DNA-Copy-Durchgang). Der Platz bleibt,
+                bis eine Statusseite den Punkt tragen kann. */}
+            <span aria-hidden="true" />
             <span className="flex items-center gap-2 font-semibold">
                 {supportedLngs.map((lng, i) => (
                     <span key={lng} className="flex items-center gap-2">

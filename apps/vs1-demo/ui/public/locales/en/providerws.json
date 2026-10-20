@@ -59,7 +59,6 @@
     "done": "Done",
     "cancel": "Cancel",
     "sendVerification": "Send verification",
-    "errorFallback": "Request failed — try again.",
     "sentPrefix": "Verification sent to ",
     "sentSuffix": ". The change applies once the link is clicked — it works one time and expires after 1 hour.",
     "untilThenPrefix": "Until then, ",
@@ -68,7 +67,12 @@
     "newAddress": "New address",
     "notePrefix": "We send a confirmation link to the ",
     "noteNew": "new",
-    "noteSuffix": " address — nothing changes until it's clicked. Request routing, reminders and invoices follow the new address afterwards."
+    "noteSuffix": " address — nothing changes until it's clicked. Request routing, reminders and invoices follow the new address afterwards.",
+    "sameAddress": "This is already your contact address.",
+    "sendFailed": {
+      "heading": "We couldn’t send the verification link",
+      "message": "Your contact address is unchanged. Please try again. If the problem continues, contact support."
+    }
   },
   "addMarket": {
     "eyebrow": "COVERAGE",
@@ -104,8 +108,8 @@
     "paid": "Paid",
     "lineItems": "Line items",
     "total": "Total",
-    "failedNote": "Payment failed — retry or update your payment method in Billing to avoid a workspace lock.",
-    "pricingNote": "Pricing model: €92 per confirmed engagement · €2 per affiliate click · €0 subscription.",
+    "failedNote": "Payment did not go through. You can pay the invoice or change your payment method in Billing. Your profile stays visible; bookings pause only if the invoice is still open 7 days after the due date.",
+    "pricingNote": "Pricing model: your plan subscription plus one lead fee per booking at its opportunity band — plan discounts already deducted. Details under Billing.",
     "payAtStripe": "Pay invoice at Stripe",
     "viewAtStripe": "View at Stripe"
   },
@@ -268,47 +272,6 @@
     "failedTitle": "This link doesn't work anymore.",
     "failedBody": "It was already used or has expired (links are valid for 1 hour). Request the change again from Settings — the current address stays active.",
     "openSettings": "Open settings"
-  },
-  "coverage": {
-    "title": "Coverage",
-    "previewProfile": "Preview public profile",
-    "viewRankingImpact": "View ranking impact",
-    "subtitle": "Your public profile + matching weights. Every edit affects search ranking and lead routing within 60 seconds. Adding a market triggers 2-business-day re-verification before it goes live.",
-    "rankBannerTitle": "Current search rank: #3 of 47 verified DE providers · last 30 days",
-    "rankBannerBody": "Adding markets, removing domains, or changing SLA-target each shifts your ranking within ~60 sec. Verification re-check required for new markets.",
-    "edit": "Edit",
-    "publicIdentityTitle": "Public identity",
-    "publicIdentitySub": "How clients see you in search results",
-    "marketsTitle": "Markets covered",
-    "marketsSub": "2 active · adding a market = 2-BD re-verification + ranking re-index",
-    "marketGermany": "✓ Germany · rank #3 of 47",
-    "marketAustria": "✓ Austria · rank #5 of 18",
-    "marketNetherlands": "Netherlands",
-    "marketSwitzerland": "Switzerland",
-    "pendingMarketChip": "⏳ {{code}} · verification pending",
-    "addMarketChip": "+ Add market",
-    "domainsTitle": "Compliance domains handled",
-    "domainsSub": "3 active · each domain has independent ranking weight",
-    "domainVatTitle": "VAT & Indirect Tax",
-    "domainVatMeta": "8 active engagements · rank #3",
-    "domainEprTitle": "Producer Responsibility",
-    "domainEprMeta": "3 active · rank #2 (top-tier)",
-    "domainDatTitle": "Data Privacy",
-    "domainDatMeta": "1 active · rank #14 (improving)",
-    "expansionBannerTitle": "Expanding into Customs & Excise (CST) would unlock rank-#1 contender position",
-    "expansionBannerBody": "14 customers ran Risk Maps last month with DE + CST coverage gaps · only 4 providers cover both · adding CST > est. €18-24k MRR + likely top-3 in CST domain.",
-    "exploreExpansion": "Explore expansion",
-    "languagesTitle": "Languages spoken",
-    "languagesSub": "Clients filter providers by language · affects matching",
-    "slaTitle": "SLA target",
-    "slaSub": "How fast you commit to confirm · directly affects your ranking",
-    "sla6hTitle": "Confirm within 6h",
-    "sla6hSub": "top-tier",
-    "sla12hTitle": "Confirm within 12h",
-    "sla12hSub": "recommended",
-    "sla24hTitle": "Confirm within 24h",
-    "sla24hSub": "standard",
-    "slaNote": "Faster targets lift your rank — but missing them hurts your quality score. Pick what you can reliably hit."
   },
   "notifications": {
     "title": "Notifications",
@@ -616,7 +579,10 @@
         "sat": "Sat",
         "sun": "Sun"
       }
-    }
+    },
+    "activeSinceReadonly": "“Active since” is part of your checked details, like your company name. You change it in your application.",
+    "activeSinceNone": "Not shown",
+    "previewActiveSince": "active since {{year}}"
   },
   "termine": {
     "title": "Appointments & <accent>leads</accent>.",
@@ -750,7 +716,16 @@
       "email": "Contact email",
       "website": "Website",
       "languages": "Languages (comma-separated)",
-      "region": "Region"
+      "region": "Region",
+      "activeSince": "Active since",
+      "activeSincePh": "e.g. 2015",
+      "activeSinceHint": "Year you started offering these services. Leave empty to hide it.",
+      "activeSinceInvalid": "Please enter a year between 1900 and {{max}}, for example 2015.",
+      "reviewNote": "Changes to company name, website and “active since” go live right away. Our review team checks them within 3 business days.",
+      "activeSinceRemoved": {
+        "heading": "Saved",
+        "message": "“Active since” is no longer shown to users."
+      }
     },
     "legal": {
       "note": "Only our review team sees these details. They never appear on your card.",
@@ -793,7 +768,8 @@
         "limited": "Partly approved",
         "paused": "Paused",
         "retired": "Retired"
-      }
+      },
+      "addFailed": "We couldn’t add the service"
     },
     "coverageStatus": {
       "pending": "Requested",
@@ -1054,7 +1030,14 @@
       "serviceCodeUnknown": "This service code is not in our list. Please check the spelling, for example tax-vat.returns.",
       "countryCode": "Please enter a two-letter country code, for example AT.",
       "countryListed": "{{country}} is already listed for this service. Please enter a different country.",
-      "agreementName": "Please enter your name to accept."
+      "agreementName": "Please enter your name to accept.",
+      "serviceExists": "This service is already in your list.",
+      "serviceCodeFixed": "The category of a service can’t be changed. Retire this service and add a new one instead.",
+      "serviceRetired": "This service has been retired and can no longer be edited."
+    },
+    "saveFailed": {
+      "heading": "We couldn’t save your changes",
+      "message": "Your entries are still here. Please try again. If the problem continues, contact support."
     }
   },
   "verification": {
@@ -1186,7 +1169,11 @@
       "done_one": "Reported. {{count}} service is paused; our review team will get in touch.",
       "done_other": "Reported. {{count}} services are paused; our review team will get in touch.",
       "doneNone": "Reported. Our review team will get in touch.",
-      "dateInvalid": "Please choose the date it happened — today or earlier."
+      "dateInvalid": "Please choose the date it happened — today or earlier.",
+      "sendFailed": {
+        "heading": "We couldn’t report the change",
+        "message": "Your entries are still here. Please try again. If the problem continues, contact support."
+      }
     }
   },
   "identity": {

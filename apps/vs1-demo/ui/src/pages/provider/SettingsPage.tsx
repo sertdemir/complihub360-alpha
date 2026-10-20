@@ -11,7 +11,7 @@ import { CalendarPanel } from '../../components/provider/CalendarPanel';
 import { AvailabilityPanel } from '../../components/provider/AvailabilityPanel';
 import { ApiAccessPanel } from '../../components/provider/ApiAccessPanel';
 import { InboxAddress } from '../../components/contact/SendStates';
-import { AVAILABILITY_EVENT, fetchCoverage, setAvailability, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
+import { fetchCoverage, setAvailability, syncAvailability, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
 import { fetchApplication } from '../../api/application';
 import { CONTACT_INBOX, failureOf, sendContact, type SendFailure } from '../../api/contact';
 import { identityFindingsOf, identityHintFrom } from '../../api/client';
@@ -87,14 +87,14 @@ export function SettingsPage() {
   const [apiEligible, setApiEligible] = useState(false);
 
   useEffect(() => {
+    // Die Kopfzeile schaltet denselben Zustand — beide Stellen zeigen dasselbe.
+    // Ein Umschalten dort ist neuer als die Zeile, die hier noch laedt.
+    const sync = syncAvailability(setAvail);
     fetchCoverage().then((c) => {
       if (c.contact_email) setContactEmail(c.contact_email);
-      setAvail(c.availability ?? 'available');
+      sync.loaded(c.availability ?? 'available');
     }).catch(() => {});
-    // Die Kopfzeile schaltet denselben Zustand — beide Stellen zeigen dasselbe.
-    const onSync = (e: Event) => setAvail((e as CustomEvent<'available' | 'ooo'>).detail);
-    window.addEventListener(AVAILABILITY_EVENT, onSync);
-    return () => window.removeEventListener(AVAILABILITY_EVENT, onSync);
+    return sync.stop;
   }, []);
 
   useEffect(() => {
@@ -262,13 +262,18 @@ export function SettingsPage() {
 // model (shown on the card instead of a price), full pricing table (revealed
 // only on the monetised detail page) and the anonymized identity fields.
 export function MatchmakingPanel() {
-  const { t } = useTranslation('providerws');
+  const { t, i18n } = useTranslation('providerws');
+  const navigate = useNavigate();
   // Startet leer und fuellt sich aus dem gespeicherten Profil. Bis 09.10.2026
   // standen hier Beispielwerte (Norditalien, 2015, drei Preiszeilen) — wer
   // speicherte, schrieb sie in sein oeffentliches Profil.
   const [billing, setBilling] = useState<BillingModel>('project');
   const [region, setRegion] = useState('');
-  const [activeSince, setActiveSince] = useState('');
+  // Punkt 3 (O2): „Aktiv seit" ist eine gepruefte Angabe und wird in der
+  // Bewerbung gepflegt (Change-Control). Hier steht es nur noch zur Ansicht —
+  // bis 18.10.2026 ging es von hier ungeprueft live, und `parseInt(x) || null`
+  // verwarf „seit 2013" still, waehrend „Gespeichert" erschien.
+  const [activeSince, setActiveSince] = useState<number | null>(null);
   const [rows, setRows] = useState<PricingRow[]>([]);
   // Speichern erst, wenn der gespeicherte Stand geladen ist — sonst ueberschreibt
   // ein Klick das Profil mit leeren Feldern.
@@ -288,7 +293,7 @@ export function MatchmakingPanel() {
     fetchCoverage().then((c) => {
       if (c.billing_model) setBilling(c.billing_model);
       setRegion(c.region ?? '');
-      setActiveSince(c.active_since != null ? String(c.active_since) : '');
+      setActiveSince(c.active_since ?? null);
       setRows(Array.isArray(c.pricing_table) ? c.pricing_table : []);
       setLoaded(true);
     }).catch(() => setLoadFailed(true)); // bleibt gesperrt: ohne gespeicherten Stand kein Ueberschreiben
@@ -303,7 +308,6 @@ export function MatchmakingPanel() {
         billing_model: billing,
         pricing_table: rows,
         region,
-        active_since: parseInt(activeSince, 10) || null,
       });
     } catch (e) {
       // Phase 3: der Identitaets-Scan blockiert und benennt die Stelle (422).
@@ -345,7 +349,8 @@ export function MatchmakingPanel() {
       <div className="rounded-lg border border-brand/40 bg-brand-light px-3.5 py-3">
         <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-fg-brand">{t('settings.previewTitle')}</p>
         <p className="mt-1 text-[14px] font-bold text-fg">Verified Provider <span className="text-fg-tertiary">A/B/C</span></p>
-        <p className="text-[12px] text-fg-secondary">{[t('settings.previewAreas'), region.trim()].filter(Boolean).join(' · ')}</p>
+        {/* S1: die Vorschau zeigt, was die Karte zeigt — das Jahr eingeschlossen. */}
+        <p className="text-[12px] text-fg-secondary">{[t('settings.previewAreas'), region.trim(), activeSince != null ? t('settings.previewActiveSince', { year: activeSince }) : ''].filter(Boolean).join(' · ')}</p>
         <p className="mt-1.5 text-[11px] text-fg-tertiary">{t('settings.previewNote')}</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -357,7 +362,14 @@ export function MatchmakingPanel() {
         </div>
         <div>
           <p className="mb-1 text-[12px] font-medium text-fg-secondary">{t('settings.activeSinceLabel')}</p>
-          <Input value={activeSince} onChange={(e) => setActiveSince(e.target.value)} />
+          <div className="flex min-h-[42px] flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="text-[14px] font-semibold text-fg">{activeSince ?? t('settings.activeSinceNone')}</span>
+            <button type="button" className="text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline"
+              onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/provider-dashboard/application`)}>
+              {t('settings.changeViaApplication')}
+            </button>
+          </div>
+          <p className="mt-1 text-[12px] leading-relaxed text-fg-tertiary">{t('settings.activeSinceReadonly')}</p>
         </div>
       </div>
       <div>

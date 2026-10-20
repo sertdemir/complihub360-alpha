@@ -1,35 +1,10 @@
 import { apiFetch } from './client';
 
 // ─── Engagement API ───────────────────────────────────────────────────────────
-// POST /api/v1/engagement — creates the request, issues single-use magic-link
-// tokens server-side and triggers the provider notification (Resend or outbox
-// log). GET/POST provider/* — the magic-link action flow (public action page).
-
-export interface CreateEngagementInput {
-  provider_key: string;
-  country: string;
-  category: string;
-  message: string;
-  structured_answers?: Record<string, unknown>;
-  /** Wave A: link the wizard session (the dossier source). */
-  session_id?: string;
-  /** Identity fields — stored server-side, revealed only via dossier unlock. */
-  requester_email?: string;
-  company?: string;
-}
-
-export interface CreateEngagementResult {
-  id: string;
-  status: string;
-}
-
-export async function createEngagement(input: CreateEngagementInput): Promise<CreateEngagementResult> {
-  const res = await apiFetch<{ ok: boolean; id: string; status: string }>('/api/v1/engagement', {
-    method: 'POST',
-    body: JSON.stringify(input),
-  });
-  return { id: res.id, status: res.status };
-}
+// GET/POST provider/* — the magic-link action flow (public action page).
+// Anfragen entstehen heute ueber die Buchung (api/bookings.ts); der fruehere
+// Helfer fuer POST /api/v1/engagement hatte keinen Aufrufer mehr und ist weg
+// (Punkt 4, 18.10.2026).
 
 // Anonymized dossier (Addendum 2026-07-10): what the provider sees BEFORE
 // confirming — situational context + redacted message, never identity.

@@ -147,14 +147,20 @@ export const CountryRiskMatrix: Record<CountryCode, CountryRiskProfile> = {
     }
 };
 
+// Nur eigene Schluessel zaehlen. `code in CountryRiskMatrix` sah bis
+// 2026-10-19 auch geerbte Eigenschaften: "toString", "constructor" oder
+// "__proto__" galten als bekanntes Land, kamen bis in die Engine und liessen
+// sie werfen — von jedem Gast ausloesbar ueber /search (markets).
+const isOwnCountry = (code: string): boolean =>
+    Object.prototype.hasOwnProperty.call(CountryRiskMatrix, code);
+
 export function getCountryRiskProfile(code: CountryCode): CountryRiskProfile {
-    const profile = CountryRiskMatrix[code];
-    if (!profile) {
+    if (!isOwnCountry(code)) {
         throw new Error(`Country profile not found for code: ${code}`);
     }
-    return profile;
+    return CountryRiskMatrix[code];
 }
 
 export function isKnownCountry(code: string): code is CountryCode {
-    return code in CountryRiskMatrix;
+    return isOwnCountry(code);
 }

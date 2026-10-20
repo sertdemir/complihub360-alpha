@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 // Nutzer-Entscheidung 2026-10-01 (TKT-PROV-06): ist ein Anbieter nicht
 // abrechenbar, erscheint KEIN Buchen-Knopf. Vorher durfte der Nutzer einen
-// Termin waehlen und wurde erst beim Absenden mit 409 BILLING_NOT_READY
+// Termin waehlen und wurde erst beim Absenden mit 409 (heute PROVIDER_NOT_BOOKABLE)
 // abgewiesen — ein Korb nach der Terminwahl ist die schlechteste Variante.
 //
 // WAS DIESER TEST BELEGT: dass der Zweig existiert und VOR dem Knopf greift.

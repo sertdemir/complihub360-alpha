@@ -1,5 +1,5 @@
 import type { PenaltyCeiling } from '@complihub/compliance-engine';
-import { apiFetch } from './client';
+import { ApiError, apiFetch } from './client';
 import type { SearchProfile } from '../components/wizard/WizardContext';
 
 // ─── Search API (Phase-3 wiring) ─────────────────────────────────────────────
@@ -122,6 +122,27 @@ export interface SearchResult {
   /** Aeltere Antworten kennen sie nicht — dann gibt es keinen Befund
    *  "begrenzt", statt einen zu raten. */
   coverage?: SearchCoverage;
+  /** 'failed': die Engine hat nicht gerechnet — `laws` ist leer, weil nichts
+   *  geprueft wurde, nicht weil nichts gilt. Fehlt das Feld (aeltere Antwort),
+   *  gilt 'ok'. Gelesen wird es ueber `lawsOf`, nicht direkt. */
+  laws_status?: 'ok' | 'failed';
+  /** Nur bei `laws_status: 'failed'`: die Referenz-ID fuer "Technical details". */
+  correlationId?: string;
+}
+
+/** Die Pflichten einer Antwort — oder ein Fehler, wenn die Engine nicht
+ *  gerechnet hat. Ohne diese Unterscheidung las sich ein Engine-Ausfall als
+ *  "keine Pflichten gefunden" (Risk Map, PDF-Export), also als Entwarnung
+ *  (DNA §4.5, 18.10.2026). Mit Referenz wird es ein ApiError, damit die
+ *  Flaeche "Technical details" zeigen kann; ohne Referenz ein schlichter
+ *  Fehler — eine erfundene ID fuehrt den Support ins Leere. */
+export function lawsOf(res: SearchResult): SearchLaw[] {
+  if (res.laws_status === 'failed') {
+    // Der Server hat geantwortet (200); gescheitert ist die Engine dahinter.
+    if (res.correlationId) throw new ApiError('Compliance engine failed', 200, res.correlationId, undefined, { errorCode: 'ENGINE_FAILED' });
+    throw new Error('Compliance engine failed');
+  }
+  return res.laws ?? [];
 }
 
 export async function runSearch(profile: Partial<SearchProfile> & { country?: string }): Promise<SearchResult> {

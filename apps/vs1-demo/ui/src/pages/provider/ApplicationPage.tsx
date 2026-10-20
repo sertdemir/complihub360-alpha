@@ -16,6 +16,8 @@ import { FormField } from '../../components/ui/FormField';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ApiError, identityFindingsOf, identityHintFrom } from '../../api/client';
+import { FailureNote } from '../../components/ui/FailureNote';
+import { errorCodeOf, errorFieldOf, saveFailureFrom, type SaveFailure } from '../../lib/serverErrors';
 import { EMAIL_RE } from '../../api/contact';
 import { FormErrorSummary, focusField, type FormError } from '../../components/ui/FormErrorSummary';
 import { FieldError, errorAria } from '../../components/ui/FieldError';
@@ -24,6 +26,15 @@ import {
   type AgreementType, type Application, type ApplicationPatch, type ChangePreview, type ChecklistItem, type Evidence, type EvidenceType, type ProviderChange, type Service, type ServiceInput,
 } from '../../api/application';
 import { cn } from '../../lib/utils';
+import { activeSinceMax, parseActiveSince } from '../../lib/activeSince';
+
+// Speicherfehler ohne Server-Text (Punkt 2, Wahl L1 · C3): Zuordnung in
+// lib/serverErrors.ts, hier nur die Anzeige.
+function SaveFailureView({ failure, heading, className = '' }: { failure: SaveFailure; heading: string; className?: string }) {
+  const { t } = useTranslation('providerws');
+  if (failure.kind === 'text') return <p role="alert" className={`text-[12px] text-error-700 dark:text-red-300 ${className}`}>{failure.text}</p>;
+  return <FailureNote heading={heading} message={t('application.saveFailed.message')} reference={failure.reference} className={className} />;
+}
 
 // ─── Provider · Bewerbung (Dossier) ──────────────────────────────────────────
 // Figma "Provider · Bewerbung — Dossier v2" (Seite "Provider Onboarding
@@ -259,7 +270,7 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
   const { t } = useTranslation('providerws');
   const p = app.provider;
   const [editing, setEditing] = useState(!settled);
-  const [f, setF] = useState({ name: p.name ?? '', contact_email: p.contact_email ?? '', website_url: p.website_url ?? '', languages: (p.languages ?? []).join(', '), region: p.region ?? '' });
+  const [f, setF] = useState({ name: p.name ?? '', contact_email: p.contact_email ?? '', website_url: p.website_url ?? '', languages: (p.languages ?? []).join(', '), region: p.region ?? '', active_since: p.active_since != null ? String(p.active_since) : '' });
   const { save, state, label } = useSave(onSaved);
   const labels = { complete: t('application.state.complete'), open: t('application.state.open') };
   // V2 (11.10.2026): ein Entwurf darf luecken haben — was fuer die Einreichung
@@ -268,9 +279,16 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
   // Fokus dorthin. Nennt der Identitaets-Scan die Region, steht das dort.
   const [tried, setTried] = useState(false);
   const [regionHint, setRegionHint] = useState<string | null>(null);
+  // Punkt 3 (P1): „Aktiv seit" ist ein Jahr von 1900 bis heute oder leer
+  // (= nicht anzeigen). Was der Server trotzdem ablehnt, steht am selben Feld.
+  const [sinceServer, setSinceServer] = useState(false);
+  // L1: Wer das Jahr entfernt, liest, was jetzt gilt — auch nach dem Wechsel
+  // zurueck in die Leseansicht.
+  const [sinceRemoved, setSinceRemoved] = useState(false);
   const errorsOf = (): FormError[] => {
     const errs: FormError[] = [];
     if (f.contact_email.trim() && !EMAIL_RE.test(f.contact_email.trim())) errs.push({ id: 'app-account-contact_email', label: t('application.account.email'), message: t('common:contactSend.field.email') });
+    if (parseActiveSince(f.active_since) === 'invalid' || sinceServer) errs.push({ id: 'app-account-active_since', label: t('application.account.activeSince'), message: t('application.account.activeSinceInvalid', { max: activeSinceMax() }) });
     return errs;
   };
   const errors = tried ? errorsOf() : [];
@@ -281,13 +299,17 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
     const now = errorsOf();
     if (now.length) { focusField(now[0].id); return; }
     setRegionHint(null);
+    setSinceRemoved(false);
+    const since = parseActiveSince(f.active_since) as number | null;
     const ok = await save(
-      { name: f.name, contact_email: f.contact_email, website_url: f.website_url, languages: f.languages.split(',').map((s) => s.trim()).filter(Boolean), region: f.region },
+      { name: f.name, contact_email: f.contact_email, website_url: f.website_url, languages: f.languages.split(',').map((s) => s.trim()).filter(Boolean), region: f.region, active_since: since },
       (e) => {
+        if (errorFieldOf(e) === 'active_since') { setSinceServer(true); focusField('app-account-active_since'); return true; }
         if (identityFindingsOf(e)?.[0]?.field !== 'region') return false;
         setRegionHint(identityHintFrom(e, t)); focusField('app-account-region'); return true;
       },
     );
+    if (ok && since === null && p.active_since != null) setSinceRemoved(true);
     if (ok && settled) setEditing(false);
   };
   return (
@@ -298,6 +320,7 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
           { label: t('application.account.name'), value: p.name }, { label: t('application.account.email'), value: p.contact_email },
           { label: t('application.account.website'), value: p.website_url }, { label: t('application.account.region'), value: p.region },
           { label: t('application.account.languages'), value: (p.languages ?? []).join(', ') },
+          { label: t('application.account.activeSince'), value: p.active_since != null ? String(p.active_since) : null },
         ]} />
       ) : (<>
       <div className="grid gap-4 md:grid-cols-2">
@@ -317,11 +340,30 @@ function AccountPanel({ app, settled, onSaved }: { app: Application; settled: bo
           <FieldError id="app-account-region" alert message={regionHint} />
         </FormField>
       </div>
+      {/* F1: Ziffern-Tastatur, hoechstens vier Zeichen, Label verknuepft. */}
+      <FormField label={t('application.account.activeSince')} htmlFor="app-account-active_since" className="max-w-[300px]"
+        helper={errFor('app-account-active_since') ? undefined : t('application.account.activeSinceHint')}>
+        <Input id="app-account-active_since" inputMode="numeric" maxLength={4} autoComplete="off" value={f.active_since}
+          placeholder={t('application.account.activeSincePh')} aria-describedby="app-account-active_since-msg"
+          onChange={(e) => { setF({ ...f, active_since: e.target.value }); setSinceServer(false); }}
+          error={!!errFor('app-account-active_since')} {...errorAria('app-account-active_since', !!errFor('app-account-active_since'))} />
+        <FieldError id="app-account-active_since" alert message={errFor('app-account-active_since')} />
+      </FormField>
+      {CONTROLLED.has(p.lifecycle_status) && <p className="text-[12px] leading-relaxed text-fg-tertiary">{t('application.account.reviewNote')}</p>}
       <div className="flex items-center gap-3">
         <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={onSave}>{label}</Button>
         {state === 'error' && <span role="alert" className="text-[12px] text-error-700 dark:text-red-300">{t('application.saveError')}</span>}
       </div>
       </>)}
+      {sinceRemoved && (
+        <div role="status" className="flex gap-2.5 rounded-lg border border-brand/40 bg-brand-light px-3.5 py-3">
+          <CheckCircle2 size={16} aria-hidden className="mt-0.5 shrink-0 text-fg-brand" />
+          <div className="text-[12.5px] leading-relaxed">
+            <p className="font-semibold text-fg">{t('application.account.activeSinceRemoved.heading')}</p>
+            <p className="text-fg-secondary">{t('application.account.activeSinceRemoved.message')}</p>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
@@ -391,7 +433,7 @@ function ServicesPanel({ app, changes, onChanged }: { app: Application; changes:
   const [adding, setAdding] = useState(false);
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
-  const [err, setErr] = useState<string | null>(null);
+  const [err, setErr] = useState<SaveFailure | null>(null);
   // V2 (11.10.2026): der Code ist das eine Pflichtfeld. Der Knopf bleibt
   // aktiv; fehlt er oder kennt der Server ihn nicht, steht das am Feld.
   const [codeError, setCodeError] = useState<string | null>(null);
@@ -404,8 +446,9 @@ function ServicesPanel({ app, changes, onChanged }: { app: Application; changes:
     setBusy(true); setErr(null); setCodeError(null);
     try { const s = await createService({ service_code: code.trim(), service_name: name.trim() || undefined }); setOpen(s.id); setAdding(false); setCode(''); setName(''); await onChanged(); }
     catch (e) {
-      if (e instanceof ApiError && e.body.errorCode === 'UNKNOWN_SERVICE_CODE') { setCodeError(t('application.errors.serviceCodeUnknown')); focusField('app-service-code'); return; }
-      setErr(identityHintFrom(e, t) ?? (e instanceof ApiError && e.status === 422 && /categor/i.test(e.message) ? t('application.services.allowanceError') : (e instanceof Error ? e.message : t('application.saveError'))));
+      if (errorCodeOf(e) === 'UNKNOWN_SERVICE_CODE') { setCodeError(t('application.errors.serviceCodeUnknown')); focusField('app-service-code'); return; }
+      if (errorCodeOf(e) === 'SERVICE_EXISTS') { setCodeError(t('application.errors.serviceExists')); focusField('app-service-code'); return; }
+      setErr(saveFailureFrom(e, t));
     }
     finally { setBusy(false); }
   };
@@ -427,7 +470,7 @@ function ServicesPanel({ app, changes, onChanged }: { app: Application; changes:
           <Button size="sm" disabled={busy} onClick={add}>{t('application.services.add')}</Button>
           <Button size="sm" variant="ghost" onClick={() => { setAdding(false); setCodeError(null); }}>{t('application.agreements.cancel')}</Button>
           <FieldError id="app-service-code" alert message={codeError} className="basis-full" />
-          {err && <span role="alert" className="basis-full text-[12px] text-error-700 dark:text-red-300">{err}</span>}
+          {err && <SaveFailureView failure={err} heading={t('application.services.addFailed')} className="basis-full" />}
         </div>
       ) : (
         app.services.length > 0 && (
@@ -497,7 +540,7 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
     try { await putCoverage(s.id, [...codes, country]); setCountry(''); await onChanged(); }
     catch (e) {
       // Bis hierher ging ein Fehler still verloren; jetzt steht er da.
-      if (e instanceof ApiError && e.status === 400 && /country_code/.test(e.message)) { setCountryError(t('application.errors.countryCode')); focusField(countryId); }
+      if (errorFieldOf(e) === 'country_code') { setCountryError(t('application.errors.countryCode')); focusField(countryId); }
       else setCountryFailed(true);
     }
     finally { setBusy(false); }
@@ -651,7 +694,7 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
   const [date, setDate] = useState(startDate);
   const [preview, setPreview] = useState<{ patch: Partial<ServiceInput>; at: string | null; result: ChangePreview } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [err, setErr] = useState<SaveFailure | null>(null);
   const tomorrow = isoDay(new Date(Date.now() + 86400_000));
   const lastDay = isoDay(new Date(Date.now() + 365 * 86400_000));
   const at = mode === 'date' ? date : null;
@@ -698,7 +741,7 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
       // Mit Datum immer die Zusammenfassung: sie nennt, was ab wann gilt.
       if (result.held.length || at) setPreview({ patch, at, result });
       else { await saveService(s.id, patch); await onDone(t('application.change.saved')); }
-    } catch (e) { setErr(identityHintFrom(e, t) ?? (e instanceof Error ? e.message : t('application.saveError'))); }
+    } catch (e) { setErr(saveFailureFrom(e, t)); }
     finally { setBusy(false); }
   };
   const send = async () => {
@@ -708,7 +751,7 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
       await saveService(s.id, preview.patch, undefined, preview.at);
       await onDone(preview.at ? t('application.change.sentDated', { date: effectiveLong(preview.at, locale) }) : t('application.change.sent'));
     }
-    catch (e) { setErr(e instanceof Error ? e.message : t('application.saveError')); }
+    catch (e) { setErr(saveFailureFrom(e, t)); }
     finally { setBusy(false); }
   };
 
@@ -736,7 +779,7 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
         {when && <Group title={t('application.change.groupScheduled', { date: when })} rows={scheduled} />}
         <Group title={t('application.change.groupInstant')} rows={now} />
         <p className="text-[12.5px] text-fg-secondary">{when ? t('application.change.summaryNoteDated', { date: when }) : t('application.change.summaryNote')}</p>
-        {err && <p role="alert" className="text-[12px] text-error-700 dark:text-red-300">{err}</p>}
+        {err && <SaveFailureView failure={err} heading={t('application.saveFailed.heading')} />}
         <div className="flex gap-2">
           <Button size="sm" disabled={busy} onClick={send}>{t('application.change.send')}</Button>
           <Button size="sm" variant="secondary" disabled={busy} onClick={() => setPreview(null)}>{t('application.change.back')}</Button>
@@ -778,7 +821,7 @@ function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: S
           </FormField>
         ))}
       </div>
-      {err && <p role="alert" className="text-[12px] text-error-700 dark:text-red-300">{err}</p>}
+      {err && <SaveFailureView failure={err} heading={t('application.saveFailed.heading')} />}
       <FormErrorSummary errors={errors} />
       <div className="flex gap-2">
         <Button size="sm" disabled={busy} onClick={next}>{t('application.change.next')}</Button>
@@ -900,7 +943,7 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
     setBusy(true); setAcceptFailed(false);
     try { await acceptAgreement({ agreement_type: modal, version: versionOf(modal), language: i18n.resolvedLanguage || 'en', accepted_by_name: name.trim(), accepted_by_title: title.trim() || undefined }); setModal(null); await onChanged(); }
     catch (e) {
-      if (e instanceof ApiError && e.status === 400 && /accepted_by_name/.test(e.message)) { setNameMissing(true); focusField('app-agreement-name'); }
+      if (errorFieldOf(e) === 'accepted_by_name') { setNameMissing(true); focusField('app-agreement-name'); }
       else setAcceptFailed(true);
     }
     finally { setBusy(false); }

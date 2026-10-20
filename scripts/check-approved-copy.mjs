@@ -198,7 +198,12 @@ const VORLAGE = {
       "howBookingWorks": "An appointment is created when a business selects you in the results and books one of your available times. For that to be possible:",
       "closing": "How often you’re booked depends on demand in your areas. Your plan doesn’t change that.",
       "invoicesHeading": "No invoices yet",
-      "invoicesMessage": "Your invoices appear here once a plan has been billed."
+      "invoicesMessage": "Your invoices appear here once a plan has been billed.",
+      // Sechste Abnahme (Abdeckung, 18.10.2026): noch keine freigegebene Leistung.
+      "coverage": "No approved service yet",
+      "coverageClosing": "The matrix fills in once our review team has approved your first service for a country.",
+      "coverageHow": "Our review team is checking your documents. Once a service is approved, you appear for it in the results and can be booked.",
+      "coverageAction": "Go to verification"
     },
     "readiness": {
       "verified": "Verification completed",
@@ -221,16 +226,34 @@ const VORLAGE = {
       "belowThreshold": "from 5 requests",
       "thresholdNote": "A rate based on one or two requests says little about you. That’s why we show it from five requests."
     },
+    // ── Sechste Abnahme: Angleich der Abdeckung an das User-Dashboard
+    // (Canvas A1–A8), Figma „Provider · Abdeckung (So 18.10.)" mit NOTE
+    // 3804:600 („Neue oder geänderte Copy (zur Abnahme)"), Review-OK
+    // 18.10.2026 („Die Abdeckung passt"). Titel mit Goldwort als <accent>,
+    // Matrix als Karte mit Kopf, Zähler und Hinweisband, Karte „For matching",
+    // Reaktionszeit mit Bezug, Leerzustand ohne Freigabe (empty.coverage*).
     "coverage": {
-      "heading": "Where you appear",
+      "heading": "Where you <accent>appear</accent>.",
       "message": "As approved by our review team. To change it, submit the change under Services. It applies after review.",
       "approved": "approved",
       "underReview": "under review",
       "notRequested": "not requested",
       "languages": "Languages",
       "responseTime": "Response time",
-      "hours": "{{hours}} hours",
-      "submitChange": "Submit a change"
+      "hours": "{{hours}} hours to confirm",
+      "submitChange": "Submit a change",
+      "matrixTitle": "Approved services",
+      "services_one": "{{count}} service",
+      "services_other": "{{count}} services",
+      "countries_one": "{{count}} country",
+      "countries_other": "{{count}} countries",
+      "service": "Service",
+      "matrixHint": "Matching reads this matrix too. A dash marks a service that is currently not approved in that country.",
+      "matchingTitle": "For matching",
+      "matchingSub": "Shown to companies in the results",
+      "availability": "Availability",
+      "available": "Available",
+      "ooo": "Out of office"
     },
     "profileUnavailable": "Your saved profile can’t be reached right now. Saving works again once it has loaded."
   }

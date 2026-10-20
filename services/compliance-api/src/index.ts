@@ -12,7 +12,7 @@ import { generateRelevantSubdomains, isKnownCountry, type CountryCode, type Indu
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
 import { verifySupabaseJwt } from "./supabaseJwt.js";
-import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
+import { sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleDomain } from "./domain.js";
 import { handleAuthAdopt } from "./adoption.js";
@@ -39,6 +39,7 @@ import { handleSubscriptionGet, handleSubscriptionSelect, handleSubscriptionSche
 import { handleProviderReview } from "./providerReview.js";
 import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpact.js";
 import { plannedPrices } from "./changeSchedule.js";
+import { readActiveSince } from "./activeSince.js";
 import { redactText } from "@complihub360/redaction";
 import {
     loadVisibility, maskIdentity, publicTitle, rankBasis, requiredFor, scanFields, serializeProvider, verificationDepth,
@@ -407,6 +408,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     /** Schritt 4 (#8): welche Seite der Aufrufer an einer Anfrage ist —
      *  'user' (Ersteller), 'provider' (Mitglied des Anbieters), 'server'
      *  (Server-Key oder Admin) oder null (fremd). */
+    /** P4: die Anfrage, wie die Anbieterseite sie sieht — ohne Identitaet des Nutzers. */
+    const engagementForProvider = (eng: Record<string, unknown>): Record<string, unknown> => {
+        const { user_id: _u, session_id: _s, requester_email: _e, ...rest } = eng as Record<string, unknown> & { user_id?: unknown; session_id?: unknown; requester_email?: unknown };
+        void _u; void _s; void _e;
+        const IDENTITY_KEYS = new Set(['company', 'company_name', 'email', 'requester_email', 'name', 'contact_name', 'phone', 'website', 'vat_id']);
+        const answers = rest.structured_answers && typeof rest.structured_answers === 'object' && !Array.isArray(rest.structured_answers)
+            ? Object.fromEntries(Object.entries(rest.structured_answers as Record<string, unknown>).filter(([k]) => !IDENTITY_KEYS.has(k.toLowerCase())))
+            : rest.structured_answers;
+        return { ...rest, structured_answers: answers };
+    };
     const engagementSide = async (eng: Record<string, unknown>): Promise<'user' | 'provider' | 'server' | null> => {
         if (authViaApiKey || authIsAdmin) return 'server';
         if (authUserId && eng.user_id === authUserId) return 'user';
@@ -1031,7 +1042,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     ? Math.round((usableReviews.reduce((sum: number, r: any) => sum + Number(r.rating), 0) / usableReviews.length) * 10) / 10 : null;
                 // Ohne Listenposition gibt es keinen Buchstaben — das Detail traegt
                 // nur die Beschreibung; den Buchstaben kennt die aufrufende Liste.
-                const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), p.region ?? null);
+                // P10: die Region traegt bei Altbestand die Identitaet ("Kanzlei
+                // Schmidt, Hamburg") — vor der Offenlegung nur maskiert, wie in /search.
+                const regionShown = revealed ? (p.region ?? null) : (typeof p.region === 'string' ? maskIdentity(p.region, identityCtx(p)) : null);
+                const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), regionShown);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
                     ok: true,
@@ -1044,7 +1058,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         // sie in der Sprache des Nutzers zeigt — `descriptor`
                         // traegt die englischen Taxonomie-Namen.
                         area_codes: [...areas].sort(),
-                        descriptor_region: p.region ?? null,
+                        descriptor_region: regionShown,
                         // Freigegebene Leistungsnamen aus der View — nicht die
                         // Selbstauskunft aus `categories`.
                         specializations,
@@ -1238,14 +1252,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const bookings = rows.map((b: any) => {
                     const p = byKey[b.provider_key] || {};
                     const areas = [...new Set(viewAll.filter((r: any) => r.provider_key === b.provider_key).map((r: any) => r.area_code as string).filter(Boolean))];
-                    const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), p.region ?? null);
+                    // P10: Region vor der Offenlegung maskiert, wie in /search.
+                    const regionShown = b.identity_revealed ? (p.region ?? null) : (typeof p.region === 'string' ? maskIdentity(p.region, identityCtx(p)) : null);
+                    const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), regionShown);
                     return {
                         id: b.id,
                         public_ref: p.public_ref ?? null,
                         provider_name: b.identity_revealed ? (p.name ?? 'Verified Provider') : 'Verified Provider',
                         provider_descriptor: title.descriptor,
                         provider_area_codes: [...areas].sort(),
-                        provider_region: p.region ?? null,
+                        provider_region: regionShown,
                         identity_revealed: !!b.identity_revealed,
                         // Affiliate 1b: the provider's website is a POST-BOOKING
                         // reveal only — never before, to preserve stage-1/2 anonymity.
@@ -1678,7 +1694,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });
                 // Phase 5: no_show aus dieser Route heisst "der Anbieter kam nicht"
                 // — Vorfall statt Guthaben (Spec B "provider no-show").
-                if (status === 'no_show') await recordProviderNoShow({ ...b, id: bookingId }, authUserId, correlationId).catch(() => {});
+                // B13: der Nutzer meldet, dass der Anbieter fehlte. Der Statuswechsel
+                // steht; faellt der Vorfall danach aus (Zeile, Benachrichtigung,
+                // Serienpruefung), bleibt die 200 — aber die Luecke wird sichtbar,
+                // statt in einem leeren catch zu verschwinden.
+                if (status === 'no_show') {
+                    await recordProviderNoShow({ ...b, id: bookingId }, authUserId, correlationId).catch(async (err) => {
+                        structuredLog('error', 'Provider no-show could not be recorded', { correlationId, errorCode: 'ERR_PROVIDER_NO_SHOW', severity: 'error', bookingId, providerKey: b.provider_key, detail: String(err).slice(0, 200) } as any);
+                        await supabaseApi.insert('event_log', { type: 'provider_no_show_record_failed', payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, error: String(err).slice(0, 200) } })
+                            .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'provider_no_show_record_failed', detail: String(e).slice(0, 200) } as any));
+                    });
+                }
                 if (status === 'cancelled') {
                     // Bis hierher blieb der Termin im Anbieterkalender stehen:
                     // abgesagt im System, gebucht im Kalender. Derselbe Fehler
@@ -1804,11 +1830,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     if (!p || !view.length) { fail(404, 'NOT_FOUND', 'Provider not found'); return; }
                     // Buchbar heisst matchbar UND zahlungsbereit (Spec A §21.1). Das
                     // Gate sperrt die Buchung, nie das Matching (§14).
+                    // B14: der Nutzer-Draht nennt den Zahlungszustand des Anbieters
+                    // nicht — ein neutraler Code, dieselbe Lage wie bei einer Pause.
                     if (!view.some((r: any) => r.bookable_chargeable)) {
-                        fail(409, 'BILLING_NOT_READY', 'This provider cannot take bookings yet'); return;
+                        fail(409, 'PROVIDER_NOT_BOOKABLE', 'This provider cannot take bookings at the moment'); return;
                     }
                     // Pausiert (C2): etwa aus einem alten Tab. Fuer den Nutzer dieselbe
-                    // neutrale Lage wie BILLING_NOT_READY — mit anderen Anbietern.
+                    // neutrale Lage wie PROVIDER_NOT_BOOKABLE — mit anderen Anbietern.
                     if (isPaused(p)) { fail(409, 'PROVIDER_PAUSED', 'This provider is not taking new bookings right now'); return; }
                     // Phase 6: Buchungspause (§24) sperrt die Buchung — nie das
                     // Matching. Derselbe neutrale Fehler: der Nutzer erfaehrt keinen Grund.
@@ -1887,6 +1915,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const cycleStart = cycleStartFor(sub, now);
                     const used = await getDiscountCounter(providerKey, cycleStart);
                     const quote = quoteLeadFee(cfg, sub, opp.opp, used, now);
+                    if (sub && !quote.planVersionExact) {
+                        // B4: Konfigurationsluecke, kein Normalfall — der Rabatt der juengsten
+                        // Version greift, aber jemand muss sehen, dass der Katalog die
+                        // gebundene Version nicht mehr fuehrt.
+                        structuredLog('warn', 'Subscription plan version missing from catalog — using latest', { correlationId, errorCode: 'PLAN_VERSION_FALLBACK', severity: 'warning', providerKey, planCode: sub.planCode, planVersion: sub.planVersion, usedVersion: quote.planVersion } as any);
+                        await supabaseApi.insert('event_log', { type: 'plan_version_fallback', payload: { providerKey, planCode: sub.planCode, planVersion: sub.planVersion, usedVersion: quote.planVersion } })
+                            .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'plan_version_fallback', detail: String(e).slice(0, 200) } as any));
+                    }
                     const policies = (await supabaseApi.select('user_discount_policy', {}, { limit: 50 })) as any[];
                     const today = now.toISOString().slice(0, 10);
                     const policy = policies.filter((r) => String(r.effective_from) <= today).sort((a, b) => b.version - a.version)[0] ?? null;
@@ -1905,7 +1941,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         }
                         if (!customerId || !paymentMethodId) {
                             await syncBillingReadiness(providerKey).catch(() => null);
-                            fail(409, 'BILLING_NOT_READY', 'This provider cannot take bookings yet'); return;
+                            fail(409, 'PROVIDER_NOT_BOOKABLE', 'This provider cannot take bookings at the moment'); return;
                         }
                     }
 
@@ -1935,8 +1971,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     if (charge.outcome === 'failed') {
                         if (charge.result.kind === 'card') {
                             await recordPaymentFailure({ providerKey, ledgerId: charge.ledgerId, result: charge.result, paymentMethodId, correlationId });
-                            // Neutral und ohne Decline-Code: das liegt nicht am Nutzer.
-                            fail(409, 'BOOKING_NOT_COMPLETED', 'The booking could not be completed. This is not on your side — the provider has been informed.', { reason: 'provider_billing' });
+                            // Neutral, ohne Decline-Code und ohne Grund (B14): das liegt
+                            // nicht am Nutzer, und mehr muss er nicht wissen.
+                            fail(409, 'BOOKING_NOT_COMPLETED', 'The booking could not be completed. This is not on your side — the provider has been informed.');
                         } else {
                             await supabaseApi.insert('event_log', { type: 'lead_payment_error', payload: { providerKey, ledgerId: charge.ledgerId, detail: charge.result.detail.slice(0, 200) } }).catch(() => {});
                             structuredLog('error', 'Lead charge failed at Stripe', { correlationId, errorCode: 'ERR_LEAD_CHARGE', severity: 'error', route: req.url });
@@ -1996,9 +2033,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     }
 
                     if (quote.enabled && !linkedRoot) {
-                        await supabaseApi.upsert('provider_discount_counter', 'provider_key,cycle_start', {
-                            provider_key: providerKey, cycle_start: cycleStart, used: quote.counterUsedAfter, updated_at: sharingAt,
-                        }).catch(() => {});
+                        // B9: die Datenbank zaehlt — atomar, ohne Read-before-write. Zwei
+                        // parallele Buchungen koennen so den Zaehler nicht mehr um eins zu
+                        // niedrig hinterlassen. (Welche Rabattstufe DIESE Buchung bekam,
+                        // stand schon fest, als die Belastung lief — das bleibt.) Ein
+                        // Fehler hier kippt die Buchung nicht, aber er wird gesehen.
+                        const step = Math.max(0, quote.counterUsedAfter - used);
+                        try {
+                            await supabaseApi.rpc('increment_discount_counter', { p_provider_key: providerKey, p_cycle_start: cycleStart, p_increment: step });
+                        } catch (cntErr) {
+                            structuredLog('error', 'Discount counter increment failed', { correlationId, errorCode: 'ERR_DISCOUNT_COUNTER', severity: 'error', providerKey, cycleStart, step, detail: String(cntErr).slice(0, 200) } as any);
+                            await supabaseApi.insert('event_log', { type: 'discount_counter_failed', payload: { providerKey, cycleStart, step, ledgerId: charge.ledgerId, error: String(cntErr).slice(0, 200) } })
+                                .catch((e) => structuredLog('error', 'event_log insert failed', { correlationId, errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'discount_counter_failed', detail: String(e).slice(0, 200) } as any));
+                        }
                     }
                     // Kalendereintrag beim Anbieter. BEWUSST nach dem Insert und
                     // bewusst nicht fatal: Die Buchung ist bezahlt und gilt — ein
@@ -2021,20 +2068,33 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             await supabaseApi.insert('event_log', { type: 'calendar_event_failed', payload: { bookingId: booking.id, providerKey, slotStart } }).catch(() => {});
                         }
                     }
-                    await supabaseApi.insert('event_log', { type: 'scheduling_confirmed', payload: { bookingId: booking.id, providerKey, userId: authUserId, slotStart, ledgerId: charge.ledgerId } });
+                    // B3: Buchung, Belastung und Offenlegung stehen. Ein Ereignis,
+                    // das nicht geschrieben werden kann, macht daraus keinen Fehler
+                    // fuer den Nutzer — es wird geloggt und als Luecke benannt.
+                    // `lead.revealed` zuerst: das ist die Spur der Offenlegung.
+                    const audit = async (type: string, payload: Record<string, unknown>) => {
+                        try { await supabaseApi.insert('event_log', { type, payload }); }
+                        catch (err) {
+                            structuredLog('error', 'Booking audit event failed', {
+                                correlationId, errorCode: 'ERR_AUDIT_EVENT', severity: 'error', route: req.url,
+                                detail: `${type}: ${String(err).slice(0, 200)}`,
+                            });
+                        }
+                    };
+                    await audit('lead.revealed', {
+                        bookingId: booking.id, providerKey, userId: authUserId, sharedFields: [...SHARED_FIELDS_V1],
+                        acknowledgementVersion: ack.version, sharingConfirmedAt: sharingAt,
+                    });
+                    await audit('scheduling_confirmed', { bookingId: booking.id, providerKey, userId: authUserId, slotStart, ledgerId: charge.ledgerId });
                     if (linkedRoot) {
-                        await supabaseApi.insert('event_log', { type: 'booking_linked_to_lead', payload: { bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId, rootBookingId: linkedRoot.id } });
+                        await audit('booking_linked_to_lead', { bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId, rootBookingId: linkedRoot.id });
                         // Eine offene Frist ist damit erfuellt — ohne Guthaben.
                         if (linkedRoot.rebook_deadline && !linkedRoot.credit_decided_at) await supabaseApi.update('scheduling', { id: linkedRoot.id }, { credit_decided_at: sharingAt }).catch(() => {});
-                    } else await supabaseApi.insert('event_log', { type: 'provider_lead_charged', payload: {
+                    } else await audit('provider_lead_charged', {
                         bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId,
                         band: quote.band, finalFeeCents: quote.finalFeeCents, currency: quote.currency,
                         paymentIntentId: charge.outcome === 'captured' ? charge.paymentIntentId : null, feeEnabled: quote.enabled,
-                    } });
-                    await supabaseApi.insert('event_log', { type: 'lead.revealed', payload: {
-                        bookingId: booking.id, providerKey, userId: authUserId, sharedFields: [...SHARED_FIELDS_V1],
-                        acknowledgementVersion: ack.version, sharingConfirmedAt: sharingAt,
-                    } });
+                    });
                     // Der Anbieter erfaehrt es im Dashboard und per Mail; beides ohne Nutzeridentitaet im Text.
                     (async () => {
                         const members = (await supabaseApi.select('provider_members', { provider_key: providerKey }, { limit: 20 })) as Array<{ user_id: string }>;
@@ -2127,6 +2187,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         return;
                     }
                     const providerKey: string = booking.provider_key;
+                    const reviewBody = typeof d.body === 'string' ? d.body.slice(0, 2000) : null;
+                    // P12: Bewertungen sind vor der Buchung lesbar — der Name des
+                    // Anbieters darf nicht ueber den Mandanten hineinkommen. Das
+                    // Lese-Netz (maskIdentity) bleibt fuer den Altbestand.
+                    if (reviewBody) {
+                        const prov = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0];
+                        const findings = scanFields({ body: reviewBody }, identityCtx(prov));
+                        if (findings.length) { identityRejection(res, correlationId, findings); return; }
+                    }
                     await supabaseApi.insert('reviews', {
                         booking_id: d.booking_id,
                         provider_key: providerKey,
@@ -2134,7 +2203,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         to_role: fromRole === 'user' ? 'provider' : 'user',
                         rating,
                         categories: Array.isArray(d.categories) ? d.categories : [],
-                        body: typeof d.body === 'string' ? d.body.slice(0, 2000) : null,
+                        body: reviewBody,
                         verified: true, // jetzt begruendet: an eine gehaltene Buchung gebunden
                     });
                     if (fromRole === 'user') {
@@ -2181,7 +2250,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const name = typeof d.name === 'string' ? d.name.trim() : '';
                 if (!name) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'name required', correlationId }));
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'name', message: 'name required', correlationId }));
+                    return;
+                }
+                // Punkt 3: ein Jahr von 1900 bis heute oder nichts — am Feld benannt.
+                const since = readActiveSince(d.active_since);
+                if (since === 'invalid') {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'active_since', message: 'active_since must be a year from 1900 to the current year, or null', correlationId }));
                     return;
                 }
                 const providerKey = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
@@ -2216,7 +2292,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // pseudonym_label wird nicht mehr angenommen: der Titel vor der
                     // Buchung entsteht in der API (anonymity.ts).
                     region: d.region ?? null,
-                    active_since: Number.isInteger(d.active_since) ? d.active_since : null,
+                    active_since: since?.value ?? null,
                     // Dossier fuer die Partnerseite: bisher zaehlte der Intake die
                     // Nachweise nur fuer das Event-Log und warf sie dann weg. Jetzt
                     // werden sie gespeichert — sonst bleibt die Karte "Qualifikation"
@@ -2332,7 +2408,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const findings = scanFields({ region: patch.region, pricing_table: patch.pricing_table }, identityCtx(own[0]));
                     if (findings.length) { identityRejection(res, correlationId, findings); return; }
                 }
-                if (Number.isInteger(d.active_since)) patch.active_since = d.active_since;
+                // Punkt 3 (O2): „Aktiv seit" ist eine gepruefte Angabe und laeuft
+                // ueber die Bewerbung (Change-Control). Hier wuerde es ungeprueft
+                // live gehen — deshalb benannt abgelehnt, nicht still verworfen.
+                if (d.active_since !== undefined) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'active_since', message: 'active_since is changed through the application', correlationId }));
+                    return;
+                }
                 if (Object.keys(patch).length === 0) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'No valid profile fields', correlationId }));
@@ -2360,7 +2443,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const providerKey = (req.url || '').split('/')[4];
         try {
             await syncOpenInvoices(providerKey).catch(() => { /* list still renders */ });
-            const invoices = await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 });
+            const all = (await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 })) as any[];
+            // B7: ein `draft` ist bei Stripe angelegt, aber noch keine Rechnung an
+            // den Anbieter — der naechste Monatslauf nimmt ihn auf. Nicht zeigen.
+            const invoices = all.filter((r) => r.status !== 'draft');
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, invoices }));
@@ -2474,7 +2560,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const newEmail = typeof d.new_email === 'string' ? d.new_email.trim().toLowerCase() : '';
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(newEmail)) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'new_email must be a valid address', correlationId }));
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', field: 'new_email', message: 'new_email must be a valid address', correlationId }));
                     return;
                 }
                 const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as
@@ -2826,9 +2912,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 return;
             }
             const messages = await supabaseApi.select('engagement_messages', { engagement_id: engagementId }, { order: 'created_at.asc', limit: 100 });
+            // P4 (2026-10-18): die Anbieterseite bekam die rohe Zeile — user_id,
+            // session_id, requester_email, company — vor jeder Offenlegung. Die
+            // Offenlegung gehoert zur Buchung (Spec B Schritt 5), nicht zur
+            // Anfrage. Der Anbieter liest die Anfrage ohne Identitaet des Nutzers;
+            // Ersteller und Server-Key sehen weiter alles.
+            const engagement = seite === 'provider' ? engagementForProvider(eng[0]) : eng[0];
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, engagement: eng[0], messages }));
+            res.end(JSON.stringify({ ok: true, engagement, messages }));
         } catch {
             structuredLog('error', 'Engagement detail failed', { correlationId, errorCode: 'ERR_ENGAGEMENT_DETAIL', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -3090,198 +3182,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to compute admin stats', correlationId }));
         }
-    } else if (req.method === 'POST' && req.url === '/api/v1/document/upload') {
-        // P0 #5: document upload runs through the redaction pipeline BEFORE any
-        // persistence — only sanitized content is stored; raw text is discarded
-        // here (raw-vault storage is a separate, later concern). The AI gate
-        // (sanitized_ready + ai_allowed) is derived from the redaction result.
-        let body = '';
-        req.on('data', (chunk: any) => body += chunk.toString());
-        req.on('end', async () => {
-            try {
-                const requestData = JSON.parse(body);
-                const { filename, mimeType, text, engagementId, userId } = requestData;
-                if (!filename || typeof filename !== 'string' || !text || typeof text !== 'string') {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'filename and text are required', correlationId }));
-                    return;
-                }
-                // Consent gate (Art. 6(1)(a) / Art. 7 GDPR): AI eligibility requires
-                // an explicit opt-in with this upload — absence or anything other
-                // than boolean true counts as NO consent. The document is still
-                // stored (sanitized); it just never becomes ai_allowed.
-                const consentAI = requestData.consentAI === true;
-                const redaction = redactText(text, { profile: 'strict' });
-                const aiAllowed = redaction.sanitized_ready && redaction.classification !== 'restricted' && consentAI;
-                const inserted = (await supabaseApi.insert('documents', {
-                    engagement_id: engagementId || null,
-                    user_id: userId || null,
-                    filename,
-                    mime_type: mimeType || null,
-                    content_sanitized: redaction.sanitizedText,
-                    redaction_report: redaction.report,
-                    classification: redaction.classification,
-                    sanitized_ready: redaction.sanitized_ready,
-                    consent_ai: consentAI,
-                    ai_allowed: aiAllowed
-                })) as Array<{ id: string }>;
-                const documentId = inserted?.[0]?.id;
-                await supabaseApi.insert('event_log', {
-                    type: 'document_uploaded',
-                    payload: { documentId, filename, classification: redaction.classification, sanitized_ready: redaction.sanitized_ready, consentAI, riskScore: redaction.report.riskScore }
-                });
-                res.setHeader('x-correlation-id', correlationId);
-                res.writeHead(201, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, id: documentId, sanitized_ready: redaction.sanitized_ready, consent_ai: consentAI, ai_allowed: aiAllowed, classification: redaction.classification, report: redaction.report }));
-            } catch {
-                structuredLog('error', 'Document upload failed', { correlationId, errorCode: 'ERR_DOC_UPLOAD', severity: 'error', route: req.url });
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Document upload failed', correlationId }));
-            }
-        });
-    } else if (req.method === 'POST' && req.url === '/api/v1/document/request-ai') {
-        // P0 #5: the AI gate — a document may only enter any AI flow when the
-        // privacy pipeline marked it sanitized_ready AND ai_allowed.
-        let body = '';
-        req.on('data', (chunk: any) => body += chunk.toString());
-        req.on('end', async () => {
-            try {
-                const { documentId } = JSON.parse(body);
-                if (!documentId) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'documentId is required', correlationId }));
-                    return;
-                }
-                const rows = (await supabaseApi.select('documents', { id: documentId }, { limit: 1 })) as
-                    Array<{ id: string; sanitized_ready: boolean; consent_ai: boolean; ai_allowed: boolean; classification: string; content_sanitized: string }>;
-                const doc = rows[0];
-                if (!doc) {
-                    res.writeHead(404, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Document not found', correlationId }));
-                    return;
-                }
-                // Defense in depth: ai_allowed already encodes consent at upload
-                // time, but the gate re-checks each condition so a later data fix
-                // or consent withdrawal (consent_ai=false) is honored immediately.
-                if (!doc.sanitized_ready || !doc.consent_ai || !doc.ai_allowed) {
-                    const reason = !doc.consent_ai ? 'NO_CONSENT' : 'NOT_SANITIZED';
-                    await supabaseApi.insert('event_log', { type: 'document_ai_blocked', payload: { documentId, classification: doc.classification, reason } });
-                    res.writeHead(403, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'PRIVACY_GATE', reason, message: 'Document is not cleared for AI processing', classification: doc.classification, correlationId }));
-                    return;
-                }
-                await supabaseApi.insert('event_log', { type: 'document_ai_requested', payload: { documentId } });
-                res.setHeader('x-correlation-id', correlationId);
-                res.writeHead(202, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, id: documentId, status: 'queued', message: 'Document accepted for AI processing (sanitized content only)' }));
-            } catch {
-                structuredLog('error', 'Document AI request failed', { correlationId, errorCode: 'ERR_DOC_AI', severity: 'error', route: req.url });
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Document AI request failed', correlationId }));
-            }
-        });
-    } else if (req.method === 'POST' && req.url === '/api/v1/engagement') {
-        let body = '';
-        req.on('data', (chunk: any) => body += chunk.toString());
-        req.on('end', async () => {
-            try {
-                const requestData = JSON.parse(body);
-                // Note: The ID generation will be handled by the DB via uuid_generate_v4()
-                // so we don't strictly need to generate it, but we can generate one to return it immediately
-                const crypto = await import('crypto');
-                const engagementId = crypto.randomUUID();
-
-                const newEngagement = {
-                    id: engagementId,
-                    // Der Ersteller kommt aus dem GEPRUEFTEN Token, nie aus dem
-                    // Body. Vorher stand hier requestData.user_id — ein
-                    // angemeldetes Konto haette Anfragen im Namen jedes anderen
-                    // anlegen koennen. Und weil das Frontend das Feld nie
-                    // schickte, gehoerte bis 2026-08-31 KEINE einzige
-                    // UI-Anfrage jemandem (user_id NULL) — womit auch jede
-                    // provider_confirmed/replied/declined-Benachrichtigung ins
-                    // Leere lief: notify() hat ohne Empfaenger nichts zu tun.
-                    user_id: authUserId || undefined,
-                    // Wave A7: link the wizard session + carry the requester
-                    // identity (revealed only via the dossier unlock).
-                    session_id: requestData.session_id || undefined,
-                    provider_key: requestData.provider_key,
-                    country: requestData.country,
-                    category: requestData.category,
-                    structured_answers: {
-                        ...(requestData.structured_answers || {}),
-                        ...(requestData.requester_email ? { requester_email: requestData.requester_email } : {}),
-                        ...(requestData.company ? { company: requestData.company } : {}),
-                    },
-                    message: requestData.message || "",
-                    status: 'created',
-                    sla_confirm_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-                    // Contract (Provider Flows §6.1 / Marketplace Ops §5.1): reply SLA is 48h, not 72h.
-                    sla_reply_deadline: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                };
-
-                await supabaseApi.insert('engagement_requests', newEngagement);
-
-                // P0 #1: issue signed, expiring, single-use magic-link tokens
-                // (one per provider action). Only the SHA-256 hash is stored;
-                // the raw tokens go into the e-mail links.
-                const nodeCrypto = await import('node:crypto');
-                const magicLinks: Record<string, string> = {};
-                for (const action of ['confirm', 'reply', 'decline'] as const) {
-                    const rawToken = nodeCrypto.randomBytes(32).toString('base64url');
-                    const tokenHash = nodeCrypto.createHash('sha256').update(rawToken).digest('hex');
-                    await supabaseApi.insert('magic_link_tokens', {
-                        engagement_id: engagementId,
-                        action,
-                        token_hash: tokenHash,
-                        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-                    });
-                    magicLinks[action] = `?id=${engagementId}&token=${rawToken}`;
-                }
-
-                // Wave B: the requester's opening message seeds the thread.
-                if (newEngagement.message) {
-                    await supabaseApi.insert('engagement_messages', {
-                        engagement_id: engagementId, author: 'user', body: newEngagement.message,
-                    }).catch(() => { /* thread is best-effort at creation time */ });
-                }
-
-                await supabaseApi.insert('event_log', {
-                    type: 'primary_request_submitted',
-                    payload: { engagementId, provider_key: newEngagement.provider_key }
-                });
-
-                // Funnel: deliver the magic links to the provider (Resend if
-                // configured, e-mail outbox log otherwise). Fire-and-forget —
-                // the engagement + tokens exist regardless of delivery.
-                (async () => {
-                    const provRows = (await supabaseApi.select('providers', { provider_key: newEngagement.provider_key }, { limit: 1 })) as
-                        Array<{ name: string; contact_email?: string | null }>;
-                    await sendMagicLinkMail({
-                        engagementId,
-                        providerKey: newEngagement.provider_key,
-                        providerName: provRows[0]?.name || newEngagement.provider_key,
-                        contactEmail: provRows[0]?.contact_email ?? null,
-                        country: newEngagement.country,
-                        category: newEngagement.category,
-                        message: newEngagement.message,
-                        magicLinks,
-                        correlationId,
-                        locale: typeof requestData.locale === 'string' ? requestData.locale : undefined,
-                    });
-                })().catch(() => { /* logged inside the mailer */ });
-
-                res.setHeader('x-correlation-id', correlationId);
-                res.writeHead(201, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, id: engagementId, status: 'created', magicLinks }));
-            } catch (err) {
-                console.error("Engagement request error:", err);
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'BAD_REQUEST', message: 'Invalid payload or DB error' }));
-            }
-        });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/provider/magic/')) {
         // P0 #1: real token lookup — hash, match, expiry + single-use check.
         const token = req.url.split('/').pop() || '';
@@ -3497,6 +3397,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 //    unknown country must not kill the search (providers are
                 //    still scored; laws just come back empty).
                 let engineResults: EnrichedSubdomain[] = [];
+                // Hat die Engine gerechnet? `laws: []` heisst sonst zweierlei —
+                // "nichts gefunden" und "nicht geprueft" —, und die Risk Map
+                // zeigte beides als Entwarnung (DNA §4.5).
+                let engineFailed = false;
                 // All requested markets the engine knows a profile for; unknown
                 // codes are dropped rather than killing the whole search.
                 const requestedMarkets: string[] = Array.isArray(requestData.structured_answers?.markets)
@@ -3522,26 +3426,32 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         });
                     }
                 } catch (engineErr) {
-                    console.warn('compliance-engine country profile missing:', String(engineErr));
-                }
-
-                // 2. Vector Search (RAG) - Query PostgreSQL pgvector
-                // Stub embedding since backend currently lacks an active LLM API integration for live vectors
-                const queryEmbedding = new Array(768).fill(0.01);
-
-                // Wrap the rpc in try/catch to gracefully handle empty DB tables mapping to empty arrays
-                let knowledgeMatches: any[] = [];
-                try {
-                    const rpcResponse = await supabaseApi.rpc('match_knowledge_chunks', {
-                        query_embedding: queryEmbedding,
-                        match_threshold: 0.1,
-                        match_count: 5
+                    engineFailed = true;
+                    // Unbekannte Laender sind oben schon herausgefiltert — wer
+                    // hier landet, hat einen Engine-Fehler, und der Nutzer sieht
+                    // eine Risk Map ohne Pflichten. Bis 2026-10-18 stand das nur
+                    // als console.warn ohne Referenz-ID im Log.
+                    structuredLog('error', 'Compliance engine failed', {
+                        correlationId,
+                        errorCode: 'ERR_SEARCH_ENGINE',
+                        severity: 'error',
+                        route: '/api/v1/search',
+                        countries: engineCountries,
+                        detail: String(engineErr).slice(0, 500),
                     });
-                    knowledgeMatches = (rpcResponse as any)?.data as any[] || rpcResponse as any[] || [];
-                    if (!Array.isArray(knowledgeMatches)) knowledgeMatches = [];
-                } catch (e) {
-                    console.warn("RPC match_knowledge_chunks fail:", e);
                 }
+
+                // 2. Kein Korpus-Abruf. Bis 2026-10-18 stand hier eine "RAG"-Suche
+                //    ueber match_knowledge_chunks mit einem konstanten Vektor
+                //    (0.01 × 768): fuenf beliebige Abschnitte des EY Global VAT
+                //    Guide, ohne Bezug zur Anfrage, woertlich als `tutorials` an
+                //    jeden Gast — an RLS und an 20261011000100 vorbei. Keine
+                //    Oberflaeche las das Feld; ein Fehler ging still in
+                //    console.warn. Der Korpus ist interne Grundlage des
+                //    Assistenten (assistant.ts) und verlaesst die API nie im
+                //    Wortlaut. Wer hier wieder Wissen anbietet, braucht ein echtes
+                //    Anfrage-Embedding (embed_model, ADR-0011), eine auditierte
+                //    Grenze fuer die Wizard-Daten und liefert hoechstens Labels.
 
                 // 3. Fetch, score and anonymize matched providers.
                 //    Ranking = 0.6·Relevance + 0.3·Quality + 0.1·Priority (spec §6).
@@ -3737,12 +3647,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
-                    // Says what the payload IS. The knowledge-chunk lookup above
-                    // still runs on a stub embedding and the assistant that would
-                    // ground a real summary is feature-flagged off, so the string
-                    // must not claim a synthesis that does not happen: everything
-                    // below `laws` comes out of the deterministic engine.
-                    overview_summary: "Obligations identified by the compliance engine for the requested markets and domains.",
+                    // Says what the payload IS. There is no corpus lookup on this
+                    // route and the assistant that would ground a real summary is
+                    // feature-flagged off, so the string must not claim a
+                    // synthesis that does not happen: everything below `laws`
+                    // comes out of the deterministic engine.
+                    overview_summary: engineFailed
+                        ? "The compliance engine could not assess the requested markets. Obligations are missing, not absent."
+                        : "Obligations identified by the compliance engine for the requested markets and domains.",
+                    // 'failed': die Engine hat nicht gerechnet, `laws` ist leer,
+                    // weil nichts geprueft wurde. Die Risk Map zeigt dann
+                    // riskMapFailed mit dieser Referenz-ID, nicht "keine
+                    // Pflichten". Die Anbieter bleiben drin (die Bereichsseite
+                    // braucht nur sie); ob sie erscheinen, entscheidet die Flaeche.
+                    laws_status: engineFailed ? 'failed' : 'ok',
+                    ...(engineFailed ? { correlationId } : {}),
                     providers: anonProviders,
                     // Bereich × Markt: deckt ein freigegebener Anbieter das ab?
                     // Nur Booleans je Zelle — kein Anbieter, keine Anzahl.
@@ -3790,9 +3709,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         applies_from: r.appliesFrom ?? null,
                         state: r.focus ? 'confirmed' : 'likely',
                     })),
-                    tutorials: knowledgeMatches.map((m: any) => ({ id: m.id, content: m.content })),
-                    articles: [],
-                    tips: []
                 }));
             } catch (err) {
                 // Bis 2026-09-22: `400 { error: String(err) }` fuer JEDEN Fehler —

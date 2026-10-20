@@ -6,7 +6,6 @@ import type { SearchProfile } from '../components/wizard/WizardContext';
 // Guests anchor via a random guest_key; registration adopts these later.
 
 const GUEST_KEY = 'ch360_guest_key';
-const LAST_SESSION = 'ch360_last_session_id';
 
 export function ensureGuestKey(): string {
   let k = localStorage.getItem(GUEST_KEY);
@@ -15,10 +14,6 @@ export function ensureGuestKey(): string {
     localStorage.setItem(GUEST_KEY, k);
   }
   return k;
-}
-
-export function lastSessionId(): string | null {
-  return localStorage.getItem(LAST_SESSION);
 }
 
 // ─── Session list + actions (wiring map B13) ─────────────────────────────────
@@ -87,6 +82,5 @@ export async function saveWizardSession(profile: SearchProfile): Promise<string>
       answers: profile,
     }),
   });
-  localStorage.setItem(LAST_SESSION, res.id);
   return res.id;
 }

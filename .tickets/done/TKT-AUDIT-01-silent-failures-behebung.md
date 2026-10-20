@@ -1,0 +1,93 @@
+---
+title: "Silent-Failure-Befunde beheben (Buchung, Abrechnung, Privacy)"
+assignee: "Claude (Umsetzung) · Nutzer (Review je PR)"
+status: done
+---
+
+# Silent-Failure-Befunde beheben
+
+Befundliste: [`docs/audits/silent-failures-buchung-billing-privacy-2026-10-16.md`](../../docs/audits/silent-failures-buchung-billing-privacy-2026-10-16.md)
+(29 Befunde, PR #326). Reihenfolge vom Nutzer bestätigt (2026-10-18): wie vorgeschlagen, Geld zuerst.
+Ein PR je Befund, jeder mit Test, der den stillen Fehler vorher sichtbar gemacht hätte.
+
+## Fortschritt
+
+### 1 · Geld, das verloren geht oder doppelt fließt
+
+- [x] **B1** Stripe ohne Timeout, Netzabbruch nach Capture → `failed`, Retry belastet doppelt.
+  Timeout (`STRIPE_TIMEOUT_MS`), Ausgang `unknown` im Ledger, Sperre `payment_unresolved`,
+  Abgleich-Tick `runChargeReconcileTick` (Liste der PaymentIntents, Erstattung ohne Buchung).
+  Migration `20261018000000`, pgTAP 17, ADR-0005 „Offen" aktualisiert.
+- [x] **B2** Erstattung scheitert unsichtbar / gelungene Erstattung als Fehler protokolliert.
+  `reverseOrphanCharge` in `leadCharge.ts`: Refund → Ledger-Ereignis → event_log, jeder Schritt
+  einzeln mit `structuredLog('error')`; was halb bleibt, sperrt `payment_unresolved`, und der
+  Abgleich-Tick erstattet `captured` ohne Buchung mit demselben Idempotency-Key nach. Keine Migration.
+- [x] **B8** Doppelklick → zwei Ledger-Zeilen, zwei PaymentIntents.
+  Client schickt `request_id` je Versuch (`newBookingRequestId`, nach Fehler neu, bei „läuft noch“
+  gleich); Ledger-Spalte `request_key` mit Unique `(user_id, request_key)`. Wiederholung nach
+  Erfolg → dieselbe 201 (`replay: true`); Zeile ohne Buchung oder 23505 → 409 `BOOKING_IN_PROGRESS`
+  ohne Stripe. Migration `20261018000100`, pgTAP 18, Mock mit Gedächtnis je Session.
+- [x] **B7** Monatslauf: Stripe-Rechnung vor DB-Zeile; outer `catch {}` bricht den Lauf ab.
+  `issueInvoiceFor` in `billing.ts`: Stripe-Create → Zeile `draft` (mit `stripe_invoice_id`) → Positionen
+  → finalisieren → senden → Zeile `open` → Guthaben (einmal, Notiz trägt die Stripe-Kennung). Ein `draft`
+  wird beim nächsten Lauf wieder aufgenommen, nie neu ausgestellt; Anbieterlisten zeigen keine Entwürfe.
+  Je Anbieter `try/catch` → Ergebniszeile `error: issue_failed`, `errors` in der Antwort, `invoice_run_failed`.
+  Migration `20261018000200` (Status `draft`), pgTAP 19.
+- [x] **B6** 30-%-Guthaben: `credit_decided_at` vor dem Insert.
+  Reihenfolge gedreht: erst `provider_credits`, dann `credit_decided_at`. Nicht-Unique-Fehler lässt die
+  Frist offen (nächster Tick versucht es erneut); Unique-Verletzung = Guthaben steht schon → nur die Frist
+  schließen, `lead.credit_issued` mit `resumed: true`, keine zweite Meldung. Ledger-Spur ohne leeres `catch`.
+- [x] **B4** `quoteLeadFee` findet den Plan nur bei exakter `plan_version`.
+  `PricingConfig.planVersions` hält alle geltenden Versionen; `planFor(cfg, sub)` liefert die gebundene
+  Version, sonst die jüngste des Codes mit `exact: false`. `quoteLeadFee` trägt `planVersionExact`; die
+  Buchung loggt und protokolliert `plan_version_fallback`. Monatslauf und Vorschau rechnen die gebundene
+  Version (ein Abo zahlt, was es abgeschlossen hat; Versionswechsel über den geplanten Wechsel).
+
+### 2 · Zustände, die kippen und nie wiederkommen
+
+- [x] **B5** Tarifwechsel am Stichtag: altes Abo beendet, bevor das neue steht.
+  `executeSchedule`: erst der Nachfolger (ein schon vorhandener wird wiederverwendet), dann Ende und Leeren
+  der Vormerkung. Wirft der Insert, bleibt das alte Abo samt Vormerkung stehen, der nächste Tick holt nach.
+  `runSubscriptionPeriodTick` mit per-Zeile `try/catch`, `errors` im Ergebnis und im Watcher-Summary.
+- [x] **B11** Einzugs-Tick: Marker vor der Aktion.
+  Marker (`invoice_retry` je Stufe) erst nach `sendNotice` bzw. `attempt`. Wirft die Aktion, bleibt die
+  Stufe offen, Ereignis `invoice_retry_error`, der nächste Tick am selben Tag holt nach; der
+  Idempotency-Key je Stufe bei Stripe verhindert eine doppelte Belastung. Shadow: Marker ist die Aktion.
+  `log` im Versuch ohne leeres `catch`.
+- [x] **B12** Guthaben-Verbrauch hinter `.catch(() => {})` — erledigt mit B7 (`issueInvoiceFor`, einmal je Rechnung).
+- [x] **B9** Rabattzähler Read-before-write: RPC `increment_discount_counter` (Migration `20261018000300`, pgTAP 20),
+  Fehler → `discount_counter_failed`. Die Rabattstufe dieser Buchung stand schon vor der Belastung fest.
+- [x] **B10** `recordPaymentFailure` wirft bis in die Route: jeder Schritt einzeln, `lead_payment_failed_record_error`
+  mit `step`, die Route antwortet immer 409 `BOOKING_NOT_COMPLETED`.
+- [x] **B13** `recordProviderNoShow(...).catch(() => {})`: Fehler geloggt, Ereignis `provider_no_show_record_failed`, 200 bleibt.
+
+### 3 · Audit und Offenlegung
+
+- [x] **P4** `GET /engagement/:id` auf der Anbieterseite ohne `user_id`, `session_id`, `requester_email` und ohne
+  Identitätsschlüssel in `structured_answers` (`engagementForProvider`); Ersteller und Server-Key wie bisher.
+- [x] **P1** Assistant: Sitzungen nicht ladbar → 502 `ASSISTANT_CONTEXT_UNAVAILABLE`, kein Modellaufruf (DNA).
+- [x] **P2** Assistant: Audit `assistant_chat` VOR dem Modellaufruf; scheitert es → 502 `ASSISTANT_AUDIT_UNAVAILABLE`.
+- [x] **P5** Assistant: `redactText(strict)` auf Frage, Verlauf, Sitzungs-Labels. Dazu **P14**: Timeout 20 s an beiden Modellaufrufen.
+- [x] **P7** mit B10 erledigt (`logEvent`).
+- [x] **P8** Retention `api_request_log`: `retention_deleted` {table, count, errors, cutoff}, per-Zeile `try/catch`, `errors` im Watcher.
+- P3 = B2 (erledigt).
+
+### 4 · Kleinkram mit klarer Korrektur
+
+- [x] **B3** Ereignisse nach dem Buchungs-Insert einzeln abgefangen (`ERR_AUDIT_EVENT`), `lead.revealed` zuerst, immer 201.
+- [x] **B14** Nutzer-Draht: 409 `PROVIDER_NOT_BOOKABLE` statt `BILLING_NOT_READY`; `BOOKING_NOT_COMPLETED` ohne `reason`.
+- [x] **B15** `StripeError.paymentIntentId` aus `error.payment_intent.id` → `stripeRef` gefuellt.
+- [x] **P9** Engagement: 400 nur fuer den Body, sonst 500 + `structuredLog` (`ERR_ENGAGEMENT_CREATE`), kein Rohfehler.
+- [x] **P10** Region vor der Offenlegung maskiert — Detail und `/bookings` wie `/search`.
+- [x] **P11** `serializeProvider`: harte Deny-Liste (`stripe_customer_id`, `vat_id` nie; `name`, `website_url`, `contact_email` nicht vor der Offenlegung).
+- [x] **P12** Review-Text durch `scanFields` → 422 `IDENTITY_IN_TEXT`.
+- [x] **P13** `email_sent`/`email_failed` ohne Empfaenger, Fehler gekappt; Outbox behaelt den Empfaenger.
+- [x] **P14** mit P5 erledigt (Timeout an beiden Modellaufrufen).
+
+**Stand 2026-10-18: alle 29 Befunde behoben.** PRs #329, #331, #333, #339, #340, #342, #343, #345, #346 und dieser.
+
+## DNA-Check
+
+Kein Zielkonflikt. B1 schützt den Anbieter vor einer Doppelbelastung und sagt dem Nutzer
+die Wahrheit („nichts gebucht, nichts zu zahlen") statt „gescheitert" zu behaupten, wenn
+niemand es weiß. Die Sperre ist neutral formuliert und löst sich von selbst.

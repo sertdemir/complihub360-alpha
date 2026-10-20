@@ -37,7 +37,7 @@
       "gold": "shouldn't",
       "post": " be doing alone."
     },
-    "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. Six minutes to your first risk map. No account required.",
+    "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. About five minutes to your first risk map. No account required.",
     "subtitleMobile": "CompliHub360 maps the rules across European markets, then connects you to a verified specialist when something needs hands. Six minutes to your first risk map. No account required.",
     "cta": {
       "start": "Assess My Needs",
@@ -49,7 +49,7 @@
       "No credit card",
       "Results in your browser"
     ],
-    "visualCaption": "Six minutes · 4 questions · No account required",
+    "visualCaption": "About five minutes · 4 questions · No account required",
     "preview": {
       "context": "Cross-border launch — DE → UK + NL",
       "steps": [
@@ -75,15 +75,15 @@
       "placeholder": "Describe your situation in your own words…",
       "answer": "Ask a Compliance Question",
       "guided": "Assess My Needs",
-      "trust": "Free · anonymous · under 3 minutes"
+      "trust": "Free · anonymous · about five minutes"
     }
   },
   "heroWorld": {
     "title": {
-      "line1": "Cross-border compliance.",
-      "line2": "Simplified."
+      "line1": "Understand what applies to your business.",
+      "line2": "Know what to do next."
     },
-    "lead": "Understand your obligations across {{markets}} markets. Find the right specialists. Stay compliant.",
+    "lead": "Your obligations in {{markets}} markets, each with its source. The right specialist when you need one.",
     "ctaRiskMap": "Assess My Needs",
     "ask": {
       "placeholder": "Describe what you need",
@@ -114,7 +114,7 @@
       },
       {
         "title": "Expert network",
-        "desc": "Verified specialists you can trust."
+        "desc": "Specialists checked against evidence for each service and market."
       },
       {
         "title": "Smart technology",
@@ -126,7 +126,7 @@
       },
       {
         "title": "Your data, protected",
-        "desc": "Enterprise-grade security and privacy."
+        "desc": "Anonymous assessment. Identifiers masked before any AI sees your text."
       }
     ]
   },
@@ -552,7 +552,7 @@
     "drawerLabel": "Save your progress"
   },
   "riskMapPreview": {
-    "guestNote": "Guest map · expires in 30 min",
+    "guestNote": "Guest map · kept for 30 min — save it to keep it",
     "eyebrow": "Your risk map",
     "title": "Here's what applies to you.",
     "stats": [
@@ -576,28 +576,28 @@
     "rows": [
       {
         "title": "OSS quarterly return",
-        "detail": "Last filed: Q1 2025 · Penalty: €5,000 + 1%/mo · UStG §18i",
+        "detail": "Last filed: Q1 2025 · Next return due · UStG §18i",
         "market": "DE · NL",
         "due": "Apr 30",
         "dueSub": "6 days"
       },
       {
         "title": "VAT registration — UK",
-        "detail": "Post-Brexit threshold check · up to €20,000 · VATA §3",
+        "detail": "Post-Brexit threshold check · VATA §3",
         "market": "UK",
         "due": "May 15",
         "dueSub": "21 days"
       },
       {
         "title": "EPR packaging registration (LUCID)",
-        "detail": "Producer status to confirm · up to €50,000 · VerpackG",
+        "detail": "Producer status to confirm · VerpackG",
         "market": "DE",
         "due": "May 02",
         "dueSub": "8 days"
       },
       {
         "title": "EPR registration renewal (PackUK)",
-        "detail": "Last filed: Apr 2024 · 4% of UK revenue · Packaging Regs",
+        "detail": "Last filed: Apr 2024 · Renewal due · Packaging Regs",
         "market": "UK",
         "due": "May 15",
         "dueSub": "21 days"
@@ -654,28 +654,28 @@
     "rows": [
       {
         "title": "OSS quarterly return",
-        "detail": "Last filed: Q1 2025 · Penalty: €5,000 + 1%/month · UStG §18i (OSS)",
+        "detail": "Last filed: Q1 2025 · Next return due · UStG §18i (OSS)",
         "market": "DE · NL",
         "due": "Apr 30",
         "dueSub": "6 days"
       },
       {
         "title": "VAT registration — UK",
-        "detail": "Post-Brexit threshold check needed · Penalty: up to €20,000 · UK VATA 1994 §3",
+        "detail": "Post-Brexit threshold check needed · UK VATA 1994 §3",
         "market": "UK",
         "due": "May 15",
         "dueSub": "21 days"
       },
       {
         "title": "EPR packaging registration (LUCID)",
-        "detail": "Producer status to confirm · Penalty: up to €50,000 · VerpackG Art. 9 Abs. 1",
+        "detail": "Producer status to confirm before first shipment · VerpackG §9",
         "market": "DE",
         "due": "May 02",
         "dueSub": "8 days"
       },
       {
         "title": "EPR registration renewal (PackUK)",
-        "detail": "Last filed: Apr 2024 · Penalty: 4% of UK revenue · UK Packaging Regs. 2023 §7",
+        "detail": "Last filed: Apr 2024 · Renewal due · UK Packaging Regs. 2023 §7",
         "market": "UK",
         "due": "May 15",
         "dueSub": "21 days"
@@ -703,7 +703,7 @@
       },
       {
         "title": "Beneficial-owner update",
-        "detail": "Last filed: Mar 2025 · Penalty: €1,000–5,000 · GwG §20 Abs. 1",
+        "detail": "Last filed: Mar 2025 · Update due · GwG §20 Abs. 1",
         "market": "DE",
         "due": "Jun 30",
         "dueSub": "ongoing"
@@ -714,7 +714,7 @@
     "unlock": "See my best matches with a free account",
     "save": {
       "title": "Save this map. Unlock the providers.",
-      "subtitle": "Free account. No credit card. Founding-member access through Beta launch.",
+      "subtitle": "Free account. No credit card. Your map and your matches stay saved.",
       "cta": "Create free account"
     },
     "statsCompact": [
@@ -788,15 +788,15 @@
     "steps": [
       {
         "title": "Start your assessment",
-        "desc": "4–5 questions. Under 2 minutes. No account needed."
+        "desc": "Four questions. About five minutes. No account needed."
       },
       {
         "title": "See your risk map",
         "desc": "Anonymous preview, structured, source-cited."
       },
       {
-        "title": "Sign up to see matches",
-        "desc": "Provider matching is reserved for registered accounts."
+        "title": "Save your map to see matches",
+        "desc": "A free account lets us hold your map and send your request to the right provider. No credit card."
       },
       {
         "title": "Get structured handovers",
@@ -1108,7 +1108,7 @@
       {
         "label": "Brand mark — Verified Provider",
         "title": "A quiet sign of accountability.",
-        "desc": "Verified Providers are vetted advisors who accept shared responsibility for your matter. The gold mark is restraint, not promotion."
+        "desc": "Verified Providers are vetted advisors who answer for your matter under their own professional responsibility. The gold mark is restraint, not promotion."
       }
     ],
     "demo": {
@@ -1180,12 +1180,12 @@
       "reqEprMeta": "EPR · France",
       "chipTaxIt": "TAX & VAT · IT",
       "chipPackFr": "PACKAGING · FR",
-      "riskHigh": "● High risk · threshold reached",
-      "riskMedium": "● Medium risk · deadline Q3",
+      "riskHigh": "● High priority · threshold reached",
+      "riskMedium": "● Medium priority · due Q3",
       "chipMonitoring": "MONITORING",
       "chipRequest": "REQUEST",
       "chipSla": "SLA",
-      "feedThreshold": "Risk threshold reached · Italy VAT",
+      "feedThreshold": "Threshold reached · Italy VAT",
       "feedReplied": "Provider replied · Verified tax firm",
       "feedSla": "SLA reminder · Data protection firm · UK",
       "time6h": "6h",

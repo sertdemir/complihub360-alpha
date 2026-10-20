@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ArrowRight, CalendarCheck, Globe, Inbox } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { WORKSPACE_CARD } from '../ui/Card';
 import { TechnicalDetails } from '../results/RiskMapState';
 import { referenceOf } from '../../api/client';
 import { fetchApplication, type Application, type LifecycleStatus } from '../../api/application';
@@ -41,7 +43,7 @@ export function LoadFailedState({
     <div role="status" className={section ? 'flex max-w-[720px] flex-col gap-3 py-2' : 'flex max-w-[720px] flex-col gap-3'}>
       <Heading className={section
         ? 'text-[17px] font-semibold leading-snug text-fg'
-        : 'text-balance font-serif text-[30px] font-bold leading-tight text-fg'}>
+        : 'text-balance font-serif text-[32px] font-bold leading-tight text-fg'}>
         {t(`states.partner.loadFailed.${surface}`)}
       </Heading>
       <p className="text-pretty text-body-sm leading-relaxed text-fg-secondary">{t('states.partner.loadFailed.message')}</p>
@@ -156,43 +158,62 @@ export function ReadinessEmpty({
   kind,
   items,
 }: {
-  kind: 'appointments' | 'requests';
+  kind: 'appointments' | 'requests' | 'coverage';
   items: ReadinessItem[] | null;
 }) {
   const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
   const locale = i18n.resolvedLanguage || 'en';
+  // A7 (Angleich an das User-Dashboard, Figma 3794:29340, 18.10.2026): die
+  // Grammatik des User-EmptyState — Icon, Serif-Titel, Hinweis, Erklaerung,
+  // drei Spalten, EINE Aktion rechts unten — mit der Bereitschaft als Spalten
+  // (Zustand ✓/! statt Nummer). Die erste offene Sache mit Weg wird die Aktion.
+  // `coverage` (Abdeckung, Figma 3804:529): noch keine freigegebene Leistung —
+  // ohne Bereitschaftsliste, der eine Weg fuehrt zur Verifizierung.
+  const coverage = kind === 'coverage';
+  const open = items?.find((it) => !it.done && it.action)
+    ?? (coverage ? { action: { to: 'verification', label: t('states.partner.empty.coverageAction') } } : null);
+  const Icon = kind === 'appointments' ? CalendarCheck : coverage ? Globe : Inbox;
+  const closing = t(coverage ? 'states.partner.empty.coverageClosing' : 'states.partner.empty.closing');
+  const how = t(coverage ? 'states.partner.empty.coverageHow' : 'states.partner.empty.howBookingWorks');
   return (
-    <div className="space-y-3.5 rounded-xl border border-dashed border-stroke bg-surface-secondary/60 px-6 py-5">
-      <div className="space-y-1.5">
-        <h2 className="text-[17px] font-semibold text-fg">{t(`states.partner.empty.${kind}`)}</h2>
-        <p className="max-w-3xl text-body-sm leading-relaxed text-fg-secondary">{t('states.partner.empty.howBookingWorks')}</p>
+    <div className={`${WORKSPACE_CARD} mx-auto max-w-[720px] px-9 py-8`}>
+      <div className="flex items-center gap-3.5">
+        <span className="grid h-11 w-11 shrink-0 place-items-center text-fg-brand">
+          <Icon size={20} strokeWidth={1.9} />
+        </span>
+        <div className="min-w-0">
+          <h2 className="font-serif text-[20px] font-bold leading-tight text-fg">{t(`states.partner.empty.${kind}`)}</h2>
+          <p className="mt-0.5 text-body-2xs text-fg-tertiary">{closing}</p>
+        </div>
       </div>
+      <p className="mt-[18px] text-body-xs leading-relaxed text-fg-secondary [text-wrap:pretty]">{how}</p>
       {items && (
-        <ul className="space-y-2.5">
+        <ul className="mt-[22px] grid gap-5 border-t border-stroke-subtle pt-[22px] sm:grid-cols-3">
           {items.map((it) => (
             <li key={it.key} className="flex items-start gap-3" data-readiness={it.key} data-done={it.done}>
               <span
                 aria-hidden
                 className={'mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full border text-[12px] font-bold '
-                  + (it.done ? 'border-success-500/40 bg-success-50 text-success-700' : 'border-warning-500/50 bg-warning-50 text-warning-700')}
+                  + (it.done ? 'border-success-500/40 bg-success-bg text-success-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'border-warning-500/50 bg-warning-bg text-warning-800 dark:bg-amber-500/15 dark:text-amber-300')}
               >
                 {it.done ? '✓' : '!'}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[13px] font-medium text-fg">{it.title}</span>
-                {it.sub && <span className="block text-[12px] text-fg-tertiary">{it.sub}</span>}
+                <span className="block text-body-xs font-bold text-fg">{it.title}</span>
+                {it.sub && <span className="mt-0.5 block text-body-2xs leading-snug text-fg-tertiary">{it.sub}</span>}
               </span>
-              {it.action && (
-                <Button size="sm" variant="secondary" onClick={() => navigate(`/${locale}/provider-dashboard/${it.action!.to}`)}>
-                  {it.action.label}
-                </Button>
-              )}
             </li>
           ))}
         </ul>
       )}
-      <p className="text-[12px] text-fg-tertiary">{t('states.partner.empty.closing')}</p>
+      {open && (
+        <div className="mt-6 flex justify-end">
+          <Button onClick={() => navigate(`/${locale}/provider-dashboard/${open.action!.to}`)}>
+            {open.action!.label} <ArrowRight size={14} className="ml-1" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

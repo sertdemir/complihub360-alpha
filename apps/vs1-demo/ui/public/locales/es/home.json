@@ -37,7 +37,7 @@
       "gold": "no debería",
       "post": " hacer usted solo."
     },
-    "subtitleDesktop": "CompliHub360 mapea las normas que aplican a sus operaciones en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
+    "subtitleDesktop": "CompliHub360 mapea las normas que aplican a sus operaciones en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Unos cinco minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
     "subtitleMobile": "CompliHub360 mapea las normas en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
     "cta": {
       "start": "Evaluar mis necesidades",
@@ -49,7 +49,7 @@
       "Sin tarjeta de crédito",
       "Resultados en su navegador"
     ],
-    "visualCaption": "Seis minutos · 4 preguntas · Sin necesidad de cuenta",
+    "visualCaption": "Unos cinco minutos · 4 preguntas · Sin necesidad de cuenta",
     "preview": {
       "context": "Lanzamiento transfronterizo — DE → UK + NL",
       "steps": [
@@ -75,14 +75,15 @@
       "placeholder": "Describa su situación con sus propias palabras…",
       "answer": "Hacer una pregunta de compliance",
       "guided": "Evaluar mis necesidades",
-      "trust": "Gratis · anónimo · en menos de 3 minutos"
+      "trust": "Gratis · anónimo · unos cinco minutos"
     }
   },
   "heroWorld": {
     "title": {
-      "line2": "Simplificado."
+      "line2": "Sepa qué hacer a continuación.",
+      "line1": "Entienda qué aplica a su empresa."
     },
-    "lead": "Entienda sus obligaciones. Encuentre a los especialistas adecuados. Manténgase conforme — allí donde venda.",
+    "lead": "Sus obligaciones en {{markets}} mercados, cada una con su fuente. El especialista adecuado cuando lo necesite.",
     "ctaRiskMap": "Evaluar mis necesidades",
     "ask": {
       "placeholder": "Describa su caso",
@@ -112,7 +113,7 @@
       },
       {
         "title": "Red de expertos",
-        "desc": "Especialistas verificados en los que confiar."
+        "desc": "Especialistas verificados con pruebas por servicio y mercado."
       },
       {
         "title": "Tecnología inteligente",
@@ -124,7 +125,7 @@
       },
       {
         "title": "Sus datos, protegidos",
-        "desc": "Seguridad y privacidad de nivel enterprise."
+        "desc": "Evaluación anónima. Los identificadores se enmascaran antes de que una IA vea su texto."
       }
     ]
   },
@@ -550,7 +551,7 @@
     "drawerLabel": "Guarde su progreso"
   },
   "riskMapPreview": {
-    "guestNote": "Mapa de invitado · caduca en 30 min",
+    "guestNote": "Mapa de invitado · se conserva 30 min — guárdelo para conservarlo",
     "eyebrow": "Su Risk Map",
     "title": "Esto es lo que le aplica.",
     "stats": [
@@ -574,28 +575,28 @@
     "rows": [
       {
         "title": "Declaración trimestral OSS",
-        "detail": "Última presentación: Q1 2025 · Sanción: €5,000 + 1 %/mes · UStG §18i",
+        "detail": "Última presentación: Q1 2025 · Próxima declaración · UStG §18i",
         "market": "DE · NL",
         "due": "30 abr",
         "dueSub": "6 días"
       },
       {
         "title": "Registro de IVA — UK",
-        "detail": "Comprobación de umbral tras el Brexit · hasta €20,000 · VATA §3",
+        "detail": "Comprobación de umbral tras el Brexit · VATA §3",
         "market": "UK",
         "due": "15 may",
         "dueSub": "21 días"
       },
       {
         "title": "Registro RAP de envases (LUCID)",
-        "detail": "Condición de productor por confirmar · hasta €50,000 · VerpackG",
+        "detail": "Condición de productor por confirmar · VerpackG",
         "market": "DE",
         "due": "02 may",
         "dueSub": "8 días"
       },
       {
         "title": "Renovación del registro RAP (PackUK)",
-        "detail": "Última presentación: abr 2024 · 4 % de los ingresos UK · Packaging Regs",
+        "detail": "Última presentación: abr 2024 · Renovación pendiente · Packaging Regs",
         "market": "UK",
         "due": "15 may",
         "dueSub": "21 días"
@@ -652,28 +653,28 @@
     "rows": [
       {
         "title": "Declaración trimestral OSS",
-        "detail": "Última presentación: Q1 2025 · Sanción: €5,000 + 1 %/mes · UStG §18i (OSS)",
+        "detail": "Última presentación: Q1 2025 · Próxima declaración pendiente · UStG §18i (OSS)",
         "market": "DE · NL",
         "due": "30 abr",
         "dueSub": "6 días"
       },
       {
         "title": "Registro de IVA — UK",
-        "detail": "Se requiere comprobar el umbral tras el Brexit · Sanción: hasta €20,000 · UK VATA 1994 §3",
+        "detail": "Se requiere comprobar el umbral tras el Brexit · UK VATA 1994 §3",
         "market": "UK",
         "due": "15 may",
         "dueSub": "21 días"
       },
       {
         "title": "Registro RAP de envases (LUCID)",
-        "detail": "Condición de productor por confirmar · Sanción: hasta €50,000 · VerpackG Art. 9 Abs. 1",
+        "detail": "Condición de productor por confirmar antes del primer envío · VerpackG §9",
         "market": "DE",
         "due": "02 may",
         "dueSub": "8 días"
       },
       {
         "title": "Renovación del registro RAP (PackUK)",
-        "detail": "Última presentación: abr 2024 · Sanción: 4 % de los ingresos UK · UK Packaging Regs. 2023 §7",
+        "detail": "Última presentación: abr 2024 · Renovación pendiente · UK Packaging Regs. 2023 §7",
         "market": "UK",
         "due": "15 may",
         "dueSub": "21 días"
@@ -701,7 +702,7 @@
       },
       {
         "title": "Actualización de titulares reales",
-        "detail": "Última presentación: mar 2025 · Sanción: €1,000–5,000 · GwG §20 Abs. 1",
+        "detail": "Última presentación: mar 2025 · Actualización pendiente · GwG §20 Abs. 1",
         "market": "DE",
         "due": "30 jun",
         "dueSub": "continuo"
@@ -712,7 +713,7 @@
     "unlock": "Vea sus mejores matches con una cuenta gratuita",
     "save": {
       "title": "Guarde este mapa. Desbloquee los proveedores.",
-      "subtitle": "Cuenta gratuita. Sin tarjeta de crédito. Acceso de miembro fundador hasta el lanzamiento de la Beta.",
+      "subtitle": "Cuenta gratuita. Sin tarjeta de crédito. Su mapa y sus coincidencias quedan guardados.",
       "cta": "Crear cuenta gratuita"
     },
     "statsCompact": [
@@ -784,15 +785,15 @@
     "steps": [
       {
         "title": "Inicie su evaluación",
-        "desc": "4–5 preguntas. Menos de 2 minutos. Sin necesidad de cuenta."
+        "desc": "Cuatro preguntas. Unos cinco minutos. Sin necesidad de cuenta."
       },
       {
         "title": "Vea su Risk Map",
         "desc": "Vista previa anónima, estructurada, con fuentes citadas."
       },
       {
-        "title": "Regístrese para ver los matches",
-        "desc": "El matching con proveedores está reservado a cuentas registradas."
+        "title": "Guarde su mapa para ver los matches",
+        "desc": "Una cuenta gratuita nos permite guardar su mapa y enviar su solicitud al proveedor adecuado. Sin tarjeta de crédito."
       },
       {
         "title": "Reciba traspasos estructurados",
@@ -1082,7 +1083,7 @@
       {
         "label": "Marca — Verified Provider",
         "title": "Una señal discreta de responsabilidad.",
-        "desc": "Los Verified Providers son asesores evaluados que aceptan una responsabilidad compartida por su asunto. La marca dorada es contención, no promoción."
+        "desc": "Los Verified Providers son asesores evaluados que responden por su asunto bajo su propia responsabilidad profesional. La marca dorada es contención, no promoción."
       }
     ],
     "demo": {
@@ -1153,12 +1154,12 @@
       "reqEprMeta": "EPR · Francia",
       "chipTaxIt": "IMPUESTOS E IVA · IT",
       "chipPackFr": "ENVASES · FR",
-      "riskHigh": "● Riesgo alto · umbral alcanzado",
-      "riskMedium": "● Riesgo medio · plazo T3",
+      "riskHigh": "● Prioridad alta · umbral alcanzado",
+      "riskMedium": "● Prioridad media · vence T3",
       "chipMonitoring": "SEGUIMIENTO",
       "chipRequest": "SOLICITUD",
       "chipSla": "SLA",
-      "feedThreshold": "Umbral de riesgo alcanzado · IVA Italia",
+      "feedThreshold": "Umbral alcanzado · IVA Italia",
       "feedReplied": "El proveedor ha respondido · Despacho fiscal verificado",
       "feedSla": "Recordatorio de SLA · Despacho de protección de datos · Reino Unido",
       "time6h": "6 h",

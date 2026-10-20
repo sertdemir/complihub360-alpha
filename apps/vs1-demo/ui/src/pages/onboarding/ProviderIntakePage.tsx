@@ -8,7 +8,9 @@ import { Banner } from '../../components/ui/Banner';
 import { Logo } from '../../components/ui/Logo';
 import { FormErrorSummary, focusField, type FormError } from '../../components/ui/FormErrorSummary';
 import { FieldError, errorAria } from '../../components/ui/FieldError';
-import { ApiError, apiFetch } from '../../api/client';
+import { apiFetch } from '../../api/client';
+import { errorFieldOf } from '../../lib/serverErrors';
+import { activeSinceMax, parseActiveSince } from '../../lib/activeSince';
 import { DOMAINS } from '../../lib/domains';
 import type { BillingModel } from '../../api/provider';
 
@@ -38,9 +40,13 @@ export function ProviderIntakePage() {
   // das Absenden: Fehler am Feld und gesammelt am Knopf, Fokus aufs erste.
   const [tried, setTried] = useState(false);
   const [serverName, setServerName] = useState(false);
+  // Punkt 3: ein Jahr von 1900 bis heute oder leer — vorher machte
+  // `parseInt(x) || null` aus „seit 2015" still nichts und aus „15" das Jahr 15.
+  const [serverSince, setServerSince] = useState(false);
   const errorsOf = (): FormError[] => {
     const errs: FormError[] = [];
     if (name.trim().length < 2 || serverName) errs.push({ id: 'intake-name', label: t('intake.nameShort'), message: t('intake.errors.name') });
+    if (parseActiveSince(activeSince) === 'invalid' || serverSince) errs.push({ id: 'intake-active-since', label: t('settings.activeSinceLabel'), message: t('application.account.activeSinceInvalid', { max: activeSinceMax() }) });
     if (!statutes) errs.push({ id: 'intake-statutes', label: t('intake.statutesShort'), message: t('intake.errors.statutes') });
     return errs;
   };
@@ -67,14 +73,18 @@ export function ProviderIntakePage() {
           categories: [...cats],
           billing_model: billing,
           region: region.trim() || null,
-          active_since: parseInt(activeSince, 10) || null,
+          active_since: parseActiveSince(activeSince) as number | null,
           certifications: certs.split('\n').map((s) => s.trim()).filter(Boolean),
         }),
       });
       setState('done');
     } catch (err) {
-      // Der Server bemaengelt den Namen (400 "name required"): der Satz steht am Feld.
-      if (err instanceof ApiError && err.status === 400 && /name/i.test(err.message)) {
+      // Der Server bemaengelt den Namen: der Satz steht am Feld. Erkannt am
+      // Feld im Fehler, nicht am Server-Text (Punkt 2).
+      if (errorFieldOf(err) === 'active_since') {
+        setServerSince(true); setState('idle'); focusField('intake-active-since'); return;
+      }
+      if (errorFieldOf(err) === 'name') {
         setServerName(true); setState('idle'); focusField('intake-name'); return;
       }
       setState('error');
@@ -167,7 +177,13 @@ export function ProviderIntakePage() {
         <p className="text-[12px] leading-relaxed text-fg-tertiary">{t('intake.titleNote')}</p>
         <div className="grid gap-3 sm:grid-cols-2">
           {field(t('settings.regionLabel'), <Input value={region} onChange={(e) => setRegion(e.target.value)} placeholder="Norditalien" />)}
-          {field(t('settings.activeSinceLabel'), <Input value={activeSince} onChange={(e) => setActiveSince(e.target.value)} placeholder="2015" />)}
+          {field(t('settings.activeSinceLabel'), <>
+            <Input id="intake-active-since" inputMode="numeric" maxLength={4} autoComplete="off" value={activeSince}
+              onChange={(e) => { setActiveSince(e.target.value); setServerSince(false); }} placeholder={t('application.account.activeSincePh')}
+              aria-describedby="intake-active-since-hint" error={!!errFor('intake-active-since')} {...errorAria('intake-active-since', !!errFor('intake-active-since'))} />
+            <FieldError id="intake-active-since" alert message={errFor('intake-active-since')} />
+            {!errFor('intake-active-since') && <p id="intake-active-since-hint" className="mt-1.5 text-[12px] text-fg-tertiary">{t('application.account.activeSinceHint')}</p>}
+          </>, 'intake-active-since')}
         </div>
       </div>
       <div className="space-y-4 rounded-xl border border-stroke bg-surface-secondary/40 p-6">

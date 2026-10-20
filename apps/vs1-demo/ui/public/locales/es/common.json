@@ -11,51 +11,7 @@
     "signOut": "Cerrar sesión"
   },
   "hero": {
-    "scenarios": {
-      "shortcut": {
-        "seg1": "Tu Atajo de ",
-        "seg2": "Cumplimiento",
-        "seg3": " a los Mercados Globales",
-        "text": "Identifica instantáneamente brechas regulatorias y conéctate con expertos locales verificados.",
-        "cta": "Encuentra mi atajo de cumplimiento",
-        "usp1": "Análisis de brechas instantáneo",
-        "usp2": "Expertos locales verificados",
-        "usp3": "Ejecución rápida"
-      },
-      "actionPlan": {
-        "seg1": "Del Riesgo Regulatorio al ",
-        "seg2": "Plan de Acción",
-        "seg3": " en Minutos",
-        "text": "Traduce la fragmentación local en una hoja de ruta clara. Entiende más rápido y decide más seguro.",
-        "cta": "Crea mi plan de acción ahora",
-        "usp1": "Entiende más rápido",
-        "usp2": "Decide más seguro",
-        "usp3": "Hoja de ruta clara"
-      },
-      "experts": {
-        "seg1": "La Vía Más Rápida Hacia ",
-        "seg2": "Expertos Locales en Cumplimiento",
-        "cta": "Conecta con un experto ahora",
-        "usp1": "Matching instantáneo",
-        "usp2": "Expertos precalificados",
-        "usp3": "Evaluación personalizada"
-      }
-    },
-    "companies": "La confianza de empresas innovadoras",
-    "scroll": "Explorar Plataforma",
-    "funnel": {
-      "countryLabel": "Mercado Objetivo",
-      "countryUk": "Reino Unido",
-      "countryEu": "Unión Europea",
-      "countryGlobal": "Global / Otro",
-      "categoryLabel": "Categoría de Cumplimiento",
-      "catTaxVat": "Impuestos e IVA",
-      "catEpr": "EPR Embalaje",
-      "catPrivacy": "Privacidad de Datos",
-      "catMarketing": "Compliance de marketing",
-      "catCorporate": "Configuración Corporativa",
-      "cta": "Califica ahora"
-    }
+    "scroll": "Explorar Plataforma"
   },
   "components": {
     "engagementModal": {
@@ -81,9 +37,9 @@
       "body": "Los fundadores necesitan velocidad y claridad, no explicaciones legales académicas. CompliHub360 convierte la complejidad regulatoria en decisiones que usted puede tomar: qué se aplica a su empresa, por qué importa y quién puede ayudar. La expansión internacional es una de esas decisiones, no la única.",
       "cta": "Iniciar verificación de cumplimiento",
       "pain1Title": "El punto ciego transfronterizo",
-      "pain1Desc": "¿Expandiéndote internacionalmente? Los umbrales de IVA, las leyes de embalaje EPR y el GDPR difieren por país. Un registro omitido puede significar multas.",
-      "pain2Title": "La trampa del experto poco fiable",
-      "pain2Desc": "Enviar correos fríos a proveedores de cumplimiento y esperar semanas para respuestas vagas no es una estrategia. Es una responsabilidad.",
+      "pain1Desc": "¿Expansión internacional? Los umbrales de IVA, las normas de envases EPR y el RGPD difieren por país, y cada registro tiene su propio desencadenante. El mapa muestra cuáles le aplican.",
+      "pain2Title": "El camino largo hasta el especialista adecuado",
+      "pain2Desc": "Enviar correos a ciegas a proveedores y esperar semanas una respuesta cuesta un tiempo que quizá no tenga. Una solicitud estructurada con su contexto recibe una respuesta de fondo en 48 horas.",
       "pain3Title": "Nosotros lo solucionamos",
       "diagramTitle": "Del contexto al especialista adecuado",
       "node1Label": "Puerta de País",
@@ -97,7 +53,6 @@
       "stat1Label": "Pasos para el perfil de riesgo",
       "stat2Label": "Tiempo máximo de confirmación",
       "stat3Label": "Ventana máxima de respuesta",
-      "stat4Label": "Sorpresas regulatorias",
       "railSub": "Velocidad y claridad en lugar de dictámenes"
     },
     "operations": {
@@ -106,7 +61,7 @@
       "body": "Los gerentes de operaciones y operadores de agencias necesitan conocimiento estructurado y un sistema unificado, no sitios gubernamentales dispersos y caóticos hilos de correo. CompliHub360 te da un único centro de control para el cumplimiento transfronterizo.",
       "card1Title": "Investigación dispersa",
       "card1Problem": "La información sobre restricciones publicitarias, EPR y leyes fiscales está fragmentada en sitios gubernamentales no estructurados.",
-      "card1Solution": "Nuestro Centro de Conocimiento agrega leyes respaldadas por fuentes, tutoriales y guías — todo adaptado a tu perfil de búsqueda exacto.",
+      "card1Solution": "Las páginas de Mercados y Áreas de cumplimiento recogen las obligaciones que comprobamos, cada una con su norma. Las guías y tutoriales llegarán cuando merezcan la lectura.",
       "card2Title": "Pérdida de continuidad",
       "card2Problem": "Rastrear solicitudes de proveedores, sesiones guardadas y actualizaciones legales es caótico sin un sistema unificado.",
       "card2Solution": "El Centro de Control del Panel te permite guardar sesiones, rastrear estados de engagement en tiempo real y monitorear tareas.",
@@ -133,12 +88,12 @@
     "counsel": {
       "overline": "Para Asesores Jurídicos Internos",
       "title": "Inteligencia defendible. Orquestación segura.",
-      "body": "Los profesionales legales exigen privacidad estricta de datos y cero alucinaciones de IA. CompliHub360 es una capa de infraestructura segura y lista para la Ley de IA de la UE que acelera la investigación legal y estructura de forma segura los mandatos externos.",
+      "body": "Los profesionales legales necesitan una estricta privacidad de datos y resultados trazables. CompliHub360 es una capa centrada en la privacidad, construida con la Ley de IA de la UE en mente: estructura la investigación y los mandatos externos, y cada afirmación lleva su fuente.",
       "cta": "Probar la investigación segura",
-      "benefit1Title": "Cero alucinaciones",
-      "benefit1Desc": "Cada resumen, etiqueta de riesgo y consejo está respaldado directamente por enlaces a fuentes legales oficiales y validadas. Sin afirmaciones inventadas.",
+      "benefit1Title": "Resultados ligados a fuentes",
+      "benefit1Desc": "Cada resumen, etiqueta de riesgo y consejo enlaza con la fuente oficial en la que se basa. Donde no tenemos fuente, lo decimos en lugar de rellenar el hueco.",
       "benefit2Title": "Arquitectura de privacidad primero",
-      "benefit2Desc": "Los documentos pasan por un Pipeline local de redacción de PII. Los nombres, correos electrónicos y números de teléfono se enmascaran antes de cualquier procesamiento de IA.",
+      "benefit2Desc": "Los documentos pasan por un pipeline local de redacción. Las direcciones de correo, los números de teléfono y los patrones de identificadores conocidos se enmascaran antes de cualquier procesamiento de IA. Las reglas de patrones no detectan todos los nombres; el Trust Center indica qué cubren.",
       "benefit3Title": "Dossiers de engagement estructurados",
       "benefit3Desc": "Reemplaza los correos vagos con dossiers de cumplimiento estructurados enviados a asesores locales verificados, acelerando el proceso de mandato.",
       "privacyGateTitle": "La Puerta de IA con Privacidad Primero",
@@ -152,7 +107,7 @@
       "stage4Desc": "Resumen respaldado por fuentes",
       "codeCommentBefore": "// Antes de la redacción",
       "codeCommentAfter": "// Después de la redacción",
-      "stat1Label": "PII enmascarada antes de la IA",
+      "stat1Label": "Las entradas pasan por la puerta de redacción",
       "stat2Label": "Resultados vinculados a fuentes",
       "railSub": "Afirmaciones con fuente, datos enmascarados"
     },
@@ -307,7 +262,7 @@
     "startAssessment": "Iniciar evaluación de {{title}}",
     "riskPanel": {
       "eyebrow": "Ponderado por el motor",
-      "title": "Dónde arde primero — calculado para su mercado.",
+      "title": "Lo que requiere atención primero — ponderado para su mercado.",
       "lead": "El motor de cumplimiento pondera cada área a partir de bases legales, rangos de sanciones y plazos. El ranking muestra qué necesita atención primero; la vista comparativa pone riesgo, plazo de actuación y exposición típica lado a lado.",
       "marketNote": "Ponderado para {{market}} — el selector de mercado de arriba recalcula ranking y rangos.",
       "tabRanking": "Ranking de riesgo",
@@ -340,7 +295,7 @@
       "col": {
         "risk": "Riesgo",
         "time": "Plazo para actuar",
-        "fine": "Exposición típica",
+        "fine": "Sanción máxima",
         "markets": "Mercados activos",
         "proven": "acreditado"
       },
@@ -350,7 +305,7 @@
     "howItWorks": {
       "overline": "Orquestación, no un directorio",
       "title": "De la incertidumbre a la acción estructurada — en cuatro pasos",
-      "body": "CompliHub360 controla el embudo de contratación y garantiza la responsabilidad de respuesta. Usted mantiene el control de principio a fin.",
+      "body": "CompliHub360 estructura su solicitud y exige a los proveedores sus tiempos de respuesta. Usted mantiene el control de principio a fin.",
       "stepLabel": "Paso {{num}}",
       "define": {
         "title": "Definir",
@@ -380,7 +335,7 @@
       "openCta": "Abrir",
       "library": {
         "title": "Biblioteca de Cumplimiento",
-        "body": "Normativas seleccionadas, fuentes oficiales y guías estructuradas para cada área."
+        "body": "Las normativas y fuentes oficiales detrás de cada área."
       },
       "countries": {
         "title": "Guías por país",
@@ -388,7 +343,7 @@
       },
       "tutorials": {
         "title": "Tutoriales y guías prácticas",
-        "body": "Manuales paso a paso para escenarios de cumplimiento habituales."
+        "body": "Guías paso a paso — se añaden a medida que se escriben."
       }
     },
     "meta": {
@@ -439,7 +394,7 @@
       "personaFit": "Ideal para: fabricantes y revendedores",
       "cov1": "Asistente de EPR y envases — evalúa rol comercial, mercados objetivo, categorías de producto",
       "cov2": "Responsabilidad de productor por mercado – calcula la probabilidad de que esté sujeto a RAP",
-      "cov3": "Casos límite con lógica de seguridad – en caso de duda se asume una obligación, no se descarta",
+      "cov3": "Los casos límite se marcan como abiertos, no se descartan: ve dónde es probable una obligación y dónde hace falta confirmarla",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
       },
@@ -1130,7 +1085,7 @@
     },
     "cta": {
       "title": "O empiece por su propia situación.",
-      "lead": "Seis minutos, cuatro preguntas, sin necesidad de cuenta."
+      "lead": "Cuatro preguntas, unos cinco minutos, sin necesidad de cuenta."
     }
   },
   "aiGov": {
@@ -1142,7 +1097,7 @@
     "dimOrgTitle": "Responsabilidad Organizacional",
     "dimOrgDesc": "Las pautas de gobernanza claras dictan quién puede implementar, acceder y auditar las características de IA. Mantenemos registros de auditoría completos para todas las interacciones de IA.",
     "dimTechTitle": "Robustez Técnica",
-    "dimTechDesc": "Nuestra infraestructura garantiza cero tiempo de inactividad y alternativas resilientes. Las Privacy Gates dedican a sanitizar todas las entradas antes de que lleguen a cualquier LLM.",
+    "dimTechDesc": "Nuestra infraestructura está construida para la resiliencia: si falla un paso de IA, el flujo recurre a un proceso determinista. Las Privacy Gates dedicadas sanean cada entrada antes de que llegue a cualquier LLM.",
     "dimRegTitle": "Cumplimiento Normativo",
     "dimRegDesc": "Desarrollado para la Ley de IA de la UE y la norma ISO 42001. Mapeamos estándares globales directamente en nuestro código, priorizando las estrictas reglas de privacidad de la UE y el Reino Unido.",
     "dimRiskTitle": "Gestión de Riesgos",
@@ -1374,7 +1329,7 @@
     },
     "cta": {
       "title": "Empiece por donde tenga sentido.",
-      "lead": "Seis minutos, cuatro preguntas, sin cuenta."
+      "lead": "Cuatro preguntas, unos cinco minutos, sin necesidad de cuenta."
     },
     "seeAll": "Ver cómo funciona cada paso"
   },
@@ -1595,7 +1550,7 @@
     },
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
-      "lead": "Seis minutos, cuatro preguntas, sin necesidad de cuenta."
+      "lead": "Cuatro preguntas, unos cinco minutos, sin necesidad de cuenta."
     },
     "vignette": {
       "confirmed": "Cita confirmada",
@@ -1762,7 +1717,7 @@
       "description": "Qué obligaciones de compliance se aplican en {{country}}, cómo se ponderan las áreas y con qué fuente jurídica."
     },
     "complianceArea": {
-      "title": "{{area}} — Obligaciones y sanciones | CompliHub360",
+      "title": "{{area}} — Obligaciones y fuentes | CompliHub360",
       "description": "Cada obligación de {{area}} con su norma, exposición sancionadora y plazos por mercado. Emparejado con especialistas verificados."
     }
   },
@@ -2127,7 +2082,11 @@
         "howBookingWorks": "Se crea una cita cuando una empresa le selecciona en los resultados y reserva uno de sus horarios disponibles. Para que eso sea posible:",
         "closing": "La frecuencia de las reservas depende de la demanda en sus áreas. Su plan no influye en ello.",
         "invoicesHeading": "Todavía no hay facturas",
-        "invoicesMessage": "Sus facturas aparecerán aquí cuando se haya facturado un plan."
+        "invoicesMessage": "Sus facturas aparecerán aquí cuando se haya facturado un plan.",
+        "coverage": "Aún no hay servicios aprobados",
+        "coverageClosing": "La matriz se completa cuando nuestro equipo de revisión apruebe su primer servicio para un país.",
+        "coverageHow": "Nuestro equipo de revisión está comprobando sus documentos. En cuanto se apruebe un servicio, aparecerá para él en los resultados y podrá recibir reservas.",
+        "coverageAction": "Ir a la verificación"
       },
       "readiness": {
         "verified": "Verificación completada",
@@ -2151,15 +2110,27 @@
         "thresholdNote": "Una tasa basada en una o dos solicitudes dice poco de usted. Por eso la mostramos a partir de cinco solicitudes."
       },
       "coverage": {
-        "heading": "Dónde aparece",
+        "heading": "Dónde <accent>aparece</accent>.",
         "message": "Según lo aprobado por nuestro equipo de revisión. Para cambiarlo, envíe el cambio en Servicios. Se aplica tras la revisión.",
         "approved": "aprobado",
         "underReview": "en revisión",
         "notRequested": "no solicitado",
         "languages": "Idiomas",
         "responseTime": "Tiempo de respuesta",
-        "hours": "{{hours}} horas",
-        "submitChange": "Enviar un cambio"
+        "hours": "{{hours}} horas para confirmar",
+        "submitChange": "Enviar un cambio",
+        "matrixTitle": "Servicios aprobados",
+        "services_one": "{{count}} servicio",
+        "services_other": "{{count}} servicios",
+        "countries_one": "{{count}} país",
+        "countries_other": "{{count}} países",
+        "service": "Servicio",
+        "matrixHint": "El matching también lee esta matriz. Un guion marca un servicio que actualmente no está aprobado en ese país.",
+        "matchingTitle": "Para el matching",
+        "matchingSub": "Se muestra a las empresas en los resultados",
+        "availability": "Disponibilidad",
+        "available": "Disponible",
+        "ooo": "Ausente"
       },
       "profileUnavailable": "No se puede acceder a su perfil guardado en este momento. Podrá volver a guardar cuando se haya cargado."
     }

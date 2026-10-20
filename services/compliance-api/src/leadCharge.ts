@@ -266,28 +266,44 @@ export async function recordPaymentFailure(args: {
     paymentMethodId: string | null;
     correlationId: string;
 }): Promise<void> {
-    const rows = (await supabaseApi.select('providers', { provider_key: args.providerKey }, { limit: 1 })) as any[];
-    const p = rows[0];
-    if (!p) return;
+    // B10 (2026-10-18): nichts hier darf den Handler kippen. Vorher warf das
+    // providers-Update bis in die Route, die mit 500 „Scheduling create failed"
+    // antwortete — der Anbieter weder gesperrt noch informiert, der Nutzer mit
+    // einer falschen Fehlermeldung. Jetzt: jeder Schritt einzeln, jeder Fehler
+    // im Log und im event_log; die Route antwortet unabhaengig davon 409.
+    const { providerKey, ledgerId, correlationId } = args;
+    const fail = (step: string, err: unknown) => {
+        structuredLog('error', 'recordPaymentFailure: step failed', { correlationId, errorCode: 'ERR_PAYMENT_FAILURE_RECORD', severity: 'error', providerKey, ledgerId, step, detail: String(err).slice(0, 200) } as any);
+        return logEvent('lead_payment_failed_record_error', { providerKey, ledgerId, step, error: String(err).slice(0, 200) }, correlationId);
+    };
+    let p: any = null;
+    try {
+        const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+        p = rows[0] ?? null;
+    } catch (err) { await fail('load_provider', err); }
+    if (!p) { await logEvent('lead_payment_failed', { providerKey, ledgerId, reason: args.result.reason, stripeRef: args.result.stripeRef, providerRowMissing: true }, correlationId); return; }
     const reasons = new Set<string>(Array.isArray(p.billing_block_reasons) ? p.billing_block_reasons : []);
     reasons.add('payment_failed');
     const now = new Date().toISOString();
-    await supabaseApi.update('providers', { provider_key: args.providerKey }, {
-        billing_ready: false,
-        billing_block_reasons: Array.from(reasons),
-        billing_synced_at: now,
-        last_payment_failure: { at: now, payment_method_id: args.paymentMethodId, reason: args.result.reason, ledger_id: args.ledgerId },
-    });
-    await supabaseApi.insert('event_log', {
-        type: 'lead_payment_failed',
-        payload: { providerKey: args.providerKey, ledgerId: args.ledgerId, reason: args.result.reason, stripeRef: args.result.stripeRef },
-    }).catch(() => { /* non-blocking */ });
-    const members = (await supabaseApi.select('provider_members', { provider_key: args.providerKey }, { limit: 20 })) as Array<{ user_id: string }>;
-    for (const m of members) {
-        await notify({ to: m.user_id, actor: null, type: 'payment_failed', subject: 'provider', subjectId: args.providerKey,
-            payload: { providerKey: args.providerKey }, dedupeKey: `payment_failed:${args.ledgerId}` });
-    }
-    await sendPaymentFailedMail({ to: p.contact_email ?? null, providerKey: args.providerKey, correlationId: args.correlationId });
+    try {
+        await supabaseApi.update('providers', { provider_key: providerKey }, {
+            billing_ready: false,
+            billing_block_reasons: Array.from(reasons),
+            billing_synced_at: now,
+            last_payment_failure: { at: now, payment_method_id: args.paymentMethodId, reason: args.result.reason, ledger_id: ledgerId },
+        });
+    } catch (err) { await fail('block_provider', err); }
+    await logEvent('lead_payment_failed', { providerKey, ledgerId, reason: args.result.reason, stripeRef: args.result.stripeRef }, correlationId);
+    try {
+        const members = (await supabaseApi.select('provider_members', { provider_key: providerKey }, { limit: 20 })) as Array<{ user_id: string }>;
+        for (const m of members) {
+            await notify({ to: m.user_id, actor: null, type: 'payment_failed', subject: 'provider', subjectId: providerKey,
+                payload: { providerKey }, dedupeKey: `payment_failed:${ledgerId}` });
+        }
+    } catch (err) { await fail('notify_members', err); }
+    try {
+        await sendPaymentFailedMail({ to: p.contact_email ?? null, providerKey, correlationId });
+    } catch (err) { await fail('mail', err); }
 }
 
 /**
