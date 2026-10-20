@@ -503,7 +503,7 @@ export function TerminePage() {
           tragen — bis 2026-08-31 sass diese Seite als einzige Arbeitsfläche
           auf blankem Weiss. Negative Ränder heben das Shell-Padding auf,
           damit die Tönung randlos steht. */}
-      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+      <div className="-mx-4 -my-5 min-h-[calc(100%+2.5rem)] bg-gradient-stage lg:-mx-8 lg:-my-6 lg:min-h-[calc(100%+3rem)] px-8 py-7">
       <div className="mx-auto max-w-[1140px] space-y-5">
         {/* Canvas-Wahl 1C (2026-09-05): Termine oben als Buehne — H1, "Als
             Naechstes"-Karte, dann Kommend/Vergangen als Reiter ueber einem

@@ -12,6 +12,7 @@
 // single place that decides who counts as authenticated.
 
 import crypto from 'node:crypto';
+import { structuredLog } from '@complihub360/types';
 
 type Jwk = crypto.JsonWebKey & { kid?: string };
 
@@ -31,30 +32,52 @@ function jwksUrl(): string | null {
     return `${base.replace(/\/+$/, '')}/auth/v1/.well-known/jwks.json`;
 }
 
+// Ein laufender Abruf wird geteilt. Bis 20.10.2026 sahen parallele Aufrufe
+// waehrend des ersten Abrufs "gerade versucht" und bekamen die leere Karte:
+// Nach jedem API-Neustart scheiterten die ersten Anfragen eines frisch
+// angemeldeten Nutzers mit es256_unknown_kid, knownKeys 0, und die App
+// meldete ihn sofort wieder ab (Beta-Klicktest).
+let jwksInflight: Promise<Map<string, crypto.KeyObject>> | null = null;
+
 async function loadJwks(forceFresh: boolean): Promise<Map<string, crypto.KeyObject>> {
     const now = Date.now();
     const fresh = now - jwksFetchedAt < JWKS_TTL_MS;
+    if (fresh && !forceFresh) return jwksKeys;
+    if (jwksInflight) return jwksInflight;
+    // Die Bremse gilt nur, solange Schluessel da sind: Sie schuetzt vor einer
+    // Flut erfundener kids, darf aber einen leeren Cache nicht festhalten.
     const attemptedRecently = now - jwksLastAttempt < JWKS_MIN_INTERVAL_MS;
-    if ((fresh && !forceFresh) || attemptedRecently) return jwksKeys;
+    if (attemptedRecently && jwksKeys.size > 0) return jwksKeys;
 
     const url = jwksUrl();
     if (!url) return jwksKeys;
     jwksLastAttempt = now;
-    try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`jwks http ${res.status}`);
-        const body = (await res.json()) as { keys?: Jwk[] };
-        const next = new Map<string, crypto.KeyObject>();
-        for (const jwk of body.keys ?? []) {
-            if (jwk.kty !== 'EC' || jwk.crv !== 'P-256' || !jwk.kid) continue;
-            try {
-                next.set(jwk.kid, crypto.createPublicKey({ key: jwk, format: 'jwk' }));
-            } catch { /* skip malformed key, keep the rest */ }
+    jwksInflight = (async () => {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`jwks http ${res.status}`);
+            const body = (await res.json()) as { keys?: Jwk[] };
+            const next = new Map<string, crypto.KeyObject>();
+            for (const jwk of body.keys ?? []) {
+                if (jwk.kty !== 'EC' || jwk.crv !== 'P-256' || !jwk.kid) continue;
+                try {
+                    next.set(jwk.kid, crypto.createPublicKey({ key: jwk, format: 'jwk' }));
+                } catch { /* skip malformed key, keep the rest */ }
+            }
+            jwksKeys = next;
+            jwksFetchedAt = Date.now();
+        } catch (err) {
+            // Stale Schluessel bleiben; der Fehler wird aber nicht mehr verschluckt.
+            structuredLog('warn', 'JWKS fetch failed', {
+                correlationId: 'jwks', errorCode: 'ERR_JWKS_FETCH', severity: 'warn', route: 'auth/jwks',
+                knownKeys: jwksKeys.size, error: err instanceof Error ? err.message : String(err),
+            });
+        } finally {
+            jwksInflight = null;
         }
-        jwksKeys = next;
-        jwksFetchedAt = now;
-    } catch { /* network/parse failure → keep stale keys */ }
-    return jwksKeys;
+        return jwksKeys;
+    })();
+    return jwksInflight;
 }
 
 /** Why a token was rejected — logged by the auth gate, never the token itself. */
@@ -128,4 +151,5 @@ export function resetJwksCacheForTests(): void {
     jwksKeys = new Map();
     jwksFetchedAt = 0;
     jwksLastAttempt = 0;
+    jwksInflight = null;
 }
