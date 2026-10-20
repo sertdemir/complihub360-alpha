@@ -75,8 +75,7 @@
       "placeholder": "Durumunuzu kendi kelimelerinizle anlatın…",
       "answer": "Bir uyum sorusu sorun",
       "guided": "İhtiyaçlarımı değerlendir",
-      "trust": "Ücretsiz · anonim · yaklaşık beş dakika",
-      "note": "Betada sorunuz doğru alana ve değerlendirmeye yönlendirir — henüz doğrudan bir yanıta değil."
+      "trust": "Ücretsiz · anonim · yaklaşık beş dakika"
     }
   },
   "heroWorld": {
@@ -88,7 +87,8 @@
     "ctaRiskMap": "İhtiyacımı değerlendir",
     "ask": {
       "placeholder": "Talebinizi kısaca anlatın",
-      "send": "Gönder"
+      "send": "Gönder",
+      "note": "Betada sorunuz doğru alana ve değerlendirmeye yönlendirir — henüz doğrudan bir yanıta değil."
     },
     "promises": [
       {

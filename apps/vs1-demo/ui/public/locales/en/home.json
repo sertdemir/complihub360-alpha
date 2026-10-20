@@ -75,8 +75,7 @@
       "placeholder": "Describe your situation in your own words…",
       "answer": "Ask a Compliance Question",
       "guided": "Assess My Needs",
-      "trust": "Free · anonymous · about five minutes",
-      "note": "In the beta, your question leads to the right area and into the assessment — not yet to a direct answer."
+      "trust": "Free · anonymous · about five minutes"
     }
   },
   "heroWorld": {
@@ -88,7 +87,8 @@
     "ctaRiskMap": "Assess My Needs",
     "ask": {
       "placeholder": "Describe what you need",
-      "send": "Send"
+      "send": "Send",
+      "note": "In the beta, your question leads to the right area and into the assessment — not yet to a direct answer."
     },
     "promises": [
       {
