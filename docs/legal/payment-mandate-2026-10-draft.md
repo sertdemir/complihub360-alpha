@@ -129,6 +129,12 @@ example because the same slot was taken at the same moment), we refund the
 lead fee to the same payment method on our own initiative. You do not need
 to do anything; the transaction appears in your billing history.
 
+If it stays open whether a charge went through (for example because the
+connection to the payment provider dropped), the booking does not go ahead.
+We settle the outcome within a few minutes; a charge that went through
+without a booking we refund on our own initiative. Until then you do not
+accept new bookings; you remain visible.
+
 **7. Revocation**
 
 You can revoke this mandate at any time in your account under *Settings*.

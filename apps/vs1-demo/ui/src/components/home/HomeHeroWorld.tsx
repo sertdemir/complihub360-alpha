@@ -70,6 +70,14 @@ function AskForm({ className = '' }: { className?: string }) {
   );
 }
 
+/** Ehrlich zur Beta: die Frage fuehrt in die Erhebung, nicht zu einer
+ *  Direktantwort (DNA-Copy-Durchgang, Nit hero.dual — lag zuerst im nicht
+ *  gemounteten HomeHero, seit 2026-10-20 hier, wo der Hero wirklich steht). */
+function AskNote() {
+  const { t } = useTranslation('home');
+  return <p className="mt-2 text-body-2xs text-fg-tertiary">{t('heroWorld.ask.note')}</p>;
+}
+
 export function HomeHeroWorld() {
   const { t } = useTranslation('home');
   const navigate = useNavigate();
@@ -88,7 +96,9 @@ export function HomeHeroWorld() {
             className="w-full min-w-0 lg:max-w-[560px] lg:flex-1"
           >
             <h1 className="font-serif text-display-md font-semibold tracking-[-0.015em] text-fg lg:text-display-xl lg:leading-[1.08]">
-              <span className="whitespace-nowrap">{t('heroWorld.title.line1')}</span>
+              {/* Kein nowrap mehr: seit dem DNA-Durchgang (PR #353) ist Zeile 1 ein Satz,
+                  der auf dem Handy abgeschnitten wurde und auf dem Desktop ueber die Karte lief. */}
+              <span>{t('heroWorld.title.line1')}</span>
               <br />
               <GoldWord>{t('heroWorld.title.line2')}</GoldWord>
             </h1>
@@ -98,6 +108,7 @@ export function HomeHeroWorld() {
                 {t('heroWorld.ctaRiskMap')} <ArrowRight size={17} />
               </Button>
               <AskForm />
+              <AskNote />
             </div>
           </motion.div>
 

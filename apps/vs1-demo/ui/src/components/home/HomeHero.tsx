@@ -214,9 +214,6 @@ function DualEntrySearch({ layout }: { layout: 'desktop' | 'mobile' }) {
           {t('hero.dual.answer')}
         </Button>
       </form>
-      {/* Ehrlich zur Beta: die Frage fuehrt in die Erhebung, nicht zu einer
-          Direktantwort (DNA-Copy-Durchgang, Nit hero.dual). */}
-      <p className="mt-2 text-body-2xs text-fg-tertiary">{t('hero.dual.note')}</p>
       <div className={`mt-4 flex items-center gap-4 ${layout === 'mobile' ? 'flex-col items-stretch' : ''}`}>
         <button
           type="button"

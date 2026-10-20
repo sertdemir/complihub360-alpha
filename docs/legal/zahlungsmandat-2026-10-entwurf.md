@@ -1,6 +1,6 @@
 # CompliHub360 · Zahlungsmandat für Anbieter — Entwurf Fassung 2026-10
 
-**Stand: 15.10.2026 · Status: Entwurf zur Rechtsprüfung · seit 15.10.2026 als Fassung `2026-10` im Annahme-Modal (Interim, Entscheidung des Nutzers) · ersetzt die textlose Fassung `2026-09`; im Produkt steht statt `[Betreiber]` bis zur Freigabe „CompliHub360“**
+**Stand: 20.10.2026 (Nachtrag zu Abschnitt 6: offener Ausgang einer Belastung, seit PR #329) · Status: Entwurf zur Rechtsprüfung · seit 15.10.2026 als Fassung `2026-10` im Annahme-Modal (Interim, Entscheidung des Nutzers) · ersetzt die textlose Fassung `2026-09`; im Produkt steht statt `[Betreiber]` bis zur Freigabe „CompliHub360“**
 
 > **Kein Rechtsrat.** Dieser Entwurf stammt aus der Produktentwicklung. Er
 > beschreibt, was die Plattform heute tatsächlich tut, in Worten, die ein
@@ -122,6 +122,12 @@ Beispiel, weil derselbe Termin gleichzeitig vergeben wurde), erstatten wir
 die Lead-Gebühr von selbst auf dasselbe Zahlungsmittel. Sie müssen dafür
 nichts tun; der Vorgang steht in Ihrem Abrechnungsverlauf.
 
+Bleibt bei einer Belastung offen, ob sie gelungen ist (etwa weil die
+Verbindung zum Zahlungsdienstleister abbrach), kommt die Buchung nicht
+zustande. Wir klären den Ausgang innerhalb weniger Minuten; eine Belastung,
+die ohne Buchung durchging, erstatten wir von selbst. Bis zur Klärung nehmen
+Sie keine neuen Buchungen an; Sie bleiben sichtbar.
+
 **7. Widerruf**
 
 Sie können dieses Mandat jederzeit in Ihrem Konto unter *Einstellungen*
@@ -160,6 +166,7 @@ Neues über die alte Fassung hinaus.
 | 5 | Abo: Frist unverändert, Pause 7 Tage nach Fälligkeit | ADR-0006 A2, `due_at` wird nie geschrieben |
 | 5 | keine eigene Gebühr für einen gescheiterten Versuch | kein Posten im Code; **zur Bestätigung durch die Prüfung** |
 | 6 | automatische Erstattung bei Doppelbuchung | ADR-0005 Punkt 9, `refundPaymentIntent`, Ereignis `lead_charge_reversed` |
+| 6 | offener Ausgang: keine Buchung, Abgleich, Erstattung von selbst, bis dahin keine neuen Buchungen | Silent-Failure-Befund B1 (PR #329), Ledger-Status `unknown`, Sperrgrund `payment_unresolved`, `runChargeReconcileTick` alle zwei Minuten, Ereignisse `lead_charge_reconciled` / `lead_charge_reversed` |
 | 7 | Widerruf in den Einstellungen, Folge: keine Buchungen | `withdrawn_authorization`, `billingReadiness` verlangt eine nicht abgelöste Annahme |
 | 8 | Fassung, Sprache, Name, Rolle, Zeit, Referenz | `provider_agreement_acceptance`: `version`, `language`, `accepted_by_name`, `accepted_by_title`, `accepted_at`, `audit_ref`; alte Fassung bleibt (`superseded_at`) |
 | 9 | Neuannahme bei Änderung | Spec A §23, Annahme-Modal zeigt immer die aktuelle Fassung |
