@@ -1225,6 +1225,31 @@ function apiAccessLog(key: string) {
   ];
   return { ok: true, calls, today: { count: 318, limited: 3, failed: 0 }, events };
 }
+// Control Center (GET /admin/stats) in der Form des Servers (adminStats.ts).
+// Bewusst mit einer Quote ohne Grundlage (Erinnerung: null) — so sieht man im
+// Mock den Zustand „noch keine Grundlage" statt eines erfundenen 0 %.
+function adminStats() {
+  const days = [6, 5, 4, 3, 2, 1, 0].map((n) => { const d = new Date(Date.now() - n * 24 * H); return `${String(d.getUTCDate()).padStart(2, '0')}.${String(d.getUTCMonth() + 1).padStart(2, '0')}`; });
+  return {
+    ok: true, generatedAt: plus(0), truncated: [],
+    bookings: { today: 1, last7: 4, total: 10, upcoming7: 3, cancelled7: 1, noShows7: 0, disputesOpen: 0, unreported: 1, heldRate: 0.8, disclosureAuditedRate: 1, reminderRate: null },
+    watchlist: [
+      { id: 'a1f30c92-0000-4000-8000-000000000001', provider_key: PARTNER_KEY, slot_start: plus(5 * H), flag: 'soon', msUntil: 5 * H },
+      { id: 'b7d21e40-0000-4000-8000-000000000002', provider_key: PARTNER_KEY, slot_start: plus(20 * H), flag: 'soon', msUntil: 20 * H },
+      { id: 'c9e84a17-0000-4000-8000-000000000003', provider_key: 'dahlmann-cpa', slot_start: plus(3 * 24 * H), flag: 'upcoming', msUntil: 3 * 24 * H },
+    ],
+    privacy: { aiRequests7: 0, aiRedacted7: 0, reveals7: 4, evidenceStored: 5, evidenceToReview: 1, customerUploads: null },
+    security: { rateLimitPerMinute: 100, accessEvents7: 3, errorEvents7: 1 },
+    events: [
+      { type: 'scheduling_confirmed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-2 * H) },
+      { type: 'lead.revealed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-2 * H) },
+      { type: 'calendar_event_failed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-9 * H) },
+      { type: 'api_key_issued', payload: {}, created_at: plus(-30 * H) },
+    ],
+    series: { dates: days, bookings: [0, 1, 0, 1, 0, 1, 1], cancelled: [0, 0, 0, 1, 0, 0, 0], noShows: [0, 0, 0, 0, 0, 0, 0], aiRequests: [0, 0, 0, 0, 0, 0, 0], aiRedacted: [0, 0, 0, 0, 0, 0, 0], reveals: [0, 1, 0, 1, 0, 1, 1] },
+  };
+}
+
 function adminApiClients() {
   return { ok: true, clients: API_STATE.clients.map((c) => ({ ...c, provider_name: c.provider_key === PARTNER_KEY ? 'Schmidt & Partner' : 'Lund Nordic AB', plan_code: 'global', eligible: true, fee_note: null, approved_by: null, last_used_ip: c.last_used_at ? '203.0.113.7' : null })) };
 }
@@ -1299,6 +1324,7 @@ export function route(method: string, path: string, body: Record<string, unknown
     if (p[0] === 'provider' && p[2] === 'api-access' && p[3] === 'log') return apiAccessLog(p[1]);
     if (p[0] === 'provider' && p[2] === 'api-access') return apiAccess(p[1]);
     if (p[0] === 'admin' && p[1] === 'api-access') return adminApiClients();
+    if (p[0] === 'admin' && p[1] === 'stats') return role === 'admin' ? adminStats() : { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin stats are admin-only' };
     if (p[0] === 'provider' && p[2] === 'coverage') { const c = partnerCoverage(); return { ...c, coverage: { ...c.coverage, availability_hours: AVAIL.hours, timezone: AVAIL.timezone, booking_paused_at: null } }; }
     if (p[0] === 'provider' && p[2] === 'invoices') return partnerInvoices();
     if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'preview') return partnerBillingPreview();
