@@ -62,6 +62,20 @@ export const supabaseApi = {
         return res.json();
     },
 
+    // Wie select(), aber mit PostgREST-Ausdruecken ('gte.<iso>', 'not.like.*_shadow',
+    // 'in.("a","b")'). Gebraucht, wo ein Zeitfenster gelesen werden muss: mit
+    // "die letzten N Zeilen" verdraengen Shadow-Marker alle 5 Minuten echte
+    // Ereignisse aus dem Fenster (Control Center, 20.10.2026).
+    async selectWhere(table: string, filters: Record<string, string>, opts: { order?: string; limit?: number } = {}) {
+        const queryParams = new URLSearchParams();
+        for (const [key, expr] of Object.entries(filters)) queryParams.append(key, expr);
+        if (opts.order) queryParams.append('order', opts.order);
+        if (opts.limit) queryParams.append('limit', String(opts.limit));
+        const res = await fetch(`${restUrl}/${table}?${queryParams.toString()}`, { method: 'GET', headers: defaultHeaders });
+        if (!res.ok) throw new Error(`Supabase selectWhere failed: ${await res.text()}`);
+        return res.json();
+    },
+
     async select(table: string, match: any, opts: { order?: string; limit?: number } = {}) {
         const queryParams = new URLSearchParams();
         for (const [key, value] of Object.entries(match)) {

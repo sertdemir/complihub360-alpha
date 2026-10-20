@@ -36,6 +36,26 @@ vi.mock('../supabase.js', () => ({
             if (opts.limit) rows = rows.slice(0, opts.limit);
             return rows;
         },
+        // Spiegelt supabaseApi.selectWhere fuer die Ausdruecke, die gebraucht
+        // werden ('eq.', 'gte.', 'not.like.*x', 'in.("a","b")'); alles andere
+        // wirft — sonst haette der Test den Filter still ignoriert.
+        async selectWhere(table: string, filters: Record<string, string>, opts: { order?: string; limit?: number } = {}) {
+            const passt = (r: any) => Object.entries(filters).every(([k, expr]) => {
+                const v = r[k];
+                if (expr.startsWith('eq.')) return String(v) === expr.slice(3);
+                if (expr.startsWith('gte.')) return v !== undefined && v !== null && String(v) >= expr.slice(4);
+                if (expr.startsWith('not.like.*')) return !String(v ?? '').endsWith(expr.slice(10));
+                if (expr.startsWith('in.(')) return expr.slice(4, -1).split(',').map((x) => x.replace(/^"|"$/g, '')).includes(String(v));
+                throw new Error(`unsupported filter in test store: ${expr}`);
+            });
+            let rows = (db[table] ?? []).filter(passt);
+            if (opts.order) {
+                const [col, dir] = opts.order.split('.');
+                rows = [...rows].sort((a, b) => (a[col] < b[col] ? -1 : 1) * (dir === 'desc' ? -1 : 1));
+            }
+            if (opts.limit) rows = rows.slice(0, opts.limit);
+            return rows;
+        },
         async insert(table: string, data: any) {
             const rows = (Array.isArray(data) ? data : [data]).map((r) => ({ id: randomUUID(), ...r }));
             (db[table] ??= []).push(...rows);
@@ -3232,6 +3252,33 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         expect((await api('/api/v1/admin/review/neue-kanzlei', { auth: 'jwt' })).status).toBe(403);
         expect((await api('/api/v1/admin/stats', { auth: 'jwt' })).status).toBe(403);
         expect((await api('/api/v1/admin/review/queue', { auth: 'none' })).status).toBe(401);
+    });
+
+    it('/admin/stats liest Buchungen und Audit-Log, nicht die toten Tabellen', async () => {
+        // 20.10.2026: vorher engagement_requests + documents — beide leer im Betrieb.
+        const now = Date.now();
+        const iso = (dh: number) => new Date(now + dh * 3_600_000).toISOString();
+        db.engagement_requests = [{ id: 'alt', status: 'replied', created_at: iso(0) }];
+        db.documents = [{ classification: 'x', consent_ai: true, created_at: iso(0) }];
+        db.scheduling = [{ id: 'b1', provider_key: 'studio', status: 'confirmed', slot_start: iso(5), created_at: iso(0), acknowledgement_version: 'v2' }];
+        db.event_log = [
+            { type: 'assistant_chat', timestamp: iso(-1), payload: { redacted: true } },
+            { type: 'lead.revealed', timestamp: iso(0), payload: { bookingId: 'b1', userId: 'u-geheim', providerKey: 'studio' } },
+            // Shadow-Marker zaehlen nirgends mit und verdraengen nichts.
+            { type: 'appointment_reminder_shadow', timestamp: iso(0), payload: { bookingId: 'b1' } },
+            { type: 'sla_breach_shadow', timestamp: iso(0), payload: {} },
+            // ausserhalb des Fensters
+            { type: 'calendar_event_failed', timestamp: iso(-24 * 10), payload: {} },
+        ];
+        const r = await adminApi('/api/v1/admin/stats');
+        expect(r.status).toBe(200);
+        expect(r.body.bookings).toMatchObject({ today: 1, total: 1, upcoming7: 1, disclosureAuditedRate: 1 });
+        expect(r.body.privacy).toMatchObject({ aiRequests7: 1, aiRedacted7: 1, reveals7: 1, customerUploads: null });
+        expect(r.body.security).toMatchObject({ errorEvents7: 0 });
+        expect(r.body.watchlist).toEqual([expect.objectContaining({ id: 'b1', flag: 'soon' })]);
+        expect(r.body.events.map((e: any) => e.type)).not.toContain('appointment_reminder_shadow');
+        expect(JSON.stringify(r.body.events)).not.toContain('u-geheim');
+        expect(r.body).not.toHaveProperty('stats');
     });
 
     it('zeigt eingereichte Bewerbungen in der Queue mit Risiko', async () => {
