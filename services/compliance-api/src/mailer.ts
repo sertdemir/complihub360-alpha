@@ -96,7 +96,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             subjectNewLabel: 'New request',
             subjectNewTail: 'please confirm within 24h',
             reminderLabel: 'Reminder',
-            subjectReminderTail: 'the client is waiting for your confirmation',
+            subjectReminderTail: 'confirmation still open',
             textTitle: 'New engagement request on CompliHub360',
             textProviderLabel: 'Provider',
             textScopeLabel: 'Scope',
@@ -123,7 +123,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             footOnceStrong: 'once',
             footOncePost: ' and expires after 24 hours.',
             footRanking: 'Fast confirmations improve your provider ranking.',
-            footerTagline: 'CompliHub360 — the orchestration layer between compliance complexity and operational reality.',
+            footerTagline: 'CompliHub360 — Always on your side.',
             footerReason: 'You received this e-mail because your firm is a listed provider on complihub360.com.',
         },
         emailChange: {
@@ -148,7 +148,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             subjectNewLabel: 'Neue Anfrage',
             subjectNewTail: 'bitte innerhalb von 24h bestätigen',
             reminderLabel: 'Erinnerung',
-            subjectReminderTail: 'der Mandant wartet auf Ihre Bestätigung',
+            subjectReminderTail: 'Bestätigung noch offen',
             textTitle: 'Neue Mandatsanfrage auf CompliHub360',
             textProviderLabel: 'Anbieter',
             textScopeLabel: 'Umfang',
@@ -175,12 +175,12 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             footOnceStrong: 'einmal',
             footOncePost: ' und läuft nach 24 Stunden ab.',
             footRanking: 'Schnelle Bestätigungen verbessern Ihr Anbieter-Ranking.',
-            footerTagline: 'CompliHub360 — die Orchestrierungsschicht zwischen Compliance-Komplexität und operativer Realität.',
-            footerReason: 'Sie erhalten diese E-Mail, weil Ihre Kanzlei als Anbieter auf complihub360.com gelistet ist.',
+            footerTagline: 'CompliHub360 — Always on your side.',
+            footerReason: 'Sie erhalten diese E-Mail, weil Ihr Unternehmen als Anbieter auf complihub360.com gelistet ist.',
         },
         emailChange: {
             subject: 'Bestätigen Sie Ihre neue CompliHub360-Kontaktadresse',
-            textIntro: 'Sie (oder jemand aus Ihrer Kanzlei) haben darum gebeten, die Kontaktadresse für {name} auf CompliHub360 auf diese E-Mail-Adresse zu ändern.',
+            textIntro: 'Sie (oder jemand aus Ihrem Unternehmen) haben darum gebeten, die Kontaktadresse für {name} auf CompliHub360 auf diese E-Mail-Adresse zu ändern.',
             textConfirmLabel: 'Änderung bestätigen',
             textOnce: 'Der Link funktioniert einmal und läuft nach 1 Stunde ab. Falls Sie dies nicht angefordert haben, ignorieren Sie diese E-Mail — die aktuelle Adresse bleibt aktiv.',
             headlinePre: 'Bestätigen Sie Ihre neue ',
@@ -200,7 +200,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             subjectNewLabel: 'Nueva solicitud',
             subjectNewTail: 'le rogamos confirmar en 24h',
             reminderLabel: 'Recordatorio',
-            subjectReminderTail: 'el cliente espera su confirmación',
+            subjectReminderTail: 'confirmación aún pendiente',
             textTitle: 'Nueva solicitud de mandato en CompliHub360',
             textProviderLabel: 'Proveedor',
             textScopeLabel: 'Alcance',
@@ -227,7 +227,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             footOnceStrong: 'una sola vez',
             footOncePost: ' y caduca a las 24 horas.',
             footRanking: 'Las confirmaciones rápidas mejoran su posición como proveedor.',
-            footerTagline: 'CompliHub360 — la capa de orquestación entre la complejidad del compliance y la realidad operativa.',
+            footerTagline: 'CompliHub360 — Always on your side.',
             footerReason: 'Usted recibe este correo porque su firma figura como proveedor en complihub360.com.',
         },
         emailChange: {
@@ -252,7 +252,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             subjectNewLabel: 'Yeni talep',
             subjectNewTail: 'lütfen 24 saat içinde onaylayın',
             reminderLabel: 'Hatırlatma',
-            subjectReminderTail: 'müşteri onayınızı bekliyor',
+            subjectReminderTail: 'onay hâlâ açık',
             textTitle: 'CompliHub360 üzerinde yeni müşteri talebi',
             textProviderLabel: 'Sağlayıcı',
             textScopeLabel: 'Kapsam',
@@ -279,7 +279,7 @@ const STRINGS: Record<MailLocale, MailStrings> = {
             footOnceStrong: 'bir kez',
             footOncePost: ' çalışır ve 24 saat sonra geçerliliğini yitirir.',
             footRanking: 'Hızlı onaylar sağlayıcı sıralamanızı iyileştirir.',
-            footerTagline: 'CompliHub360 — uyum karmaşıklığı ile operasyonel gerçeklik arasındaki orkestrasyon katmanı.',
+            footerTagline: 'CompliHub360 — Always on your side.',
             footerReason: 'Bu e-postayı, firmanız complihub360.com üzerinde listelenmiş bir sağlayıcı olduğu için alıyorsunuz.',
         },
         emailChange: {
@@ -508,7 +508,7 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
     en: {
         request_user: {
             subject: 'How was your appointment? 2 minutes for your review',
-            body: 'Your intro call has taken place. Rate your specialist within the next 2 days — your feedback personalises your matching, helps us react faster to problems and improves your service. Reviews are verified and appear anonymised.\n\n→ Dashboard → Appointments → "Rate provider"',
+            body: 'Your intro call has taken place. If you have two minutes, rate your specialist — your feedback improves your matching and helps us notice problems early. Reviews are verified and appear anonymised.\n\n→ Dashboard → Appointments → "Rate provider"',
         },
         request_provider: {
             subject: 'Please review your lead within 2 days',
@@ -526,7 +526,7 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
     de: {
         request_user: {
             subject: 'Wie war Ihr Termin? 2 Minuten für Ihre Bewertung',
-            body: 'Ihr Erstgespräch hat stattgefunden. Bewerten Sie Ihren Spezialisten innerhalb der nächsten 2 Tage — Ihr Feedback personalisiert Ihr Matching, hilft uns, schneller auf Probleme zu reagieren, und verbessert Ihren Service. Bewertungen sind verifiziert und erscheinen anonymisiert.\n\n→ Dashboard → Termine → „Provider bewerten"',
+            body: 'Ihr Erstgespräch hat stattgefunden. Wenn Sie zwei Minuten haben, bewerten Sie Ihren Spezialisten — Ihr Feedback verbessert Ihr Matching und hilft uns, Probleme früh zu bemerken. Bewertungen sind verifiziert und erscheinen anonymisiert.\n\n→ Dashboard → Termine → „Provider bewerten"',
         },
         request_provider: {
             subject: 'Bitte bewerten Sie Ihren Lead innerhalb von 2 Tagen',
@@ -544,7 +544,7 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
     es: {
         request_user: {
             subject: '¿Qué tal su cita? 2 minutos para su valoración',
-            body: 'Su llamada inicial ha tenido lugar. Valore a su especialista en los próximos 2 días — su feedback personaliza su matching, nos ayuda a reaccionar más rápido ante problemas y mejora su servicio. Las valoraciones son verificadas y aparecen anonimizadas.\n\n→ Dashboard → Citas → «Valorar proveedor»',
+            body: 'Su llamada inicial ha tenido lugar. Si tiene dos minutos, valore a su especialista — su feedback mejora su matching y nos ayuda a detectar problemas a tiempo. Las valoraciones son verificadas y aparecen anonimizadas.\n\n→ Dashboard → Citas → «Valorar proveedor»',
         },
         request_provider: {
             subject: 'Valore su lead en un plazo de 2 días',
@@ -562,7 +562,7 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
     tr: {
         request_user: {
             subject: 'Randevunuz nasıldı? Değerlendirmeniz için 2 dakika',
-            body: 'İlk görüşmeniz gerçekleşti. Uzmanınızı önümüzdeki 2 gün içinde değerlendirin — geri bildiriminiz eşleştirmenizi kişiselleştirir, sorunlara daha hızlı tepki vermemize yardımcı olur ve hizmetinizi iyileştirir. Değerlendirmeler doğrulanır ve anonim görünür.\n\n→ Panel → Randevular → «Sağlayıcıyı değerlendir»',
+            body: 'İlk görüşmeniz gerçekleşti. İki dakikanız varsa uzmanınızı değerlendirin — geri bildiriminiz eşleştirmenizi iyileştirir ve sorunları erken fark etmemize yardımcı olur. Değerlendirmeler doğrulanır ve anonim görünür.\n\n→ Panel → Randevular → «Sağlayıcıyı değerlendir»',
         },
         request_provider: {
             subject: 'Lütfen lead\'inizi 2 gün içinde değerlendirin',
@@ -1227,7 +1227,7 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
         rejected: { subject: 'Your change was not applied', body: 'Our review team did not apply your change from {date}. Your previous details stay in place.\n\nYou can adjust the details and send them again.' },
         reverification: { subject: 'One document for your change', body: 'For your change from {date}, our review team needs a current document.\n\nYou can upload it in your provider dashboard under Application → Evidence.' },
         resumed: { subject: 'Your services can be booked again', body: 'We have reviewed your report. The paused services are visible and bookable again.\n\nThank you for reporting the change right away.' },
-        kept_paused: { subject: 'Your report: the services stay paused for now', body: 'We have reviewed your report. The affected services stay paused for now.' },
+        kept_paused: { subject: 'Your report: the services stay paused for now', body: 'We have reviewed your report. The affected services stay paused for now. We will tell you as soon as that changes, and what would be needed to resume.' },
     },
     de: {
         noteLabel: 'Hinweis unseres Prüfteams',
@@ -1237,7 +1237,7 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
         rejected: { subject: 'Ihre Änderung wurde nicht übernommen', body: 'Unser Prüfteam hat Ihre Änderung vom {date} nicht übernommen. Es gilt weiter der bisherige Stand.\n\nSie können die Angaben anpassen und erneut senden.' },
         reverification: { subject: 'Ein Nachweis zu Ihrer Änderung', body: 'Zu Ihrer Änderung vom {date} braucht unser Prüfteam einen aktuellen Nachweis.\n\nSie laden ihn im Anbieter-Dashboard unter Bewerbung → Nachweise hoch.' },
         resumed: { subject: 'Ihre Leistungen sind wieder buchbar', body: 'Wir haben Ihre Meldung geprüft. Die pausierten Leistungen sind wieder sichtbar und buchbar.\n\nDanke, dass Sie die Änderung gleich gemeldet haben.' },
-        kept_paused: { subject: 'Ihre Meldung: die Leistungen bleiben vorerst pausiert', body: 'Wir haben Ihre Meldung geprüft. Die betroffenen Leistungen bleiben vorerst pausiert.' },
+        kept_paused: { subject: 'Ihre Meldung: die Leistungen bleiben vorerst pausiert', body: 'Wir haben Ihre Meldung geprüft. Die betroffenen Leistungen bleiben vorerst pausiert. Wir sagen Ihnen, sobald sich das ändert, und was für eine Wiederaufnahme nötig wäre.' },
     },
     es: {
         noteLabel: 'Nota de nuestro equipo de revisión',
@@ -1247,7 +1247,7 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
         rejected: { subject: 'Su cambio no se ha aplicado', body: 'Nuestro equipo de revisión no ha aplicado su cambio del {date}. Siguen vigentes sus datos anteriores.\n\nPuede ajustar los datos y enviarlos de nuevo.' },
         reverification: { subject: 'Un documento para su cambio', body: 'Para su cambio del {date}, nuestro equipo de revisión necesita un documento actual.\n\nPuede subirlo en su panel de socio en Solicitud → Justificantes.' },
         resumed: { subject: 'Sus servicios vuelven a poder reservarse', body: 'Hemos revisado su aviso. Los servicios en pausa vuelven a ser visibles y reservables.\n\nGracias por avisar del cambio enseguida.' },
-        kept_paused: { subject: 'Su aviso: los servicios siguen en pausa por ahora', body: 'Hemos revisado su aviso. Los servicios afectados siguen en pausa por ahora.' },
+        kept_paused: { subject: 'Su aviso: los servicios siguen en pausa por ahora', body: 'Hemos revisado su aviso. Los servicios afectados siguen en pausa por ahora. Le avisaremos en cuanto eso cambie y de lo que haría falta para reanudar.' },
     },
     tr: {
         noteLabel: 'İnceleme ekibimizin notu',
@@ -1257,7 +1257,7 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
         rejected: { subject: 'Değişikliğiniz uygulanmadı', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi uygulamadı. Önceki bilgileriniz geçerli kalır.\n\nBilgileri düzenleyip yeniden gönderebilirsiniz.' },
         reverification: { subject: 'Değişikliğiniz için bir belge', body: '{date} tarihli değişikliğiniz için inceleme ekibimizin güncel bir belgeye ihtiyacı var.\n\nBelgeyi sağlayıcı panelinde Başvuru → Belgeler bölümünden yükleyebilirsiniz.' },
         resumed: { subject: 'Hizmetleriniz yeniden rezerve edilebilir', body: 'Bildiriminizi inceledik. Duraklatılan hizmetler yeniden görünür ve rezerve edilebilir.\n\nDeğişikliği hemen bildirdiğiniz için teşekkür ederiz.' },
-        kept_paused: { subject: 'Bildiriminiz: hizmetler şimdilik duraklatılmış kalıyor', body: 'Bildiriminizi inceledik. İlgili hizmetler şimdilik duraklatılmış kalıyor.' },
+        kept_paused: { subject: 'Bildiriminiz: hizmetler şimdilik duraklatılmış kalıyor', body: 'Bildiriminizi inceledik. İlgili hizmetler şimdilik duraklatılmış kalıyor. Bu değişir değişmez ve yeniden başlamak için ne gerektiğini size bildiririz.' },
     },
 };
 

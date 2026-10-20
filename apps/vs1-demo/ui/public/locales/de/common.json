@@ -40,7 +40,7 @@
       "pain1Desc": "International expandieren? Umsatzsteuerschwellen, EPR-Verpackungsregeln und DSGVO unterscheiden sich je Land — und jede Registrierung hat ihren eigenen Auslöser. Die Karte zeigt, welche für Sie gelten.",
       "pain2Title": "Der lange Weg zu den richtigen Fachleuten",
       "pain2Desc": "Anbieter kalt anzuschreiben und wochenlang auf Antwort zu warten kostet Zeit, die Sie vielleicht nicht haben. Eine strukturierte Anfrage mit Ihrem Kontext bekommt innerhalb von 48 Stunden eine Antwort in der Sache.",
-      "pain3Title": "Wir lösen das",
+      "pain3Title": "Was CompliHub360 stattdessen tut",
       "diagramTitle": "Vom Kontext zur richtigen Fachperson",
       "node1Label": "Länder-Gate",
       "node1Desc": "Zielmarkt auswählen",
@@ -291,7 +291,7 @@
       "title": "Alle Bereiche auf einen Blick",
       "body": "Schnell-Vergleich für Recherchierende und Entscheider. Nach Risiko sortieren, um zuerst zu triagieren.",
       "area": "Compliance-Bereich",
-      "disclaimer": "Indikative Spannen basierend auf öffentlichen regulatorischen Quellen. Die tatsächliche Exposition hängt von Ihrem Fall ab – über den Wizard für genaue Empfehlungen prüfen.",
+      "disclaimer": "Indikative Spannen basierend auf öffentlichen regulatorischen Quellen. Die tatsächliche Exposition hängt von Ihrem Fall ab – die Erhebung grenzt sie auf Ihren ein.",
       "col": {
         "risk": "Risiko",
         "time": "Handlungsfrist",
@@ -505,7 +505,7 @@
       "personaFit": "Ideal für: Internationale Expansionsteams",
       "cov1": "Gründungs- & Meldungsassistent – bewertet aktuellen Status, gewünschte Märkte, Team-Komplexität",
       "cov2": "Strukturbedarf je Markt – bestimmt, ob Ihr Setup eine eigene Gesellschaft braucht",
-      "cov3": "Intelligente Weiterleitung zu Bildungsleitfaden-Pfaden für unsichere Gründer",
+      "cov3": "Leitet zu den erklärenden Seiten, wenn die Strukturfrage noch offen ist",
       "fines": {
         "authorities": "Lokale Handelsregister · Finanzbehörden · Geldwäsche-Aufseher"
       },
@@ -1816,7 +1816,7 @@
       "sales": {
         "short": "Preise",
         "title": "Preise und Pläne",
-        "desc": "Welcher Plan passt, was ein Team kostet, wie Rechnungen laufen.",
+        "desc": "Für Anbieter: welcher Plan passt, was er kostet, wie Rechnungen laufen. Für Unternehmen bleibt die Plattform kostenlos.",
         "sla": "Antwort am nächsten Werktag"
       },
       "partner": {

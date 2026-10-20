@@ -31,7 +31,7 @@
     "seeIfApplies": "Bunun size uygulanıp uygulanmadığını görün"
   },
   "hero": {
-    "eyebrow": "Compliance Intelligence ve Provider Matching platformu",
+    "eyebrow": "Uyumda netlik ve doğru uzman",
     "title": {
       "pre": "Tek başınıza yürütmemeniz ",
       "gold": "gereken",
@@ -75,7 +75,8 @@
       "placeholder": "Durumunuzu kendi kelimelerinizle anlatın…",
       "answer": "Bir uyum sorusu sorun",
       "guided": "İhtiyaçlarımı değerlendir",
-      "trust": "Ücretsiz · anonim · yaklaşık beş dakika"
+      "trust": "Ücretsiz · anonim · yaklaşık beş dakika",
+      "note": "Betada sorunuz doğru alana ve değerlendirmeye yönlendirir — henüz doğrudan bir yanıta değil."
     }
   },
   "heroWorld": {
@@ -144,7 +145,7 @@
       },
       {
         "title": "İhtiyacınızdan fazlası satılır.",
-        "desc": "Teşvik, en geniş kapsamı teklif etmektir. Kimseye bir işin küçük olduğunu ya da zaten halledildiğini söylemesi için para ödenmez."
+        "desc": "Teşvik genellikle en geniş kapsamı ödüllendirir. Çok az kişiye bir işin küçük olduğunu ya da zaten halledildiğini söylemesi için para ödenir."
       },
       {
         "title": "Kapsam belirlemede kaybolan haftalar.",
@@ -712,7 +713,7 @@
     "partnersTitle": "Bunu kimin çözebileceğini bulduk.",
     "unlock": "En iyi eşleşmelerinizi ücretsiz hesapla görün",
     "save": {
-      "title": "Bu haritayı kaydedin. Sağlayıcıların kilidini açın.",
+      "title": "Bu haritayı kaydedin. Eşleşmelerinizi saklayın.",
       "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Haritanız ve eşleşmeleriniz kayıtlı kalır.",
       "cta": "Ücretsiz hesap oluşturun"
     },
@@ -738,7 +739,7 @@
   "matchmaking": {
     "eyebrow": "Fark",
     "title": {
-      "line1": "Diğer araçlar size neyin yanlış olduğunu söyler.",
+      "line1": "Bir kural listesi bir plan değildir.",
       "pre": "Biz sizi çözecek kişiyle ",
       "gold": "buluştururuz",
       "post": "."
@@ -1271,7 +1272,7 @@
     "cardTitle": "Aylık briefing"
   },
   "footer": {
-    "tagline": "Uyum karmaşıklığı ile operasyonel gerçeklik arasındaki orkestrasyon katmanı.",
+    "tagline": "İşletmeniz için neyin geçerli olduğunu anlamanıza — ve gerektiğinde doğru kişiye ulaşmanıza yardımcı oluyoruz.",
     "notLawFirm": "Bir hukuk bürosu değiliz. Doğrulanmış uzmanları orkestre ederiz.",
     "beta": "Beta",
     "columns": {

@@ -31,7 +31,7 @@
     "seeIfApplies": "Compruebe si esto le aplica"
   },
   "hero": {
-    "eyebrow": "Plataforma de compliance intelligence y provider matching",
+    "eyebrow": "Claridad en compliance y el especialista adecuado",
     "title": {
       "pre": "El trabajo de compliance que ",
       "gold": "no debería",
@@ -75,7 +75,8 @@
       "placeholder": "Describa su situación con sus propias palabras…",
       "answer": "Hacer una pregunta de compliance",
       "guided": "Evaluar mis necesidades",
-      "trust": "Gratis · anónimo · unos cinco minutos"
+      "trust": "Gratis · anónimo · unos cinco minutos",
+      "note": "En la beta, su pregunta lleva al área adecuada y a la evaluación — todavía no a una respuesta directa."
     }
   },
   "heroWorld": {
@@ -144,7 +145,7 @@
       },
       {
         "title": "Le venden más de lo que necesita.",
-        "desc": "El incentivo es cotizar el alcance más amplio. A nadie le pagan por decirle que una tarea es pequeña, o que ya está resuelta."
+        "desc": "El incentivo suele premiar el alcance más amplio. A pocos les pagan por decirle que una tarea es pequeña, o que ya está resuelta."
       },
       {
         "title": "Semanas que se van en definir el alcance.",
@@ -712,7 +713,7 @@
     "partnersTitle": "Hemos encontrado quién puede actuar sobre esto.",
     "unlock": "Vea sus mejores matches con una cuenta gratuita",
     "save": {
-      "title": "Guarde este mapa. Desbloquee los proveedores.",
+      "title": "Guarde este mapa. Conserve sus coincidencias.",
       "subtitle": "Cuenta gratuita. Sin tarjeta de crédito. Su mapa y sus coincidencias quedan guardados.",
       "cta": "Crear cuenta gratuita"
     },
@@ -738,7 +739,7 @@
   "matchmaking": {
     "eyebrow": "La diferencia",
     "title": {
-      "line1": "Otras herramientas le dicen qué está mal.",
+      "line1": "Una lista de normas no es un plan.",
       "pre": "Nosotros le ",
       "gold": "conectamos",
       "post": " con quien lo resuelve."
@@ -1271,7 +1272,7 @@
     "cardTitle": "El briefing mensual"
   },
   "footer": {
-    "tagline": "La capa de orquestación entre la complejidad del compliance y la realidad operativa.",
+    "tagline": "Le ayudamos a entender qué aplica a su empresa — y a llegar a la persona adecuada cuando hace falta.",
     "notLawFirm": "No somos un despacho de abogados. Orquestamos especialistas verificados.",
     "beta": "Beta",
     "columns": {

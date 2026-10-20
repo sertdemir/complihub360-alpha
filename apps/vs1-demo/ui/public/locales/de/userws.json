@@ -346,7 +346,7 @@
     },
     "library": {
       "title": "Bibliothek",
-      "sub": "Wissen, Tutorials & Werkzeuge · bald verfügbar — sichern Sie sich Early Access",
+      "sub": "Wissen, Tutorials & Werkzeuge · bald verfügbar — zum Early Access anmelden",
       "panelTitle": "Wissen, Tutorials & Werkzeuge",
       "panelSub": "Geprüfte Beiträge von Fachleuten, nach Bereich und Markt sortiert — jeder nennt die Vorschrift, die er erklärt.",
       "feature1": "Tutorials je Bereich",
@@ -539,9 +539,9 @@
     "notConfigured": "Der Assistent ist in dieser Umgebung noch nicht angebunden.",
     "quota": "Tageslimit erreicht — der Upgrade-Plan kommt in Kürze.",
     "upgradeTitle": "Assistant Pro",
-    "upgradeBody": "Ihre 5 kostenlosen Fragen für heute sind aufgebraucht. Mit Assistant Pro erhalten Sie unbegrenzte Antworten aus der geprüften Wissensbasis — monatlich kündbar.",
+    "upgradeBody": "Ihre 5 kostenlosen Fragen für heute sind aufgebraucht. Assistant Pro hebt das Tageslimit auf 200 — monatlich kündbar.",
     "upgradeCta": "Upgrade · 12 € / Monat",
-    "upgradeSuccess": "Assistant Pro ist aktiv — willkommen an Bord! Fragen Sie los."
+    "upgradeSuccess": "Assistant Pro ist aktiv. Fragen Sie los."
   },
   "termine": {
     "title": "Ihre <accent>Termine</accent>.",
