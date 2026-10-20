@@ -508,7 +508,7 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
     en: {
         request_user: {
             subject: 'How was your appointment? 2 minutes for your review',
-            body: 'Your intro call has taken place. Rate your specialist within the next 2 days — your feedback personalises your matching, helps us react faster to problems and improves your service. Reviews are verified and appear anonymised.\n\n→ Dashboard → Appointments → "Rate provider"',
+            body: 'Your intro call has taken place. If you have two minutes, rate your specialist — your feedback improves your matching and helps us notice problems early. Reviews are verified and appear anonymised.\n\n→ Dashboard → Appointments → "Rate provider"',
         },
         request_provider: {
             subject: 'Please review your lead within 2 days',
@@ -526,7 +526,7 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
     de: {
         request_user: {
             subject: 'Wie war Ihr Termin? 2 Minuten für Ihre Bewertung',
-            body: 'Ihr Erstgespräch hat stattgefunden. Bewerten Sie Ihren Spezialisten innerhalb der nächsten 2 Tage — Ihr Feedback personalisiert Ihr Matching, hilft uns, schneller auf Probleme zu reagieren, und verbessert Ihren Service. Bewertungen sind verifiziert und erscheinen anonymisiert.\n\n→ Dashboard → Termine → „Provider bewerten"',
+            body: 'Ihr Erstgespräch hat stattgefunden. Wenn Sie zwei Minuten haben, bewerten Sie Ihren Spezialisten — Ihr Feedback verbessert Ihr Matching und hilft uns, Probleme früh zu bemerken. Bewertungen sind verifiziert und erscheinen anonymisiert.\n\n→ Dashboard → Termine → „Provider bewerten"',
         },
         request_provider: {
             subject: 'Bitte bewerten Sie Ihren Lead innerhalb von 2 Tagen',
@@ -544,7 +544,7 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
     es: {
         request_user: {
             subject: '¿Qué tal su cita? 2 minutos para su valoración',
-            body: 'Su llamada inicial ha tenido lugar. Valore a su especialista en los próximos 2 días — su feedback personaliza su matching, nos ayuda a reaccionar más rápido ante problemas y mejora su servicio. Las valoraciones son verificadas y aparecen anonimizadas.\n\n→ Dashboard → Citas → «Valorar proveedor»',
+            body: 'Su llamada inicial ha tenido lugar. Si tiene dos minutos, valore a su especialista — su feedback mejora su matching y nos ayuda a detectar problemas a tiempo. Las valoraciones son verificadas y aparecen anonimizadas.\n\n→ Dashboard → Citas → «Valorar proveedor»',
         },
         request_provider: {
             subject: 'Valore su lead en un plazo de 2 días',
@@ -562,7 +562,7 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
     tr: {
         request_user: {
             subject: 'Randevunuz nasıldı? Değerlendirmeniz için 2 dakika',
-            body: 'İlk görüşmeniz gerçekleşti. Uzmanınızı önümüzdeki 2 gün içinde değerlendirin — geri bildiriminiz eşleştirmenizi kişiselleştirir, sorunlara daha hızlı tepki vermemize yardımcı olur ve hizmetinizi iyileştirir. Değerlendirmeler doğrulanır ve anonim görünür.\n\n→ Panel → Randevular → «Sağlayıcıyı değerlendir»',
+            body: 'İlk görüşmeniz gerçekleşti. İki dakikanız varsa uzmanınızı değerlendirin — geri bildiriminiz eşleştirmenizi iyileştirir ve sorunları erken fark etmemize yardımcı olur. Değerlendirmeler doğrulanır ve anonim görünür.\n\n→ Panel → Randevular → «Sağlayıcıyı değerlendir»',
         },
         request_provider: {
             subject: 'Lütfen lead\'inizi 2 gün içinde değerlendirin',

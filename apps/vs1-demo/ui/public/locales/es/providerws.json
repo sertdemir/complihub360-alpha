@@ -169,7 +169,7 @@
       "network": "Sin conexión. Nada ha cambiado en su cuenta; inténtelo de nuevo.",
       "rateLimit": "Demasiados mensajes en poco tiempo. Espere un momento."
     },
-    "scope": "No forma parte del soporte: negociaciones con empresas, asesoramiento profesional, disputas de honorarios. Usted es el profesional; nosotros somos la plataforma."
+    "scope": "No forma parte del soporte: sus negociaciones de honorarios con clientes y el asesoramiento profesional; usted es el profesional, nosotros la plataforma. Las preguntas sobre una tarifa de lead, una banda o un abono sí van aquí, en Facturación."
   },
   "billing": {
     "title": "Facturación",
@@ -227,7 +227,7 @@
       "withdrawn_authorization": "La autorización de cobro ha sido retirada. Acepte la versión actual para continuar.",
       "overdue_invoice": "Hay una factura vencida. Páguela en el portal.",
       "account_paused": "Su cuenta está en pausa.",
-      "payment_failed": "El último cobro de lead falló. Otro método de pago levanta el bloqueo — la misma tarjeta no.",
+      "payment_failed": "El último cobro de lead no se completó. Haga comprobar de nuevo la misma tarjeta o añada otro método de pago; ambas opciones levantan la pausa una vez confirmadas.",
       "payment_unresolved": "Un cobro reciente todavía se está confirmando con el servicio de pagos. Las reservas se reanudan por sí solas en cuanto quede resuelto, normalmente en pocos minutos."
     },
     "graceTitleOne": "Hay una factura pendiente",
@@ -273,7 +273,7 @@
   },
   "notifications": {
     "title": "Notificaciones",
-    "subtitle": "Feed de eventos agregado del modelo canónico de eventos. Nuevas solicitudes · recordatorios de SLA · avisos de degradación · eventos de pago · procesamiento de adjuntos. Configure la entrega por canal (correo + in-app) en Configuración → Notificaciones.",
+    "subtitle": "Todo lo que le hemos enviado, en un solo lugar: nuevas solicitudes, recordatorios de SLA, avisos de plan y pago, actividad de valoraciones. Elija la entrega por correo o en la app en Configuración → Notificaciones.",
     "markAllRead": "Marcar todo como leído",
     "preferences": "Preferencias",
     "chipAll": "Todas",
@@ -352,7 +352,7 @@
       "reverification": "Nueva verificación",
       "suspension": "Cuenta suspendida"
     },
-    "enforcementBody": "Desde el {{date}}, tras {{count}} incidencias en el periodo. Su perfil sigue visible; las nuevas reservas están en pausa hasta que el equipo decida.",
+    "enforcementBody": "Desde el {{date}}, tras {{count}} incidencias en el periodo. Las nuevas reservas están en pausa hasta que el equipo decida; lo que esto significa para su visibilidad lo indica el estado de arriba.",
     "appealLabel": "Recurso: ¿qué deberíamos saber?",
     "appealPlaceholder": "Por ejemplo: qué ocurrió en las citas, pruebas, circunstancias.",
     "appealSend": "Presentar recurso",
@@ -424,7 +424,7 @@
   },
   "requests": {
     "title": "Solicitudes",
-    "subtitle": "Todas las solicitudes dirigidas a su workspace · ancladas por push (correo + Magic-Link). Las solicitudes nuevas se destacan con un banner persistente hasta confirmarse. El filtro predeterminado muestra las solicitudes que esperan su acción.",
+    "subtitle": "Todas las solicitudes dirigidas a usted. Las nuevas llegan por correo con un enlace de un solo uso y permanecen destacadas aquí hasta que confirme. El filtro predeterminado muestra lo que le espera.",
     "outOfOffice": "Ausente",
     "oooBannerTitle": "Ausencia activa",
     "oooBannerBody": "Las nuevas solicitudes están en pausa y se redirigen · su ranking queda congelado durante la ausencia · los temporizadores de SLA se reanudan a su regreso.",
@@ -482,7 +482,7 @@
     "pricingRemoveRow": "Eliminar fila",
     "pricingServicePh": "Servicio",
     "pricingPricePh": "Precio",
-    "pricingNoteV2": "En la tarjeta del listado no aparece ningún precio concreto — solo el modelo de facturación. La tabla completa se muestra al abrir el detalle (facturado).",
+    "pricingNoteV2": "La tarjeta del listado muestra solo su modelo de facturación, sin precios. Su tabla de precios completa aparece en su página de detalle. Las tarifas de lead surgen por reserva, no por visita al perfil.",
     "matchmakingSave": "Guardar perfil de matchmaking",
     "matchmakingSaved": "Guardado.",
     "previewTitle": "Así aparece antes de la reserva",
