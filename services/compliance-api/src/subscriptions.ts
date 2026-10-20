@@ -834,7 +834,7 @@ export async function handleSubscriptionSelect(
         if (r.code === 'PROVIDER_NOT_ELIGIBLE') {
             json(res, 409, {
                 errorCode: 'PROVIDER_NOT_ELIGIBLE',
-                message: 'This account cannot start a subscription. Please contact us.',
+                message: 'This account cannot start a subscription right now. Write to us via Help & support — a person will look at it.',
                 correlationId,
             });
             return;

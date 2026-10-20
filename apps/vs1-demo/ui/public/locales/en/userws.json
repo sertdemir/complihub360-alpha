@@ -347,7 +347,7 @@
     },
     "library": {
       "title": "Library",
-      "sub": "Knowledge, tutorials & tools · coming soon — secure early access",
+      "sub": "Knowledge, tutorials & tools · coming soon — join early access",
       "panelTitle": "Knowledge, tutorials & tools",
       "panelSub": "Reviewed pieces from specialists, sorted by area and market — each naming the statute it explains.",
       "feature1": "Tutorials per area",
@@ -542,9 +542,9 @@
     "notConfigured": "The assistant isn’t connected yet on this environment.",
     "quota": "Daily free limit reached — the upgrade plan is coming soon.",
     "upgradeTitle": "Assistant Pro",
-    "upgradeBody": "Your 5 free questions for today are used up. Assistant Pro gives you unlimited answers from the verified knowledge base — cancel anytime.",
+    "upgradeBody": "Your 5 free questions for today are used up. Assistant Pro raises the daily allowance to 200 — cancel anytime.",
     "upgradeCta": "Upgrade · €12 / month",
-    "upgradeSuccess": "Assistant Pro is active — welcome aboard! Ask away."
+    "upgradeSuccess": "Assistant Pro is active. Ask away."
   },
   "termine": {
     "title": "Your <accent>appointments</accent>.",
