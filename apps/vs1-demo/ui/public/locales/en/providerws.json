@@ -170,7 +170,7 @@
       "network": "No connection. Nothing changed on your account — please try again.",
       "rateLimit": "Too many messages in a short time. Please wait a moment."
     },
-    "scope": "Not part of support: negotiations with companies, professional advice, fee disputes. You are the professional — we are the platform.",
+    "scope": "Not part of support: your fee negotiations with clients and professional advice — you are the professional, we are the platform. Questions about a lead fee, a band or a credit do belong here, under Billing.",
     "messageTooShort": "Please describe what happened in at least 10 characters."
   },
   "billing": {
@@ -229,7 +229,7 @@
       "withdrawn_authorization": "The billing authorisation has been withdrawn. Accept the current version to continue.",
       "overdue_invoice": "An invoice is overdue. Pay it in the portal.",
       "account_paused": "Your account is paused.",
-      "payment_failed": "The last lead charge failed. A different payment method lifts this — the same card does not.",
+      "payment_failed": "The last lead charge did not go through. Have the same card checked again or add a different payment method — either lifts the pause once confirmed.",
       "payment_unresolved": "A recent charge is still being confirmed with the payment service. Bookings resume on their own once it is settled, usually within a few minutes."
     },
     "graceTitleOne": "One invoice is open",
@@ -275,7 +275,7 @@
   },
   "notifications": {
     "title": "Notifications",
-    "subtitle": "Aggregated event feed from canonical event model. New requests · SLA reminders · downgrade warnings · payment events · attachment processing. Configure per-channel delivery (email + in-app) in Settings → Notifications.",
+    "subtitle": "Everything we have sent you in one place: new requests, SLA reminders, plan and payment updates, review activity. Choose email or in-app delivery under Settings → Notifications.",
     "markAllRead": "Mark all read",
     "preferences": "Preferences",
     "chipAll": "All",
@@ -354,7 +354,7 @@
       "reverification": "Re-verification",
       "suspension": "Account suspended"
     },
-    "enforcementBody": "Since {{date}}, after {{count}} incidents in the period. Your profile stays visible; new bookings are paused until the team decides.",
+    "enforcementBody": "Since {{date}}, after {{count}} incidents in the period. New bookings are paused until the team decides; what this means for your visibility is shown in the status above.",
     "appealLabel": "Appeal — what should we know?",
     "appealPlaceholder": "For example: what happened at the appointments, evidence, circumstances.",
     "appealSend": "Submit appeal",
@@ -443,7 +443,7 @@
   },
   "requests": {
     "title": "Requests",
-    "subtitle": "All requests routed to your workspace · push-anchored (email + magic-link). New requests highlighted with a persistent banner until confirmed. Default filter shows requests awaiting your action.",
+    "subtitle": "Every request routed to you. New requests arrive by email with a one-time link and stay highlighted here until you confirm. The default filter shows what is waiting for you.",
     "outOfOffice": "Out of office",
     "oooBannerTitle": "Out of office active",
     "oooBannerBody": "New requests are paused and re-routed · your ranking is frozen while away · SLA timers resume on return.",
@@ -501,7 +501,7 @@
     "pricingRemoveRow": "Remove row",
     "pricingServicePh": "Service",
     "pricingPricePh": "Price",
-    "pricingNoteV2": "No concrete price appears on the listing card — only the billing model. The full table is shown on the (billed) detail open.",
+    "pricingNoteV2": "The listing card shows only your billing model, no prices. Your full pricing table appears on your detail page. Lead fees arise per booking, not per profile view.",
     "matchmakingSave": "Save matchmaking profile",
     "matchmakingSaved": "Saved.",
     "previewTitle": "How you appear before booking",

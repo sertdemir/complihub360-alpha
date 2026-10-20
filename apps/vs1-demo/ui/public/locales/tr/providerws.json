@@ -169,7 +169,7 @@
       "network": "Bağlantı yok. Hesabınızda hiçbir şey değişmedi; lütfen tekrar deneyin.",
       "rateLimit": "Kısa sürede çok fazla mesaj. Lütfen biraz bekleyin."
     },
-    "scope": "Desteğin kapsamı dışında: şirketlerle pazarlık, mesleki danışmanlık, ücret anlaşmazlıkları. Uzman sizsiniz; biz platformuz."
+    "scope": "Desteğin kapsamı dışında: müşterilerle ücret pazarlığınız ve mesleki danışmanlık — uzman sizsiniz, biz platformuz. Bir lead ücreti, bant veya alacak hakkındaki sorular ise buraya ait, Faturalama altında."
   },
   "billing": {
     "title": "Faturalama",
@@ -227,7 +227,7 @@
       "withdrawn_authorization": "Ödeme yetkisi geri çekildi. Devam etmek için güncel sürümü onaylayın.",
       "overdue_invoice": "Vadesi geçmiş bir fatura var. Portalda ödeyin.",
       "account_paused": "Hesabınız duraklatıldı.",
-      "payment_failed": "Son lead tahsilatı başarısız oldu. Farklı bir ödeme yöntemi engeli kaldırır — aynı kart kaldırmaz.",
+      "payment_failed": "Son lead tahsilatı gerçekleşmedi. Aynı kartı yeniden kontrol ettirin veya farklı bir ödeme yöntemi ekleyin — onaylandığında ikisi de duraklamayı kaldırır.",
       "payment_unresolved": "Yakın tarihli bir tahsilat ödeme hizmetiyle hâlâ doğrulanıyor. Çözüldüğünde rezervasyonlar kendiliğinden devam eder, genellikle birkaç dakika içinde."
     },
     "graceTitleOne": "Bir fatura açık",
@@ -273,7 +273,7 @@
   },
   "notifications": {
     "title": "Bildirimler",
-    "subtitle": "Kanonik olay modelinden toplanan olay akışı. Yeni talepler · SLA hatırlatmaları · düşürme uyarıları · ödeme olayları · ek işleme. Kanal bazlı teslimatı (e-posta + uygulama içi) Ayarlar → Bildirimler bölümünden yapılandırın.",
+    "subtitle": "Size gönderdiğimiz her şey tek yerde: yeni talepler, SLA hatırlatmaları, plan ve ödeme bildirimleri, değerlendirme etkinliği. E-posta veya uygulama içi teslimatı Ayarlar → Bildirimler bölümünden seçin.",
     "markAllRead": "Tümünü okundu işaretle",
     "preferences": "Tercihler",
     "chipAll": "Tümü",
@@ -352,7 +352,7 @@
       "reverification": "Yeniden doğrulama",
       "suspension": "Hesap askıya alındı"
     },
-    "enforcementBody": "{{date}} itibarıyla, dönemdeki {{count}} olaydan sonra. Profiliniz görünür kalır; ekip karar verene kadar yeni rezervasyonlar duraklatıldı.",
+    "enforcementBody": "{{date}} itibarıyla, dönemdeki {{count}} olaydan sonra. Ekip karar verene kadar yeni rezervasyonlar duraklatıldı; bunun görünürlüğünüz için ne anlama geldiğini yukarıdaki durum gösterir.",
     "appealLabel": "İtiraz: neyi bilmemiz gerekir?",
     "appealPlaceholder": "Örneğin: randevularda ne oldu, kanıtlar, koşullar.",
     "appealSend": "İtiraz et",
@@ -424,7 +424,7 @@
   },
   "requests": {
     "title": "Talepler",
-    "subtitle": "Çalışma alanınıza yönlendirilen tüm talepler · push tabanlı (e-posta + Magic-Link). Yeni talepler onaylanana kadar kalıcı bir banner ile vurgulanır. Varsayılan filtre, işleminizi bekleyen talepleri gösterir.",
+    "subtitle": "Size yönlendirilen her talep. Yeni talepler tek kullanımlık bağlantıyla e-posta olarak gelir ve onaylayana kadar burada vurgulanır. Varsayılan filtre sizi bekleyenleri gösterir.",
     "outOfOffice": "Ofis dışında",
     "oooBannerTitle": "Ofis dışı modu etkin",
     "oooBannerBody": "Yeni talepler duraklatıldı ve yeniden yönlendiriliyor · yokluğunuz sırasında sıralamanız dondurulur · SLA sayaçları dönüşünüzde devam eder.",
@@ -482,7 +482,7 @@
     "pricingRemoveRow": "Satırı kaldır",
     "pricingServicePh": "Hizmet",
     "pricingPricePh": "Fiyat",
-    "pricingNoteV2": "Listeleme kartında somut fiyat görünmez — yalnızca faturalama modeli. Tam tablo (faturalanan) detay açılışında gösterilir.",
+    "pricingNoteV2": "Listeleme kartı yalnızca faturalama modelinizi gösterir, fiyat göstermez. Tam fiyat tablonuz detay sayfanızda görünür. Lead ücretleri profil görüntülemesi başına değil, rezervasyon başına oluşur.",
     "matchmakingSave": "Eşleştirme profilini kaydet",
     "matchmakingSaved": "Kaydedildi.",
     "previewTitle": "Rezervasyondan önce böyle görünürsünüz",
