@@ -241,7 +241,7 @@ export function UserHomePage() {
   if (loading) {
     return (
       <UserShell>
-        <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+        <div className="-mx-4 -my-5 min-h-[calc(100%+2.5rem)] bg-gradient-stage lg:-mx-8 lg:-my-6 lg:min-h-[calc(100%+3rem)] px-8 py-7">
           <div className="mx-auto max-w-[1200px]">
             {kopf}
             <p className="mt-8 text-body-xs text-fg-tertiary">{t('home.loading')}</p>
@@ -255,7 +255,7 @@ export function UserHomePage() {
   if (nichts) {
     return (
       <UserShell>
-        <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+        <div className="-mx-4 -my-5 min-h-[calc(100%+2.5rem)] bg-gradient-stage lg:-mx-8 lg:-my-6 lg:min-h-[calc(100%+3rem)] px-8 py-7">
           <div className="mx-auto max-w-[1200px]">
             {kopf}
             <EmptyState
@@ -334,7 +334,7 @@ export function UserHomePage() {
 
   return (
     <UserShell>
-      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+      <div className="-mx-4 -my-5 min-h-[calc(100%+2.5rem)] bg-gradient-stage lg:-mx-8 lg:-my-6 lg:min-h-[calc(100%+3rem)] px-8 py-7">
         <div className="mx-auto max-w-[1200px]">
           {kopf}
 
