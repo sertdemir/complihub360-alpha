@@ -57,21 +57,38 @@ async function loadJwks(forceFresh: boolean): Promise<Map<string, crypto.KeyObje
     return jwksKeys;
 }
 
-/** Verify signature + decode. Returns the payload object, or null. */
-export async function verifySupabaseJwt(token: string): Promise<Record<string, any> | null> {
+/** Why a token was rejected — logged by the auth gate, never the token itself. */
+export type JwtRejectReason =
+    | 'malformed' | 'hs256_no_secret' | 'hs256_bad_signature'
+    | 'es256_unknown_kid' | 'es256_bad_signature' | 'unsupported_alg';
+
+export interface JwtCheck {
+    payload: Record<string, any> | null;
+    reason: JwtRejectReason | null;
+    alg?: string;
+    kid?: string;
+    /** Wie viele Schluessel der JWKS-Cache gerade kennt (0 = Abruf gescheitert oder leer). */
+    knownKeys?: number;
+}
+
+/** Verify signature + decode, with the reason on failure. */
+export async function checkSupabaseJwt(token: string): Promise<JwtCheck> {
     const parts = token.split('.');
-    if (parts.length !== 3) return null;
+    if (parts.length !== 3) return { payload: null, reason: 'malformed' };
     const [headerB64, payloadB64, signatureB64] = parts;
 
     let header: any;
     try {
         header = JSON.parse(Buffer.from(headerB64, 'base64url').toString('utf8'));
-    } catch { return null; }
+    } catch { return { payload: null, reason: 'malformed' }; }
+    const alg = typeof header.alg === 'string' ? header.alg : undefined;
+    const kid = typeof header.kid === 'string' ? header.kid : undefined;
+    const fail = (reason: JwtRejectReason, knownKeys?: number): JwtCheck => ({ payload: null, reason, alg, kid, knownKeys });
     const signedData = Buffer.from(`${headerB64}.${payloadB64}`);
 
     if (header.alg === 'HS256') {
         const jwtSecret = process.env.SUPABASE_JWT_SECRET;
-        if (!jwtSecret) return null;
+        if (!jwtSecret) return fail('hs256_no_secret');
         const expectedSignature = crypto
             .createHmac('sha256', jwtSecret)
             .update(signedData)
@@ -79,25 +96,31 @@ export async function verifySupabaseJwt(token: string): Promise<Record<string, a
         const sigBuf = Buffer.from(signatureB64);
         const expBuf = Buffer.from(expectedSignature);
         // Constant-time comparison to avoid signature timing leaks.
-        if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) return null;
+        if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) return fail('hs256_bad_signature');
     } else if (header.alg === 'ES256' && typeof header.kid === 'string') {
         let sig: Buffer;
-        try { sig = Buffer.from(signatureB64, 'base64url'); } catch { return null; }
+        try { sig = Buffer.from(signatureB64, 'base64url'); } catch { return fail('malformed'); }
         // JOSE ES256 signatures are raw R||S — exactly 64 bytes.
-        if (sig.length !== 64) return null;
-        let key = (await loadJwks(false)).get(header.kid);
-        if (!key) key = (await loadJwks(true)).get(header.kid);
-        if (!key) return null;
+        if (sig.length !== 64) return fail('es256_bad_signature');
+        let keys = await loadJwks(false);
+        let key = keys.get(header.kid);
+        if (!key) { keys = await loadJwks(true); key = keys.get(header.kid); }
+        if (!key) return fail('es256_unknown_kid', keys.size);
         const ok = crypto.verify('sha256', signedData, { key, dsaEncoding: 'ieee-p1363' }, sig);
-        if (!ok) return null;
+        if (!ok) return fail('es256_bad_signature', keys.size);
     } else {
         // Pin the algorithms — reject alg:none and RS/ES "confusion" tokens.
-        return null;
+        return fail('unsupported_alg');
     }
 
     try {
-        return JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
-    } catch { return null; }
+        return { payload: JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8')), reason: null, alg, kid };
+    } catch { return fail('malformed'); }
+}
+
+/** Verify signature + decode. Returns the payload object, or null. */
+export async function verifySupabaseJwt(token: string): Promise<Record<string, any> | null> {
+    return (await checkSupabaseJwt(token)).payload;
 }
 
 /** Test hook: forget cached JWKS so the next verify refetches. */

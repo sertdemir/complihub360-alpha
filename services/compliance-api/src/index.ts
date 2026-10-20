@@ -11,7 +11,7 @@ import { generateRelevantSubdomains, isKnownCountry, type CountryCode, type Indu
 
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
-import { verifySupabaseJwt } from "./supabaseJwt.js";
+import { checkSupabaseJwt } from "./supabaseJwt.js";
 import { sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleDomain } from "./domain.js";
@@ -327,7 +327,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         //    key via JWKS — supabaseJwt.ts): signature there, exp/nbf/role here.
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.substring(7);
-            const payload = await verifySupabaseJwt(token);
+            const check = await checkSupabaseJwt(token);
+            const payload = check.payload;
+            // Bis 20.10.2026 lehnte das Tor still ab: Beta-Login, sofortiger
+            // Logout, kein Wort im Log. Jetzt steht der Grund da — ohne Token.
+            let rejected: string | null = check.reason;
             if (payload) {
                 const nowSec = Math.floor(Date.now() / 1000);
                 const notExpired = typeof payload.exp !== 'number' || payload.exp > nowSec;
@@ -345,7 +349,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const appRole = (payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined)
                         ?? (payload.user_metadata && typeof payload.user_metadata.role === 'string' ? payload.user_metadata.role : undefined);
                     if (appRole === 'admin') authIsAdmin = true;
+                } else {
+                    rejected = !notExpired ? 'expired' : !active ? 'not_yet_valid' : 'role';
                 }
+            }
+            if (rejected) {
+                structuredLog("warn", "Bearer token rejected", {
+                    correlationId, errorCode: "ERR_JWT_REJECTED", severity: "warn", route: (req.url || '').split('?')[0],
+                    reason: rejected, alg: check.alg, kid: check.kid, knownKeys: check.knownKeys,
+                });
             }
         }
 
