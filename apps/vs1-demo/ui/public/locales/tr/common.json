@@ -40,7 +40,7 @@
       "pain1Desc": "Uluslararası büyüyor musunuz? KDV eşikleri, EPR ambalaj kuralları ve GDPR ülkeye göre farklıdır ve her kaydın kendi tetikleyicisi vardır. Harita hangilerinin sizin için geçerli olduğunu gösterir.",
       "pain2Title": "Doğru uzmana giden uzun yol",
       "pain2Desc": "Sağlayıcılara soğuk e-posta gönderip haftalarca yanıt beklemek, belki de sahip olmadığınız zamanı alır. Bağlamınızı içeren yapılandırılmış bir talep 48 saat içinde özlü bir yanıt alır.",
-      "pain3Title": "Biz bunu çözüyoruz",
+      "pain3Title": "CompliHub360 bunun yerine ne yapar",
       "diagramTitle": "Bağlamdan doğru uzmana",
       "node1Label": "Ülke Kapısı",
       "node1Desc": "Hedef pazar seçin",
@@ -291,7 +291,7 @@
       "title": "Tüm alanlar bir bakışta",
       "body": "Araştırmacılar ve karar vericiler için hızlı karşılaştırma. Önceliklendirmek için riske göre sıralayın.",
       "area": "Uyumluluk Alanı",
-      "disclaimer": "Kamuya açık düzenleyici kaynaklara dayanan gösterge niteliğinde aralıklar. Nihai risk, özel durumunuza bağlıdır — kesin yönlendirme için değerlendirmeyi asistan üzerinden yapın.",
+      "disclaimer": "Kamuya açık düzenleyici kaynaklara dayanan gösterge niteliğinde aralıklar. Nihai risk, özel durumunuza bağlıdır — değerlendirme bunu sizin durumunuza daraltır.",
       "col": {
         "risk": "Risk",
         "time": "Harekete Geçme Süresi",
@@ -505,7 +505,7 @@
       "personaFit": "En uygun: Uluslararası büyüme ekipleri",
       "cov1": "Şirket Kuruluşu ve Bildirimler Asistanı — mevcut durumu, istenen pazarları, ekip karmaşıklığını değerlendirir",
       "cov2": "Pazar başına şirket ihtiyacı – kurulumunuzun kendi şirketini gerektirip gerektirmediğini belirler",
-      "cov3": "Belirsiz kurucular için eğitim rehberi yollarına akıllı yönlendirme",
+      "cov3": "Yapı sorusu hâlâ açıkken açıklayıcı sayfalara yönlendirir",
       "fines": {
         "authorities": "Yerel ticaret sicilleri · Vergi otoriteleri · AML denetçileri"
       },
@@ -1816,7 +1816,7 @@
       "sales": {
         "short": "Fiyatlar",
         "title": "Fiyatlar ve planlar",
-        "desc": "Hangi plan uyar, bir ekip ne tutar, faturalama nasıl işler.",
+        "desc": "Sağlayıcılar için: hangi plan uyar, ne tutar, faturalama nasıl işler. İşletmeler için platform ücretsiz kalır.",
         "sla": "Ertesi iş günü yanıt"
       },
       "partner": {

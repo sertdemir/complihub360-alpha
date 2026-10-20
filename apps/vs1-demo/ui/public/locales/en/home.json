@@ -31,7 +31,7 @@
     "seeIfApplies": "See if this applies to you"
   },
   "hero": {
-    "eyebrow": "Compliance Intelligence & Provider-Matching Platform",
+    "eyebrow": "Compliance clarity and the right specialist",
     "title": {
       "pre": "The compliance work you ",
       "gold": "shouldn't",
@@ -75,7 +75,8 @@
       "placeholder": "Describe your situation in your own words…",
       "answer": "Ask a Compliance Question",
       "guided": "Assess My Needs",
-      "trust": "Free · anonymous · about five minutes"
+      "trust": "Free · anonymous · about five minutes",
+      "note": "In the beta, your question leads to the right area and into the assessment — not yet to a direct answer."
     }
   },
   "heroWorld": {
@@ -145,7 +146,7 @@
       },
       {
         "title": "Sold more than you need.",
-        "desc": "The incentive is to quote the widest scope. Nobody is paid to tell you a task is small, or that you have already handled it."
+        "desc": "The incentive usually rewards the widest scope. Few are paid to tell you a task is small, or that you have already handled it."
       },
       {
         "title": "Weeks that disappear into scoping.",
@@ -713,7 +714,7 @@
     "partnersTitle": "We've found who can act on this.",
     "unlock": "See my best matches with a free account",
     "save": {
-      "title": "Save this map. Unlock the providers.",
+      "title": "Save this map. Keep your matches.",
       "subtitle": "Free account. No credit card. Your map and your matches stay saved.",
       "cta": "Create free account"
     },
@@ -739,7 +740,7 @@
   "matchmaking": {
     "eyebrow": "The difference",
     "title": {
-      "line1": "Other tools tell you what's wrong.",
+      "line1": "A list of rules is not a plan.",
       "pre": "We ",
       "gold": "connect",
       "post": " you with who fixes it."
@@ -1306,7 +1307,7 @@
     "cardTitle": "The monthly briefing"
   },
   "footer": {
-    "tagline": "The orchestration layer between compliance complexity and operational reality.",
+    "tagline": "We help you understand what applies to your business — and reach the right person when it needs one.",
     "notLawFirm": "Not a law firm. We orchestrate verified specialists.",
     "beta": "Beta",
     "columns": {

@@ -58,13 +58,13 @@
     "eyebrow_other": "{{count}} Verified Providers matched",
     "title": "We've found who can act on this.",
     "none": "No provider covers this area yet.",
-    "unlocked": "Matches unlocked",
+    "unlocked": "Matches saved",
     "unlockCta": "See my best matches with a free account",
     "match": "{{pct}} match",
     "requestQuote": "Request quote"
   },
   "cta": {
-    "title": "Save this map. Unlock the providers.",
+    "title": "Save this map. Keep your matches.",
     "body": "Free account. No credit card. Your map and your matches stay saved.",
     "button": "Create free account"
   },
@@ -300,7 +300,7 @@
     "kpiOpenSub_one": "{{count}} obligation is waiting on your answer",
     "kpiOpenSub_other": "{{count}} obligations are waiting on your answers",
     "group": {
-      "now": "Act now",
+      "now": "Due now",
       "month": "This month",
       "open": "To clarify first",
       "later": "Later"

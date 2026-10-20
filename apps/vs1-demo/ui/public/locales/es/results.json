@@ -58,13 +58,13 @@
     "eyebrow_other": "{{count}} Verified Providers encontrados",
     "title": "Hemos encontrado quién puede actuar sobre esto.",
     "none": "Aún no hay proveedor con cobertura en esta área.",
-    "unlocked": "Coincidencias desbloqueadas",
+    "unlocked": "Coincidencias guardadas",
     "unlockCta": "Vea sus mejores coincidencias con una cuenta gratuita",
     "match": "{{pct}} de coincidencia",
     "requestQuote": "Solicitar presupuesto"
   },
   "cta": {
-    "title": "Guarde este mapa. Desbloquee los proveedores.",
+    "title": "Guarde este mapa. Conserve sus coincidencias.",
     "body": "Cuenta gratuita. Sin tarjeta de crédito. Su mapa y sus coincidencias quedan guardados.",
     "button": "Crear cuenta gratuita"
   },
@@ -294,7 +294,7 @@
     "kpiOpenSub_one": "{{count}} obligación espera su respuesta",
     "kpiOpenSub_other": "{{count}} obligaciones esperan sus respuestas",
     "group": {
-      "now": "Actuar ahora",
+      "now": "Vence ahora",
       "month": "Este mes",
       "open": "Primero aclarar",
       "later": "Más adelante"

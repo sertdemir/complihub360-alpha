@@ -40,7 +40,7 @@
       "pain1Desc": "Expanding internationally? VAT thresholds, EPR packaging rules and GDPR differ by country — and each registration has its own trigger. The map shows which ones apply to you.",
       "pain2Title": "The long way to the right specialist",
       "pain2Desc": "Cold-emailing providers and waiting weeks for a reply costs time you may not have. A structured request with your context gets a substantive answer within 48 hours.",
-      "pain3Title": "We Fix This",
+      "pain3Title": "What CompliHub360 does instead",
       "pain3Desc": "The assessment captures your context in four steps, maps the risks that apply in your markets, and connects you with Verified Providers who confirm within 24 hours and reply within 48.",
       "diagramTitle": "From context to the right specialist",
       "node1Label": "Country Gate",
@@ -293,7 +293,7 @@
       "title": "Every area at a glance",
       "body": "Quick-scan comparison for researchers and decision-makers. Sort by risk to triage first.",
       "area": "Compliance Area",
-      "disclaimer": "Indicative ranges based on public regulatory references. Final exposure depends on your specific case — assess via the wizard for accurate guidance.",
+      "disclaimer": "Indicative ranges based on public regulatory references. Final exposure depends on your specific case — the assessment narrows it to yours.",
       "col": {
         "risk": "Risk",
         "time": "Time to Act",
@@ -508,7 +508,7 @@
       "personaFit": "Best for: International expansion teams",
       "cov1": "Company Setup & Filings Wizard — evaluates current status, desired markets, team complexity",
       "cov2": "Entity need per market – determines whether your setup requires its own company",
-      "cov3": "Intelligent routing to educational guide paths for uncertain founders",
+      "cov3": "Routes to the explanatory pages when the setup question is still open",
       "fines": {
         "authorities": "Local commercial registries · Tax authorities · AML supervisors"
       },
@@ -1863,7 +1863,7 @@
       "sales": {
         "short": "Pricing",
         "title": "Pricing and plans",
-        "desc": "Which plan fits, what a team costs, how invoicing works.",
+        "desc": "For providers: which plan fits, what it costs, how invoicing works. For businesses, the platform stays free.",
         "sla": "Reply the next business day"
       },
       "partner": {

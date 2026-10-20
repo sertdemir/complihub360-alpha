@@ -40,7 +40,7 @@
       "pain1Desc": "¿Expansión internacional? Los umbrales de IVA, las normas de envases EPR y el RGPD difieren por país, y cada registro tiene su propio desencadenante. El mapa muestra cuáles le aplican.",
       "pain2Title": "El camino largo hasta el especialista adecuado",
       "pain2Desc": "Enviar correos a ciegas a proveedores y esperar semanas una respuesta cuesta un tiempo que quizá no tenga. Una solicitud estructurada con su contexto recibe una respuesta de fondo en 48 horas.",
-      "pain3Title": "Nosotros lo solucionamos",
+      "pain3Title": "Qué hace CompliHub360 en su lugar",
       "diagramTitle": "Del contexto al especialista adecuado",
       "node1Label": "Puerta de País",
       "node1Desc": "Seleccionar mercado objetivo",
@@ -291,7 +291,7 @@
       "title": "Todas las áreas de un vistazo",
       "body": "Comparación rápida para investigadores y responsables de decisión. Ordene por riesgo para priorizar.",
       "area": "Área de cumplimiento",
-      "disclaimer": "Rangos indicativos basados en referencias regulatorias públicas. La exposición final depende de su caso específico — evalúelo con el asistente para obtener una orientación precisa.",
+      "disclaimer": "Rangos indicativos basados en referencias regulatorias públicas. La exposición final depende de su caso específico — la evaluación la acota al suyo.",
       "col": {
         "risk": "Riesgo",
         "time": "Plazo para actuar",
@@ -505,7 +505,7 @@
       "personaFit": "Ideal para: equipos de expansión internacional",
       "cov1": "Asistente de Constitución y Presentaciones — evalúa el estado actual, mercados deseados, complejidad del equipo",
       "cov2": "Necesidad de entidad por mercado – determina si su configuración requiere una sociedad propia",
-      "cov3": "Enrutamiento inteligente a rutas de guías educativas para fundadores indecisos",
+      "cov3": "Dirige a las páginas explicativas cuando la cuestión de la estructura sigue abierta",
       "fines": {
         "authorities": "Registros mercantiles locales · Autoridades fiscales · Supervisores AML"
       },
@@ -1816,7 +1816,7 @@
       "sales": {
         "short": "Precios",
         "title": "Precios y planes",
-        "desc": "Qué plan encaja, cuánto cuesta un equipo, cómo funciona la facturación.",
+        "desc": "Para proveedores: qué plan encaja, cuánto cuesta, cómo funciona la facturación. Para las empresas, la plataforma sigue siendo gratuita.",
         "sla": "Respuesta al siguiente día hábil"
       },
       "partner": {

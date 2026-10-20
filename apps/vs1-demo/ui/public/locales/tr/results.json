@@ -58,13 +58,13 @@
     "eyebrow_other": "{{count}} Verified Provider eşleşti",
     "title": "Bu konuda kimin harekete geçebileceğini bulduk.",
     "none": "Bu alanı kapsayan sağlayıcı henüz yok.",
-    "unlocked": "Eşleşmeler açıldı",
+    "unlocked": "Eşleşmeler kaydedildi",
     "unlockCta": "En iyi eşleşmelerinizi ücretsiz bir hesapla görün",
     "match": "{{pct}} uyum",
     "requestQuote": "Teklif isteyin"
   },
   "cta": {
-    "title": "Bu haritayı kaydedin. Sağlayıcıların kilidini açın.",
+    "title": "Bu haritayı kaydedin. Eşleşmelerinizi saklayın.",
     "body": "Ücretsiz hesap. Kredi kartı gerekmez. Haritanız ve eşleşmeleriniz kayıtlı kalır.",
     "button": "Ücretsiz hesap oluşturun"
   },
@@ -294,7 +294,7 @@
     "kpiOpenSub_one": "{{count}} yükümlülük yanıtınızı bekliyor",
     "kpiOpenSub_other": "{{count}} yükümlülük yanıtlarınızı bekliyor",
     "group": {
-      "now": "Hemen harekete geçin",
+      "now": "Şimdi vadesi geliyor",
       "month": "Bu ay",
       "open": "Önce netleştirin",
       "later": "Daha sonra"

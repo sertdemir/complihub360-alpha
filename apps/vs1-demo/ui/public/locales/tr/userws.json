@@ -346,7 +346,7 @@
     },
     "library": {
       "title": "Kitaplık",
-      "sub": "Bilgi, eğitimler ve araçlar · yakında — erken erişim hakkınızı ayırtın",
+      "sub": "Bilgi, eğitimler ve araçlar · yakında — erken erişime katılın",
       "panelTitle": "Bilgi, eğitimler ve araçlar",
       "panelSub": "Uzmanlardan doğrulanmış içerikler, alana ve pazara göre sıralanır — her biri açıkladığı mevzuatı belirtir.",
       "feature1": "Alana göre eğitimler",
@@ -539,9 +539,9 @@
     "notConfigured": "Asistan bu ortamda henüz bağlı değil.",
     "quota": "Günlük ücretsiz limite ulaşıldı — yükseltme planı yakında geliyor.",
     "upgradeTitle": "Assistant Pro",
-    "upgradeBody": "Bugünkü 5 ücretsiz sorunuz tükendi. Assistant Pro ile doğrulanmış bilgi tabanından sınırsız yanıt alırsınız — aylık iptal edilebilir.",
+    "upgradeBody": "Bugünkü 5 ücretsiz sorunuz tükendi. Assistant Pro günlük sınırı 200'e çıkarır — aylık iptal edilebilir.",
     "upgradeCta": "Yükselt · Ayda 12 €",
-    "upgradeSuccess": "Assistant Pro etkin — aramıza hoş geldiniz! Sorularınızı sorabilirsiniz."
+    "upgradeSuccess": "Assistant Pro etkin. Sorularınızı sorabilirsiniz."
   },
   "termine": {
     "title": "<accent>Randevularınız</accent>.",

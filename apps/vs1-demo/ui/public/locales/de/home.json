@@ -31,7 +31,7 @@
     "seeIfApplies": "Prüfen Sie, ob das auf Sie zutrifft"
   },
   "hero": {
-    "eyebrow": "Plattform für Compliance-Intelligence & Provider-Matching",
+    "eyebrow": "Compliance-Klarheit und die richtigen Fachleute",
     "title": {
       "pre": "Die Compliance-Arbeit, die Sie ",
       "gold": "nicht",
@@ -75,7 +75,8 @@
       "placeholder": "Beschreiben Sie Ihr Anliegen in eigenen Worten…",
       "answer": "Eine Compliance-Frage stellen",
       "guided": "Meinen Bedarf ermitteln",
-      "trust": "Kostenlos · anonym · etwa fünf Minuten"
+      "trust": "Kostenlos · anonym · etwa fünf Minuten",
+      "note": "In der Beta führt Ihre Frage zum passenden Bereich und in die Erhebung — noch nicht zu einer direkten Antwort."
     }
   },
   "heroWorld": {
@@ -144,7 +145,7 @@
       },
       {
         "title": "Mehr verkauft als nötig.",
-        "desc": "Der Anreiz liegt darin, den größten Umfang anzubieten. Niemand wird dafür bezahlt, Ihnen zu sagen, dass eine Aufgabe klein ist — oder längst erledigt."
+        "desc": "Der Anreiz belohnt meist den größten Umfang. Wenige werden dafür bezahlt, Ihnen zu sagen, dass eine Aufgabe klein ist — oder längst erledigt."
       },
       {
         "title": "Wochen, die im Scoping verschwinden.",
@@ -712,7 +713,7 @@
     "partnersTitle": "Wir haben gefunden, wer das umsetzen kann.",
     "unlock": "Meine besten Matches mit kostenlosem Konto ansehen",
     "save": {
-      "title": "Diese Map speichern. Anbieter freischalten.",
+      "title": "Diese Map speichern. Treffer behalten.",
       "subtitle": "Kostenloses Konto. Keine Kreditkarte. Ihre Karte und Ihre Treffer bleiben gespeichert.",
       "cta": "Kostenloses Konto erstellen"
     },
@@ -738,7 +739,7 @@
   "matchmaking": {
     "eyebrow": "Der Unterschied",
     "title": {
-      "line1": "Andere Tools zeigen Ihnen, was falsch läuft.",
+      "line1": "Eine Liste von Regeln ist kein Plan.",
       "pre": "Wir ",
       "gold": "verbinden",
       "post": " Sie mit denen, die es lösen."
@@ -1271,7 +1272,7 @@
     "cardTitle": "Das monatliche Briefing"
   },
   "footer": {
-    "tagline": "Die Orchestrierungsebene zwischen Compliance-Komplexität und betrieblicher Realität.",
+    "tagline": "Wir helfen Ihnen zu verstehen, was für Ihr Unternehmen gilt — und die richtige Person zu erreichen, wenn es eine braucht.",
     "notLawFirm": "Keine Kanzlei. Wir orchestrieren verifizierte Spezialisten.",
     "beta": "Beta",
     "columns": {

@@ -94,7 +94,7 @@ export function handleAuthAdopt(
         } catch {
             structuredLog('error', 'Signup adoption failed', { correlationId, errorCode: 'ERR_ADOPTION', severity: 'error', route: '/api/v1/auth/adopt' });
             res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Adoption failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'The adoption could not be saved right now. Nothing was changed — please try again in a moment.', correlationId }));
         }
     });
 }

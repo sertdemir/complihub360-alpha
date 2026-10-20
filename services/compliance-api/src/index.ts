@@ -1415,13 +1415,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             switch (r.result) {
                 case 'not_found': send(404, { errorCode: 'NOT_FOUND', message: 'Provider not found' }); return;
                 case 'rate_limited': send(429, { errorCode: 'RECHECK_LIMIT', message: 'Too many checks — try again later', retry_after: r.retryAfter }); return;
-                case 'stripe_error': send(502, { errorCode: 'STRIPE_ERROR', message: 'Stripe request failed' }); return;
+                case 'stripe_error': send(502, { errorCode: 'STRIPE_ERROR', message: 'The payment service did not respond right now. Please try again in a moment.' }); return;
                 case 'declined': case 'needs_action': send(200, { ok: true, result: r.result, reason: r.reason }); return;
                 default: send(200, { ok: true, result: r.result, readiness: readiness(r.readiness) });
             }
         } catch (err) {
             structuredLog('error', 'Payment method recheck failed', { correlationId, errorCode: 'ERR_RECHECK', severity: 'error', route: req.url, detail: err instanceof Error ? err.message : String(err) } as any);
-            send(500, { errorCode: 'INTERNAL', message: 'Recheck failed' });
+            send(500, { errorCode: 'INTERNAL', message: 'The card could not be rechecked right now. Nothing was changed — please try again in a moment.' });
         }
     } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing\/sync$/.test(req.url || '')) {
         // Phase 4: Zahlungsbereitschaft aus Stripe und Datenbank neu berechnen —
@@ -1449,7 +1449,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             const detail = err instanceof StripeError ? { stripeStatus: err.status, stripeCode: err.code, stripeType: err.type, detail: err.message } : { detail: err instanceof Error ? err.message : String(err) };
             structuredLog('error', 'Billing sync failed', { correlationId, errorCode: 'ERR_BILLING_SYNC', severity: 'error', route: req.url, ...detail });
             res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'The payment service did not respond right now. Please try again in a moment.', correlationId }));
         }
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/bookings$/.test(req.url || '')) {
         // Matchmaking v2: the provider's paid leads (bookings). The dossier —
@@ -2559,7 +2559,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         } catch {
             structuredLog('error', 'Billing portal failed', { correlationId, errorCode: 'ERR_BILLING_PORTAL', severity: 'error', route: req.url });
             res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'The payment service did not respond right now. Please try again in a moment.', correlationId }));
         }
     } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/change-email$/.test(req.url || '')) {
         // B8: request a contact-email change. A single-use verify link (1h)
@@ -2848,7 +2848,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             } catch (err) {
                 structuredLog('error', 'Market request failed', { correlationId, errorCode: 'ERR_MARKET_REQUEST', severity: 'error', route: req.url, detail: String(err).slice(0, 500) });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Market request failed', correlationId }));
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'The market request could not be saved right now. Nothing was changed — please try again in a moment.', correlationId }));
             }
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/session') {
@@ -2880,7 +2880,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             } catch {
                 structuredLog('error', 'Session save failed', { correlationId, errorCode: 'ERR_SESSION', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session save failed', correlationId }));
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Your session could not be saved right now. Nothing was changed — please try again in a moment.', correlationId }));
             }
         });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/sessions')) {
@@ -3039,7 +3039,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         } else if (reminderOutcome === 'error') {
             structuredLog('error', 'Reminder failed', { correlationId, errorCode: 'ERR_REMIND', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Reminder failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'The reminder could not be sent right now. Nothing was changed — please try again in a moment.', correlationId }));
         } else {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, id: engagementId, reminded: true }));
