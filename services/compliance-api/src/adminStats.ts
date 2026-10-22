@@ -78,7 +78,7 @@ export interface AdminStats {
 
 const DAY = 24 * 3_600_000;
 /** Dieselbe Lesart wie das Cockpit (cockpit.ts) — ein Fehlerbegriff fuer beide Seiten. */
-const ERROR_RE = /fail|error|blocked|invalid|breach|downgrad/i;
+export const ERROR_RE = /fail|error|blocked|invalid|breach|downgrad/i;
 const ACCESS_RE = /^api_(access|key)_/;
 const DISCLOSURE = new Set(['lead.revealed', 'booking_rebooked']);
 /**
@@ -90,6 +90,15 @@ const FEED_KEYS = ['providerKey', 'provider_key', 'status', 'kind', 'stage', 're
 
 const ratio = (n: number, d: number): number | null => (d ? n / d : null);
 const at = (e: EventRow): string | null => e.timestamp ?? e.created_at ?? null;
+
+/** Ein Ereignis fuer einen Audit-Stream — nur mit den freigegebenen Payload-Schluesseln. Cockpit nutzt dasselbe. */
+export function feedEvent(e: EventRow): { type: string; payload: Record<string, unknown>; created_at: string | null } {
+    return {
+        type: e.type,
+        payload: Object.fromEntries(FEED_KEYS.filter(k => e.payload && k in e.payload).map(k => [k, e.payload![k]])),
+        created_at: at(e),
+    };
+}
 
 /** Beginn des 7-Tage-Fensters (UTC-Tag von vor sechs Tagen) — index.ts filtert damit serverseitig. */
 export function windowStart(now: Date = new Date()): Date {
@@ -212,11 +221,7 @@ export function computeAdminStats(input: {
             accessEvents7: input.events7.filter(e => ACCESS_RE.test(e.type)).length,
             errorEvents7: input.events7.filter(e => ERROR_RE.test(e.type)).length,
         },
-        events: input.feed.slice(0, 12).map(e => ({
-            type: e.type,
-            payload: Object.fromEntries(FEED_KEYS.filter(k => e.payload && k in e.payload).map(k => [k, e.payload![k]])),
-            created_at: at(e),
-        })),
+        events: input.feed.slice(0, 12).map(feedEvent),
         series,
     };
 }

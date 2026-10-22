@@ -40,9 +40,12 @@ vi.mock('../supabase.js', () => ({
         // werden ('eq.', 'gte.', 'not.like.*x', 'in.("a","b")'); alles andere
         // wirft — sonst haette der Test den Filter still ignoriert.
         async selectWhere(table: string, filters: Record<string, string>, opts: { order?: string; limit?: number } = {}) {
-            const passt = (r: any) => Object.entries(filters).every(([k, expr]) => {
+            // `select` ist die Spaltenauswahl, kein Filter. Der Store liefert die
+            // ganze Zeile; dass der Server nur Spalten liest, prueft der Aufrufer.
+            const passt = (r: any) => Object.entries(filters).filter(([k]) => k !== 'select').every(([k, expr]) => {
                 const v = r[k];
                 if (expr.startsWith('eq.')) return String(v) === expr.slice(3);
+                if (expr === 'is.null') return v === null || v === undefined;
                 if (expr.startsWith('gte.')) return v !== undefined && v !== null && String(v) >= expr.slice(4);
                 if (expr.startsWith('not.like.*')) return !String(v ?? '').endsWith(expr.slice(10));
                 if (expr.startsWith('in.(')) return expr.slice(4, -1).split(',').map((x) => x.replace(/^"|"$/g, '')).includes(String(v));
@@ -3252,6 +3255,26 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         expect((await api('/api/v1/admin/review/neue-kanzlei', { auth: 'jwt' })).status).toBe(403);
         expect((await api('/api/v1/admin/stats', { auth: 'jwt' })).status).toBe(403);
         expect((await api('/api/v1/admin/review/queue', { auth: 'none' })).status).toBe(401);
+    });
+
+    it('/admin/cockpit liest Buchungen, Tarife und Bewertungen, nicht engagement_requests', async () => {
+        // 22.10.2026: vorher engagement_requests (tot) und 12 $ je Assistant-Abo.
+        const iso = (dh: number) => new Date(Date.now() + dh * 3_600_000).toISOString();
+        db.engagement_requests = [{ id: 'alt', status: 'replied', created_at: iso(0) }];
+        db.scheduling = [{ id: 'b1', provider_key: 'studio', status: 'confirmed', slot_start: iso(5), created_at: iso(0), message: 'geheime Nachricht' }];
+        db.reviews = [{ from_role: 'user', rating: 4, body: 'Freitext' }];
+        db.event_log = [
+            { type: 'lead.revealed', timestamp: iso(0), payload: { userId: 'u-geheim', providerKey: 'studio' } },
+            { type: 'appointment_reminder_shadow', timestamp: iso(0), payload: {} },
+        ];
+        const r = await adminApi('/api/v1/admin/cockpit');
+        expect(r.status).toBe(200);
+        expect(r.body.cockpit.product).toMatchObject({ bookingsToday: 1, bookingsTotal: 1 });
+        expect(r.body.cockpit.voice.reviews).toMatchObject({ count: 1, avgRating: 4 });
+        expect(r.body.cockpit.events.map((e: any) => e.type)).toEqual(['lead.revealed']);
+        expect(JSON.stringify(r.body)).not.toMatch(/u-geheim|geheime Nachricht|Freitext/);
+        expect(r.body.cockpit).not.toHaveProperty('productEngagement');
+        expect((await api('/api/v1/admin/cockpit', { auth: 'jwt' })).status).toBe(403);
     });
 
     it('/admin/stats liest Buchungen und Audit-Log, nicht die toten Tabellen', async () => {
