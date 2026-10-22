@@ -1,8 +1,8 @@
 {
-  "draftBanner": "DRAFT — This page describes the actual data processing of the system but is not legal advice. Finalize with legal counsel or a compliance generator and fill the marked placeholders before launch.",
+  "draftBanner": "BETA — This page describes the actual data processing of the system and was written without review by legal counsel. It is not legal advice. Anything still open is marked in the text.",
   "privacy": {
     "title": "Privacy Policy",
-    "updated": "Last updated: July 2026 · Draft",
+    "updated": "Last updated: October 2026 · Beta",
     "headings": {
       "controller": "1. Controller",
       "data": "2. Data we process",
@@ -16,7 +16,7 @@
   },
   "imprint": {
     "title": "Imprint",
-    "updated": "Information pursuant to § 5 DDG (German law) · Draft",
+    "updated": "Information pursuant to § 5 DDG (German law) · Beta",
     "headings": {
       "provider": "Provider",
       "representedBy": "Represented by",
