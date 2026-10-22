@@ -1,8 +1,8 @@
 {
-  "draftBanner": "TASLAK — Bu sayfa sistemin gerçek veri işleme süreçlerini açıklar ancak hukuki danışmanlık yerine geçmez. Yayından önce bir avukatla veya uyum aracıyla son haline getirin ve işaretli yer tutucuları doldurun.",
+  "draftBanner": "BETA — Bu sayfa sistemin gerçek veri işleme süreçlerini açıklar ve avukat incelemesi olmadan hazırlanmıştır. Hukuki danışmanlık yerine geçmez. Henüz açık olan noktalar metinde işaretlidir.",
   "privacy": {
     "title": "Gizlilik Politikası",
-    "updated": "Son güncelleme: Temmuz 2026 · Taslak",
+    "updated": "Son güncelleme: Ekim 2026 · Beta",
     "headings": {
       "controller": "1. Veri sorumlusu",
       "data": "2. İşlediğimiz veriler",
@@ -16,7 +16,7 @@
   },
   "imprint": {
     "title": "Künye",
-    "updated": "§ 5 DDG (Alman hukuku) uyarınca bilgiler · Taslak",
+    "updated": "§ 5 DDG (Alman hukuku) uyarınca bilgiler · Beta",
     "headings": {
       "provider": "Sağlayıcı",
       "representedBy": "Temsilci",

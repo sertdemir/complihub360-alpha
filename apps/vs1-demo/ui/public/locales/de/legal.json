@@ -1,8 +1,8 @@
 {
-  "draftBanner": "ENTWURF — Diese Seite beschreibt die tatsächliche Datenverarbeitung des Systems, ersetzt aber keine Rechtsberatung. Vor Veröffentlichung durch einen Anwalt oder Datenschutz-Generator finalisieren und die markierten Platzhalter füllen.",
+  "draftBanner": "BETA — Diese Seite beschreibt die tatsächliche Datenverarbeitung des Systems und wurde ohne anwaltliche Prüfung erstellt. Sie ersetzt keine Rechtsberatung. Was noch offen ist, ist im Text markiert.",
   "privacy": {
     "title": "Datenschutzerklärung",
-    "updated": "Stand: Juli 2026 · Entwurf",
+    "updated": "Stand: Oktober 2026 · Beta",
     "headings": {
       "controller": "1. Verantwortlicher",
       "data": "2. Welche Daten wir verarbeiten",
@@ -16,7 +16,7 @@
   },
   "imprint": {
     "title": "Impressum",
-    "updated": "Angaben gemäß § 5 DDG · Entwurf",
+    "updated": "Angaben gemäß § 5 DDG · Beta",
     "headings": {
       "provider": "Anbieter",
       "representedBy": "Vertreten durch",

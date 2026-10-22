@@ -1,8 +1,8 @@
 {
-  "draftBanner": "BORRADOR — Esta página describe el tratamiento de datos real del sistema, pero no constituye asesoramiento jurídico. Finalícela con un abogado o un generador de cumplimiento y complete los marcadores señalados antes del lanzamiento.",
+  "draftBanner": "BETA — Esta página describe el tratamiento de datos real del sistema y se redactó sin revisión de un abogado. No constituye asesoramiento jurídico. Lo que sigue pendiente está marcado en el texto.",
   "privacy": {
     "title": "Política de Privacidad",
-    "updated": "Última actualización: julio de 2026 · Borrador",
+    "updated": "Última actualización: octubre de 2026 · Beta",
     "headings": {
       "controller": "1. Responsable",
       "data": "2. Datos que tratamos",
@@ -16,7 +16,7 @@
   },
   "imprint": {
     "title": "Aviso legal",
-    "updated": "Información conforme al § 5 DDG (legislación alemana) · Borrador",
+    "updated": "Información conforme al § 5 DDG (legislación alemana) · Beta",
     "headings": {
       "provider": "Proveedor",
       "representedBy": "Representado por",
