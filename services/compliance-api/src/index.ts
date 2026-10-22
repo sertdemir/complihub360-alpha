@@ -35,6 +35,7 @@ import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { handleProviderApplication } from "./providerApplication.js";
+import { handleAgreementsRoute } from "./agreements.js";
 import { handleSubscriptionGet, handleSubscriptionSelect, handleSubscriptionSchedule, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
 import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpact.js";
@@ -310,6 +311,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         ['POST', /^\/api\/v1\/contact$/],
         ['GET', /^\/api\/v1\/nylas\/callback(\?|$)/],      // Nylas Hosted Auth: der signierte state ist das Credential                  // Kontaktseite + Partner-Bewerbung (eigenes Limit)
         ['GET', /^\/api\/v1\/acknowledgement(\?|$)/],       // booking acknowledgement text (public legal copy)
+        ['GET', /^\/api\/v1\/agreements\/[a-z-]+(\?|$)/],  // Beta-Vereinbarung / AGB: Text ist oeffentlich
         ['GET', /^\/api\/v1\/sessions(\?|$)/],             // guest session list (guest_key = bearer)
         ['POST', /^\/api\/v1\/provider\/intake$/],         // intake token checked in-handler
         ['GET', /^\/api\/v1\/provider\/magic\//],          // single-use token IS the credential
@@ -470,6 +472,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     if (req.method === 'GET' && req.url === '/api/v1/me/provider') {
         await handleMeProvider(res, correlationId, authUserId);
         return;
+    }
+
+    // Beta-Vereinbarung: Text (oeffentlich), Stand und Annahme des Nutzers.
+    if (/^\/api\/v1\/(agreements\/|me\/agreements)/.test(req.url || '')) {
+        if (await handleAgreementsRoute(req, res, { correlationId, authUserId })) return;
     }
 
     const linkMatch = /^\/api\/v1\/admin\/provider\/([a-z0-9-]+)\/member$/.exec(req.url || '');

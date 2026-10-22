@@ -6027,3 +6027,72 @@ describe('Retention api_request_log (P8): Audit-Ereignis, Fehler zaehlen statt a
         expect(db.event_log.find((e) => e.type === 'retention_deleted')?.payload).toMatchObject({ count: 1, errors: 1 });
     });
 });
+
+// ─── Beta-Vereinbarung (Canvas-Wahl 1A · 2A · 3A+3C · 4C, 22.10.2026) ────────
+
+function seedBetaAgreement(over: Record<string, any> = {}) {
+    const points = [{ lead: 'Das ist ein Test.', text: 'Sie nutzen eine unfertige Version.' }, { lead: 'Es kostet nichts.', text: 'Nichts wird abgebucht.' }];
+    (db.user_agreements ??= []).push(
+        { agreement: 'beta', version: 'beta-2026-10', language: 'en', title: 'Beta agreement', points, effective_from: '2026-10-22', ...over },
+        { agreement: 'beta', version: 'beta-2026-10', language: 'de', title: 'Beta-Vereinbarung', points, effective_from: '2026-10-22', ...over },
+    );
+}
+
+describe('Beta-Vereinbarung — Text, Stand, Annahme', () => {
+    it('GET /agreements/beta ist oeffentlich, kennt die Sprache und faellt auf Englisch zurueck', async () => {
+        seedBetaAgreement();
+        const de = await api('/api/v1/agreements/beta?lang=de', { auth: 'none' });
+        expect(de.status).toBe(200);
+        expect(de.body).toMatchObject({ agreement: 'beta', version: 'beta-2026-10', language: 'de', title: 'Beta-Vereinbarung' });
+        expect(de.body.points).toHaveLength(2);
+        const tr = await api('/api/v1/agreements/beta?lang=tr', { auth: 'none' });
+        expect(tr.body.language).toBe('en');
+    });
+
+    it('GET /agreements/foo ist 404, ohne Fassung 503', async () => {
+        expect((await api('/api/v1/agreements/foo', { auth: 'none' })).status).toBe(404);
+        expect((await api('/api/v1/agreements/beta', { auth: 'none' })).status).toBe(503);
+    });
+
+    it('GET /me/agreements verlangt einen Nutzer und meldet required, solange nichts angenommen ist', async () => {
+        seedBetaAgreement();
+        expect((await api('/api/v1/me/agreements', { auth: 'none' })).status).toBe(401);
+        expect((await api('/api/v1/me/agreements', { auth: 'key' })).status).toBe(401);
+        const r = await api('/api/v1/me/agreements', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.agreements.beta).toMatchObject({ current_version: 'beta-2026-10', accepted_version: null, required: true });
+        expect(r.body.agreements.terms).toMatchObject({ current_version: null, required: false });
+    });
+
+    it('POST /me/agreements/beta schreibt die Annahme einmal, wiederholt als replay, danach required=false', async () => {
+        seedBetaAgreement();
+        const r1 = await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: JSON.stringify({ version: 'beta-2026-10', language: 'de' }) });
+        expect(r1.status).toBe(201);
+        expect(r1.body).toMatchObject({ agreement: 'beta', version: 'beta-2026-10', language: 'de' });
+        expect(db.user_agreement_acceptance).toEqual([expect.objectContaining({ user_id: USER_ID, agreement: 'beta', version: 'beta-2026-10', language: 'de' })]);
+        expect(db.event_log.some((e) => e.type === 'agreement_accepted' && e.payload.userId === USER_ID)).toBe(true);
+        const r2 = await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: JSON.stringify({ version: 'beta-2026-10', language: 'de' }) });
+        expect(r2.status).toBe(200);
+        expect(r2.body.replay).toBe(true);
+        expect(db.user_agreement_acceptance).toHaveLength(1);
+        const state = await api('/api/v1/me/agreements', { auth: 'jwt' });
+        expect(state.body.agreements.beta).toMatchObject({ accepted_version: 'beta-2026-10', required: false, language: 'de' });
+    });
+
+    it('POST mit veralteter Fassung: 409 mit current_version, nichts geschrieben', async () => {
+        seedBetaAgreement();
+        const r = await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: JSON.stringify({ version: 'beta-2026-09' }) });
+        expect(r.status).toBe(409);
+        expect(r.body).toMatchObject({ errorCode: 'AGREEMENT_OUTDATED', current_version: 'beta-2026-10' });
+        expect(db.user_agreement_acceptance ?? []).toHaveLength(0);
+    });
+
+    it('POST ohne version: 400; ohne Nutzer: 401; mit Sprache ohne Zeile: speichert die gelieferte Sprache', async () => {
+        seedBetaAgreement();
+        expect((await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: '{}' })).status).toBe(400);
+        expect((await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'key', body: JSON.stringify({ version: 'beta-2026-10' }) })).status).toBe(401);
+        const tr = await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: JSON.stringify({ version: 'beta-2026-10', language: 'tr' }) });
+        expect(tr.status).toBe(201);
+        expect(tr.body.language).toBe('en');
+    });
+});
