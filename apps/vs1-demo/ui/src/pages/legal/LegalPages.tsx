@@ -93,7 +93,7 @@ export function PrivacyPage() {
         </Section>
         <Section heading={t('privacy.headings.recipients')}>
           <p>
-            Hosting: Hostinger ({PLACEHOLDER('Serverstandort, z. B. Deutschland')}) · Datenbank/Auth: Supabase (Region EU) ·
+            Hosting: Hostinger (Rechenzentrum Frankfurt am Main, Deutschland) · Datenbank/Auth: Supabase (Region eu-central-1, Frankfurt) ·
             KI-Dienste: Anthropic (nur bereinigte Inhalte, gemäß Abschnitt 4). Mit allen Dienstleistern bestehen
             Auftragsverarbeitungsverträge nach Art. 28 DSGVO. Verified Provider erhalten Ihre Anfragedaten nur, wenn Sie eine
             Anfrage an sie richten.
@@ -156,7 +156,7 @@ export function PrivacyPage() {
       </Section>
       <Section heading={t('privacy.headings.recipients')}>
         <p>
-          Hosting: Hostinger ({PLACEHOLDER('server location, e.g. Germany')}) · Database/Auth: Supabase (EU region) · AI
+          Hosting: Hostinger (data centre Frankfurt am Main, Germany) · Database/Auth: Supabase (region eu-central-1, Frankfurt) · AI
           services: Anthropic (sanitized content only, per section 4). Data processing agreements under Art. 28 GDPR are in
           place with all providers. Verified Providers receive your request data only when you direct a request to them.
         </p>
