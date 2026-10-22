@@ -18,8 +18,8 @@ Ablauf im [Runbook](../../docs/runbooks/llm-scaleway-umstellung.md).
 - [x] Privacy-Hook kennt die neuen Endpunkte
 - [x] DNA-Prüfbogen (`scripts/llm-eval/`), zeigt den antwortenden Anbieter
 - [x] Silent-Failure-Review umgesetzt: Modell-Filter in der RPC, Korpus-Signal, Audit im Fehlerfall, abgeschnittene Antworten, Hook erkennt `llm.ts`-Aufrufer, Ingest erst einfügen dann löschen
-- [ ] Migration `20261018090000` auf Staging und Beta, VOR dem Merge
-- [ ] Scaleway-Zugang und AVV (Nutzer)
+- [x] Migration `20261018090000` auf Staging und Beta eingespielt (2026-10-22, SQL-Editor; apply_migration lief dreimal ins Zeitlimit). Geprüft: eine Signatur, nur service_role, Migrationseintrag vorhanden, Altaufruf mit drei Argumenten liefert weiter Treffer
+- [x] Scaleway-Zugang (Personal project, IAM-Anwendung `Complihub-api`, `GenerativeApisModelAccess`), Schlüssel getestet 2026-10-20; AVV folgt als Firma
 - [ ] Prüfbogen lokal und auf Staging, Urteil eingetragen (Nutzer)
 - [ ] Staging umgestellt, Korpus neu eingebettet
 - [ ] Gemini-Zweig entfernt (Folge-PR)
