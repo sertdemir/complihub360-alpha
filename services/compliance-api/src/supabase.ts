@@ -71,7 +71,9 @@ export const supabaseApi = {
         for (const [key, expr] of Object.entries(filters)) queryParams.append(key, expr);
         if (opts.order) queryParams.append('order', opts.order);
         if (opts.limit) queryParams.append('limit', String(opts.limit));
-        const res = await fetch(`${restUrl}/${table}?${queryParams.toString()}`, { method: 'GET', headers: defaultHeaders });
+        // Eine haengende Abfrage haelt sonst die ganze Antwort fest (Promise.all im
+        // Cockpit); nach 10 s ist die Quelle "nicht lesbar" statt "laedt ewig".
+        const res = await fetch(`${restUrl}/${table}?${queryParams.toString()}`, { method: 'GET', headers: defaultHeaders, signal: AbortSignal.timeout(10_000) });
         if (!res.ok) throw new Error(`Supabase selectWhere failed: ${await res.text()}`);
         return res.json();
     },

@@ -3729,18 +3729,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         handleBillingRun(req, res, correlationId, authViaApiKey);
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/cockpit')) {
         // Founder cockpit read-model: five lenses aggregated across the live
-        // systems (cockpit.ts) — server-to-server key only.
+        // systems (cockpit.ts) — Admin-JWT oder Server-Key.
         res.setHeader('x-correlation-id', correlationId);
         if (!authViaApiKey && !authIsAdmin) {
             res.writeHead(403, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Cockpit is admin-only', correlationId }));
         } else {
             try {
-                const cockpit = await buildCockpit();
+                const cockpit = await buildCockpit(correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, cockpit, correlationId }));
-            } catch {
-                structuredLog('error', 'Cockpit build failed', { correlationId, errorCode: 'ERR_COCKPIT', severity: 'error', route: req.url });
+            } catch (err) {
+                structuredLog('error', 'Cockpit build failed', { correlationId, errorCode: 'ERR_COCKPIT', severity: 'error', route: req.url, detail: String(err).slice(0, 200) });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Cockpit build failed', correlationId }));
             }

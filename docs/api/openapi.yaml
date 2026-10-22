@@ -1693,6 +1693,21 @@ paths:
         '200': { description: "generatedAt, truncated[], bookings, watchlist[], privacy, security, events[], series" }
         '403': { description: Kein Admin }
 
+  /admin/cockpit:
+    get:
+      summary: Founder Cockpit — Plattform, Produkt, Umsatz, Kundenstimme, Vertrauen
+      description: >-
+        Seit 22.10.2026 aus `scheduling`, `sessions`, `invoices`, `provider_subscriptions` (Preis aus dem Tarifkatalog),
+        `provider_lead_ledger` mit Status aus `provider_lead_ledger_payment_events` (gezaehlt wie im Billing-Lauf: captured, n/a),
+        `provider_credits`, `reviews`, `providers` (Lebenszyklus), Vorfaellen und Massnahmen; vorher aus `engagement_requests`
+        und einem angenommenen Assistant-Preis. Betraege je Waehrung (`Amounts`), nie ueber Waehrungen summiert. Eine Quelle,
+        die nicht gelesen werden kann, steht in `unavailable` — ihre Zahlen sind null. Nur Spaltenauswahl ohne Freitext und
+        Kontaktdaten. Rechnung in services/compliance-api/src/cockpit.ts.
+      security: [ { bearerAuth: [] } ]
+      responses:
+        '200': { description: "cockpit: generatedAt, unavailable[], truncated[], platformHealth, product, money, voice, trust, rates, events[], series" }
+        '403': { description: Kein Admin }
+
   # ─── Phase 2: Review-Arbeitsplatz (Admin-JWT oder Server-Key, sonst 403) ───
 
   /admin/review/queue:

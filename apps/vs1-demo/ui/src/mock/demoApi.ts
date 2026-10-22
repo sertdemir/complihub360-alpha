@@ -1250,6 +1250,42 @@ function adminStats() {
   };
 }
 
+// Founder Cockpit (GET /admin/cockpit) in der Form des Servers (cockpit.ts).
+// Mit einer Quote ohne Grundlage (Abrechnungsbereit: null) und einer Quelle,
+// die nicht gelesen werden konnte (reviews) — so sieht man im Mock beide
+// ehrlichen Zustaende statt erfundener Zahlen.
+function adminCockpit() {
+  const days = [6, 5, 4, 3, 2, 1, 0].map((n) => { const d = new Date(Date.now() - n * 24 * H); return `${String(d.getUTCDate()).padStart(2, '0')}.${String(d.getUTCMonth() + 1).padStart(2, '0')}`; });
+  return {
+    ok: true,
+    cockpit: {
+      generatedAt: plus(0), watchersShadow: true, unavailable: ['reviews'], truncated: [],
+      platformHealth: { api: 'up', db: 'degraded', errorEvents7: 1, latestEventAt: plus(-2 * H) },
+      product: { bookingsToday: 1, bookings7: 4, bookingsTotal: 10, heldRate: 0.71, sessionsActive: 37, sessions7: 6 },
+      // Wie auf Staging: Katalog in USD, aeltere Rechnungen in EUR.
+      money: {
+        baseCurrency: 'USD', mrr: { USD: 24700 }, unpriced: 0, subscriptions: { active: 3, pastDue: 0 },
+        invoices: { open: 2, paid: 6, failed: 1, overdue: 1, openAmounts: { USD: 9900, EUR: 4900 }, paidAmounts: { USD: 29500, EUR: 9900 } },
+        leadFees7: { charges: 3, collected: { USD: 7000 }, pending: 1, failed: 0 }, credits7: { USD: 1200 }, assistantActive: 1,
+      },
+      voice: { reviews: null, userCancellations7: 1, disputesOpen: 0 },
+      trust: {
+        providers: { live: 3, onboarding: 1, paused: 0, suspended: 0, reverification: 0, ended: 0 },
+        providerNoShows30: 0, incidents30: 0, enforcementOpen: 0, appealsPending: 0, attentionTotal: 1,
+        attention: [{ provider_key: PARTNER_KEY, reason: 'billing_blocked', since: null }],
+      },
+      rates: { heldRate: 0.71, invoicesPaid: 0.67, billingReady: null, subscriptionsCurrent: 1 },
+      events: [
+        { type: 'scheduling_confirmed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-2 * H) },
+        { type: 'provider_lead_charged', payload: { providerKey: PARTNER_KEY, band: 2 }, created_at: plus(-2 * H) },
+        { type: 'invoice_issued', payload: {}, created_at: plus(-30 * H) },
+        { type: 'calendar_event_failed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-40 * H) },
+      ],
+      series: { dates: days, bookings: [0, 1, 0, 1, 0, 1, 1], sessions: [1, 0, 2, 1, 0, 1, 1], leadFeeCents: [0, 3500, 0, 0, 0, 0, 3500] },
+    },
+  };
+}
+
 function adminApiClients() {
   return { ok: true, clients: API_STATE.clients.map((c) => ({ ...c, provider_name: c.provider_key === PARTNER_KEY ? 'Schmidt & Partner' : 'Lund Nordic AB', plan_code: 'global', eligible: true, fee_note: null, approved_by: null, last_used_ip: c.last_used_at ? '203.0.113.7' : null })) };
 }
@@ -1325,6 +1361,7 @@ export function route(method: string, path: string, body: Record<string, unknown
     if (p[0] === 'provider' && p[2] === 'api-access') return apiAccess(p[1]);
     if (p[0] === 'admin' && p[1] === 'api-access') return adminApiClients();
     if (p[0] === 'admin' && p[1] === 'stats') return role === 'admin' ? adminStats() : { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin stats are admin-only' };
+    if (p[0] === 'admin' && p[1] === 'cockpit') return role === 'admin' ? adminCockpit() : { __status: 403, errorCode: 'FORBIDDEN', message: 'Cockpit is admin-only' };
     if (p[0] === 'provider' && p[2] === 'coverage') { const c = partnerCoverage(); return { ...c, coverage: { ...c.coverage, availability_hours: AVAIL.hours, timezone: AVAIL.timezone, booking_paused_at: null } }; }
     if (p[0] === 'provider' && p[2] === 'invoices') return partnerInvoices();
     if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'preview') return partnerBillingPreview();
