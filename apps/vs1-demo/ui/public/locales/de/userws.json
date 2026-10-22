@@ -54,7 +54,8 @@
     "navCalendar": "Kalender",
     "signOut": "Abmelden",
     "search": "Suche",
-    "switchTo": "Wechseln zu"
+    "switchTo": "Wechseln zu",
+    "navAccount": "Konto"
   },
   "home": {
     "title": "Willkommen zurück, <accent>{{name}}</accent>.",

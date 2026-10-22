@@ -55,7 +55,8 @@
     "navCalendar": "Calendar",
     "signOut": "Sign out",
     "search": "Search",
-    "switchTo": "Go to"
+    "switchTo": "Go to",
+    "navAccount": "Account"
   },
   "home": {
     "title": "Welcome back, <accent>{{name}}</accent>.",

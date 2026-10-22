@@ -16,7 +16,7 @@ const PLACEHOLDER = (label: string) => (
   </span>
 );
 
-function LegalShell({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {
+export function LegalShell({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {
   return (
     <>
       <main className="bg-surface">
@@ -31,7 +31,7 @@ function LegalShell({ title, updated, children }: { title: string; updated: stri
   );
 }
 
-function Section({ heading, children }: { heading: string; children: React.ReactNode }) {
+export function Section({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
     <section>
       <h2 className="text-[17px] font-semibold text-fg">{heading}</h2>
