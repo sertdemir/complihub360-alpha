@@ -5590,6 +5590,56 @@ describe('Phase 6 — Performance aus Fakten, Ranking ohne Annahmen, Serien-No-S
         expect(second.rank_basis).toMatchObject({ completed: 0, bookings: 0, neutral: ['rating', 'completion'] });
         expect(JSON.stringify(r.body)).not.toMatch(/confirmation_rate":0\.8|response_hours":7/);
     });
+
+    // Wizard-Audit, Plan-Effekte (Entscheidung 23.10.2026): "neutral" heisst
+    // "ohne Daten". Wer noch nie buchbar war, hat keine Buchungen und steht
+    // damit neutral, ohne Abzug. Wer frueher buchbar war, behaelt seine echte
+    // Bilanz — gute wie schlechte. Der Zahlungsstatus (`bookable_chargeable`)
+    // beruehrt den Rang nie (§14).
+    describe('Plan-Effekt: der Zahlungsstatus ist kein Ranking-Merkmal', () => {
+        const suche = () => api('/api/v1/search', { method: 'POST', auth: 'none', body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }) });
+        const reviewFor = (key: string, rating: number) => (db.reviews ??= []).push({ id: randomUUID(), provider_key: key, from_role: 'user', to_role: 'provider', verified: true, booking_id: randomUUID(), rating, created_at: past(1) });
+
+        it('noch nie buchbar: neutral wie ein buchbarer ohne Daten, kein Abzug', async () => {
+            seedProvider({ provider_key: 'zahlt', rating: null, completed_count: 0 });
+            seedProvider({ provider_key: 'zahlt-nicht', rating: null, completed_count: 0, bookable: false });
+            const r = await suche();
+            const byRef = new Map(r.body.providers.map((p: any) => [p.public_ref, p]));
+            expect(byRef.get(refOf('zahlt-nicht')).rank_basis).toEqual(byRef.get(refOf('zahlt')).rank_basis);
+            expect(byRef.get(refOf('zahlt-nicht')).rank_basis.neutral).toEqual(['rating', 'completion']);
+            expect(byRef.get(refOf('zahlt-nicht')).match).toBe(byRef.get(refOf('zahlt')).match);
+        });
+
+        it('noch nie buchbar, aber tiefer geprueft: steht vor dem buchbaren — die Buchbarkeit zieht nichts ab', async () => {
+            seedProvider({ provider_key: 'buchbar', rating: null, completed_count: 0, depth: 'none' });
+            seedProvider({ provider_key: 'geprueft', rating: null, completed_count: 0, depth: 'independent', bookable: false });
+            const r = await suche();
+            expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('geprueft'), refOf('buchbar')]);
+        });
+
+        // Die Reihenfolge des Anlegens ist absichtlich so gewaehlt, dass ein
+        // Gleichstand (Qualitaet auf neutral gezwungen) den Test faellt: bei
+        // gleichem Score behaelt die Liste die Reihenfolge der Daten.
+        it('frueher buchbar, gute Bilanz: sie bleibt in der Zahlungspause und hebt ihn', async () => {
+            seedProvider({ provider_key: 'neu', rating: null, completed_count: 0 });
+            seedProvider({ provider_key: 'pausiert', rating: null, completed_count: 0, bookable: false });
+            for (let i = 0; i < 6; i++) bk({ provider_key: 'pausiert' });
+            for (const rt of [5, 5, 4]) reviewFor('pausiert', rt);
+            const r = await suche();
+            expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('pausiert'), refOf('neu')]);
+            expect(r.body.providers[0].rank_basis).toMatchObject({ completed: 6, bookings: 6, neutral: [] });
+        });
+
+        it('frueher buchbar, schlechte Bilanz: kuendigen setzt sie nicht auf neutral zurueck', async () => {
+            seedProvider({ provider_key: 'pausiert', rating: null, completed_count: 0, bookable: false });
+            seedProvider({ provider_key: 'neu', rating: null, completed_count: 0 });
+            for (let i = 0; i < 3; i++) bk({ provider_key: 'pausiert' });
+            for (let i = 0; i < 3; i++) bk({ provider_key: 'pausiert', status: 'no_show', no_show_by: 'provider' });
+            for (const rt of [2, 1, 2]) reviewFor('pausiert', rt);
+            const r = await suche();
+            expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('neu'), refOf('pausiert')]);
+        });
+    });
 });
 
 describe('Kalender: Nylas Hosted Auth', () => {

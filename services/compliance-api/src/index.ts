@@ -3558,6 +3558,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         completed, bookings: ownBookings.length,
                         incidents: ownIncidents.length, incident_window_days: perfPolicy.incidentWindowDays, min_sample: perfPolicy.rateMinBookings,
                     });
+                    // Plan-Effekt (Entscheidung 23.10.2026): "neutral" heisst "ohne
+                    // Daten", nicht "nicht buchbar". Der Zahlungsstatus fliesst nicht
+                    // ein (§14) — wer pausiert, behaelt seine Bilanz, gute wie schlechte.
                     const quality = q.value;
 
                     const rows = viewByKey.get(p.provider_key) ?? [];
