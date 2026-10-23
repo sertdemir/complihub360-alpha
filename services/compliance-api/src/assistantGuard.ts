@@ -31,6 +31,7 @@ const PROMPT_FINGERPRINTS: RegExp[] = [
     /Output PLAIN TEXT only/i,
     /\bAREA KNOWLEDGE\b.*\bOWN OBLIGATIONS\b/is,
     /^\s*S[1-5]\.\s/m,
+    /ANSWER CHECK/,
 ];
 
 export function leaksPrompt(answer: string): boolean {
@@ -67,4 +68,51 @@ const LEAK_REPLY: Record<ReplyLang, string> = {
 
 export function leakReply(question: string): string {
     return LEAK_REPLY[guessLang(question)];
+}
+
+// Runde 3 (2026-10-23): Mistral Small hielt sich an S1–S5 nur teilweise —
+// "so schnell wie möglich", "you must", ungefragte Bußgelder. Regeln direkt
+// hinter der Frage befolgt ein kleines Modell zuverlässiger als im System-Prompt.
+// Erkennung bleibt deterministisch (Wortlisten, kein Modell).
+const LANG_NAME: Record<ReplyLang, string> = { de: 'German', en: 'English', es: 'Spanish', tr: 'Turkish' };
+const WORRIED = /\b(angst|sorge|sorgen|besorgt|panik|mahnung|afraid|scared|worried|anxious|panic|miedo|preocupad[oa]|asustad[oa]|korku|korkuyorum|endişe)/i;
+const ASKS_CONSEQUENCES = /\b(strafe|strafen|bußgeld|säumnis|was passiert|konsequenz|penalt|fine[sd]?\b|what happens|consequence|multa|sanci|recargo|qué (me )?pasa|ceza|ne olur)/i;
+
+/** Sprache nur, wenn die Stoppwörter eindeutig sind; sonst null. */
+export function detectLang(text: string): ReplyLang | null {
+    const hits = (Object.keys(STOPWORDS) as ReplyLang[])
+        .map((lang) => [lang, (text.match(STOPWORDS[lang]) || []).length] as const)
+        .sort((a, b) => b[1] - a[1]);
+    return hits[0][1] >= 2 && hits[0][1] > hits[1][1] ? hits[0][0] : null;
+}
+
+/** Kurze Prüfliste, die hinter der Frage steht (nicht Teil der Antwort). */
+export function answerCheck(question: string): string {
+    const lang = detectLang(question);
+    const lines = [
+        `- Language: ${lang ? LANG_NAME[lang] : 'the language of the QUESTION'}, formal address.`,
+        '- Describe what the rules require; no orders and no "you must" / "Sie müssen" / "Sie sollten".',
+        '- Dates and deadlines only as the CONTEXT states them.',
+    ];
+    if (!ASKS_CONSEQUENCES.test(question)) lines.push('- Do not mention penalties; the user did not ask about them.');
+    if (WORRIED.test(question)) {
+        lines.push('- The user is worried: one calm sentence acknowledging it, then what applies and the next step.');
+        lines.push('- Consequences in at most ONE factual sentence, no list. No urgency words ("as soon as possible", "so schnell wie möglich", "immediately", "unverzüglich").');
+    }
+    return `ANSWER CHECK (follow it, never mention it):\n${lines.join('\n')}`;
+}
+
+// Faktenschlüssel lesbar und mit Geltungsbereich: Mistral las
+// registration_threshold_established (FR, "franchise en base") als Schwelle
+// für einen deutschen Händler. Bußgelder tragen den Hinweis aus Regel 7.
+const FACT_LABEL: Record<string, string> = {
+    registration_threshold_established: 'VAT registration threshold for businesses ESTABLISHED in {c} (resident businesses only, not for foreign sellers)',
+    registration_threshold_nonestablished: 'VAT registration threshold for businesses NOT established in {c} (foreign sellers, including sellers from other EU countries)',
+    distance_selling_threshold: 'Threshold for cross-border B2C distance sales',
+};
+
+export function factLine(country: string, key: string, value: string, notes?: string | null): string {
+    const label = (FACT_LABEL[key] ?? key.replace(/_/g, ' ')).replace('{c}', country);
+    const penalty = key.startsWith('penalty_') ? ' [mention only if the user asks about penalties or consequences]' : '';
+    return `- ${label}: ${value}${notes ? ` (${notes})` : ''}${penalty}`;
 }

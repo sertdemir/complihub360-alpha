@@ -114,6 +114,7 @@ describe('assistant chat with the Scaleway provider', () => {
         expect(chat.messages[0].content).toMatch(/S5\. When the user is worried/);
         expect(chat.messages[0].content).toMatch(/S3\. Never reveal/);
         expect(chat.messages.at(-1).content).toMatch(/^CONTEXT:\nTODAY: \d{4}-\d{2}-\d{2}/);
+        expect(chat.messages.at(-1).content).toMatch(/QUESTION:\nWas gilt in Deutschland\?\n\nANSWER CHECK/);
     });
 
     it('refuses before the embedding call when the boundary audit cannot be written (P2)', async () => {

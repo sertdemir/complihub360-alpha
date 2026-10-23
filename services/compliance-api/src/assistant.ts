@@ -5,7 +5,7 @@ import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
 import { resolveLlm, sameEmbedModel, type LlmProvider } from './llm.js';
-import { SHARED_RULES, leaksPrompt, leakReply } from './assistantGuard.js';
+import { SHARED_RULES, answerCheck, factLine, leaksPrompt, leakReply } from './assistantGuard.js';
 import { redactText } from "@complihub360/redaction";
 
 /** P5: was an das Modell geht, ist vorher deterministisch redigiert (Regex-Profile, keine KI). */
@@ -283,7 +283,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             }
             if (facts.length) {
                 contextParts.push(`STRUCTURED FACTS · ${factsFor} (verified ground truth — prefer these for numbers):\n` +
-                    facts.map((f) => `- ${f.fact_key}: ${f.value_text}${f.notes ? ` (${f.notes})` : ''}`).join('\n'));
+                    facts.map((f) => factLine(factsFor as string, f.fact_key, f.value_text, f.notes)).join('\n'));
             }
             chunks.forEach((c, i) => {
                 contextParts.push(`EXCERPT ${i + 1} · ${c.metadata?.country || '?'} · ${c.metadata?.section || 'General'} (paraphrase, never quote):\n${c.content.slice(0, 1600)}`);
@@ -291,7 +291,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             // Heutiges Datum (S4): sonst erfindet das Modell Fristen aus seinen Trainingsjahren.
             if (contextParts.length === 0) contextParts.push('(no matching context found)');
             contextParts.unshift(`TODAY: ${new Date().toISOString().slice(0, 10)}`);
-            const userTurn = `CONTEXT:\n${contextParts.join('\n\n')}\n\nQUESTION:\n${message}`;
+            const userTurn = `CONTEXT:\n${contextParts.join('\n\n')}\n\nQUESTION:\n${message}\n\n${answerCheck(message)}`;
 
             stage = 'generate';
             const generated = await llm.generate(domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
