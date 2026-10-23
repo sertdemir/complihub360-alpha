@@ -78,10 +78,16 @@ Sie gehört zum **Website Implementation Handover V1.1**. V1.0 des Handovers ist
 - **Wortgleich vorhanden:** alle 17 State-Texte (Heading, Message, Actions) und die Sharing-Bestätigung stehen in den englischen Sprachdateien bzw. im UI-Code (maschineller Abgleich gegen die Extraktion).
 - **Eingebaut oder bewusst zurückgestellt:** 16 von 17. „More information needed" und „Alternative available" warten auf ihre Funktionen.
 - **Erledigt:** Launch-Scope-Audit (#276), Zustände (#291), Terminologie (#297), Privacy-Tests zugeordnet (#300).
+- **Availability, Schritt 5:**
+  - Audit am 11.10.2026. Danach:
+    - Abdeckungszahlen und die Reichweite je Bereich kommen aus der Engine (#309, `lib/coverage.ts`).
+    - `copy:check` sucht in der EN-Copy nach Reichweitenversprechen.
+    - Der Unavailable-Zustand richtet sich nach den Abdeckungsdaten, die Zellfreigabe verlangt eine Lizenz, und auch Gäste sehen begrenzte Abdeckung (#314).
+  - Nachgeprüft am 23.10.2026: Alle sieben Availability-Tests tragen. Eine Restaussage war falsch und ist korrigiert: „Company Setup & Filings" nannte die DACH-Region, aber AT und CH prüft die Engine nicht.
 - **Offen:**
-  - Availability-Audit
-  - A11y-Audit: Tastatur und Fokus, Lade-Ansagen, Fehler-Fokus, Tooltips, Farbe
-  - Prüfung mit langen deutschen und türkischen Strings
+  - A11y: Tastatur und Fokus, Lade-Ansagen, Tooltips, Farbe. Die Designbefunde vom 11.10. sind an die Design-Session gegangen. Die Fehlerübersicht (`FormErrorSummary`) steht in 20 Komponenten. Am 23.10. fehlte sie in 6 Dateien mit `<form>`: in vier Such- und Frageleisten (`AreaAskBand`, `DomainAssistant`, `HomeHeroWorld`, `SearchResultPage`), im Beta-Schritt (`BetaAgreementStepPage`) und im nicht eingebundenen `HomeHero`.
+  - Prüfung mit langen deutschen und türkischen Strings.
+  - Lokalisierter Rückfall: Punkt e vom 11.10., zurückgestellt, solange EN first gilt.
   - Owner und Datum je Gate, Sign-off: Das entscheidet der Mensch.
   - Aufbewahrungsfrist für den Audit-Record: Die Zahl kommt vom Nutzer.
 - **Lokalisierung:** DE, ES und TR sind seit 09.10.2026 bewusst pausiert („Erst Englisch fertig"). Fehlende Schlüssel fallen auf EN zurück. Das widerspricht dem Punkt „Localized pages contain no unintended English fallback text", bis die Lokalisierung nachzieht.
