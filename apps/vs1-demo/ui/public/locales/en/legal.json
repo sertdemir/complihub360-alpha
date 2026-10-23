@@ -82,7 +82,6 @@
     "cardTitle": "Before we start: one sheet",
     "cardLead": "You are invited as a tester. Nine sentences say what this test is and what it is not.",
     "listLabel": "Beta agreement · version {{version}}",
-    "fullText": "Read the whole sheet",
     "checkbox": "I have read the beta agreement (version {{version}}) and agree.",
     "cta": "Continue to your workspace",
     "exitQuestion": "Rather not?",
