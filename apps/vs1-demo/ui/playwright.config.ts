@@ -21,8 +21,9 @@ import { defineConfig, devices } from '@playwright/test';
 //        gewinnt Reacts Effekt-Flush zuverlaessig, auch bei 20-facher
 //        CPU-Drosselung. Gefunden hat es dieselbe Zusicherung bei langsamem
 //        Seitenaufbau. Reproduzierbar machen hiesse, den Lauf an die
-//        Erreichbarkeit von fonts.googleapis.com zu haengen — dafuer ist ein
-//        CI-Test das falsche Werkzeug.
+//        Erreichbarkeit eines fremden CDN zu haengen (damals Google Fonts,
+//        seit 23.10.2026 self-hosted) — dafuer ist ein CI-Test das falsche
+//        Werkzeug.
 //
 // Was er dafuer verlaesslich haelt: echte Anker mit richtigen hrefs,
 // aria-expanded/aria-controls-Verdrahtung, aria-current auf dem aktuellen Ziel,

@@ -3,8 +3,9 @@ import { type Page, type BrowserContext, test as base, expect } from '@playwrigh
 // ─── Gemeinsames Geruest der Kernfluss-Tests ─────────────────────────────────
 // Demo-Login wie der lokale Mock ihn kennt: drei localStorage-Schluessel, die
 // useAuthStore liest, sobald `isDemoLoginEnabled` (DEV + VITE_MOCK_API) gilt.
-// Fremde Hosts werden abgewiesen (Schriften von fonts.googleapis.com), sonst
-// haengt jeder Test an einem CDN, das mit dem Produkt nichts zu tun hat.
+// Fremde Hosts werden abgewiesen. Seit 23.10.2026 laedt die Seite nichts
+// mehr von Dritten (Schriften self-hosted); die Sperre bleibt als Wache, damit
+// ein neuer Fremdaufruf hier rot wird statt still durchzugehen.
 
 export type DemoRole = 'user' | 'partner' | 'admin';
 

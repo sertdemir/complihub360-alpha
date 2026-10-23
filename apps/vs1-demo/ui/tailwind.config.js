@@ -217,7 +217,7 @@ export default {
                 'container-3xl': '1760px',
             },
             fontFamily: {
-                sans: ['"Inter"', 'system-ui', 'sans-serif'],
+                sans: ['"Inter Variable"', '"Inter"', 'system-ui', 'sans-serif'],
                 serif: ['"IBM Plex Serif"', 'Georgia', 'serif'],
             },
             fontSize: {
