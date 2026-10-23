@@ -542,6 +542,20 @@ Legacy-migrated services carry only the area code (`MIG/20260920…:763-789`).
 
 ## 6 Scope decisions for Demet
 
+### Decisions taken (founder, 23 October 2026)
+
+The founder adopted the audit's recommendations on four points:
+
+| Point | Decision |
+|---|---|
+| F1 | "Confirmed" only when a user fact supports the obligation. Category interest alone is shown as a lower state. Three states instead of two: *confirmed by your answers*, *likely*, *worth checking*. To be implemented before any new category entry points. |
+| F2 | Without category overlap, no match percentage. Such Providers appear only when no one else fits, in a separate, honestly labelled block. The coverage gap is shown, not filled. |
+| Plan effects | The plan cap on category breadth stays (product feature, not rank). Quality for Providers who cannot yet be booked counts as neutral in ranking. |
+| Q1 | No personal-matter route at launch. S01 offers existing business / self-employed, starting a business, and not sure. Private requests get a friendly, honest way out, not a dead end. |
+| Q3 | No free text in wizard v1. S15 is replaced by a selectable "My case isn't listed", which flags the request for a Provider assessment (S16). Free text only after redaction, privacy policy and retention are settled. |
+
+Already implemented from this audit: F3 (sertdemir/complihub360-alpha#372) and the in-wizard fixes B1, B5–B8, B12–B15, F4, F8 (sertdemir/complihub360-alpha#373).
+
 ### Escalated DNA conflicts
 
 Per `CLAUDE.md`, an agent does not resolve these itself. They are named here for a human decision.
