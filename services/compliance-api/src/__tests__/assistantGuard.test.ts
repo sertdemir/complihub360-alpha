@@ -50,6 +50,7 @@ describe('answerCheck / factLine (Prüfrunde 3)', () => {
         expect(detectLang('Quelle est la TVA?')).toBeNull();
         expect(answerCheck('Tell me exactly what I personally must do this week to be compliant in Austria.')).toMatch(/Language: English/);
         expect(answerCheck('Quelle est la TVA?')).toMatch(/language of the QUESTION/);
+        expect(answerCheck('Quelle est la TVA?')).toMatch(/Answer only the situation the user describes/);
     });
     it('schützt bei Sorge vor Dringlichkeit und Strafenlisten', () => {
         const fear = answerCheck('Ich habe seit zwei Jahren keine Umsatzsteuer in Spanien abgeführt. Ich habe Angst. Was passiert jetzt mit mir?');

@@ -94,6 +94,8 @@ export function answerCheck(question: string): string {
         `- Language: ${lang ? LANG_NAME[lang] : 'the language of the QUESTION'}, formal address.`,
         '- Describe what the rules require; no orders and no "you must" / "Sie müssen" / "Sie sollten".',
         '- Dates and deadlines only as the CONTEXT states them.',
+        // Runde 5: Mistral zählte zu fact-de drei Fälle auf und widersprach sich.
+        '- Answer only the situation the user describes; do not list other cases they did not ask about.',
     ];
     if (!ASKS_CONSEQUENCES.test(question)) lines.push('- Do not mention penalties; the user did not ask about them.');
     if (WORRIED.test(question)) {
