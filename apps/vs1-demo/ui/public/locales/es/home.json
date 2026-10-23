@@ -965,11 +965,11 @@
   "domains": {
     "eyebrow": "Lo que sabemos",
     "title": {
-      "pre": "Todos los ámbitos. ",
-      "gold": "Un",
-      "post": " mapa coherente."
+      "pre": "Sus áreas, ",
+      "gold": "un",
+      "post": " mapa."
     },
-    "subtitle": "El mapa que nadie dibuja — dibujado. Todos los ámbitos que cubrimos, de principio a fin, con los mercados en los que se aplican y las obligaciones que conllevan.",
+    "subtitle": "Elija un área para ver los mercados en los que tenemos sus normas y las obligaciones que se derivan de ellas.",
     "cardCta": "Haga clic para ver más",
     "drawerEyebrow": "Área",
     "drawerAria": "Detalle de {{domain}}",

@@ -14,9 +14,8 @@ const scrub = (text: string): string => redactText(text, { profile: 'strict' }).
 // ─── VAT assistant (chatbot plan phase ②) ─────────────────────────────────────
 // RAG over knowledge_chunks (vector 768, match_knowledge_chunks RPC) plus the
 // structured jurisdiction_facts table. The model behind both sides comes from
-// llm.ts: Scaleway (Mistral Small + Qwen3-Embedding) once LLM_API_KEY is set,
-// Gemini only as the transition until then. Returns 503
-// ASSISTANT_NOT_CONFIGURED while neither key is set (same pattern as the
+// llm.ts: Scaleway (Mistral Small + Qwen3-Embedding) via LLM_API_KEY. Returns 503
+// ASSISTANT_NOT_CONFIGURED while the key is not set (same pattern as the
 // Stripe billing portal). Answers are information, not legal/tax advice
 // (RDG/StBerG), and must never reproduce licensed source text verbatim — the
 // corpus is internal ground truth only.

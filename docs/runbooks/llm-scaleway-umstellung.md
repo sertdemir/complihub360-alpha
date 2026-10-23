@@ -2,7 +2,9 @@
 
 Entscheidung: [ADR-0011](../decisions/ADR-0011-sprachmodell-scaleway-offene-modelle.md). Code: `services/compliance-api/src/llm.ts`.
 
-Reihenfolge einhalten. Bis Schritt 4 antwortet der Assistent unverändert über Gemini.
+> **Abgeschlossen am 23.10.2026.** Staging und Beta laufen über Scaleway, beide Korpora sind mit `qwen3-embedding-8b` neu eingebettet, `GEMINI_API_KEY` ist von beiden Servern entfernt und bei Google gelöscht, der Gemini-Code ist raus. Das Runbook bleibt als Protokoll und als Vorlage für einen späteren Anbieterwechsel stehen. Staging und Beta teilen einen `LLM_API_KEY`; beim Erneuern beide `.env` tauschen.
+
+Reihenfolge einhalten. Bis Schritt 4 antwortete der Assistent unverändert über Gemini.
 
 ## 0. Migration VOR dem Merge einspielen
 
@@ -98,10 +100,12 @@ Die Kennung im Ingest (`LLM_EMBED_MODEL` oder Standard `qwen3-embedding-8b`) mus
 3. Ist er sauber: `GEMINI_API_KEY` aus `/docker/complihub-api/.env` entfernen, Container neu starten, den Schlüssel in der Google-Konsole widerrufen.
 4. Google aus der Subprozessor-Liste streichen.
 
+   **Erledigt am 23.10.2026** für Staging und Beta: Schlüssel aus beiden `.env` entfernt, Container mit `docker compose up -d --force-recreate api` neu erzeugt (ein `restart` liest die `.env` nicht neu), Probefrage auf beiden über Scaleway. Beide Gemini-Schlüssel in AI Studio gelöscht. Die Datenschutzerklärung nennt seit #384 Scaleway statt Gemini. Beta wurde zusätzlich mit „Deploy Beta" auf `main` gebracht und mit eigenem Ingest neu eingebettet (Supabase-Werte aus `/docker/complihub-beta-api/.env` laden, `SUPABASE_URL` vor dem Lauf prüfen).
+
 ## 7. Aufräumen im Code
 
-Folge-PR: `geminiLegacy` und `gemini_embed_batch` entfernen, `GEMINI_API_KEY` aus den `.env.example`-Dateien streichen.
+Erledigt: `geminiLegacy` und `gemini_embed_batch` sind entfernt, `GEMINI_API_KEY` steht in keiner `.env.example` mehr. Ein übrig gebliebener `GEMINI_API_KEY` wird ignoriert; ohne `LLM_API_KEY` antwortet der Assistent 503. `LEGACY_EMBED_MODEL` bleibt nur, damit Chunks ohne `embed_model`-Feld nie als Treffer gelten.
 
 ## Zurück, falls nötig
 
-`LLM_API_KEY` leeren und Container neu starten. Dann greift wieder Gemini; nach Schritt 5 aber ohne Korpus-Treffer, bis der Korpus erneut mit Gemini eingebettet ist (`GEMINI_API_KEY=... python3 scripts/ingest-ey-corpus.py`).
+Seit Schritt 7 gibt es keinen Rückweg zu Gemini mehr im Code. Ein Anbieterwechsel geht über `LLM_BASE_URL`, `LLM_CHAT_MODEL` und `LLM_EMBED_MODEL` an einen anderen OpenAI-kompatiblen Endpunkt (IONOS, OVHcloud, eigener vLLM-Server). Ändert sich das Embedding-Modell, muss der Korpus neu eingebettet werden (Schritt 5).
