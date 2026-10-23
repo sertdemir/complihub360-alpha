@@ -411,6 +411,43 @@ describe('auth gate', () => {
         expect([200, 201]).toContain(save.status);
     });
 
+    // Wizard-Audit F3 (23.10.2026): der Eigentuemer einer Sitzung kommt aus
+    // dem JWT, nie aus dem Body.
+    it('owns a session saved with a JWT by that user, so the account sees it', async () => {
+        const save = await api('/api/v1/session', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ guest_key: 'guest-eigen', country: 'DE', categories: ['tax-vat'] }),
+        });
+        expect(save.status).toBe(201);
+        expect(db.sessions.find((s: any) => s.id === save.body.id)?.user_id).toBe(USER_ID);
+
+        const list = await api('/api/v1/sessions', { auth: 'jwt' });
+        expect(list.body.sessions.map((s: any) => s.id)).toContain(save.body.id);
+    });
+
+    it('ignores a user_id in the body — nobody can place a session in another account', async () => {
+        const fremd = randomUUID();
+        const guest = await api('/api/v1/session', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ guest_key: 'guest-xyz', user_id: fremd, country: 'DE' }),
+        });
+        expect(guest.status).toBe(201);
+        expect(db.sessions.find((s: any) => s.id === guest.body.id)?.user_id).toBeNull();
+
+        const signedIn = await api('/api/v1/session', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ user_id: fremd, country: 'DE' }),
+        });
+        expect(db.sessions.find((s: any) => s.id === signedIn.body.id)?.user_id).toBe(USER_ID);
+
+        const noAnchor = await api('/api/v1/session', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ user_id: fremd, country: 'DE' }),
+        });
+        expect(noAnchor.status).toBe(400);
+        expect(noAnchor.body.errorCode).toBe('VALIDATION_ERROR');
+    });
+
     it('keeps admin + booking routes closed for guests', async () => {
         const tick = await api('/api/v1/admin/watchers/tick', { method: 'POST', body: '{}', auth: 'none' });
         expect(tick.status).toBe(401);
