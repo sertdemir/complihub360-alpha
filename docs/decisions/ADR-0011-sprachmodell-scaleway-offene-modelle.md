@@ -1,6 +1,7 @@
 # ADR-0011: Sprachmodell — offene Modelle über Scaleway statt Gemini
 
 **Status:** ACCEPTED (Entscheidung des Nutzers am 2026-10-18: „Scaleway mit Mistral Small")
+**Umgesetzt:** 2026-10-23 auf Staging und Beta, Gemini entfernt. Nach einem Vergleich mit Llama 3.3 70B bleibt Mistral Small, abgesichert durch deterministische Wächter (`assistantGuard.ts`).
 **Date:** 2026-10-18
 **Bezug:** [`KN-BRAND-001`](../../.knowledge/memory/nodes/KN-BRAND-001-complihub360-dna.md) §5 (AI Voice & Behavior) · [`privacy-no-raw-to-ai`](../../.agents/rules/privacy-no-raw-to-ai.md) · [`privacy-audit-required`](../../.agents/rules/privacy-audit-required.md) · ADR-0002 (DNA ohne CI-Gate) · [`docs/ai/jev-system-one-plan.md`](../ai/jev-system-one-plan.md) · `TKT-AI-01`
 
