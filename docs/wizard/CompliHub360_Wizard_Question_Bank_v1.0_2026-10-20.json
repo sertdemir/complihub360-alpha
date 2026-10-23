@@ -1,0 +1,3332 @@
+{
+  "title": "CompliHub360 approved wizard design",
+  "version": "1.0",
+  "date": "20 October 2026",
+  "status": "Approved question design; production dependencies remain open",
+  "groups": [
+    {
+      "id": "shared",
+      "title": "Shared questions",
+      "purpose": "Build a short, reusable profile, then ask only the category questions that can change the requested service or Provider fit.",
+      "notes": [
+        "Ask shared facts once. Confirm reuse only for the same entity, work, countries and product group. A multi-category user does not repeat the shared interview.",
+        "Country, language and local-form catalogues are selection controls, not free-text fields. Exact catalogue content is maintained separately. The flashcards show the control specification rather than an incomplete global list.",
+        "Personal matter is an approved design option but remains on hold for launch until platform scope and Terms are resolved. Do not place that user into a business journey by default.",
+        "No generic start-date, budget, company size or motivation question is added. Use a deadline only for work affected by a real date."
+      ],
+      "sources": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "cards": [
+        {
+          "id": "S01",
+          "prompt": "Which best describes your situation?",
+          "options": [
+            "Existing business / self-employed",
+            "Starting a business",
+            "Personal matter",
+            "Not sure"
+          ],
+          "why": "Separates existing operations, planned activity and the unresolved personal-user scope.",
+          "when": "First card.",
+          "mode": "Choose one",
+          "notes": "Personal matter must not launch before the scope decision. Not sure triggers short factual clarification, not an invented company.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S02",
+          "prompt": "What brings you here today?",
+          "options": [
+            "Business, product or service launch",
+            "Expansion",
+            "Compliance check",
+            "Ongoing support",
+            "Changing or adding a Provider",
+            "Problem, notice or deadline",
+            "Not sure"
+          ],
+          "why": "Distinguishes a launch, transfer, ongoing service and active issue so follow-ups fit the actual task.",
+          "when": "Once per relevant project.",
+          "mode": "Choose all that apply",
+          "notes": "Not sure is exclusive. Map changing Provider to the affected work later; it does not mean a problem occurred.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S03",
+          "prompt": "Where is your business established?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not established yet",
+            "Not sure"
+          ],
+          "why": "Keeps the business home location separate from sales markets and service jurisdictions.",
+          "when": "Existing business, or formation status is relevant.",
+          "mode": "Choose countries",
+          "notes": "If not established, show planned establishment countries / Still deciding inline. Never derive this from the first sales market.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S04",
+          "prompt": "What do you sell or provide?",
+          "options": [
+            "Physical products",
+            "Digital products / software",
+            "Services",
+            "Still deciding",
+            "Not sure"
+          ],
+          "why": "Avoids stock and product branches for users who only provide services.",
+          "when": "Business activity is relevant.",
+          "mode": "Choose all that apply",
+          "notes": "Still deciding and Not sure are each exclusive.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S05",
+          "prompt": "Who do you sell to?",
+          "options": [
+            "Consumers for personal use",
+            "Businesses or organisations",
+            "Both",
+            "Still deciding",
+            "Not sure"
+          ],
+          "why": "Separates consumer-facing work from business sales without asking users to interpret legal duties.",
+          "when": "Sales context affects the selected work.",
+          "mode": "Choose one",
+          "notes": "",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S06",
+          "prompt": "How do you sell or provide your offering?",
+          "options": [
+            "Own website / app",
+            "Selling on marketplaces",
+            "Operating a marketplace",
+            "Direct / wholesale",
+            "Physical stores",
+            "Still deciding",
+            "Not sure"
+          ],
+          "why": "Distinguishes marketplace sellers from platform operators and identifies relevant channels.",
+          "when": "Channel affects the selected work.",
+          "mode": "Choose all that apply",
+          "notes": "Still deciding and Not sure are each exclusive. A seller is not automatically a marketplace operator.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S07",
+          "prompt": "Which countries do you sell to?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not selling yet",
+            "Not sure"
+          ],
+          "why": "Records actual customer markets without treating planned markets as existing sales.",
+          "when": "Markets affect the selected work.",
+          "mode": "Choose countries",
+          "notes": "Show planned markets inline when needed, with Still deciding. Preserve separate current and planned fields.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S08",
+          "prompt": "Where do you hold stock?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "No stock held",
+            "Not sure"
+          ],
+          "why": "Identifies stock locations that may matter independently of customer countries.",
+          "when": "Physical products and stock location affects the selected work.",
+          "mode": "Choose countries",
+          "notes": "Include fulfilment and marketplace warehouses. Prelaunch wording: Where will you hold stock? Choices include No stock will be held and Still deciding.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S09",
+          "prompt": "How is this work currently handled?",
+          "options": [
+            "No arrangements yet",
+            "Internally",
+            "External Provider",
+            "Internally and a Provider",
+            "Different arrangements — choose separately",
+            "Not sure"
+          ],
+          "why": "Supports new work, supplementary help and a Provider transfer without assuming a service failure.",
+          "when": "Existing arrangements for the selected work are unknown.",
+          "mode": "Choose one",
+          "notes": "Different arrangements opens inline rows by service and country. Never apply one answer to all categories without confirmation.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S10",
+          "prompt": "Which languages are you comfortable using for support?",
+          "options": [
+            "Language selector: choose from the maintained language catalogue without typing.",
+            "No preference"
+          ],
+          "why": "Finds a mutually usable support language without requiring every selected language.",
+          "when": "Once; reuse across categories unless the user changes it.",
+          "mode": "Choose languages",
+          "notes": "Any selected language is acceptable. Unconfirmed Provider language is not a verified match. Content translation languages are separate.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S11",
+          "prompt": "How would you prefer to communicate?",
+          "options": [
+            "Email",
+            "Phone",
+            "Video call",
+            "WhatsApp",
+            "WeChat",
+            "No preference"
+          ],
+          "why": "Adds a useful preference without excluding a qualified Provider for an unverified communication channel.",
+          "when": "Once; optional preference.",
+          "mode": "Choose all that apply",
+          "notes": "No preference is exclusive. Treat as a soft preference and confirm actual availability before booking.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S12",
+          "prompt": "What do you need help with?",
+          "options": [
+            "Tax/VAT",
+            "EPR & Packaging",
+            "Data & Privacy",
+            "Marketing Compliance",
+            "Company Setup & Filings",
+            "Product Compliance",
+            "Logistics & Customs",
+            "Legal Support",
+            "Environmental / Chemical & Substance Compliance",
+            "Help me identify what I need"
+          ],
+          "why": "Routes directly to relevant category questions and provides a guided route when the user cannot name the service.",
+          "when": "Once after enough context to route; do not force irrelevant shared facts first.",
+          "mode": "Choose all that apply",
+          "notes": "Help me identify what I need is exclusive. Suggest topics from factual context and ask the user to confirm them; do not mark obligations confirmed.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S13",
+          "prompt": "Is there a deadline for this work?",
+          "options": [
+            "Choose a date",
+            "No fixed deadline",
+            "Not sure"
+          ],
+          "why": "Captures a real constraint for an issue, filing or time-sensitive appointment without asking everyone about urgency.",
+          "when": "A selected issue or service has a material date.",
+          "mode": "Choose one",
+          "notes": "Use a calendar. No notice uploads, reference numbers or incident detail. A date does not establish Provider capacity.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S14",
+          "prompt": "What support do you need for this work?",
+          "options": [
+            "Start or add support",
+            "Change Provider / take over existing work",
+            "Resolve an issue",
+            "Not sure"
+          ],
+          "why": "Separates continuity or transfer from a problem with the underlying work.",
+          "when": "The service branch needs an intent and it is not already clear.",
+          "mode": "Choose all that apply",
+          "notes": "Not sure is exclusive. Use across Tax/VAT, EPR, WEEE, batteries, filings and ongoing chemical services. Ask issue details only if an issue was selected.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S15",
+          "prompt": "Anything not covered by these choices?",
+          "options": [
+            "Continue with my selections",
+            "Add a short explanation"
+          ],
+          "why": "Provides a limited escape route when a predefined option is missing.",
+          "when": "Optional, after a short predefined clarification or an unlisted company type.",
+          "mode": "Choose one",
+          "notes": "Approved exception to selection-only: optional 2–3 sentences, proposed 500-character cap. Exclude personal, confidential or sensitive information. Suggest structured choices and require confirmation or correction before matching. Do not infer legal obligations. AI processing and privacy implementation remain open.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S16",
+          "prompt": "Would you like a Provider to assess this need?",
+          "options": [
+            "Find a Provider to assess this need",
+            "Keep this need unconfirmed"
+          ],
+          "why": "Lets the user explicitly request advice when a detail remains unknown.",
+          "when": "At review, a relevant need is still unresolved after short clarification.",
+          "mode": "Choose one",
+          "notes": "Not sure alone does not imply consent to an assessment. Match only a verified assessment service in the relevant jurisdiction; show a gap when unavailable.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        {
+          "id": "S17",
+          "prompt": "Review your request",
+          "options": [
+            "Edit a section",
+            "See my results"
+          ],
+          "why": "Lets the user correct the combined request and see any remaining uncertainty before Provider search.",
+          "when": "Once after all selected category branches.",
+          "mode": "Review and continue",
+          "notes": "Show selected services, country roles, product groups, current/planned facts, transfer intent, preferences and unresolved needs. Clear dependent answers when an upstream edit makes them irrelevant. Show coverage gaps rather than inventing matches.",
+          "sources": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tax-vat",
+      "title": "Tax/VAT",
+      "purpose": "Match the actual tax service, tax type and country, including ongoing support and Provider transfers.",
+      "notes": [
+        "Use Tax/VAT in broad labels. Keep VAT/GST, sales tax, business income tax and payroll taxes as distinct actual tax types.",
+        "Bind registration status and work to each tax-country combination. Legal company form and tax election or status are separate.",
+        "Reuse the shared service-intent card for takeover or changing Provider. A routine transfer does not trigger issue questions."
+      ],
+      "sources": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "cards": [
+        {
+          "id": "T01",
+          "prompt": "What Tax/VAT support do you need?",
+          "options": [
+            "Tax registration",
+            "Returns & ongoing support",
+            "Review & advice",
+            "Notice or existing issue",
+            "Update or close a registration",
+            "Not sure"
+          ],
+          "why": "Identifies the service before adding tax-specific details.",
+          "when": "Tax/VAT selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "id": "T02",
+          "prompt": "Which countries do you need Tax/VAT support in?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Need guidance on the countries",
+            "Not sure"
+          ],
+          "why": "Matches service jurisdiction rather than the first sales market.",
+          "when": "Requested service countries not confirmed.",
+          "mode": "Choose countries",
+          "notes": "Assign by tax or service inline if they differ.",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "id": "T03",
+          "prompt": "Which taxes do you need help with?",
+          "options": [
+            "VAT / GST",
+            "Sales tax",
+            "Business income tax",
+            "Payroll taxes",
+            "Not sure"
+          ],
+          "why": "Separates different tax specialisms without requiring technical tax codes.",
+          "when": "Ask only when relevant and not already confirmed for the same work.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "id": "T04",
+          "prompt": "What is the registration status?",
+          "options": [
+            "Registered",
+            "In progress",
+            "Not registered",
+            "Different statuses — choose separately",
+            "Not sure"
+          ],
+          "why": "Distinguishes initial registration, incomplete work and existing accounts.",
+          "when": "Registration status changes the selected work.",
+          "mode": "Choose one per tax and country",
+          "notes": "Different statuses opens the relevant tax-country rows inline.",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "id": "T05",
+          "prompt": "Which returns need support?",
+          "options": [
+            "Upcoming returns",
+            "Overdue returns",
+            "Correcting past returns",
+            "Not sure"
+          ],
+          "why": "Separates ordinary recurring filings from backlog or corrections.",
+          "when": "Returns selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "id": "T06",
+          "prompt": "What kind of Tax/VAT issue is it?",
+          "options": [
+            "Authority notice",
+            "Audit or investigation",
+            "Penalty or payment issue",
+            "Registration or filing issue",
+            "Delayed refund",
+            "Not sure"
+          ],
+          "why": "Finds relevant issue experience without collecting notices or financial data.",
+          "when": "Issue selected; not a routine takeover.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "id": "T07",
+          "prompt": "What would you like reviewed?",
+          "options": [
+            "Registration requirements",
+            "Tax on sales or purchases",
+            "Existing setup",
+            "Business change or expansion",
+            "Tax planning",
+            "Not sure"
+          ],
+          "why": "Matches advice to a concrete question.",
+          "when": "Review & advice selected and the purpose is not already clear.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "id": "T08",
+          "prompt": "What needs updating?",
+          "options": [
+            "Business details",
+            "Tax/VAT scheme or status",
+            "Close a registration",
+            "Not sure"
+          ],
+          "why": "Distinguishes maintenance from closure and fresh registration.",
+          "when": "Update or close selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "id": "T09",
+          "prompt": "Where do your employees work?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "No employees yet",
+            "Not sure"
+          ],
+          "why": "Captures employment locations, including remote work, independently of the company home country.",
+          "when": "Payroll support selected and work locations are unknown.",
+          "mode": "Choose countries",
+          "notes": "If no employees yet, ask planned work countries / Still deciding inline only when needed.",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        },
+        {
+          "id": "T10",
+          "prompt": "What is the business structure?",
+          "options": [
+            "Company / LLC",
+            "Sole trader",
+            "Partnership",
+            "Another structure",
+            "Not sure"
+          ],
+          "why": "Routes income-tax support without treating a tax election as a legal form.",
+          "when": "Business income tax selected and structure is not already known.",
+          "mode": "Choose one",
+          "notes": "Explain Company / LLC with relevant local examples such as corporation or limited company. Planned structure can be Still deciding. Do not list an S-corp election as a universal company form.",
+          "sources": [
+            "T1",
+            "T2",
+            "T3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product-packaging",
+      "title": "EPR and Packaging with WEEE and Batteries",
+      "purpose": "Identify overlapping packaging, electronic-equipment and battery needs without asking users to know EPR categories.",
+      "notes": [
+        "EPR means extended producer responsibility. A product can trigger more than one possible topic; a phone with a battery and packaging must not be forced into one exclusive category.",
+        "Use one joined intake. Preserve the existing destination IDs: packaging under product-packaging; WEEE and batteries under environment. Reuse shared product and battery facts.",
+        "Product descriptions and country choices screen possible services. A Provider confirms applicable duties, legal producer roles and local classifications."
+      ],
+      "sources": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "cards": [
+        {
+          "id": "E01",
+          "prompt": "Which products do you sell or plan to sell?",
+          "options": [
+            "Electrical or electronic products",
+            "Batteries sold separately",
+            "Other physical products",
+            "Not sure"
+          ],
+          "why": "Separates electronics, standalone batteries and other products while allowing overlap.",
+          "when": "Product facts not already confirmed for this work.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E02",
+          "prompt": "Do any of these products contain or come with batteries?",
+          "options": [
+            "Yes",
+            "No",
+            "Not sure"
+          ],
+          "why": "Captures built-in batteries and batteries supplied with a product without adding another full wizard page.",
+          "when": "Inline with product choice for electronics or other physical products.",
+          "mode": "Choose one",
+          "notes": "Skip repeat for standalone batteries. If only some groups, assign the fact inline to those groups.",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E03",
+          "prompt": "Which packaging activities apply?",
+          "options": [
+            "Sell already packaged products",
+            "Pack or repack products",
+            "Add shipping packaging",
+            "Make or sell empty packaging",
+            "No packaging",
+            "Not sure"
+          ],
+          "why": "Describes actual packaging activity instead of the ambiguous category Packaged products.",
+          "when": "Packaging may be relevant.",
+          "mode": "Choose all that apply",
+          "notes": "No packaging and Not sure are each exclusive. Do not assume all sellers add packaging themselves.",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E04",
+          "prompt": "How are you involved with these products?",
+          "options": [
+            "Sell other brands",
+            "Sell under our own brand",
+            "Manufacture products",
+            "Source products from another country",
+            "Not sure"
+          ],
+          "why": "Records the activity needed to assess local producer roles.",
+          "when": "Role facts are missing.",
+          "mode": "Choose all that apply",
+          "notes": "Assign by product group if different. Sourcing abroad does not by itself establish the legal importer role.",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E05",
+          "prompt": "Which countries do you need support in?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not sure"
+          ],
+          "why": "Connects each possible packaging, WEEE or battery need to the correct service jurisdiction.",
+          "when": "Not already confirmed for the exact topic.",
+          "mode": "Choose countries",
+          "notes": "Confirm common countries once or assign different countries by topic inline.",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E06",
+          "prompt": "What support do you need?",
+          "options": [
+            "Check requirements",
+            "Register, update or close",
+            "Reporting & fees",
+            "Take-back or recycling",
+            "Authorised representative",
+            "Notice or existing issue",
+            "Not sure"
+          ],
+          "why": "Separates registration, recurring work, collection arrangements and representation.",
+          "when": "EPR, WEEE or battery topic selected.",
+          "mode": "Choose all that apply",
+          "notes": "Reuse the same service intent and takeover choices for all three topic families.",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E07",
+          "prompt": "What is the registration status?",
+          "options": [
+            "Registered",
+            "In progress",
+            "Not registered",
+            "Different statuses — choose separately",
+            "Not sure"
+          ],
+          "why": "Keeps an existing battery registration separate from an unregistered packaging need.",
+          "when": "Status affects requested work.",
+          "mode": "Choose one per topic and country",
+          "notes": "Different statuses expands topic-country rows inline.",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E08",
+          "prompt": "What registration support do you need?",
+          "options": [
+            "Start or complete a registration",
+            "Update a registration",
+            "Close a registration",
+            "Not sure"
+          ],
+          "why": "Separates new work from maintenance and closure.",
+          "when": "Register, update or close selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E09",
+          "prompt": "Which reporting or fee support do you need?",
+          "options": [
+            "Upcoming reporting",
+            "Overdue reporting",
+            "Correct past reporting",
+            "Calculate quantities or fees",
+            "Not sure"
+          ],
+          "why": "Distinguishes ordinary reporting, backlog and calculation help without collecting weights.",
+          "when": "Reporting & fees selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E10",
+          "prompt": "What kind of issue is it?",
+          "options": [
+            "Registration",
+            "Reporting",
+            "Fees or penalties",
+            "Take-back or recycling",
+            "Not sure"
+          ],
+          "why": "Routes an issue to the relevant service specialist.",
+          "when": "Issue explicitly selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E11",
+          "prompt": "What are the batteries used in?",
+          "options": [
+            "Phones, laptops or everyday products",
+            "E-bikes or scooters",
+            "Electric or hybrid vehicles",
+            "Vehicle starting or ignition",
+            "Industrial equipment or energy storage",
+            "Other uses",
+            "Not sure"
+          ],
+          "why": "Finds battery expertise using familiar examples rather than asking users for legal battery classes.",
+          "when": "Battery support selected and this detail changes capability fit.",
+          "mode": "Choose all that apply",
+          "notes": "These are business descriptions. The Provider confirms the jurisdiction-specific category.",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E12",
+          "prompt": "Which electrical or electronic products are involved?",
+          "options": [
+            "Phones, computers & accessories",
+            "Home appliances",
+            "Lighting",
+            "Tools or industrial equipment",
+            "Toys or leisure products",
+            "Medical or specialist equipment",
+            "Other products",
+            "Not sure"
+          ],
+          "why": "Identifies the product experience needed for WEEE work.",
+          "when": "WEEE support selected and product groups are unknown.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        },
+        {
+          "id": "E13",
+          "prompt": "Which packaging materials are involved?",
+          "options": [
+            "Paper / cardboard",
+            "Plastic",
+            "Glass",
+            "Metal",
+            "Wood",
+            "Other materials",
+            "Not sure"
+          ],
+          "why": "Adds a packaging specialism only when it helps identify a Provider.",
+          "when": "Packaging service requires material detail; otherwise skip.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "E1",
+            "E2",
+            "E3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "data-privacy",
+      "title": "Data and Privacy",
+      "purpose": "Route reviews, documents, ongoing work, individual requests and incidents while collecting only broad business context.",
+      "notes": [
+        "Prioritise an incident, request or authority notice before general context. Ask only missing facts that affect the selected service.",
+        "The detailed sensitive-information checklist was withdrawn. Do not reintroduce health, biometric, criminal-record or other sensitive inventories in the normal journey.",
+        "Under 18 is a broad screening flag, not a universal legal age or consent threshold. Country and activity facts do not automatically determine the applicable privacy law.",
+        "The final Privacy Policy and the optional explanation processing arrangements remain launch dependencies. No actual records, breach details, names or correspondence are collected.",
+        "Confirm requested service countries inline using the approved country control when they are not already confirmed. People locations, business establishment and requested Provider jurisdiction are separate facts."
+      ],
+      "sources": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9",
+        "D10",
+        "D11",
+        "D12",
+        "D13",
+        "D14"
+      ],
+      "cards": [
+        {
+          "id": "D01",
+          "prompt": "What privacy support do you need?",
+          "options": [
+            "Privacy review & advice",
+            "Policies & agreements",
+            "Ongoing privacy support",
+            "Request, complaint or authority notice",
+            "Data breach or suspected incident",
+            "Not sure — guide me"
+          ],
+          "why": "Separates distinct privacy services and puts active issues into a focused route.",
+          "when": "Data & Privacy selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D02",
+          "prompt": "Whose personal information does your business handle?",
+          "options": [
+            "Customers or potential customers",
+            "Website or app users",
+            "Employees or job applicants",
+            "Business contacts or suppliers",
+            "People whose information we handle for clients",
+            "Other people",
+            "Not sure"
+          ],
+          "why": "Provides broad context for the selected task without collecting records about individuals.",
+          "when": "Only if it affects the service and is not already known.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D03",
+          "prompt": "Does this include information about anyone under 18?",
+          "options": [
+            "Yes",
+            "No",
+            "Not sure"
+          ],
+          "why": "Flags possible experience with children without asking for ages, names or legal conclusions.",
+          "when": "Inline with relevant people groups; only when material.",
+          "mode": "Choose one",
+          "notes": "A screening flag only. The Provider assesses local age rules.",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D04",
+          "prompt": "Where are these people located?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not sure"
+          ],
+          "why": "Separates people locations from sales markets, company establishment and data storage.",
+          "when": "Needed to scope this privacy service.",
+          "mode": "Choose countries",
+          "notes": "Allow assignment by people group inline. Planned wording: Where will these people be located? Include Still deciding. Ask to confirm proposed reuse from sales markets.",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D05",
+          "prompt": "What do you use personal information for?",
+          "options": [
+            "Sales or customer service",
+            "Staff or recruitment",
+            "Marketing or advertising",
+            "Website or app analytics",
+            "Client services",
+            "Other activities",
+            "Not sure"
+          ],
+          "why": "Adds activity context that changes the privacy specialism required.",
+          "when": "Only if relevant to this selected privacy task.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D06",
+          "prompt": "Who decides why and how the information is used?",
+          "options": [
+            "Our business",
+            "Our clients",
+            "Jointly with another organisation",
+            "Not sure"
+          ],
+          "why": "Helps identify advice for client processing or shared decisions without assigning a legal role.",
+          "when": "Client services or mixed arrangements make this material.",
+          "mode": "Choose all that apply",
+          "notes": "Do not automatically label controller, processor or joint controller. Multiple answers may apply to different activities.",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D07",
+          "prompt": "Which documents need support?",
+          "options": [
+            "Website or app privacy notice",
+            "Staff or recruitment privacy notice",
+            "Client or supplier data agreements",
+            "Internal privacy policies",
+            "Not sure"
+          ],
+          "why": "Matches the document type rather than asking the user to upload it.",
+          "when": "Policies & agreements selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D08",
+          "prompt": "What would you like done with these documents?",
+          "options": [
+            "Create new documents",
+            "Review existing documents",
+            "Update existing documents",
+            "Not sure — guide me"
+          ],
+          "why": "Distinguishes drafting, professional review and updating, including documents initially drafted with AI.",
+          "when": "Policies & agreements; skip when the task is already clear.",
+          "mode": "Choose all that apply",
+          "notes": "Do not ask which AI tool wrote a policy. Assign actions to document types inline if needed. This is the final approved refinement.",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D09",
+          "prompt": "Which ongoing support do you need?",
+          "options": [
+            "Day-to-day privacy advice",
+            "Privacy officer / DPO support",
+            "Review & maintain policies and records",
+            "Staff training",
+            "Not sure"
+          ],
+          "why": "Separates ongoing advice, officer support, maintenance and training.",
+          "when": "Ongoing privacy support selected.",
+          "mode": "Choose all that apply",
+          "notes": "DPO means data protection officer. Selecting this service does not establish that a statutory appointment is required.",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D10",
+          "prompt": "What needs a response?",
+          "options": [
+            "Request from an individual",
+            "Privacy complaint",
+            "Authority notice",
+            "Not sure"
+          ],
+          "why": "Finds experience with the relevant response process.",
+          "when": "Request, complaint or authority notice selected.",
+          "mode": "Choose all that apply",
+          "notes": "Helper: for example, a request to access, correct or delete information. No actual correspondence.",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D11",
+          "prompt": "What incident support do you need?",
+          "options": [
+            "Assess a suspected incident",
+            "Respond to an incident",
+            "Review a past incident",
+            "Not sure"
+          ],
+          "why": "Separates triage, response and later review without collecting sensitive incident narratives.",
+          "when": "Data breach or suspected incident selected.",
+          "mode": "Choose all that apply",
+          "notes": "Do not imply emergency capacity or a universal reporting deadline. Use the scoped deadline card only when relevant.",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        },
+        {
+          "id": "D12",
+          "prompt": "What would you like reviewed?",
+          "options": [
+            "Understand privacy requirements",
+            "Review current privacy practices",
+            "Sharing data with other organisations",
+            "Using data across countries",
+            "New product or project",
+            "Not sure"
+          ],
+          "why": "Identifies the advice topic while avoiding a detailed data inventory.",
+          "when": "Review & advice selected and purpose is not already clear.",
+          "mode": "Choose all that apply",
+          "notes": "Data storage, recipient and access locations are separate facts if a later approved specialist intake needs them; never infer them from sales countries.",
+          "sources": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "marketing-seo",
+      "title": "Marketing Compliance",
+      "purpose": "Separate marketing channels, claims, consent processes and search visibility so each request reaches the right specialist.",
+      "notes": [
+        "Search & AI visibility is an approved service design, but its Provider service code and capability coverage still need implementation.",
+        "Claims about products belong here when used in marketing. Mandatory product labels, warnings and instructions belong under Product Compliance. Link overlapping work once.",
+        "SEO means search engine optimisation. GEO means optimisation for visibility in generative AI answers. Search-platform documentation supports technical design; it is not government regulation."
+      ],
+      "sources": [
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "cards": [
+        {
+          "id": "M01",
+          "prompt": "What marketing support do you need?",
+          "options": [
+            "Cookies & tracking",
+            "Email / SMS marketing",
+            "Advertising & product claims",
+            "Influencers, affiliates & reviews",
+            "Consent & opt-out processes",
+            "Search & AI visibility (SEO / GEO)",
+            "Notice or existing issue",
+            "Not sure — guide me"
+          ],
+          "why": "Separates different marketing compliance and visibility specialisms.",
+          "when": "Marketing Compliance selected.",
+          "mode": "Choose all that apply",
+          "notes": "Helper for SEO / GEO: being found in search engines and AI answers.",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M02",
+          "prompt": "What would you like a Provider to help with?",
+          "options": [
+            "Review & advice",
+            "Setup & improvements",
+            "Ongoing support",
+            "Issue or notice",
+            "Not sure"
+          ],
+          "why": "Distinguishes advice, implementation, maintenance and an active issue.",
+          "when": "Action is not already clear.",
+          "mode": "Choose all that apply",
+          "notes": "Assign by topic inline if different; reuse existing service intent.",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M03",
+          "prompt": "Which countries do you need support in?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not sure"
+          ],
+          "why": "Scopes each marketing task to relevant markets.",
+          "when": "Service countries not confirmed.",
+          "mode": "Choose countries",
+          "notes": "Confirm common countries or assign by topic inline.",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M04",
+          "prompt": "Where do you need cookies or tracking support?",
+          "options": [
+            "Website",
+            "App",
+            "Both",
+            "Not sure"
+          ],
+          "why": "Identifies the relevant technical environment.",
+          "when": "Cookies & tracking selected and environment is unknown.",
+          "mode": "Choose one",
+          "notes": "Planned websites and apps count; reuse known channel facts.",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M05",
+          "prompt": "Which messaging channels need support?",
+          "options": [
+            "Email",
+            "SMS / text messages",
+            "Both",
+            "Not sure"
+          ],
+          "why": "Separates channel-specific marketing rules and setup.",
+          "when": "Email / SMS marketing selected and channel is unknown.",
+          "mode": "Choose one",
+          "notes": "",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M06",
+          "prompt": "What needs checking?",
+          "options": [
+            "Ads & social media content",
+            "Claims about your products",
+            "Prices, discounts & offers",
+            "Not sure"
+          ],
+          "why": "Finds the relevant review expertise without collecting campaign content.",
+          "when": "Advertising & product claims selected.",
+          "mode": "Choose all that apply",
+          "notes": "Product-claim examples: health, performance or environmental claims. Mandatory labels route to Product Compliance; do not ask the same shared claim need twice.",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M07",
+          "prompt": "Which activities need support?",
+          "options": [
+            "Influencer promotions",
+            "Affiliate marketing",
+            "Customer reviews or testimonials",
+            "Not sure"
+          ],
+          "why": "Separates distinct promotion and disclosure needs.",
+          "when": "Influencers, affiliates & reviews selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M08",
+          "prompt": "Which consent or opt-out processes need support?",
+          "options": [
+            "Collecting consent",
+            "Recording or managing consent choices",
+            "Unsubscribes or opt-outs",
+            "Not sure"
+          ],
+          "why": "Distinguishes collection from ongoing preference management.",
+          "when": "Consent & opt-out processes selected.",
+          "mode": "Choose all that apply",
+          "notes": "Reuse the same privacy or marketing work once, with linked category specialisms.",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M09",
+          "prompt": "What kind of marketing issue is it?",
+          "options": [
+            "Authority notice",
+            "Complaint or legal demand",
+            "Platform warning or restriction",
+            "Another marketing issue",
+            "Not sure"
+          ],
+          "why": "Distinguishes regulator, claimant and platform response experience.",
+          "when": "Notice or issue selected.",
+          "mode": "Choose all that apply",
+          "notes": "Use scoped deadline where relevant; no notices or ad account identifiers.",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M10",
+          "prompt": "Where do you want better visibility?",
+          "options": [
+            "Search engines — SEO",
+            "AI answers — GEO",
+            "Both",
+            "Not sure"
+          ],
+          "why": "Separates search and AI visibility capability.",
+          "when": "Search & AI visibility selected.",
+          "mode": "Choose one",
+          "notes": "Do not promise placement, ranking or inclusion in AI answers.",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        },
+        {
+          "id": "M11",
+          "prompt": "Which content languages do you need help with?",
+          "options": [
+            "Language selector: choose from the maintained language catalogue without typing.",
+            "Not sure"
+          ],
+          "why": "Matches language capability for the content itself.",
+          "when": "SEO / GEO work needs content-language expertise and it is unknown.",
+          "mode": "Choose languages",
+          "notes": "Keep separate from support communication languages. No URLs, keywords or ranking data in this wizard.",
+          "sources": [
+            "M1",
+            "M2",
+            "M3",
+            "M4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "corporate-structure",
+      "title": "Company Setup and Filings",
+      "purpose": "Match formation, additional registrations, ongoing administration, changes and closure using local company terminology.",
+      "notes": [
+        "Use New company formation and Ongoing filings. Do not narrow all filings to annual filings.",
+        "Choose the country first, then a state or region only where relevant, then verified local company types on the same card. Names such as LLC, GmbH, SARL and BV are local forms, not universal equivalents.",
+        "Country-specific form catalogues remain incomplete. Verified examples are not a global production catalogue. More company types appears only when additional verified entries exist.",
+        "Need advice is an explicit service request. Not decided yet is a state and does not silently opt the user into advice."
+      ],
+      "sources": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5"
+      ],
+      "cards": [
+        {
+          "id": "C01",
+          "prompt": "What company support do you need?",
+          "options": [
+            "New company formation",
+            "Register an existing company in another location",
+            "Update company details or structure",
+            "Company filings & ongoing support",
+            "Close a company",
+            "Not sure — guide me"
+          ],
+          "why": "Separates formation from expansion, administration, changes and closure.",
+          "when": "Company Setup & Filings selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C02",
+          "prompt": "Where would you like to form your company?",
+          "options": [
+            "Choose a location",
+            "Need advice on where to establish",
+            "Not decided yet"
+          ],
+          "why": "Separates a known location from an advice request and an undecided location.",
+          "when": "New company formation selected.",
+          "mode": "Choose one",
+          "notes": "Choose location opens country, then state or region where needed, on this card. Advice can cover country, state or city as relevant; do not require a speculative location.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C03",
+          "prompt": "Which company type do you need?",
+          "options": [
+            "Verified local company types with short English descriptions",
+            "More company types",
+            "My company type isn’t listed",
+            "Need advice on company type",
+            "Not decided yet"
+          ],
+          "why": "Lets users select a familiar local form while preserving an unlisted or undecided state.",
+          "when": "Formation country is known; inline after location.",
+          "mode": "Choose one",
+          "notes": "Options depend on the verified country/state catalogue. More appears only when further verified types exist. Unlisted opens the optional explanation and confirmed structured interpretation. Skip type if location advice is needed first.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C04",
+          "prompt": "Where will you mainly run the business from?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Multiple countries",
+            "Not decided yet"
+          ],
+          "why": "Adds operating context when advice on formation location needs it.",
+          "when": "Location is undecided and this fact is needed and missing.",
+          "mode": "Choose countries",
+          "notes": "Do not infer the formation jurisdiction from operating base. Multiple countries expands country selection inline.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C05",
+          "prompt": "Who will own the new company?",
+          "options": [
+            "Individuals — one or more people",
+            "Companies or organisations",
+            "Both individuals and organisations",
+            "Not decided yet"
+          ],
+          "why": "Distinguishes owner types without asking for identities, names or ownership percentages.",
+          "when": "New company formation selected and it affects the requested service.",
+          "mode": "Choose one",
+          "notes": "One individual can be an owner or shareholder; shareholder does not mean more than one person.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C06",
+          "prompt": "Will any owners be based outside the formation country?",
+          "options": [
+            "Yes",
+            "No",
+            "Not sure"
+          ],
+          "why": "Finds experience with foreign owners when the new formation country is known.",
+          "when": "New formation only; owner type and formation country are known.",
+          "mode": "Choose one",
+          "notes": "For people, based means where they live; for companies, where registered. This is not an eligibility decision and is not a general branch-registration gate.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C07",
+          "prompt": "Where do you need registration support?",
+          "options": [
+            "Choose a location",
+            "Need advice on where to register",
+            "Not decided yet"
+          ],
+          "why": "Captures an additional registration in any country, including another location in the company home country.",
+          "when": "Register an existing company elsewhere selected.",
+          "mode": "Choose one",
+          "notes": "Country and relevant state or region inline. Reuse an already registered location for ongoing support or a Provider change.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C08",
+          "prompt": "What stage is the registration at?",
+          "options": [
+            "Not started",
+            "In progress",
+            "Already registered",
+            "Not sure"
+          ],
+          "why": "Routes unfinished registrations and ongoing support differently.",
+          "when": "Existing-company registration selected; skip advice-only request.",
+          "mode": "Choose one",
+          "notes": "Already registered leads to support for that registration, rather than a forced new application.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C09",
+          "prompt": "What needs changing?",
+          "options": [
+            "Registered name or address",
+            "Ownership or shares",
+            "Directors or management",
+            "Company type or structure",
+            "Other company details",
+            "Not sure"
+          ],
+          "why": "Identifies the change specialism without collecting company records.",
+          "when": "Update company details or structure selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C10",
+          "prompt": "Which ongoing support do you need?",
+          "options": [
+            "Ongoing filings",
+            "Company records or registers",
+            "Registered address or agent services",
+            "Company administration / secretarial support",
+            "Not sure"
+          ],
+          "why": "Distinguishes recurring formal work and address or agent services.",
+          "when": "Company filings & ongoing support selected.",
+          "mode": "Choose all that apply",
+          "notes": "Company secretarial support means formal company administration, records and filings.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C11",
+          "prompt": "What filing support do you need?",
+          "options": [
+            "Start or add filing support",
+            "Change Provider / take over filings",
+            "Resolve a filing issue",
+            "Not sure"
+          ],
+          "why": "Makes an ordinary transfer possible without implying a late or incorrect filing.",
+          "when": "Ongoing filings selected and intent is unknown.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C12",
+          "prompt": "What filing issue needs support?",
+          "options": [
+            "Late or missed filing",
+            "Incorrect or rejected filing",
+            "Notice or penalty",
+            "Not sure"
+          ],
+          "why": "Finds corrective filing expertise only when an issue exists.",
+          "when": "Resolve a filing issue selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C13",
+          "prompt": "Which registered service do you need?",
+          "options": [
+            "Registered address",
+            "Registered agent",
+            "Both",
+            "Not sure"
+          ],
+          "why": "Separates two services that require different local capabilities.",
+          "when": "Registered address or agent services selected.",
+          "mode": "Choose one",
+          "notes": "Use verified local terminology and rules. Do not treat a registered address as a registered agent.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C14",
+          "prompt": "What would you like to close?",
+          "options": [
+            "A company",
+            "A branch or local registration",
+            "Not sure — need advice"
+          ],
+          "why": "Separates company closure from ending one registration.",
+          "when": "Close a company selected.",
+          "mode": "Choose one",
+          "notes": "",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        },
+        {
+          "id": "C15",
+          "prompt": "Is the company having difficulty paying its debts?",
+          "options": [
+            "Yes",
+            "No",
+            "Not sure"
+          ],
+          "why": "Identifies possible debt or insolvency expertise for a closure request.",
+          "when": "Closing a company; skip branch-only closure.",
+          "mode": "Choose one",
+          "notes": "No financial amounts. This question does not determine legal insolvency or eligibility for a closure procedure.",
+          "sources": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product-compliance",
+      "title": "Product Compliance",
+      "purpose": "Match service, product group and market, with short extra checks only for specialist products.",
+      "notes": [
+        "Ask product facts before product-specific specialist questions. Reuse the same product group, battery and market facts from EPR or other branches.",
+        "Mandatory product information, warnings and instructions are here. Marketing claims link to Marketing Compliance. Intellectual property belongs under Legal Support.",
+        "Medical, food, cosmetic-claim, children’s-product and wireless flags are matching descriptions. A Provider confirms regulatory classification, approval requirements and applicable roles."
+      ],
+      "sources": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "cards": [
+        {
+          "id": "R01",
+          "prompt": "What product compliance support do you need?",
+          "options": [
+            "Review & advice",
+            "Testing, certification & approvals",
+            "Product registrations & compliance documents",
+            "Labels, warnings & instructions",
+            "Responsible person / local representative",
+            "Product issue, notice or recall",
+            "Not sure — guide me"
+          ],
+          "why": "Identifies the service without making users select a legal regime.",
+          "when": "Product Compliance selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R02",
+          "prompt": "Which products need support?",
+          "options": [
+            "Electrical or electronic products",
+            "Batteries",
+            "Toys or children’s products",
+            "Cosmetics or personal care",
+            "Food, drinks or supplements",
+            "Clothing, textiles or footwear",
+            "More product types",
+            "Not sure"
+          ],
+          "why": "Finds the relevant product specialist using familiar groups.",
+          "when": "Product groups for this work are unknown.",
+          "mode": "Choose all that apply",
+          "notes": "More product types expands Household products or furniture; Chemicals or cleaning products; Machinery or industrial products; Medical or healthcare products; Other products. More is a disclosure control, not a stored product group.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R03",
+          "prompt": "Which countries do these products need support in?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not sure"
+          ],
+          "why": "Connects product requirements and representation to the relevant market.",
+          "when": "Product service countries not confirmed.",
+          "mode": "Choose countries",
+          "notes": "Confirm common countries or assign by product group inline.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R04",
+          "prompt": "How are you involved with these products?",
+          "options": [
+            "Sell other brands",
+            "Sell under our own brand",
+            "Manufacture products",
+            "Source products from another country",
+            "Not sure"
+          ],
+          "why": "Records activity without requiring users to know their legal product role.",
+          "when": "Same-group activity not already confirmed.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R05",
+          "prompt": "Are these products already being sold?",
+          "options": [
+            "All of them",
+            "Some of them",
+            "None of them",
+            "Not sure"
+          ],
+          "why": "Separates market-entry support from existing product compliance.",
+          "when": "Sales stage changes the work and is not known.",
+          "mode": "Choose one",
+          "notes": "Some opens product-group rows inline. Preserve current and planned markets; do not assume all groups have the same stage.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R06",
+          "prompt": "Which testing or approval support do you need?",
+          "options": [
+            "Identify required tests or approvals",
+            "Arrange or carry out testing",
+            "Review existing reports or certificates",
+            "Certification or approval applications",
+            "Not sure"
+          ],
+          "why": "Separates technical assessment, testing delivery and approval work.",
+          "when": "Testing, certification & approvals selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R07",
+          "prompt": "Which registration or document support do you need?",
+          "options": [
+            "New product registrations",
+            "Update or renew registrations",
+            "Create compliance documents",
+            "Review or update documents",
+            "Change Provider / take over existing work",
+            "Resolve an issue",
+            "Not sure"
+          ],
+          "why": "Captures new work, maintenance, transfers and document review.",
+          "when": "Product registrations & compliance documents selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R08",
+          "prompt": "What label or instruction support do you need?",
+          "options": [
+            "Create new labels or instructions",
+            "Review or update existing ones",
+            "Translate or adapt for another market",
+            "Not sure"
+          ],
+          "why": "Separates creation, review and market adaptation.",
+          "when": "Labels, warnings & instructions selected.",
+          "mode": "Choose all that apply",
+          "notes": "For translation or adaptation, select content languages inline. Reuse the same requested translation work once.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R09",
+          "prompt": "What representative support do you need?",
+          "options": [
+            "Check whether one is needed",
+            "Appoint a new representative",
+            "Change an existing representative",
+            "Review current arrangements",
+            "Not sure"
+          ],
+          "why": "Distinguishes advice, appointment, transfer and review.",
+          "when": "Responsible person / local representative selected.",
+          "mode": "Choose all that apply",
+          "notes": "Verify the exact role for the product and country. A generic representative service does not prove GPSR, medical, EPR or chemical representative capability.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R10",
+          "prompt": "What kind of product issue is it?",
+          "options": [
+            "Safety concern or reported incident",
+            "Authority notice or investigation",
+            "Marketplace compliance request or restriction",
+            "Withdrawal or recall",
+            "Another product issue",
+            "Not sure"
+          ],
+          "why": "Finds issue and recall expertise without deciding that a recall is legally required.",
+          "when": "Product issue, notice or recall selected.",
+          "mode": "Choose all that apply",
+          "notes": "Prioritise the focused issue route and a relevant deadline. Do not request incident reports, identities or documents.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R11",
+          "prompt": "What would you like reviewed?",
+          "options": [
+            "Understand requirements",
+            "Review current compliance",
+            "Assess product or material changes",
+            "Prepare for another market",
+            "Not sure"
+          ],
+          "why": "Scopes advice without repeating an already clear purpose.",
+          "when": "Review & advice selected and purpose is unknown.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R12",
+          "prompt": "Which medical or healthcare products are involved?",
+          "options": [
+            "Medical devices or equipment",
+            "Tests or diagnostic kits",
+            "Medical software or apps",
+            "Medicines or pharmaceuticals",
+            "Protective equipment",
+            "Other healthcare products",
+            "Not sure"
+          ],
+          "why": "Avoids matching all healthcare products to one generic product specialist.",
+          "when": "Medical or healthcare group selected and subtype changes fit.",
+          "mode": "Choose all that apply",
+          "notes": "Descriptions are not legal classifications; protective equipment and software may need separate assessments.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R13",
+          "prompt": "Which food or feed products are involved?",
+          "options": [
+            "General food or drinks",
+            "Food / dietary supplements",
+            "Infant foods or specialist nutrition",
+            "Pet food or animal feed",
+            "Other food or feed products",
+            "Not sure"
+          ],
+          "why": "Separates food, supplements, specialist nutrition and animal feed expertise.",
+          "when": "Food, drinks or supplements selected and subtype changes fit.",
+          "mode": "Choose all that apply",
+          "notes": "Specialist nutrition includes products for particular medical dietary needs; classification remains for the Provider.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R14",
+          "prompt": "Do any selected products make these claims?",
+          "options": [
+            "Sun protection / SPF",
+            "Treating or preventing a condition",
+            "Neither",
+            "Not sure"
+          ],
+          "why": "Flags claims that can affect which cosmetic or healthcare specialist is needed.",
+          "when": "Cosmetics or personal care selected and this affects fit.",
+          "mode": "Choose all that apply",
+          "notes": "Neither and Not sure are exclusive. Examples of conditions: acne or dandruff. Do not automatically classify the product as a medicine.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R15",
+          "prompt": "Which children’s products are involved?",
+          "options": [
+            "Toys or games",
+            "Baby-care or nursery products",
+            "Children’s furniture or equipment",
+            "Children’s clothing or accessories",
+            "Other children’s products",
+            "Not sure"
+          ],
+          "why": "Separates toys from other products intended for children.",
+          "when": "Toys or children’s products selected and subtype changes fit.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        },
+        {
+          "id": "R16",
+          "prompt": "Do any of these products have wireless or radio functions?",
+          "options": [
+            "Yes",
+            "No",
+            "Not sure"
+          ],
+          "why": "Finds radio-equipment expertise for relevant electronic, toy or medical products.",
+          "when": "Relevant product group and feature not already confirmed.",
+          "mode": "Choose one",
+          "notes": "Examples: Wi-Fi, Bluetooth or mobile connectivity. If yes, assign to product groups inline. No radio frequencies or device identifiers.",
+          "sources": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "logistics-customs",
+      "title": "Logistics and Customs",
+      "purpose": "Match paired routes, logistics services, transport modes and handling needs without asking users to classify dangerous goods themselves.",
+      "notes": [
+        "Preserve each departure-destination pair. Shipping departure country, manufacturing origin and stock location are different facts.",
+        "Use Recurring shipments and Ground. Ground maps to road/truck capability internally; Rail stays a separate option.",
+        "Selecting all applicable modes is possible. Need advice on transport is exclusive; an All above option does not replace unknown or advice states."
+      ],
+      "sources": [
+        "G1",
+        "G2",
+        "G3"
+      ],
+      "cards": [
+        {
+          "id": "G01",
+          "prompt": "What logistics or customs support do you need?",
+          "options": [
+            "Customs clearance",
+            "Import / export review & advice",
+            "Duties, product classification or origin",
+            "Shipping / freight",
+            "Warehousing / fulfilment",
+            "Shipment or customs issue",
+            "Not sure"
+          ],
+          "why": "Separates customs, transport and warehouse capabilities.",
+          "when": "Logistics & Customs selected.",
+          "mode": "Choose all that apply",
+          "notes": "Helper for duties: customs charges, product codes and origin rules.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G02",
+          "prompt": "Where are the goods moving from and to?",
+          "options": [
+            "Departure country",
+            "Destination country",
+            "Not sure for either end",
+            "Add another route"
+          ],
+          "why": "Matches actual route coverage without merging unrelated departure and destination countries.",
+          "when": "Clearance, freight, route advice or shipment issue selected.",
+          "mode": "Paired country selections",
+          "notes": "Use the country selector at each end. Add another route repeats the pair inline. Planned routes count. Warehouse-only work skips this.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G03",
+          "prompt": "Is this for a one-off shipment or recurring shipments?",
+          "options": [
+            "One-off shipment",
+            "Recurring shipments",
+            "Both",
+            "Not sure"
+          ],
+          "why": "Finds capacity for a single job and continuing operations.",
+          "when": "Customs clearance or shipping selected and recurrence is unknown.",
+          "mode": "Choose one",
+          "notes": "",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G04",
+          "prompt": "What kind of shipping do you need?",
+          "options": [
+            "Parcel / courier",
+            "Freight",
+            "Both",
+            "Not sure"
+          ],
+          "why": "Separates parcel networks from pallet, container and bulk transport.",
+          "when": "Shipping selected and type is unknown.",
+          "mode": "Choose one",
+          "notes": "Helper: freight includes pallets, containers or bulk goods.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G05",
+          "prompt": "Which transport modes do you need?",
+          "options": [
+            "Air",
+            "Sea",
+            "Ground",
+            "Rail",
+            "Need advice on transport"
+          ],
+          "why": "Matches transport capabilities while supporting journeys using several modes.",
+          "when": "Freight selected and modes are unknown.",
+          "mode": "Choose all that apply",
+          "notes": "Need advice is exclusive. Ground means road/truck in internal capability mapping; Rail remains separate.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G06",
+          "prompt": "Which warehouse or fulfilment services do you need?",
+          "options": [
+            "Storage",
+            "Order fulfilment",
+            "Marketplace preparation",
+            "Returns handling",
+            "Not sure"
+          ],
+          "why": "Separates storage from picking, packing, dispatch and marketplace preparation.",
+          "when": "Warehousing / fulfilment selected.",
+          "mode": "Choose all that apply",
+          "notes": "Explain fulfilment as picking, packing and dispatching orders; marketplace preparation as preparing goods for marketplace fulfilment centres.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G07",
+          "prompt": "Where do you need warehouse or fulfilment support?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not sure"
+          ],
+          "why": "Matches the actual warehouse service location.",
+          "when": "Warehouse or fulfilment selected and requested location is unknown.",
+          "mode": "Choose countries",
+          "notes": "City or area selector only where needed for availability. Offer known stock countries for confirmation; do not assume they are the requested new locations.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G08",
+          "prompt": "Do the goods need any of this handling?",
+          "options": [
+            "Batteries or battery-powered products",
+            "Chemicals, aerosols or flammable liquids",
+            "Temperature-controlled handling",
+            "Oversized or heavy goods",
+            "None of these",
+            "Not sure"
+          ],
+          "why": "Finds handling expertise without requiring dangerous-goods classification.",
+          "when": "Shipping or storage work needs handling capability.",
+          "mode": "Choose all that apply",
+          "notes": "None of these and Not sure are exclusive. Reuse battery facts. Provider confirms transport classification; no UN numbers or technical packing data.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G09",
+          "prompt": "Where do you need customs clearance support?",
+          "options": [
+            "Departure country — export",
+            "Destination country — import",
+            "Both",
+            "Not sure"
+          ],
+          "why": "Separates export and import clearance capabilities on each route.",
+          "when": "Customs clearance selected.",
+          "mode": "Choose one per route",
+          "notes": "Display actual paired route countries. Confirm common answer or assign by route inline.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G10",
+          "prompt": "Which duties or classification topics need support?",
+          "options": [
+            "Customs product codes — HS codes",
+            "Customs duties & import Tax/VAT",
+            "Customs value",
+            "Origin or trade agreements",
+            "Duty relief or refunds",
+            "Not sure"
+          ],
+          "why": "Separates classification, valuation, origin and relief expertise.",
+          "when": "Duties, product classification or origin selected.",
+          "mode": "Choose all that apply",
+          "notes": "Do not ask for actual product codes, values or origin proofs.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G11",
+          "prompt": "Which import or export topics need support?",
+          "options": [
+            "Requirements",
+            "Registrations, licences or permits",
+            "Documents or processes",
+            "Local importer / exporter support",
+            "Review current arrangements",
+            "Not sure"
+          ],
+          "why": "Matches the advice or local role needed for the route.",
+          "when": "Import / export review & advice selected.",
+          "mode": "Choose all that apply",
+          "notes": "Verify actual local role capability. Do not promise a universally valid importer-of-record or exporter service.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        },
+        {
+          "id": "G12",
+          "prompt": "What kind of shipment or customs issue is it?",
+          "options": [
+            "Shipment delayed or held",
+            "Missing or rejected documents",
+            "Disputed duties or charges",
+            "Customs notice, inspection or penalty",
+            "Lost or damaged goods",
+            "Another issue",
+            "Not sure"
+          ],
+          "why": "Finds relevant response expertise without collecting shipment identifiers or paperwork.",
+          "when": "Shipment or customs issue selected.",
+          "mode": "Choose all that apply",
+          "notes": "Reuse route and product facts; scoped deadline only where relevant.",
+          "sources": [
+            "G1",
+            "G2",
+            "G3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "legal-advisory",
+      "title": "Legal Support",
+      "purpose": "Route business legal work by topic, country, action and matter stage, including specialist IP and notary services.",
+      "notes": [
+        "Business and professional work only until the personal-user scope decision is resolved. Individual employee claims remain a separate open decision.",
+        "Legal Support has no seeded subcategories in the compatibility inventory. IP, notary and other specialist services require explicit service records and verified Provider capability.",
+        "Requested country, governing law, forum, property location, document origin, document use and appointment location are distinct. The Provider confirms professional authority and jurisdiction.",
+        "Online communication preference does not establish the availability or validity of an online notarial act."
+      ],
+      "sources": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ],
+      "cards": [
+        {
+          "id": "J01",
+          "prompt": "What legal support do you need?",
+          "options": [
+            "Trademarks & intellectual property",
+            "Contracts & agreements",
+            "Employment / workplace",
+            "Business disputes or claims",
+            "Company transactions or ownership",
+            "Commercial property or leases",
+            "Regulatory advice or authority notices",
+            "Notary services & document authentication",
+            "Not sure"
+          ],
+          "why": "Separates distinct legal specialisms rather than matching a general parent label.",
+          "when": "Legal Support selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J02",
+          "prompt": "Which countries do you need legal support in?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not sure"
+          ],
+          "why": "Identifies requested service coverage without guessing governing law.",
+          "when": "Legal service jurisdictions are not already confirmed.",
+          "mode": "Choose countries",
+          "notes": "State, province or region selector only where material. Assign by legal topic inline when different. Provider confirms governing law and forum.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J03",
+          "prompt": "What would you like a Provider to do?",
+          "options": [
+            "Advice or review",
+            "Prepare or update documents",
+            "Applications or registrations",
+            "Help with a dispute or proceeding",
+            "Ongoing legal support",
+            "Change Provider / take over existing work",
+            "Not sure"
+          ],
+          "why": "Separates advice, documents, applications, disputes and a transfer.",
+          "when": "Action is not already clear.",
+          "mode": "Choose all that apply",
+          "notes": "Show relevant actions only for the selected topic; reuse the same matter action.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J04",
+          "prompt": "Which intellectual property needs support?",
+          "options": [
+            "Trademarks — names, logos or brands",
+            "Patents — inventions",
+            "Design rights — product appearance",
+            "Copyright — content or software",
+            "Trade secrets — confidential know-how",
+            "Other intellectual property",
+            "Not sure"
+          ],
+          "why": "Matches the specific IP practice rather than treating all IP rights as trademarks.",
+          "when": "Trademarks & intellectual property selected.",
+          "mode": "Choose all that apply",
+          "notes": "No brand names, inventions, code or confidential details in the wizard.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J05",
+          "prompt": "What stage is the IP application or right at?",
+          "options": [
+            "New application",
+            "Application in progress",
+            "Existing registration or granted right",
+            "Different stages — choose separately",
+            "Not sure"
+          ],
+          "why": "Distinguishes application, prosecution and maintenance work.",
+          "when": "An application or registration service is relevant.",
+          "mode": "Choose one per right and country",
+          "notes": "Different stages opens rows inline. Do not assume registration or validity in another jurisdiction.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J06",
+          "prompt": "Which contracts or agreements need support?",
+          "options": [
+            "Customer or supplier",
+            "Employment or contractor",
+            "Distribution, agency or franchise",
+            "Confidentiality or intellectual property",
+            "Company ownership or investment",
+            "Website or app terms",
+            "Other agreements",
+            "Not sure"
+          ],
+          "why": "Finds the relevant drafting and review experience.",
+          "when": "Contracts & agreements selected.",
+          "mode": "Choose all that apply",
+          "notes": "Reuse action already chosen. Link privacy agreements or other overlapping work once.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J07",
+          "prompt": "Which workplace topics need support?",
+          "options": [
+            "Contracts or policies",
+            "Employee or contractor arrangements",
+            "Dismissal or restructuring",
+            "Workplace complaints or disputes",
+            "Cross-border or remote work",
+            "Not sure"
+          ],
+          "why": "Routes business-side employment work to a suitable specialist.",
+          "when": "Employment / workplace selected.",
+          "mode": "Choose all that apply",
+          "notes": "Use employee work countries, not company registration country. Individual employee claims remain on hold pending scope decision.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J08",
+          "prompt": "What stage is the dispute at?",
+          "options": [
+            "Discussions or negotiations",
+            "Formal demand or complaint",
+            "Mediation or arbitration",
+            "Court or tribunal proceedings",
+            "No steps taken yet",
+            "Not sure"
+          ],
+          "why": "Matches the current matter stage without imposing a fixed sequence.",
+          "when": "Dispute or proceeding selected.",
+          "mode": "Choose all that apply",
+          "notes": "No steps taken yet and Not sure are each exclusive. No claim amounts, allegations, parties or case numbers.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J09",
+          "prompt": "What do you need help doing?",
+          "options": [
+            "Pursue a claim",
+            "Respond to a claim",
+            "Both",
+            "Not sure"
+          ],
+          "why": "Distinguishes bringing a claim from defending or responding to one.",
+          "when": "A dispute or claim needs this detail.",
+          "mode": "Choose one",
+          "notes": "Both can include a counterclaim. Reuse for the same IP, contract, employment or property matter. It does not automatically mean court proceedings.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J10",
+          "prompt": "Which company legal work needs support?",
+          "options": [
+            "Buy or sell a business",
+            "Investment or fundraising",
+            "Shareholder or owner arrangements",
+            "Restructure or reorganise",
+            "Directors’ responsibilities or company decisions",
+            "Not sure"
+          ],
+          "why": "Separates transaction and governance experience.",
+          "when": "Company transactions or ownership selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J11",
+          "prompt": "Which commercial property work needs support?",
+          "options": [
+            "Lease or rent premises",
+            "Buy or sell property",
+            "Development or permitted use",
+            "Property dispute",
+            "Other commercial property work",
+            "Not sure"
+          ],
+          "why": "Finds relevant commercial property expertise.",
+          "when": "Commercial property or leases selected.",
+          "mode": "Choose all that apply",
+          "notes": "Select property country and relevant state/city when needed for the service. No street address or price.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J12",
+          "prompt": "Which regulatory support do you need?",
+          "options": [
+            "Understand or review requirements",
+            "Licences, permits or authorisations",
+            "Authority notice",
+            "Inspection or investigation",
+            "Enforcement or appeal",
+            "Not sure"
+          ],
+          "why": "Separates advice, applications and enforcement work.",
+          "when": "Regulatory advice or authority notices selected.",
+          "mode": "Choose all that apply",
+          "notes": "Reuse known tax, product, privacy or other subject. If missing, use a short topic clarification. No typed regulator name or notice upload.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J13",
+          "prompt": "Which notary or authentication services do you need?",
+          "options": [
+            "Notarise signatures or documents",
+            "Certify copies",
+            "Notarial deeds or transactions",
+            "Apostille or legalisation support",
+            "Not sure — need advice"
+          ],
+          "why": "Distinguishes notarial acts and cross-border authentication support.",
+          "when": "Notary services & document authentication selected.",
+          "mode": "Choose all that apply",
+          "notes": "Explain formal company or property notarial work where relevant. Verify local availability and authority; not all lawyers are notaries and not all notaries provide legal advice.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J14",
+          "prompt": "Where are the documents from and where will they be used?",
+          "options": [
+            "Document origin country",
+            "Country or countries of use",
+            "Not sure for either",
+            "Add another document group"
+          ],
+          "why": "Keeps origin-use relationships intact for authentication advice.",
+          "when": "Apostille or legalisation support selected.",
+          "mode": "Paired country selections",
+          "notes": "Origin means the issuing authority or notary country. Add each document group inline. Do not conclude that an Apostille is required or sufficient from these answers alone.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J15",
+          "prompt": "How would you prefer the notary appointment?",
+          "options": [
+            "In person",
+            "Online where available",
+            "No preference"
+          ],
+          "why": "Distinguishes appointment preference from legal eligibility for a remote act.",
+          "when": "An appointment-based notary service selected.",
+          "mode": "Choose one",
+          "notes": "In person opens requested appointment country and relevant city/area / Not sure. Online availability and receiving-country acceptance must be confirmed by a qualified Provider.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        },
+        {
+          "id": "J16",
+          "prompt": "Where will the person signing be located during the online appointment?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not sure yet"
+          ],
+          "why": "Identifies signer-location restrictions independently of document origin, use or company location.",
+          "when": "Online notary appointment requested and a signing act is involved.",
+          "mode": "Choose countries",
+          "notes": "Allow multiple countries for different signers. State or region only where needed. Unknown keeps online completion unconfirmed. No identities or identity documents.",
+          "sources": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "environment",
+      "title": "Environmental Chemical and Substance Compliance",
+      "purpose": "Identify chemical, mixture and article activities, then match the requested specialist service without collecting formulas or dossiers.",
+      "notes": [
+        "Ask or reuse the product/material group first, then countries, then the service. Add activity context only where it changes matching.",
+        "WEEE and batteries reuse the joined EPR journey and keep the existing environment destination. Do not repeat those product, status or takeover questions.",
+        "Broad manufacture, import and sale descriptions do not determine a legal chemical role. Representative roles and substance regimes require jurisdiction-specific verification.",
+        "The approved chemical journey does not create a supported catalogue for general ESG, emissions, site permits or every environmental service."
+      ],
+      "sources": [
+        "H1",
+        "H2",
+        "H3",
+        "H4"
+      ],
+      "cards": [
+        {
+          "id": "H01",
+          "prompt": "Which products or materials need support?",
+          "options": [
+            "Chemicals or raw materials",
+            "Formulated products",
+            "Finished products or components",
+            "Not sure"
+          ],
+          "why": "Separates chemical production, formulated mixtures and finished-product work.",
+          "when": "Chemical or substance support selected; same-group facts unknown.",
+          "mode": "Choose all that apply",
+          "notes": "Formulated examples: cleaners, paints and adhesives. Finished products open the existing product-family selector. Reuse known product groups.",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H02",
+          "prompt": "Which countries do you need support in?",
+          "options": [
+            "Country selector: six regions on the same card; choose countries or territories without typing.",
+            "Not sure"
+          ],
+          "why": "Connects the actual chemical service to the relevant production, import, supply or use country.",
+          "when": "After products/materials; service countries not confirmed.",
+          "mode": "Choose countries",
+          "notes": "Confirm common countries or assign by product/material group inline. Do not require unrelated countries.",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H03",
+          "prompt": "What chemical or substance support do you need?",
+          "options": [
+            "Review & advice",
+            "Registrations or notifications",
+            "Substance restrictions or product checks",
+            "Safety data sheets / hazard labels",
+            "Local representative",
+            "Ongoing reporting or updates",
+            "Authority notice or existing issue",
+            "Not sure"
+          ],
+          "why": "Separates the specialist service without requiring chemical identifiers.",
+          "when": "After relevant product/material and country context.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H04",
+          "prompt": "How are you involved with these products or materials?",
+          "options": [
+            "Produce chemicals or raw materials",
+            "Blend or formulate products",
+            "Make finished products or components",
+            "Source from another country",
+            "Sell or distribute",
+            "Use in our own operations",
+            "Not sure"
+          ],
+          "why": "Distinguishes actual activities that can require different chemical expertise.",
+          "when": "Only when activity changes the requested service.",
+          "mode": "Choose all that apply",
+          "notes": "General manufacturing is not automatically manufacture of a chemical substance under a particular law.",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H05",
+          "prompt": "Which registration or notification support do you need?",
+          "options": [
+            "New filing",
+            "Continue work in progress",
+            "Update or maintain a filing",
+            "Change Provider / take over existing work",
+            "Resolve an issue",
+            "Not sure"
+          ],
+          "why": "Separates new work, unfinished work, maintenance and transfers.",
+          "when": "Registrations or notifications selected.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H06",
+          "prompt": "Which restriction or product checks do you need?",
+          "options": [
+            "Check applicable restrictions",
+            "Review supplier documents or declarations",
+            "Arrange testing or review results",
+            "Assess product or material changes",
+            "Not sure"
+          ],
+          "why": "Finds assessment, documentation and testing capability.",
+          "when": "Substance restrictions or product checks selected.",
+          "mode": "Choose all that apply",
+          "notes": "Reuse product testing work once; retain the additional chemical specialism.",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H07",
+          "prompt": "Which materials need support?",
+          "options": [
+            "Safety data sheets",
+            "Hazard labels",
+            "Both",
+            "Not sure"
+          ],
+          "why": "Separates the two document types without collecting their contents.",
+          "when": "Safety data sheets / hazard labels selected.",
+          "mode": "Choose one",
+          "notes": "SDS means safety data sheet. This card asks about document types, not ingredients.",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H08",
+          "prompt": "What safety data sheet or hazard-label support do you need?",
+          "options": [
+            "Create new materials",
+            "Review or update existing materials",
+            "Translate or adapt for another market",
+            "Not sure"
+          ],
+          "why": "Matches creation, technical review and market adaptation.",
+          "when": "Inline with the document-type choice; action is unknown.",
+          "mode": "Choose all that apply",
+          "notes": "For translation, select content languages inline. A general label or translation capability is not enough without verified chemical expertise.",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H09",
+          "prompt": "What local representative support do you need?",
+          "options": [
+            "Check whether one is needed",
+            "Appoint a new representative",
+            "Change an existing representative",
+            "Review current arrangements",
+            "Not sure"
+          ],
+          "why": "Separates advice, appointment, transfer and review.",
+          "when": "Local representative selected.",
+          "mode": "Choose all that apply",
+          "notes": "Match the exact chemical role and country, such as a REACH Only Representative where relevant. Do not substitute a generic product representative.",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H10",
+          "prompt": "Which ongoing support do you need?",
+          "options": [
+            "Filings or reporting",
+            "Registration updates",
+            "Safety data sheet or label updates",
+            "Supplier or customer compliance requests",
+            "Monitor rule changes or ongoing advice",
+            "Not sure"
+          ],
+          "why": "Finds maintenance and advisory capability without repeating initial-registration questions.",
+          "when": "Ongoing reporting or updates selected.",
+          "mode": "Choose all that apply",
+          "notes": "Reuse the takeover intent card if changing Provider. A takeover is not automatically an issue.",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H11",
+          "prompt": "What kind of chemical or substance issue is it?",
+          "options": [
+            "Registration or reporting",
+            "Safety data sheet or label",
+            "Restricted-substance concern",
+            "Authority notice, inspection or investigation",
+            "Product or shipment restriction",
+            "Another chemical issue",
+            "Not sure"
+          ],
+          "why": "Finds response expertise without collecting technical dossiers or notices.",
+          "when": "Authority notice or issue selected.",
+          "mode": "Choose all that apply",
+          "notes": "Link the same product, customs or legal issue once. Use scoped deadline only where relevant.",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        },
+        {
+          "id": "H12",
+          "prompt": "What would you like reviewed?",
+          "options": [
+            "Understand requirements",
+            "Review current arrangements",
+            "New or changed product or material",
+            "New market",
+            "Not sure"
+          ],
+          "why": "Scopes advice to the actual business change or uncertainty.",
+          "when": "Review & advice selected and purpose unknown.",
+          "mode": "Choose all that apply",
+          "notes": "",
+          "sources": [
+            "H1",
+            "H2",
+            "H3",
+            "H4"
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": {
+    "P1": {
+      "title": "CompliHub360 compatibility inventory",
+      "scope": "Internal repository and staging audit dated 16 October 2026",
+      "location": "wizard-compatibility-inventory-2026-10-16.md"
+    },
+    "P2": {
+      "title": "CompliHub360 platform and data processing Fact Sheet",
+      "scope": "Internal Draft 3 content, stored as Draft 1 version 2; 28 September 2026",
+      "location": "CompliHub360_Platform_and_Data_Processing_Fact_Sheet_Draft_1.docx"
+    },
+    "P3": {
+      "title": "CompliHub360 User Terms of Use",
+      "scope": "Internal Lawyer Review Draft 3; 8 October 2026",
+      "location": "CompliHub360_User_Terms_of_Use_Lawyer_Review_Draft_3.docx"
+    },
+    "T1": {
+      "title": "European Commission VAT",
+      "scope": "EU VAT framework and business context",
+      "location": "https://taxation-customs.ec.europa.eu/taxation/vat_en"
+    },
+    "T2": {
+      "title": "IRS business structures",
+      "scope": "US structures and tax treatment; not a global forms catalogue",
+      "location": "https://www.irs.gov/businesses/small-businesses-self-employed/business-structures"
+    },
+    "E1": {
+      "title": "European Commission waste electrical and electronic equipment",
+      "scope": "EU WEEE topic; does not establish all-country producer duties",
+      "location": "https://environment.ec.europa.eu/topics/waste-and-recycling/waste-electrical-and-electronic-equipment-weee_en"
+    },
+    "E2": {
+      "title": "European Commission batteries",
+      "scope": "EU battery topic and distinct regulatory framework",
+      "location": "https://environment.ec.europa.eu/topics/waste-and-recycling/batteries_en"
+    },
+    "E3": {
+      "title": "European Commission packaging waste",
+      "scope": "EU packaging topic; national implementation and current dates need catalogue verification",
+      "location": "https://environment.ec.europa.eu/topics/waste-and-recycling/packaging-waste_en"
+    },
+    "D1": {
+      "title": "General Data Protection Regulation",
+      "scope": "EU regulation; minimisation, roles and territorial scope",
+      "location": "https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng"
+    },
+    "D2": {
+      "title": "ICO controllers and processors guide",
+      "scope": "UK role analysis; the wizard records activities without deciding legal roles",
+      "location": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/controllers-and-processors/controllers-and-processors-a-guide/"
+    },
+    "D3": {
+      "title": "California Privacy Protection Agency FAQs",
+      "scope": "California context; demonstrates the need for jurisdiction-specific assessment",
+      "location": "https://www.cppa.ca.gov/faq.html"
+    },
+    "D4": {
+      "title": "OAIC small business guidance",
+      "scope": "Australia; small-business coverage has qualifications and exceptions",
+      "location": "https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies/organisations/small-business"
+    },
+    "D5": {
+      "title": "India digital personal data commencement notification",
+      "scope": "India staged commencement; do not treat all substantive duties as already active in October 2026",
+      "location": "https://www.meity.gov.in/static/uploads/2025/11/c56ceae6c383460ca69577428d36828b.pdf"
+    },
+    "M1": {
+      "title": "FTC advertising and marketing guidance",
+      "scope": "US advertising, endorsements and claims context",
+      "location": "https://www.ftc.gov/business-guidance/advertising-marketing"
+    },
+    "M2": {
+      "title": "ICO direct marketing and electronic communications",
+      "scope": "UK marketing and tracking context",
+      "location": "https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/"
+    },
+    "M3": {
+      "title": "FTC environmental claims Green Guides summary",
+      "scope": "US environmental marketing claims; supports the claims branch",
+      "location": "https://www.ftc.gov/business-guidance/resources/environmental-claims-summary-green-guides"
+    },
+    "M4": {
+      "title": "Google Search documentation on AI features",
+      "scope": "Official technical documentation, not legislation; visibility is not guaranteed",
+      "location": "https://developers.google.com/search/docs/appearance/ai-features"
+    },
+    "C1": {
+      "title": "Your Europe starting a business",
+      "scope": "EU overview; legal forms and conditions vary by country",
+      "location": "https://europa.eu/youreurope/business/lifecycle/starting/startups/index_en.htm"
+    },
+    "C2": {
+      "title": "UK limited company formation",
+      "scope": "UK local company terminology and formation context",
+      "location": "https://www.gov.uk/limited-company-formation"
+    },
+    "C3": {
+      "title": "ACRA choosing a company type",
+      "scope": "Singapore company types; not universal equivalents",
+      "location": "https://www.acra.gov.sg/register/business/registering-different-business-structures/local-company/choosing-a-company-type/"
+    },
+    "C4": {
+      "title": "German Limited Liability Companies Act",
+      "scope": "Germany local GmbH and UG terminology",
+      "location": "https://www.gesetze-im-internet.de/gmbhg/BJNR004770892.html"
+    },
+    "C5": {
+      "title": "UK closing a limited company",
+      "scope": "UK closure routes; financial situation can change required expertise",
+      "location": "https://www.gov.uk/closing-a-limited-company"
+    },
+    "R1": {
+      "title": "Your Europe general product compliance",
+      "scope": "EU overview; distinct product rules, roles and market context",
+      "location": "https://europa.eu/youreurope/business/product-rules-compliance/general-product-compliance/index_en.htm"
+    },
+    "R2": {
+      "title": "CPSC business education",
+      "scope": "US product and children’s-product compliance resources",
+      "location": "https://www.cpsc.gov/Business--Manufacturing/Business-Education"
+    },
+    "R3": {
+      "title": "FDA cosmetic drug or both",
+      "scope": "US classification can depend on intended use and claims",
+      "location": "https://www.fda.gov/cosmetics/cosmetics-laws-regulations/it-cosmetic-drug-or-both-or-it-soap"
+    },
+    "R4": {
+      "title": "FDA determining whether a product is a medical device",
+      "scope": "US medical-device boundary; a product descriptor is not a legal classification",
+      "location": "https://www.fda.gov/medical-devices/classify-your-medical-device/how-determine-if-your-product-medical-device"
+    },
+    "R5": {
+      "title": "European Commission Radio Equipment Directive",
+      "scope": "EU radio-equipment framework; wireless flag identifies possible specialist expertise",
+      "location": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/radio-equipment-directive-red_en"
+    },
+    "G1": {
+      "title": "International Trade Administration customs brokers and freight forwarders",
+      "scope": "US government distinction between customs and transport services",
+      "location": "https://www.trade.gov/customs-brokers-and-freight-forwarders"
+    },
+    "G2": {
+      "title": "UK importing goods guide",
+      "scope": "UK import steps and service context; not a universal route rule",
+      "location": "https://www.gov.uk/import-goods-into-uk"
+    },
+    "G3": {
+      "title": "FAA how to ship dangerous goods",
+      "scope": "US air transport context; Provider must assess actual goods and requirements",
+      "location": "https://www.faa.gov/hazmat/safecargo/how_to_ship"
+    },
+    "J1": {
+      "title": "WIPO intellectual property overview",
+      "scope": "Official intergovernmental overview of distinct IP rights",
+      "location": "https://www.wipo.int/en/web/about-ip"
+    },
+    "J2": {
+      "title": "HCCH Apostille section",
+      "scope": "Official intergovernmental convention and competent-authority resources",
+      "location": "https://www.hcch.net/en/instruments/specialised-sections/Apostille/"
+    },
+    "J3": {
+      "title": "Washington RCW 42.45.280",
+      "scope": "Washington remote notarisation; use current version effective until 1 January 2027 for the October 2026 baseline",
+      "location": "https://app.leg.wa.gov/RCW/default.aspx?cite=42.45.280"
+    },
+    "J4": {
+      "title": "Arizona Revised Statutes 41-263",
+      "scope": "Arizona remote notarial acts; signer location can matter",
+      "location": "https://www.azleg.gov/ars/41/00263.htm"
+    },
+    "H1": {
+      "title": "ECHA registration",
+      "scope": "EU REACH registration context; service and role require local assessment",
+      "location": "https://echa.europa.eu/regulations/reach/registration"
+    },
+    "H2": {
+      "title": "ECHA safety data sheets",
+      "scope": "EU safety data sheet resources",
+      "location": "https://echa.europa.eu/safety-data-sheets"
+    },
+    "H3": {
+      "title": "ECHA classification",
+      "scope": "EU CLP classification resources",
+      "location": "https://echa.europa.eu/web/guest/regulations/clp/classification"
+    },
+    "H4": {
+      "title": "EPA TSCA chemical imports",
+      "scope": "US chemical-import requirements demonstrate a separate jurisdictional framework",
+      "location": "https://www.epa.gov/tsca-import-export-requirements/tsca-requirements-importing-chemicals"
+    },
+    "D6": {
+      "title": "Office of the Privacy Commissioner of Canada privacy laws",
+      "scope": "Canada official framework overview; local scope must be assessed",
+      "location": "https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/02_05_d_15/"
+    },
+    "D7": {
+      "title": "Brazil General Personal Data Protection Law",
+      "scope": "Brazil LGPD consolidated legislation; separate scope from EU rules",
+      "location": "https://planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709compilado.htm"
+    },
+    "D8": {
+      "title": "Kenya Office of the Data Protection Commissioner FAQs",
+      "scope": "Kenya official regulator context; no worldwide exemption rule inferred",
+      "location": "https://www.odpc.go.ke/faqs/"
+    },
+    "D9": {
+      "title": "South Africa Protection of Personal Information Act",
+      "scope": "South Africa official statute; local applicability must be assessed",
+      "location": "https://www.justice.gov.za/legislation/acts/2013-004.pdf"
+    },
+    "D10": {
+      "title": "Japan Personal Information Protection Commission offshore guidance",
+      "scope": "Japan official guidance for overseas businesses",
+      "location": "https://www.ppc.go.jp/personalinfo/legal/guidelines_offshore/"
+    },
+    "D11": {
+      "title": "Korea Personal Information Protection Commission overseas guidance",
+      "scope": "Korea official regulator publication; separate territorial assessment",
+      "location": "https://pipc.go.kr/eng/user/ltn/new/noticeDetail.do?bbsId=BBSMSTR_000000000001&nttId=2488"
+    },
+    "D12": {
+      "title": "China Personal Information Protection Law",
+      "scope": "China official publication; separate national framework and transfer assessment",
+      "location": "https://www.cac.gov.cn/2021-08/20/c_1631050028355286.htm?eqid=c1b27c46000007a10000000664659814"
+    },
+    "D13": {
+      "title": "New Zealand Privacy Commissioner guidance",
+      "scope": "New Zealand official regulator guidance; scope depends on local facts",
+      "location": "https://www.privacy.org.nz/resources-and-learning/knowledge-base/view/154/"
+    },
+    "D14": {
+      "title": "ADGM Office of Data Protection",
+      "scope": "UAE financial free zone framework; not a substitute for UAE federal or DIFC rules",
+      "location": "https://www.adgm.com/operating-in-adgm/office-of-data-protection"
+    },
+    "T3": {
+      "title": "IRS Form 2553",
+      "scope": "US tax election by qualifying corporations and LLCs; legal form and election remain distinct",
+      "location": "https://www.irs.gov/forms-pubs/about-form-2553"
+    }
+  }
+}
