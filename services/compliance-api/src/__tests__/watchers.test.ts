@@ -14,6 +14,8 @@ const store = vi.hoisted(() => ({
     events: [] as Array<{ type: string; payload: any }>,
     failEngagements: false,
     failMarkers: false,
+    failProviders: false,
+    inserts: [] as string[],
     gate: null as null | Promise<void>,
 }));
 
@@ -29,11 +31,15 @@ vi.mock('../supabase.js', () => ({
                 if (store.failMarkers) throw new Error('Supabase select failed: timeout');
                 return store.events.filter((e) => e.type === match.type);
             }
-            if (table === 'providers') return [{ provider_key: 'studio', name: 'Studio', contact_email: 'p@example.com', partner_status: 'active' }];
+            if (table === 'providers') {
+                if (store.failProviders) throw new Error('Supabase select failed: 503');
+                return [{ provider_key: 'studio', name: 'Studio', contact_email: 'p@example.com', partner_status: 'active' }];
+            }
             return [];
         },
         async selectWhere() { return []; },
         async insert(table: string, data: any) {
+            store.inserts.push(table);
             if (table === 'event_log') store.events.push(data);
             return [data];
         },
@@ -82,7 +88,7 @@ const engagement = (over: Record<string, unknown> = {}) => ({
 describe('SLA-Waechter', () => {
     beforeEach(() => {
         process.env.WATCHERS_SHADOW = 'false';
-        store.engagements = []; store.events = []; store.failEngagements = false; store.failMarkers = false; store.gate = null;
+        store.engagements = []; store.events = []; store.failEngagements = false; store.failMarkers = false; store.failProviders = false; store.inserts = []; store.gate = null;
         mail.magic = 0; passes.billing = 0;
     });
     afterEach(() => { delete process.env.WATCHERS_SHADOW; });
@@ -101,6 +107,19 @@ describe('SLA-Waechter', () => {
         expect(await issueReminder('e1', { auto: false })).toBe('ok');
         expect(store.events[0].payload).toMatchObject({ engagementId: 'e1', auto: false, stage: 'manual' });
         expect((await runWatcherTick()).reminders).toBe(1);
+    });
+
+    it('scheitert das Lesen des Anbieters, steht nichts im Protokoll — der naechste Lauf versucht es wieder', async () => {
+        store.engagements = [engagement()];
+        store.failProviders = true;
+        const s = await runWatcherTick();
+        expect(s).toMatchObject({ reminders: 0 });
+        expect(s.errors).toBeGreaterThanOrEqual(1);
+        expect(store.inserts).toEqual([]);
+        expect(mail.magic).toBe(0);
+        store.failProviders = false;
+        expect((await runWatcherTick()).reminders).toBe(1);
+        expect(mail.magic).toBe(1);
     });
 
     it('Ladefehler bei den Anfragen: Fehler gezaehlt, die anderen Passes laufen weiter', async () => {

@@ -66,6 +66,10 @@ jobs:
                 echo "::warning::Der Tick meldet Fehler in einzelnen Paessen — Logs der API ansehen"
               fi
               ;;
+            202)
+              # Ein Lauf in der API laeuft noch; dieser hat nichts getan.
+              echo "::warning::Tick uebersprungen — in der API laeuft noch ein Lauf. Haelt das an, haengt er (Log ERR_WATCHER_TICK_STUCK)."
+              ;;
             401|403) echo "::error::Tick abgewiesen ($code) — STAGING_API_KEY passt nicht zum API_KEY der API, oder die Basic-Auth-Wand steht vor /api"; exit 1 ;;
             *)       echo "::error::Unerwarteter Status $code"; exit 1 ;;
           esac
@@ -103,6 +107,10 @@ jobs:
               if printf '%s' "$summary" | grep -q '"errors":[1-9]'; then
                 echo "::warning::Der Tick meldet Fehler in einzelnen Paessen — Logs der API ansehen"
               fi
+              ;;
+            202)
+              # Ein Lauf in der API laeuft noch; dieser hat nichts getan.
+              echo "::warning::Tick uebersprungen — in der API laeuft noch ein Lauf. Haelt das an, haengt er (Log ERR_WATCHER_TICK_STUCK)."
               ;;
             401|403) echo "::error::Tick abgewiesen ($code) — BETA_API_KEY passt nicht zum API_KEY der API, oder die Basic-Auth-Wand steht vor /api"; exit 1 ;;
             *)       echo "::error::Unerwarteter Status $code"; exit 1 ;;

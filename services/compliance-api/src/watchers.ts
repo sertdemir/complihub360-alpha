@@ -122,6 +122,13 @@ export async function issueReminder(
         if (!eng[0]) return "not_found";
         if (!OPEN_CONFIRM.includes(eng[0].status as typeof OPEN_CONFIRM[number])) return "invalid_state";
 
+        // Zuerst alles lesen, was der Versand braucht: der Marker unten sperrt
+        // die automatische Erinnerung fuer diese Anfrage. Scheiterte ein Lesen
+        // erst danach, stuende "gesendet" im Protokoll, ohne dass eine Mail
+        // ging — und kein Lauf versuchte es wieder.
+        const provRows = (await supabaseApi.select("providers", { provider_key: eng[0].provider_key }, { limit: 1 })) as
+            Array<{ name: string; contact_email?: string | null }>;
+
         const correlationId = crypto.randomUUID();
         const magicLinks: Record<string, string> = {};
         for (const action of ["confirm", "reply", "decline"] as const) {
@@ -153,8 +160,6 @@ export async function issueReminder(
                 : "Reminder sent — the provider received a fresh confirmation link.",
         }).catch(() => { /* thread note is best-effort */ });
 
-        const provRows = (await supabaseApi.select("providers", { provider_key: eng[0].provider_key }, { limit: 1 })) as
-            Array<{ name: string; contact_email?: string | null }>;
         await sendMagicLinkMail({
             engagementId,
             providerKey: eng[0].provider_key,
@@ -184,7 +189,10 @@ function markerType(base: string, shadow: boolean): string {
 }
 
 async function loadMarkers(base: string, shadow: boolean): Promise<Set<string>> {
-    const rows = (await supabaseApi.select("event_log", { type: markerType(base, shadow) }, { limit: 5000 })) as EventRow[];
+    // Neueste zuerst: offene Anfragen sind die juengsten, und ueber der
+    // Lesegrenze lieferte PostgREST sonst eine beliebige Teilmenge — ein
+    // fehlender Marker hiesse eine zweite Erinnerung.
+    const rows = (await supabaseApi.select("event_log", { type: markerType(base, shadow) }, { order: "timestamp.desc", limit: 5000 })) as EventRow[];
     const set = new Set<string>();
     for (const r of rows) {
         const id = r.payload?.engagementId;
@@ -203,18 +211,25 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 // den Prozess): beide laden dieselben Marker, bevor einer schreibt, und
 // verschickten jede faellige Erinnerung doppelt. Eine Lese-Abfrage ohne
 // Timeout kann einen Lauf ueber den naechsten Takt hinaus halten.
-let tickRunning = false;
+// Haengt ein Lauf ueber drei Takte, ist das kein Gedraenge mehr, sondern ein
+// Fehler: dann faellt jeder weitere Lauf aus, auch der aus dem Workflow.
+let tickStartedAt: number | null = null;
 
 export async function runWatcherTick(): Promise<TickSummary> {
-    if (tickRunning) {
-        structuredLog("warn", "Watcher tick skipped — previous tick still running", { correlationId: "watchers", errorCode: "WATCHER_TICK_BUSY", severity: "warn", route: "watchers/tick" });
+    if (tickStartedAt !== null) {
+        const runningForMs = Date.now() - tickStartedAt;
+        const stuck = runningForMs > 3 * watcherConfig.tickMs;
+        structuredLog(stuck ? "error" : "warn", "Watcher tick skipped — previous tick still running", {
+            correlationId: "watchers", errorCode: stuck ? "ERR_WATCHER_TICK_STUCK" : "WATCHER_TICK_BUSY",
+            severity: stuck ? "error" : "warn", route: "watchers/tick", runningForMs,
+        });
         return { ...emptySummary(watcherConfig.shadow), skipped: true };
     }
-    tickRunning = true;
+    tickStartedAt = Date.now();
     try {
         return await tick();
     } finally {
-        tickRunning = false;
+        tickStartedAt = null;
     }
 }
 
@@ -368,8 +383,8 @@ export async function runSlaTick(shadow: boolean, now: number = Date.now()): Pro
     let engagements: Engagement[];
     try {
         engagements = (await supabaseApi.select("engagement_requests", {}, { order: "created_at.desc", limit: 500 })) as Engagement[];
-    } catch {
-        structuredLog("error", "Watcher tick: engagement load failed", { correlationId: "watchers", errorCode: "ERR_WATCHER_LOAD", severity: "error", route: "watchers/tick" });
+    } catch (err) {
+        structuredLog("error", "Watcher tick: engagement load failed", { correlationId: "watchers", errorCode: "ERR_WATCHER_LOAD", severity: "error", route: "watchers/tick", detail: String(err).slice(0, 200) });
         summary.errors++;
         return summary;
     }
@@ -384,8 +399,8 @@ export async function runSlaTick(shadow: boolean, now: number = Date.now()): Pro
             loadMarkers("sla_breach", shadow),
             loadMarkers("engagement_expired", shadow),
         ]);
-    } catch {
-        structuredLog("error", "Watcher tick: SLA marker load failed", { correlationId: "watchers", errorCode: "ERR_WATCHER_MARKERS", severity: "error", route: "watchers/tick" });
+    } catch (err) {
+        structuredLog("error", "Watcher tick: SLA marker load failed", { correlationId: "watchers", errorCode: "ERR_WATCHER_MARKERS", severity: "error", route: "watchers/tick", detail: String(err).slice(0, 200) });
         summary.errors++;
         return summary;
     }

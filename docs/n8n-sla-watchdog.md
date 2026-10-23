@@ -74,7 +74,11 @@ billing and appointment reminders silently did not run.
 Within one process, ticks never overlap: a tick that starts while the previous
 one (scheduler or `POST /admin/watchers/tick`) is still running returns
 `skipped: true` and does nothing, because both would load the same markers before
-either writes. A rejected tick is logged (`ERR_WATCHER_TICK`), never left as an
+either writes. The admin route answers such a tick with `202` and `ok: false`
+(the hourly workflow shows a warning), and a tick held for more than three
+intervals logs `ERR_WATCHER_TICK_STUCK`. `issueReminder` reads everything it
+needs before it writes the marker, so a failed read leaves no "sent" behind
+and the next tick tries again. A rejected tick is logged (`ERR_WATCHER_TICK`), never left as an
 unhandled rejection that would end the Node process.
 
 Single-container assumption for Beta. Multi-replica safety (a Postgres advisory

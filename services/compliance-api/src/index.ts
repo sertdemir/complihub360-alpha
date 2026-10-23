@@ -3787,6 +3787,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         } else {
             try {
                 const summary = await runWatcherTick();
+                // Ein uebersprungener Lauf hat nichts getan — kein 200 mit
+                // lauter Nullen, das sah fuer den Workflow wie ein Lauf aus.
+                if (summary.skipped) {
+                    res.writeHead(202, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ ok: false, skipped: true, message: 'A watcher tick is still running — this one did nothing', correlationId }));
+                    return;
+                }
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, summary, correlationId }));
             } catch {
