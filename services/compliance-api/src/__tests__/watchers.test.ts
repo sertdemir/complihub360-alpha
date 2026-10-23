@@ -16,6 +16,8 @@ const store = vi.hoisted(() => ({
     failMarkers: false,
     failProviders: false,
     inserts: [] as string[],
+    notes: [] as string[],
+    providerEmail: 'p@example.com' as string | null,
     gate: null as null | Promise<void>,
 }));
 
@@ -33,13 +35,14 @@ vi.mock('../supabase.js', () => ({
             }
             if (table === 'providers') {
                 if (store.failProviders) throw new Error('Supabase select failed: 503');
-                return [{ provider_key: 'studio', name: 'Studio', contact_email: 'p@example.com', partner_status: 'active' }];
+                return [{ provider_key: 'studio', name: 'Studio', contact_email: store.providerEmail, partner_status: 'active' }];
             }
             return [];
         },
         async selectWhere() { return []; },
         async insert(table: string, data: any) {
             store.inserts.push(table);
+            if (table === 'engagement_messages') store.notes.push(data.body);
             if (table === 'event_log') store.events.push(data);
             return [data];
         },
@@ -53,7 +56,11 @@ vi.mock('../supabase.js', () => ({
 
 const mail = vi.hoisted(() => ({ magic: 0 }));
 vi.mock('../mailer.js', () => ({
-    sendMagicLinkMail: vi.fn(async () => { mail.magic++; }),
+    sendMagicLinkMail: vi.fn(async (m: { contactEmail: string | null }) => {
+        mail.magic++;
+        store.inserts.push('mail');
+        return m.contactEmail ? 'logged' : 'no_address';
+    }),
     sendReviewMail: vi.fn(async () => {}),
     sendMarketCoveredMail: vi.fn(async () => {}),
     sendProviderCoveredMail: vi.fn(async () => {}),
@@ -88,7 +95,7 @@ const engagement = (over: Record<string, unknown> = {}) => ({
 describe('SLA-Waechter', () => {
     beforeEach(() => {
         process.env.WATCHERS_SHADOW = 'false';
-        store.engagements = []; store.events = []; store.failEngagements = false; store.failMarkers = false; store.failProviders = false; store.inserts = []; store.gate = null;
+        store.engagements = []; store.events = []; store.failEngagements = false; store.failMarkers = false; store.failProviders = false; store.inserts = []; store.notes = []; store.providerEmail = 'p@example.com'; store.gate = null;
         mail.magic = 0; passes.billing = 0;
     });
     afterEach(() => { delete process.env.WATCHERS_SHADOW; });
@@ -120,6 +127,23 @@ describe('SLA-Waechter', () => {
         store.failProviders = false;
         expect((await runWatcherTick()).reminders).toBe(1);
         expect(mail.magic).toBe(1);
+    });
+
+    it('Notiz im Verlauf erst nach dem Versuch, und ohne Zustellungs-Behauptung', async () => {
+        store.engagements = [engagement()];
+        await runWatcherTick();
+        expect(store.inserts.indexOf('engagement_messages')).toBeGreaterThan(store.inserts.indexOf('mail'));
+        expect(store.notes).toEqual(['Automated reminder — a fresh confirmation link was issued to the provider.']);
+        expect(await issueReminder('e1', { auto: false })).toBe('ok');
+        expect(store.notes[1]).toBe('A fresh confirmation link was issued to the provider.');
+        expect(store.notes.join(' ')).not.toMatch(/received|was sent/);
+    });
+
+    it('ohne Adresse sagt die Notiz das, statt einen Versand zu melden', async () => {
+        store.engagements = [engagement()];
+        store.providerEmail = null;
+        await runWatcherTick();
+        expect(store.notes).toEqual(['No reminder could be sent — the provider has no contact address on file.']);
     });
 
     it('Ladefehler bei den Anfragen: Fehler gezaehlt, die anderen Passes laufen weiter', async () => {

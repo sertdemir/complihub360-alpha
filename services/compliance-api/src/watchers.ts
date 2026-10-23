@@ -8,7 +8,7 @@ import { runSubscriptionPeriodTick } from "./subscriptions.js";
 import { runScheduledChanges } from "./changeSchedule.js";
 import { runAppointmentReminderTick, runRebookTick } from "./attendanceWatch.js";
 import { isKnownCountry } from "@complihub/compliance-engine";
-import { sendMagicLinkMail, sendReviewMail, sendMarketCoveredMail, sendProviderCoveredMail } from "./mailer.js";
+import { sendMagicLinkMail, sendReviewMail, sendMarketCoveredMail, sendProviderCoveredMail, type MagicLinkMailOutcome } from "./mailer.js";
 import { notify } from "./notifications.js";
 import { runDisclosureAuditTick } from "./disclosure.js";
 
@@ -152,15 +152,7 @@ export async function issueReminder(
             // Eine Erinnerung von Hand zaehlt nicht als die automatische.
             payload: { engagementId, provider_key: eng[0].provider_key, auto: opts.auto, stage: opts.auto ? "confirm" : "manual" },
         });
-        await supabaseApi.insert("engagement_messages", {
-            engagement_id: engagementId,
-            author: "system",
-            body: opts.auto
-                ? "Automated reminder — a fresh confirmation link was sent to the provider before the SLA deadline."
-                : "Reminder sent — the provider received a fresh confirmation link.",
-        }).catch(() => { /* thread note is best-effort */ });
-
-        await sendMagicLinkMail({
+        const mailed = await sendMagicLinkMail({
             engagementId,
             providerKey: eng[0].provider_key,
             providerName: provRows[0]?.name || eng[0].provider_key,
@@ -171,7 +163,21 @@ export async function issueReminder(
             magicLinks,
             correlationId,
             reminder: true,
-        }).catch(() => { /* logged inside the mailer */ });
+        }).catch((): MagicLinkMailOutcome => "failed");
+
+        // Die Notiz erst nach dem Versuch, und nur, was feststeht: der Link
+        // ist ausgestellt — ob die Mail ankam, wissen wir nicht. Bis 23.10.2026
+        // stand hier vor dem Versand "the provider received", auch ohne
+        // Adresse (DNA: Unsicherheit nie hinter selbstsicherer Sprache).
+        await supabaseApi.insert("engagement_messages", {
+            engagement_id: engagementId,
+            author: "system",
+            body: mailed === "no_address"
+                ? "No reminder could be sent — the provider has no contact address on file."
+                : opts.auto
+                    ? "Automated reminder — a fresh confirmation link was issued to the provider."
+                    : "A fresh confirmation link was issued to the provider.",
+        }).catch(() => { /* thread note is best-effort */ });
 
         return "ok";
     } catch {

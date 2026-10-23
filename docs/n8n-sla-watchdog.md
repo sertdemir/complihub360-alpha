@@ -41,8 +41,12 @@ once and runs three passes:
 1. **Reminder** — open-confirm request whose `sla_confirm_deadline` is within
    `SLA_REMINDER_LEAD_HOURS` (default 4h) and not yet past. Calls `issueReminder`:
    fresh single-use magic-link tokens (24h), event `sla_reminder_sent {auto:true, stage:'confirm'}`,
-   a system note on the thread, and `sendMagicLinkMail(reminder:true)` (Resend, or
-   the `email_outbox` event when `RESEND_API_KEY` is unset). One reminder per
+   `sendMagicLinkMail(reminder:true)` (Resend, or the `email_outbox` event when
+   `RESEND_API_KEY` is unset), then a system note on the thread. The note is
+   written after the mail attempt and claims only what is known: "a fresh
+   confirmation link was issued", or "No reminder could be sent — the provider
+   has no contact address on file." (until 2026-10-23 it said "the provider
+   received" before any mail was tried). One reminder per
    engagement (stage `confirm`). A manual reminder (`POST /engagement/:id/remind`)
    writes stage `manual` and does not stand in for the automatic one.
    Until 2026-10-23 the live marker carried no `stage`, so the pass never saw
