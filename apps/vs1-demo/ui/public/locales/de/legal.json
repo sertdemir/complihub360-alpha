@@ -64,7 +64,7 @@
     "lede": "Sie testen CompliHub360 vor dem Start, auf Einladung. Diese neun Sätze sagen, was das heißt und was nicht.",
     "meta": "Fassung {{version}} · ohne anwaltliche Prüfung erstellt · Betreiberin: siehe Impressum",
     "contactHeading": "Fragen zu diesem Blatt?",
-    "contact": "Schreiben Sie uns an {{email}}. Ändern wir dieses Blatt, bitten wir Sie neu um Ihre Zustimmung.",
+    "contact": "Schreiben Sie uns an <mail>{{email}}</mail>. Ändern wir dieses Blatt, bitten wir Sie neu um Ihre Zustimmung.",
     "back": "Zurück zum Workspace",
     "loading": "Das Blatt wird geladen …",
     "error": "Das Blatt konnte gerade nicht geladen werden.",

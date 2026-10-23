@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../store/useAuthStore';
 import { fetchAgreement, type UserAgreement } from '../../api/agreements';
@@ -60,10 +60,15 @@ export function BetaAgreementPage() {
 
       <Section heading={t('beta.contactHeading')}>
         <p>
-          {t('beta.contact', { email: '' }).replace(/\s+\.\s*/, ' ')}
-        </p>
-        <p>
-          <a href={`mailto:${BETA_CONTACT_EMAIL}`} className="text-fg-brand underline">{BETA_CONTACT_EMAIL}</a>
+          {/* Die Adresse steht als Link mitten im Satz. Vorher wurde sie als
+              leerer Wert eingesetzt und ein Regex nahm den Punkt mit: „Schreiben
+              Sie uns an Ändern wir dieses Blatt …" (Befund 23.10.2026). */}
+          <Trans
+            t={t}
+            i18nKey="beta.contact"
+            values={{ email: BETA_CONTACT_EMAIL }}
+            components={{ mail: <a href={`mailto:${BETA_CONTACT_EMAIL}`} className="text-fg-brand underline" /> }}
+          />
         </p>
         {isLoggedIn && (
           <p>

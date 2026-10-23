@@ -64,7 +64,7 @@
     "lede": "CompliHub360'ı lansmandan önce davetle test ediyorsunuz. Bu dokuz cümle bunun ne anlama geldiğini ve gelmediğini söyler.",
     "meta": "Sürüm {{version}} · avukat incelemesi olmadan hazırlandı · işletmeci: künyeye bakın",
     "contactHeading": "Bu sayfa hakkında sorularınız mı var?",
-    "contact": "Bize {{email}} adresinden yazın. Bu sayfayı değiştirirsek onayınızı yeniden isteriz.",
+    "contact": "Bize <mail>{{email}}</mail> adresinden yazın. Bu sayfayı değiştirirsek onayınızı yeniden isteriz.",
     "back": "Çalışma alanınıza dön",
     "loading": "Sayfa yükleniyor …",
     "error": "Sayfa şu anda yüklenemedi.",

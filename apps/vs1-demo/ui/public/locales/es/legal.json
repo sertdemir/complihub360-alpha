@@ -64,7 +64,7 @@
     "lede": "Usted prueba CompliHub360 antes del lanzamiento, por invitación. Estas nueve frases dicen qué significa eso y qué no.",
     "meta": "Versión {{version}} · redactado sin revisión de un abogado · operadora: véase el aviso legal",
     "contactHeading": "¿Preguntas sobre esta hoja?",
-    "contact": "Escríbanos a {{email}}. Si cambiamos esta hoja, le pedimos de nuevo su conformidad.",
+    "contact": "Escríbanos a <mail>{{email}}</mail>. Si cambiamos esta hoja, le pedimos de nuevo su conformidad.",
     "back": "Volver a su espacio de trabajo",
     "loading": "Cargando la hoja …",
     "error": "La hoja no se ha podido cargar ahora mismo.",
