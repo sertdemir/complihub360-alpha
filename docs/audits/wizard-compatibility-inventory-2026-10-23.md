@@ -548,7 +548,7 @@ The founder adopted the audit's recommendations on four points:
 
 | Point | Decision |
 |---|---|
-| F1 | "Confirmed" only when a user fact supports the obligation. Category interest alone is shown as a lower state. Three states instead of two: *confirmed by your answers*, *likely*, *worth checking*. To be implemented before any new category entry points. |
+| F1 | "Confirmed" only when a user fact supports the obligation. Category interest alone is shown as a lower state. Three states instead of two: *confirmed by your answers*, *likely*, *worth checking*. To be implemented before any new category entry points. Canvas choice (same day): 1C plain-language state · 2B "Why is this here?" disclosure · 3C headline follows the evidence · 4A list grouped by state · 5B one hint plus a drawer for the open answers. |
 | F2 | Without category overlap, no match percentage. Such Providers appear only when no one else fits, in a separate, honestly labelled block. The coverage gap is shown, not filled. |
 | Plan effects | The plan cap on category breadth stays (product feature, not rank). Quality for Providers who cannot yet be booked counts as neutral in ranking. |
 | Q1 | No personal-matter route at launch. S01 offers existing business / self-employed, starting a business, and not sure. Private requests get a friendly, honest way out, not a dead end. |
