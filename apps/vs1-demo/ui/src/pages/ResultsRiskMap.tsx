@@ -20,6 +20,7 @@ import { Button } from '../components/ui/Button';
 import { Banner } from '../components/ui/Banner';
 import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSnapshot';
 import { ObligationClusters, settledByWizard, type ClusterRow } from '../components/results/ObligationClusters';
+import { OutsideFitProviders, type OutsideProvider } from '../components/results/OutsideFitProviders';
 import { AnswersDrawer } from '../components/user/AnswersDrawer';
 import { MatchBasis } from '../components/user/PartnerCard';
 import { PartnerDrawer } from '../components/user/PartnerDrawer';
@@ -302,7 +303,7 @@ export function ResultsRiskMap() {
   // `query` haelt fest, womit tatsaechlich gesucht wurde — der Umfang der
   // leeren Zustaende (welche Maerkte geprueft wurden) muss dieselbe Frage
   // beschreiben, nicht das lokale Profil, wenn eine Sitzung es ersetzt hat.
-  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
+  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; providersOutside: OutsideProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
@@ -324,8 +325,8 @@ export function ResultsRiskMap() {
     // Engine nicht gerechnet → riskMapFailed mit Referenz, nicht "keine
     // Pflichten" und auch keine Anbieter ohne die Pflichten dazu.
     const laws = lawsOf(res);
-    return { providers: res.providers, laws, coverage: res.coverage, session, query };
-  }, { providers: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
+    return { providers: res.providers, providersOutside: res.providers_outside ?? [], laws, coverage: res.coverage, session, query };
+  }, { providers: [], providersOutside: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
   // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Bis 2026-09-22
   // stand hier beim Laden und bei einem API-Fehler eine Design-Fixture mit drei
   // erfundenen Anbietern (100/87/73 %); sie haette einem Nutzer ohne einen
@@ -333,6 +334,9 @@ export function ResultsRiskMap() {
   // "echte Zahl"; DNA §4.5 "Never give false reassurance").
   const providersLive = searchSource === 'api';
   const anonProviders = providersLive ? searchData.providers : [];
+  // F2 (Wizard-Audit, 23.10.2026): kommt nur, wenn niemand einen angefragten
+  // Bereich abdeckt. Ohne Match-Prozent, getrennt unter der Luecke.
+  const outsideProviders = providersLive && anonProviders.length === 0 ? searchData.providersOutside : [];
 
   // Vier Zustaende, die bis 2026-09-22 einer waren. Vorher galt: was nicht
   // live ist, ist die Design-Fixture — beim Laden, bei einem API-Fehler und
@@ -424,6 +428,24 @@ export function ResultsRiskMap() {
     return scope && scope.areas.length ? scope.markets.map((m) => ({ market: m, areas: scope.areas })) : [];
   }, [noProviderMatch, searchData.coverage, scopeProfile]);
   const coverageRequest = useCoverageRequest(noMatchGaps, !user);
+  // Der Block nennt den Markt der Suche und die angefragten Bereiche, die
+  // keiner dieser Anbieter abdeckt. "View profile" nur mit Konto (das Profil
+  // liegt hinter dem Login); fit=outside blendet dort die Buchung aus.
+  const outsideBlock = (stacked: boolean) => outsideProviders.length > 0 && !marketUnavailable ? (
+    <OutsideFitProviders
+      providers={outsideProviders}
+      requested={(scopeProfile?.categories ?? []) as string[]}
+      market={scopeProfile?.country ?? ''}
+      stacked={stacked}
+      onViewProfile={user ? (ref) => {
+        const q = new URLSearchParams({ fit: 'outside' });
+        const need = (scopeProfile?.categories ?? []) as string[];
+        if (need.length) q.set('need', need.join(','));
+        if (sessionId) q.set('session', sessionId);
+        navigate(`/${locale}/p/${ref}?${q.toString()}`);
+      } : undefined}
+    />
+  ) : null;
   // Entscheidung c (11.10.2026), Canvas S1: "begrenzt" auch fuer Gaeste.
   const guestLimited = !user && providersLive && anonProviders.length > 0 && isLimitedCoverage(anonProviders.length, searchData.coverage);
   // Die Engine hat geantwortet — mit oder ohne Pflichten. Nur dann gibt es
@@ -615,13 +637,16 @@ export function ResultsRiskMap() {
         // lib/topMatches). Die Ueberschrift zaehlt weiter alle Treffer.
         providers={marketUnavailable ? [] : topMatches(anonProviders)}
         providersEmptyState={marketUnavailable ? <NoVerifiedProvider /> : noProviderMatch && noMatchGaps.length ? (
-          <NoProviderMatchCard
-            gaps={noMatchGaps}
-            email={user?.email ?? null}
-            status={coverageRequest.status}
-            onRequest={(notify) => coverageRequest.send(notify)}
-          />
-        ) : undefined}
+          <>
+            <NoProviderMatchCard
+              gaps={noMatchGaps}
+              email={user?.email ?? null}
+              status={coverageRequest.status}
+              onRequest={(notify) => coverageRequest.send(notify)}
+            />
+            {outsideBlock(true)}
+          </>
+        ) : outsideBlock(true) ?? undefined}
         // K3 (01.10.2026): der ungepruefte Markt steht oben in der Spalte,
         // die Anbieter fuer die geprueften Maerkte bleiben darunter.
         providersTop={partial.length > 0 || providerHead ? (
@@ -925,9 +950,16 @@ export function ResultsRiskMap() {
               noMatchGaps.length ? (
                 // P1 (Figma 3693:4040): abgenommener Zustand statt "No provider
                 // covers this area yet."
-                <NoProviderMatchGuest gaps={noMatchGaps} status={coverageRequest.status} onRequest={() => coverageRequest.send(false)} />
+                <div className="flex flex-col gap-8">
+                  <NoProviderMatchGuest gaps={noMatchGaps} status={coverageRequest.status} onRequest={() => coverageRequest.send(false)} />
+                  {/* F2 (Figma 3894:3): Anbieter ohne Passung, anfangs zu. */}
+                  {outsideBlock(false)}
+                </div>
               ) : (
-                <p className="text-body-sm text-fg-secondary">{t('partners.none')}</p>
+                <div className="flex flex-col gap-8">
+                  <p className="text-body-sm text-fg-secondary">{t('partners.none')}</p>
+                  {outsideBlock(false)}
+                </div>
               )
             ) : anonProviders.length === 1 ? (
               // B3 (Canvas 09.10.2026, Figma 3634:2931): ein Treffer im

@@ -499,5 +499,14 @@
     "message_one": "It settles {{count}} obligation whose relevance is still open. Takes a few seconds.",
     "message_other": "It settles {{count}} obligations whose relevance is still open. Takes a few seconds.",
     "cta": "Add answer"
+  },
+  "outside": {
+    "title": "Verified Providers in {{market}} for other areas",
+    "sub": "They don’t cover {{areas}}. Shown so you can see who works in this market.",
+    "notCovered": "{{areas}}: not covered",
+    "viewProfile": "View profile",
+    "profileTitle": "This provider doesn’t cover what you asked about",
+    "profileBody": "You reached this profile from providers who work in the same market but not in {{areas}}. Booking from here is not offered.",
+    "profileBodyGeneric": "You reached this profile from providers who work in the same market but not in the area you asked about. Booking from here is not offered."
   }
 }

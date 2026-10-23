@@ -457,5 +457,14 @@
     "message_one": "Damit klärt sich {{count}} Pflicht, deren Relevanz noch offen ist. Dauert wenige Sekunden.",
     "message_other": "Damit klären sich {{count}} Pflichten, deren Relevanz noch offen ist. Dauert wenige Sekunden.",
     "cta": "Angabe ergänzen"
+  },
+  "outside": {
+    "title": "Verified Provider in {{market}} für andere Bereiche",
+    "sub": "Sie decken {{areas}} nicht ab. Wir zeigen sie, damit Sie sehen, wer in diesem Markt arbeitet.",
+    "notCovered": "{{areas}}: nicht abgedeckt",
+    "viewProfile": "Profil ansehen",
+    "profileTitle": "Dieser Anbieter deckt Ihre Anfrage nicht ab",
+    "profileBody": "Sie kommen von Anbietern, die im selben Markt arbeiten, aber nicht in {{areas}}. Eine Buchung bieten wir von hier aus nicht an.",
+    "profileBodyGeneric": "Sie kommen von Anbietern, die im selben Markt arbeiten, aber nicht in dem angefragten Bereich. Eine Buchung bieten wir von hier aus nicht an."
   }
 }

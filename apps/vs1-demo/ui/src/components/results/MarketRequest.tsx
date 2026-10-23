@@ -63,7 +63,7 @@ export function useMarketRequests({ areas, asGuest }: { areas: string[]; asGuest
   return { status, send };
 }
 
-function useNames() {
+export function useNames() {
   const { t, i18n } = useTranslation(['results']);
   const locale = i18n.resolvedLanguage || 'en';
   const region = (() => {

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { act, render, screen, within, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { AnonProvider, SearchLaw } from '../api/search';
 import { ApiError } from '../api/client';
@@ -929,6 +929,57 @@ describe('ResultsRiskMap provider coverage from the coverage data', () => {
     fireEvent.click(optIn);
     fireEvent.click(screen.getByRole('button', { name: /requestThisMarket/ }));
     await waitFor(() => expect(requestMarket).toHaveBeenCalledWith(expect.objectContaining({ market: 'DE', domains: ['tax-vat'], reason: 'provider_coverage', notify: true, asGuest: false })));
+  });
+
+  // F2 (Canvas-Wahl A, Figma 3894:3): niemand deckt Tax & VAT ab, im Markt
+  // arbeiten aber Anbieter fuer andere Bereiche. Die Luecke bleibt oben,
+  // darunter ein anfangs zugeklappter Block ohne Match-Prozent.
+  const outside = (key: string, areas: string[]) => {
+    const { match: _m, match_tier: _t, ...rest } = prov(key, 0);
+    return { ...rest, area_codes: areas };
+  };
+
+  it('F2: a guest sees providers outside the request below the gap, collapsed and without a profile link', async () => {
+    setProfile({ country: 'DE', categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], providers_outside: [outside('alpha', ['data-privacy'])], coverage: noCoverage, laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    renderPage();
+
+    expect(await screen.findByText('common:states.noProviderMatch.heading')).toBeInTheDocument();
+    const block = screen.getByTestId('outside-fit');
+    const toggle = within(block).getByRole('button', { expanded: false });
+    fireEvent.click(toggle);
+    expect(within(block).getByText('Verified Provider alpha')).toBeInTheDocument();
+    expect(within(block).queryByRole('button', { name: /outside\.viewProfile/ })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('teaser-card')).not.toBeInTheDocument();
+  });
+
+  it('F2: with an account "View profile" opens the profile without booking (fit=outside)', async () => {
+    auth.isLoggedIn = true;
+    auth.user = { email: 'jm@example.com' };
+    setProfile({ country: 'DE', categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], providers_outside: [outside('alpha', ['data-privacy'])], coverage: noCoverage, laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    const Probe = () => { const l = useLocation(); return <p data-testid="probe">{l.pathname + l.search}</p>; };
+    render(
+      <MemoryRouter initialEntries={['/en/results']}>
+        <Routes>
+          <Route path="/en/results" element={<ResultsRiskMap />} />
+          <Route path="/en/p/:ref" element={<Probe />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const block = await screen.findByTestId('outside-fit');
+    fireEvent.click(within(block).getByRole('button', { expanded: false }));
+    fireEvent.click(within(block).getByRole('button', { name: /outside\.viewProfile/ }));
+    expect(await screen.findByTestId('probe')).toHaveTextContent('/en/p/alpha0000000?fit=outside&need=tax-vat');
+  });
+
+  it('F2: no block when someone fits', async () => {
+    setProfile({ country: 'DE', categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [prov('alpha', 100)], providers_outside: [], coverage: { ...noCoverage, covered: { DE: ['tax-vat'] } }, laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    renderPage();
+    expect(await screen.findByText('common:states.oneProviderMatch.heading')).toBeInTheDocument();
+    expect(screen.queryByTestId('outside-fit')).not.toBeInTheDocument();
   });
 
   it('S1: a guest with matches sees the limited-coverage matrix', async () => {

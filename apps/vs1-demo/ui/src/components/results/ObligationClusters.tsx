@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
+import { DisclosureCard } from './DisclosureCard';
 import { PRIORITY_EN, priorityOf } from '../../lib/priority';
 
 // ─── Risk Map · Pflichten nach Beleg (Wizard-Audit F1) ───────────────────────
@@ -111,58 +112,37 @@ function Row({ row }: { row: ClusterRow }) {
 
 function ClusterCard({ state, rows, defaultOpen }: { state: EvidenceState; rows: ClusterRow[]; defaultOpen: boolean }) {
   const { t } = useTranslation('results');
-  const [open, setOpen] = useState(defaultOpen);
-  const bodyId = useId();
   const now = rows.filter((r) => !r.radar);
   const radar = rows.filter((r) => r.radar);
   const sections = radar.length
     ? [{ key: 'now', label: t('groups.now', { defaultValue: 'Now' }), items: now }, { key: 'radar', label: t('groups.radar', { defaultValue: 'On the radar' }), items: radar }].filter((s) => s.items.length)
     : [{ key: 'all', label: '', items: rows }];
   return (
-    <section data-testid={`cluster-${state}`} className="overflow-hidden rounded-xl border border-stroke-subtle bg-surface">
-      <h2 className="m-0">
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={bodyId}
-          onClick={() => setOpen((v) => !v)}
-          className="flex w-full items-center gap-4 px-4 py-4 text-left transition-colors hover:bg-surface-secondary/50 lg:px-6"
-        >
-          <span className="min-w-0 flex-1">
-            <span className="flex items-center gap-2.5">
-              <span className="font-serif text-[1.25rem] font-bold leading-tight text-fg">{t(`clusters.${state}.title`)}</span>
-              <span className="rounded-full bg-brand-light px-2 py-0.5 text-body-3xs font-semibold text-fg-brand">{rows.length}</span>
-            </span>
-            <span className="mt-0.5 block text-body-2xs text-fg-secondary">{t(`clusters.${state}.sub`)}</span>
-          </span>
-          <span className="inline-flex shrink-0 items-center gap-1.5 text-body-2xs font-semibold text-fg-brand">
-            {open ? t('clusters.hide') : t('clusters.show', { count: rows.length })}
-            {open ? <ChevronUp size={16} aria-hidden /> : <ChevronDown size={16} aria-hidden />}
-          </span>
-        </button>
-      </h2>
-      {open && (
-        <div id={bodyId}>
-          <div className="hidden grid-cols-[100px_1fr_120px_110px] gap-4 border-t border-stroke-subtle bg-surface-secondary px-6 py-3 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary lg:grid">
-            <span>{t('table.priority')}</span>
-            <span>{t('table.obligation')}</span>
-            <span>{t('table.market')}</span>
-            <span>{t('table.due')}</span>
-          </div>
-          {sections.map((s) => (
-            <div key={s.key}>
-              {s.label && (
-                <div className="flex items-baseline gap-2 border-t border-stroke-subtle bg-surface-secondary/40 px-4 py-2.5 lg:px-6">
-                  <span className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-secondary">{s.label}</span>
-                  <span className="text-body-3xs text-fg-tertiary">{s.items.length}</span>
-                </div>
-              )}
-              {s.items.map((r) => <Row key={r.title} row={r} />)}
+    <DisclosureCard
+      testId={`cluster-${state}`}
+      title={t(`clusters.${state}.title`)}
+      count={rows.length}
+      sub={t(`clusters.${state}.sub`)}
+      defaultOpen={defaultOpen}
+    >
+      <div className="hidden grid-cols-[100px_1fr_120px_110px] gap-4 border-t border-stroke-subtle bg-surface-secondary px-6 py-3 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary lg:grid">
+        <span>{t('table.priority')}</span>
+        <span>{t('table.obligation')}</span>
+        <span>{t('table.market')}</span>
+        <span>{t('table.due')}</span>
+      </div>
+      {sections.map((s) => (
+        <div key={s.key}>
+          {s.label && (
+            <div className="flex items-baseline gap-2 border-t border-stroke-subtle bg-surface-secondary/40 px-4 py-2.5 lg:px-6">
+              <span className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-secondary">{s.label}</span>
+              <span className="text-body-3xs text-fg-tertiary">{s.items.length}</span>
             </div>
-          ))}
+          )}
+          {s.items.map((r) => <Row key={r.title} row={r} />)}
         </div>
-      )}
-    </section>
+      ))}
+    </DisclosureCard>
   );
 }
 

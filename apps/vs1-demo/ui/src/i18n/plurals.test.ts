@@ -115,7 +115,7 @@ const CALLS: Array<[string, string]> = [
   ['pages/ResultsRiskMap.tsx', 'header.titleConfirmed'],
   ['pages/ResultsRiskMap.tsx', 'header.titleMore'],
   ['pages/ResultsRiskMap.tsx', 'hint.message'],
-  ['components/results/ObligationClusters.tsx', 'clusters.show'],
+  ['components/results/DisclosureCard.tsx', 'clusters.show'],
   ['pages/ResultsRiskMap.tsx', 'pdf.questionsOpen'],
   ['pages/ProviderDetailPage.tsx', 'detail.lageMarketsPartial'],
   ['pages/ProviderDetailPage.tsx', 'detail.matrixCovered'],

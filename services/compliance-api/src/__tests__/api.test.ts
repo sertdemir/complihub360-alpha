@@ -643,7 +643,7 @@ describe('POST /api/v1/search', () => {
             expect(r.body).not.toHaveProperty('tutorials');
             expect(r.body).not.toHaveProperty('articles');
             expect(r.body).not.toHaveProperty('tips');
-            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'overview_summary', 'providers']);
+            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'overview_summary', 'providers', 'providers_outside']);
             // Erfolg: kein Fehlersignal, keine Referenz im Koerper.
             expect(r.body.laws_status).toBe('ok');
         } finally {
@@ -2352,6 +2352,51 @@ describe('GET /api/v1/provider/:key/billing/preview — Pricing v2', () => {
     it('is not public — guests get 401', async () => {
         const r = await api('/api/v1/provider/test-kanzlei/billing/preview', { auth: 'none' });
         expect(r.status).toBe(401);
+    });
+});
+
+describe('Wizard-Audit F2: ohne Bereichs-Ueberschneidung kein Prozentwert', () => {
+    // Vorher stand ein Anbieter, der keinen angefragten Bereich abdeckt, allein
+    // ueber den Markt bei 60 % ("moderate"). DNA §3: Match-Prozente muessen
+    // ueber sichtbare Passung erklaerbar sein.
+    const suche = (domains: string[]) => api('/api/v1/search', {
+        method: 'POST', auth: 'none',
+        body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains } }),
+    });
+
+    it('wer keinen angefragten Bereich abdeckt, steht nicht in der Liste, wenn andere passen', async () => {
+        seedProvider({ provider_key: 'steuer', areas: ['tax-vat'] });
+        seedProvider({ provider_key: 'datenschutz', areas: ['data-privacy'] });
+        const r = await suche(['tax-vat']);
+        expect(r.status).toBe(200);
+        expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('steuer')]);
+        expect(r.body.providers_outside).toEqual([]);
+    });
+
+    it('passt niemand, kommen sie getrennt und ohne match, Stufe und Preisspanne', async () => {
+        seedProvider({ provider_key: 'datenschutz', areas: ['data-privacy'] });
+        const r = await suche(['tax-vat']);
+        expect(r.status).toBe(200);
+        expect(r.body.providers).toEqual([]);
+        expect(r.body.providers_outside).toHaveLength(1);
+        const p = r.body.providers_outside[0];
+        expect(p.public_ref).toBe(refOf('datenschutz'));
+        expect(p).not.toHaveProperty('match');
+        expect(p).not.toHaveProperty('match_tier');
+        expect(p).not.toHaveProperty('price_range');
+        expect(p.match_basis.domains_matched).toEqual([]);
+        expect(p.letter).toBe('A');
+        expect(Object.keys(p).join(' ')).not.toMatch(/provider_key|pseudonym_label|contact|website/);
+        // Die Luecke bleibt sichtbar.
+        expect(r.body.coverage.covered['tax-vat'] ?? []).toEqual([]);
+    });
+
+    it('eine Teil-Ueberschneidung behaelt ihren Prozentwert', async () => {
+        seedProvider({ provider_key: 'steuer', areas: ['tax-vat'] });
+        const r = await suche(['tax-vat', 'data-privacy']);
+        expect(r.body.providers).toHaveLength(1);
+        expect(r.body.providers[0].match).toBe(80);
+        expect(r.body.providers_outside).toEqual([]);
     });
 });
 

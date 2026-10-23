@@ -3586,9 +3586,20 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     : matchable;
                 const coverage = searchCoverage(allMatchable, coverageMarkets, rawCats);
 
-                const anonProviders = eligible
-                    .map((p: any) => {
-                        const { relevance, total, countryMatch, coveredIdx, basis } = scoreOf(p);
+                // Wizard-Audit F2 (23.10.2026): Wer keinen der angefragten Bereiche
+                // freigegeben hat, bekommt keinen Prozentwert. Vorher stand so ein
+                // Anbieter allein ueber den Markt bei 60 % ("moderate") — eine
+                // Passung, die es nicht gibt. Er erscheint nur, wenn sonst niemand
+                // passt, und dann getrennt in `providers_outside`, ohne match,
+                // match_tier und Preisspanne. Die Luecke bleibt sichtbar
+                // (coverage), sie wird nicht aufgefuellt.
+                const scored = eligible.map((p: any) => ({ p, s: scoreOf(p) }));
+                const outsideFit = (s: { coveredIdx: number[] }) => rawCats.length > 0 && s.coveredIdx.length === 0;
+                const fitting = scored.filter(({ s }) => !outsideFit(s));
+                const outside = fitting.length ? [] : scored.filter(({ s }) => outsideFit(s));
+
+                const anonymize = ({ p, s }: { p: any; s: ReturnType<typeof scoreOf> }) => {
+                        const { relevance, total, countryMatch, coveredIdx, basis } = s;
                         const match = Math.round(relevance * 100);
                         return {
                             // Nur Felder der Klasse anonymous (Register §13) plus
@@ -3632,7 +3643,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             _areas: Array.from(approvedAreas.get(p.provider_key) ?? []),
                             _region: p.region ?? null,
                         };
-                    })
+                };
+                const listOf = (rows: typeof scored) => rows
+                    .map(anonymize)
                     .sort((a: any, b: any) => b._rank - a._rank)
                     // Der Buchstabe ist die Position in DIESER Liste (A, B, C …);
                     // die Beschreibung kommt aus freigegebenen Bereichen und Region.
@@ -3640,6 +3653,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         const title = publicTitle(i, _areas.map((a: string) => labels.get(a) ?? a), pub.region ?? _region);
                         return { ...pub, title: title.label, letter: title.letter, descriptor: title.descriptor, area_codes: [..._areas].sort(), descriptor_region: pub.region ?? _region };
                     });
+                const anonProviders = listOf(fitting);
+                // Ohne Passung kein Prozentwert, keine Stufe und keine Spanne fuer
+                // Leistungen, die er in den angefragten Bereichen gar nicht hat.
+                const outsideProviders = listOf(outside)
+                    .map(({ match: _m, match_tier: _t, price_range: _pr, ...rest }: any) => rest);
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
@@ -3659,6 +3677,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     laws_status: engineFailed ? 'failed' : 'ok',
                     ...(engineFailed ? { correlationId } : {}),
                     providers: anonProviders,
+                    // F2: nur gefuellt, wenn `providers` leer ist, weil niemand einen
+                    // angefragten Bereich abdeckt. Ohne match — die UI zeigt sie
+                    // getrennt und sagt, dass sie das Angefragte nicht abdecken.
+                    providers_outside: outsideProviders,
                     // Bereich × Markt: deckt ein freigegebener Anbieter das ab?
                     // Nur Booleans je Zelle — kein Anbieter, keine Anzahl.
                     coverage: coverage.public,
