@@ -8,7 +8,15 @@
     "eyebrow": "Risk Map'iniz",
     "title": "Sizin için geçerli olanlar.",
     "subtitleProfile_one": "Değerlendirmenize dayanmaktadır. Kapsamda {{count}} alan bulunuyor.",
-    "subtitleProfile_other": "Değerlendirmenize dayanmaktadır. Kapsamda {{count}} alan bulunuyor."
+    "subtitleProfile_other": "Değerlendirmenize dayanmaktadır. Kapsamda {{count}} alan bulunuyor.",
+    "titleConfirmed_one": "{{count}} yükümlülük sizin için geçerli.",
+    "titleConfirmed_other": "{{count}} yükümlülük sizin için geçerli.",
+    "titleMore_one": "{{count}} tanesine daha yakından bakmaya değer.",
+    "titleMore_other": "{{count}} tanesine daha yakından bakmaya değer.",
+    "titleNoneConfirmed": "Burada daha yakından bakmaya değer.",
+    "evidenceCounts": "{{likely}} olası, {{open}} henüz açık.",
+    "evidenceOnlyLikely": "{{count}} olası.",
+    "evidenceOnlyOpen": "{{count}} henüz açık."
   },
   "stats": {
     "0": {
@@ -51,7 +59,8 @@
     "confirmed": "Onaylandı",
     "likely": "Muhtemel",
     "answer_one": "{{total}} soruyu yanıtlayın",
-    "answer_other": "{{total}} soruyu yanıtlayın"
+    "answer_other": "{{total}} soruyu yanıtlayın",
+    "open": "Açık"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider eşleşti",
@@ -387,5 +396,66 @@
     "was": "{{title}} idi",
     "wasInRiskMap": "„{{riskMap}}“ oturumunuzda {{title}} idi"
   },
-  "dueLive": "Yürürlükte"
+  "dueLive": "Yürürlükte",
+  "clusters": {
+    "confirmed": {
+      "title": "Sizin için geçerli",
+      "sub": "Yanıtlarınızla doğrulandı"
+    },
+    "likely": {
+      "title": "Muhtemelen geçerli",
+      "sub": "Bir bilgi hâlâ belirleyici"
+    },
+    "open": {
+      "title": "Geçerli olup olmadığı açık",
+      "sub": "Kontrol etmeye değer. Yanıtlarınızda bu yükümlülüklerin geçerli olduğunu gösteren bir şey henüz yok."
+    },
+    "hide": "Gizle",
+    "show_one": "{{count}} göster",
+    "show_other": "{{count}} göster"
+  },
+  "why": {
+    "toggle": "Bu neden burada?",
+    "supports": "Destekleyen:",
+    "decides": "Hâlâ belirleyici:",
+    "onlyArea": "Bu alanı siz seçtiniz. Yanıtlarınızda bu yükümlülüğün geçerli olduğunu gösteren bir şey henüz yok.",
+    "fact": {
+      "consumer_sales": "tüketicilere satış yapıyorsunuz",
+      "business_sales": "işletmelere satış yapıyorsunuz",
+      "online_sales": "çevrimiçi satış yapıyorsunuz",
+      "physical_goods": "fiziksel ürün satıyorsunuz",
+      "eu_market": "AB pazarına satış yapıyorsunuz",
+      "electronics": "elektrikli veya elektronik ürün satıyorsunuz",
+      "batteries": "ürünleriniz pil içeriyor veya pille geliyor",
+      "health_claims": "reklamlarınız sağlık beyanı içeriyor",
+      "marketplace_operator": "bir pazar yeri işletiyorsunuz",
+      "established_in_market": "şirketiniz bu pazarda kurulu"
+    },
+    "ask": {
+      "consumer_sales": "tüketicilere satış yapıp yapmadığınız",
+      "business_sales": "işletmelere satış yapıp yapmadığınız",
+      "online_sales": "çevrimiçi satış yapıp yapmadığınız",
+      "physical_goods": "fiziksel ürün satıp satmadığınız",
+      "eu_market": "AB pazarına satış yapıp yapmadığınız",
+      "electronics": "elektrikli veya elektronik ürün satıp satmadığınız",
+      "batteries": "ürünlerinizin pil içerip içermediği",
+      "health_claims": "reklamlarınızın sağlık beyanı içerip içermediği",
+      "marketplace_operator": "bir pazar yeri işletip işletmediğiniz",
+      "established_in_market": "şirketinizin nerede kurulu olduğu",
+      "establishment": "şirketinizin nerede kurulu olduğu",
+      "packaging_role": "ürünleri kimin paketleyip gönderdiği",
+      "tracking": "web sitenizin izleme kullanıp kullanmadığı",
+      "data_location": "müşteri verilerinin nerede saklandığı",
+      "intra_eu_volume": "diğer AB ülkelerine ne kadar gönderim yaptığınız",
+      "substances": "ürünlerinizin hangi maddeleri içerdiği",
+      "contract_scope": "hangi sözleşmeleri kullandığınız",
+      "cross_border_shipping": "sınır ötesine gönderim yapıp yapmadığınız"
+    }
+  },
+  "hint": {
+    "title": "Tek bir yanıt risk haritanızı netleştirir",
+    "message_one": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
+    "message_other": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
+    "cta": "Yanıt ekle"
+  }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, Fragment } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -12,15 +12,14 @@ import { LimitedCoverageCard, OneMatchGuest, ProviderStateHead } from '../compon
 import { useApiData } from '../lib/useApiData';
 import { referenceOf } from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
-import { Lock, Check, Info, ArrowRight, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { Lock, ArrowRight, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
-import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
 import { FreeAccountDrawer } from '../components/home/MarketsDrawer';
 import type { SearchProfile } from '../components/wizard/WizardContext';
 import { Button } from '../components/ui/Button';
 import { Banner } from '../components/ui/Banner';
-import { Badge } from '../components/ui/Badge';
 import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSnapshot';
+import { ObligationClusters, settledByWizard, type ClusterRow } from '../components/results/ObligationClusters';
 import { AnswersDrawer } from '../components/user/AnswersDrawer';
 import { MatchBasis } from '../components/user/PartnerCard';
 import { PartnerDrawer } from '../components/user/PartnerDrawer';
@@ -52,7 +51,6 @@ import {
   useCoverageRequest,
   useMarketRequests,
 } from '../components/results/MarketRequest';
-import { PRIORITY_EN, priorityOf } from '../lib/priority';
 import { topMatches } from '../lib/topMatches';
 
 /** J3: ab hier gilt das Laden als "laenger als erwartet" (Entscheidung 2026-10-09). */
@@ -67,6 +65,8 @@ type Severity = 'critical' | 'high' | 'medium' | 'low';
 type State =
   | { kind: 'confirmed' }
   | { kind: 'likely' }
+  // Wizard-Audit F1: nichts in den Antworten zeigt bisher, dass die Pflicht greift.
+  | { kind: 'open' }
   | { kind: 'answer'; count: number };
 
 type Obligation = {
@@ -102,6 +102,9 @@ type Obligation = {
   /** Die Bussgeld-Zeile allein. Mobil steht sie unter der Quelle (Canvas
    *  N1); `detail` bleibt fuer das PDF die zusammengesetzte Zeile. */
   penalty?: string;
+  /** Was die Stufe traegt und was noch entscheidet (Engine evidence, F1). */
+  supports?: string[];
+  decides?: string[];
 };
 
 /** Whole days from today until an ISO date, or null once the date has passed
@@ -183,7 +186,11 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
       : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
       : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? t('dueLive', { defaultValue: 'Live' }) : '',
     dueDays: l.due_days ?? undefined,
-    state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
+    // Seit F1 (23.10.2026) beruht die Stufe auf den Antworten. Aeltere
+    // Antworten ohne 'open' kennen nur confirmed/likely.
+    state: { kind: l.state === 'confirmed' ? 'confirmed' : l.state === 'open' ? 'open' : 'likely' },
+    supports: l.evidence?.supports ?? [],
+    decides: l.evidence?.decides ?? [],
     // Same horizon as the stats: a duty landing in days is "now" even
     // though it has not started; one landing in 2030 is not.
     radar: daysUntil(l.applies_from) != null && withinHorizon(l.applies_from) == null,
@@ -228,6 +235,7 @@ export function pdfObligations(rows: Obligation[], t: RiskT): PdfObligation[] {
     stateLabel:
       o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
       : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
+      : o.state.kind === 'open' ? t('state.open', { defaultValue: 'Open' })
       : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count, count: o.state.count }),
   }));
 }
@@ -247,35 +255,6 @@ function GuestExpiryNote() {
     <p data-testid="guest-expiry-mobile" className="mt-3 inline-flex items-center gap-1.5 text-body-xs text-fg-secondary lg:hidden">
       <Lock size={13} aria-hidden /> {t('topbar.guestBadge')}
     </p>
-  );
-}
-
-function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) {
-  const { t } = useTranslation('results');
-  if (state.kind === 'confirmed') {
-    return (
-      <Badge shape="pill" tone="brand" appearance="soft" size="lg" >
-        <Check size={13} strokeWidth={3} /> {t('state.confirmed')}
-      </Badge>
-    );
-  }
-  if (state.kind === 'likely') {
-    return (
-      <Badge shape="pill" tone="neutral" appearance="outline" size="lg" className="font-medium">
-        <Info size={13} /> {t('state.likely')}
-      </Badge>
-    );
-  }
-  return (
-    <Button
-      size="sm"
-      shape="soft"
-      type="button"
-      onClick={onAnswer}
-      className="transition-transform duration-200 hover:-translate-y-0.5"
-    >
-      {t('state.answer', { total: state.count, count: state.count })} <ArrowRight size={14} />
-    </Button>
   );
 }
 
@@ -451,20 +430,24 @@ export function ResultsRiskMap() {
   // eine Map, die man speichern kann, und eine Aussage "what applies to you".
   const hasResult = pageState === 'live' || pageState === 'none';
   const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale) : [];
+  // F1: Stufe je Pflicht aus den Antworten. Aeltere Zustaende ('answer')
+  // zaehlen als offen — sie sind ebenfalls noch keine Aussage.
+  const evidenceOf = (o: Obligation): 'confirmed' | 'likely' | 'open' =>
+    o.state.kind === 'confirmed' ? 'confirmed' : o.state.kind === 'likely' ? 'likely' : 'open';
+  const clusterRows: ClusterRow[] = rows.map((o) => ({
+    title: o.title, severity: o.severity, market: o.market, due: o.due, dueSub: o.dueSub,
+    sourceLabel: o.sourceLabel, sourceUrl: o.sourceUrl, law: o.law, noSource: o.noSource, penalty: o.penalty,
+    radar: o.radar, evidence: evidenceOf(o), supports: o.supports ?? [], decides: o.decides ?? [],
+  }));
+  const evidenceCounts = {
+    confirmed: clusterRows.filter((r) => r.evidence === 'confirmed').length,
+    likely: clusterRows.filter((r) => r.evidence === 'likely').length,
+    open: clusterRows.filter((r) => r.evidence === 'open').length,
+  };
+  const settles = settledByWizard(clusterRows);
 
-  // Two groups, not two tables: "Now" is what the user is accountable for
-  // today, "On the radar" is adopted law that only bites later. filter() is
-  // stable, so order inside each group holds.
+  // Reihenfolge der Engine; Gruppierung nach Beleg macht ObligationClusters.
   const indexed = rows.map((o, i) => ({ o, i }));
-  const nowRows = indexed.filter((x) => !x.o.radar);
-  const radarRows = indexed.filter((x) => x.o.radar);
-  // Headers appear only when there is something to separate; with no staged
-  // obligations the table renders exactly as it did before.
-  const grouped = radarRows.length
-    ? [{ key: 'now', label: t('groups.now', { defaultValue: 'Now' }), items: nowRows },
-       { key: 'radar', label: t('groups.radar', { defaultValue: 'On the radar' }), items: radarRows }]
-        .filter((g) => g.items.length)
-    : [{ key: 'now', label: '', items: indexed }];
 
   // Stat strip mirrors the table: count, near-term deadlines, median
   // days-to-deadline, matched partners. Fixture values until the API answers.
@@ -581,7 +564,9 @@ export function ResultsRiskMap() {
     due: o.due,
     dueSub: o.dueSub,
     dueDays: o.dueDays,
-    state: o.state,
+    // Die Sitzungsansicht fuehrt Ungeklaertes schon als eigene Gruppe
+    // ("Erst zu klaeren"); eine offene Pflicht gehoert genau dorthin.
+    state: o.state.kind === 'open' ? { kind: 'answer', count: Math.max(1, o.decides?.length ?? 0) } : o.state,
     sourceLabel: o.sourceLabel,
     sourceUrl: o.sourceUrl,
     sourceText: o.sourceUrl ? undefined : o.law,
@@ -612,10 +597,10 @@ export function ResultsRiskMap() {
     ) : <ProviderStateHead count={shownProviders.length} />;
 
   if (isLoggedIn) {
-    const notAnswer = (o: Obligation) => o.state.kind !== 'answer';
+    const notAnswer = (o: Obligation) => o.state.kind !== 'answer' && o.state.kind !== 'open';
     const critical = rows.filter((o) => notAnswer(o) && o.severity === 'critical').length;
     const high = rows.filter((o) => notAnswer(o) && o.severity === 'high').length;
-    const open = rows.filter((o) => o.state.kind === 'answer').length;
+    const open = rows.filter((o) => o.state.kind === 'answer' || o.state.kind === 'open').length;
     const session = searchData.session;
     // Der Untertitel nennt nur, was wirklich bekannt ist: Markt und Bereiche.
     // Eine Versionsnummer stuende hier gern — die API fuehrt keine.
@@ -842,8 +827,13 @@ export function ResultsRiskMap() {
         {/* Header */}
         <div className="mx-auto mt-14 max-w-3xl text-center">
           <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-brand">{t('header.eyebrow')}</span>
+          {/* 3C: die Ueberschrift sagt nur, was die Antworten tragen. */}
           <h1 className="mt-3 font-serif text-[2.75rem] font-bold leading-[1.05] tracking-tight text-fg sm:text-[3.25rem]">
-            {t('header.title')}
+            {evidenceCounts.confirmed > 0
+              ? [t('header.titleConfirmed', { count: evidenceCounts.confirmed }),
+                 evidenceCounts.likely + evidenceCounts.open > 0 ? t('header.titleMore', { count: evidenceCounts.likely + evidenceCounts.open }) : null]
+                  .filter(Boolean).join(' ')
+              : t('header.titleNoneConfirmed')}
           </h1>
           {/* Nur mit Profil. Der fruehere Standard-Untertitel beschrieb ein
               erfundenes Unternehmen ("Germany · United Kingdom · Netherlands.
@@ -856,15 +846,26 @@ export function ResultsRiskMap() {
               {t('header.subtitleProfile', { count: profile.categories?.length ?? 0 })}
             </p>
           )}
+          {rows.length > 0 && evidenceCounts.likely + evidenceCounts.open > 0 && (
+            <p className="mt-1 text-body-md leading-relaxed text-fg-secondary">
+              {evidenceCounts.likely && evidenceCounts.open
+                ? t('header.evidenceCounts', { likely: evidenceCounts.likely, open: evidenceCounts.open })
+                : evidenceCounts.likely
+                  ? t('header.evidenceOnlyLikely', { count: evidenceCounts.likely })
+                  : t('header.evidenceOnlyOpen', { count: evidenceCounts.open })}
+            </p>
+          )}
           <GuestExpiryNote />
         </div>
 
         {/* Stat strip — nur, wenn die Engine geantwortet hat */}
         {stats && (
           <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-between gap-y-4 rounded-xl border border-stroke-subtle bg-surface px-8 py-6 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.3)]">
-            {stats.map((s, i) => (
+            {/* F1: die Gesamtzahl steht nicht mehr hier — die Ueberschrift
+                nennt, was feststeht, und die Cards zaehlen je Stufe. */}
+            {stats.map((s, i) => i === 0 ? null : (
               <div key={s.label} className="flex items-center">
-                {i > 0 && <span className="mr-8 hidden h-8 w-px bg-stroke-subtle sm:block" />}
+                {i > 1 && <span className="mr-8 hidden h-8 w-px bg-stroke-subtle sm:block" />}
                 <span className="text-[1.5rem] font-bold text-fg">
                   {s.days != null ? t('days', { count: s.days }) : s.value || t('ongoing')}
                 </span>
@@ -884,78 +885,31 @@ export function ResultsRiskMap() {
           </div>
         )}
 
-        {/* Obligations — ab lg die Tabelle, darunter je Pflicht eine Karte
-            (Canvas L1 · M1 · N1, Figma 3574:17253, abgenommen 04.10.2026).
-            Dieselben Knoten fuer beide: bis lg legt ein Zwei-Spalten-Grid
-            Prioritaet und Status nach oben, Titel und Quelle in die Mitte,
-            Markt und Frist nach unten; ab lg ordnet die Fuenf-Spalten-Zeile
-            sie in DOM-Reihenfolge. So steht jede Pflicht genau einmal im
-            Baum. Vorher galt das feste Fuenf-Spalten-Grid auf jeder Breite
-            und brach Titel auf 390 px fast Buchstabe fuer Buchstabe um. Die
-            Grenze ist lg, nicht md: auf 768 px bleiben der Pflicht-Spalte
-            rund 100 px, die Titel brachen dort genauso. */}
-          <div className={`${partial.length > 0 ? 'mt-5' : 'mt-12'} flex flex-col gap-3 lg:block lg:overflow-hidden lg:rounded-xl lg:border lg:border-stroke-subtle`}>
-            <div className="hidden grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary lg:grid">
-              <span>{t('table.priority')}</span>
-              <span>{t('table.obligation')}</span>
-              <span>{t('table.market')}</span>
-              <span>{t('table.due')}</span>
-              <span className="text-right">{t('table.state')}</span>
+        {/* 5B (Canvas 23.10.2026): ein ruhiger Hinweis, nur wenn eine Antwort
+            im heutigen Wizard wirklich etwas klaert. Fragen, die der Wizard
+            noch nicht stellt, verspricht er nicht. */}
+        {settles > 0 && (
+          <div className="mt-10 flex flex-col gap-4 rounded-md bg-brand-light px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-body-md font-semibold text-fg">{t('hint.title')}</p>
+              <p className="mt-0.5 text-body-sm text-fg-secondary">{t('hint.message', { count: settles })}</p>
             </div>
-            {grouped.map((g) => (
-              <Fragment key={g.key}>
-                {g.label && (
-                  <div className="flex items-baseline gap-2 pt-1 lg:border-b lg:border-stroke-subtle lg:bg-surface-secondary/40 lg:px-6 lg:py-2.5">
-                    <span className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-secondary">{g.label}</span>
-                    <span className="text-body-3xs text-fg-tertiary">{g.items.length}</span>
-                  </div>
-                )}
-                {g.items.map(({ o }) => (
-              <div
-                key={o.title}
-                data-testid="obligation-row"
-                className="grid grid-cols-[minmax(0,1fr)_auto] gap-y-2.5 rounded-xl border border-stroke-subtle bg-surface p-4 lg:grid-cols-[100px_1fr_120px_110px_160px] lg:items-center lg:gap-4 lg:rounded-none lg:border-0 lg:border-b lg:px-6 lg:py-5 lg:transition-colors lg:last:border-b-0 lg:hover:bg-surface-secondary/50"
-              >
-                <span className="col-start-1 row-start-1 self-center lg:col-start-auto lg:row-start-auto">
-                  <RiskBadge level={o.severity as RiskLevel} styleVariant="soft" size="sm">
-                    {t(`priority.${priorityOf(o.severity)}`, { defaultValue: PRIORITY_EN[priorityOf(o.severity)] })}
-                  </RiskBadge>
-                </span>
-                <span className="col-span-2 row-start-2 min-w-0 lg:col-span-1 lg:row-start-auto">
-                  <span className="block text-body-md font-bold text-fg">{o.title}</span>
-                  {/* Source leads, penalty follows in a muted tone (Brand Map
-                      §11: penalties are facts worth showing, but must not be the
-                      first thing the eye lands on). Bis lg je eine Zeile (N1). */}
-                  <span className="mt-1 block text-body-2xs leading-relaxed text-fg-brand lg:mt-0.5">
-                    {o.sourceUrl ? (
-                      <a
-                        href={o.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="underline decoration-dotted underline-offset-2 hover:decoration-solid"
-                        title={t('sourceLinkTitle', { defaultValue: 'Open the official text on EUR-Lex' })}
-                      >
-                        {o.sourceLabel} ↗
-                      </a>
-                    ) : o.noSource ? <span className="italic text-fg-tertiary">{o.law}</span> : o.law}
-                    {(o.sourceUrl || o.law) && o.penalty && <span className="hidden lg:inline"> · </span>}
-                    {o.penalty && <span className="mt-0.5 block text-fg-tertiary lg:mt-0 lg:inline">{o.penalty}</span>}
-                  </span>
-                </span>
-                <span className="col-start-1 row-start-3 border-t border-stroke-subtle pt-2.5 text-body-sm text-fg-secondary lg:col-start-auto lg:row-start-auto lg:border-0 lg:pt-0">{o.market}</span>
-                <span className="col-start-2 row-start-3 border-t border-stroke-subtle pt-2.5 text-right lg:col-start-auto lg:row-start-auto lg:border-0 lg:pt-0 lg:text-left">
-                  <span className="text-body-sm font-semibold text-fg lg:block">{o.due}</span>
-                  {o.dueSub && <span className="ml-1.5 text-body-2xs text-fg-tertiary lg:ml-0 lg:block">{o.dueSub}</span>}
-                </span>
-                <span className="col-start-2 row-start-1 flex justify-end lg:col-start-auto lg:row-start-auto">
-                  <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />
-                </span>
-              </div>
-                ))}
-              </Fragment>
-            ))}
+            <Button
+              size="md"
+              className="shrink-0"
+              onClick={() => (canReviewAnswers ? setAnswersOpen(true) : navigate(`/${locale}/wizard?refine=1`))}
+            >
+              {t('hint.cta')}
+            </Button>
           </div>
+        )}
+
+        {/* 4A · 1C · 2B (Canvas 23.10.2026, Figma 3881:6782): die Pflichten
+            nach Beleg in drei auf- und zuklappbaren Cards. Die Stufe steht im
+            Kartenkopf, nicht mehr als Spalte. */}
+        <div className={`${partial.length > 0 || settles > 0 ? 'mt-5' : 'mt-12'}`}>
+          <ObligationClusters rows={clusterRows} />
+        </div>
 
         {/* Partners matched — echte Treffer der Engine, sonst nichts.
             Die Karten bleiben gesperrt (Identitaet erst nach Registrierung),

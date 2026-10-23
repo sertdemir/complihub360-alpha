@@ -8,7 +8,15 @@
     "eyebrow": "Ihre Risk Map",
     "title": "Das gilt für Sie.",
     "subtitleProfile_one": "Basierend auf Ihrer Einschätzung. {{count}} Bereich im Fokus.",
-    "subtitleProfile_other": "Basierend auf Ihrer Einschätzung. {{count}} Bereiche im Fokus."
+    "subtitleProfile_other": "Basierend auf Ihrer Einschätzung. {{count}} Bereiche im Fokus.",
+    "titleConfirmed_one": "{{count}} Pflicht gilt für Sie.",
+    "titleConfirmed_other": "{{count}} Pflichten gelten für Sie.",
+    "titleMore_one": "{{count}} weitere lohnt einen genauen Blick.",
+    "titleMore_other": "{{count}} weitere lohnen einen genauen Blick.",
+    "titleNoneConfirmed": "Hier lohnt sich ein genauer Blick.",
+    "evidenceCounts": "{{likely}} wahrscheinlich, {{open}} noch offen.",
+    "evidenceOnlyLikely": "{{count}} wahrscheinlich.",
+    "evidenceOnlyOpen": "{{count}} noch offen."
   },
   "stats": {
     "0": {
@@ -51,7 +59,8 @@
     "confirmed": "Bestätigt",
     "likely": "Wahrscheinlich",
     "answer_one": "{{total}} Frage beantworten",
-    "answer_other": "{{total}} Fragen beantworten"
+    "answer_other": "{{total}} Fragen beantworten",
+    "open": "Offen"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider gefunden",
@@ -387,5 +396,66 @@
     "was": "war {{title}}",
     "wasInRiskMap": "war {{title}} in Ihrer Sitzung „{{riskMap}}“"
   },
-  "dueLive": "Gilt jetzt"
+  "dueLive": "Gilt jetzt",
+  "clusters": {
+    "confirmed": {
+      "title": "Gilt für Sie",
+      "sub": "Durch Ihre Angaben bestätigt"
+    },
+    "likely": {
+      "title": "Gilt wahrscheinlich",
+      "sub": "Eine Angabe entscheidet noch"
+    },
+    "open": {
+      "title": "Ob es gilt, ist offen",
+      "sub": "Prüfen lohnt sich. Noch zeigt nichts in Ihren Angaben, dass diese Pflichten greifen."
+    },
+    "hide": "Ausblenden",
+    "show_one": "{{count}} zeigen",
+    "show_other": "{{count}} zeigen"
+  },
+  "why": {
+    "toggle": "Warum steht das hier?",
+    "supports": "Spricht dafür:",
+    "decides": "Entscheidet noch:",
+    "onlyArea": "Sie haben diesen Bereich gewählt. Noch zeigt nichts in Ihren Angaben, dass diese Pflicht greift.",
+    "fact": {
+      "consumer_sales": "Sie verkaufen an Verbraucher",
+      "business_sales": "Sie verkaufen an Unternehmen",
+      "online_sales": "Sie verkaufen online",
+      "physical_goods": "Sie verkaufen physische Waren",
+      "eu_market": "Sie verkaufen in die EU",
+      "electronics": "Sie verkaufen Elektro- oder Elektronikgeräte",
+      "batteries": "Ihre Produkte enthalten Batterien oder werden mit Batterien geliefert",
+      "health_claims": "Ihre Werbung macht Gesundheitsaussagen",
+      "marketplace_operator": "Sie betreiben einen Marktplatz",
+      "established_in_market": "Ihr Unternehmen sitzt in diesem Markt"
+    },
+    "ask": {
+      "consumer_sales": "ob Sie an Verbraucher verkaufen",
+      "business_sales": "ob Sie an Unternehmen verkaufen",
+      "online_sales": "ob Sie online verkaufen",
+      "physical_goods": "ob Sie physische Waren verkaufen",
+      "eu_market": "ob Sie in die EU verkaufen",
+      "electronics": "ob Sie Elektro- oder Elektronikgeräte verkaufen",
+      "batteries": "ob Ihre Produkte Batterien enthalten",
+      "health_claims": "ob Ihre Werbung Gesundheitsaussagen macht",
+      "marketplace_operator": "ob Sie einen Marktplatz betreiben",
+      "established_in_market": "wo Ihr Unternehmen sitzt",
+      "establishment": "wo Ihr Unternehmen sitzt",
+      "packaging_role": "wer die Ware verpackt und versendet",
+      "tracking": "ob Ihre Website Tracking nutzt",
+      "data_location": "wo Kundendaten gespeichert werden",
+      "intra_eu_volume": "wie viel Sie in andere EU-Länder liefern",
+      "substances": "welche Stoffe Ihre Produkte enthalten",
+      "contract_scope": "welche Verträge Sie nutzen",
+      "cross_border_shipping": "ob Sie über Grenzen versenden"
+    }
+  },
+  "hint": {
+    "title": "Eine Angabe macht Ihre Risk Map genauer",
+    "message_one": "Damit klärt sich {{count}} Pflicht, deren Relevanz noch offen ist. Dauert wenige Sekunden.",
+    "message_other": "Damit klären sich {{count}} Pflichten, deren Relevanz noch offen ist. Dauert wenige Sekunden.",
+    "cta": "Angabe ergänzen"
+  }
 }

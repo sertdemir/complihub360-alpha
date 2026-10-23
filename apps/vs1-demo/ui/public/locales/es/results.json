@@ -8,7 +8,15 @@
     "eyebrow": "Su Risk Map",
     "title": "Esto es lo que le aplica.",
     "subtitleProfile_one": "Basado en su evaluación. {{count}} ámbito en alcance.",
-    "subtitleProfile_other": "Basado en su evaluación. {{count}} ámbitos en alcance."
+    "subtitleProfile_other": "Basado en su evaluación. {{count}} ámbitos en alcance.",
+    "titleConfirmed_one": "{{count}} obligación le aplica.",
+    "titleConfirmed_other": "{{count}} obligaciones le aplican.",
+    "titleMore_one": "{{count}} más merece una revisión detallada.",
+    "titleMore_other": "{{count}} más merecen una revisión detallada.",
+    "titleNoneConfirmed": "Esto merece una revisión detallada.",
+    "evidenceCounts": "{{likely}} probables, {{open}} aún abiertas.",
+    "evidenceOnlyLikely": "{{count}} probables.",
+    "evidenceOnlyOpen": "{{count}} aún abiertas."
   },
   "stats": {
     "0": {
@@ -51,7 +59,8 @@
     "confirmed": "Confirmada",
     "likely": "Probable",
     "answer_one": "Responder {{total}} pregunta",
-    "answer_other": "Responder {{total}} preguntas"
+    "answer_other": "Responder {{total}} preguntas",
+    "open": "Abierta"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider encontrado",
@@ -387,5 +396,66 @@
     "was": "era {{title}}",
     "wasInRiskMap": "era {{title}} en su sesión «{{riskMap}}»"
   },
-  "dueLive": "Vigente"
+  "dueLive": "Vigente",
+  "clusters": {
+    "confirmed": {
+      "title": "Le aplica",
+      "sub": "Confirmado por sus respuestas"
+    },
+    "likely": {
+      "title": "Probablemente le aplica",
+      "sub": "Un dato aún lo decide"
+    },
+    "open": {
+      "title": "Aún no se sabe si aplica",
+      "sub": "Merece la pena revisarlo. Nada en sus respuestas indica todavía que estas obligaciones apliquen."
+    },
+    "hide": "Ocultar",
+    "show_one": "Mostrar {{count}}",
+    "show_other": "Mostrar {{count}}"
+  },
+  "why": {
+    "toggle": "¿Por qué aparece esto?",
+    "supports": "Lo respalda:",
+    "decides": "Aún decide:",
+    "onlyArea": "Ha elegido esta área. Nada en sus respuestas indica todavía que esta obligación aplique.",
+    "fact": {
+      "consumer_sales": "vende a consumidores",
+      "business_sales": "vende a empresas",
+      "online_sales": "vende en línea",
+      "physical_goods": "vende productos físicos",
+      "eu_market": "vende en la UE",
+      "electronics": "vende aparatos eléctricos o electrónicos",
+      "batteries": "sus productos contienen o incluyen baterías",
+      "health_claims": "su publicidad hace declaraciones de salud",
+      "marketplace_operator": "opera un marketplace",
+      "established_in_market": "su empresa está establecida en este mercado"
+    },
+    "ask": {
+      "consumer_sales": "si vende a consumidores",
+      "business_sales": "si vende a empresas",
+      "online_sales": "si vende en línea",
+      "physical_goods": "si vende productos físicos",
+      "eu_market": "si vende en la UE",
+      "electronics": "si vende aparatos eléctricos o electrónicos",
+      "batteries": "si sus productos contienen baterías",
+      "health_claims": "si su publicidad hace declaraciones de salud",
+      "marketplace_operator": "si opera un marketplace",
+      "established_in_market": "dónde está establecida su empresa",
+      "establishment": "dónde está establecida su empresa",
+      "packaging_role": "quién embala y envía los productos",
+      "tracking": "si su sitio web usa seguimiento",
+      "data_location": "dónde se almacenan los datos de clientes",
+      "intra_eu_volume": "cuánto envía a otros países de la UE",
+      "substances": "qué sustancias contienen sus productos",
+      "contract_scope": "qué contratos utiliza",
+      "cross_border_shipping": "si envía a otros países"
+    }
+  },
+  "hint": {
+    "title": "Una respuesta hace su mapa de riesgos más preciso",
+    "message_one": "Aclara {{count}} obligación cuya relevancia aún está abierta. Solo unos segundos.",
+    "message_other": "Aclara {{count}} obligaciones cuya relevancia aún está abierta. Solo unos segundos.",
+    "cta": "Añadir respuesta"
+  }
 }
