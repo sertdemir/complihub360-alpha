@@ -77,7 +77,7 @@ export function leakReply(question: string): string {
 // hinter der Frage befolgt ein kleines Modell zuverlässiger als im System-Prompt.
 // Erkennung bleibt deterministisch (Wortlisten, kein Modell).
 const LANG_NAME: Record<ReplyLang, string> = { de: 'German', en: 'English', es: 'Spanish', tr: 'Turkish' };
-const WORRIED = /\b(angst|sorge|sorgen|besorgt|panik|mahnung|afraid|scared|worried|anxious|panic|miedo|preocupad[oa]|asustad[oa]|korku|korkuyorum|endişe)/i;
+const WORRIED = /(?:\b(?:angst|sorge|sorgen|besorgt|beunruhigt|nervös|panik|mahnung|afraid|scared|worr(?:y|ied|ying)|concerned|nervous|anxious|panic|miedo|preocupad[oa]|asustad[oa]|nervios[oa]|angustia|korku|korkuyorum|endişe)|ängst)/i;
 const ASKS_CONSEQUENCES = /\b(strafe|strafen|bußgeld|säumnis|was passiert|konsequenz|penalt|fine[sd]?\b|what happens|consequence|multa|sanci|recargo|qué (me )?pasa|ceza|ne olur)/i;
 
 /** Sprache nur, wenn die Stoppwörter eindeutig sind; sonst null. */
@@ -113,16 +113,27 @@ export function answerCheck(question: string): string {
 // kam eine Liste aus drei Strafen samt "können folgende Konsequenzen drohen".
 // Der Wächter greift deshalb auch bei Drohwörtern und Strafenlisten.
 const URGENCY = /(so schnell wie möglich|schnellstmöglich|unverzüglich|umgehend|sofort|as soon as possible|immediately|right away|without delay|urgently|lo antes posible|cuanto antes|inmediatamente|de inmediato|en kısa sürede|hemen|derhal|acilen)/i;
-const THREAT = /(drohen|droht|drohende|threaten\w*|you (?:could|will|may) face|amenaza\w*|tehdit)/i;
-const PENALTY = /(strafe|bußgeld|geldbuße|sanktion|säumniszuschlag|haftung|penalt|\bfines?\b|multa|sanci[oó]n|recargo|ceza)/i;
+const THREAT = /(drohen|droht|drohende|threaten\w*|\byou (?:\w+ )?face\b|riskier\w*|mit [^.\n]{0,40}rechnen|amenaza\w*|se expone\w*|enfrentar\w*|tehdit)/i;
+const PENALTY = /(strafe|bußgeld|geldbuße|sanktion|zuschlag|haftung|penalt|\bfines?\b|multa|sanci[oó]n|recargo|ceza)/i;
+// Listenpunkte: "-", "•", "*", Gedankenstriche, "1." / "1)" — auch mehrere in einer Zeile.
+const LIST_MARK = /(?:^|\s)(?:[-•*–—]|\d+[.)])\s+/;
+
+function penaltyItems(answer: string): number {
+    return answer.split('\n').reduce((n, line) => n + line.split(LIST_MARK).slice(1).filter((seg) => PENALTY.test(seg)).length, 0);
+}
+
+/** Sorge im Gespräch? `text` = Frage plus frühere Nutzer-Turns. */
+export function isWorried(text: string): boolean {
+    return WORRIED.test(text);
+}
 
 /** Druck in einer Antwort an einen besorgten Nutzer? Liefert den Auslöser oder null. */
-export function pressureInWorriedReply(question: string, answer: string): string | null {
-    if (!WORRIED.test(question)) return null;
+export function pressureInWorriedReply(worryText: string, answer: string): string | null {
+    if (!isWorried(worryText)) return null;
     const word = answer.match(URGENCY)?.[0] ?? answer.match(THREAT)?.[0];
     if (word) return word;
-    const penaltyLines = answer.split('\n').filter((l) => /^\s*[-•]/.test(l) && PENALTY.test(l)).length;
-    return penaltyLines >= 2 ? `penalty list (${penaltyLines})` : null;
+    const items = penaltyItems(answer);
+    return items >= 2 ? `penalty list (${items})` : null;
 }
 
 export const CALM_REWRITE = `CALM REWRITE (follow it, never mention it): your previous draft put pressure on a worried user (urgency words, threats or a list of penalties). Write the answer again: one calm sentence acknowledging the worry, then what applies and what the next step is, consequences in at most one factual sentence and never as a list. Do not use urgency words or phrases such as "as soon as possible", "immediately", "so schnell wie möglich", "unverzüglich", "sofort", and do not use "drohen" or "threaten".`;
@@ -130,32 +141,47 @@ export const CALM_REWRITE = `CALM REWRITE (follow it, never mention it): your pr
 // Staging-Runde (2026-10-23): Zur Kleinunternehmerregelung nannte Mistral
 // 22.000 €/50.000 € — den Stand vor 2025, aus dem Trainingswissen; der Kontext
 // sagt dazu nichts. Jeder Betrag ab 1.000 und jeder Prozentsatz der Antwort
-// muss deshalb im Kontext (oder in der Frage) stehen. Deterministisch.
-const AMOUNT = /(?<![\d.,])(?:\d{1,3}(?:[.,\u00a0\u202f]\d{3}(?!\d))+(?:[.,]\d{1,2}(?!\d))?|\d{4,})/g;
-const PERCENT = /(\d+(?:[.,]\d+)?)\s?%/g;
-const NUMBER = /\d+(?:[.,]\d+)*/g;
+// muss deshalb im Kontext oder in einer Nutzer-Nachricht stehen — Beträge
+// gegen Beträge, Prozente gegen Prozente. Deterministisch.
+// Grenze: Ein Auszug aus einem anderen Land belegt dieselbe Zahl mit.
+const AMOUNT = /(?<![\p{L}\d.,/])(?:\d{1,3}(?:[.,\u00a0\u202f ]\d{3}(?!\d))+(?:[.,]\d{1,2}(?!\d))?|\d{4,})(?![\d/])/gu;
+const SCALED = /(?<![\p{L}\d.,/])(\d+(?:[.,]\d+)?)\s?(k|tsd\.?|tausend|mio\.?|million(?:en|s)?|millones|milyon)(?!\p{L})/giu;
+const PERCENT = /(?<![\p{L}\d.,/])(\d+(?:[.,]\d+)?)\s?(?:%|prozent|percent|per cent|por ciento|pour cent)|%\s?(\d+(?:[.,]\d+)?)|yüzde\s?(\d+(?:[.,]\d+)?)/giu;
 
 function amountKey(token: string): string {
     return token.replace(/[.,]\d{1,2}$/, '').replace(/\D/g, '');
 }
-function plainKey(token: string): string {
-    return token.replace(',', '.').replace(/\.0+$/, '');
+function scaledKey(num: string, unit: string): string {
+    const factor = /^(k|tsd|tausend)/i.test(unit) ? 1e3 : 1e6;
+    return String(Math.round(Number(num.replace(',', '.')) * factor));
+}
+function percentKey(num: string): string {
+    return num.replace(',', '.').replace(/\.0+$/, '');
+}
+function amounts(text: string): Array<[string, string]> {
+    const out: Array<[string, string]> = [];
+    for (const m of text.matchAll(SCALED)) out.push([m[0].trim(), scaledKey(m[1], m[2])]);
+    const rest = text.replace(SCALED, ' ');
+    for (const m of rest.matchAll(AMOUNT)) {
+        const isYear = /^\d{4}$/.test(m[0]) && Number(m[0]) >= 1900 && Number(m[0]) <= 2100;
+        if (!isYear) out.push([m[0].trim(), amountKey(m[0])]);
+    }
+    return out.filter(([, key]) => Number(key) >= 1000);
+}
+function percents(text: string): Array<[string, string]> {
+    return [...text.matchAll(PERCENT)].map((m) => {
+        const num = m[1] ?? m[2] ?? m[3];
+        return [`${num}%`, percentKey(num)] as [string, string];
+    });
 }
 
 /** Beträge (ab 1.000) und Prozentsätze der Antwort, die im Kontext nicht vorkommen. */
 export function ungroundedFigures(answer: string, context: string): string[] {
-    const known = new Set<string>();
-    for (const m of context.match(AMOUNT) ?? []) known.add(amountKey(m));
-    for (const m of context.match(NUMBER) ?? []) known.add(plainKey(m));
+    const knownAmounts = new Set(amounts(context).map(([, k]) => k));
+    const knownPercents = new Set(percents(context).map(([, k]) => k));
     const missing = new Set<string>();
-    for (const m of answer.match(AMOUNT) ?? []) {
-        const key = amountKey(m);
-        const isYear = /^\d{4}$/.test(m) && Number(m) >= 1900 && Number(m) <= 2100;
-        if (Number(key) >= 1000 && !isYear && !known.has(key)) missing.add(m.trim());
-    }
-    for (const m of answer.matchAll(PERCENT)) {
-        if (!known.has(plainKey(m[1]))) missing.add(`${m[1]}%`);
-    }
+    for (const [shown, key] of amounts(answer)) if (!knownAmounts.has(key)) missing.add(shown);
+    for (const [shown, key] of percents(answer)) if (!knownPercents.has(key)) missing.add(shown);
     return [...missing];
 }
 

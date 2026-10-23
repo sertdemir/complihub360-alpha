@@ -132,6 +132,50 @@ describe('assistant chat with the Scaleway provider', () => {
         expect(events('assistant_chat_result')[0]).toMatchObject({ figure_rewrite: 'rewritten', urgency_rewrite: 'none' });
     });
 
+    it('checks the rewrite against both guards and records a newly introduced figure', async () => {
+        provider(ok({ choices: [{ message: { content: 'Ich verstehe Ihre Sorge. Ihnen drohen Nachzahlungen.' }, finish_reason: 'stop' }] }));
+        fetchMock.mockResolvedValueOnce(ok({ choices: [{ message: { content: 'Ich verstehe Ihre Sorge. Es fällt ein Zuschlag von 5 % pro Monat an.' }, finish_reason: 'stop' }] }) as never);
+        rpc.mockResolvedValueOnce([{ content: 'Late payment interest applies.', metadata: { embed_model: 'qwen3-embedding-8b' }, similarity: 0.7 }]);
+
+        await call({ message: 'Ich habe Angst, ich habe zwei Jahre keine USt gemeldet.', country: 'ES' }, `10.0.10.${++ipSeq}`);
+
+        expect(events('assistant_chat_result')[0]).toMatchObject({ urgency_rewrite: 'rewritten', figure_rewrite: 'introduced', figures_before: 0, figures_after: 1 });
+    });
+
+    it('does not let an earlier assistant answer vouch for a figure', async () => {
+        provider(ok({ choices: [{ message: { content: 'Die Grenze liegt bei 22.000 Euro.' }, finish_reason: 'stop' }] }));
+        fetchMock.mockResolvedValueOnce(ok({ choices: [{ message: { content: 'Dazu hat CompliHub360 keine geprüfte Zahl.' }, finish_reason: 'stop' }] }) as never);
+        rpc.mockResolvedValueOnce([{ content: 'No small-business rules.', metadata: { embed_model: 'qwen3-embedding-8b' }, similarity: 0.7 }]);
+
+        await call({
+            message: 'Und wenn ich 25.000 mache?', country: 'DE',
+            history: [{ role: 'user', content: 'Gibt es eine Kleinunternehmerregelung?' }, { role: 'assistant', content: 'Ja, bis 22.000 Euro.' }],
+        }, `10.0.11.${++ipSeq}`);
+
+        expect(fetchMock).toHaveBeenCalledTimes(3);
+        expect(events('assistant_chat_result')[0]).toMatchObject({ figure_rewrite: 'rewritten' });
+    });
+
+    it('keeps the rewrite reason when the second call fails', async () => {
+        provider(ok({ choices: [{ message: { content: 'Die Grenze liegt bei 22.000 Euro.' }, finish_reason: 'stop' }] }));
+        fetchMock.mockResolvedValueOnce({ ok: false, status: 503, json: async () => ({}), text: async () => 'overloaded' } as never);
+        rpc.mockResolvedValueOnce([{ content: 'No small-business rules.', metadata: { embed_model: 'qwen3-embedding-8b' }, similarity: 0.7 }]);
+
+        const r = await call({ message: 'Gibt es eine Kleinunternehmerregelung?', country: 'DE' }, `10.0.12.${++ipSeq}`);
+
+        expect(r.status).toBe(502);
+        expect(events('assistant_chat_result')[0]).toMatchObject({ outcome: 'error', stage: 'generate_rewrite', rewrite_reason: { pressure: null, figures: 1 } });
+    });
+
+    it('records how close the best chunk came when nothing passes the threshold', async () => {
+        provider(ok({ choices: [{ message: { content: 'Antwort' }, finish_reason: 'stop' }] }));
+        rpc.mockResolvedValueOnce([]).mockResolvedValueOnce([{ similarity: 0.5812 }]);
+
+        await call({ message: 'Wie hoch ist die EPR-Gebühr für Batterien?', country: 'IT' }, `10.0.13.${++ipSeq}`);
+
+        expect(events('assistant_chat_result')[0]).toMatchObject({ chunks: 0, corpus_missing: false, top_similarity: null, top_below_threshold: 0.581 });
+    });
+
     it('leaves urgency words alone when the user is not worried', async () => {
         provider(ok({ choices: [{ message: { content: 'Registration is required immediately upon the first taxable supply.' }, finish_reason: 'stop' }] }));
         rpc.mockResolvedValueOnce([{ content: 'x', metadata: { embed_model: 'qwen3-embedding-8b' }, similarity: 0.6 }]);

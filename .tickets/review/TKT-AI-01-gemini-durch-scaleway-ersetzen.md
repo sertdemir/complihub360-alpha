@@ -204,3 +204,23 @@ Nächste Schritte laut Runbook: Merge, Staging umstellen (Schritt 4), Korpus neu
 - **Unsicherheit nie hinter selbstsicherer Sprache verstecken:** Der Zahlen-Wächter verhindert, dass veraltete Schwellen aus dem Trainingswissen als Fakt erscheinen. Ohne Zahl im Kontext soll das Modell sagen, dass keine geprüfte Zahl vorliegt.
 
 **Offen für den Nutzer:** Bleibt nach dem Neuschreiben eine ungedeckte Zahl stehen, geht die Antwort heute trotzdem raus. Das Log meldet es dann. Ob sie stattdessen ganz zurückgehalten werden soll, entscheidet der Nutzer.
+
+### Silent-Failure-Review der Wächter (23.10.2026)
+
+Das Review fand 4 hohe und 5 mittlere Befunde, alle im Code dieses PRs. Behoben:
+- **Beide Wächter prüfen die neue Fassung.** Ein neu eingeführter Befund gilt als `introduced`. Das Ereignis trägt `figures_before` und `figures_after`.
+- **Prozentsätze werden nur gegen Prozentsätze im Kontext geprüft.** `TODAY` und `EXCERPT n` belegen damit nichts mehr.
+- **Nur Nutzer-Turns belegen Zahlen.** Frühere Antworten des Assistenten waschen eine erfundene Zahl nicht mehr rein.
+- **Mehr Schreibweisen erkannt:** k, Tsd., Mio., normales Leerzeichen als Tausendertrenner, `%20`, „Prozent", „percent", „por ciento".
+- **Keine Fehlalarme mehr** bei Rechtsakten (2017/2455) und USt-IDs.
+- **Druck-Wächter erweitert:**
+  - erkennt nummerierte, `*`- und Gedankenstrich-Listen sowie Listen in einer Zeile
+  - kennt „Zuschlag", „riskieren", „mit … rechnen" und „you might face"
+  - mehr Sorge-Wörter: concerned, nervös, worry, nerviosa
+  - Sorge zählt auch aus früheren Nutzer-Turns
+- **Fehlschlag des zweiten Aufrufs:** Das Fehler-Ereignis trägt `rewrite_reason`.
+- **Kalibrierung:** Bleibt die Suche unter der Schwelle leer, steht der beste Wert als `top_below_threshold` im Ereignis.
+
+Bekannte Grenze: Ein Auszug aus einem anderen Land belegt dieselbe Zahl mit.
+
+**Offen beim Nutzer (Eskalation aus dem Review):** Was passiert mit einer Antwort, die nach dem Neuschreiben weiterhin `kept` oder `introduced` ist? Heute geht sie mit Log-Eintrag raus. Möglich wären: zurückhalten, eine feste ehrliche Antwort schicken oder die Zahl markieren.

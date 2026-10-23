@@ -110,3 +110,39 @@ describe('ungroundedFigures (Staging-Runde, Zahlen nur aus dem Kontext)', () => 
         expect(ungroundedFigures('Der Satz beträgt 4,9 %.', 'reduced rates: 4.9%, 10%')).toEqual([]);
     });
 });
+
+describe('Silent-Failure-Review (23.10.2026): Lücken und Fehlalarme der Wächter', () => {
+    const worried = 'Ich habe Angst, ich habe zwei Jahre keine USt gemeldet.';
+    it('Druck: nummerierte, *- und Gedankenstrich-Listen, Listen in einer Zeile, Zuschläge', () => {
+        expect(pressureInWorriedReply(worried, '1. Bußgeld bis 25.000 €\n2. Strafen bei Vorsatz')).toBe('penalty list (2)');
+        expect(pressureInWorriedReply(worried, '* Bußgeld\n* Strafen')).toBe('penalty list (2)');
+        expect(pressureInWorriedReply(worried, '– Bußgeld\n– Strafen')).toBe('penalty list (2)');
+        expect(pressureInWorriedReply(worried, 'Mögliche Folgen: - Bußgeld - Strafen - Haftung')).toBe('penalty list (3)');
+        expect(pressureInWorriedReply(worried, '- Verspätungszuschlag\n- Säumniszuschlag')).toBe('penalty list (2)');
+        expect(pressureInWorriedReply(worried, 'Ab dem 1. Januar fällt ein Zuschlag an.')).toBeNull();
+    });
+    it('Druck: Drohkulisse ohne Drohwort, englische Formen, Sorge aus früheren Turns', () => {
+        expect(pressureInWorriedReply(worried, 'Sie riskieren hohe Bußgelder.')).toMatch(/riskier/i);
+        expect(pressureInWorriedReply(worried, 'Sie müssen mit Strafen und Zinsen rechnen.')).toMatch(/rechnen/);
+        expect(pressureInWorriedReply('I am concerned about my filings.', 'You might face fines.')).toMatch(/face/);
+        expect(pressureInWorriedReply('Was passiert jetzt?\nIch bin nervös.', 'Sie riskieren Strafen.')).toMatch(/riskier/i);
+    });
+    it('Zahlen: Prozente nur gegen Prozente — Kopfzeilen und Datum belegen nichts', () => {
+        const ctx = 'CONTEXT:\nTODAY: 2026-10-23\n\nEXCERPT 5 · ES · J. Penalties (paraphrase, never quote):\nwithin 10 days, Article 23\n\nQUESTION:\nWas passiert?';
+        expect(ungroundedFigures('Der Zuschlag beträgt 5 % pro Monat, später 10 % und 23 %.', ctx)).toEqual(['5%', '10%', '23%']);
+    });
+    it('Zahlen: k, Mio., normales Leerzeichen, türkisches %20, Prozent-Wörter', () => {
+        const ctx = 'reduced rates: 4%, 10%\nthreshold EUR 10,000';
+        expect(ungroundedFigures('Die Grenze liegt bei EUR 85k.', ctx)).toEqual(['85k']);
+        expect(ungroundedFigures('Ab 1,5 Mio. € gilt …', ctx)).toEqual(['1,5 Mio.']);
+        expect(ungroundedFigures('Le seuil est de 85 000 €.', ctx)).toEqual(['85 000']);
+        expect(ungroundedFigures('KDV oranı %20.', ctx)).toEqual(['20%']);
+        expect(ungroundedFigures('Es gelten 16 Prozent; el tipo es 21 por ciento.', ctx)).toEqual(['16%', '21%']);
+        expect(ungroundedFigures('Ermäßigt %10, Schwelle 10 000 €, also 10k.', ctx)).toEqual([]);
+    });
+    it('Zahlen: keine Fehlalarme für Rechtsakte, USt-IDs und Werte aus der Frage in Kurzform', () => {
+        expect(ungroundedFigures('Seit der Richtlinie (EU) 2017/2455 gilt das OSS.', 'x')).toEqual([]);
+        expect(ungroundedFigures('Format: DE123456789.', 'x')).toEqual([]);
+        expect(ungroundedFigures('Bei 30.000 € Umsatz …', 'QUESTION:\nIch mache 30k Umsatz.')).toEqual([]);
+    });
+});
