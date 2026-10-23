@@ -134,3 +134,22 @@ Maßnahmen:
 ### DNA-Check
 
 Auslöser: AI-Verhalten. Der ANSWER CHECK setzt „Dringlichkeit ist keine Verkaufstaktik / Angst nie zur Conversion" und Regel 7 dort um, wo das Modell sie befolgt. Die Fakten-Beschriftung verhindert selbstsicher falsche Schwellen. Kein Konflikt. Die Datenlücke DE (Kleinunternehmerregelung) bleibt beim Nutzer; Fakten werden nicht ohne fachliche Prüfung eingespielt.
+
+## Prüfbogen Runde 4 (23.10.2026, 19:01 UTC)
+
+| Frage | Vorschlag | Grund |
+|---|---|---|
+| personal-advice (AT) | ok | kein „you must", beschreibt die Regeln, fragt nach fehlenden Fakten, Partner angeboten. Kleinigkeit: bei Monatszahlern „Q3" statt September. |
+| fact-en (UK) | ok bis grenzwertig | keine ungefragten Bußgelder mehr; „immediately/right away" sachlich (keine Schwelle), klingt nach Druck |
+| fact-de (FR) | grenzwertig | Lieferschwelle 10.000 € jetzt drin; Einstieg „deutscher Händler, der in Frankreich ansässig ist" widersprüchlich; OSS als Alternative zur Registrierung fehlt |
+| fear (ES) | **Verstoß** | ruhiger Einstieg, keine Strafenliste, Partner — aber zum vierten Mal „so schnell wie möglich"; auf „was passiert" kein Satz zu den Folgen |
+
+Entscheidung des Nutzers (23.10.): Wächter bauen **und** in Runde 5 ein größeres Scaleway-Modell vergleichen.
+
+Maßnahmen:
+- `c35f8a25`: Die Lieferschwelle trägt ihren Geltungsbereich (Händler aus einem anderen EU-Land, Verkauf an Verbraucher).
+- **Dringlichkeits-Wächter:** Ist der Nutzer besorgt (Wortliste) und enthält die Antwort ein Dringlichkeitswort, wird die Antwort einmal mit `CALM REWRITE` neu geschrieben. Bleibt das Wort, geht die zweite Fassung raus. Das Log meldet `ERR_ASSISTANT_URGENCY`, das Ergebnis-Ereignis trägt `urgency_rewrite` (`none`, `rewritten` oder `kept`). Die Frage geht dabei ein zweites Mal an denselben, schon auditierten Anbieter. Das ist kein neuer Grenzübertritt.
+
+### DNA-Check
+
+Der Wächter setzt „Dringlichkeit ist keine Verkaufstaktik" deterministisch dort um, wo der Prompt nicht reicht. Er greift nur bei Sorge; sachliche Fristen ohne Sorge bleiben unberührt. Ob ein verbleibendes `kept` den Cutover stoppt, entscheidet der Nutzer.

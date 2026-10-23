@@ -5,7 +5,7 @@ import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
 import { resolveLlm, sameEmbedModel, type LlmProvider } from './llm.js';
-import { SHARED_RULES, answerCheck, factLine, leaksPrompt, leakReply } from './assistantGuard.js';
+import { CALM_REWRITE, SHARED_RULES, answerCheck, factLine, leaksPrompt, leakReply, urgencyInWorriedReply } from './assistantGuard.js';
 import { redactText } from "@complihub360/redaction";
 
 /** P5: was an das Modell geht, ist vorher deterministisch redigiert (Regex-Profile, keine KI). */
@@ -294,7 +294,22 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             const userTurn = `CONTEXT:\n${contextParts.join('\n\n')}\n\nQUESTION:\n${message}\n\n${answerCheck(message)}`;
 
             stage = 'generate';
-            const generated = await llm.generate(domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
+            const systemPrompt = domain ? domainPrompt(domain) : SYSTEM_PROMPT;
+            let generated = await llm.generate(systemPrompt, history, userTurn);
+            // Dringlichkeits-Wächter (DNA: Angst und Dringlichkeit nie als Hebel):
+            // Ist der Nutzer besorgt und drängt die Antwort, einmal neu schreiben.
+            // Bleibt das Wort, geht die zweite Fassung raus und das Log zeigt es.
+            let urgencyRewrite: 'none' | 'rewritten' | 'kept' = 'none';
+            const urgentWord = urgencyInWorriedReply(message, generated);
+            if (urgentWord) {
+                stage = 'generate_calm';
+                generated = await llm.generate(systemPrompt, history, `${userTurn}\n\n${CALM_REWRITE}`);
+                const still = urgencyInWorriedReply(message, generated);
+                urgencyRewrite = still ? 'kept' : 'rewritten';
+                structuredLog('warn', 'Assistant: urgency in a reply to a worried user', {
+                    correlationId, errorCode: 'ERR_ASSISTANT_URGENCY', severity: 'warn', detail: `${urgentWord} → ${still ?? 'rewritten'}`,
+                });
+            }
             // Deterministischer Leck-Schutz: gibt das Modell seine Anweisungen
             // aus, geht stattdessen eine feste Antwort in der Sprache der Frage.
             const promptLeak = leaksPrompt(generated);
@@ -303,7 +318,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
 
             // Ohne Frageinhalt — Volumen, Abdeckung und Kalibrierung der Schwelle.
             await logAssistantEvent({
-                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
+                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, urgency_rewrite: urgencyRewrite, country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
                 top_similarity: chunks[0] ? Math.round(chunks[0].similarity * 1000) / 1000 : null,
             }, correlationId);
 

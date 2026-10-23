@@ -105,6 +105,30 @@ describe('assistant chat with the Scaleway provider', () => {
         expect(events('assistant_chat_result')[0]).toMatchObject({ outcome: 'ok', prompt_leak_blocked: true });
     });
 
+    it('rewrites a reply to a worried user once when it pushes urgency (Prüfrunde 4)', async () => {
+        provider(ok({ choices: [{ message: { content: 'Es ist wichtig, dass Sie sich so schnell wie möglich registrieren.' }, finish_reason: 'stop' }] }));
+        fetchMock.mockResolvedValueOnce(ok({ choices: [{ message: { content: 'Ich verstehe Ihre Sorge. Nachmeldungen sind möglich; ein Partner kann helfen.' }, finish_reason: 'stop' }] }) as never);
+        rpc.mockResolvedValueOnce([{ content: 'x', metadata: { embed_model: 'qwen3-embedding-8b' }, similarity: 0.6 }]);
+
+        const r = await call({ message: 'Ich habe seit zwei Jahren keine Umsatzsteuer in Spanien abgeführt. Ich habe Angst.', country: 'ES' }, `10.0.7.${++ipSeq}`);
+
+        expect(r.status).toBe(200);
+        expect(r.body.answer).toBe('Ich verstehe Ihre Sorge. Nachmeldungen sind möglich; ein Partner kann helfen.');
+        expect(JSON.parse(fetchMock.mock.calls[2][1].body).messages.at(-1).content).toMatch(/CALM REWRITE/);
+        expect(events('assistant_chat_result')[0]).toMatchObject({ outcome: 'ok', urgency_rewrite: 'rewritten' });
+    });
+
+    it('leaves urgency words alone when the user is not worried', async () => {
+        provider(ok({ choices: [{ message: { content: 'Registration is required immediately upon the first taxable supply.' }, finish_reason: 'stop' }] }));
+        rpc.mockResolvedValueOnce([{ content: 'x', metadata: { embed_model: 'qwen3-embedding-8b' }, similarity: 0.6 }]);
+
+        const r = await call({ message: 'When does a non-UK seller have to register for VAT in the UK?', country: 'UK' }, `10.0.8.${++ipSeq}`);
+
+        expect(r.body.answer).toMatch(/immediately/);
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(events('assistant_chat_result')[0]).toMatchObject({ urgency_rewrite: 'none' });
+    });
+
     it('sends the shared rules (formal address, no personal orders, no prompt disclosure) with the prompt', async () => {
         provider(ok({ choices: [{ message: { content: 'Antwort' }, finish_reason: 'stop' }] }));
         rpc.mockResolvedValueOnce([]).mockResolvedValueOnce([{}]);

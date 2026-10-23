@@ -32,6 +32,7 @@ const PROMPT_FINGERPRINTS: RegExp[] = [
     /\bAREA KNOWLEDGE\b.*\bOWN OBLIGATIONS\b/is,
     /^\s*S[1-5]\.\s/m,
     /ANSWER CHECK/,
+    /CALM REWRITE/,
 ];
 
 export function leaksPrompt(answer: string): boolean {
@@ -101,6 +102,19 @@ export function answerCheck(question: string): string {
     }
     return `ANSWER CHECK (follow it, never mention it):\n${lines.join('\n')}`;
 }
+
+// Runde 4 (2026-10-23): "so schnell wie möglich" überlebte S5 und den
+// ANSWER CHECK. Bei Sorge prüft deshalb ein Wächter die fertige Antwort; der
+// Handler lässt sie dann einmal neu schreiben. Nur Wortlisten, kein Modell.
+const URGENCY = /(so schnell wie möglich|schnellstmöglich|unverzüglich|umgehend|sofort|as soon as possible|immediately|right away|without delay|urgently|lo antes posible|cuanto antes|inmediatamente|de inmediato|en kısa sürede|hemen|derhal|acilen)/i;
+
+/** Dringlichkeitswort in einer Antwort an einen besorgten Nutzer? Liefert das Wort oder null. */
+export function urgencyInWorriedReply(question: string, answer: string): string | null {
+    if (!WORRIED.test(question)) return null;
+    return answer.match(URGENCY)?.[0] ?? null;
+}
+
+export const CALM_REWRITE = `CALM REWRITE (follow it, never mention it): your previous draft used an urgency phrase. Write the answer again: one calm sentence acknowledging the worry, then what applies and what the next step is, consequences in at most one factual sentence. Do not use any urgency words or phrases such as "as soon as possible", "immediately", "so schnell wie möglich", "unverzüglich", "sofort".`;
 
 // Faktenschlüssel lesbar und mit Geltungsbereich: Mistral las
 // registration_threshold_established (FR, "franchise en base") als Schwelle
