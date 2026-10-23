@@ -5,7 +5,7 @@ import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
 import { resolveLlm, sameEmbedModel, type LlmProvider } from './llm.js';
-import { CALM_REWRITE, SHARED_RULES, answerCheck, factLine, leaksPrompt, leakReply, urgencyInWorriedReply } from './assistantGuard.js';
+import { CALM_REWRITE, SHARED_RULES, answerCheck, factLine, figureCheck, leaksPrompt, leakReply, pressureInWorriedReply, ungroundedFigures } from './assistantGuard.js';
 import { redactText } from "@complihub360/redaction";
 
 /** P5: was an das Modell geht, ist vorher deterministisch redigiert (Regex-Profile, keine KI). */
@@ -103,7 +103,9 @@ Rules — follow ALL of them:
 8. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.${SHARED_RULES}`;
 }
 
-const MATCH_THRESHOLD = 0.4;
+// Kalibriert am 23.10.2026 mit Qwen3-Embedding-8B auf Staging (12 Prüffragen):
+// passende Treffer 0,656–0,761, unpassende 0,567–0,646. 0,6 ist vorläufig.
+const MATCH_THRESHOLD = 0.6;
 const MATCH_COUNT = 6;
 
 // Ergebnis-Ereignis nach dem Aufruf (Ausgang, Abdeckung, Kalibrierung), ohne
@@ -296,19 +298,34 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             stage = 'generate';
             const systemPrompt = domain ? domainPrompt(domain) : SYSTEM_PROMPT;
             let generated = await llm.generate(systemPrompt, history, userTurn);
-            // Dringlichkeits-Wächter (DNA: Angst und Dringlichkeit nie als Hebel):
-            // Ist der Nutzer besorgt und drängt die Antwort, einmal neu schreiben.
-            // Bleibt das Wort, geht die zweite Fassung raus und das Log zeigt es.
+            // Zwei deterministische Wächter, höchstens EIN zweiter Aufruf:
+            // - Druck (DNA: Angst und Dringlichkeit nie als Hebel): besorgter
+            //   Nutzer und Dringlichkeit, Drohung oder Strafenliste in der Antwort.
+            // - Zahlen: ein Betrag oder Prozentsatz, der nicht im Kontext steht.
+            // Bleibt ein Befund, geht die zweite Fassung raus und das Log zeigt es.
+            const groundText = [userTurn, ...history.map((h) => h.content)].join('\n');
+            const pressure = pressureInWorriedReply(message, generated);
+            const figures = ungroundedFigures(generated, groundText);
             let urgencyRewrite: 'none' | 'rewritten' | 'kept' = 'none';
-            const urgentWord = urgencyInWorriedReply(message, generated);
-            if (urgentWord) {
-                stage = 'generate_calm';
-                generated = await llm.generate(systemPrompt, history, `${userTurn}\n\n${CALM_REWRITE}`);
-                const still = urgencyInWorriedReply(message, generated);
-                urgencyRewrite = still ? 'kept' : 'rewritten';
-                structuredLog('warn', 'Assistant: urgency in a reply to a worried user', {
-                    correlationId, errorCode: 'ERR_ASSISTANT_URGENCY', severity: 'warn', detail: `${urgentWord} → ${still ?? 'rewritten'}`,
-                });
+            let figureRewrite: 'none' | 'rewritten' | 'kept' = 'none';
+            if (pressure || figures.length) {
+                stage = 'generate_rewrite';
+                const notes = [pressure ? CALM_REWRITE : '', figures.length ? figureCheck(figures) : ''].filter(Boolean).join('\n\n');
+                generated = await llm.generate(systemPrompt, history, `${userTurn}\n\n${notes}`);
+                if (pressure) {
+                    const still = pressureInWorriedReply(message, generated);
+                    urgencyRewrite = still ? 'kept' : 'rewritten';
+                    structuredLog('warn', 'Assistant: pressure in a reply to a worried user', {
+                        correlationId, errorCode: 'ERR_ASSISTANT_URGENCY', severity: 'warn', detail: `${pressure} → ${still ?? 'rewritten'}`,
+                    });
+                }
+                if (figures.length) {
+                    const still = ungroundedFigures(generated, groundText);
+                    figureRewrite = still.length ? 'kept' : 'rewritten';
+                    structuredLog('warn', 'Assistant: figures not found in the context', {
+                        correlationId, errorCode: 'ERR_ASSISTANT_UNGROUNDED', severity: 'warn', detail: `${figures.length} → ${still.length}`,
+                    });
+                }
             }
             // Deterministischer Leck-Schutz: gibt das Modell seine Anweisungen
             // aus, geht stattdessen eine feste Antwort in der Sprache der Frage.
@@ -318,7 +335,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
 
             // Ohne Frageinhalt — Volumen, Abdeckung und Kalibrierung der Schwelle.
             await logAssistantEvent({
-                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, urgency_rewrite: urgencyRewrite, country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
+                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, urgency_rewrite: urgencyRewrite, figure_rewrite: figureRewrite, country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
                 top_similarity: chunks[0] ? Math.round(chunks[0].similarity * 1000) / 1000 : null,
             }, correlationId);
 

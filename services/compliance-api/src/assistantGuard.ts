@@ -33,6 +33,7 @@ const PROMPT_FINGERPRINTS: RegExp[] = [
     /^\s*S[1-5]\.\s/m,
     /ANSWER CHECK/,
     /CALM REWRITE/,
+    /FIGURE CHECK/,
 ];
 
 export function leaksPrompt(answer: string): boolean {
@@ -108,15 +109,59 @@ export function answerCheck(question: string): string {
 // Runde 4 (2026-10-23): "so schnell wie möglich" überlebte S5 und den
 // ANSWER CHECK. Bei Sorge prüft deshalb ein Wächter die fertige Antwort; der
 // Handler lässt sie dann einmal neu schreiben. Nur Wortlisten, kein Modell.
+// Staging-Runde (2026-10-23, mit Korpus): ohne ein einziges Dringlichkeitswort
+// kam eine Liste aus drei Strafen samt "können folgende Konsequenzen drohen".
+// Der Wächter greift deshalb auch bei Drohwörtern und Strafenlisten.
 const URGENCY = /(so schnell wie möglich|schnellstmöglich|unverzüglich|umgehend|sofort|as soon as possible|immediately|right away|without delay|urgently|lo antes posible|cuanto antes|inmediatamente|de inmediato|en kısa sürede|hemen|derhal|acilen)/i;
+const THREAT = /(drohen|droht|drohende|threaten\w*|you (?:could|will|may) face|amenaza\w*|tehdit)/i;
+const PENALTY = /(strafe|bußgeld|geldbuße|sanktion|säumniszuschlag|haftung|penalt|\bfines?\b|multa|sanci[oó]n|recargo|ceza)/i;
 
-/** Dringlichkeitswort in einer Antwort an einen besorgten Nutzer? Liefert das Wort oder null. */
-export function urgencyInWorriedReply(question: string, answer: string): string | null {
+/** Druck in einer Antwort an einen besorgten Nutzer? Liefert den Auslöser oder null. */
+export function pressureInWorriedReply(question: string, answer: string): string | null {
     if (!WORRIED.test(question)) return null;
-    return answer.match(URGENCY)?.[0] ?? null;
+    const word = answer.match(URGENCY)?.[0] ?? answer.match(THREAT)?.[0];
+    if (word) return word;
+    const penaltyLines = answer.split('\n').filter((l) => /^\s*[-•]/.test(l) && PENALTY.test(l)).length;
+    return penaltyLines >= 2 ? `penalty list (${penaltyLines})` : null;
 }
 
-export const CALM_REWRITE = `CALM REWRITE (follow it, never mention it): your previous draft used an urgency phrase. Write the answer again: one calm sentence acknowledging the worry, then what applies and what the next step is, consequences in at most one factual sentence. Do not use any urgency words or phrases such as "as soon as possible", "immediately", "so schnell wie möglich", "unverzüglich", "sofort".`;
+export const CALM_REWRITE = `CALM REWRITE (follow it, never mention it): your previous draft put pressure on a worried user (urgency words, threats or a list of penalties). Write the answer again: one calm sentence acknowledging the worry, then what applies and what the next step is, consequences in at most one factual sentence and never as a list. Do not use urgency words or phrases such as "as soon as possible", "immediately", "so schnell wie möglich", "unverzüglich", "sofort", and do not use "drohen" or "threaten".`;
+
+// Staging-Runde (2026-10-23): Zur Kleinunternehmerregelung nannte Mistral
+// 22.000 €/50.000 € — den Stand vor 2025, aus dem Trainingswissen; der Kontext
+// sagt dazu nichts. Jeder Betrag ab 1.000 und jeder Prozentsatz der Antwort
+// muss deshalb im Kontext (oder in der Frage) stehen. Deterministisch.
+const AMOUNT = /(?<![\d.,])(?:\d{1,3}(?:[.,\u00a0\u202f]\d{3}(?!\d))+(?:[.,]\d{1,2}(?!\d))?|\d{4,})/g;
+const PERCENT = /(\d+(?:[.,]\d+)?)\s?%/g;
+const NUMBER = /\d+(?:[.,]\d+)*/g;
+
+function amountKey(token: string): string {
+    return token.replace(/[.,]\d{1,2}$/, '').replace(/\D/g, '');
+}
+function plainKey(token: string): string {
+    return token.replace(',', '.').replace(/\.0+$/, '');
+}
+
+/** Beträge (ab 1.000) und Prozentsätze der Antwort, die im Kontext nicht vorkommen. */
+export function ungroundedFigures(answer: string, context: string): string[] {
+    const known = new Set<string>();
+    for (const m of context.match(AMOUNT) ?? []) known.add(amountKey(m));
+    for (const m of context.match(NUMBER) ?? []) known.add(plainKey(m));
+    const missing = new Set<string>();
+    for (const m of answer.match(AMOUNT) ?? []) {
+        const key = amountKey(m);
+        const isYear = /^\d{4}$/.test(m) && Number(m) >= 1900 && Number(m) <= 2100;
+        if (Number(key) >= 1000 && !isYear && !known.has(key)) missing.add(m.trim());
+    }
+    for (const m of answer.matchAll(PERCENT)) {
+        if (!known.has(plainKey(m[1]))) missing.add(`${m[1]}%`);
+    }
+    return [...missing];
+}
+
+export function figureCheck(figures: string[]): string {
+    return `FIGURE CHECK (follow it, never mention it): your previous draft used figures that do not appear in the CONTEXT: ${figures.join(', ')}. Write the answer again using only figures that appear in the CONTEXT. Where the CONTEXT gives no figure, say that CompliHub360 has no verified figure for it instead of giving one.`;
+}
 
 // Faktenschlüssel lesbar und mit Geltungsbereich: Mistral las
 // registration_threshold_established (FR, "franchise en base") als Schwelle

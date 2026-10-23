@@ -87,12 +87,14 @@ Die Kennung im Ingest (`LLM_EMBED_MODEL` oder Standard `qwen3-embedding-8b`) mus
 2. **Schwelle kalibrieren:** `match_threshold` 0.4 stammt aus der Gemini-Zeit. Nach dem Lauf die Werte `top_similarity` im `event_log` ansehen:
 
    ```sql
-   select payload->>'top_similarity' as top, payload->>'chunks' as chunks, created_at
-   from event_log where type = 'assistant_chat' and payload->>'provider' = 'openai-compatible'
-   order by created_at desc limit 20;
+   select payload->>'top_similarity' as top, payload->>'chunks' as chunks, "timestamp"
+   from event_log where type = 'assistant_chat_result' and payload->>'provider' = 'openai-compatible'
+   order by "timestamp" desc limit 20;
    ```
 
-   Liegen passende Treffer deutlich über oder unter 0.4, `MATCH_THRESHOLD` in `assistant.ts` anpassen.
+   Liegen passende Treffer deutlich über oder unter der Schwelle, `MATCH_THRESHOLD` in `assistant.ts` anpassen.
+
+   **Erledigt am 23.10.2026:** Mit Qwen lagen passende Treffer bei 0,656–0,761, unpassende bei 0,567–0,646 (12 Prüffragen). Die Schwelle steht jetzt bei **0,6**. Das ist vorläufig; nach einer Woche echter Fragen erneut mit der Abfrage oben prüfen. `top_similarity` steht im Ereignis `assistant_chat_result`, nicht in `assistant_chat`.
 3. Ist er sauber: `GEMINI_API_KEY` aus `/docker/complihub-api/.env` entfernen, Container neu starten, den Schlüssel in der Google-Konsole widerrufen.
 4. Google aus der Subprozessor-Liste streichen.
 

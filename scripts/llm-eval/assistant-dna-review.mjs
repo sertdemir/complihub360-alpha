@@ -60,6 +60,9 @@ function hints(q, status, answer, sources) {
     if (q.lang === 'de' && /\b(du|dich|dir|dein\w*)\b/i.test(answer)) h.push('duzt — Produkt-Copy siezt (Regel S1)');
     if (/\b(you must|Sie müssen|du musst|drohen (dir|Ihnen)|so schnell wie möglich|as soon as possible|unverzüglich|immediately)\b/i.test(answer)) h.push('persönliche Anweisung, Drohung oder Dringlichkeit — prüfen (Regel 3, S2, S5)');
     if (/\b(19|20)\d{2}\b/.test(answer) && !/\b2026\b/.test(answer)) h.push('nennt eine Jahreszahl — erfunden? (S4)');
+    if (/(drohen|droht|threaten\w*|you (?:could|will|may) face)/i.test(answer)) h.push(`Drohwort: "${answer.match(/(drohen|droht|threaten\w*|you (?:could|will|may) face)/i)[0]}" — Drohkulisse? (S5)`);
+    const penaltyLines = answer.split('\n').filter((l) => /^\s*[-•]/.test(l) && /(strafe|bußgeld|geldbuße|sanktion|haftung|penalt|\bfines?\b|multa|sanci|ceza)/i.test(l)).length;
+    if (penaltyLines >= 2) h.push(`Strafen als Liste (${penaltyLines} Zeilen) — Regel 7 / S5`);
     if (PROFESSION.test(answer)) h.push(`nennt eine Fachperson ("${answer.match(PROFESSION)[0]}") — prüfen, ob als Verweis oder als Selbstbild`);
     if (PANIC.test(answer)) h.push(`Dringlichkeitswort: "${answer.match(PANIC)[0]}" — prüfen auf Druck`);
     const counts = Object.fromEntries(Object.entries(STOP).map(([l, re]) => [l, (answer.match(re) || []).length]));

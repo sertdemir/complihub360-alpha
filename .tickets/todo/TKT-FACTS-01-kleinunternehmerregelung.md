@@ -20,6 +20,8 @@ Dazu kommt, dass die Märkte die Befreiung uneinheitlich abbilden:
 | FR | `registration_threshold_established` = „None (franchise en base below EUR 85,000 / 37,500)" | Befreiung im Werttext. Das Modell wandte sie in Runde 3 auf einen deutschen Händler an. |
 | DE, NL, IT, ES | „None", keine Befreiung | Befreiung fehlt, wo es eine gibt |
 
+**Befund aus dem Prüfbogen gegen Staging (23.10.2026, mit Korpus):** Auf die Frage `small-business` nannte der Assistent die Kleinunternehmerregelung mit 22.000 € Vorjahr und 50.000 € laufendes Jahr. Das ist der Stand vor 2025. Er stammt aus dem Trainingswissen des Modells, nicht aus dem Kontext. Der EY-Korpus (DE, „C. Who is liable") sagt ausdrücklich, dass das deutsche Recht keine Sonderregeln zur Registrierung für Kleinunternehmen kennt. Seit diesem Befund fängt der Zahlen-Wächter solche Zahlen ab (TKT-AI-01). Die richtige Information kommt aber erst mit diesem Ticket in den Kontext.
+
 ## Acceptance Criteria
 
 - [ ] **Konvention festgelegt:** ein eigener Schlüssel, z. B. `small_business_exemption`. Die Registrierungsschwelle bleibt, was sie ist. AT und FR werden auf den neuen Schlüssel umgezogen, damit die Befreiung nicht mehr als Registrierungsschwelle erscheint.

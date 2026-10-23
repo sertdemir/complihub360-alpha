@@ -118,6 +118,20 @@ describe('assistant chat with the Scaleway provider', () => {
         expect(events('assistant_chat_result')[0]).toMatchObject({ outcome: 'ok', urgency_rewrite: 'rewritten' });
     });
 
+    it('rewrites figures that are not in the context and records it (Staging-Runde)', async () => {
+        provider(ok({ choices: [{ message: { content: 'Die Kleinunternehmerregelung gilt bis 22.000 Euro Vorjahresumsatz.' }, finish_reason: 'stop' }] }));
+        fetchMock.mockResolvedValueOnce(ok({ choices: [{ message: { content: 'Dazu hat CompliHub360 keine geprüfte Zahl.' }, finish_reason: 'stop' }] }) as never);
+        rpc.mockResolvedValueOnce([{ content: 'There is no registration threshold.', metadata: { embed_model: 'qwen3-embedding-8b' }, similarity: 0.7 }]);
+
+        const r = await call({ message: 'Ich bin nur ein kleiner Einzelunternehmer. Lohnt es sich?', country: 'DE' }, `10.0.9.${++ipSeq}`);
+
+        expect(r.body.answer).toBe('Dazu hat CompliHub360 keine geprüfte Zahl.');
+        const retry = JSON.parse(fetchMock.mock.calls[2][1].body).messages.at(-1).content;
+        expect(retry).toMatch(/FIGURE CHECK .*: 22\.000\./);
+        expect(retry).not.toMatch(/CALM REWRITE/);
+        expect(events('assistant_chat_result')[0]).toMatchObject({ figure_rewrite: 'rewritten', urgency_rewrite: 'none' });
+    });
+
     it('leaves urgency words alone when the user is not worried', async () => {
         provider(ok({ choices: [{ message: { content: 'Registration is required immediately upon the first taxable supply.' }, finish_reason: 'stop' }] }));
         rpc.mockResolvedValueOnce([{ content: 'x', metadata: { embed_model: 'qwen3-embedding-8b' }, similarity: 0.6 }]);
