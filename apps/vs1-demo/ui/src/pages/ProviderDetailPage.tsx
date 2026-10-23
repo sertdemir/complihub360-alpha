@@ -3,7 +3,8 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { UserShell } from '../components/user/UserShell';
-import { Button } from '../components/ui/Button';
+import { Button, outlineBrandClass } from '../components/ui/Button';
+import { useNames } from '../components/results/MarketRequest';
 import { Badge } from '../components/ui/Badge';
 import { KpiRing, useEntered } from '../components/ui/Stats';
 import { SEVERITY_STYLE } from '../components/compliance-areas/severity';
@@ -75,6 +76,12 @@ export function ProviderDetailPage() {
   const [booking, setBooking] = useState<UserBooking | null>(null);
 
   const search = params.toString();
+  // F2 (Wizard-Audit, 23.10.2026): aus dem Block "Anbieter ohne Passung" der
+  // Risk Map. Dieser Anbieter deckt keinen angefragten Bereich ab — von hier
+  // aus wird keine Buchung angeboten, nur das Profil.
+  const outsideNeed = params.get('fit') === 'outside'
+    ? (params.get('need') ?? '').split(',').filter(Boolean)
+    : null;
 
   useEffect(() => {
     let alive = true;
@@ -187,6 +194,7 @@ export function ProviderDetailPage() {
               entered={entered}
               locale={locale}
               onBook={book}
+              outsideNeed={outsideNeed}
               onBack={() => (ctx ? navigate(ctx.backTo) : navigate(-1))}
             />
           )}
@@ -196,7 +204,7 @@ export function ProviderDetailPage() {
   );
 }
 
-function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, onBook, onBack }: {
+function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, onBook, onBack, outsideNeed = null }: {
   p: ProviderDetail;
   ctx: ProviderContext | null;
   areaLabel: string | null;
@@ -206,6 +214,8 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
   entered: boolean;
   locale: string;
   onBook: (slot?: string) => void;
+  /** F2: gesetzt, wenn der Nutzer aus "Anbieter ohne Passung" kommt — die angefragten Bereiche. */
+  outsideNeed?: string[] | null;
   onBack: () => void;
 }) {
   const { t } = useTranslation('results');
@@ -413,7 +423,9 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
           <Packages p={p} />
           <Reviews data={reviews} p={p} confirm={confirm} locale={locale} />
         </div>
-        {booking ? <AppointmentRail booking={booking} locale={locale} onBook={onBook} /> : <BookingRail p={p} slots={slots} locale={locale} onBook={onBook} ctx={ctx} revealed={revealed} />}
+        {booking ? <AppointmentRail booking={booking} locale={locale} onBook={onBook} />
+          : outsideNeed ? <OutsideFitRail p={p} need={outsideNeed} onBack={onBack} />
+          : <BookingRail p={p} slots={slots} locale={locale} onBook={onBook} ctx={ctx} revealed={revealed} />}
       </div>
     </>
   );
@@ -724,6 +736,29 @@ function Reviews({ data, p, confirm, locale }: {
 // Verfuegbarkeit begruendet ihn, sie fuehrt ihn nicht ein. Ein Klick auf einen
 // Termin belegt den Slot auf der Buchungsseite vor, sonst waehlt der Nutzer
 // zweimal.
+/** F2 · statt der Buchung: der Grund, warum es von hier keine gibt. Ein
+ *  bestehender Termin (AppointmentRail) geht vor — der bleibt sichtbar. */
+function OutsideFitRail({ p, need, onBack }: { p: ProviderDetail; need: string[]; onBack: () => void }) {
+  const { t } = useTranslation('results');
+  const names = useNames();
+  return (
+    <aside data-testid="outside-fit-rail" className={`${CARD} sticky top-6 p-5`}>
+      <h2 className="text-body-sm font-bold text-fg">{t('outside.profileTitle')}</h2>
+      <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-tertiary">
+        {need.length ? t('outside.profileBody', { areas: names.list(need.map(names.area)) }) : t('outside.profileBodyGeneric')}
+      </p>
+      <Button size="md" shape="soft" variant="outline" fullWidth type="button" className={`mt-4 ${outlineBrandClass}`} onClick={onBack}>
+        {t('detail.backToRiskMap')}
+      </Button>
+      {p.billing_model && (
+        <p className="mt-4 border-t border-stroke-subtle pt-3.5 text-body-3xs text-fg-tertiary">
+          {t('detail.billing')}: {t(`snapshot.billing.${p.billing_model}`)}
+        </p>
+      )}
+    </aside>
+  );
+}
+
 function BookingRail({ p, slots, locale, onBook, ctx, revealed = false }: {
   p: ProviderDetail;
   /** A1: schon offen — dann stimmt "Identity becomes visible after booking" nicht mehr. */

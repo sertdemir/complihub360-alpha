@@ -125,7 +125,7 @@ export interface SearchResult {
   providers: AnonProvider[];
   /** Wizard-Audit F2: nur gefuellt, wenn `providers` leer ist, weil niemand
    *  einen angefragten Bereich abdeckt. Ohne match, match_tier und Preisspanne;
-   *  nie mit `providers` mischen. Die Oberflaeche zeigt sie noch nicht. */
+   *  nie mit `providers` mischen. Die Risk Map zeigt sie getrennt (OutsideFitProviders). */
   providers_outside?: Omit<AnonProvider, 'match' | 'match_tier' | 'price_range'>[];
   laws: SearchLaw[];
   /** Aeltere Antworten kennen sie nicht — dann gibt es keinen Befund

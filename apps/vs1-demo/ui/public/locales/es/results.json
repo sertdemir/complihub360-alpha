@@ -458,5 +458,14 @@
     "message_one": "Aclara {{count}} obligación cuya relevancia aún está abierta. Solo unos segundos.",
     "message_other": "Aclara {{count}} obligaciones cuya relevancia aún está abierta. Solo unos segundos.",
     "cta": "Añadir respuesta"
+  },
+  "outside": {
+    "title": "Verified Providers en {{market}} para otras áreas",
+    "sub": "No cubren {{areas}}. Se muestran para que vea quién trabaja en este mercado.",
+    "notCovered": "{{areas}}: no cubierto",
+    "viewProfile": "Ver perfil",
+    "profileTitle": "Este proveedor no cubre lo que ha solicitado",
+    "profileBody": "Llega a este perfil desde proveedores que trabajan en el mismo mercado, pero no en {{areas}}. Desde aquí no se ofrece la reserva.",
+    "profileBodyGeneric": "Llega a este perfil desde proveedores que trabajan en el mismo mercado, pero no en el área solicitada. Desde aquí no se ofrece la reserva."
   }
 }

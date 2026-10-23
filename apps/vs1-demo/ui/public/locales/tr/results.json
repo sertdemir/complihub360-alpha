@@ -458,5 +458,14 @@
     "message_one": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
     "message_other": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
     "cta": "Yanıt ekle"
+  },
+  "outside": {
+    "title": "{{market}} pazarında diğer alanlar için Verified Provider’lar",
+    "sub": "{{areas}} alanını kapsamıyorlar. Bu pazarda kimin çalıştığını görebilmeniz için gösteriliyorlar.",
+    "notCovered": "{{areas}}: kapsanmıyor",
+    "viewProfile": "Profili görüntüle",
+    "profileTitle": "Bu sağlayıcı talebinizi kapsamıyor",
+    "profileBody": "Bu profile aynı pazarda çalışan ancak {{areas}} alanında çalışmayan sağlayıcılardan ulaştınız. Buradan rezervasyon sunulmuyor.",
+    "profileBodyGeneric": "Bu profile aynı pazarda çalışan ancak talep ettiğiniz alanda çalışmayan sağlayıcılardan ulaştınız. Buradan rezervasyon sunulmuyor."
   }
 }
