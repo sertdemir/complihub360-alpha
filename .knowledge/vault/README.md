@@ -34,6 +34,7 @@ Der dritte hat mit den ersten beiden nichts zu tun.
 | `95 Anhänge/CompliHub360_DNA_V1.docx` | `.knowledge/vault/brand/CompliHub360_DNA_V1.docx` |
 | `02 Strategie/CompliHub360 DNA V1.md` | `.knowledge/vault/brand/CompliHub360_DNA_V1.md` (Extraktion) |
 | `20 Claude Memory/KN-BRAND-001 …` | `.knowledge/memory/nodes/KN-BRAND-001-…md` |
+| `95 Anhänge/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx` | `.knowledge/vault/product/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx` |
 
 Ändert sich im Obsidian-Vault eine Fassung, wird sie hier als **neue Version** nachgezogen und der SHA-256 im Knoten aktualisiert.
 
@@ -42,3 +43,4 @@ Der dritte hat mit den ersten beiden nichts zu tun.
 | Artefakt | Version | Wissensknoten | SHA-256 (Original) |
 |---|---|---|---|
 | [`brand/CompliHub360_DNA_V1.docx`](brand/CompliHub360_DNA_V1.docx) | V1 | [`KN-BRAND-001`](../memory/nodes/KN-BRAND-001-complihub360-dna.md) | `ba9d0491c128d4d3d5f269ad204655918e9a6c2a6a15d2f82537dc7a30a3c4e8` |
+| [`product/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx`](product/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx) | 1.0 | [`KN-PRODUCT-001`](../memory/nodes/KN-PRODUCT-001-technical-ux-acceptance-checklist.md) | `1561d431e8c7d4e7a7da8ef4b26e152214a5a6c2614da44a38e11f3c90ad7df6` |
