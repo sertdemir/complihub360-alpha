@@ -650,11 +650,13 @@
     "disclosure": {
       "pending": {
         "short": "Los datos de contacto llegarán en breve",
-        "reason": "Se liberan en cuanto quede registrada la comunicación de los datos de la reserva."
+        "reason": "Se liberan en cuanto quede registrada la comunicación de los datos de la reserva.",
+        "context": "Llega junto con los datos de contacto."
       },
       "withheld": {
         "short": "Datos de contacto no liberados",
-        "reason": "La reserva se canceló antes de que se liberaran los datos de contacto."
+        "reason": "La reserva se canceló antes de que se liberaran los datos de contacto.",
+        "context": "No liberado."
       }
     }
   },

@@ -422,7 +422,7 @@ export function LeadsPage() {
             </div>
             <div className={DRAWER_BOX}>
               <p className={DRAWER_EYEBROW}>{t('termine.dossierContext')}</p>
-              <p className="mt-1 text-[13px] leading-relaxed text-fg-secondary">{dossierFor.disclosure !== 'released' ? t(`termine.disclosure.${dossierFor.disclosure}.short`) : dossierFor.meta}</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-fg-secondary">{dossierFor.disclosure !== 'released' ? t(`termine.disclosure.${dossierFor.disclosure}.context`) : dossierFor.meta}</p>
             </div>
             <p className="text-[12px] text-fg-tertiary">{t('termine.dossierNote')}</p>
             {dossierFor.status === 'completed' && (

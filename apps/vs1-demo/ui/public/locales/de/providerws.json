@@ -650,11 +650,13 @@
     "disclosure": {
       "pending": {
         "short": "Kontaktdaten folgen in Kürze",
-        "reason": "Sie werden freigegeben, sobald die Offenlegung der Buchung protokolliert ist."
+        "reason": "Sie werden freigegeben, sobald die Offenlegung der Buchung protokolliert ist.",
+        "context": "Folgt mit den Kontaktdaten."
       },
       "withheld": {
         "short": "Kontaktdaten nicht freigegeben",
-        "reason": "Die Buchung wurde storniert, bevor die Kontaktdaten freigegeben waren."
+        "reason": "Die Buchung wurde storniert, bevor die Kontaktdaten freigegeben waren.",
+        "context": "Nicht freigegeben."
       }
     }
   },

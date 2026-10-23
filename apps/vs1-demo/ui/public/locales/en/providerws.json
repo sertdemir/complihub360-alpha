@@ -670,11 +670,13 @@
     "disclosure": {
       "pending": {
         "short": "Contact details follow shortly",
-        "reason": "They are released once the booking’s disclosure has been recorded."
+        "reason": "They are released once the booking’s disclosure has been recorded.",
+        "context": "Follows with the contact details."
       },
       "withheld": {
         "short": "Contact details not released",
-        "reason": "The booking was cancelled before the contact details were released."
+        "reason": "The booking was cancelled before the contact details were released.",
+        "context": "Not released."
       }
     }
   },

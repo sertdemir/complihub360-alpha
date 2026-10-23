@@ -650,11 +650,13 @@
     "disclosure": {
       "pending": {
         "short": "İletişim bilgileri kısa süre içinde gelecek",
-        "reason": "Rezervasyonun paylaşım kaydı oluşturulduğunda açılır."
+        "reason": "Rezervasyonun paylaşım kaydı oluşturulduğunda açılır.",
+        "context": "İletişim bilgileriyle birlikte gelir."
       },
       "withheld": {
         "short": "İletişim bilgileri paylaşılmadı",
-        "reason": "Rezervasyon, iletişim bilgileri paylaşılmadan önce iptal edildi."
+        "reason": "Rezervasyon, iletişim bilgileri paylaşılmadan önce iptal edildi.",
+        "context": "Paylaşılmadı."
       }
     }
   },
