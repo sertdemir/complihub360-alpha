@@ -288,7 +288,10 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             chunks.forEach((c, i) => {
                 contextParts.push(`EXCERPT ${i + 1} · ${c.metadata?.country || '?'} · ${c.metadata?.section || 'General'} (paraphrase, never quote):\n${c.content.slice(0, 1600)}`);
             });
-            const userTurn = `CONTEXT:\n${contextParts.join('\n\n') || '(no matching context found)'}\n\nQUESTION:\n${message}`;
+            // Heutiges Datum (S4): sonst erfindet das Modell Fristen aus seinen Trainingsjahren.
+            if (contextParts.length === 0) contextParts.push('(no matching context found)');
+            contextParts.unshift(`TODAY: ${new Date().toISOString().slice(0, 10)}`);
+            const userTurn = `CONTEXT:\n${contextParts.join('\n\n')}\n\nQUESTION:\n${message}`;
 
             stage = 'generate';
             const generated = await llm.generate(domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);

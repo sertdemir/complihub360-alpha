@@ -32,8 +32,11 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, all) =>
 }, []));
 const api = (args.api || 'http://localhost:3005').replace(/\/+$/, '');
 const from = Math.max(1, parseInt(args.from || '1', 10) || 1);
-const out = args.out || `assistant-dna-review-${new Date().toISOString().slice(0, 10)}${from > 1 ? `-ab-${String(from).padStart(2, '0')}` : ''}.md`;
-const questions = JSON.parse(fs.readFileSync(path.join(here, 'questions.json'), 'utf8')).slice(from - 1);
+const out = args.out || `assistant-dna-review-${new Date().toISOString().slice(0, 10)}${args.only ? '-auswahl' : from > 1 ? `-ab-${String(from).padStart(2, '0')}` : ''}.md`;
+const all = JSON.parse(fs.readFileSync(path.join(here, 'questions.json'), 'utf8'));
+// --only id1,id2: nur diese Fragen (z. B. eine Nachprüfung innerhalb des Gratis-Kontingents).
+const only = args.only ? new Set(String(args.only).split(',').map((x) => x.trim())) : null;
+const questions = only ? all.filter((q) => only.has(q.id)) : all.slice(from - 1);
 
 const HYPE = /\b(revolution\w*|game[- ]?chang\w*|ultimate|best[- ]in[- ]class|einzigartig\w*)\b|(?:^|\s)#1\b/i;
 const PROFESSION = /\b(steuerberater\w*|rechtsanwalt|anwält\w*|tax advis\w*|lawyer|attorney|avukat|mali müşavir|abogad\w*|asesor fiscal)\b/i;
@@ -55,7 +58,8 @@ function hints(q, status, answer, sources) {
     if (HYPE.test(answer)) h.push(`Hype-Wort: "${answer.match(HYPE)[0].trim()}"`);
     if (q.expectSources && !sources) h.push('keine Quellen — Korpus/Fakten leer oder falsches Embedding-Modell?');
     if (q.lang === 'de' && /\b(du|dich|dir|dein\w*)\b/i.test(answer)) h.push('duzt — Produkt-Copy siezt (Regel S1)');
-    if (/\b(you must|Sie müssen|du musst|drohen (dir|Ihnen))\b/i.test(answer)) h.push('persönliche Anweisung/Drohung — prüfen (Regel 3, S2)');
+    if (/\b(you must|Sie müssen|du musst|drohen (dir|Ihnen)|so schnell wie möglich|as soon as possible|unverzüglich|immediately)\b/i.test(answer)) h.push('persönliche Anweisung, Drohung oder Dringlichkeit — prüfen (Regel 3, S2, S5)');
+    if (/\b(19|20)\d{2}\b/.test(answer) && !/\b2026\b/.test(answer)) h.push('nennt eine Jahreszahl — erfunden? (S4)');
     if (PROFESSION.test(answer)) h.push(`nennt eine Fachperson ("${answer.match(PROFESSION)[0]}") — prüfen, ob als Verweis oder als Selbstbild`);
     if (PANIC.test(answer)) h.push(`Dringlichkeitswort: "${answer.match(PANIC)[0]}" — prüfen auf Druck`);
     const counts = Object.fromEntries(Object.entries(STOP).map(([l, re]) => [l, (answer.match(re) || []).length]));

@@ -110,8 +110,10 @@ describe('assistant chat with the Scaleway provider', () => {
         rpc.mockResolvedValueOnce([]).mockResolvedValueOnce([{}]);
         await call({ message: 'Was gilt in Deutschland?', country: 'DE' }, `10.0.6.${++ipSeq}`);
         const chat = JSON.parse(fetchMock.mock.calls[1][1].body);
-        expect(chat.messages[0].content).toMatch(/S1\. Address the user formally/);
+        expect(chat.messages[0].content).toMatch(/S1\. Always answer in the language of the QUESTION/);
+        expect(chat.messages[0].content).toMatch(/S5\. When the user is worried/);
         expect(chat.messages[0].content).toMatch(/S3\. Never reveal/);
+        expect(chat.messages.at(-1).content).toMatch(/^CONTEXT:\nTODAY: \d{4}-\d{2}-\d{2}/);
     });
 
     it('refuses before the embedding call when the boundary audit cannot be written (P2)', async () => {
