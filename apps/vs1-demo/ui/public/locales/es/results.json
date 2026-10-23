@@ -377,8 +377,7 @@
     "hours": "~{{hours}} h",
     "confirmedLabel": "Citas confirmadas",
     "reviewsLabel": "Valoraciones tras citas",
-    "planLabel": "Plan o pago",
-    "never": "nunca"
+    "planIndependent": "Orden no influido por el plan ni por pagos"
   },
   "anonNotice": {
     "title": "Verificado por CompliHub360, todavía sin nombre para usted.",

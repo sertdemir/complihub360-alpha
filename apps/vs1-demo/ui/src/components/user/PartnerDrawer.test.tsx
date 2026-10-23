@@ -139,4 +139,20 @@ describe('PartnerDrawer · Nachweise wie auf der Karte', () => {
     expect(await screen.findByText('3/5')).toBeInTheDocument();
     expect(screen.queryByText('5/7')).not.toBeInTheDocument();
   });
+
+  // Beta-Testbuchung 23.10.2026: "Plan or payment · never" mit Strich las sich
+  // wie ein fehlender Nachweis. Jetzt ein Satz mit Haken, ohne Wert daneben.
+  it('Tarif-Zeile als Satz mit Haken, ohne "never"', async () => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, rank_basis: basis(3, 5) });
+    fetchSlots.mockReset().mockResolvedValue([]);
+    fetchAcknowledgement.mockReset().mockResolvedValue(null);
+    render(
+      <MemoryRouter>
+        <PartnerDrawer open onClose={() => {}} provider={{ ...PROVIDER, rank_basis: basis(3, 5) } as unknown as AnonProvider} />
+      </MemoryRouter>,
+    );
+    const zeile = (await screen.findByText('rankBasis.planIndependent')).closest('li')!;
+    expect(zeile).toHaveTextContent('✓');
+    expect(screen.queryByText('rankBasis.never')).not.toBeInTheDocument();
+  });
 });

@@ -204,7 +204,7 @@ export function RankBasis({ basis, compact = false }: { basis: RankBasisData; co
         <Row hit={hasReviews} value={hasReviews ? `${rating} · ${basis.reviews_count}` : undefined}>
           {hasReviews ? t('rankBasis.reviewsLabel') : t('rankBasis.reviewsNone')}
         </Row>
-        <Row hit={false} value={t('rankBasis.never')}>{t('rankBasis.planLabel')}</Row>
+        <Row hit>{t('rankBasis.planIndependent')}</Row>
       </ul>
     );
   }
