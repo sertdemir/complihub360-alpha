@@ -27,12 +27,16 @@ export interface SchemaStatus {
 const REFRESH_MS = 10 * 60 * 1000;
 let status: SchemaStatus = { state: 'unknown', missing: [], checkedAt: null };
 
-/** Rein: Dateinamen aus dem Repo gegen eingespielte Versionen. */
+/** Rein: Dateinamen aus dem Repo gegen eingespielte Versionen. Eine Datei
+ *  gilt als eingespielt, wenn ihr Zeitstempel ODER ihr Name ohne Zeitstempel
+ *  (`name:<Name>`) auftaucht — Staging fuehrt aeltere Migrationen mit dem
+ *  Zeitstempel des Einspielens und blossem Namen (20261024000000). */
 export function missingMigrations(expectedFiles: string[], applied: string[]): string[] {
     const have = new Set(applied);
     return expectedFiles.filter((f) => {
-        const v = /^(\d{14})_/.exec(f)?.[1];
-        return v ? !have.has(v) : false;
+        const m = /^(\d{14})_(.+?)(\.sql)?$/.exec(f);
+        if (!m) return false;
+        return !have.has(m[1]) && !have.has(`name:${m[2]}`);
     });
 }
 
