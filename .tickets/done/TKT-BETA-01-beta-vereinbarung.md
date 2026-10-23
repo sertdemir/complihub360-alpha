@@ -1,7 +1,7 @@
 ---
 title: "Beta-Vereinbarung: ein Blatt statt AGB, Zustimmung nach dem ersten Login, Nachweis im Konto"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Beta-Vereinbarung (Canvas-Wahl 1A · 2A · 3A+3C · 4C, 22.10.2026)
