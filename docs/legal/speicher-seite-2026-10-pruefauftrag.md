@@ -104,6 +104,8 @@ keinen Dritten außer dem Hosting-Anbieter.
 
 **Was der Code tut:**
 - Schriften und Symbole kommen vom eigenen Server (`@fontsource`, gebündelt). Es gibt keine Karten, Videos oder fremden Skripte. Plausible läuft auf unserem Server.
+  - **Erst seit PR #383 (23.10.2026)** kommen die Schriften vom eigenen Server. Vorher lud die Seite sie von Google Fonts, obwohl die Speicher-Seite seit 18.10. „keine Schriften von fremden Servern" sagte.
+  - Auf der Beta gilt das bis zum nächsten Deploy weiter. Wenn das für die Bewertung zählt (IP-Übermittlung an Google in diesem Zeitraum), bitte vermerken.
 - Für die Anmeldung, und solange man angemeldet ist, spricht der Browser **direkt** mit Supabase (Frankfurt), dem Anmelde- und Datenbankdienst. Das gilt für die Anmeldung selbst und für die Erneuerung der Anmeldung.
 - Für Zahlungen und den USt-Assistenten-Kauf sowie für die Kalenderverbindung führt die Anwendung auf Seiten von Stripe bzw. Nylas. Das ist eine Weiterleitung, kein eingebetteter Inhalt, und sie geschieht nur auf Klick.
 
@@ -127,6 +129,8 @@ keinen Dritten außer dem Hosting-Anbieter.
 Die Seite nennt als Kontakt `dataprivacy@complihub360.com`. Das ist dieselbe
 Adresse wie in der Datenschutzerklärung. Dort stehen außerdem die
 Verantwortliche und ihre Anschrift. Das Impressum nennt eine andere Adresse.
+
+**Tatsache vorab:** Die Postfächer laufen über Google Workspace. `dataprivacy@` war am 23.10.2026 um 23:43 noch nicht erreichbar („Address not found"). Bevor dieses Blatt verschickt wird, prüfen wir Empfang und Antwort.
 
 **Prüffragen:**
 - **C-1:** Genügt auf dieser Seite die Adresse, oder gehört die Verantwortliche dazu, etwa als Verweis auf die Datenschutzerklärung?
