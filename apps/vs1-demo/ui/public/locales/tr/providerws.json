@@ -576,7 +576,7 @@
     "minutes": "{{count}} dk",
     "dossierEyebrow": "LEAD DOSYASI",
     "dossierContact": "İletişim ve randevu",
-    "dossierContext": "Başvuru bağlamı",
+    "dossierContext": "Talep",
     "dossierNote": "Rezervasyonda teslim edilir, onaylanacak bir şey yok. Lead ücreti rezervasyon başına faturalanır; müşteri gelmez ve 14 gün içinde yeniden rezervasyon yapmazsa %30 alacak alırsınız.",
     "emptyUpcoming": "Yaklaşan randevu yok.",
     "emptyPast": "Henüz geçmiş randevu yok.",

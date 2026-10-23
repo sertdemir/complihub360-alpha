@@ -595,7 +595,7 @@
     "minutes": "{{count}} min",
     "dossierEyebrow": "LEAD DOSSIER",
     "dossierContact": "Contact & slot",
-    "dossierContext": "Intake context",
+    "dossierContext": "Request",
     "dossierNote": "Delivered at booking, nothing to confirm. The lead fee is billed per booking; if the client does not show and does not rebook within 14 days, you receive a 30 % credit.",
     "emptyUpcoming": "No upcoming appointments.",
     "emptyPast": "No past appointments yet.",
