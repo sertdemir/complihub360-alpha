@@ -140,8 +140,8 @@ describe('Assistant — Privacy-Befunde P1, P2, P5', () => {
             expect(sent).toContain('name the gap in one sentence');
             expect(sent).toContain('stay calm and factual');
             expect(sent).toContain('NOT legal or tax advice');
-            // Keine reflexartige Partner-Empfehlung, Bussgeld nie als Schlagzeile.
-            expect(sent).toContain('Do not present a partner request as the only or the required next step');
+            // Keine reflexartige Anbieter-Empfehlung, Bussgeld nie als Schlagzeile.
+            expect(sent).toContain('Do not present a provider request as the only or the required next step');
             expect(sent).toContain('Penalties are context, not the headline');
             expect(sent).not.toContain('coverage for it is coming');
         }

@@ -223,4 +223,14 @@ Das Review fand 4 hohe und 5 mittlere Befunde, alle im Code dieses PRs. Behoben:
 
 Bekannte Grenze: Ein Auszug aus einem anderen Land belegt dieselbe Zahl mit.
 
-**Offen beim Nutzer (Eskalation aus dem Review):** Was passiert mit einer Antwort, die nach dem Neuschreiben weiterhin `kept` oder `introduced` ist? Heute geht sie mit Log-Eintrag raus. Möglich wären: zurückhalten, eine feste ehrliche Antwort schicken oder die Zahl markieren.
+**Entschieden vom Nutzer (23.10.2026): Option 2, zurückhalten mit festem Satz.**
+- Bleibt nach dem Neuschreiben Druck oder eine ungedeckte Zahl (`kept` oder `introduced`), geht die Antwort nicht raus. Stattdessen kommt ein fester Satz in der Sprache der Frage (`heldReply`). Das Log meldet `ERR_ASSISTANT_HELD`, das Ereignis trägt `held`. Druck geht vor der Zahl.
+- Der feste Satz nennt die Grenze, bietet die genauere Frage oder eine Anfrage an einen verifizierten Anbieter an und bleibt formell.
+- **Mitkorrigiert:** Seit der Festlegung vom 15.10. heißt es Anbieter oder Provider statt „Partner" (`scripts/check-terminology.mjs`). Die Prompts sagten noch „verified partner", deshalb schrieb das Modell in jeder Antwort „Partner". Jetzt steht in Prompt und Prüfliste „verified provider". Der Prüfbogen markiert „Partner".
+- **Mitkorrigiert:** `guessLang` erkennt Wörter mit Akzent („qué", „için"). Vorher bekamen spanische Fragen die englische Leck-Antwort.
+
+DNA-Check zu den festen Sätzen:
+- **Grenze benennen statt Unsicherheit verstecken:** Der Satz sagt „keine geprüfte Zahl".
+- **Kein Zwang zum Menschen:** Der Anbieter wird als Möglichkeit angeboten, die genauere Frage als Alternative.
+- **Ruhig bei Sorge, ohne falsche Beruhigung:** Der Satz nennt die Abhängigkeit vom eigenen Fall, verspricht aber nichts.
+- **Gleicher Respekt:** Alle bekommen dieselbe Formulierung in derselben formellen Anrede.

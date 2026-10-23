@@ -5,7 +5,7 @@ import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
 import { resolveLlm, sameEmbedModel, type LlmProvider } from './llm.js';
-import { CALM_REWRITE, SHARED_RULES, answerCheck, factLine, figureCheck, leaksPrompt, leakReply, pressureInWorriedReply, ungroundedFigures } from './assistantGuard.js';
+import { CALM_REWRITE, SHARED_RULES, answerCheck, factLine, figureCheck, heldReply, leaksPrompt, leakReply, pressureInWorriedReply, ungroundedFigures } from './assistantGuard.js';
 import { redactText } from "@complihub360/redaction";
 
 /** P5: was an das Modell geht, ist vorher deterministisch redigiert (Regex-Profile, keine KI). */
@@ -62,7 +62,7 @@ const SYSTEM_PROMPT = `You are the CompliHub360 compliance assistant for VAT / i
 
 Rules — follow ALL of them:
 0. You are an AI assistant, not a lawyer, tax adviser or customs specialist. Say so when asked, or when the user treats you as one.
-1. Answer ONLY from the CONTEXT block (structured facts + knowledge excerpts). If the context does not cover the question, say so plainly and offer a choice: rephrase or narrow the question, or — where a qualified person is needed — send a request to a verified partner via CompliHub360. Do not present a partner request as the only or the required next step. Never guess.
+1. Answer ONLY from the CONTEXT block (structured facts + knowledge excerpts). If the context does not cover the question, say so plainly and offer a choice: rephrase or narrow the question, or — where a qualified person is needed — send a request to a verified provider via CompliHub360. Do not present a provider request as the only or the required next step. Never guess.
 1b. Separate what the rules clearly require from what depends on interpretation or on the user's facts; for the second kind, say that it depends and on what.
 1c. When the context is incomplete or conflicting, give the closest reliable answer and name the gap in one sentence.
 1d. If the user is worried or mentions an enforcement letter, a penalty or a missed deadline, stay calm and factual: what applies, what the next step is, where a qualified person helps.
@@ -89,7 +89,7 @@ function domainPrompt(slug: string): string {
 
 Rules — follow ALL of them:
 0. You are an AI assistant, not a lawyer, tax adviser or customs specialist. Say so when asked, or when the user treats you as one.
-1. Answer ONLY from the CONTEXT block: the AREA KNOWLEDGE (the duties this area carries, with statute, penalty and cadence per market), the user's OWN OBLIGATIONS from their saved sessions, and — where present — structured facts and knowledge excerpts. If the context does not cover the question, say so plainly and offer a choice: rephrase or narrow the question, or — where a qualified person is needed — send a request to a verified partner via CompliHub360. Do not present a partner request as the only or the required next step. Never guess and never bring in other areas.
+1. Answer ONLY from the CONTEXT block: the AREA KNOWLEDGE (the duties this area carries, with statute, penalty and cadence per market), the user's OWN OBLIGATIONS from their saved sessions, and — where present — structured facts and knowledge excerpts. If the context does not cover the question, say so plainly and offer a choice: rephrase or narrow the question, or — where a qualified person is needed — send a request to a verified provider via CompliHub360. Do not present a provider request as the only or the required next step. Never guess and never bring in other areas.
 1b. Separate what the rules clearly require from what depends on interpretation or on the user's facts; for the second kind, say that it depends and on what.
 1c. When the context is incomplete or conflicting, give the closest reliable answer and name the gap in one sentence.
 1d. If the user is worried or mentions an enforcement letter, a penalty or a missed deadline, stay calm and factual: what applies, what the next step is, where a qualified person helps.
@@ -339,11 +339,19 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             // aus, geht stattdessen eine feste Antwort in der Sprache der Frage.
             const promptLeak = leaksPrompt(generated);
             if (promptLeak) structuredLog('warn', 'Assistant: prompt leak blocked', { correlationId, errorCode: 'ERR_ASSISTANT_PROMPT_LEAK', severity: 'warn' });
-            const answer = promptLeak ? leakReply(rawMessage) : generated;
+            // Entscheidung des Nutzers (23.10.2026, Option 2): Bleibt nach dem
+            // Neuschreiben Druck oder eine ungedeckte Zahl, geht die Antwort
+            // NICHT raus, sondern ein fester ehrlicher Satz. Druck zuerst — bei
+            // Sorge zaehlt der Ton mehr als die fehlende Zahl.
+            const held: 'pressure' | 'figures' | null = promptLeak ? null
+                : urgencyRewrite === 'kept' || urgencyRewrite === 'introduced' ? 'pressure'
+                : figureRewrite === 'kept' || figureRewrite === 'introduced' ? 'figures' : null;
+            if (held) structuredLog('warn', 'Assistant: reply held back, fixed reply sent', { correlationId, errorCode: 'ERR_ASSISTANT_HELD', severity: 'warn', detail: held });
+            const answer = promptLeak ? leakReply(rawMessage) : held ? heldReply(held, rawMessage) : generated;
 
             // Ohne Frageinhalt — Volumen, Abdeckung und Kalibrierung der Schwelle.
             await logAssistantEvent({
-                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, urgency_rewrite: urgencyRewrite, figure_rewrite: figureRewrite,
+                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, held, urgency_rewrite: urgencyRewrite, figure_rewrite: figureRewrite,
                 figures_before: figures.length, figures_after: figuresAfter, country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
                 top_similarity: chunks[0] ? Math.round(chunks[0].similarity * 1000) / 1000 : null,
                 top_below_threshold: topBelowThreshold,

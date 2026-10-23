@@ -63,6 +63,7 @@ function hints(q, status, answer, sources) {
     if (/(drohen|droht|threaten\w*|you (?:could|will|may) face)/i.test(answer)) h.push(`Drohwort: "${answer.match(/(drohen|droht|threaten\w*|you (?:could|will|may) face)/i)[0]}" — Drohkulisse? (S5)`);
     const penaltyLines = answer.split('\n').filter((l) => /^\s*[-•]/.test(l) && /(strafe|bußgeld|geldbuße|sanktion|haftung|penalt|\bfines?\b|multa|sanci|ceza)/i.test(l)).length;
     if (penaltyLines >= 2) h.push(`Strafen als Liste (${penaltyLines} Zeilen) — Regel 7 / S5`);
+    if (/\b(partner\w*|socio\w*|iş ortağ\w*)/i.test(answer)) h.push('sagt „Partner" — Begriff ist Anbieter/Provider (seit 15.10.2026)');
     if (PROFESSION.test(answer)) h.push(`nennt eine Fachperson ("${answer.match(PROFESSION)[0]}") — prüfen, ob als Verweis oder als Selbstbild`);
     if (PANIC.test(answer)) h.push(`Dringlichkeitswort: "${answer.match(PANIC)[0]}" — prüfen auf Druck`);
     const counts = Object.fromEntries(Object.entries(STOP).map(([l, re]) => [l, (answer.match(re) || []).length]));
