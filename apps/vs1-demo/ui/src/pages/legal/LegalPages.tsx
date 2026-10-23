@@ -480,7 +480,9 @@ export function TermsPage() {
 // grep for localStorage./sessionStorage. before editing. The one genuinely
 // legal call, whether each entry is "strictly necessary" under §25 TDDDG /
 // ePrivacy, is our own assessment (all necessary, no consent) and is flagged
-// as such on the page; counsel has not reviewed it.
+// as such on the page; counsel has not reviewed it. The open questions for
+// counsel (per-key classification, third parties, contact) are in
+// docs/legal/speicher-seite-2026-10-pruefauftrag.md.
 
 const STORAGE_KEYS: { name: string; scope: 'local' | 'session'; en: string; de: string }[] = [
   // Anmeldung: schreibt das Supabase-SDK selbst (lib/supabase.ts, persistSession,
@@ -625,9 +627,11 @@ export function CookiePage() {
         <Section heading={t('cookies.headings.thirdParty')}>
           <p>
             Wir binden keine Inhalte Dritter ein: keine Karten, keine Videos, keine Schriften von fremden Servern.
-            Schriftarten und Symbole liefern wir von unserem eigenen Server aus. Beim Aufruf dieser Website wird Ihre
-            IP-Adresse deshalb an keinen Dritten übermittelt, abgesehen von unserem Hosting-Anbieter (siehe
-            Datenschutzerklärung).
+            Schriftarten und Symbole liefern wir von unserem eigenen Server aus. Beim bloßen Aufruf dieser Website geht
+            Ihre IP-Adresse deshalb nur an unseren Hosting-Anbieter. Während Sie sich anmelden und solange Sie angemeldet
+            sind, verbindet sich Ihr Browser zusätzlich mit unserem Anmeldedienst Supabase (Frankfurt). Für eine Zahlung
+            und für die Kalenderverbindung wechseln Sie auf eine Seite von Stripe bzw. Nylas, nur wenn Sie das selbst
+            auslösen (siehe Datenschutzerklärung).
           </p>
         </Section>
         <Section heading={t('cookies.headings.contact')}>
@@ -692,8 +696,10 @@ export function CookiePage() {
       <Section heading={t('cookies.headings.thirdParty')}>
         <p>
           We embed no third-party content: no maps, no videos, no fonts from external servers. Fonts and icons are
-          served from our own server. When you visit this website, your IP address is therefore not transmitted to any
-          third party other than our hosting provider (see the privacy policy).
+          served from our own server. Simply visiting this website therefore sends your IP address only to our hosting
+          provider. While you sign in and for as long as you are signed in, your browser also connects to our sign-in
+          service Supabase (Frankfurt). For a payment and for connecting a calendar you move to a Stripe or Nylas page,
+          only when you start it yourself (see the privacy policy).
         </p>
       </Section>
       <Section heading={t('cookies.headings.contact')}>
