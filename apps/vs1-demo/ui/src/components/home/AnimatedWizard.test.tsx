@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { AnimatedWizard } from './AnimatedWizard';
+import { AnimatedWizard, buildProfile, selectionFromProfile } from './AnimatedWizard';
 import type { SearchProfile } from '../wizard/WizardContext';
 
 // ─── initialMarkets · the market page hands over its market ──────────────────
@@ -62,5 +62,65 @@ describe('AnimatedWizard · initialMarkets', () => {
   it('falls back to a normal start when the code is unknown', () => {
     setup({ initialMarkets: ['XX'] });
     expect(screen.getByRole('heading', { name: 'wizard.steps.markets.title' })).toBeInTheDocument();
+  });
+});
+
+// ─── Wizard-Audit 23.10.2026: was angezeigt wird, wird auch gespeichert ──────
+describe('AnimatedWizard · audit fixes', () => {
+  const card = (key: string) =>
+    screen.getByText(`wizard.cards.${key}.title`).closest('[role="button"]') as HTMLElement;
+  const next = () => screen.getByRole('button', { name: /wizard\.footer\.next/ });
+
+  it('B12: no market, no way forward — and the reason is named', () => {
+    setup();
+    expect(next()).toBeDisabled();
+    expect(next()).toHaveAttribute('aria-describedby', 'wizard-needs-market');
+    expect(screen.getByText('wizard.needsMarket')).toBeInTheDocument();
+    fireEvent.click(card('germany'));
+    expect(next()).toBeEnabled();
+    expect(screen.queryByText('wizard.needsMarket')).not.toBeInTheDocument();
+  });
+
+  it('B12: a category-only entry cannot generate without a market', () => {
+    const { onComplete } = setup({ initialProfile: { categories: ['tax-vat'] } as SearchProfile });
+    const generate = screen.getByRole('button', { name: /wizard\.generate/ });
+    expect(generate).toBeDisabled();
+    fireEvent.click(generate);
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+
+  it('B1: Operations takes exactly one business model', () => {
+    const { onComplete } = setup({ initialMarkets: ['DE'] });
+    fireEvent.click(card('d2cEcommerce'));
+    fireEvent.click(card('marketplace'));
+    expect(card('d2cEcommerce')).toHaveAttribute('aria-pressed', 'false');
+    expect(card('marketplace')).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(next());
+    fireEvent.click(next());
+    fireEvent.click(screen.getByRole('button', { name: /wizard\.generate/ }));
+    const profile = onComplete.mock.calls[0][0] as SearchProfile;
+    expect(profile.businessType).toBe('marketplace');
+    expect(profile.businessTypeNote).toBe('Marketplace');
+  });
+
+  it('B8 · F8: no invented EU scope, no invented "no existing Provider"', () => {
+    const { onComplete } = setup({ initialMarkets: ['US', 'TR'] });
+    fireEvent.click(next());
+    fireEvent.click(next());
+    fireEvent.click(screen.getByRole('button', { name: /wizard\.generate/ }));
+    const profile = onComplete.mock.calls[0][0] as SearchProfile;
+    expect(profile.markets).toEqual(['US', 'TR']);
+    expect(profile.marketScope).toBe('');
+    expect(profile.existingProvider).toBeNull();
+  });
+});
+
+describe('buildProfile · B5 drawer markets', () => {
+  it('stores drawer markets as ISO codes and reads old name profiles back', () => {
+    const profile = buildProfile(new Set(['Germany', 'Others']), ['Switzerland', 'Austria']);
+    expect(profile.markets).toEqual(['DE', 'CH', 'AT']);
+    expect(selectionFromProfile(profile).extraMarkets).toEqual(['Switzerland', 'Austria']);
+    // Profile vor dem Fix trugen den Namen — die Auswahl bleibt dieselbe.
+    expect(selectionFromProfile({ ...profile, markets: ['DE', 'Portugal'] }).extraMarkets).toEqual(['Portugal']);
   });
 });

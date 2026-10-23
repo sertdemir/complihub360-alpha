@@ -242,7 +242,7 @@
       },
       "other": {
         "title": "Sonstiges",
-        "desc": "Beschreiben Sie es in einem Satz"
+        "desc": "Keines davon passt"
       },
       "vatTax": {
         "title": "Steuern & USt",
@@ -282,8 +282,7 @@
       }
     },
     "footer": {
-      "next": "Weiter",
-      "skipRoute": "Überspringen & zuordnen"
+      "next": "Weiter"
     },
     "review": {
       "title": "Ihre Situation, zusammengefasst.",
@@ -294,7 +293,8 @@
       "edit": "Bearbeiten",
       "trust": "Anonym · Kein Konto nötig, um Ihre Risk Map zu sehen · Verarbeitung in ~4 Sekunden"
     },
-    "skipHint": "Unsicher? Überspringen Sie den Schritt — wir ordnen anhand Ihres Geschäftsmodells und Ihrer Märkte zu.",
+    "skipHint": "Unsicher? Wählen Sie, was am ehesten passt — jede Antwort lässt sich vor dem Erstellen noch ändern.",
+    "needsMarket": "Wählen Sie mindestens einen Markt, um fortzufahren.",
     "back": "Zurück",
     "generate": "Meine Risk Map erstellen",
     "removeMarket": "{{market}} entfernen",
@@ -549,6 +549,7 @@
     },
     "footNote": "Dauert 20 Sekunden · Kein Passwort · Keine Kreditkarte.",
     "done": "Fertig",
+    "sendFailed": "Der Link konnte gerade nicht versendet werden. Bitte prüfen Sie die Adresse und versuchen Sie es gleich noch einmal.",
     "drawerLabel": "Fortschritt speichern"
   },
   "riskMapPreview": {
