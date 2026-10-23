@@ -41,6 +41,7 @@ on:
       - 'packages/**'
       - 'services/compliance-api/**'
       - 'services/redaction/**'
+      - 'supabase/migrations/**'
       - '.github/workflows/deploy-staging.yml'
   workflow_dispatch:
 
@@ -83,6 +84,12 @@ jobs:
           npx esbuild services/compliance-api/src/index.ts --bundle --platform=node \
             --format=cjs --outfile=out/index.cjs
           echo "{\"sha\":\"$GITHUB_SHA\",\"builtAt\":\"$(date -u +%FT%TZ)\"}" > out/api-build-info.json
+          # Welche Migrationen dieser Stand erwartet (schemaCheck.ts, wie Beta).
+          # Die API vergleicht sie mit der Datenbank und meldet es im Health-Check.
+          ls supabase/migrations | grep -E '^[0-9]{14}_.*\.sql$' \
+            | node -e 'console.log(JSON.stringify(require("fs").readFileSync(0,"utf8").trim().split("\n")))' \
+            > out/expected-migrations.json
+          test -s out/expected-migrations.json
 
       - uses: actions/upload-artifact@v4
         with:
@@ -171,7 +178,7 @@ jobs:
           set -euo pipefail
           test -s api-bundle/index.cjs
           install -m 644 api-bundle/index.cjs api-bundle/api-build-info.json \
-            /docker/complihub-api/app/
+            api-bundle/expected-migrations.json /docker/complihub-api/app/
           # docker group membership is root-equivalent, so the runner user has
           # none. It may call exactly three root-owned wrappers via sudo — see
           # scripts/vps/install-github-runner.sh.
@@ -184,8 +191,25 @@ jobs:
           # waits on this one — a flaky check would block the whole deploy.
           # Still fails hard after ~45s, so a genuinely dead API stays red.
           for a in $(seq 1 15); do
-            if sudo /usr/local/sbin/complihub-api-health 2>/dev/null | grep -q '"ok":true'; then
+            out=$(sudo /usr/local/sbin/complihub-api-health 2>/dev/null || true)
+            if printf '%s' "$out" | grep -q '"ok":true'; then
               echo "✓ API container healthy on the new bundle (after ${a} attempt(s))"
+              # Datenbank auf dem Stand des Codes? (schemaCheck.ts, wie Beta.)
+              # Staging-Migrationen laufen per Supabase-MCP; fehlt eine, brechen
+              # die Wege ab, die sie brauchen. "unknown": erster Abgleich noch
+              # nicht fertig oder Funktion fehlt — dann nur eine Warnung.
+              for b in $(seq 1 10); do
+                case "$out" in
+                  *'"schema":"current"'*) echo "✓ Datenbank hat alle Migrationen"; exit 0 ;;
+                  *'"schema":"behind"'*)
+                    echo "::error::Der Staging-Datenbank fehlen Migrationen. Namen im Log (ERR_SCHEMA_BEHIND):"
+                    sudo /usr/local/sbin/complihub-api-logs 2>/dev/null | grep ERR_SCHEMA_BEHIND | tail -1 || true
+                    exit 1 ;;
+                esac
+                sleep 2
+                out=$(sudo /usr/local/sbin/complihub-api-health 2>/dev/null || true)
+              done
+              echo "::warning::Migrationsstand unbekannt (applied_migration_versions fehlt oder Abfrage gescheitert) — siehe ERR_SCHEMA_CHECK im Log"
               exit 0
             fi
             sleep 3
