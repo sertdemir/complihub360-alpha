@@ -34,7 +34,7 @@ Der dritte hat mit den ersten beiden nichts zu tun.
 | `95 Anhänge/CompliHub360_DNA_V1.docx` | `.knowledge/vault/brand/CompliHub360_DNA_V1.docx` |
 | `02 Strategie/CompliHub360 DNA V1.md` | `.knowledge/vault/brand/CompliHub360_DNA_V1.md` (Extraktion) |
 | `20 Claude Memory/KN-BRAND-001 …` | `.knowledge/memory/nodes/KN-BRAND-001-…md` |
-| `95 Anhänge/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx` | `.knowledge/vault/product/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx` |
+| `14 Anhänge/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx` | `.knowledge/vault/product/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx` |
 
 Ändert sich im Obsidian-Vault eine Fassung, wird sie hier als **neue Version** nachgezogen und der SHA-256 im Knoten aktualisiert.
 
