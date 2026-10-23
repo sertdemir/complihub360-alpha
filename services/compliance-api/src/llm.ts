@@ -1,19 +1,14 @@
 // ─── Sprachmodell-Anbieter für den Assistenten ────────────────────────────────
 //
-// Ein Interface, zwei Implementierungen:
+// OpenAI-kompatibel (Festlegung 2026-10-18): Scaleway Generative APIs in Paris
+// mit offenen Modellen — Mistral Small für die Antwort, Qwen3-Embedding für die
+// Korpus-Suche. Jeder andere OpenAI-kompatible Endpunkt (IONOS, OVHcloud, ein
+// eigener vLLM-Server) ist nur eine andere LLM_BASE_URL — kein Codewechsel.
+// Gemini war der Übergang und ist seit dem Cutover am 23.10.2026 entfernt
+// (docs/runbooks/llm-scaleway-umstellung.md).
 //
-//   • OpenAI-kompatibel (Ziel, Festlegung 2026-10-18): Scaleway Generative APIs
-//     in Paris mit offenen Modellen — Mistral Small für die Antwort,
-//     Qwen3-Embedding für die Korpus-Suche. Jeder andere OpenAI-kompatible
-//     Endpunkt (IONOS, OVHcloud, ein eigener vLLM-Server) ist nur eine andere
-//     LLM_BASE_URL — kein Codewechsel.
-//   • Gemini (Übergang): bleibt nur, solange LLM_API_KEY fehlt, damit Staging
-//     bis zur Umstellung weiter antwortet. Wird nach dem Cutover entfernt
-//     (docs/runbooks/llm-scaleway-umstellung.md).
-//
-// Die Wahl hängt allein an der Konfiguration. Es gibt bewusst KEIN
-// automatisches Ausweichen zur Laufzeit: Fällt Scaleway aus, scheitert die
-// Anfrage sichtbar (502), statt still Daten an einen anderen Anbieter zu geben.
+// Es gibt bewusst KEIN Ausweichen auf einen anderen Anbieter: Fällt Scaleway
+// aus, scheitert die Anfrage sichtbar (502), statt still Daten woandershin zu geben.
 //
 // Vektoren verschiedener Modelle sind nicht vergleichbar. Jeder Korpus-Chunk
 // trägt deshalb `metadata.embed_model`; der Assistent nimmt nur Treffer, die
@@ -22,7 +17,7 @@
 /** Breite der Spalte knowledge_chunks.embedding (vector(768)). */
 export const EMBED_DIMS = 768;
 
-/** Modell, mit dem der Bestand ohne `embed_model`-Feld eingebettet wurde. */
+/** Modell der Chunks ohne `embed_model`-Feld (Gemini-Altbestand; seit 23.10.2026 neu eingebettet). */
 export const LEGACY_EMBED_MODEL = 'gemini-embedding-001';
 
 export const DEFAULT_BASE_URL = 'https://api.scaleway.ai/v1';
@@ -38,7 +33,7 @@ export type ChatTurn = { role: string; content: string };
 
 export interface LlmProvider {
     /** Für Audit und Logs: wer die Frage verarbeitet hat. */
-    readonly id: 'openai-compatible' | 'gemini';
+    readonly id: 'openai-compatible';
     readonly chatModel: string;
     readonly embedModel: string;
     embedQuery(text: string): Promise<number[]>;
@@ -47,10 +42,7 @@ export interface LlmProvider {
 
 type Env = Record<string, string | undefined>;
 
-/**
- * Liefert den konfigurierten Anbieter oder null (→ 503 ASSISTANT_NOT_CONFIGURED).
- * LLM_API_KEY gewinnt; GEMINI_API_KEY ist nur der Übergang.
- */
+/** Liefert den konfigurierten Anbieter oder null (→ 503 ASSISTANT_NOT_CONFIGURED). */
 export function resolveLlm(env: Env = process.env): LlmProvider | null {
     const key = env.LLM_API_KEY?.trim();
     if (key) {
@@ -61,8 +53,7 @@ export function resolveLlm(env: Env = process.env): LlmProvider | null {
             embedModel: env.LLM_EMBED_MODEL?.trim() || DEFAULT_EMBED_MODEL,
         });
     }
-    const gemini = env.GEMINI_API_KEY?.trim();
-    return gemini ? geminiLegacy(gemini) : null;
+    return null;
 }
 
 /** Kürzt einen Matryoshka-Vektor auf `dims` und normiert ihn wieder auf Länge 1. */
@@ -118,13 +109,11 @@ function trimHistory(history: ChatTurn[]): ChatTurn[] {
     }));
 }
 
-/** Was OpenAI-kompatible Anbieter und Gemini zurückgeben — alles optional, weil fremd. */
+/** Was OpenAI-kompatible Anbieter zurückgeben — alles optional, weil fremd. */
 type ApiBody = {
     error?: { message?: string }; message?: string; detail?: string;
     data?: Array<{ embedding?: unknown }>;
     choices?: Array<{ message?: { content?: unknown }; finish_reason?: string }>;
-    embedding?: { values?: unknown };
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
 };
 
 async function postJson(url: string, headers: Record<string, string>, payload: unknown): Promise<{ ok: boolean; status: number; body: ApiBody }> {
@@ -170,43 +159,8 @@ export function openAiCompatible(cfg: { apiKey: string; baseUrl: string; chatMod
             const text = body?.choices?.[0]?.message?.content;
             if (!ok || typeof text !== 'string' || !text.trim()) throw new Error(`generate: ${errorText(body, status)}`);
             // Abgeschnitten fehlt oft genau der Schluss: die Grenze oder der
-            // Weg zum Partner. Lieber sichtbar scheitern als halb antworten.
+            // Weg zum Anbieter. Lieber sichtbar scheitern als halb antworten.
             if (body.choices?.[0]?.finish_reason === 'length') throw new Error('generate: answer truncated (finish_reason=length)');
-            return toPlainText(text);
-        },
-    };
-}
-
-// ─── Übergang: Gemini (entfällt nach dem Cutover) ────────────────────────────
-const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-const GEMINI_GEN_MODEL = 'gemini-flash-latest';
-
-function geminiLegacy(apiKey: string): LlmProvider {
-    return {
-        id: 'gemini',
-        chatModel: GEMINI_GEN_MODEL,
-        embedModel: LEGACY_EMBED_MODEL,
-        async embedQuery(text) {
-            const { ok, status, body } = await postJson(`${GEMINI_BASE}/${LEGACY_EMBED_MODEL}:embedContent?key=${apiKey}`, {}, {
-                content: { parts: [{ text }] }, taskType: 'RETRIEVAL_QUERY', outputDimensionality: EMBED_DIMS,
-            });
-            if (!ok) throw new Error(`Gemini embed: ${errorText(body, status)}`);
-            return fitEmbedding(body?.embedding?.values);
-        },
-        async generate(system, history, user) {
-            const contents = [
-                ...trimHistory(history).map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
-                { role: 'user', parts: [{ text: user }] },
-            ];
-            const { ok, status, body } = await postJson(`${GEMINI_BASE}/${GEMINI_GEN_MODEL}:generateContent?key=${apiKey}`, {}, {
-                system_instruction: { parts: [{ text: system }] },
-                contents,
-                // Thinking-Modelle zahlen Reasoning aus demselben Budget.
-                generationConfig: { temperature: 0.2, maxOutputTokens: 8192 },
-            });
-            const text = (body?.candidates?.[0]?.content?.parts ?? []).map((p) => p.text || '').join('');
-            if (!ok || !text) throw new Error(`Gemini generate: ${errorText(body, status)}`);
-            if (body.candidates?.[0]?.finishReason === 'MAX_TOKENS') throw new Error('Gemini generate: answer truncated (MAX_TOKENS)');
             return toPlainText(text);
         },
     };
