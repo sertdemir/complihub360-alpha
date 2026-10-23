@@ -1,7 +1,9 @@
 import { createContext, useContext, useReducer, ReactNode } from "react";
 
-// Canonical final 8 domains (lib/domains.ts, decision 2026-08-04) — Full
-// Support removed; Product Compliance, Logistics & Customs, Legal Advisory added.
+// Canonical nine domains (lib/domains.ts): the final eight of 2026-08-04 —
+// Full Support removed; Product Compliance, Logistics & Customs, Legal Advisory
+// added — plus Environment (2026-09-18). Same set as service_categories and
+// SLUG_TO_ENGINE (Wizard-Audit B13).
 export type WizardCategory =
     | "tax-vat"
     | "product-packaging"
@@ -44,7 +46,8 @@ export interface SearchProfile {
     intent: Intent;
     urgency: Urgency;
     note: string;
-    existingProvider: boolean;
+    /** null = nicht gefragt / unbekannt — nie stillschweigend "nein". */
+    existingProvider: boolean | null;
 }
 
 const DEFAULT_PROFILE: SearchProfile = {
@@ -59,7 +62,7 @@ const DEFAULT_PROFILE: SearchProfile = {
     intent: "",
     urgency: "",
     note: "",
-    existingProvider: false,
+    existingProvider: null,
 };
 
 type WizardAction =

@@ -8,6 +8,7 @@ import { X, Search, Check, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { focusField } from '../ui/FormErrorSummary';
 import { FieldError, FIELD_ERROR_CLASS, errorAria } from '../ui/FieldError';
+import type { SearchProfile } from '../wizard/WizardContext';
 
 // ─── Wizard drawers · Figma 1698:293 (Other Markets) + 1740:428 (Country) ────
 // Both open INSIDE the wizard container (absolute, not a viewport portal): a
@@ -275,16 +276,28 @@ function CountryInfoContent({ id, onSelect, onClose }: {
 // Copy variants live under account.saveProgress.* and account.freeAccount.*.
 export type AccountCopyKey = 'saveProgress' | 'freeAccount';
 
-export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onClose: () => void; copyKey?: AccountCopyKey }) {
+export function SaveProgressContent({ onClose, copyKey = 'saveProgress', draft }: {
+  onClose: () => void;
+  copyKey?: AccountCopyKey;
+  /** Der Wizard-Stand beim Klick auf "Save progress". Hat er einen Markt, wird
+      er als Profil abgelegt, das /results nach dem Magic Link wieder aufbaut. */
+  draft?: SearchProfile;
+}) {
   const { t } = useTranslation('home');
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [sendFailed, setSendFailed] = useState(false);
+  // "Your progress is safe" darf nur stehen, wenn der Stand wirklich abgelegt
+  // ist (Wizard-Audit B7b). Ohne Markt gibt es noch nichts zu sichern.
+  const [draftKept, setDraftKept] = useState(false);
   const valid = /.+@.+\..+/.test(email);
   // Regel V2 (11.10.2026): der Knopf bleibt aktiv (gesperrt nur, solange der
   // Link unterwegs ist). Ein Feld — der Satz steht am Feld, der Fokus geht hinein.
   const [tried, setTried] = useState(false);
-  const emailError = tried && !valid ? t('common:contactSend.field.email') : null;
+  const emailError = tried && !valid
+    ? t('common:contactSend.field.email')
+    : sendFailed ? t('account.sendFailed') : null;
   const base = `account.${copyKey}`;
 
   return (
@@ -319,7 +332,7 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
               type="email"
               autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setSendFailed(false); }}
               placeholder={t('account.emailPlaceholder')}
               className={'mt-2 w-full rounded-xl border border-stroke px-4 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand' + (emailError ? FIELD_ERROR_CLASS : '')}
               {...errorAria('save-email', !!emailError)}
@@ -332,7 +345,7 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
             <p className="mt-1 text-fg-secondary">
               {t('account.sentTo.pre')}
               <span className="font-semibold text-fg">{email}</span>
-              {t('account.sentTo.post')} {t(`${base}.confirm`)}
+              {t('account.sentTo.post')} {t(draft && !draftKept ? 'account.freeAccount.confirm' : `${base}.confirm`)}
             </p>
           </div>
         )}
@@ -358,10 +371,25 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
             const sb = isSupabaseConfigured ? await getSupabase() : null;
             if (sb) {
               const lang = document.documentElement.lang || 'en';
-              await sb.auth.signInWithOtp({
+              // signInWithOtp meldet Fehler im Ergebnis, nicht per throw — bis
+              // 23.10.2026 stand deshalb bei jedem Fehler "Check your inbox"
+              // (Wizard-Audit B7a). Jetzt: Fehler am Feld, kein Erfolg.
+              const failed = await sb.auth.signInWithOtp({
                 email,
                 options: { emailRedirectTo: `${window.location.origin}/${lang}/results` },
-              }).catch(() => { /* rate-limit etc. — sent state still shows guidance */ });
+              }).then(({ error }) => !!error, () => true);
+              if (failed) {
+                setSending(false);
+                setSendFailed(true);
+                focusField('save-email');
+                return;
+              }
+            }
+            if (draft && draft.markets.length > 0) {
+              try {
+                localStorage.setItem('ch360_last_profile', JSON.stringify(draft));
+                setDraftKept(true);
+              } catch { /* privater Modus: dann gilt die ehrliche Bestaetigung ohne Sicherung */ }
             }
             setSending(false);
             setSent(true);
@@ -386,6 +414,7 @@ export function WizardDrawerLayer({
   onSelectCountry,
   saveOpen,
   onSaveClose,
+  draft,
 }: {
   marketsOpen: boolean;
   onMarketsClose: () => void;
@@ -396,6 +425,7 @@ export function WizardDrawerLayer({
   onSelectCountry: (id: string) => void;
   saveOpen: boolean;
   onSaveClose: () => void;
+  draft?: SearchProfile;
 }) {
   const { t } = useTranslation('home');
   return (
@@ -407,7 +437,7 @@ export function WizardDrawerLayer({
         {infoCountry && <CountryInfoContent id={infoCountry} onSelect={onSelectCountry} onClose={onInfoClose} />}
       </WizardDrawer>
       <WizardDrawer open={saveOpen} onClose={onSaveClose} label={t('account.drawerLabel')}>
-        <SaveProgressContent onClose={onSaveClose} />
+        <SaveProgressContent onClose={onSaveClose} draft={draft} />
       </WizardDrawer>
     </>
   );
