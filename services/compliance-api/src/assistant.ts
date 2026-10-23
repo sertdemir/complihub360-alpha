@@ -5,7 +5,7 @@ import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
 import { resolveLlm, sameEmbedModel, type LlmProvider } from './llm.js';
-import { CALM_REWRITE, SHARED_RULES, answerCheck, factLine, leaksPrompt, leakReply, urgencyInWorriedReply } from './assistantGuard.js';
+import { CALM_REWRITE, SHARED_RULES, answerCheck, factLine, figureCheck, heldReply, leaksPrompt, leakReply, pressureInWorriedReply, ungroundedFigures } from './assistantGuard.js';
 import { redactText } from "@complihub360/redaction";
 
 /** P5: was an das Modell geht, ist vorher deterministisch redigiert (Regex-Profile, keine KI). */
@@ -62,7 +62,7 @@ const SYSTEM_PROMPT = `You are the CompliHub360 compliance assistant for VAT / i
 
 Rules — follow ALL of them:
 0. You are an AI assistant, not a lawyer, tax adviser or customs specialist. Say so when asked, or when the user treats you as one.
-1. Answer ONLY from the CONTEXT block (structured facts + knowledge excerpts). If the context does not cover the question, say so plainly and offer a choice: rephrase or narrow the question, or — where a qualified person is needed — send a request to a verified partner via CompliHub360. Do not present a partner request as the only or the required next step. Never guess.
+1. Answer ONLY from the CONTEXT block (structured facts + knowledge excerpts). If the context does not cover the question, say so plainly and offer a choice: rephrase or narrow the question, or — where a qualified person is needed — send a request to a verified provider via CompliHub360. Do not present a provider request as the only or the required next step. Never guess.
 1b. Separate what the rules clearly require from what depends on interpretation or on the user's facts; for the second kind, say that it depends and on what.
 1c. When the context is incomplete or conflicting, give the closest reliable answer and name the gap in one sentence.
 1d. If the user is worried or mentions an enforcement letter, a penalty or a missed deadline, stay calm and factual: what applies, what the next step is, where a qualified person helps.
@@ -89,7 +89,7 @@ function domainPrompt(slug: string): string {
 
 Rules — follow ALL of them:
 0. You are an AI assistant, not a lawyer, tax adviser or customs specialist. Say so when asked, or when the user treats you as one.
-1. Answer ONLY from the CONTEXT block: the AREA KNOWLEDGE (the duties this area carries, with statute, penalty and cadence per market), the user's OWN OBLIGATIONS from their saved sessions, and — where present — structured facts and knowledge excerpts. If the context does not cover the question, say so plainly and offer a choice: rephrase or narrow the question, or — where a qualified person is needed — send a request to a verified partner via CompliHub360. Do not present a partner request as the only or the required next step. Never guess and never bring in other areas.
+1. Answer ONLY from the CONTEXT block: the AREA KNOWLEDGE (the duties this area carries, with statute, penalty and cadence per market), the user's OWN OBLIGATIONS from their saved sessions, and — where present — structured facts and knowledge excerpts. If the context does not cover the question, say so plainly and offer a choice: rephrase or narrow the question, or — where a qualified person is needed — send a request to a verified provider via CompliHub360. Do not present a provider request as the only or the required next step. Never guess and never bring in other areas.
 1b. Separate what the rules clearly require from what depends on interpretation or on the user's facts; for the second kind, say that it depends and on what.
 1c. When the context is incomplete or conflicting, give the closest reliable answer and name the gap in one sentence.
 1d. If the user is worried or mentions an enforcement letter, a penalty or a missed deadline, stay calm and factual: what applies, what the next step is, where a qualified person helps.
@@ -103,7 +103,9 @@ Rules — follow ALL of them:
 8. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.${SHARED_RULES}`;
 }
 
-const MATCH_THRESHOLD = 0.4;
+// Kalibriert am 23.10.2026 mit Qwen3-Embedding-8B auf Staging (12 Prüffragen):
+// passende Treffer 0,656–0,761, unpassende 0,567–0,646. 0,6 ist vorläufig.
+const MATCH_THRESHOLD = 0.6;
 const MATCH_COUNT = 6;
 
 // Ergebnis-Ereignis nach dem Aufruf (Ausgang, Abdeckung, Kalibrierung), ohne
@@ -116,20 +118,17 @@ async function logAssistantEvent(payload: Record<string, unknown>, correlationId
     });
 }
 
-// Hat der Korpus ueberhaupt Chunks dieses Modells? Nur gefragt, wenn eine
-// Suche leer bleibt — dann ist "nichts Passendes" von "falsch oder gar nicht
-// eingebettet" zu unterscheiden (z. B. LLM_EMBED_MODEL auf dem Server weicht
-// von der Kennung im Ingest ab). Ergebnis je Modell 10 Minuten gemerkt.
-const corpusCheck = new Map<string, { has: boolean; at: number }>();
-async function corpusHasModel(model: string, vector: number[]): Promise<boolean> {
-    const hit = corpusCheck.get(model);
-    if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit.has;
+// Bleibt die Suche leer: Gibt es ueberhaupt Chunks dieses Modells, und wie
+// nah kam der beste? Unterscheidet "nichts ueber der Schwelle" von "falsch
+// oder gar nicht eingebettet" (z. B. LLM_EMBED_MODEL auf dem Server weicht von
+// der Kennung im Ingest ab) und liefert den Wert unter der Schwelle fuer die
+// Kalibrierung. null = keine Chunks dieses Modells.
+async function bestUnfiltered(model: string, vector: number[]): Promise<number | null> {
     const rows = (await supabaseApi.rpc('match_knowledge_chunks', {
         query_embedding: vector, match_threshold: -1, match_count: 1, embed_model: model,
-    })) as unknown[];
-    const has = Array.isArray(rows) && rows.length > 0;
-    corpusCheck.set(model, { has, at: Date.now() });
-    return has;
+    })) as Array<{ similarity?: number }>;
+    if (!Array.isArray(rows) || rows.length === 0) return null;
+    return typeof rows[0]?.similarity === 'number' ? rows[0].similarity : -1;
 }
 
 export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, correlationId: string, ip: string, identity: CallerIdentity): void {
@@ -141,6 +140,8 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
         let llm: LlmProvider | null = null;
         let audit: Record<string, unknown> | null = null;
         let stage = 'init';
+        // Warum neu geschrieben wird — auch im Fehlerfall des zweiten Aufrufs.
+        let rewriteReason: { pressure: string | null; figures: number } | null = null;
         try {
             llm = resolveLlm();
             if (!llm) {
@@ -236,6 +237,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             // als zweite Sicherung, falls die Migration fehlt.
             let chunks: Array<{ content: string; metadata: { country?: string; section?: string; embed_model?: string } | null; similarity: number }> = [];
             let corpusMissing = false;
+            let topBelowThreshold: number | null = null;
             const embedModel = llm.embedModel;
             if (vatScope) {
                 stage = 'embed';
@@ -244,7 +246,9 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
                 chunks = ((await supabaseApi.rpc('match_knowledge_chunks', {
                     query_embedding: vector, match_threshold: MATCH_THRESHOLD, match_count: MATCH_COUNT, embed_model: llm.embedModel,
                 })) as typeof chunks).filter((c) => sameEmbedModel(c.metadata, embedModel));
-                if (!chunks.length && !(await corpusHasModel(llm.embedModel, vector))) {
+                const best = chunks.length ? undefined : await bestUnfiltered(llm.embedModel, vector);
+                if (best !== undefined && best !== null && best >= 0) topBelowThreshold = Math.round(best * 1000) / 1000;
+                if (best === null) {
                     corpusMissing = true;
                     structuredLog('warn', 'Assistant corpus has no chunks for the embed model', { correlationId, errorCode: 'ERR_ASSISTANT_CORPUS', severity: 'warn', detail: llm.embedModel });
                 }
@@ -296,30 +300,61 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             stage = 'generate';
             const systemPrompt = domain ? domainPrompt(domain) : SYSTEM_PROMPT;
             let generated = await llm.generate(systemPrompt, history, userTurn);
-            // Dringlichkeits-Wächter (DNA: Angst und Dringlichkeit nie als Hebel):
-            // Ist der Nutzer besorgt und drängt die Antwort, einmal neu schreiben.
-            // Bleibt das Wort, geht die zweite Fassung raus und das Log zeigt es.
-            let urgencyRewrite: 'none' | 'rewritten' | 'kept' = 'none';
-            const urgentWord = urgencyInWorriedReply(message, generated);
-            if (urgentWord) {
-                stage = 'generate_calm';
-                generated = await llm.generate(systemPrompt, history, `${userTurn}\n\n${CALM_REWRITE}`);
-                const still = urgencyInWorriedReply(message, generated);
-                urgencyRewrite = still ? 'kept' : 'rewritten';
-                structuredLog('warn', 'Assistant: urgency in a reply to a worried user', {
-                    correlationId, errorCode: 'ERR_ASSISTANT_URGENCY', severity: 'warn', detail: `${urgentWord} → ${still ?? 'rewritten'}`,
+            // Zwei deterministische Wächter, höchstens EIN zweiter Aufruf:
+            // - Druck (DNA: Angst und Dringlichkeit nie als Hebel): besorgter
+            //   Nutzer und Dringlichkeit, Drohung oder Strafenliste in der Antwort.
+            // - Zahlen: ein Betrag oder Prozentsatz, der nicht im Kontext steht.
+            // Bleibt ein Befund, geht die zweite Fassung raus und das Log zeigt es.
+            // Belegt sind Kontext, Frage und fruehere NUTZER-Turns — nie eine
+            // fruehere Antwort, sonst waescht sich eine erfundene Zahl rein.
+            const userTurns = history.filter((h) => h.role !== 'assistant').map((h) => h.content);
+            const groundText = [userTurn, ...userTurns].join('\n');
+            const worryText = [message, ...userTurns].join('\n');
+            const pressure = pressureInWorriedReply(worryText, generated);
+            const figures = ungroundedFigures(generated, groundText);
+            type Rewrite = 'none' | 'rewritten' | 'kept' | 'introduced';
+            let urgencyRewrite: Rewrite = 'none';
+            let figureRewrite: Rewrite = 'none';
+            let figuresAfter = figures.length;
+            if (pressure || figures.length) {
+                rewriteReason = { pressure: pressure ?? null, figures: figures.length };
+                stage = 'generate_rewrite';
+                const notes = [pressure ? CALM_REWRITE : '', figures.length ? figureCheck(figures) : ''].filter(Boolean).join('\n\n');
+                generated = await llm.generate(systemPrompt, history, `${userTurn}\n\n${notes}`);
+                // Beide Waechter auf der neuen Fassung — sie kann einen Befund
+                // beheben und einen anderen neu einfuehren.
+                const pressureNow = pressureInWorriedReply(worryText, generated);
+                const figuresNow = ungroundedFigures(generated, groundText);
+                figuresAfter = figuresNow.length;
+                urgencyRewrite = pressure ? (pressureNow ? 'kept' : 'rewritten') : (pressureNow ? 'introduced' : 'none');
+                figureRewrite = figures.length ? (figuresNow.length ? 'kept' : 'rewritten') : (figuresNow.length ? 'introduced' : 'none');
+                if (urgencyRewrite !== 'none') structuredLog('warn', 'Assistant: pressure in a reply to a worried user', {
+                    correlationId, errorCode: 'ERR_ASSISTANT_URGENCY', severity: 'warn', detail: `${pressure ?? '—'} → ${pressureNow ?? 'rewritten'} (${urgencyRewrite})`,
+                });
+                if (figureRewrite !== 'none') structuredLog('warn', 'Assistant: figures not found in the context', {
+                    correlationId, errorCode: 'ERR_ASSISTANT_UNGROUNDED', severity: 'warn', detail: `${figures.length} → ${figuresNow.length} (${figureRewrite})`,
                 });
             }
             // Deterministischer Leck-Schutz: gibt das Modell seine Anweisungen
             // aus, geht stattdessen eine feste Antwort in der Sprache der Frage.
             const promptLeak = leaksPrompt(generated);
             if (promptLeak) structuredLog('warn', 'Assistant: prompt leak blocked', { correlationId, errorCode: 'ERR_ASSISTANT_PROMPT_LEAK', severity: 'warn' });
-            const answer = promptLeak ? leakReply(rawMessage) : generated;
+            // Entscheidung des Nutzers (23.10.2026, Option 2): Bleibt nach dem
+            // Neuschreiben Druck oder eine ungedeckte Zahl, geht die Antwort
+            // NICHT raus, sondern ein fester ehrlicher Satz. Druck zuerst — bei
+            // Sorge zaehlt der Ton mehr als die fehlende Zahl.
+            const held: 'pressure' | 'figures' | null = promptLeak ? null
+                : urgencyRewrite === 'kept' || urgencyRewrite === 'introduced' ? 'pressure'
+                : figureRewrite === 'kept' || figureRewrite === 'introduced' ? 'figures' : null;
+            if (held) structuredLog('warn', 'Assistant: reply held back, fixed reply sent', { correlationId, errorCode: 'ERR_ASSISTANT_HELD', severity: 'warn', detail: held });
+            const answer = promptLeak ? leakReply(rawMessage) : held ? heldReply(held, rawMessage) : generated;
 
             // Ohne Frageinhalt — Volumen, Abdeckung und Kalibrierung der Schwelle.
             await logAssistantEvent({
-                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, urgency_rewrite: urgencyRewrite, country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
+                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, held, urgency_rewrite: urgencyRewrite, figure_rewrite: figureRewrite,
+                figures_before: figures.length, figures_after: figuresAfter, country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
                 top_similarity: chunks[0] ? Math.round(chunks[0].similarity * 1000) / 1000 : null,
+                top_below_threshold: topBelowThreshold,
             }, correlationId);
 
             const sources = [
@@ -337,7 +372,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
                 correlationId, errorCode: 'ERR_ASSISTANT', severity: 'error', route: '/api/v1/assistant/chat',
                 detail: `${stage}${llm ? ` · ${llm.id}` : ''} · ${String(err).slice(0, 300)}`,
             });
-            if (audit) await logAssistantEvent({ ...audit, outcome: 'error', stage }, correlationId);
+            if (audit) await logAssistantEvent({ ...audit, outcome: 'error', stage, ...(rewriteReason ? { rewrite_reason: rewriteReason } : {}) }, correlationId);
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'ASSISTANT_ERROR', message: 'The assistant could not answer right now. Please try again in a moment.', correlationId }));
         }
