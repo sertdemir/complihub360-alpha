@@ -4,29 +4,22 @@ import { supabaseApi } from "./supabase.js";
 import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
+import { resolveLlm, sameEmbedModel, type LlmProvider } from './llm.js';
+import { CALM_REWRITE, SHARED_RULES, answerCheck, factLine, leaksPrompt, leakReply, urgencyInWorriedReply } from './assistantGuard.js';
 import { redactText } from "@complihub360/redaction";
 
-/** P14: kein Modellaufruf ohne Grenze — eine haengende Verbindung hielt die Anfrage offen, bis das Betriebssystem aufgab. */
-const MODEL_TIMEOUT_MS = 20_000;
 /** P5: was an das Modell geht, ist vorher deterministisch redigiert (Regex-Profile, keine KI). */
 const scrub = (text: string): string => redactText(text, { profile: 'strict' }).sanitizedText;
 
 // ─── VAT assistant (chatbot plan phase ②) ─────────────────────────────────────
 // RAG over knowledge_chunks (vector 768, match_knowledge_chunks RPC) plus the
-// structured jurisdiction_facts table. Gemini powers both sides: query
-// embeddings (text-embedding-004, 768 dims — matches the schema) and answer
-// generation. Returns 503 ASSISTANT_NOT_CONFIGURED until GEMINI_API_KEY is set
-// (same pattern as the Stripe billing portal). Answers are information, not
-// legal/tax advice (RDG/StBerG), and must never reproduce licensed source
-// text verbatim — the corpus is internal ground truth only.
-
-const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-// gemini-embedding-001 with outputDimensionality 768 matches the vector(768)
-// schema; truncated (non-3072) embeddings must be re-normalized for cosine.
-const EMBED_MODEL = 'gemini-embedding-001';
-const EMBED_DIMS = 768;
-// 'latest' alias — pinned models age out for new API projects (2.5-flash 404s).
-const GEN_MODEL = 'gemini-flash-latest';
+// structured jurisdiction_facts table. The model behind both sides comes from
+// llm.ts: Scaleway (Mistral Small + Qwen3-Embedding) once LLM_API_KEY is set,
+// Gemini only as the transition until then. Returns 503
+// ASSISTANT_NOT_CONFIGURED while neither key is set (same pattern as the
+// Stripe billing portal). Answers are information, not legal/tax advice
+// (RDG/StBerG), and must never reproduce licensed source text verbatim — the
+// corpus is internal ground truth only.
 
 const SUPPORTED_COUNTRIES = new Set(['DE', 'UK', 'NL', 'FR', 'IT', 'ES', 'US', 'TR', 'AT']);
 
@@ -65,46 +58,6 @@ async function isSubscriber(userKey: string | null): Promise<boolean> {
     } catch { return false; }
 }
 
-async function embedQuery(apiKey: string, text: string): Promise<number[]> {
-    const res = await fetch(`${GEMINI_BASE}/${EMBED_MODEL}:embedContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
-        body: JSON.stringify({ content: { parts: [{ text }] }, taskType: 'RETRIEVAL_QUERY', outputDimensionality: EMBED_DIMS }),
-    });
-    const body = await res.json() as { embedding?: { values?: number[] }; error?: { message?: string } };
-    if (!res.ok || !body.embedding?.values) throw new Error(`Gemini embed: ${body.error?.message || res.status}`);
-    const v = body.embedding.values;
-    const norm = Math.sqrt(v.reduce((s, x) => s + x * x, 0)) || 1;
-    return v.map((x) => x / norm);
-}
-
-async function generate(apiKey: string, system: string, history: Array<{ role: string; content: string }>, user: string): Promise<string> {
-    const contents = [
-        ...history.slice(-6).map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content.slice(0, 2000) }] })),
-        { role: 'user', parts: [{ text: user }] },
-    ];
-    const res = await fetch(`${GEMINI_BASE}/${GEN_MODEL}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
-        body: JSON.stringify({
-            system_instruction: { parts: [{ text: system }] },
-            contents,
-            // Thinking models spend reasoning tokens from the same budget —
-            // 1024 truncated answers mid-sentence. The prompt caps prose length.
-            generationConfig: { temperature: 0.2, maxOutputTokens: 8192 },
-        }),
-    });
-    const body = await res.json() as {
-        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-        error?: { message?: string };
-    };
-    const text = body.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('') || '';
-    if (!res.ok || !text) throw new Error(`Gemini generate: ${body.error?.message || res.status}`);
-    return text.trim();
-}
-
 const SYSTEM_PROMPT = `You are the CompliHub360 compliance assistant for VAT / indirect-tax questions.
 
 Rules — follow ALL of them:
@@ -119,7 +72,7 @@ Rules — follow ALL of them:
 5. Be compact: at most ~180 words. Use short bullet points for lists of obligations, rates or deadlines. State amounts and deadlines precisely.
 5a. Output PLAIN TEXT only — the chat window renders no Markdown. Never use **, *, # or backticks; bullets are lines starting with "- ".
 6. When the question names a country outside the covered set (DE, UK, NL, FR, IT, ES, US, TR, AT), say that CompliHub360 does not yet cover that country, so you cannot answer for it, and that the user can ask to be notified when it is covered.
-7. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.`;
+7. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.${SHARED_RULES}`;
 
 // Bereichsseite (Canvas 3B, 2026-09-13): die Frage antwortet NUR ueber diesen
 // Bereich und die Sitzungen des Nutzers. Der Kontext besteht dann aus dem
@@ -147,7 +100,36 @@ Rules — follow ALL of them:
 6. Be compact: at most ~180 words. Short bullet points for lists. State amounts and deadlines precisely.
 6a. Output PLAIN TEXT only — no Markdown; bullets are lines starting with "- ".
 7. Where the AREA KNOWLEDGE marks an entry as EU-level without a national source, say that the national text is not on file.
-8. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.`;
+8. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.${SHARED_RULES}`;
+}
+
+const MATCH_THRESHOLD = 0.4;
+const MATCH_COUNT = 6;
+
+// Ergebnis-Ereignis nach dem Aufruf (Ausgang, Abdeckung, Kalibrierung), ohne
+// Frageinhalt. Der Grenzuebertritt selbst ist da schon fail-closed auditiert
+// (P2, `assistant_chat` VOR dem ersten Anbieter-Aufruf). Dieses hier bleibt
+// nicht-blockierend, aber nie still.
+async function logAssistantEvent(payload: Record<string, unknown>, correlationId: string): Promise<void> {
+    await supabaseApi.insert('event_log', { type: 'assistant_chat_result', payload }).catch((err: unknown) => {
+        structuredLog('warn', 'Assistant result event not written', { correlationId, errorCode: 'ERR_ASSISTANT_AUDIT_RESULT', severity: 'warn', detail: String(err).slice(0, 200) });
+    });
+}
+
+// Hat der Korpus ueberhaupt Chunks dieses Modells? Nur gefragt, wenn eine
+// Suche leer bleibt — dann ist "nichts Passendes" von "falsch oder gar nicht
+// eingebettet" zu unterscheiden (z. B. LLM_EMBED_MODEL auf dem Server weicht
+// von der Kennung im Ingest ab). Ergebnis je Modell 10 Minuten gemerkt.
+const corpusCheck = new Map<string, { has: boolean; at: number }>();
+async function corpusHasModel(model: string, vector: number[]): Promise<boolean> {
+    const hit = corpusCheck.get(model);
+    if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit.has;
+    const rows = (await supabaseApi.rpc('match_knowledge_chunks', {
+        query_embedding: vector, match_threshold: -1, match_count: 1, embed_model: model,
+    })) as unknown[];
+    const has = Array.isArray(rows) && rows.length > 0;
+    corpusCheck.set(model, { has, at: Date.now() });
+    return has;
 }
 
 export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, correlationId: string, ip: string, identity: CallerIdentity): void {
@@ -155,9 +137,13 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
     req.on('data', (chunk: Buffer) => { raw += chunk.toString(); if (raw.length > 32_000) req.destroy(); });
     req.on('end', async () => {
         res.setHeader('x-correlation-id', correlationId);
+        // Fuer den Fehlerfall: was schon an den Anbieter ging, wird auch dann auditiert.
+        let llm: LlmProvider | null = null;
+        let audit: Record<string, unknown> | null = null;
+        let stage = 'init';
         try {
-            const apiKey = process.env.GEMINI_API_KEY;
-            if (!apiKey) {
+            llm = resolveLlm();
+            if (!llm) {
                 res.writeHead(503, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'ASSISTANT_NOT_CONFIGURED', message: 'The assistant is not connected yet', correlationId }));
                 return;
@@ -222,11 +208,47 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
 
             // Retrieval: vector search over the corpus + structured facts —
             // der Korpus ist Umsatzsteuer, also nur im USt-Bereich.
-            const chunks = vatScope
-                ? (await supabaseApi.rpc('match_knowledge_chunks', {
-                    query_embedding: await embedQuery(apiKey, country ? `[${country}] ${message}` : message), match_threshold: 0.4, match_count: 6,
-                })) as Array<{ content: string; metadata: { country?: string; section?: string } | null; similarity: number }>
-                : [];
+            // P2: der Grenzuebertritt zur AI wird VOR dem ersten Anbieter-Aufruf
+            // auditiert — schon das Embedding schickt die (redigierte) Frage
+            // hinaus. Ohne Nachrichteninhalt; provider/modelle nennen den
+            // Unterauftragsverarbeiter. Kann das Audit nicht geschrieben werden,
+            // findet kein Aufruf statt: ein Grenzuebertritt ohne Spur ist keiner,
+            // den wir machen.
+            const requestAudit = {
+                domain, message_chars: rawMessage.length, redacted: message !== rawMessage, sessions: scoped?.active.length ?? 0,
+                provider: llm.id, model: llm.chatModel, embed_model: llm.embedModel,
+            };
+            try {
+                await supabaseApi.insert('event_log', { type: 'assistant_chat', payload: requestAudit });
+            } catch (err) {
+                structuredLog('error', 'Assistant: audit write failed — model call refused', { correlationId, errorCode: 'ERR_ASSISTANT_AUDIT', severity: 'error', detail: String(err).slice(0, 200) });
+                res.writeHead(502, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'ASSISTANT_AUDIT_UNAVAILABLE', message: 'The assistant is briefly unavailable. Please try again in a moment.', correlationId }));
+                return;
+            }
+            audit = requestAudit;
+            res.setHeader('x-llm-provider', `${llm.id}:${llm.chatModel}`);
+
+            // Nur Treffer desselben Embedding-Modells wie die Frage — die RPC
+            // filtert VOR dem LIMIT (20261018090000). Waehrend der
+            // Neu-Einbettung liegen alte und neue Vektoren nebeneinander, und
+            // ein Fremdvektor ergibt Zufallsaehnlichkeit. sameEmbedModel bleibt
+            // als zweite Sicherung, falls die Migration fehlt.
+            let chunks: Array<{ content: string; metadata: { country?: string; section?: string; embed_model?: string } | null; similarity: number }> = [];
+            let corpusMissing = false;
+            const embedModel = llm.embedModel;
+            if (vatScope) {
+                stage = 'embed';
+                const vector = await llm.embedQuery(country ? `[${country}] ${message}` : message);
+                stage = 'retrieve';
+                chunks = ((await supabaseApi.rpc('match_knowledge_chunks', {
+                    query_embedding: vector, match_threshold: MATCH_THRESHOLD, match_count: MATCH_COUNT, embed_model: llm.embedModel,
+                })) as typeof chunks).filter((c) => sameEmbedModel(c.metadata, embedModel));
+                if (!chunks.length && !(await corpusHasModel(llm.embedModel, vector))) {
+                    corpusMissing = true;
+                    structuredLog('warn', 'Assistant corpus has no chunks for the embed model', { correlationId, errorCode: 'ERR_ASSISTANT_CORPUS', severity: 'warn', detail: llm.embedModel });
+                }
+            }
 
             // `factsFor` kann seit 20260917000000 eine Region tragen ('US-CA'),
             // nicht nur ein Land. Abgefragt wird weiter ueber `country_code` —
@@ -261,30 +283,44 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             }
             if (facts.length) {
                 contextParts.push(`STRUCTURED FACTS · ${factsFor} (verified ground truth — prefer these for numbers):\n` +
-                    facts.map((f) => `- ${f.fact_key}: ${f.value_text}${f.notes ? ` (${f.notes})` : ''}`).join('\n'));
+                    facts.map((f) => factLine(factsFor as string, f.fact_key, f.value_text, f.notes)).join('\n'));
             }
             chunks.forEach((c, i) => {
                 contextParts.push(`EXCERPT ${i + 1} · ${c.metadata?.country || '?'} · ${c.metadata?.section || 'General'} (paraphrase, never quote):\n${c.content.slice(0, 1600)}`);
             });
-            const userTurn = `CONTEXT:\n${contextParts.join('\n\n') || '(no matching context found)'}\n\nQUESTION:\n${message}`;
+            // Heutiges Datum (S4): sonst erfindet das Modell Fristen aus seinen Trainingsjahren.
+            if (contextParts.length === 0) contextParts.push('(no matching context found)');
+            contextParts.unshift(`TODAY: ${new Date().toISOString().slice(0, 10)}`);
+            const userTurn = `CONTEXT:\n${contextParts.join('\n\n')}\n\nQUESTION:\n${message}\n\n${answerCheck(message)}`;
 
-            // P2: der Grenzuebertritt zur AI wird VOR dem Aufruf auditiert — ohne
-            // Nachrichteninhalt (Umfang und Abdeckung). Kann das Audit nicht
-            // geschrieben werden, findet der Aufruf nicht statt: ein Grenzuebertritt
-            // ohne Spur ist keiner, den wir machen (.agents/rules, Privacy).
-            try {
-                await supabaseApi.insert('event_log', {
-                    type: 'assistant_chat',
-                    payload: { country: factsFor, domain, chunks: chunks.length, message_chars: rawMessage.length, redacted: message !== rawMessage, sessions: scoped?.active.length ?? 0 },
+            stage = 'generate';
+            const systemPrompt = domain ? domainPrompt(domain) : SYSTEM_PROMPT;
+            let generated = await llm.generate(systemPrompt, history, userTurn);
+            // Dringlichkeits-Wächter (DNA: Angst und Dringlichkeit nie als Hebel):
+            // Ist der Nutzer besorgt und drängt die Antwort, einmal neu schreiben.
+            // Bleibt das Wort, geht die zweite Fassung raus und das Log zeigt es.
+            let urgencyRewrite: 'none' | 'rewritten' | 'kept' = 'none';
+            const urgentWord = urgencyInWorriedReply(message, generated);
+            if (urgentWord) {
+                stage = 'generate_calm';
+                generated = await llm.generate(systemPrompt, history, `${userTurn}\n\n${CALM_REWRITE}`);
+                const still = urgencyInWorriedReply(message, generated);
+                urgencyRewrite = still ? 'kept' : 'rewritten';
+                structuredLog('warn', 'Assistant: urgency in a reply to a worried user', {
+                    correlationId, errorCode: 'ERR_ASSISTANT_URGENCY', severity: 'warn', detail: `${urgentWord} → ${still ?? 'rewritten'}`,
                 });
-            } catch (err) {
-                structuredLog('error', 'Assistant: audit write failed — model call refused', { correlationId, errorCode: 'ERR_ASSISTANT_AUDIT', severity: 'error', detail: String(err).slice(0, 200) });
-                res.writeHead(502, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'ASSISTANT_AUDIT_UNAVAILABLE', message: 'The assistant is briefly unavailable. Please try again in a moment.', correlationId }));
-                return;
             }
+            // Deterministischer Leck-Schutz: gibt das Modell seine Anweisungen
+            // aus, geht stattdessen eine feste Antwort in der Sprache der Frage.
+            const promptLeak = leaksPrompt(generated);
+            if (promptLeak) structuredLog('warn', 'Assistant: prompt leak blocked', { correlationId, errorCode: 'ERR_ASSISTANT_PROMPT_LEAK', severity: 'warn' });
+            const answer = promptLeak ? leakReply(rawMessage) : generated;
 
-            const answer = await generate(apiKey, domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
+            // Ohne Frageinhalt — Volumen, Abdeckung und Kalibrierung der Schwelle.
+            await logAssistantEvent({
+                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, urgency_rewrite: urgencyRewrite, country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
+                top_similarity: chunks[0] ? Math.round(chunks[0].similarity * 1000) / 1000 : null,
+            }, correlationId);
 
             const sources = [
                 ...(domain ? [{ label: `CompliHub area knowledge · ${DOMAIN_LABEL[domain]}`, kind: 'area', name: DOMAIN_LABEL[domain] }] : []),
@@ -295,8 +331,13 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             ];
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, answer, sources, correlationId }));
-        } catch {
-            structuredLog('error', 'Assistant chat failed', { correlationId, errorCode: 'ERR_ASSISTANT', severity: 'error', route: '/api/v1/assistant/chat' });
+        } catch (err) {
+            // Ursache ins Log (gekappt, ohne Frage), nach aussen nur die ID.
+            structuredLog('error', 'Assistant chat failed', {
+                correlationId, errorCode: 'ERR_ASSISTANT', severity: 'error', route: '/api/v1/assistant/chat',
+                detail: `${stage}${llm ? ` · ${llm.id}` : ''} · ${String(err).slice(0, 300)}`,
+            });
+            if (audit) await logAssistantEvent({ ...audit, outcome: 'error', stage }, correlationId);
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'ASSISTANT_ERROR', message: 'The assistant could not answer right now. Please try again in a moment.', correlationId }));
         }

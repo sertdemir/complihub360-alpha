@@ -94,6 +94,21 @@ test('privacy: sperrt, wenn ein Edit Raw-Ref und AI-Endpoint neu zusammenführt'
     { content: `import { rawVault } from '@x/storage';\n${AI_FILE}` }, ''));
 });
 
+test('privacy: erkennt die OpenAI-kompatiblen EU-Endpunkte (Scaleway, IONOS)', () => {
+  const raw = "const ref = 'raw://doc1';\n";
+  for (const ai of [
+    "const base = 'https://api.scaleway.ai/v1';\n",
+    "await fetch(`${base}/v1/embeddings`);\n",
+    "const base = 'https://openai.inference.de-txl.ionos.com/v1';\n",
+    'const key = process.env.LLM_API_KEY;\n',
+    "import { resolveLlm } from './llm.js';\n",
+    "import { sameEmbedModel } from '../llm.js';\n",
+    'const llm = resolveLlm();\n',
+  ]) {
+    assert.ok(checkPrivacy('services/x/src/new.ts', 'Write', { content: raw + ai }, ''), ai);
+  }
+});
+
 test('privacy: lässt Kommentare, Tests, getrennte Module und Altbestand durch', () => {
   const commentOnly = "// Ein raw://-Ref erreicht nie die AI.\n" + AI_FILE;
   assert.equal(checkPrivacy('services/x/src/a.ts', 'Write', { content: commentOnly }, ''), null);
