@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckCircle2 } from 'lucide-react';
 import { Card } from './Card';
 import { Typography } from './Typography';
 
@@ -38,7 +39,7 @@ export const OptionCard = React.forwardRef<HTMLDivElement, OptionCardProps>(
       >
         {selected && (
           <div className="absolute top-3 right-3">
-            <span className="material-symbols-outlined text-primary-600 text-lg">check_circle</span>
+            <CheckCircle2 size={18} className="text-primary-600" aria-hidden />
           </div>
         )}
         {icon && (

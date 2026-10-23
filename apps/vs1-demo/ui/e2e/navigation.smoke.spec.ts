@@ -13,11 +13,11 @@ import { expect, test, type Page, type Locator } from '@playwright/test';
 // dafuer gibt es Storybook, und ein Screenshot-Vergleich hier wuerde bei jeder
 // Textaenderung rot.
 
-// Jede Navigation wartet auf `domcontentloaded`, nicht auf `load`. Die Seite
-// laedt ihre Schriften von fonts.googleapis.com, und `load` wartet darauf: in
-// einer Umgebung ohne Zugang dorthin kostete jeder Test 12,7 Sekunden statt
-// 0,2. Auf einem Runner mit Zugang waere es schnell — und trotzdem haenge ich
-// einen Smoke-Test nicht an die Erreichbarkeit eines fremden CDN. Die Locators
+// Jede Navigation wartet auf `domcontentloaded`, nicht auf `load`. Bis zum
+// 23.10.2026 lud die Seite ihre Schriften von fonts.googleapis.com, und `load`
+// wartete darauf: in einer Umgebung ohne Zugang dorthin kostete jeder Test
+// 12,7 Sekunden statt 0,2. Die Schriften sind seitdem self-hosted; die
+// Wartestrategie bleibt, denn ein Smoke-Test prueft Navigation. Die Locators
 // warten ohnehin von selbst auf das, was sie brauchen.
 
 /** Reacts useId erzeugt Ids mit Doppelpunkten (":r1:") — als CSS-Id-Selektor ungueltig. */
@@ -44,11 +44,10 @@ async function expectFocusOnLink(page: Page, text: RegExp) {
   expect(focused.text).toMatch(text);
 }
 
-// Alles ausser der eigenen Herkunft wird abgewiesen. Die Seite laedt ihre
-// Schriften von fonts.googleapis.com; in einer Umgebung ohne Zugang dorthin
-// haengt jeder Test 13 Sekunden an ausstehenden Anfragen. Auf einem Runner mit
-// Zugang waere es schnell — und trotzdem haengt ein Smoke-Test nicht an der
-// Erreichbarkeit eines fremden CDN. Geprueft wird Navigation, nicht Typografie.
+// Alles ausser der eigenen Herkunft wird abgewiesen. Seit 23.10.2026 laedt die
+// Seite nichts mehr von Dritten (Schriften self-hosted). Die Sperre bleibt als
+// Wache: Ein neuer Fremdaufruf faellt hier auf, statt still durchzugehen.
+// Geprueft wird Navigation, nicht Typografie.
 test.beforeEach(async ({ page }) => {
   await page.route(/^https?:\/\/(?!localhost|127\.0\.0\.1)/, (route) => route.abort());
 });

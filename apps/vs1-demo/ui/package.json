@@ -8,7 +8,7 @@
     ],
     "scripts": {
         "dev": "vite",
-    "dev:mock": "VITE_MOCK_API=1 vite",
+        "dev:mock": "VITE_MOCK_API=1 vite",
         "build": "npm run build:root --prefix ../../.. && npx tsc && vite build",
         "preview": "vite preview",
         "start": "node server.js",
@@ -22,6 +22,8 @@
         "@complihub/compliance-engine": "*",
         "@complihub360/types": "*",
         "@complihub360/ui": "*",
+        "@fontsource-variable/inter": "^5.3.0",
+        "@fontsource/ibm-plex-serif": "^5.3.0",
         "@radix-ui/react-slot": "^1.2.4",
         "@supabase/supabase-js": "^2.108.2",
         "class-variance-authority": "^0.7.1",

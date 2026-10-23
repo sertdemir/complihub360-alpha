@@ -623,10 +623,10 @@ export function CookiePage() {
         </Section>
         <Section heading={t('cookies.headings.thirdParty')}>
           <p>
-            Eingebundene Inhalte Dritter können eigene Speichermechanismen mitbringen. Derzeit betrifft das nur die
-            Schriftarten und Symbole, die wir von Google Fonts laden (fonts.googleapis.com, fonts.gstatic.com). Beim Laden
-            wird Ihre IP-Adresse an Google übermittelt; Google setzt dabei nach eigenen Angaben keine Cookies. Karten,
-            Videos oder andere Inhalte Dritter binden wir nicht ein.
+            Wir binden keine Inhalte Dritter ein: keine Karten, keine Videos, keine Schriften von fremden Servern.
+            Schriftarten und Symbole liefern wir von unserem eigenen Server aus. Beim Aufruf dieser Website wird Ihre
+            IP-Adresse deshalb an keinen Dritten übermittelt, abgesehen von unserem Hosting-Anbieter (siehe
+            Datenschutzerklärung).
           </p>
         </Section>
         <Section heading={t('cookies.headings.contact')}>
@@ -690,9 +690,9 @@ export function CookiePage() {
       </Section>
       <Section heading={t('cookies.headings.thirdParty')}>
         <p>
-          Embedded third-party content can bring its own storage. Currently this concerns only the fonts and icons we load
-          from Google Fonts (fonts.googleapis.com, fonts.gstatic.com). Loading them transmits your IP address to Google;
-          according to Google, no cookies are set in the process. We embed no maps, videos or other third-party content.
+          We embed no third-party content: no maps, no videos, no fonts from external servers. Fonts and icons are
+          served from our own server. When you visit this website, your IP address is therefore not transmitted to any
+          third party other than our hosting provider (see the privacy policy).
         </p>
       </Section>
       <Section heading={t('cookies.headings.contact')}>
