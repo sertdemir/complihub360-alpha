@@ -133,7 +133,7 @@ Die Privacy-Architektur ist deterministisch und der AI immer vorgelagert. Detail
 | `.tickets/` | Ticket-Lifecycle (`doing` → `review` → `done`) |
 | `.claude/hooks/` | Guard-Hooks für Claude Code (Git-Hooks, geschützte Configs/Regeln, Privacy-Gate, UI-Typecheck) — Übersicht im README dort |
 | `.claude/agents/` | Projekt-Subagenten mit festem DNA- und Privacy-Block |
-| `.claude/settings.json` → `permissions.allow` | lesende Supabase-MCP-Aufrufe ohne Rückfrage (Logs, Tabellen, Migrationen, Advisor). Schreibende (`execute_sql`, `apply_migration`, Branches, Edge-Deploy) fragen weiter — sie ändern Beta oder Staging direkt. |
+| `.claude/settings.json` → `permissions.allow` | lesende MCP-Aufrufe ohne Rückfrage: Supabase (Logs, Tabellen, Migrationen, Advisor) und Scaleway (alle 41 Tools des nur lesend gestarteten Servers aus `.mcp.json`, Runbook `docs/runbooks/scaleway-mcp.md`). Schreibende Supabase-Aufrufe (`execute_sql`, `apply_migration`, Branches, Edge-Deploy) fragen weiter — sie ändern Beta oder Staging direkt. |
 
 ## Drei Dinge heißen „Vault" — sie sind nicht dasselbe
 

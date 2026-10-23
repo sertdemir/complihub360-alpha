@@ -101,10 +101,15 @@ bewusste Änderung an `.mcp.json`, nicht ein Flag im Chat.
   gibt es kein `scw`, und `api.scaleway.com` ist hinter dem Proxy gesperrt.
   Claude Code meldet den Server dann als nicht verbunden und arbeitet ohne
   ihn weiter. Das ist erwartet.
-- Die Tool-Namen stehen erst nach `list-tools` fest. Wer lesende Aufrufe ohne
-  Rückfrage freigeben will, trägt sie wie bei Supabase in
-  `.claude/settings.json` unter `permissions.allow` ein
-  (Muster `mcp__scaleway__<tool>`).
+- Die 41 Tools des so gestarteten Servers (Stand CLI 23.10.2026, Liste aus
+  `list-tools`) sind in `.claude/settings.json` unter `permissions.allow`
+  freigegeben (Muster `mcp__scaleway__<tool>`), weil sie alle nur lesen.
+  Kommt mit einer neuen CLI-Version ein Tool dazu, fragt Claude Code bei dem
+  einmal nach; dann `list-tools` erneut laufen lassen und die Liste nachziehen.
+- Wer den Server zusätzlich mit `claude mcp add --scope user` angelegt hat,
+  hat ihn doppelt (Projekt und Konto). Claude Code nimmt die Projektfassung;
+  die Kontofassung lässt sich mit `claude mcp remove --scope user scaleway`
+  entfernen.
 - `scw init` legt den Schlüssel im Klartext in `~/.config/scw/config.yaml`
   ab. Wer das nicht will, setzt stattdessen `SCW_ACCESS_KEY`,
   `SCW_SECRET_KEY`, `SCW_DEFAULT_ORGANIZATION_ID`, `SCW_DEFAULT_PROJECT_ID`
