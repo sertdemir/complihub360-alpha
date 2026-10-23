@@ -13,7 +13,9 @@ test.beforeEach(async ({ page }) => { await blockForeignHosts(page); await reset
 
 test('Gast: die Risk Map kommt ohne Konto, die Anbieter bleiben verschlossen', async ({ page }) => {
   await runWizard(page);
-  await expect(page.getByRole('heading', { name: "Here's what applies to you." })).toBeVisible();
+  // F1 (23.10.2026): die Ueberschrift folgt den Belegen — "N obligations
+  // apply to you." oder, ohne Bestaetigtes, "Here's what's worth a closer look."
+  await expect(page.getByRole('heading', { level: 1, name: /appl(y|ies) to you\.|worth a closer look\./ })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Save this map. Keep your matches.' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'View details' })).toHaveCount(0);
   await expect(page.locator('body')).not.toContainText(REAL_PROVIDER_NAMES);
