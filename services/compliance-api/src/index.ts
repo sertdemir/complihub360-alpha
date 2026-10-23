@@ -2160,8 +2160,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
                         correlationId,
                     }));
-                } catch {
-                    structuredLog('error', 'Scheduling create failed', { correlationId, errorCode: 'ERR_SCHEDULING', severity: 'error', route: req.url });
+                } catch (err) {
+                    // Bis 23.10.2026 ohne Ursache: Die erste Beta-Testbuchung scheiterte
+                    // vor der Belastung, und das Log sagte nur "create failed".
+                    structuredLog('error', 'Scheduling create failed', {
+                        correlationId, errorCode: 'ERR_SCHEDULING', severity: 'error', route: req.url,
+                        detail: err instanceof Error ? err.message.slice(0, 300) : String(err).slice(0, 300),
+                        at: err instanceof Error ? (err.stack ?? '').split('\n').slice(1, 4).map((l) => l.trim()).join(' | ').slice(0, 400) : undefined,
+                    } as any);
                     res.writeHead(500, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Scheduling create failed', correlationId }));
                 }
