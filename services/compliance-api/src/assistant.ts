@@ -5,6 +5,7 @@ import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
 import { resolveLlm, sameEmbedModel, type LlmProvider } from './llm.js';
+import { SHARED_RULES, leaksPrompt, leakReply } from './assistantGuard.js';
 import { redactText } from "@complihub360/redaction";
 
 /** P5: was an das Modell geht, ist vorher deterministisch redigiert (Regex-Profile, keine KI). */
@@ -71,7 +72,7 @@ Rules — follow ALL of them:
 5. Be compact: at most ~180 words. Use short bullet points for lists of obligations, rates or deadlines. State amounts and deadlines precisely.
 5a. Output PLAIN TEXT only — the chat window renders no Markdown. Never use **, *, # or backticks; bullets are lines starting with "- ".
 6. When the question names a country outside the covered set (DE, UK, NL, FR, IT, ES, US, TR, AT), say that CompliHub360 does not yet cover that country, so you cannot answer for it, and that the user can ask to be notified when it is covered.
-7. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.`;
+7. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.${SHARED_RULES}`;
 
 // Bereichsseite (Canvas 3B, 2026-09-13): die Frage antwortet NUR ueber diesen
 // Bereich und die Sitzungen des Nutzers. Der Kontext besteht dann aus dem
@@ -99,7 +100,7 @@ Rules — follow ALL of them:
 6. Be compact: at most ~180 words. Short bullet points for lists. State amounts and deadlines precisely.
 6a. Output PLAIN TEXT only — no Markdown; bullets are lines starting with "- ".
 7. Where the AREA KNOWLEDGE marks an entry as EU-level without a national source, say that the national text is not on file.
-8. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.`;
+8. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.${SHARED_RULES}`;
 }
 
 const MATCH_THRESHOLD = 0.4;
@@ -290,11 +291,16 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             const userTurn = `CONTEXT:\n${contextParts.join('\n\n') || '(no matching context found)'}\n\nQUESTION:\n${message}`;
 
             stage = 'generate';
-            const answer = await llm.generate(domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
+            const generated = await llm.generate(domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
+            // Deterministischer Leck-Schutz: gibt das Modell seine Anweisungen
+            // aus, geht stattdessen eine feste Antwort in der Sprache der Frage.
+            const promptLeak = leaksPrompt(generated);
+            if (promptLeak) structuredLog('warn', 'Assistant: prompt leak blocked', { correlationId, errorCode: 'ERR_ASSISTANT_PROMPT_LEAK', severity: 'warn' });
+            const answer = promptLeak ? leakReply(rawMessage) : generated;
 
             // Ohne Frageinhalt — Volumen, Abdeckung und Kalibrierung der Schwelle.
             await logAssistantEvent({
-                ...audit, outcome: 'ok', country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
+                ...audit, outcome: 'ok', prompt_leak_blocked: promptLeak, country: factsFor, chunks: chunks.length, corpus_missing: corpusMissing,
                 top_similarity: chunks[0] ? Math.round(chunks[0].similarity * 1000) / 1000 : null,
             }, correlationId);
 

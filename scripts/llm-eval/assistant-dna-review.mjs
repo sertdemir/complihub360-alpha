@@ -54,6 +54,8 @@ function hints(q, status, answer, sources) {
     if (words > 230) h.push(`lang: ${words} Wörter (Ziel ~180)`);
     if (HYPE.test(answer)) h.push(`Hype-Wort: "${answer.match(HYPE)[0].trim()}"`);
     if (q.expectSources && !sources) h.push('keine Quellen — Korpus/Fakten leer oder falsches Embedding-Modell?');
+    if (q.lang === 'de' && /\b(du|dich|dir|dein\w*)\b/i.test(answer)) h.push('duzt — Produkt-Copy siezt (Regel S1)');
+    if (/\b(you must|Sie müssen|du musst|drohen (dir|Ihnen))\b/i.test(answer)) h.push('persönliche Anweisung/Drohung — prüfen (Regel 3, S2)');
     if (PROFESSION.test(answer)) h.push(`nennt eine Fachperson ("${answer.match(PROFESSION)[0]}") — prüfen, ob als Verweis oder als Selbstbild`);
     if (PANIC.test(answer)) h.push(`Dringlichkeitswort: "${answer.match(PANIC)[0]}" — prüfen auf Druck`);
     const counts = Object.fromEntries(Object.entries(STOP).map(([l, re]) => [l, (answer.match(re) || []).length]));
