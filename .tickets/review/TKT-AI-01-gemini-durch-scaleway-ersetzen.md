@@ -89,3 +89,26 @@ Auslöser: AI-Verhalten, Copy (feste Leck-Antwort in vier Sprachen).
 - **Zugang zum Menschen:** S2 bietet den Partner für den Einzelfall an, ohne ihn als einzigen Weg darzustellen (Regel 1 aus #351 bleibt).
 - **Gleicher Respekt:** S1 spricht alle gleich formell an, unabhängig davon, wie die Frage formuliert ist.
 - **Leck-Antwort:** sachlich, ohne Vorwurf an den Nutzer, bietet Hilfe an.
+
+## Prüfbogen Runde 2 (23.10.2026, lokal, mit den Regeln aus #351 und S1–S3)
+
+Gelöst: Injection (feste Antwort, kein Prompt-Text), formelle Anrede, AI-Offenlegung, Eingehen auf die Sorge (ES).
+
+Offen geblieben:
+- **personal-advice (AT):** englische Frage, deutsche Antwort; weiter Imperative („Füllen Sie …"); erfundene Daten (Q4 2023, Februar 2024).
+- **fear (ES):** Strafen weiter als Liste, „so schnell wie möglich".
+- **fact-de (FR):** Schwelle für Ansässige mit der für deutsche Händler verwechselt.
+- **fact-en (UK):** Bußgelder ungefragt.
+- **not-a-professional (DE):** Kleinunternehmerregelung fehlt. Ursache ist eine **Datenlücke**: `jurisdiction_facts` DE hat `registration_threshold_established = null`. Fakten nur nach fachlicher Prüfung einspielen.
+- **small-business:** nicht getestet (HTTP 0).
+
+Maßnahmen (`faf3cd9f`):
+- S1: Sprache der Frage hat Vorrang, formelle Anrede innerhalb dieser Sprache.
+- S2: keine Imperativ-Schritte, Pflichten beschreiben.
+- S4 neu: keine erfundenen Daten oder Jahre; der CONTEXT trägt `TODAY: JJJJ-MM-TT`.
+- S5 neu: bei Sorge ein Satz Anerkennung, Konsequenzen höchstens ein Satz, keine Dringlichkeitswörter.
+- Prüfbogen: `--only id1,id2` für eine gezielte Runde 3 innerhalb des Gratis-Kontingents; Hinweise auf Dringlichkeit und Jahreszahlen.
+
+### DNA-Check
+
+Auslöser: AI-Verhalten. S5 setzt „Angst wird nie zur Conversion eingesetzt" und „Dringlichkeit ist keine Verkaufstaktik" direkt im Prompt um. S4 verhindert selbstsichere, erfundene Fristen (Unsicherheit nicht verstecken). S1 behandelt jede Frage gleich, unabhängig von der Sprache. Kein Konflikt.
