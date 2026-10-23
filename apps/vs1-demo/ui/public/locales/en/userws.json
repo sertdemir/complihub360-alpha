@@ -443,7 +443,7 @@
     "remind": "Remind",
     "remindSent": "Sent ✓",
     "remindError": "Reminder failed — try again in a moment.",
-    "remindedNote": "Reminder delivered — the provider received a fresh 24h confirmation link. A note was added to the thread.",
+    "remindedNote": "Reminder triggered — the provider gets a fresh 24h confirmation link. A note is in the thread.",
     "threadTitle": "Open thread",
     "threadDesc": "Full history — your opening message, replies and system notes.",
     "withdrawTitle": "Withdraw request",
