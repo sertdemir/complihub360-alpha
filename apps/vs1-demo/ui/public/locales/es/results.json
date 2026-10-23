@@ -363,6 +363,15 @@
     "booked": "Reservado",
     "providersEyebrow": "Verified Providers"
   },
+  "otherProviders": {
+    "toggle_one": "{{count}} proveedor verificado en {{market}} para otras áreas",
+    "toggle_other": "{{count}} proveedores verificados en {{market}} para otras áreas",
+    "heading": "Otros proveedores verificados en {{market}}",
+    "message": "No cubren {{areas}}. Se muestran para que vea quién trabaja en su mercado, no como recomendación.",
+    "notCovered": "No cubre {{areas}}",
+    "drawerTitle": "No disponible para esta solicitud",
+    "drawerNote": "Este proveedor está verificado en su mercado, pero no cubre {{areas}}. Puede ver el perfil, pero no reservarlo para esta solicitud."
+  },
   "rankBasis": {
     "group": "Verificado y medido",
     "verificationLine": {

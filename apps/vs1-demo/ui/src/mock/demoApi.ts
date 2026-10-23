@@ -524,7 +524,12 @@ function search(body: unknown) {
   // der Trefferliste. So ist "kein freigegebener Anbieter" (P1 · Q1) lokal
   // erreichbar — Wizard: z. B. nur Umwelt oder nur Recht.
   const matching = providers.filter((p) => p.match_basis.domains_matched.length > 0);
-  return { ok: true, providers: matching, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
+  // F2 wie der Server: passt niemand, kommen die Anbieter im Markt ohne
+  // Ueberschneidung getrennt, ohne Prozent und mit eigenen Buchstaben.
+  const others = matching.length ? [] : providers
+    .filter((p) => p.match_basis.country_covered)
+    .map((p, j) => ({ ...p, title: `Verified Provider ${LETTER(j)}`, letter: LETTER(j), match: null, match_tier: null }));
+  return { ok: true, providers: matching, other_providers: others, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
 }
 
 type MockDetail = {

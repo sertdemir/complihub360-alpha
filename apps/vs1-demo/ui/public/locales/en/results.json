@@ -369,6 +369,15 @@
     "booked": "Booked",
     "providersEyebrow": "Verified Providers"
   },
+  "otherProviders": {
+    "toggle_one": "{{count}} verified provider in {{market}} for other areas",
+    "toggle_other": "{{count}} verified providers in {{market}} for other areas",
+    "heading": "Other verified providers in {{market}}",
+    "message": "They do not cover {{areas}}. Shown so you can see who works in your market, not as a recommendation.",
+    "notCovered": "Does not cover {{areas}}",
+    "drawerTitle": "Not available for this request",
+    "drawerNote": "This provider is verified in your market but does not cover {{areas}}. You can view the profile, but not book it for this request."
+  },
   "rankBasis": {
     "group": "Verified and measured",
     "verificationLine": {

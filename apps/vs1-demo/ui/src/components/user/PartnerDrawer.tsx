@@ -17,7 +17,8 @@ import {
   bookingFailureFrom, createBooking, newBookingRequestId, fetchAcknowledgement, fetchProviderDetail, fetchSlots,
   type BookingAcknowledgement, type BookingFailure, type ProviderDetail,
 } from '../../api/bookings';
-import type { AnonProvider } from '../../api/search';
+import type { AnonProvider, OtherProvider } from '../../api/search';
+import { useNames } from '../results/MarketRequest';
 
 // ─── Partner-Schublade ───────────────────────────────────────────────────────
 // Canvas "Partnerseite" 1C, Nutzer-Entscheidung 2026-09-15: der Anbieter
@@ -72,7 +73,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   opportunity?: { areaCode: string; countries: string[] } | null;
   /** Der Anbieter aus der Suche — traegt Match-Zahl und Pseudonym schon; die
    *  Schublade muss dafuer nichts nachladen. */
-  provider: AnonProvider | null;
+  provider: AnonProvider | OtherProvider | null;
   /** Woraus die Match-Zahl besteht, meist <MatchBasis basis={p.match_basis} />. */
   basisNode?: React.ReactNode;
   /** Vorschlag fuer die Nachricht an den Anbieter, z. B. der Sitzungstitel. */
@@ -118,6 +119,10 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   const [slotTried, setSlotTried] = useState(false);
   const slotError = slotTried && !selected ? tw('shared.pickSlotError') : null;
   const sharedRows = useSharedRows();
+  // F2: welche Bereiche angefragt waren — fuer den Satz, warum hier nicht
+  // gebucht werden kann.
+  const names = useNames();
+  const requestedAreas = names.list((provider?.match_basis?.domains_requested ?? []).map(names.area));
 
   // Phase 3: die Schublade spricht den Anbieter nur ueber den opaken Ref an.
   const key = provider?.public_ref ?? '';
@@ -276,9 +281,11 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
                   </span>
                 )}
               </div>
-              <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950">
-                {provider.match}
-              </span>
+              {provider.match != null && (
+                <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950">
+                  {provider.match}
+                </span>
+              )}
             </div>
             {/* Canvas 3B: warum ohne Namen — dort, wo die Frage entsteht. */}
             {!booking && <AnonNotice className="mt-3" />}
@@ -297,7 +304,15 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
         ) : undefined
       }
       footer={
-        step === 'profil' && d?.bookable_chargeable === false ? (
+        step === 'profil' && provider.match == null ? (
+          // F2 (Nutzer 23.10.2026): ein Anbieter ohne den angefragten Bereich
+          // ist zum Ansehen da, nicht zum Buchen — sonst zahlte er die
+          // Lead-Gebuehr fuer eine Anfrage ausserhalb seiner Freigabe.
+          <div>
+            <p className="text-body-sm font-bold text-fg">{t('otherProviders.drawerTitle')}</p>
+            <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-tertiary">{t('otherProviders.drawerNote', { areas: requestedAreas })}</p>
+          </div>
+        ) : step === 'profil' && d?.bookable_chargeable === false ? (
           // Wie die Detailseite (Nutzer-Entscheidung 2026-10-01): kein Knopf
           // und keine Termine, wenn nicht gebucht werden kann. Vorher fuehrte
           // die Schublade bis zur Terminwahl und dann in die 409 (Testlauf
@@ -438,7 +453,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
 
 // ─── Schritt 1: das Profil ───────────────────────────────────────────────────
 function Profil({ provider, detail, d, basisNode }: {
-  provider: AnonProvider;
+  provider: AnonProvider | OtherProvider;
   detail: Detail;
   d: ProviderDetail | null;
   basisNode?: React.ReactNode;
@@ -450,7 +465,7 @@ function Profil({ provider, detail, d, basisNode }: {
           wurde. Die Zahl oben ist damit nicht nur eine Behauptung. */}
       {basisNode && (
         <section>
-          <h3 className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('matchBasis.groupFit')} · {provider.match} %</h3>
+          <h3 className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('matchBasis.groupFit')}{provider.match != null ? ` · ${provider.match} %` : ''}</h3>
           <div className="mt-2">{basisNode}</div>
         </section>
       )}

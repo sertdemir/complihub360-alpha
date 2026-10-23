@@ -363,6 +363,15 @@
     "booked": "Alındı",
     "providersEyebrow": "Verified Provider’lar"
   },
+  "otherProviders": {
+    "toggle_one": "{{market}} pazarında diğer alanlar için {{count}} doğrulanmış sağlayıcı",
+    "toggle_other": "{{market}} pazarında diğer alanlar için {{count}} doğrulanmış sağlayıcı",
+    "heading": "{{market}} pazarındaki diğer doğrulanmış sağlayıcılar",
+    "message": "{{areas}} alanını kapsamıyorlar. Pazarınızda kimlerin çalıştığını görebilmeniz için gösteriliyorlar, tavsiye olarak değil.",
+    "notCovered": "{{areas}} alanını kapsamıyor",
+    "drawerTitle": "Bu talep için uygun değil",
+    "drawerNote": "Bu sağlayıcı pazarınızda doğrulanmıştır, ancak {{areas}} alanını kapsamıyor. Profili görüntüleyebilirsiniz, ancak bu talep için rezervasyon yapamazsınız."
+  },
   "rankBasis": {
     "group": "Doğrulandı ve ölçüldü",
     "verificationLine": {

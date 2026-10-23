@@ -363,6 +363,15 @@
     "booked": "Gebucht",
     "providersEyebrow": "Verified Provider"
   },
+  "otherProviders": {
+    "toggle_one": "{{count}} verifizierter Provider in {{market}} für andere Bereiche",
+    "toggle_other": "{{count}} verifizierte Provider in {{market}} für andere Bereiche",
+    "heading": "Weitere verifizierte Provider in {{market}}",
+    "message": "Sie decken {{areas}} nicht ab. Wir zeigen sie, damit Sie sehen, wer in Ihrem Markt tätig ist, nicht als Empfehlung.",
+    "notCovered": "Deckt {{areas}} nicht ab",
+    "drawerTitle": "Für diese Anfrage nicht buchbar",
+    "drawerNote": "Dieser Provider ist in Ihrem Markt verifiziert, deckt aber {{areas}} nicht ab. Sie können das Profil ansehen, aber für diese Anfrage nicht buchen."
+  },
   "rankBasis": {
     "group": "Geprüft und gemessen",
     "verificationLine": {

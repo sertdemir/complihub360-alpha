@@ -6,9 +6,10 @@ import type { PenaltyCeiling } from '@complihub/compliance-engine';
 import { describeCeiling, penaltyText } from '../lib/penaltyCeiling';
 import { cadenceLabel, obligationLabel } from '../lib/obligationText';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
-import { lawsOf, runSearch, type AnonProvider, type SearchCoverage, type SearchLaw } from '../api/search';
+import { lawsOf, runSearch, type AnonProvider, type OtherProvider, type SearchCoverage, type SearchLaw } from '../api/search';
 import { coverageGaps, isLimitedCoverage } from '../lib/matchState';
 import { LimitedCoverageCard, OneMatchGuest, ProviderStateHead } from '../components/results/ProviderStates';
+import { OtherProvidersBlock } from '../components/results/OtherProviders';
 import { useApiData } from '../lib/useApiData';
 import { referenceOf } from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
@@ -278,7 +279,7 @@ export function ResultsRiskMap() {
   const [answersOpen, setAnswersOpen] = useState<boolean>(!!location.state?.openAnswers);
   // Partner oeffnen als Schublade ueber der Sitzung (Canvas 1C, 2026-09-15) —
   // wie auf der Bereichsseite. Kein Seitenwechsel, die Ergebnisse bleiben stehen.
-  const [partnerOpen, setPartnerOpen] = useState<AnonProvider | null>(null);
+  const [partnerOpen, setPartnerOpen] = useState<AnonProvider | OtherProvider | null>(null);
   // Termine des Nutzers je Anbieter: wo einer liegt, traegt die Karte den
   // Klarnamen statt des Pseudonyms (Stufe 3).
   const [booked, setBooked] = useState<BookingByKey>({});
@@ -302,7 +303,7 @@ export function ResultsRiskMap() {
   // `query` haelt fest, womit tatsaechlich gesucht wurde — der Umfang der
   // leeren Zustaende (welche Maerkte geprueft wurden) muss dieselbe Frage
   // beschreiben, nicht das lokale Profil, wenn eine Sitzung es ersetzt hat.
-  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
+  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; otherProviders: OtherProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
@@ -324,8 +325,8 @@ export function ResultsRiskMap() {
     // Engine nicht gerechnet → riskMapFailed mit Referenz, nicht "keine
     // Pflichten" und auch keine Anbieter ohne die Pflichten dazu.
     const laws = lawsOf(res);
-    return { providers: res.providers, laws, coverage: res.coverage, session, query };
-  }, { providers: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
+    return { providers: res.providers, otherProviders: res.other_providers ?? [], laws, coverage: res.coverage, session, query };
+  }, { providers: [], otherProviders: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
   // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Bis 2026-09-22
   // stand hier beim Laden und bei einem API-Fehler eine Design-Fixture mit drei
   // erfundenen Anbietern (100/87/73 %); sie haette einem Nutzer ohne einen
@@ -333,6 +334,9 @@ export function ResultsRiskMap() {
   // "echte Zahl"; DNA §4.5 "Never give false reassurance").
   const providersLive = searchSource === 'api';
   const anonProviders = providersLive ? searchData.providers : [];
+  // F2 (23.10.2026): nur, wenn niemand den angefragten Bereich abdeckt — der
+  // Server liefert sie sonst gar nicht. Getrennt, eingeklappt, nicht buchbar.
+  const otherProviders = providersLive && anonProviders.length === 0 ? searchData.otherProviders : [];
 
   // Vier Zustaende, die bis 2026-09-22 einer waren. Vorher galt: was nicht
   // live ist, ist die Design-Fixture — beim Laden, bei einem API-Fehler und
@@ -614,13 +618,20 @@ export function ResultsRiskMap() {
         // Hoechstens drei Karten, volle Treffer zuerst (Nutzer 23.10.2026,
         // lib/topMatches). Die Ueberschrift zaehlt weiter alle Treffer.
         providers={marketUnavailable ? [] : topMatches(anonProviders)}
-        providersEmptyState={marketUnavailable ? <NoVerifiedProvider /> : noProviderMatch && noMatchGaps.length ? (
-          <NoProviderMatchCard
-            gaps={noMatchGaps}
-            email={user?.email ?? null}
-            status={coverageRequest.status}
-            onRequest={(notify) => coverageRequest.send(notify)}
-          />
+        providersEmptyState={marketUnavailable ? <NoVerifiedProvider /> : noProviderMatch && (noMatchGaps.length || otherProviders.length) ? (
+          // F2 · Canvas 1B: die Luecke zuerst, darunter eingeklappt, wer im
+          // Markt fuer andere Bereiche verifiziert ist.
+          <div className="flex flex-col gap-4">
+            {noMatchGaps.length > 0 && (
+              <NoProviderMatchCard
+                gaps={noMatchGaps}
+                email={user?.email ?? null}
+                status={coverageRequest.status}
+                onRequest={(notify) => coverageRequest.send(notify)}
+              />
+            )}
+            <OtherProvidersBlock providers={otherProviders} onDetails={setPartnerOpen} />
+          </div>
         ) : undefined}
         // K3 (01.10.2026): der ungepruefte Markt steht oben in der Spalte,
         // die Anbieter fuer die geprueften Maerkte bleiben darunter.
@@ -925,7 +936,13 @@ export function ResultsRiskMap() {
               noMatchGaps.length ? (
                 // P1 (Figma 3693:4040): abgenommener Zustand statt "No provider
                 // covers this area yet."
-                <NoProviderMatchGuest gaps={noMatchGaps} status={coverageRequest.status} onRequest={() => coverageRequest.send(false)} />
+                <div className="flex flex-col items-center gap-6">
+                  <NoProviderMatchGuest gaps={noMatchGaps} status={coverageRequest.status} onRequest={() => coverageRequest.send(false)} />
+                  {/* F2: Gaeste sehen den Block auch; Details erst mit Konto. */}
+                  <div className="w-full max-w-[360px]">
+                    <OtherProvidersBlock providers={otherProviders} onDetails={() => setSaveOpen(true)} />
+                  </div>
+                </div>
               ) : (
                 <p className="text-body-sm text-fg-secondary">{t('partners.none')}</p>
               )

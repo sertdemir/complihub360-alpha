@@ -66,6 +66,11 @@ export interface AnonProvider {
   markets_covered?: string[];
 }
 
+/** F2 (Entscheidung 23.10.2026): ein Anbieter im Markt ohne einen der
+ *  angefragten Bereiche. Kein Match-Prozent — die UI zeigt ihn getrennt und
+ *  benannt, nur zum Ansehen, nie als Treffer. */
+export type OtherProvider = Omit<AnonProvider, 'match' | 'match_tier'> & { match: null; match_tier: null };
+
 export interface PriceRange {
   min: number | null;
   max: number | null;
@@ -123,6 +128,9 @@ export interface SearchLaw {
 export interface SearchResult {
   overview_summary: string;
   providers: AnonProvider[];
+  /** F2: nur gefuellt, wenn `providers` leer ist. Aeltere Antworten kennen
+   *  das Feld nicht — dann gibt es den Block nicht. */
+  other_providers?: OtherProvider[];
   laws: SearchLaw[];
   /** Aeltere Antworten kennen sie nicht — dann gibt es keinen Befund
    *  "begrenzt", statt einen zu raten. */

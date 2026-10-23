@@ -156,3 +156,24 @@ describe('PartnerDrawer · Nachweise wie auf der Karte', () => {
     expect(screen.queryByText('rankBasis.never')).not.toBeInTheDocument();
   });
 });
+
+// F2 (Nutzer 23.10.2026): ein Anbieter ohne den angefragten Bereich ist zum
+// Ansehen da. Kein Prozent, kein Buchen — sonst zahlte er die Lead-Gebuehr
+// fuer eine Anfrage ausserhalb seiner Freigabe.
+describe('PartnerDrawer · Anbieter ohne Bereichs-Treffer (F2)', () => {
+  it('zeigt keinen Prozentwert und keinen Buchungsknopf, sondern den Grund', async () => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, bookable_chargeable: true });
+    fetchSlots.mockReset().mockResolvedValue([]);
+    fetchAcknowledgement.mockReset().mockResolvedValue(null);
+    const other = { ...PROVIDER, match: null, match_tier: null, match_basis: { country: 'DE', country_covered: true, domains_requested: ['tax-vat'], domains_matched: [] } };
+    render(
+      <MemoryRouter>
+        <PartnerDrawer open onClose={() => {}} provider={other as unknown as AnonProvider} />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText('otherProviders.drawerTitle')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /detail\.bookCta/ })).not.toBeInTheDocument();
+    expect(screen.queryByText('100')).not.toBeInTheDocument();
+    expect(screen.queryByText(/null/)).not.toBeInTheDocument();
+  });
+});
