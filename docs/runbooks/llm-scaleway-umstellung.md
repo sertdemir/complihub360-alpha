@@ -25,14 +25,27 @@ In der Liste müssen `mistral-small-3.2-24b-instruct-2506` und `qwen3-embedding-
 
 ## 3. DNA-Prüfbogen lokal
 
-```bash
-# Terminal 1
-LLM_API_KEY=... npm run dev:service
-# Terminal 2
-node scripts/llm-eval/assistant-dna-review.mjs --api http://localhost:3005 --token <JWT eines Assistant-Pro-Testkontos>
+Einmalig `services/compliance-api/.env` anlegen (von Git ausgeschlossen):
+
+```text
+SUPABASE_URL=https://kqylqwogxbiwpnomkzsn.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<service_role-Schlüssel aus Supabase → Project Settings → API Keys>
+LLM_API_KEY=<Scaleway Secret Key>
+API_KEY=<beliebiger lokaler Testwert>
 ```
 
-Ohne Pro-Konto sind nur fünf Fragen pro Tag und Identität frei. Den Bogen lesen und je Frage das Urteil eintragen. **Ein Verstoß gegen eine harte DNA-Grenze stoppt hier.** Lokal ist der Korpus noch Gemini-eingebettet, die Antworten kommen also nur aus den Fakten; das prüft Ton und Grenzen, nicht die Trefferqualität.
+`API_KEY` braucht es, weil `/api/v1/assistant/chat` nur angemeldet erreichbar ist (Nutzer-JWT oder Server-Schlüssel).
+
+```bash
+# Terminal 1
+npm run dev:service          # warten auf "Compliance API running on port 3005"
+# Terminal 2
+node scripts/llm-eval/assistant-dna-review.mjs --api http://localhost:3005 --api-key <API_KEY>
+```
+
+Nach fünf Fragen greift das Gratis-Kontingent (402). Der Bogen hält an und nennt die nächste Frage: Server in Terminal 1 neu starten (Ctrl+C, `npm run dev:service`), dann mit `--from 6` und danach `--from 11` weiter. Jeder Teil landet in einer eigenen Datei. Mit einem Assistant-Pro-Konto geht es in einem Lauf (`--token <JWT>`).
+
+Den Bogen lesen und je Frage das Urteil eintragen. **Ein Verstoß gegen eine harte DNA-Grenze stoppt hier.** Im Kopf muss überall `openai-compatible:…` stehen. Lokal ist der Korpus noch Gemini-eingebettet, die Antworten kommen also nur aus den Fakten; das prüft Ton und Grenzen, nicht die Trefferqualität.
 
 ## 4. Staging umstellen
 

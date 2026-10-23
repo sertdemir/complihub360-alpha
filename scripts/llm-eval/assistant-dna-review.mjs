@@ -10,11 +10,17 @@
 // der Mensch beim Lesen.
 //
 //   node scripts/llm-eval/assistant-dna-review.mjs \
-//     --api http://localhost:3005 [--token <JWT eines Pro-Testkontos>] [--out bericht.md]
+//     --api http://localhost:3005 [--api-key <API_KEY des Servers> | --token <JWT>] [--from 6] [--out bericht.md]
 //
-// Das Free-Kontingent erlaubt 5 Fragen pro Tag und Identität; für den ganzen
-// Bogen braucht es ein Assistant-Pro-Testkonto (--token) oder einen frisch
-// gestarteten lokalen Server je 5 Fragen.
+// Anmeldung: Die Route verlangt einen Nutzer-JWT oder den Server-Schlüssel.
+// Lokal am einfachsten: API_KEY=<beliebig> in services/compliance-api/.env
+// und denselben Wert als --api-key.
+//
+// Das Free-Kontingent erlaubt 5 Fragen pro Tag und Identität. Stößt der Bogen
+// darauf (402), hält er an und nennt die Frage, ab der es weitergeht: lokalen
+// Server neu starten (der Zähler lebt im Speicher), dann mit --from N weiter.
+// Jeder Teil bekommt eine eigene Datei. Mit einem Assistant-Pro-Konto
+// (--token) läuft der ganze Bogen in einem Durchgang.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,8 +31,9 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, all) =>
     return acc;
 }, []));
 const api = (args.api || 'http://localhost:3005').replace(/\/+$/, '');
-const out = args.out || `assistant-dna-review-${new Date().toISOString().slice(0, 10)}.md`;
-const questions = JSON.parse(fs.readFileSync(path.join(here, 'questions.json'), 'utf8'));
+const from = Math.max(1, parseInt(args.from || '1', 10) || 1);
+const out = args.out || `assistant-dna-review-${new Date().toISOString().slice(0, 10)}${from > 1 ? `-ab-${String(from).padStart(2, '0')}` : ''}.md`;
+const questions = JSON.parse(fs.readFileSync(path.join(here, 'questions.json'), 'utf8')).slice(from - 1);
 
 const HYPE = /\b(revolution\w*|game[- ]?chang\w*|ultimate|best[- ]in[- ]class|einzigartig\w*)\b|(?:^|\s)#1\b/i;
 const PROFESSION = /\b(steuerberater\w*|rechtsanwalt|anwält\w*|tax advis\w*|lawyer|attorney|avukat|mali müşavir|abogad\w*|asesor fiscal)\b/i;
@@ -55,9 +62,14 @@ function hints(q, status, answer, sources) {
     return h;
 }
 
-const headers = { 'Content-Type': 'application/json', ...(args.token ? { Authorization: `Bearer ${args.token}` } : {}) };
+const headers = {
+    'Content-Type': 'application/json',
+    ...(args.token ? { Authorization: `Bearer ${args.token}` } : {}),
+    ...(args['api-key'] ? { 'x-api-key': args['api-key'] } : {}),
+};
 const rows = [];
-for (const q of questions) {
+let next = null;
+for (const [i, q] of questions.entries()) {
     let status = 0, answer = "", sources = "", provider = "";
     try {
         const res = await fetch(`${api}/api/v1/assistant/chat`, {
@@ -72,6 +84,11 @@ for (const q of questions) {
         sources = (body.sources || []).map((s) => s.label).join(' · ');
     } catch (e) {
         answer = `Fehler: ${e.message}`;
+    }
+    if (status === 402) { next = from + i; break; }
+    if (status === 401 && i === 0) {
+        console.log('401 — nicht angemeldet. API_KEY=<wert> in services/compliance-api/.env setzen, Server neu starten, dann --api-key <wert> mitgeben.');
+        process.exit(1);
     }
     const h = hints(q, status, answer, sources);
     rows.push({ q, status, answer, sources, provider, h });
@@ -112,3 +129,7 @@ const md = [
 ].join('\n');
 fs.writeFileSync(out, md);
 console.log(`\nPrüfbogen: ${path.resolve(out)}`);
+if (next) {
+    console.log(`\nGratis-Grenze erreicht (402). Lokalen Server neu starten (Ctrl+C, npm run dev:service), dann weiter mit:`);
+    console.log(`  node scripts/llm-eval/assistant-dna-review.mjs --api ${api}${args['api-key'] ? ' --api-key <dein API_KEY>' : ''} --from ${next}`);
+}
