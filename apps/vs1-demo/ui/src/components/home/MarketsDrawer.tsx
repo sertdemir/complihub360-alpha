@@ -71,14 +71,22 @@ function WizardDrawer({ open, onClose, label, children }: {
 // (marketsDrawer.markets.<id>.{name,desc}).
 const EUROPEAN_IDS = ['Switzerland', 'Austria', 'Belgium', 'Sweden', 'Denmark', 'Poland', 'Czechia', 'Romania'] as const;
 const EXPANDING_IDS = ['Norway', 'Ireland', 'Finland', 'Portugal'] as const;
-const TOTAL = EUROPEAN_IDS.length + EXPANDING_IDS.length;
 
 type Market = { id: string; name: string; desc: string };
 
-function MarketsContent({ value, onChange, onClose }: {
+// Wizard v1a: Sitz und Lager fragen nach LAENDERN, nicht nach weiteren
+// Maerkten. Dann stehen oben die Hauptlaender, die nicht schon als eigene
+// Karte im Schritt liegen (primary), und eigene Maerkte fallen aus der Liste
+// (exclude) — sonst stuende ein Land doppelt da.
+export type DrawerCountry = { id: string; name: string; desc: string };
+
+function MarketsContent({ value, onChange, onClose, primary = [], exclude = [], variant = 'markets' }: {
   value: string[];
   onChange: (v: string[]) => void;
   onClose: () => void;
+  primary?: DrawerCountry[];
+  exclude?: string[];
+  variant?: 'markets' | 'countries';
 }) {
   const { t } = useTranslation('home');
   const [local, setLocal] = useState<string[]>(value);
@@ -95,8 +103,12 @@ function MarketsContent({ value, onChange, onClose }: {
   });
   const toggle = (id: string) => setLocal((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
   const match = (m: Market) => m.name.toLowerCase().includes(query.trim().toLowerCase());
-  const eu = EUROPEAN_IDS.map(toMarket).filter(match);
-  const ex = EXPANDING_IDS.map(toMarket).filter(match);
+  const keep = (id: string) => !exclude.includes(id);
+  const main = primary.filter((m) => keep(m.id)).filter(match);
+  const eu = EUROPEAN_IDS.filter(keep).map(toMarket).filter(match);
+  const ex = EXPANDING_IDS.filter(keep).map(toMarket).filter(match);
+  const total = primary.filter((m) => keep(m.id)).length + [...EUROPEAN_IDS, ...EXPANDING_IDS].filter(keep).length;
+  const copy = variant === 'countries' ? 'marketsDrawer.countries' : 'marketsDrawer';
 
   const Row = (m: Market) => {
     const on = local.includes(m.id);
@@ -128,12 +140,12 @@ function MarketsContent({ value, onChange, onClose }: {
       </div>
 
       <div className="flex-1 overflow-y-auto px-8 pt-6">
-        <h3 className="font-serif text-[32px] font-bold leading-none text-fg">{t('marketsDrawer.title')}</h3>
+        <h3 className="font-serif text-[32px] font-bold leading-none text-fg">{t(`${copy}.title`)}</h3>
         <p className="mt-3 text-body-sm font-semibold text-fg-brand">
-          {t('marketsDrawer.count', { selected: local.length, total: TOTAL })}
+          {t('marketsDrawer.count', { selected: local.length, total })}
         </p>
         <p className="mt-4 text-body-sm leading-relaxed text-fg-secondary">
-          {t('marketsDrawer.desc')}
+          {t(`${copy}.desc`)}
         </p>
 
         <div className="mt-6 flex items-center gap-2.5 rounded-xl border border-stroke px-4 py-3 focus-within:border-stroke-brand">
@@ -148,6 +160,13 @@ function MarketsContent({ value, onChange, onClose }: {
 
         <hr className="my-6 border-stroke-subtle" />
 
+        {main.length > 0 && (
+          <>
+            <p className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{t('marketsDrawer.countries.main')}</p>
+            <div className="mt-2">{main.map(Row)}</div>
+            {eu.length > 0 && <hr className="my-6 border-stroke-subtle" />}
+          </>
+        )}
         {eu.length > 0 && (
           <>
             <p className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{t('marketsDrawer.european')}</p>
@@ -161,7 +180,7 @@ function MarketsContent({ value, onChange, onClose }: {
             <div className="mt-2">{ex.map(Row)}</div>
           </>
         )}
-        {eu.length === 0 && ex.length === 0 && (
+        {main.length === 0 && eu.length === 0 && ex.length === 0 && (
           <p className="py-8 text-center text-body-sm text-fg-tertiary">{t('marketsDrawer.noMatch', { query })}</p>
         )}
         <div className="h-6" />
@@ -415,7 +434,13 @@ export function WizardDrawerLayer({
   saveOpen,
   onSaveClose,
   draft,
+  primary,
+  exclude,
+  variant,
 }: {
+  primary?: DrawerCountry[];
+  exclude?: string[];
+  variant?: 'markets' | 'countries';
   marketsOpen: boolean;
   onMarketsClose: () => void;
   value: string[];
@@ -430,8 +455,8 @@ export function WizardDrawerLayer({
   const { t } = useTranslation('home');
   return (
     <>
-      <WizardDrawer open={marketsOpen} onClose={onMarketsClose} label={t('marketsDrawer.title')}>
-        <MarketsContent value={value} onChange={onChange} onClose={onMarketsClose} />
+      <WizardDrawer open={marketsOpen} onClose={onMarketsClose} label={t(variant === 'countries' ? 'marketsDrawer.countries.title' : 'marketsDrawer.title')}>
+        <MarketsContent value={value} onChange={onChange} onClose={onMarketsClose} primary={primary} exclude={exclude} variant={variant} />
       </WizardDrawer>
       <WizardDrawer open={!!infoCountry} onClose={onInfoClose} label={t('countryInfo.drawerLabel')}>
         {infoCountry && <CountryInfoContent id={infoCountry} onSelect={onSelectCountry} onClose={onInfoClose} />}

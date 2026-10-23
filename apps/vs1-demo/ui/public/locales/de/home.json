@@ -166,7 +166,8 @@
       "markets": "Märkte",
       "operations": "Tätigkeit",
       "domains": "Bereiche",
-      "review": "Übersicht"
+      "review": "Übersicht",
+      "business": "Unternehmen"
     },
     "saveProgress": "Fortschritt speichern",
     "steps": {
@@ -181,6 +182,30 @@
       "domains": {
         "title": "Welche Compliance-Bereiche beschäftigen Sie?",
         "subtitle": "Mehrfachauswahl. Wir priorisieren die Pflichten in diesen Bereichen."
+      },
+      "situation": {
+        "title": "Was beschreibt Ihre Situation am besten?",
+        "subtitle": "Wählen Sie eine Antwort. Sie bestimmt, welche Fragen folgen."
+      },
+      "offering": {
+        "title": "Was verkaufen oder bieten Sie an?",
+        "subtitle": "Mehrfachauswahl."
+      },
+      "establishment": {
+        "title": "Wo ist Ihr Unternehmen ansässig?",
+        "subtitle": "Sie verkaufen nach {{markets}}. Ist Ihr Unternehmen in einem dieser Länder registriert?"
+      },
+      "stock": {
+        "title": "Wo lagern Sie Ware?",
+        "subtitle": "Mehrfachauswahl, einschließlich Fulfillment- und Marktplatz-Lagern. Nur gefragt, weil Sie physische Produkte verkaufen."
+      },
+      "eprProducts": {
+        "title": "Welche Produkte verkaufen Sie oder planen Sie zu verkaufen?",
+        "subtitle": "EPR & Verpackung · Frage 1 von 2. Mehrfachauswahl. Batterien gehören zu dieser Frage."
+      },
+      "packaging": {
+        "title": "Welche Verpackungstätigkeiten treffen zu?",
+        "subtitle": "EPR & Verpackung · Frage 2 von 2. Mehrfachauswahl."
       }
     },
     "cards": {
@@ -279,6 +304,88 @@
       "environment": {
         "title": "Umwelt",
         "desc": "WEEE, Batterien, Stoffrecht"
+      },
+      "sitExisting": {
+        "title": "Bestehendes Unternehmen / selbstständig",
+        "desc": "Sie verkaufen oder erbringen bereits Leistungen"
+      },
+      "sitStarting": {
+        "title": "Gründung geplant",
+        "desc": "Sie planen gerade oder bauen auf"
+      },
+      "sitNotSure": {
+        "title": "Nicht sicher",
+        "desc": "Wir machen weiter, ohne etwas anzunehmen"
+      },
+      "offPhysical": {
+        "title": "Physische Produkte",
+        "desc": "Waren, die Sie versenden oder übergeben"
+      },
+      "offDigital": {
+        "title": "Digitale Produkte / Software",
+        "desc": "Downloads, Apps, Abonnements"
+      },
+      "offServices": {
+        "title": "Dienstleistungen",
+        "desc": "Arbeit, die Sie für Kunden erbringen"
+      },
+      "offDeciding": {
+        "title": "Noch offen",
+        "desc": "Noch nicht festgelegt"
+      },
+      "notSure": {
+        "title": "Nicht sicher",
+        "desc": "Kein Problem — Sie können es in der Übersicht noch ändern"
+      },
+      "estMarket": {
+        "desc": "Einer Ihrer Märkte"
+      },
+      "estNotYet": {
+        "title": "Noch nicht gegründet",
+        "desc": "Wird gerade aufgebaut"
+      },
+      "stockMarket": {
+        "desc": "Sie verkaufen hier"
+      },
+      "stockNone": {
+        "title": "Kein eigener Lagerbestand",
+        "desc": "Dropshipping oder Fertigung auf Bestellung"
+      },
+      "eprElectronics": {
+        "title": "Elektro- oder Elektronikprodukte",
+        "desc": "Alles mit Stecker oder Batterie"
+      },
+      "eprBatteriesInside": {
+        "title": "Produkte mit Batterien",
+        "desc": "Batterien eingebaut oder mitgeliefert"
+      },
+      "eprBatteriesSeparate": {
+        "title": "Batterien einzeln",
+        "desc": "Lose Batterien oder Akkupacks"
+      },
+      "eprOther": {
+        "title": "Andere physische Produkte",
+        "desc": "Alles andere, was Sie versenden"
+      },
+      "pkgPackaged": {
+        "title": "Bereits verpackte Produkte verkaufen",
+        "desc": "Produkte kommen in ihrer Verpackung an"
+      },
+      "pkgRepack": {
+        "title": "Produkte verpacken oder umpacken",
+        "desc": "Sie bringen Produkte in eine Verpackung"
+      },
+      "pkgShipping": {
+        "title": "Versandverpackung hinzufügen",
+        "desc": "Kartons, Füllmaterial, Versandtaschen"
+      },
+      "pkgEmpty": {
+        "title": "Leere Verpackung herstellen oder verkaufen",
+        "desc": "Verpackung ist Ihr Produkt"
+      },
+      "pkgNone": {
+        "title": "Keine Verpackung",
+        "desc": "Nichts wird verpackt oder versendet"
       }
     },
     "footer": {
@@ -291,14 +398,24 @@
       "operations": "Tätigkeit",
       "domains": "Compliance-Bereiche",
       "edit": "Bearbeiten",
-      "trust": "Anonym · Kein Konto nötig, um Ihre Risk Map zu sehen · Verarbeitung in ~4 Sekunden"
+      "trust": "Anonym · Kein Konto nötig, um Ihre Risk Map zu sehen · Verarbeitung in ~4 Sekunden",
+      "business": "Ihr Unternehmen",
+      "offering": "Sie verkaufen",
+      "marketsStock": "Märkte · Lager",
+      "epr": "EPR & Verpackung",
+      "notSure": "Nicht sicher — noch offen",
+      "establishedIn": "ansässig in",
+      "establishmentOpen": "Sitz:",
+      "stockIn": "Lager in",
+      "stockOpen": "Lager:"
     },
     "skipHint": "Unsicher? Wählen Sie, was am ehesten passt — jede Antwort lässt sich vor dem Erstellen noch ändern.",
     "needsMarket": "Wählen Sie mindestens einen Markt, um fortzufahren.",
     "back": "Zurück",
     "generate": "Meine Risk Map erstellen",
     "removeMarket": "{{market}} entfernen",
-    "aboutMarket": "Über {{market}}"
+    "aboutMarket": "Über {{market}}",
+    "situationHint": "Ein privates Anliegen? CompliHub360 ist vorerst für Unternehmen gebaut — eine Beratungsstelle vor Ort ist der bessere erste Schritt."
   },
   "marketsDrawer": {
     "header": "Märkte",
@@ -362,6 +479,11 @@
         "name": "Portugal",
         "desc": "EU-USt · SAF-T-Dateiformat"
       }
+    },
+    "countries": {
+      "title": "Weitere Länder",
+      "desc": "Wählen Sie alle Länder, die zutreffen.",
+      "main": "Hauptmärkte"
     }
   },
   "countryInfo": {

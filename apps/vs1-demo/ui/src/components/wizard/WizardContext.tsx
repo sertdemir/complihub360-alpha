@@ -34,6 +34,21 @@ export type RevenueBand =
 export type Intent = "self-check" | "expert" | "full-service" | "";
 export type Urgency = "today" | "week" | "month" | "researching" | "";
 
+// Wizard v1a (Canvas-Wahl 23.10.2026): die Antworten der neuen Fragen. Sie
+// liegen nur in sessions.answers — die Engine liest sie noch nicht (D1), und
+// welche Antwort welche Pflicht bestaetigt, entscheidet der Mensch vorher.
+// "not-sure" ist eine eigene Antwort, nie ein stilles Nein.
+export interface WizardDetails {
+    situation: "existing" | "starting" | "not-sure" | "";
+    offering: string[];
+    /** Laendercodes wie in markets, dazu "not-yet" | "not-sure". */
+    establishment: string[];
+    /** Laendercodes, dazu "none" | "not-sure"; leer, wenn nicht gefragt. */
+    stock: string[];
+    eprProducts: string[];
+    packaging: string[];
+}
+
 export interface SearchProfile {
     country: string;
     markets: string[];
@@ -48,6 +63,8 @@ export interface SearchProfile {
     note: string;
     /** null = nicht gefragt / unbekannt — nie stillschweigend "nein". */
     existingProvider: boolean | null;
+    /** Fehlt bei Profilen vor Wizard v1a und bei Teil-Profilen. */
+    details?: WizardDetails;
 }
 
 const DEFAULT_PROFILE: SearchProfile = {
