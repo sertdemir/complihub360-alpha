@@ -99,7 +99,7 @@ Offen geblieben:
 - **fear (ES):** Strafen weiter als Liste, „so schnell wie möglich".
 - **fact-de (FR):** Schwelle für Ansässige mit der für deutsche Händler verwechselt.
 - **fact-en (UK):** Bußgelder ungefragt.
-- **not-a-professional (DE):** Kleinunternehmerregelung fehlt. Ursache ist eine **Datenlücke**: `jurisdiction_facts` DE hat `registration_threshold_established = null`. Fakten nur nach fachlicher Prüfung einspielen.
+- **not-a-professional (DE):** Kleinunternehmerregelung fehlt (→ `TKT-FACTS-01`). Ursache ist eine **Datenlücke**: `jurisdiction_facts` DE hat `registration_threshold_established = null`. Fakten nur nach fachlicher Prüfung einspielen.
 - **small-business:** nicht getestet (HTTP 0).
 
 Maßnahmen (`faf3cd9f`):
