@@ -102,8 +102,9 @@ export function PrivacyPage() {
         <Section heading={t('privacy.headings.recipients')}>
           <p>
             Hosting: Hostinger (Rechenzentrum Frankfurt am Main, Deutschland) · Datenbank/Auth: Supabase (Region eu-central-1, Frankfurt) ·
-            KI-Dienste: Google (Gemini API; nur bereinigte Inhalte, gemäß Abschnitt 4; ein Wechsel auf Scaleway, Paris, ist in
-            Vorbereitung) · E-Mail-Versand: Resend (USA) · Besuchszahlen: Plausible, von uns selbst auf dem Server in
+            KI-Dienste: Scaleway (Generative APIs, Rechenzentrum Paris, Frankreich; offene Modelle Mistral Small und
+            Qwen3-Embedding; nur bereinigte Inhalte, gemäß Abschnitt 4; Ihre Fragen verlassen die EU nicht) · E-Mail-Versand:
+            Resend (USA) · Besuchszahlen: Plausible, von uns selbst auf dem Server in
             Frankfurt betrieben, ohne Cookies. Für Anbieter zusätzlich: Zahlungen über Stripe und, nur wenn Sie Ihren
             Kalender verbinden, Nylas. Mit den Dienstleistern bestehen Vereinbarungen zur Auftragsverarbeitung nach
             Art. 28 DSGVO; für Dienstleister außerhalb der EU stützen wir die Übermittlung auf die Standardvertragsklauseln
@@ -181,8 +182,8 @@ export function PrivacyPage() {
       <Section heading={t('privacy.headings.recipients')}>
         <p>
           Hosting: Hostinger (data centre Frankfurt am Main, Germany) · Database/Auth: Supabase (region eu-central-1, Frankfurt) · AI
-          services: Google (Gemini API; sanitized content only, per section 4; a move to Scaleway, Paris, is being prepared) ·
-          e-mail delivery: Resend (USA) · visitor counts: Plausible, self-hosted by us on the Frankfurt server, without
+          services: Scaleway (Generative APIs, data centre Paris, France; open models Mistral Small and Qwen3-Embedding;
+          sanitized content only, per section 4; your questions do not leave the EU) · e-mail delivery: Resend (USA) · visitor counts: Plausible, self-hosted by us on the Frankfurt server, without
           cookies. For providers additionally: payments via Stripe and, only if you connect your calendar, Nylas. Data
           processing agreements under Art. 28 GDPR are in place with these providers; for providers outside the EU we rely on
           the EU Commission&apos;s standard contractual clauses or the EU-US Data Privacy Framework where the provider is
