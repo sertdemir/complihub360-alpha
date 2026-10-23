@@ -442,7 +442,7 @@
     "remind": "Hatırlat",
     "remindSent": "Gönderildi ✓",
     "remindError": "Hatırlatma başarısız — lütfen birazdan tekrar deneyin.",
-    "remindedNote": "Hatırlatma iletildi — sağlayıcı yeni bir 24 saatlik onay bağlantısı aldı. Yazışmaya bir not eklendi.",
+    "remindedNote": "Hatırlatma başlatıldı — sağlayıcı yeni bir 24 saatlik onay bağlantısı alacak. Yazışmada bir not var.",
     "threadTitle": "Yazışmayı aç",
     "threadDesc": "Tüm geçmiş — açılış mesajınız, yanıtlar ve sistem notları.",
     "withdrawTitle": "Talebi geri çek",

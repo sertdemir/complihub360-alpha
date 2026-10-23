@@ -386,7 +386,14 @@ function renderHtml(m: MagicLinkMail, t: MailStrings['magic']): string {
 </table></td></tr></table>`;
 }
 
-export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
+/**
+ * Was mit der Mail geschah — die Erinnerung schreibt danach ihre Notiz in den
+ * Verlauf und darf dort nur behaupten, was feststeht.
+ * `logged`: ohne RESEND_API_KEY nur ins Protokoll (Staging-Ausgang).
+ */
+export type MagicLinkMailOutcome = 'sent' | 'logged' | 'no_address' | 'failed';
+
+export async function sendMagicLinkMail(m: MagicLinkMail): Promise<MagicLinkMailOutcome> {
     const t = STRINGS[resolveLocale(m.locale)].magic;
     const subject = m.reminder
         ? `${t.reminderLabel} · ${m.country} ${m.category} — ${t.subjectReminderTail}`
@@ -400,7 +407,7 @@ export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
                 type: 'email_skipped_no_address',
                 payload: { engagementId: m.engagementId, providerKey: m.providerKey },
             });
-            return;
+            return 'no_address';
         }
         if (!apiKey) {
             await supabaseApi.insert('event_log', {
@@ -410,7 +417,7 @@ export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
             structuredLog('info', 'Magic-link mail logged (no RESEND_API_KEY)', {
                 correlationId: m.correlationId, route: 'mailer', severity: 'info', errorCode: 'NONE',
             });
-            return;
+            return 'logged';
         }
         const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
@@ -422,6 +429,7 @@ export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
             type: res.ok ? 'email_sent' : 'email_failed',
             payload: { engagementId: m.engagementId, subject, providerId: (body as { id?: string }).id, status: res.status },
         });
+        return res.ok ? 'sent' : 'failed';
     } catch (err) {
         // Delivery is best-effort; the engagement + tokens already exist.
         structuredLog('error', 'Magic-link mail failed', {
@@ -433,6 +441,7 @@ export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
                 payload: { engagementId: m.engagementId, error: String(err).slice(0, 200) },
             });
         } catch { /* double fault — logged above */ }
+        return 'failed';
     }
 }
 

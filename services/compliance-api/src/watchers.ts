@@ -8,7 +8,7 @@ import { runSubscriptionPeriodTick } from "./subscriptions.js";
 import { runScheduledChanges } from "./changeSchedule.js";
 import { runAppointmentReminderTick, runRebookTick } from "./attendanceWatch.js";
 import { isKnownCountry } from "@complihub/compliance-engine";
-import { sendMagicLinkMail, sendReviewMail, sendMarketCoveredMail, sendProviderCoveredMail } from "./mailer.js";
+import { sendMagicLinkMail, sendReviewMail, sendMarketCoveredMail, sendProviderCoveredMail, type MagicLinkMailOutcome } from "./mailer.js";
 import { notify } from "./notifications.js";
 import { runDisclosureAuditTick } from "./disclosure.js";
 
@@ -73,6 +73,8 @@ type EventRow = { type: string; payload?: Record<string, unknown> | null };
 
 export interface TickSummary {
     shadow: boolean;
+    /** Ein vorheriger Lauf war noch nicht fertig — dieser hat nichts getan. */
+    skipped?: boolean;
     scanned: number;
     reminders: number;
     breaches: number;
@@ -120,6 +122,13 @@ export async function issueReminder(
         if (!eng[0]) return "not_found";
         if (!OPEN_CONFIRM.includes(eng[0].status as typeof OPEN_CONFIRM[number])) return "invalid_state";
 
+        // Zuerst alles lesen, was der Versand braucht: der Marker unten sperrt
+        // die automatische Erinnerung fuer diese Anfrage. Scheiterte ein Lesen
+        // erst danach, stuende "gesendet" im Protokoll, ohne dass eine Mail
+        // ging — und kein Lauf versuchte es wieder.
+        const provRows = (await supabaseApi.select("providers", { provider_key: eng[0].provider_key }, { limit: 1 })) as
+            Array<{ name: string; contact_email?: string | null }>;
+
         const correlationId = crypto.randomUUID();
         const magicLinks: Record<string, string> = {};
         for (const action of ["confirm", "reply", "decline"] as const) {
@@ -136,19 +145,14 @@ export async function issueReminder(
 
         await supabaseApi.insert("event_log", {
             type: "sla_reminder_sent",
-            payload: { engagementId, provider_key: eng[0].provider_key, auto: opts.auto },
+            // `stage` ist der Schluessel, auf den der Erinnerungs-Pass prueft
+            // (`<id>:confirm`). Ohne ihn erkannte der Pass seine eigene
+            // Erinnerung nicht und schickte sie bei jedem Lauf neu — auf
+            // Staging 84 Mails an zwei Anbieter in zwei Tagen (1./2.9.2026).
+            // Eine Erinnerung von Hand zaehlt nicht als die automatische.
+            payload: { engagementId, provider_key: eng[0].provider_key, auto: opts.auto, stage: opts.auto ? "confirm" : "manual" },
         });
-        await supabaseApi.insert("engagement_messages", {
-            engagement_id: engagementId,
-            author: "system",
-            body: opts.auto
-                ? "Automated reminder — a fresh confirmation link was sent to the provider before the SLA deadline."
-                : "Reminder sent — the provider received a fresh confirmation link.",
-        }).catch(() => { /* thread note is best-effort */ });
-
-        const provRows = (await supabaseApi.select("providers", { provider_key: eng[0].provider_key }, { limit: 1 })) as
-            Array<{ name: string; contact_email?: string | null }>;
-        await sendMagicLinkMail({
+        const mailed = await sendMagicLinkMail({
             engagementId,
             providerKey: eng[0].provider_key,
             providerName: provRows[0]?.name || eng[0].provider_key,
@@ -159,7 +163,21 @@ export async function issueReminder(
             magicLinks,
             correlationId,
             reminder: true,
-        }).catch(() => { /* logged inside the mailer */ });
+        }).catch((): MagicLinkMailOutcome => "failed");
+
+        // Die Notiz erst nach dem Versuch, und nur, was feststeht: der Link
+        // ist ausgestellt — ob die Mail ankam, wissen wir nicht. Bis 23.10.2026
+        // stand hier vor dem Versand "the provider received", auch ohne
+        // Adresse (DNA: Unsicherheit nie hinter selbstsicherer Sprache).
+        await supabaseApi.insert("engagement_messages", {
+            engagement_id: engagementId,
+            author: "system",
+            body: mailed === "no_address"
+                ? "No reminder could be sent — the provider has no contact address on file."
+                : opts.auto
+                    ? "Automated reminder — a fresh confirmation link was issued to the provider."
+                    : "A fresh confirmation link was issued to the provider.",
+        }).catch(() => { /* thread note is best-effort */ });
 
         return "ok";
     } catch {
@@ -177,7 +195,10 @@ function markerType(base: string, shadow: boolean): string {
 }
 
 async function loadMarkers(base: string, shadow: boolean): Promise<Set<string>> {
-    const rows = (await supabaseApi.select("event_log", { type: markerType(base, shadow) }, { limit: 5000 })) as EventRow[];
+    // Neueste zuerst: offene Anfragen sind die juengsten, und ueber der
+    // Lesegrenze lieferte PostgREST sonst eine beliebige Teilmenge — ein
+    // fehlender Marker hiesse eine zweite Erinnerung.
+    const rows = (await supabaseApi.select("event_log", { type: markerType(base, shadow) }, { order: "timestamp.desc", limit: 5000 })) as EventRow[];
     const set = new Set<string>();
     for (const r of rows) {
         const id = r.payload?.engagementId;
@@ -192,10 +213,40 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 }
 
 // ─── The tick ─────────────────────────────────────────────────────────────────
+// Nie zwei Laeufe zugleich (Takt und POST /admin/watchers/tick teilen sich
+// den Prozess): beide laden dieselben Marker, bevor einer schreibt, und
+// verschickten jede faellige Erinnerung doppelt. Eine Lese-Abfrage ohne
+// Timeout kann einen Lauf ueber den naechsten Takt hinaus halten.
+// Haengt ein Lauf ueber drei Takte, ist das kein Gedraenge mehr, sondern ein
+// Fehler: dann faellt jeder weitere Lauf aus, auch der aus dem Workflow.
+let tickStartedAt: number | null = null;
+
 export async function runWatcherTick(): Promise<TickSummary> {
+    if (tickStartedAt !== null) {
+        const runningForMs = Date.now() - tickStartedAt;
+        const stuck = runningForMs > 3 * watcherConfig.tickMs;
+        structuredLog(stuck ? "error" : "warn", "Watcher tick skipped — previous tick still running", {
+            correlationId: "watchers", errorCode: stuck ? "ERR_WATCHER_TICK_STUCK" : "WATCHER_TICK_BUSY",
+            severity: stuck ? "error" : "warn", route: "watchers/tick", runningForMs,
+        });
+        return { ...emptySummary(watcherConfig.shadow), skipped: true };
+    }
+    tickStartedAt = Date.now();
+    try {
+        return await tick();
+    } finally {
+        tickStartedAt = null;
+    }
+}
+
+function emptySummary(shadow: boolean): TickSummary {
+    return { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, providerCoveredNotices: 0, billingSynced: 0, billingChanged: 0, chargesReconciled: 0, chargesRefunded: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0, apiRequestLogPruned: 0, disclosureAudited: 0, disclosureReleased: 0 };
+}
+
+async function tick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, providerCoveredNotices: 0, billingSynced: 0, billingChanged: 0, chargesReconciled: 0, chargesRefunded: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0, apiRequestLogPruned: 0, disclosureAudited: 0, disclosureReleased: 0 };
+    const summary = emptySummary(shadow);
 
     // Offenlegung ohne Audit nachholen (disclosure.ts) — zuerst, vor allem
     // anderen: das ist ein Grenzuebertritt, und das Laden darunter kann den
@@ -208,122 +259,19 @@ export async function runWatcherTick(): Promise<TickSummary> {
         summary.errors += dc.errors;
     } catch { summary.errors++; }
 
-    let engagements: Engagement[];
+    // Die SLA-Passes auf den alten Anfragen (engagement_requests). Eigener
+    // Block wie alle anderen: bis 23.10.2026 stand das Laden direkt hier, und
+    // ein Ladefehler beendete den ganzen Lauf — Bewertungen, Nachweise,
+    // Zahlungen und Terminerinnerungen fielen mit aus, ohne eigenen Fehler.
     try {
-        engagements = (await supabaseApi.select("engagement_requests", {}, { order: "created_at.desc", limit: 500 })) as Engagement[];
-    } catch {
-        structuredLog("error", "Watcher tick: engagement load failed", { correlationId: "watchers", errorCode: "ERR_WATCHER_LOAD", severity: "error", route: "watchers/tick" });
-        summary.errors++;
-        return summary;
-    }
-    summary.scanned = engagements.length;
-
-    // Preload idempotency markers once per tick.
-    const [remindMarks, breachMarks, expiryMarks] = await Promise.all([
-        loadMarkers("sla_reminder_sent", shadow),
-        loadMarkers("sla_breach", shadow),
-        loadMarkers("engagement_expired", shadow),
-    ]);
-
-    const openConfirm = engagements.filter(e => OPEN_CONFIRM.includes(e.status as typeof OPEN_CONFIRM[number]));
-    const confirmed = engagements.filter(e => e.status === "confirmed");
-
-    // 1. Reminder pass — awaiting confirm, deadline within lead window, not past.
-    for (const e of openConfirm) {
-        if (!e.sla_confirm_deadline) continue;
-        const deadline = new Date(e.sla_confirm_deadline).getTime();
-        const inWindow = now >= deadline - watcherConfig.reminderLeadMs && now < deadline;
-        if (!inWindow) continue;
-        if (remindMarks.has(`${e.id}:confirm`)) continue;
-        try {
-            if (shadow) {
-                await mark("sla_reminder_sent", true, { engagementId: e.id, provider_key: e.provider_key, stage: "confirm", auto: true });
-            } else {
-                const r = await issueReminder(e.id, { auto: true });
-                if (r !== "ok") { summary.errors++; continue; }
-            }
-            summary.reminders++;
-        } catch { summary.errors++; }
-    }
-
-    // 2. Breach pass — past deadline while still open (confirm stage) or awaiting
-    //    reply past reply deadline (reply stage). Records breach + escalates.
-    const breachCandidates: Array<{ e: Engagement; stage: "confirm" | "reply"; deadline: number }> = [];
-    for (const e of openConfirm) {
-        if (!e.sla_confirm_deadline) continue;
-        const d = new Date(e.sla_confirm_deadline).getTime();
-        if (now > d) breachCandidates.push({ e, stage: "confirm", deadline: d });
-    }
-    for (const e of confirmed) {
-        if (!e.sla_reply_deadline) continue;
-        const d = new Date(e.sla_reply_deadline).getTime();
-        if (now > d) breachCandidates.push({ e, stage: "reply", deadline: d });
-    }
-    for (const { e, stage, deadline } of breachCandidates) {
-        if (breachMarks.has(`${e.id}:${stage}`)) continue;
-        try {
-            if (shadow) {
-                await mark("sla_breach", true, { engagementId: e.id, provider_key: e.provider_key, stage, deadline: new Date(deadline).toISOString() });
-                summary.breaches++;
-                continue;
-            }
-            // Live: record the breach, bump the provider counter, escalate at threshold.
-            await mark("sla_breach", false, { engagementId: e.id, provider_key: e.provider_key, stage, deadline: new Date(deadline).toISOString() });
-            summary.breaches++;
-
-            const provRows = (await supabaseApi.select("providers", { provider_key: e.provider_key }, { limit: 1 })) as
-                Array<{ breach_count?: number | null; partner_status?: string | null }>;
-            const prov = provRows[0];
-            if (prov) {
-                const newCount = (prov.breach_count ?? 0) + 1;
-                const patch: Record<string, unknown> = { breach_count: newCount, updated_at: new Date().toISOString() };
-                if (newCount >= watcherConfig.downgradeThreshold && prov.partner_status !== "downgraded") {
-                    patch.partner_status = "downgraded";
-                }
-                await supabaseApi.update("providers", { provider_key: e.provider_key }, patch);
-                if (patch.partner_status === "downgraded") {
-                    await supabaseApi.insert("event_log", {
-                        type: "provider_downgraded",
-                        payload: { provider_key: e.provider_key, breach_count: newCount, trigger_engagement: e.id },
-                    });
-                    summary.downgrades++;
-                }
-            }
-        } catch { summary.errors++; }
-    }
-
-    // 3. Expiry pass — confirm deadline missed → terminal 'expired', burn tokens.
-    for (const e of openConfirm) {
-        if (!e.sla_confirm_deadline) continue;
-        const d = new Date(e.sla_confirm_deadline).getTime();
-        if (now <= d) continue;
-        if (expiryMarks.has(`${e.id}:expired`)) continue;
-        try {
-            if (shadow) {
-                await mark("engagement_expired", true, { engagementId: e.id, provider_key: e.provider_key, stage: "expired" });
-                summary.expiries++;
-                continue;
-            }
-            const ts = new Date().toISOString();
-            await supabaseApi.update("engagement_requests", { id: e.id }, { status: "expired", updated_at: ts });
-            const tokens = (await supabaseApi.select("magic_link_tokens", { engagement_id: e.id })) as
-                Array<{ id: string; used_at: string | null }>;
-            for (const t of tokens.filter(t => !t.used_at)) {
-                await supabaseApi.update("magic_link_tokens", { id: t.id }, { used_at: ts });
-            }
-            await supabaseApi.insert("event_log", { type: "engagement_expired", payload: { engagementId: e.id, provider_key: e.provider_key, stage: "expired" } });
-            // Der Anfragende hat auf eine Antwort gewartet, die nicht kam.
-            // `dedupeKey`, weil dieser Durchlauf im Minutentakt laeuft: die
-            // Marker oben schuetzen den Statuswechsel, nicht diese Zeile.
-            await notify({
-                to: e.user_id, type: "engagement_expired",
-                subject: "engagement", subjectId: e.id,
-                payload: { providerKey: e.provider_key },
-                dedupeKey: `engagement_expired:${e.id}`,
-            });
-            summary.expiries++;
-        } catch { summary.errors++; }
-    }
+        const sla = await runSlaTick(shadow, now);
+        summary.scanned = sla.scanned;
+        summary.reminders = sla.reminders;
+        summary.breaches = sla.breaches;
+        summary.downgrades = sla.downgrades;
+        summary.expiries = sla.expiries;
+        summary.errors += sla.errors;
+    } catch { summary.errors++; }
 
     // Review watchdog (decision 2026-08-06) — mandatory provider reviews with
     // warning → downgrade escalation; incentivized user reviews.
@@ -426,6 +374,143 @@ export async function runWatcherTick(): Promise<TickSummary> {
         correlationId: "watchers", route: "watchers/tick", severity: "info", errorCode: "NONE",
         ...summary,
     } as Record<string, unknown>);
+    return summary;
+}
+
+// ─── SLA passes (engagement_requests) ─────────────────────────────────────────
+// Reminder, breach und expiry aus dem Kopfkommentar. Laeuft im eigenen Block
+// von runWatcherTick: ein Fehler hier zaehlt als Fehler, haelt die anderen
+// Passes aber nicht auf.
+export interface SlaTickCounts { scanned: number; reminders: number; breaches: number; downgrades: number; expiries: number; errors: number }
+
+export async function runSlaTick(shadow: boolean, now: number = Date.now()): Promise<SlaTickCounts> {
+    const summary: SlaTickCounts = { scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0 };
+
+    let engagements: Engagement[];
+    try {
+        engagements = (await supabaseApi.select("engagement_requests", {}, { order: "created_at.desc", limit: 500 })) as Engagement[];
+    } catch (err) {
+        structuredLog("error", "Watcher tick: engagement load failed", { correlationId: "watchers", errorCode: "ERR_WATCHER_LOAD", severity: "error", route: "watchers/tick", detail: String(err).slice(0, 200) });
+        summary.errors++;
+        return summary;
+    }
+    summary.scanned = engagements.length;
+
+    // Preload idempotency markers once per tick. Ohne Marker kein Pass: sonst
+    // ginge jede Erinnerung und jeder Verstoss ein zweites Mal raus.
+    let remindMarks: Set<string>, breachMarks: Set<string>, expiryMarks: Set<string>;
+    try {
+        [remindMarks, breachMarks, expiryMarks] = await Promise.all([
+            loadMarkers("sla_reminder_sent", shadow),
+            loadMarkers("sla_breach", shadow),
+            loadMarkers("engagement_expired", shadow),
+        ]);
+    } catch (err) {
+        structuredLog("error", "Watcher tick: SLA marker load failed", { correlationId: "watchers", errorCode: "ERR_WATCHER_MARKERS", severity: "error", route: "watchers/tick", detail: String(err).slice(0, 200) });
+        summary.errors++;
+        return summary;
+    }
+
+    const openConfirm = engagements.filter(e => OPEN_CONFIRM.includes(e.status as typeof OPEN_CONFIRM[number]));
+    const confirmed = engagements.filter(e => e.status === "confirmed");
+
+    // 1. Reminder pass — awaiting confirm, deadline within lead window, not past.
+    for (const e of openConfirm) {
+        if (!e.sla_confirm_deadline) continue;
+        const deadline = new Date(e.sla_confirm_deadline).getTime();
+        const inWindow = now >= deadline - watcherConfig.reminderLeadMs && now < deadline;
+        if (!inWindow) continue;
+        if (remindMarks.has(`${e.id}:confirm`)) continue;
+        try {
+            if (shadow) {
+                await mark("sla_reminder_sent", true, { engagementId: e.id, provider_key: e.provider_key, stage: "confirm", auto: true });
+            } else {
+                const r = await issueReminder(e.id, { auto: true });
+                if (r !== "ok") { summary.errors++; continue; }
+            }
+            summary.reminders++;
+        } catch { summary.errors++; }
+    }
+
+    // 2. Breach pass — past deadline while still open (confirm stage) or awaiting
+    //    reply past reply deadline (reply stage). Records breach + escalates.
+    const breachCandidates: Array<{ e: Engagement; stage: "confirm" | "reply"; deadline: number }> = [];
+    for (const e of openConfirm) {
+        if (!e.sla_confirm_deadline) continue;
+        const d = new Date(e.sla_confirm_deadline).getTime();
+        if (now > d) breachCandidates.push({ e, stage: "confirm", deadline: d });
+    }
+    for (const e of confirmed) {
+        if (!e.sla_reply_deadline) continue;
+        const d = new Date(e.sla_reply_deadline).getTime();
+        if (now > d) breachCandidates.push({ e, stage: "reply", deadline: d });
+    }
+    for (const { e, stage, deadline } of breachCandidates) {
+        if (breachMarks.has(`${e.id}:${stage}`)) continue;
+        try {
+            if (shadow) {
+                await mark("sla_breach", true, { engagementId: e.id, provider_key: e.provider_key, stage, deadline: new Date(deadline).toISOString() });
+                summary.breaches++;
+                continue;
+            }
+            // Live: record the breach, bump the provider counter, escalate at threshold.
+            await mark("sla_breach", false, { engagementId: e.id, provider_key: e.provider_key, stage, deadline: new Date(deadline).toISOString() });
+            summary.breaches++;
+
+            const provRows = (await supabaseApi.select("providers", { provider_key: e.provider_key }, { limit: 1 })) as
+                Array<{ breach_count?: number | null; partner_status?: string | null }>;
+            const prov = provRows[0];
+            if (prov) {
+                const newCount = (prov.breach_count ?? 0) + 1;
+                const patch: Record<string, unknown> = { breach_count: newCount, updated_at: new Date().toISOString() };
+                if (newCount >= watcherConfig.downgradeThreshold && prov.partner_status !== "downgraded") {
+                    patch.partner_status = "downgraded";
+                }
+                await supabaseApi.update("providers", { provider_key: e.provider_key }, patch);
+                if (patch.partner_status === "downgraded") {
+                    await supabaseApi.insert("event_log", {
+                        type: "provider_downgraded",
+                        payload: { provider_key: e.provider_key, breach_count: newCount, trigger_engagement: e.id },
+                    });
+                    summary.downgrades++;
+                }
+            }
+        } catch { summary.errors++; }
+    }
+
+    // 3. Expiry pass — confirm deadline missed → terminal 'expired', burn tokens.
+    for (const e of openConfirm) {
+        if (!e.sla_confirm_deadline) continue;
+        const d = new Date(e.sla_confirm_deadline).getTime();
+        if (now <= d) continue;
+        if (expiryMarks.has(`${e.id}:expired`)) continue;
+        try {
+            if (shadow) {
+                await mark("engagement_expired", true, { engagementId: e.id, provider_key: e.provider_key, stage: "expired" });
+                summary.expiries++;
+                continue;
+            }
+            const ts = new Date().toISOString();
+            await supabaseApi.update("engagement_requests", { id: e.id }, { status: "expired", updated_at: ts });
+            const tokens = (await supabaseApi.select("magic_link_tokens", { engagement_id: e.id })) as
+                Array<{ id: string; used_at: string | null }>;
+            for (const t of tokens.filter(t => !t.used_at)) {
+                await supabaseApi.update("magic_link_tokens", { id: t.id }, { used_at: ts });
+            }
+            await supabaseApi.insert("event_log", { type: "engagement_expired", payload: { engagementId: e.id, provider_key: e.provider_key, stage: "expired" } });
+            // Der Anfragende hat auf eine Antwort gewartet, die nicht kam.
+            // `dedupeKey`, weil dieser Durchlauf im Minutentakt laeuft: die
+            // Marker oben schuetzen den Statuswechsel, nicht diese Zeile.
+            await notify({
+                to: e.user_id, type: "engagement_expired",
+                subject: "engagement", subjectId: e.id,
+                payload: { providerKey: e.provider_key },
+                dedupeKey: `engagement_expired:${e.id}`,
+            });
+            summary.expiries++;
+        } catch { summary.errors++; }
+    }
+
     return summary;
 }
 
@@ -557,8 +642,14 @@ export function startSlaWatchers(): NodeJS.Timeout | null {
         return null;
     }
     console.log(`[Watchers] SLA watchers on — tick ${watcherConfig.tickMs}ms, shadow=${watcherConfig.shadow}, lead=${watcherConfig.reminderLeadMs}ms, downgrade@${watcherConfig.downgradeThreshold}`);
-    // Fire-and-forget ticks; each tick catches its own errors.
-    const handle = setInterval(() => { void runWatcherTick(); }, watcherConfig.tickMs);
+    // Jeder Pass faengt seine Fehler selbst; was trotzdem durchschlaegt, wird
+    // hier geloggt. Ohne catch waere es eine unbehandelte Ablehnung, und die
+    // beendet einen Node-22-Prozess — die ganze API, nicht nur den Lauf.
+    const handle = setInterval(() => {
+        runWatcherTick().catch((err) => {
+            structuredLog("error", "Watcher tick failed", { correlationId: "watchers", errorCode: "ERR_WATCHER_TICK", severity: "error", route: "watchers/tick", detail: String(err).slice(0, 200) });
+        });
+    }, watcherConfig.tickMs);
     if (typeof handle.unref === "function") handle.unref();
     return handle;
 }

@@ -40,10 +40,18 @@ once and runs three passes:
 
 1. **Reminder** — open-confirm request whose `sla_confirm_deadline` is within
    `SLA_REMINDER_LEAD_HOURS` (default 4h) and not yet past. Calls `issueReminder`:
-   fresh single-use magic-link tokens (24h), event `sla_reminder_sent {auto:true}`,
-   a system note on the thread, and `sendMagicLinkMail(reminder:true)` (Resend, or
-   the `email_outbox` event when `RESEND_API_KEY` is unset). One reminder per
-   engagement (stage `confirm`).
+   fresh single-use magic-link tokens (24h), event `sla_reminder_sent {auto:true, stage:'confirm'}`,
+   `sendMagicLinkMail(reminder:true)` (Resend, or the `email_outbox` event when
+   `RESEND_API_KEY` is unset), then a system note on the thread. The note is
+   written after the mail attempt and claims only what is known: "a fresh
+   confirmation link was issued", or "No reminder could be sent — the provider
+   has no contact address on file." (until 2026-10-23 it said "the provider
+   received" before any mail was tried). One reminder per
+   engagement (stage `confirm`). A manual reminder (`POST /engagement/:id/remind`)
+   writes stage `manual` and does not stand in for the automatic one.
+   Until 2026-10-23 the live marker carried no `stage`, so the pass never saw
+   its own reminder and sent a new one every tick inside the window (Staging,
+   1–2 Sep 2026: 84 mails to two providers).
 2. **Breach / escalation** — deadline passed while still open. Confirm stage:
    open-confirm past `sla_confirm_deadline`. Reply stage: `confirmed` past
    `sla_reply_deadline`. Writes `sla_breach {stage, deadline}`, increments
@@ -60,6 +68,22 @@ once and runs three passes:
 engagement that already has its marker, keyed by `engagementId:stage`. Markers are
 **mode-scoped**: live checks the real type, shadow checks `<type>_shadow`. This is
 why flipping out of shadow later still fires each real action exactly once.
+
+The three SLA passes run as `runSlaTick` in their own block of the tick, like
+every other pass: a failed load of `engagement_requests` or of the markers counts
+an error and skips only these passes (no marker, no send). Before 2026-10-23 the
+load sat inline and a failure ended the whole tick early, so reviews, evidence,
+billing and appointment reminders silently did not run.
+
+Within one process, ticks never overlap: a tick that starts while the previous
+one (scheduler or `POST /admin/watchers/tick`) is still running returns
+`skipped: true` and does nothing, because both would load the same markers before
+either writes. The admin route answers such a tick with `202` and `ok: false`
+(the hourly workflow shows a warning), and a tick held for more than three
+intervals logs `ERR_WATCHER_TICK_STUCK`. `issueReminder` reads everything it
+needs before it writes the marker, so a failed read leaves no "sent" behind
+and the next tick tries again. A rejected tick is logged (`ERR_WATCHER_TICK`), never left as an
+unhandled rejection that would end the Node process.
 
 Single-container assumption for Beta. Multi-replica safety (a Postgres advisory
 lock around the tick) is a follow-up.

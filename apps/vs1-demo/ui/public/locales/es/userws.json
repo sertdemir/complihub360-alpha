@@ -442,7 +442,7 @@
     "remind": "Recordar",
     "remindSent": "Enviado ✓",
     "remindError": "El recordatorio falló — inténtelo de nuevo en un momento.",
-    "remindedNote": "Recordatorio entregado — el proveedor recibió un nuevo enlace de confirmación de 24 h. Se añadió una nota al hilo.",
+    "remindedNote": "Recordatorio activado — el proveedor recibirá un nuevo enlace de confirmación de 24 h. Hay una nota en el hilo.",
     "threadTitle": "Abrir hilo",
     "threadDesc": "Historial completo — su mensaje inicial, respuestas y notas del sistema.",
     "withdrawTitle": "Retirar solicitud",

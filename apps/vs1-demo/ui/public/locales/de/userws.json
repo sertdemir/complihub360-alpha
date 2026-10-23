@@ -442,7 +442,7 @@
     "remind": "Erinnern",
     "remindSent": "Gesendet ✓",
     "remindError": "Erinnerung fehlgeschlagen — versuchen Sie es gleich erneut.",
-    "remindedNote": "Erinnerung zugestellt — der Anbieter hat einen neuen 24-Std.-Bestätigungslink erhalten. Eine Notiz wurde dem Thread hinzugefügt.",
+    "remindedNote": "Erinnerung ausgelöst — der Anbieter bekommt einen neuen 24-Std.-Bestätigungslink. Eine Notiz steht im Verlauf.",
     "threadTitle": "Thread öffnen",
     "threadDesc": "Vollständiger Verlauf — Ihre Eröffnungsnachricht, Antworten und Systemnotizen.",
     "withdrawTitle": "Anfrage zurückziehen",
