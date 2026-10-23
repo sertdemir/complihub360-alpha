@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "scaleway": {
+      "type": "stdio",
+      "command": "scw",
+      "args": ["mcp", "server", "serve", "read-only=true", "namespaces=account,billing,iam,inference"]
+    }
+  }
+}
