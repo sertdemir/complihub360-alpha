@@ -8,7 +8,15 @@
     "eyebrow": "Your risk map",
     "title": "Here's what applies to you.",
     "subtitleProfile_one": "Based on your assessment. {{count}} domain in scope.",
-    "subtitleProfile_other": "Based on your assessment. {{count}} domains in scope."
+    "subtitleProfile_other": "Based on your assessment. {{count}} domains in scope.",
+    "titleConfirmed_one": "{{count}} obligation applies to you.",
+    "titleConfirmed_other": "{{count}} obligations apply to you.",
+    "titleMore_one": "{{count}} more is worth a closer look.",
+    "titleMore_other": "{{count}} more are worth a closer look.",
+    "titleNoneConfirmed": "Here's what's worth a closer look.",
+    "evidenceCounts": "{{likely}} likely, {{open}} still open.",
+    "evidenceOnlyLikely": "{{count}} likely.",
+    "evidenceOnlyOpen": "{{count}} still open."
   },
   "stats": {
     "0": {
@@ -51,7 +59,8 @@
     "confirmed": "Confirmed",
     "likely": "Likely",
     "answer_one": "Answer {{total}} question",
-    "answer_other": "Answer {{total}} questions"
+    "answer_other": "Answer {{total}} questions",
+    "open": "Open"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider matched",
@@ -430,5 +439,66 @@
   "providerCoverage": {
     "notifyLabel": "Email me when a verified provider covers this",
     "notifyHelp": "We’ll email you at {{email}}. Only for this request."
+  },
+  "clusters": {
+    "confirmed": {
+      "title": "Applies to you",
+      "sub": "Confirmed by your answers"
+    },
+    "likely": {
+      "title": "Likely applies",
+      "sub": "One detail still decides"
+    },
+    "open": {
+      "title": "Whether it applies is open",
+      "sub": "Worth checking. Nothing in your answers shows yet that these apply."
+    },
+    "hide": "Hide",
+    "show_one": "Show {{count}}",
+    "show_other": "Show {{count}}"
+  },
+  "why": {
+    "toggle": "Why is this here?",
+    "supports": "What supports it:",
+    "decides": "Still decides:",
+    "onlyArea": "You chose this area. Nothing in your answers shows yet that this obligation applies.",
+    "fact": {
+      "consumer_sales": "you sell to consumers",
+      "business_sales": "you sell to businesses",
+      "online_sales": "you sell online",
+      "physical_goods": "you sell physical goods",
+      "eu_market": "you sell into the EU",
+      "electronics": "you sell electrical or electronic products",
+      "batteries": "your products contain or come with batteries",
+      "health_claims": "your marketing makes health claims",
+      "marketplace_operator": "you operate a marketplace",
+      "established_in_market": "your business is established in this market"
+    },
+    "ask": {
+      "consumer_sales": "whether you sell to consumers",
+      "business_sales": "whether you sell to businesses",
+      "online_sales": "whether you sell online",
+      "physical_goods": "whether you sell physical goods",
+      "eu_market": "whether you sell into the EU",
+      "electronics": "whether you sell electrical or electronic products",
+      "batteries": "whether your products contain batteries",
+      "health_claims": "whether your marketing makes health claims",
+      "marketplace_operator": "whether you operate a marketplace",
+      "established_in_market": "where your business is established",
+      "establishment": "where your business is established",
+      "packaging_role": "who packs and ships the goods",
+      "tracking": "whether your website uses tracking",
+      "data_location": "where customer data is stored",
+      "intra_eu_volume": "how much you ship to other EU countries",
+      "substances": "which substances your products contain",
+      "contract_scope": "which contracts you use",
+      "cross_border_shipping": "whether you ship across borders"
+    }
+  },
+  "hint": {
+    "title": "One answer makes your risk map more precise",
+    "message_one": "It settles {{count}} obligation whose relevance is still open. Takes a few seconds.",
+    "message_other": "It settles {{count}} obligations whose relevance is still open. Takes a few seconds.",
+    "cta": "Add answer"
   }
 }

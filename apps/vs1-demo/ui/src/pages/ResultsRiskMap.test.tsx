@@ -305,7 +305,8 @@ describe('ResultsRiskMap while loading and on failure', () => {
     expect(screen.queryByText('common:states.riskMapFailed.heading')).not.toBeInTheDocument();
     // With a result the map can be saved again — top bar from md, bottom bar below.
     expect(screen.getAllByText('topbar.saveMap')).toHaveLength(2);
-    expect(screen.getByText('header.title')).toBeInTheDocument();
+    // F1: die Ueberschrift folgt den Belegen — mit Ergebnis steht eine da.
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toMatch(/^header\.title/);
     expect(runSearch).toHaveBeenCalledTimes(2);
   });
 
@@ -680,9 +681,10 @@ describe('ResultsRiskMap obligations on small screens', () => {
     const rows = screen.getAllByTestId('obligation-row');
     expect(rows).toHaveLength(1);
     const cls = rows[0].className.split(/\s+/);
-    // The five fixed columns only from lg — never as the base layout.
-    expect(cls).toContain('lg:grid-cols-[100px_1fr_120px_110px_160px]');
-    expect(cls).not.toContain('grid-cols-[100px_1fr_120px_110px_160px]');
+    // The four fixed columns only from lg — never as the base layout. Seit F1
+    // gibt es keine Status-Spalte mehr: die Stufe steht im Kopf der Card.
+    expect(cls).toContain('lg:grid-cols-[100px_1fr_120px_110px]');
+    expect(cls).not.toContain('grid-cols-[100px_1fr_120px_110px]');
     // The column header row is table chrome: there only from lg.
     const header = screen.getByText('table.obligation').parentElement!;
     expect(header.className.split(/\s+/)).toEqual(expect.arrayContaining(['hidden', 'lg:grid']));
