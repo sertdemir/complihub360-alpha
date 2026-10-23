@@ -843,11 +843,11 @@
   "domains": {
     "eyebrow": "Neleri biliyoruz",
     "title": {
-      "pre": "Her alan. ",
-      "gold": "Tek",
-      "post": " tutarlı harita."
+      "pre": "Alanlarınız, ",
+      "gold": "tek",
+      "post": " harita."
     },
-    "subtitle": "Kimsenin çizmediği harita — çizilmiş hâli. Kapsadığımız her alan, baştan sona, geçerli olduğu pazarlar ve beraberinde gelen yükümlülüklerle.",
+    "subtitle": "Kurallarını tuttuğumuz pazarları ve bunlardan doğan yükümlülükleri görmek için bir alan seçin.",
     "cardCta": "Ayrıntı için tıklayın",
     "drawerEyebrow": "Alan",
     "drawerAria": "{{domain}} ayrıntısı",

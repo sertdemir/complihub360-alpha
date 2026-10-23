@@ -67,8 +67,16 @@ const VERBOTEN = [
   { muster: /\bStart New Search\b/gi,      statt: 'Start New Assessment' },
   // "Domain" nur als eigenstaendiges Wort: eine E-Mail-Domain und eine
   // Internet-Domain bleiben Domains, ein Fachbereich heisst Area.
-  { muster: /\b(?:Compliance )?Domains?\b(?!\s*(?:name|Name|-))/g, statt: 'Area(s)',
-    ausser: /\b(?:email|e-mail|web|internet|domain name|supported-domain)\b/i },
+  // Bis 2026-10-23 ohne `i`: "Every domain. One coherent map." stand als
+  // Ueberschrift auf der Startseite, dazu acht weitere klein geschriebene
+  // Reste. Platzhalter ({{domains}}) sind keine Begriffe (Lookbehind/-ahead).
+  { muster: /(?<!\{\{)\b(?:Compliance )?Domains?\b(?!\s*(?:name|Name|-)|\}\})/gi, statt: 'Area(s)',
+    ausser: /\b(?:email|e-mail|web|internet|domain name|supported-domain)\b/i,
+    schluessel: new Map([
+      ['common:aiGov.featGateDesc', 'Name des KI-Gates "Domain Restriction" (Themenbegrenzung), kein Fachbereich'],
+      ['common:aiGov.hero.facts.gates.note', 'dasselbe Gate, Kurzform'],
+      ['providerws:identity.hintGeneric', 'Internet-Domains (Webadressen), die bis zur Buchung anonym bleiben'],
+    ]) },
   // 15.10.2026 (Nutzer): Wer auf CompliHub360 berät, ist ein Provider —
   // EN Provider, DE Anbieter, ES proveedor, TR sağlayıcı. "Partner" bleibt nur
   // im allgemeinen Wortsinn (Vertrags-, Geschäfts-, Fulfilment-Partner); genau

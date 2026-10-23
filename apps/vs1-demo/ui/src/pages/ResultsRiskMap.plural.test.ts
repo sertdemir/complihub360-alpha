@@ -12,7 +12,7 @@ const LOCALES = join(dirname(fileURLToPath(import.meta.url)), '../../public/loca
 const load = (lng: string) => JSON.parse(readFileSync(join(LOCALES, lng, 'results.json'), 'utf8'));
 
 const EXPECTED: Record<string, [string, string]> = {
-  en: ['Based on your assessment. 1 domain in scope.', 'Based on your assessment. 2 domains in scope.'],
+  en: ['Based on your assessment. 1 area in scope.', 'Based on your assessment. 2 areas in scope.'],
   de: ['Basierend auf Ihrer Einschätzung. 1 Bereich im Fokus.', 'Basierend auf Ihrer Einschätzung. 2 Bereiche im Fokus.'],
   es: ['Basado en su evaluación. 1 ámbito en alcance.', 'Basado en su evaluación. 2 ámbitos en alcance.'],
   // Turkish keeps the noun singular after a numeral.

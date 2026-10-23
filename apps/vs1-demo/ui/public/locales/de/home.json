@@ -843,11 +843,11 @@
   "domains": {
     "eyebrow": "Was wir wissen",
     "title": {
-      "pre": "Jeder Bereich. ",
-      "gold": "Eine",
-      "post": " zusammenhängende Karte."
+      "pre": "Ihre Bereiche, ",
+      "gold": "eine",
+      "post": " Karte."
     },
-    "subtitle": "Die Karte, die niemand zeichnet — gezeichnet. Jeder Bereich, den wir abdecken, durchgehend, mit den Märkten, in denen er gilt, und den Pflichten, die daraus folgen.",
+    "subtitle": "Wählen Sie einen Bereich, um die Märkte zu sehen, in denen wir seine Regeln hinterlegt haben, und die Pflichten, die daraus folgen.",
     "cardCta": "Für Details klicken",
     "drawerEyebrow": "Bereich",
     "drawerAria": "Details zu {{domain}}",

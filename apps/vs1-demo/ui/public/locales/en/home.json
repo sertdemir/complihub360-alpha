@@ -59,7 +59,7 @@
         "Review"
       ],
       "stepLabel": "Step 2 of 4",
-      "title": "Which compliance domains are in scope?",
+      "title": "Which compliance areas are in scope?",
       "subtitle": "Select all that apply. We'll map only the regulations relevant to your scope.",
       "domains": [
         "Tax & VAT",
@@ -181,7 +181,7 @@
       },
       "domains": {
         "title": "Which compliance areas concern you?",
-        "subtitle": "Multi-select. We prioritize the obligations in these domains."
+        "subtitle": "Multi-select. We prioritize the obligations in these areas."
       }
     },
     "cards": {
@@ -290,7 +290,7 @@
       "subtitle": "Here's what we'll use. Edit anything you need, then generate your risk map.",
       "markets": "Markets",
       "operations": "Operations",
-      "domains": "Compliance domains",
+      "domains": "Compliance areas",
       "edit": "Edit",
       "trust": "Anonymous · No account required to see your risk map · Processed in ~4 seconds"
     },
@@ -856,11 +856,11 @@
   "domains": {
     "eyebrow": "What we know",
     "title": {
-      "pre": "Every domain. ",
-      "gold": "One",
-      "post": " coherent map."
+      "pre": "Your areas, ",
+      "gold": "one",
+      "post": " map."
     },
-    "subtitle": "The map nobody draws — drawn. Every domain we cover, end to end, with the markets it applies in and the obligations that come with it.",
+    "subtitle": "Pick an area to see the markets where we hold its rules and the obligations that follow from them.",
     "cardCta": "Click to see more",
     "drawerEyebrow": "Area",
     "drawerAria": "{{domain}} detail",
@@ -1165,7 +1165,7 @@
     },
     "newsCard": {
       "title": "Updates that affect you.",
-      "desc": "Alerts when regulators move in markets you operate in — curated by domain, scoped to your operation."
+      "desc": "Alerts when regulators move in markets you operate in — curated by area, scoped to your operation."
     },
     "learn": {
       "meta": "Webinar · 24 min",

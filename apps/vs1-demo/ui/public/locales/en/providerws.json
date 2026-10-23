@@ -691,7 +691,7 @@
     "website": "Website",
     "countries": "Countries covered (ISO-2, comma-separated)",
     "languages": "Languages (comma-separated)",
-    "domains": "Compliance domains",
+    "domains": "Compliance areas",
     "secMatchmaking": "Matchmaking profile",
     "secCerts": "Certifications & statutes",
     "certs": "Certifications (one per line)",
