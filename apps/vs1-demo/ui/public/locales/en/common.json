@@ -749,7 +749,7 @@
         "enforcementNote": "A property of the market, not of this area",
         "strictness": "Regulatory density",
         "strictnessNote": "A property of the market, not of this area",
-        "outOfTen": "out of 10 · domain weight",
+        "outOfTen": "out of 10 · area weight",
         "marketsCompared_one": "{{count}} market compared",
         "marketsCompared_other": "{{count}} markets compared"
       },

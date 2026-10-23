@@ -112,7 +112,7 @@ export function AreaRiskCard({ profile, selectedCountry }: Props) {
               })}
             </RiskBadge>
             <span className="mt-1.5 block text-body-3xs text-fg-tertiary">
-              {t('compliance.area.risk.outOfTen', 'out of 10 · domain weight')}
+              {t('compliance.area.risk.outOfTen', 'out of 10 · area weight')}
             </span>
           </span>
         </div>
