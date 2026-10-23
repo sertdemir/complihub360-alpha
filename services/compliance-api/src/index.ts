@@ -12,6 +12,7 @@ import { generateRelevantSubdomains, factsFromAnswers, isKnownCountry, type Coun
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
 import { checkSupabaseJwt } from "./supabaseJwt.js";
+import { schemaStatus, startSchemaCheck } from "./schemaCheck.js";
 import { sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleDomain } from "./domain.js";
@@ -411,7 +412,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
     if (req.method === 'GET' && req.url === '/health') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: "up", ok: true, version: "0.1.0" }));
+        // schema: ob die Datenbank alle Migrationen des Repos hat (schemaCheck.ts).
+        // ok bleibt die Lebensanzeige; deploy-beta.yml prueft schema getrennt.
+        const sc = schemaStatus();
+        res.end(JSON.stringify({ status: "up", ok: true, version: "0.1.0", schema: sc.state, missingMigrations: sc.missing.length }));
         return;
     }
 
@@ -3822,4 +3826,5 @@ server.listen(PORT, () => {
     // by default (WATCHERS_SHADOW=true): computes and logs intended actions without
     // sending mail or mutating state until explicitly switched live.
     startSlaWatchers();
+    startSchemaCheck();
 });
