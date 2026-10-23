@@ -1,7 +1,7 @@
 ---
 title: "Beta-Vereinbarung: ein Blatt statt AGB, Zustimmung nach dem ersten Login, Nachweis im Konto"
 assignee: "Claude"
-status: "doing"
+status: "review"
 ---
 
 # Beta-Vereinbarung (Canvas-Wahl 1A · 2A · 3A+3C · 4C, 22.10.2026)
@@ -18,7 +18,7 @@ In der geschlossenen Beta ersetzt ein Blatt in neun Sätzen die zwölf leeren AG
 - [x] Figma-Review durch den Nutzer (Seite `3855:7584`), 22.10.: „Figma passt".
 - [x] UI lokal: `/terms` zeigt das Blatt (Footer „Beta-Vereinbarung"), Gate im AuthGuard bei `required` → `/beta-agreement`, Konto-Seite `/dashboard/account` mit Nachweis; Locales en/de/es/tr; Mock-Routen (`POST /api/v1/mock/agreements/reset` macht den Demo-Nutzer zum Neuling); Unit- und E2E-Tests; Screenshots. Abweichung zu Figma: der Ausstieg heißt „Abmelden" statt „Konto schließen", weil es im Produkt keine Kontolöschung gibt und das Blatt nichts verspricht, was nicht existiert.
 - [x] Staging-Migration (22.10., in Häppchen) und Prüfung des Schritts mit einem Testkonto (23.10.: Gate → Schritt → Haken → Konto; Annahme `beta-2026-10`, de, in `user_agreement_acceptance`, Ereignis `agreement_accepted`). Review-Befunde Layout behoben in #371.
-- [ ] Nutzer-Festlegung 23.10.: der Link „Das ganze Blatt lesen" im Schritt entfällt, das ganze Blatt steht im Frame selbst.
+- [x] Nutzer-Festlegung 23.10.: der Link „Das ganze Blatt lesen" im Schritt entfällt, das ganze Blatt steht im Frame selbst.
 
 ## Design / Tech Details
 

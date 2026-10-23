@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
@@ -12,8 +12,9 @@ import { markBetaAccepted, resetAgreementGate } from "../../lib/agreementGate";
 
 // ─── Schritt nach dem ersten Login (Canvas-Wahl 2A, 22.10.2026) ─────────────
 // Dasselbe Shell wie die Anmeldung: links das Narrativ auf dem Gradient, rechts
-// die Karte. Der Tester liest die neun Saetze (Kurzfassung mit Link zum
-// Volltext unter /terms), setzt den Haken und geht weiter; der Ausstieg steht
+// die Karte. Der Tester liest das ganze Blatt hier im Kasten (Festlegung
+// 23.10.2026: kein Link zum Volltext, kein Absprung), setzt den Haken und geht
+// weiter; der Ausstieg steht
 // gleichwertig daneben. DNA: Verstehen vor Zustimmen, keine Reibung, kein
 // Druck. Eine veraltete Fassung (409) wird nie still untergeschoben: die Seite
 // laedt den Text neu und sagt es.
@@ -150,9 +151,6 @@ export function BetaAgreementStepPage() {
                             </ol>
                         )}
                     </div>
-                    <p className="mt-2 text-right">
-                        <Link to={`/${lang}/terms`} target="_blank" rel="noreferrer" className="text-body-xs font-semibold text-fg-brand underline-offset-2 hover:underline">{t("betaStep.fullText")} →</Link>
-                    </p>
 
                     <label className="mt-6 flex cursor-pointer items-start gap-3 text-body-xs leading-relaxed text-fg">
                         <input

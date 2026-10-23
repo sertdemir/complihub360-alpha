@@ -29,8 +29,9 @@ test('Nutzer ohne Annahme: Gate → Schritt → Haken → zurueck ans Ziel, Nach
   await expect(page).toHaveURL(/\/de\/beta-agreement\?redirect=%2Fde%2Fdashboard%2Ftermine/);
   await expect(page.getByRole('heading', { name: 'Bevor es losgeht: ein Blatt' })).toBeVisible();
   await expect(page.getByTestId('beta-points').getByRole('listitem')).toHaveCount(9);
-  // Keine globale Navigation ueber dem Schritt, der Volltext ist verlinkt.
-  await expect(page.getByRole('link', { name: /Das ganze Blatt lesen/ })).toHaveAttribute('href', '/de/terms');
+  // Das ganze Blatt steht im Kasten; kein Absprung zum Volltext (Festlegung 23.10.).
+  await expect(page.getByTestId('beta-points')).toContainText('Jederzeit raus.');
+  await expect(page.getByRole('link', { name: /Das ganze Blatt lesen/ })).toHaveCount(0);
 
   // Ohne Haken: Hinweis, nichts geschrieben.
   const accept = page.getByRole('button', { name: /Weiter zum Workspace/ });
