@@ -42,6 +42,7 @@ import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpac
 import { plannedPrices } from "./changeSchedule.js";
 import { readActiveSince } from "./activeSince.js";
 import { redactText } from "@complihub360/redaction";
+import { revealAfterAudit } from './disclosure.js';
 import { computeAdminStats, disclosureSince, windowStart, type BookingRow, type EventRow, type EvidenceRow } from './adminStats.js';
 import {
     loadVisibility, maskIdentity, publicTitle, rankBasis, requiredFor, scanFields, serializeProvider, verificationDepth,
@@ -1532,8 +1533,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     status: b.status,
                     lead_charged: !!b.lead_charged,
                     // B1: nur, was der Nutzer bestaetigt hat (shared_snapshot); aeltere
-                    // Buchungen ohne Schnappschuss nur nach shared_fields.
-                    ...providerSharedView(b, { email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null, company: company || null }),
+                    // Buchungen ohne Schnappschuss nur nach shared_fields. Und nur nach
+                    // der Freigabe: ohne Audit der Offenlegung keine Daten (disclosure.ts).
+                    ...(b.shared_released_at
+                        ? providerSharedView(b, { email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null, company: company || null })
+                        : { user_email: null, user_company: null, message: null }),
+                    // released · pending (folgt, der Abgleich gibt frei) · withheld
+                    // (storniert vor der Freigabe — kommt nicht mehr).
+                    disclosure: b.shared_released_at ? 'released' : b.sharing_confirmed_at && b.status !== 'cancelled' ? 'pending' : 'withheld',
                     // Thema des Leads: was gebucht und berechnet wurde (Ledger), nicht
                     // die juengste Anfrage des Nutzers an diesen Anbieter — die kann
                     // ein ganz anderes Thema sein (Testlauf Phase 4, 2026-10-09:
@@ -2037,6 +2044,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             status: 'confirmed',
                             message: typeof d.message === 'string' ? d.message.slice(0, 2000) : null,
                             lead_charged: charge.outcome === 'captured' || (charge.outcome === 'linked' && !!linkedRoot?.lead_charged),
+                            // Der Nutzer sieht den Anbieter ab jetzt. Die Gegenrichtung —
+                            // seine bestaetigten Daten an den Anbieter — gibt erst
+                            // revealAfterAudit frei (shared_released_at, disclosure.ts).
                             identity_revealed: true,
                             rebooked_from: linkedRoot?.id ?? null,
                             service_id: opp.serviceRow.service_id ?? null,
@@ -2101,10 +2111,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             await supabaseApi.insert('event_log', { type: 'calendar_event_failed', payload: { bookingId: booking.id, providerKey, slotStart } }).catch(() => {});
                         }
                     }
-                    // B3: Buchung, Belastung und Offenlegung stehen. Ein Ereignis,
-                    // das nicht geschrieben werden kann, macht daraus keinen Fehler
-                    // fuer den Nutzer — es wird geloggt und als Luecke benannt.
-                    // `lead.revealed` zuerst: das ist die Spur der Offenlegung.
+                    // Offenlegung: erst das Audit (mit den Feldern, die der Nutzer
+                    // bestaetigt hat), dann die Freigabe. Scheitert das Audit, bleibt
+                    // der Termin bestehen; der Anbieter sieht die Daten erst, wenn
+                    // runDisclosureAuditTick es nachgetragen hat (disclosure.ts).
+                    await revealAfterAudit({
+                        id: booking.id, provider_key: providerKey, user_id: authUserId, shared_fields: sharedFields,
+                        acknowledgement_version: ack.version, sharing_confirmed_at: sharingAt,
+                    }, { correlationId });
+                    // B3: Die uebrigen Ereignisse sind Betriebsspuren, keine
+                    // Grenzuebertritte — scheitert eins, wird es geloggt, die Buchung bleibt.
                     const audit = async (type: string, payload: Record<string, unknown>) => {
                         try { await supabaseApi.insert('event_log', { type, payload }); }
                         catch (err) {
@@ -2114,10 +2130,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             });
                         }
                     };
-                    await audit('lead.revealed', {
-                        bookingId: booking.id, providerKey, userId: authUserId, sharedFields: [...SHARED_FIELDS_V1],
-                        acknowledgementVersion: ack.version, sharingConfirmedAt: sharingAt,
-                    });
                     await audit('scheduling_confirmed', { bookingId: booking.id, providerKey, userId: authUserId, slotStart, ledgerId: charge.ledgerId });
                     if (linkedRoot) {
                         await audit('booking_linked_to_lead', { bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId, rootBookingId: linkedRoot.id });

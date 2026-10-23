@@ -40,12 +40,13 @@ beforeEach(() => {
 });
 
 describe('BetaAgreementStepPage', () => {
-  it('zeigt die neun Saetze vom Server und den Link zum Volltext, bevor ein Haken verlangt wird', async () => {
+  it('zeigt das ganze Blatt vom Server im Kasten, ohne Absprung, bevor ein Haken verlangt wird', async () => {
     mount();
     expect(await screen.findByText('Satz 1.')).toBeInTheDocument();
     expect(screen.getAllByRole('listitem').filter((li) => /^0\d/.test(li.textContent ?? ''))).toHaveLength(9);
     expect(fetchAgreement).toHaveBeenCalledWith('beta', 'de');
-    expect(screen.getByRole('link', { name: /betaStep.fullText/ })).toHaveAttribute('href', '/de/terms');
+    // Festlegung 23.10.2026: kein Link zum Volltext — das ganze Blatt steht im Kasten.
+    expect(screen.queryByRole('link', { name: /betaStep.fullText/ })).toBeNull();
   });
 
   it('ohne Haken: Hinweis am Feld, nichts gespeichert; mit Haken: Annahme mit der gesehenen Fassung, dann weiter zum Ziel', async () => {

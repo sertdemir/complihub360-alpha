@@ -82,7 +82,6 @@
     "cardTitle": "Bevor es losgeht: ein Blatt",
     "cardLead": "Sie sind als Tester eingeladen. Neun Sätze sagen, was dieser Test ist und was nicht.",
     "listLabel": "Beta-Vereinbarung · Fassung {{version}}",
-    "fullText": "Das ganze Blatt lesen",
     "checkbox": "Ich habe die Beta-Vereinbarung (Fassung {{version}}) gelesen und bin einverstanden.",
     "cta": "Weiter zum Workspace",
     "exitQuestion": "Lieber nicht?",

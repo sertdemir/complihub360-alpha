@@ -229,6 +229,8 @@ export interface BookingRowForApi {
     slot_start: string;
     slot_end?: string | null;
     identity_revealed?: boolean | null;
+    /** Freigabe der Nutzerdaten an den Anbieter — erst nach dem Audit (disclosure.ts). */
+    shared_released_at?: string | null;
     shared_fields?: string[] | null;
     user_email?: string | null;
     user_company?: string | null;
@@ -267,7 +269,7 @@ export interface ApiLead {
  * Alles andere ist null — nie ein Feld, das der Nutzer nicht freigegeben hat.
  */
 export function serializeLead(b: BookingRowForApi): ApiLead | null {
-    if (!b.identity_revealed) return null;
+    if (!b.shared_released_at) return null;
     const shared = new Set(Array.isArray(b.shared_fields) ? b.shared_fields : []);
     return {
         id: b.id,
