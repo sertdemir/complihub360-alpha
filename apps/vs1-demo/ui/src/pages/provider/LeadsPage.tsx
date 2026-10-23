@@ -411,7 +411,10 @@ export function LeadsPage() {
         open={!!dossierFor}
         onClose={() => openDossier(null)}
         eyebrow={t('termine.dossierEyebrow')}
-        title={dossierFor ? (dossierFor.disclosure !== 'released' ? t(`termine.disclosure.${dossierFor.disclosure}.short`) : dossierFor.company ?? t('termine.companyMissing')) : ''}
+        // Ohne Firmennamen traegt die E-Mail die Ueberschrift — "Company not
+        // provided" als Titel sagte, was fehlt, statt wer gebucht hat
+        // (Beta-Testbuchung 23.10.2026). Der Hinweis bleibt in der Liste.
+        title={dossierFor ? (dossierFor.disclosure !== 'released' ? t(`termine.disclosure.${dossierFor.disclosure}.short`) : dossierFor.company ?? (dossierFor.email && dossierFor.email !== '—' ? dossierFor.email : t('termine.companyMissing'))) : ''}
       >
         {dossierFor && (
           <div className="space-y-4">

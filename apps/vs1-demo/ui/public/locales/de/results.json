@@ -386,8 +386,7 @@
     "hours": "~{{hours}} h",
     "confirmedLabel": "Termine bestätigt",
     "reviewsLabel": "Bewertungen nach Terminen",
-    "planLabel": "Plan oder Zahlung",
-    "never": "nie"
+    "planIndependent": "Reihenfolge unabhängig von Tarif oder Zahlung"
   },
   "anonNotice": {
     "title": "Von CompliHub360 geprüft, für Sie noch ohne Namen.",

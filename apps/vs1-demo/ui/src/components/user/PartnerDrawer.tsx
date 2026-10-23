@@ -455,11 +455,15 @@ function Profil({ provider, detail, d, basisNode }: {
         </section>
       )}
       {/* Canvas 2B/2C: warum der Anbieter an dieser Stelle steht — mit der
-          Zeile, die sagt, was NICHT zaehlt. */}
-      {(d?.rank_basis ?? provider.rank_basis) && (
+          Zeile, die sagt, was NICHT zaehlt.
+          Die Karte zuerst: Ihre Zahlen kommen aus der Suche und zaehlen die
+          Nachweise fuer den angefragten Markt. Die Detail-Antwort zaehlt ueber
+          alle Maerkte des Anbieters — bis 23.10.2026 stand deshalb auf der
+          Karte "3 of 5" und hier "5/7" (Beta-Testbuchung). */}
+      {(provider.rank_basis ?? d?.rank_basis) && (
         <section className={basisNode ? 'mt-5 border-t border-stroke-subtle pt-4' : ''}>
           <h3 className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('rankBasis.group')}</h3>
-          <div className="mt-2"><RankBasis basis={(d?.rank_basis ?? provider.rank_basis)!} compact /></div>
+          <div className="mt-2"><RankBasis basis={(provider.rank_basis ?? d?.rank_basis)!} compact /></div>
         </section>
       )}
 

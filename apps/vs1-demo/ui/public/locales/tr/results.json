@@ -386,8 +386,7 @@
     "hours": "~{{hours}} sa",
     "confirmedLabel": "Onaylanan randevular",
     "reviewsLabel": "Randevu sonrası değerlendirmeler",
-    "planLabel": "Plan veya ödeme",
-    "never": "asla"
+    "planIndependent": "Sıralama plan veya ödemeden bağımsızdır"
   },
   "anonNotice": {
     "title": "CompliHub360 tarafından doğrulandı, sizin için henüz adsız.",

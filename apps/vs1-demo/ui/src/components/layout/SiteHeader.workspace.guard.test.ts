@@ -54,3 +54,38 @@ describe('SiteHeader kennt jede Provider-Workspace-Route', () => {
         expect(headerList()).toContain('subscription');
     });
 });
+
+// ─── Dasselbe fuer den Nutzer-Arbeitsbereich (Beta-Testbuchung 23.10.2026) ───
+// `dashboard/booking` und `dashboard/account` fehlten in USER_WORKSPACE: nach
+// der Buchung lag der Marketing-Header ueber der UserShell.
+
+function userRouteSegments(): string[] {
+    const src = read('../../App.tsx');
+    const out = new Set<string>();
+    for (const m of src.matchAll(/path="dashboard\/([a-z0-9-]+)/g)) out.add(m[1]);
+    return [...out].sort();
+}
+
+function userHeaderList(): string[] {
+    const src = read('./SiteHeader.tsx');
+    const m = src.match(/const USER_WORKSPACE = \[([^\]]*)\]/);
+    if (!m) throw new Error('USER_WORKSPACE nicht gefunden — wurde die Liste umbenannt?');
+    return m[1].split(',').map((s) => s.trim().replace(/^'|'$/g, '')).filter(Boolean).sort();
+}
+
+describe('SiteHeader kennt jede Nutzer-Workspace-Route', () => {
+    it('findet ueberhaupt Routen und eine Liste', () => {
+        expect(userRouteSegments().length).toBeGreaterThan(5);
+        expect(userHeaderList().length).toBeGreaterThan(5);
+    });
+
+    it('traegt jeden Routen-Unterpfad in USER_WORKSPACE', () => {
+        const fehlend = userRouteSegments().filter((seg) => !userHeaderList().includes(seg));
+        expect(fehlend, `Diese Seiten bekaemen den Marketing-Header: ${fehlend.join(', ')}`).toEqual([]);
+    });
+
+    it('kennt die Buchungsbestaetigung', () => {
+        expect(userRouteSegments()).toContain('booking');
+        expect(userHeaderList()).toContain('booking');
+    });
+});

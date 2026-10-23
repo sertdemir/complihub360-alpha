@@ -55,7 +55,10 @@ export function SiteHeader() {
     return null;
   }
   // The user App-Workspace pages (v2, own UserShell) — no global header.
-  const USER_WORKSPACE = ['sessions', 'requests', 'termine', 'notifications', 'library', 'saved-providers', 'alerts', 'calendar', 'workbench'];
+  // Dieselbe Doppelung wie oben: 'booking' (Buchungsbestaetigung) und 'account'
+  // fehlten bis 23.10.2026, der Marketing-Header lag ueber der UserShell
+  // (Beta-Testbuchung). Der Waechter-Test prueft jetzt auch diese Liste.
+  const USER_WORKSPACE = ['sessions', 'requests', 'termine', 'booking', 'notifications', 'account', 'library', 'saved-providers', 'alerts', 'calendar', 'workbench'];
   if (localeOk && seg[1] === 'dashboard' && (seg.length === 2 || USER_WORKSPACE.includes(seg[2]))) {
     return null;
   }

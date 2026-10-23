@@ -392,8 +392,7 @@
     "hours": "~{{hours}} h",
     "confirmedLabel": "Appointments confirmed",
     "reviewsLabel": "Reviews after appointments",
-    "planLabel": "Plan or payment",
-    "never": "never"
+    "planIndependent": "Order not influenced by plan or payment"
   },
   "anonNotice": {
     "title": "Verified by CompliHub360, still without a name for you.",

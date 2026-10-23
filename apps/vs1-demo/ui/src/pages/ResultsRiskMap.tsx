@@ -51,6 +51,7 @@ import {
   useCoverageRequest,
   useMarketRequests,
 } from '../components/results/MarketRequest';
+import { topMatches } from '../lib/topMatches';
 
 /** J3: ab hier gilt das Laden als "laenger als erwartet" (Entscheidung 2026-10-09). */
 const DELAYED_AFTER_MS = 8000;
@@ -610,7 +611,9 @@ export function ResultsRiskMap() {
         rows={snapshotRows}
         // H3 (01.10.2026): kein Markt geprueft → keine Anbieter-Karten mit
         // "Does not cover your market", sondern der abgenommene Zustand.
-        providers={marketUnavailable ? [] : anonProviders}
+        // Hoechstens drei Karten, volle Treffer zuerst (Nutzer 23.10.2026,
+        // lib/topMatches). Die Ueberschrift zaehlt weiter alle Treffer.
+        providers={marketUnavailable ? [] : topMatches(anonProviders)}
         providersEmptyState={marketUnavailable ? <NoVerifiedProvider /> : noProviderMatch && noMatchGaps.length ? (
           <NoProviderMatchCard
             gaps={noMatchGaps}
