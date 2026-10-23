@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 import { Banner } from "../../components/ui/Banner";
+import { Button } from "../../components/ui/Button";
 import { useAuthStore } from "../../store/useAuthStore";
 import { acceptAgreement, fetchAgreement, type UserAgreement } from "../../api/agreements";
 import { ApiError } from "../../api/client";
@@ -16,8 +17,10 @@ import { markBetaAccepted, resetAgreementGate } from "../../lib/agreementGate";
 // gleichwertig daneben. DNA: Verstehen vor Zustimmen, keine Reibung, kein
 // Druck. Eine veraltete Fassung (409) wird nie still untergeschoben: die Seite
 // laedt den Text neu und sagt es.
-
-const CTA = "mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-body-sm font-semibold text-on-brand transition-colors hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-60";
+//
+// Review auf Staging (23.10.2026): die linke Seite steht fest, die Seite wird
+// auf dem Desktop nicht hoeher als der Viewport — gescrollt wird im Blatt
+// selbst. Der Knopf ist der Primary-Button des Systems (weisses Label).
 
 export function BetaAgreementStepPage() {
     const navigate = useNavigate();
@@ -89,9 +92,9 @@ export function BetaAgreementStepPage() {
     const needCheck = tried && !checked;
 
     return (
-        <div className="flex min-h-screen flex-col bg-surface lg:flex-row">
-            {/* LINKS · Narrativ auf dem Gradient (wie die Anmeldung) */}
-            <div className="flex flex-col justify-between gap-8 bg-gradient-stage px-6 pb-8 pt-8 lg:w-[57%] lg:gap-0 lg:px-16 lg:py-10">
+        <div className="flex min-h-screen flex-col bg-surface lg:h-screen lg:flex-row lg:overflow-hidden">
+            {/* LINKS · Narrativ auf dem Gradient (wie die Anmeldung), steht fest */}
+            <div className="flex flex-col justify-between gap-8 bg-gradient-stage px-6 pb-8 pt-8 lg:sticky lg:top-0 lg:h-screen lg:w-[57%] lg:gap-0 lg:px-16 lg:py-10">
                 <Logo lockup="horizontal" href="/" className="h-[36px]" />
                 <div className="max-w-[520px] py-6 lg:py-0">
                     <p className="text-body-3xs font-bold uppercase tracking-[0.14em] text-brand">{t("betaStep.eyebrow")}</p>
@@ -106,9 +109,9 @@ export function BetaAgreementStepPage() {
                 <div className="hidden lg:block" />
             </div>
 
-            {/* RECHTS · die Karte */}
-            <div className="flex flex-1 flex-col justify-center border-stroke-subtle px-6 pb-10 pt-8 lg:border-l lg:px-16 lg:py-12">
-                <form noValidate onSubmit={submit} className="mx-auto w-full max-w-[440px]" aria-labelledby="beta-step-title">
+            {/* RECHTS · die Karte; auf dem Desktop so hoch wie der Viewport, das Blatt scrollt im Kasten */}
+            <div className="flex flex-1 flex-col justify-center border-stroke-subtle px-6 pb-10 pt-8 lg:h-screen lg:min-h-0 lg:border-l lg:px-16 lg:py-10">
+                <form noValidate onSubmit={submit} className="mx-auto flex w-full max-w-[440px] flex-col lg:min-h-0 lg:max-h-full" aria-labelledby="beta-step-title">
                     <ol className="mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-tertiary" aria-label={t("betaStep.listLabel", { version })}>
                         <li className="flex items-center gap-1">{t("betaStep.steps.login")} <Check size={12} strokeWidth={3} aria-hidden /></li>
                         <li aria-hidden>›</li>
@@ -128,7 +131,7 @@ export function BetaAgreementStepPage() {
                     )}
 
                     <p className="mt-7 text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary">{t("betaStep.listLabel", { version })}</p>
-                    <div className="mt-2 rounded-xl border border-stroke bg-surface-secondary px-4 py-3.5">
+                    <div className="mt-2 max-h-[40vh] overflow-y-auto rounded-xl border border-stroke bg-surface-secondary px-4 py-3.5 lg:max-h-none lg:min-h-[160px] lg:flex-1" tabIndex={0} aria-label={t("betaStep.listLabel", { version })}>
                         {loadError ? (
                             <div role="status" className="text-body-xs text-fg-secondary">
                                 <p>{t("beta.error")}</p>
@@ -146,10 +149,10 @@ export function BetaAgreementStepPage() {
                                 ))}
                             </ol>
                         )}
-                        <p className="mt-3 text-right">
-                            <Link to={`/${lang}/terms`} target="_blank" rel="noreferrer" className="text-body-xs font-semibold text-fg-brand underline-offset-2 hover:underline">{t("betaStep.fullText")} →</Link>
-                        </p>
                     </div>
+                    <p className="mt-2 text-right">
+                        <Link to={`/${lang}/terms`} target="_blank" rel="noreferrer" className="text-body-xs font-semibold text-fg-brand underline-offset-2 hover:underline">{t("betaStep.fullText")} →</Link>
+                    </p>
 
                     <label className="mt-6 flex cursor-pointer items-start gap-3 text-body-xs leading-relaxed text-fg">
                         <input
@@ -165,9 +168,9 @@ export function BetaAgreementStepPage() {
                     </label>
                     {needCheck && <p id="beta-check-error" role="alert" className="mt-2 text-body-2xs text-fg-secondary">{t("betaStep.needCheck")}</p>}
 
-                    <button type="submit" className={CTA} disabled={!agreement || saving}>
-                        {saving ? <><Loader2 size={16} className="animate-spin" aria-hidden /> {t("betaStep.saving")}</> : <>{t("betaStep.cta")} <ArrowRight size={16} aria-hidden /></>}
-                    </button>
+                    <Button type="submit" variant="primary" size="lg" fullWidth className="mt-6" disabled={!agreement || saving} loading={saving} iconRight={<ArrowRight size={16} aria-hidden />}>
+                        {saving ? t("betaStep.saving") : t("betaStep.cta")}
+                    </Button>
 
                     <p className="mt-5 text-center text-body-xs text-fg-secondary">
                         {t("betaStep.exitQuestion")}{" "}
