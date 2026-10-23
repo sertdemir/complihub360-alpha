@@ -667,8 +667,16 @@
       "heading": "This lead can’t be rated yet",
       "message": "Ratings are possible once the appointment has taken place."
     },
-    "disclosurePending": "They are released once the booking’s disclosure has been recorded.",
-    "disclosurePendingShort": "Contact details follow shortly"
+    "disclosure": {
+      "pending": {
+        "short": "Contact details follow shortly",
+        "reason": "They are released once the booking’s disclosure has been recorded."
+      },
+      "withheld": {
+        "short": "Contact details not released",
+        "reason": "The booking was cancelled before the contact details were released."
+      }
+    }
   },
   "intake": {
     "inviteOnlyTitle": "Provider intake is invite-only.",

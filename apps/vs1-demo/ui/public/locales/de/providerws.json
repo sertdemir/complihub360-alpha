@@ -647,8 +647,16 @@
       "heading": "Dieser Lead kann noch nicht bewertet werden",
       "message": "Bewertungen sind möglich, sobald der Termin stattgefunden hat."
     },
-    "disclosurePending": "Sie werden freigegeben, sobald die Offenlegung der Buchung protokolliert ist.",
-    "disclosurePendingShort": "Kontaktdaten folgen in Kürze"
+    "disclosure": {
+      "pending": {
+        "short": "Kontaktdaten folgen in Kürze",
+        "reason": "Sie werden freigegeben, sobald die Offenlegung der Buchung protokolliert ist."
+      },
+      "withheld": {
+        "short": "Kontaktdaten nicht freigegeben",
+        "reason": "Die Buchung wurde storniert, bevor die Kontaktdaten freigegeben waren."
+      }
+    }
   },
   "intake": {
     "inviteOnlyTitle": "Anbieter-Intake nur mit Einladung.",

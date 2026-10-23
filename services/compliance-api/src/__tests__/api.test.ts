@@ -81,6 +81,7 @@ vi.mock('../supabase.js', () => ({
             const passt = (r: any) => Object.entries(filters).every(([k, expr]) => {
                 if (expr === 'is.null') return r[k] === null || r[k] === undefined;
                 if (expr.startsWith('eq.')) return String(r[k]) === expr.slice(3);
+                if (expr.startsWith('neq.')) return String(r[k]) !== expr.slice(4);
                 throw new Error(`unsupported filter in test store: ${expr}`);
             });
             const rows = (db[table] ?? []).filter(passt);
@@ -1233,9 +1234,9 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         const auditKaputt = async () => {
             const { supabaseApi } = await import('../supabase.js');
             const realInsert = supabaseApi.insert;
-            return vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+            return vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any, o?: any) => {
                 if (table === 'event_log' && data?.type === 'lead.revealed') throw new Error('event_log unavailable');
-                return realInsert(table, data);
+                return realInsert(table, data, o);
             });
         };
 
@@ -1246,13 +1247,20 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
             try { r = await book(standardBody(session)); } finally { spy.mockRestore(); }
             expect(r.status).toBe(201);
             const row = db.scheduling[0];
-            expect(row.identity_revealed).toBe(false);
+            expect(row.shared_released_at ?? null).toBeNull();
             expect(row.shared_snapshot).toBeTruthy();
+            // Die Gegenrichtung bleibt: der Nutzer sieht den Anbieter (Befund Pruefung 23.10.).
+            expect(row.identity_revealed).toBe(true);
+            expect(r.body.provider_identity).toMatchObject({ name: expect.any(String) });
             expect(db.event_log.some((e) => e.type === 'lead.revealed')).toBe(false);
             // Das Dashboard des Anbieters gibt nichts heraus, sagt aber, dass etwas kommt.
             const dash = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'none', headers: { authorization: `Bearer ${MEMBER()}` } });
             expect(dash.status).toBe(200);
-            expect(dash.body.bookings[0]).toMatchObject({ user_email: null, user_company: null, message: null, disclosure_pending: true });
+            expect(dash.body.bookings[0]).toMatchObject({ user_email: null, user_company: null, message: null, disclosure: 'pending' });
+            // Storniert der Nutzer, kommt nichts mehr — kein "folgt in Kuerze" fuer immer.
+            row.status = 'cancelled';
+            const dash2 = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'none', headers: { authorization: `Bearer ${MEMBER()}` } });
+            expect(dash2.body.bookings[0]).toMatchObject({ user_email: null, disclosure: 'withheld' });
         }, 15_000);
 
         it('der Tick traegt das Audit aus der Buchungszeile nach und gibt erst dann frei', async () => {
@@ -1264,20 +1272,32 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
             row.created_at = new Date().toISOString();
             const { runDisclosureAuditTick } = await import('../disclosure.js');
             // Zu frisch: eine laufende Buchung schreibt ihr Audit gerade selbst.
-            expect((await runDisclosureAuditTick(false, new Date(Date.parse(row.created_at) + 60_000))).checked).toBe(0);
+            expect((await runDisclosureAuditTick(new Date(Date.parse(row.created_at) + 60_000))).checked).toBe(0);
             const later = new Date(Date.parse(row.created_at) + 5 * 60_000);
-            const c = await runDisclosureAuditTick(false, later);
-            expect(c).toEqual({ checked: 1, audited: 1, revealed: 1, errors: 0 });
-            expect(row.identity_revealed).toBe(true);
+            const c = await runDisclosureAuditTick(later);
+            expect(c).toEqual({ checked: 1, audited: 1, released: 1, errors: 0 });
+            expect(row.shared_released_at).toBeTruthy();
             expect(db.event_log.find((e) => e.type === 'lead.revealed')?.payload).toMatchObject({
                 bookingId: row.id, sharedFields: row.shared_fields, acknowledgementVersion: 'booking-ack-v1', reconstructed: true,
             });
             // Ein zweiter Lauf tut nichts mehr — kein doppeltes Audit.
-            expect((await runDisclosureAuditTick(false, later)).checked).toBe(0);
+            expect((await runDisclosureAuditTick(later)).checked).toBe(0);
             expect(db.event_log.filter((e) => e.type === 'lead.revealed')).toHaveLength(1);
             const dash = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'none', headers: { authorization: `Bearer ${MEMBER()}` } });
-            expect(dash.body.bookings[0]).toMatchObject({ disclosure_pending: false });
+            expect(dash.body.bookings[0]).toMatchObject({ disclosure: 'released' });
             expect(dash.body.bookings[0].user_email).toBeTruthy();
+        }, 15_000);
+
+        it('der Tick gibt eine stornierte Buchung nicht frei', async () => {
+            const { session } = seedBookable();
+            const spy = await auditKaputt();
+            try { await book(standardBody(session)); } finally { spy.mockRestore(); }
+            const row = db.scheduling[0];
+            row.created_at = new Date(Date.now() - 10 * 60_000).toISOString();
+            row.status = 'cancelled';
+            const { runDisclosureAuditTick } = await import('../disclosure.js');
+            expect((await runDisclosureAuditTick()).checked).toBe(0);
+            expect(row.shared_released_at ?? null).toBeNull();
         }, 15_000);
 
         it('das Audit nennt die Felder aus dem Bestaetigungstext, nicht die Liste v1', async () => {
@@ -1286,6 +1306,7 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
             const r = await book(standardBody(session));
             expect(r.status).toBe(201);
             expect(db.scheduling[0]).toMatchObject({ identity_revealed: true, shared_fields: ['email', 'message'] });
+            expect(db.scheduling[0].shared_released_at).toBeTruthy();
             expect(db.event_log.find((e) => e.type === 'lead.revealed')?.payload.sharedFields).toEqual(['email', 'message']);
         });
 
@@ -1758,7 +1779,7 @@ describe('PATCH /api/v1/scheduling/:id (reschedule + outcome guards)', () => {
         const row = {
             id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID,
             slot_start: future(1), slot_end: future(1), status: 'confirmed',
-            lead_charged: true, identity_revealed: true, message: null, ...over,
+            lead_charged: true, identity_revealed: true, shared_released_at: new Date().toISOString(), message: null, ...over,
         };
         (db.scheduling ??= []).push(row);
         return row;
@@ -2071,8 +2092,8 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
             { id: randomUUID(), provider_key: 'andere-kanzlei', user_id: ohneAnfrage, category: 'tax-vat', country: 'DE', structured_answers: { company: 'Fremde Firma' }, created_at: '2026-09-30T08:00:00Z' },
         );
         (db.scheduling ??= []).push(
-            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, slot_start: '2026-10-02T07:00:00Z', slot_end: '2026-10-02T07:30:00Z', status: 'confirmed', identity_revealed: true },
-            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: ohneAnfrage, slot_start: '2026-09-13T13:00:00Z', slot_end: '2026-09-13T13:30:00Z', status: 'no_show', identity_revealed: true },
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, slot_start: '2026-10-02T07:00:00Z', slot_end: '2026-10-02T07:30:00Z', status: 'confirmed', identity_revealed: true, shared_released_at: '2026-09-30T08:00:00Z' },
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: ohneAnfrage, slot_start: '2026-09-13T13:00:00Z', slot_end: '2026-09-13T13:30:00Z', status: 'no_show', identity_revealed: true, shared_released_at: '2026-09-10T08:00:00Z' },
         );
         const r = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'jwt' });
         expect(r.status).toBe(200);
@@ -3348,7 +3369,7 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         const iso = (dh: number) => new Date(now + dh * 3_600_000).toISOString();
         db.engagement_requests = [{ id: 'alt', status: 'replied', created_at: iso(0) }];
         db.documents = [{ classification: 'x', consent_ai: true, created_at: iso(0) }];
-        db.scheduling = [{ id: 'b1', provider_key: 'studio', status: 'confirmed', slot_start: iso(5), created_at: iso(0), acknowledgement_version: 'v2' }];
+        db.scheduling = [{ id: 'b1', provider_key: 'studio', status: 'confirmed', slot_start: iso(5), created_at: iso(0), acknowledgement_version: 'v2', shared_released_at: iso(0) }];
         db.event_log = [
             { type: 'assistant_chat', timestamp: iso(-1), payload: { redacted: true } },
             { type: 'lead.revealed', timestamp: iso(0), payload: { bookingId: 'b1', userId: 'u-geheim', providerKey: 'studio' } },
@@ -4898,7 +4919,32 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
         expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
         expect(db.event_log.some((e) => e.type === 'booking_rebooked')).toBe(true);
         expect(db.notifications).toEqual([expect.objectContaining({ user_id: MEMBER_ID, type: 'booking_created' })]);
+        // 23.10.2026: auch die Neubuchung legt erst nach dem Audit offen.
+        expect(db.event_log.find((e) => e.type === 'lead.revealed' && e.payload.bookingId === neu.id)?.payload).toMatchObject({ rebookedFrom: b.id, sharedFields: ['email', 'company_name', 'message'] });
+        expect(neu.shared_released_at).toBeTruthy();
     });
+
+    it('Neubuchung, deren Audit scheitert: der Termin steht, die Daten bleiben beim Anbieter zu', async () => {
+        // Befund Pruefung 23.10.: rebookWithoutFee setzte identity_revealed und
+        // kopierte den Schnappschuss — ohne Audit, auch wenn die alte Buchung
+        // nie freigegeben war.
+        seedProvider(); seedMember();
+        const ledger = seedLedger();
+        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13), lead_ledger_id: ledger.id, acknowledgement_version: 'booking-ack-v1', shared_fields: ['email'], shared_snapshot: { email: 'test@complihub.test' }, shared_released_at: null, sharing_confirmed_at: null });
+        const { supabaseApi } = await import('../supabase.js');
+        const realInsert = supabaseApi.insert;
+        const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any, o?: any) => {
+            if (table === 'event_log' && data?.type === 'lead.revealed') throw new Error('event_log unavailable');
+            return realInsert(table, data, o);
+        });
+        let r: any;
+        try { r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: future(3) }) }); } finally { spy.mockRestore(); }
+        expect(r.status).toBe(201);
+        const neu = db.scheduling.find((x) => x.id === r.body.id);
+        expect(neu.shared_released_at ?? null).toBeNull();
+        // Kein erfundenes Bestaetigungsdatum: war keins da, kommt keins dazu.
+        expect(neu.sharing_confirmed_at).toBeNull();
+    }, 15_000);
 
     it('Umbuchung: zweimal ja, das dritte Mal 409 RESCHEDULE_LIMIT', async () => {
         seedProvider();
@@ -5818,7 +5864,7 @@ describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Lim
     }
 
     function seedLead(over: Record<string, any> = {}) {
-        const row = { id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: '2026-11-02T09:00:00Z', slot_end: '2026-11-02T09:30:00Z', status: 'confirmed', lead_charged: true, identity_revealed: true, shared_fields: ['email', 'company_name', 'message'], message: 'Bitte USt-Registrierung NL', created_at: '2026-10-01T10:00:00Z', ...over };
+        const row = { id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: '2026-11-02T09:00:00Z', slot_end: '2026-11-02T09:30:00Z', status: 'confirmed', lead_charged: true, identity_revealed: true, shared_released_at: '2026-10-01T10:00:00Z', shared_fields: ['email', 'company_name', 'message'], message: 'Bitte USt-Registrierung NL', created_at: '2026-10-01T10:00:00Z', ...over };
         (db.scheduling ??= []).push(row);
         return row;
     }
@@ -5906,9 +5952,9 @@ describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Lim
         (db.users ??= []).push({ id: USER_ID, email: 'jana@example.com' });
         (db.engagement_requests ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, created_at: '2026-09-30T00:00:00Z', structured_answers: { company: 'Jana Trading GmbH' } });
         const offen = seedLead();
-        seedLead({ id: randomUUID(), identity_revealed: false, status: 'pending' });          // vor der Offenlegung
+        seedLead({ id: randomUUID(), identity_revealed: false, shared_released_at: null, status: 'pending' });          // vor der Offenlegung
         seedLead({ id: randomUUID(), shared_fields: ['company_name'], message: 'geheim', created_at: '2026-10-02T10:00:00Z' }); // nur Firma freigegeben
-        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'andere-kanzlei', user_id: USER_ID, slot_start: '2026-11-03T09:00:00Z', status: 'confirmed', identity_revealed: true, shared_fields: ['email'], created_at: '2026-10-03T00:00:00Z' });
+        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'andere-kanzlei', user_id: USER_ID, slot_start: '2026-11-03T09:00:00Z', status: 'confirmed', identity_revealed: true, shared_released_at: '2026-10-03T00:00:00Z', shared_fields: ['email'], created_at: '2026-10-03T00:00:00Z' });
         const { key } = await activeKey();
         const r = await asKey(key, '/api/v1/ext/leads');
         expect(r.status).toBe(200);
@@ -5931,7 +5977,7 @@ describe('Phase 7 — Enterprise-API: Schluessel, Scopes, Leads, Ereignisse, Lim
     it('Lead-Status setzen braucht leads:write; fremde oder nicht offengelegte Buchung 404', async () => {
         seedGlobal();
         const offen = seedLead();
-        const verdeckt = seedLead({ id: randomUUID(), identity_revealed: false });
+        const verdeckt = seedLead({ id: randomUUID(), identity_revealed: false, shared_released_at: null });
         const { key } = await activeKey(['leads:read']);
         const ohne = await asKey(key, `/api/v1/ext/leads/${offen.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'contacted' }) });
         expect(ohne.status).toBe(403); expect(ohne.body).toMatchObject({ errorCode: 'API_SCOPE_FORBIDDEN', required_scope: 'leads:write' });

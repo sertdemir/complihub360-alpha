@@ -25,7 +25,7 @@ import { LeadsPage } from './LeadsPage';
 const lead = (over: Partial<ProviderBooking> = {}): ProviderBooking => ({
   id: 'b-1', slotStart: '2026-11-01T09:00:00Z', slotEnd: '2026-11-01T09:30:00Z', status: 'confirmed', leadCharged: true,
   userEmail: null, userCompany: null, category: 'tax-vat', country: 'DE', countries: ['DE'], message: null,
-  lead: null, userDiscountPct: null, proposal: null, acknowledgementVersion: 'v2', reviewed: false, disclosurePending: true,
+  lead: null, userDiscountPct: null, proposal: null, acknowledgementVersion: 'v2', reviewed: false, disclosure: 'pending',
   attendance: { noShowBy: null, noShowReportedAt: null, disputeStatus: 'none', rebookDeadline: null, rebookedFrom: null, rescheduleCount: 0, rescheduleLimit: 2, attendanceReportable: false, disputeOpenUntil: null, rebookOpen: false },
   ...over,
 } as ProviderBooking);
@@ -36,16 +36,23 @@ describe('Termine · Offenlegung ausstehend', () => {
   it('zeigt den Grund statt eines leeren Kontakts', async () => {
     api.fetchProviderBookings.mockResolvedValue([lead()]);
     render(<MemoryRouter><LeadsPage /></MemoryRouter>);
-    expect(await screen.findByText('termine.disclosurePendingShort')).toBeInTheDocument();
+    expect(await screen.findByText('termine.disclosure.pending.short')).toBeInTheDocument();
     expect(screen.queryByText('termine.companyMissing')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'termine.openDossier' }));
-    expect(await screen.findByText('termine.disclosurePending')).toBeInTheDocument();
+    expect(await screen.findByText('termine.disclosure.pending.reason')).toBeInTheDocument();
+  });
+
+  it('storniert vor der Freigabe: „nicht freigegeben", kein Versprechen', async () => {
+    api.fetchProviderBookings.mockResolvedValue([lead({ disclosure: 'withheld', status: 'cancelled' })]);
+    render(<MemoryRouter><LeadsPage /></MemoryRouter>);
+    expect(await screen.findByText('termine.disclosure.withheld.short')).toBeInTheDocument();
+    expect(screen.queryByText('termine.disclosure.pending.short')).not.toBeInTheDocument();
   });
 
   it('nach der Freigabe die E-Mail', async () => {
-    api.fetchProviderBookings.mockResolvedValue([lead({ disclosurePending: false, userEmail: 'kunde@example.com' })]);
+    api.fetchProviderBookings.mockResolvedValue([lead({ disclosure: 'released', userEmail: 'kunde@example.com' })]);
     render(<MemoryRouter><LeadsPage /></MemoryRouter>);
     expect(await screen.findByText('kunde@example.com')).toBeInTheDocument();
-    expect(screen.queryByText('termine.disclosurePendingShort')).not.toBeInTheDocument();
+    expect(screen.queryByText('termine.disclosure.pending.short')).not.toBeInTheDocument();
   });
 });

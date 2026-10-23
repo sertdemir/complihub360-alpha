@@ -1535,10 +1535,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // B1: nur, was der Nutzer bestaetigt hat (shared_snapshot); aeltere
                     // Buchungen ohne Schnappschuss nur nach shared_fields. Und nur nach
                     // der Freigabe: ohne Audit der Offenlegung keine Daten (disclosure.ts).
-                    ...(b.identity_revealed
+                    ...(b.shared_released_at
                         ? providerSharedView(b, { email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null, company: company || null })
                         : { user_email: null, user_company: null, message: null }),
-                    disclosure_pending: !b.identity_revealed && !!b.sharing_confirmed_at,
+                    // released · pending (folgt, der Abgleich gibt frei) · withheld
+                    // (storniert vor der Freigabe — kommt nicht mehr).
+                    disclosure: b.shared_released_at ? 'released' : b.sharing_confirmed_at && b.status !== 'cancelled' ? 'pending' : 'withheld',
                     // Thema des Leads: was gebucht und berechnet wurde (Ledger), nicht
                     // die juengste Anfrage des Nutzers an diesen Anbieter — die kann
                     // ein ganz anderes Thema sein (Testlauf Phase 4, 2026-10-09:
@@ -2042,9 +2044,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             status: 'confirmed',
                             message: typeof d.message === 'string' ? d.message.slice(0, 2000) : null,
                             lead_charged: charge.outcome === 'captured' || (charge.outcome === 'linked' && !!linkedRoot?.lead_charged),
-                            // Erst nach dem Audit freigegeben (disclosure.ts) — die
-                            // Offenlegung ist ein Grenzuebertritt und braucht ihre Spur.
-                            identity_revealed: false,
+                            // Der Nutzer sieht den Anbieter ab jetzt. Die Gegenrichtung —
+                            // seine bestaetigten Daten an den Anbieter — gibt erst
+                            // revealAfterAudit frei (shared_released_at, disclosure.ts).
+                            identity_revealed: true,
                             rebooked_from: linkedRoot?.id ?? null,
                             service_id: opp.serviceRow.service_id ?? null,
                             price_snapshot: snapshot,

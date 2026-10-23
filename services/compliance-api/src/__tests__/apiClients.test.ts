@@ -79,9 +79,10 @@ describe('Ereignisse', () => {
 });
 
 describe('Leads', () => {
-    const b = { id: 'b1', provider_key: 'k', status: 'confirmed', slot_start: NOW, identity_revealed: true, shared_fields: ['email', 'company_name', 'message'], user_email: 'a@b.c', user_company: 'Acme', message: 'Hallo', category: 'tax-vat', country: 'DE' };
+    const b = { id: 'b1', provider_key: 'k', status: 'confirmed', slot_start: NOW, identity_revealed: true, shared_released_at: NOW, shared_fields: ['email', 'company_name', 'message'], user_email: 'a@b.c', user_company: 'Acme', message: 'Hallo', category: 'tax-vat', country: 'DE' };
     it('nur nach Offenlegung, nur freigegebene Felder', () => {
-        expect(serializeLead({ ...b, identity_revealed: false })).toBeNull();
+        // Freigabe haengt am Audit (shared_released_at), nicht an identity_revealed.
+        expect(serializeLead({ ...b, shared_released_at: null })).toBeNull();
         expect(serializeLead(b)?.contact).toEqual({ email: 'a@b.c', company: 'Acme', message: 'Hallo' });
         expect(serializeLead({ ...b, shared_fields: ['company_name'] })?.contact).toEqual({ email: null, company: 'Acme', message: null });
     });

@@ -11,6 +11,7 @@ import { money } from '../../api/billing';
 import {
   fetchProviderBookings, reportProposal, reportAttendance, submitReview, reviewFailureFrom,
   type AttendanceOutcome, type BookingAttendance, type BookingStatus, type LeadProposal, type ProviderBookingLead,
+  type Disclosure,
 } from '../../api/bookings';
 import { DateMark } from '../../components/ui/DateMark';
 import { useRequestContext } from '../../lib/requestContext';
@@ -46,8 +47,8 @@ const CREDIT_PCT = 30;
 
 interface Row {
   id: string;
-  /** Offenlegung bestaetigt, aber noch nicht protokolliert (disclosure.ts). */
-  pending: boolean;
+  /** Freigabe der Nutzerdaten (disclosure.ts) — nur bei 'released' stehen Firma, Kontakt und Anliegen da. */
+  disclosure: Disclosure;
   start: string;        // ISO — Datumsmarke
   dateLine: string;
   timeLine: string;
@@ -102,7 +103,7 @@ export function LeadsPage() {
         timeLine: `${tf.format(start)}${end ? `–${tf.format(end)}` : ''}`,
         minutes: end ? Math.round((end.getTime() - start.getTime()) / 60_000) : undefined,
         company: b.userCompany,
-        pending: b.disclosurePending,
+        disclosure: b.disclosure,
         email: b.userEmail ?? '—',
         category: b.category ?? undefined,
         countries: b.countries?.length ? b.countries : b.country ? [b.country] : [],
@@ -352,8 +353,8 @@ export function LeadsPage() {
       <div className="min-w-0 flex-1">
         {/* Offenlegung noch nicht protokolliert: weder „Firma nicht angegeben"
             noch ein leeres „—" — beides stimmt nicht. Der Grund steht im Dossier. */}
-        {r.pending ? (
-          <p className="truncate text-[15px] font-medium text-fg-tertiary">{t('termine.disclosurePendingShort')}</p>
+        {r.disclosure !== 'released' ? (
+          <p className="truncate text-[15px] font-medium text-fg-tertiary">{t(`termine.disclosure.${r.disclosure}.short`)}</p>
         ) : (<>
           <p className={`truncate text-[15px] ${r.company ? 'font-semibold text-fg' : 'font-medium text-fg-tertiary'}`}>{r.company ?? t('termine.companyMissing')}</p>
           <p className="truncate text-[13px] text-fg-secondary">{r.email}</p>
@@ -410,18 +411,18 @@ export function LeadsPage() {
         open={!!dossierFor}
         onClose={() => openDossier(null)}
         eyebrow={t('termine.dossierEyebrow')}
-        title={dossierFor ? (dossierFor.pending ? t('termine.disclosurePendingShort') : dossierFor.company ?? t('termine.companyMissing')) : ''}
+        title={dossierFor ? (dossierFor.disclosure !== 'released' ? t(`termine.disclosure.${dossierFor.disclosure}.short`) : dossierFor.company ?? t('termine.companyMissing')) : ''}
       >
         {dossierFor && (
           <div className="space-y-4">
             <div className={DRAWER_BOX}>
               <p className={DRAWER_EYEBROW}>{t('termine.dossierContact')}</p>
-              <p className="mt-1 text-[14px] text-fg">{dossierFor.pending ? t('termine.disclosurePending') : dossierFor.email}</p>
+              <p className="mt-1 text-[14px] text-fg">{dossierFor.disclosure !== 'released' ? t(`termine.disclosure.${dossierFor.disclosure}.reason`) : dossierFor.email}</p>
               <p className="text-[12px] text-fg-tertiary">{dossierFor.dateLine} · {dossierFor.timeLine}</p>
             </div>
             <div className={DRAWER_BOX}>
               <p className={DRAWER_EYEBROW}>{t('termine.dossierContext')}</p>
-              <p className="mt-1 text-[13px] leading-relaxed text-fg-secondary">{dossierFor.meta}</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-fg-secondary">{dossierFor.disclosure !== 'released' ? t(`termine.disclosure.${dossierFor.disclosure}.short`) : dossierFor.meta}</p>
             </div>
             <p className="text-[12px] text-fg-tertiary">{t('termine.dossierNote')}</p>
             {dossierFor.status === 'completed' && (

@@ -11,7 +11,7 @@
 //     Antwortrate des alten Modells gibt es dort nicht mehr)
 //   - Privacy aus den Grenzuebertritten, die es wirklich gibt: Assistent → KI
 //     (bereinigt, `assistant_chat`), Offenlegung an den Anbieter
-//     (`lead.revealed`, bei Neubuchung ohne Gebuehr `booking_rebooked`),
+//     (`lead.revealed`; Neubuchungen von vor dem 23.10. tragen `booking_rebooked`),
 //     Nachweise im geschuetzten Speicher
 //   - was nicht gemessen wird, kommt als null, nie als 0. Kunden-Uploads gibt
 //     es im Produkt nicht (Pipeline nicht live) — `customerUploads: null`.
@@ -31,6 +31,8 @@ export type BookingRow = {
     cancelled_at?: string | null;
     reminder_24h_sent?: boolean | null;
     acknowledgement_version?: string | null;
+    /** Freigabe der Nutzerdaten an den Anbieter (disclosure.ts). */
+    shared_released_at?: string | null;
     dispute_status?: string | null;
     no_show_reported_at?: string | null;
 };
@@ -141,12 +143,15 @@ export function computeAdminStats(input: {
     const completed = past.filter(b => b.status === 'completed').length;
     const noShow = past.filter(b => b.status === 'no_show').length;
 
-    // Offenlegung: gezaehlt wird die Audit-Spur, nicht `sharing_confirmed_at` —
-    // das setzt jeder Buchungspfad selbst und koennte nie fehlen. Scheitert das
-    // Audit (index.ts schreibt es best effort), faellt diese Quote.
+    // Offenlegung: Basis sind die Buchungen, deren Daten der Anbieter sieht
+    // (`shared_released_at`); gezaehlt wird, ob dazu das Audit steht. Seit
+    // disclosure.ts gibt nur ein Audit frei — die Quote ist ein Stolperdraht
+    // fuer Pfade, die das umgehen. Stornierte, nie freigegebene Buchungen sind
+    // keine Offenlegung und zaehlen nicht mit. `booking_rebooked` gilt fuer
+    // Neubuchungen von vor dem 23.10.2026.
     const since = disclosureSince(bookings);
     const audited = new Set(input.disclosureEvents.filter(e => DISCLOSURE.has(e.type)).map(e => String(e.payload?.bookingId ?? '')));
-    const disclosureBase = since ? bookings.filter(b => b.created_at >= since) : [];
+    const disclosureBase = since ? bookings.filter(b => b.created_at >= since && b.shared_released_at) : [];
 
     // Erinnerung: erst ab dem ersten Termin, fuer den eine verschickt wurde —
     // im Shadow-Modus setzt niemand das Flag, und Altbuchungen kannten es nicht.
@@ -178,10 +183,17 @@ export function computeAdminStats(input: {
         // er zaehlt dort, nicht hier.
         if (b.status === 'no_show') { const ni = idxOf(b.no_show_reported_at); if (ni >= 0) series.noShows[ni]++; }
     }
+    const seenReveal = new Set<string>();
     for (const e of input.events7) {
         const i = idxOf(at(e)); if (i < 0) continue;
         if (e.type === 'assistant_chat') { series.aiRequests[i]++; if (e.payload?.redacted === true) series.aiRedacted[i]++; }
-        if (e.type === 'lead.revealed') series.reveals[i]++;
+        // Je Buchung einmal — ein rekonstruiertes Audit neben einem echten zaehlt nicht doppelt.
+        if (e.type === 'lead.revealed') {
+            const key = String(e.payload?.bookingId ?? '');
+            if (key && seenReveal.has(key)) continue;
+            if (key) seenReveal.add(key);
+            series.reveals[i]++;
+        }
     }
     const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
     const stored = input.evidence.filter(e => e.upload_confirmed === true);

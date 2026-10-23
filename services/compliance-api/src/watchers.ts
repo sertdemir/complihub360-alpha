@@ -104,7 +104,7 @@ export interface TickSummary {
     invoiceRetryPaid: number;
     apiRequestLogPruned: number;
     disclosureAudited: number;
-    disclosureRevealed: number;
+    disclosureReleased: number;
 }
 
 // ─── Shared reminder core ─────────────────────────────────────────────────────
@@ -195,15 +195,16 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, providerCoveredNotices: 0, billingSynced: 0, billingChanged: 0, chargesReconciled: 0, chargesRefunded: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0, apiRequestLogPruned: 0, disclosureAudited: 0, disclosureRevealed: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, providerCoveredNotices: 0, billingSynced: 0, billingChanged: 0, chargesReconciled: 0, chargesRefunded: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0, apiRequestLogPruned: 0, disclosureAudited: 0, disclosureReleased: 0 };
 
     // Offenlegung ohne Audit nachholen (disclosure.ts) — zuerst, vor allem
     // anderen: das ist ein Grenzuebertritt, und das Laden darunter kann den
     // Lauf frueh beenden.
     try {
-        const dc = await runDisclosureAuditTick(shadow);
+        // Nicht am Shadow-Schalter — Begruendung in disclosure.ts.
+        const dc = await runDisclosureAuditTick();
         summary.disclosureAudited = dc.audited;
-        summary.disclosureRevealed = dc.revealed;
+        summary.disclosureReleased = dc.released;
         summary.errors += dc.errors;
     } catch { summary.errors++; }
 

@@ -647,8 +647,16 @@
       "heading": "Bu lead henüz değerlendirilemez",
       "message": "Değerlendirme, randevu gerçekleştikten sonra mümkündür."
     },
-    "disclosurePending": "Rezervasyonun paylaşım kaydı oluşturulduğunda açılır.",
-    "disclosurePendingShort": "İletişim bilgileri kısa süre içinde gelecek"
+    "disclosure": {
+      "pending": {
+        "short": "İletişim bilgileri kısa süre içinde gelecek",
+        "reason": "Rezervasyonun paylaşım kaydı oluşturulduğunda açılır."
+      },
+      "withheld": {
+        "short": "İletişim bilgileri paylaşılmadı",
+        "reason": "Rezervasyon, iletişim bilgileri paylaşılmadan önce iptal edildi."
+      }
+    }
   },
   "intake": {
     "inviteOnlyTitle": "Sağlayıcı kaydı yalnızca davetle.",

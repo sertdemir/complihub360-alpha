@@ -19,11 +19,14 @@ const defaultHeaders = {
 };
 
 export const supabaseApi = {
-    async insert(table: string, data: any) {
+    // `timeoutMs`: fuer Aufrufer, die auf einen Nutzer warten (Audit der
+    // Offenlegung, disclosure.ts) — ohne haengt ein Insert bis zum fetch-Default.
+    async insert(table: string, data: any, opts: { timeoutMs?: number } = {}) {
         const res = await fetch(`${restUrl}/${table}`, {
             method: 'POST',
             headers: defaultHeaders,
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            ...(opts.timeoutMs ? { signal: AbortSignal.timeout(opts.timeoutMs) } : {}),
         });
         if (!res.ok) throw new Error(`Supabase insert failed: ${await res.text()}`);
         return res.json();

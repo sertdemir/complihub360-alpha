@@ -647,8 +647,16 @@
       "heading": "Este lead aún no se puede valorar",
       "message": "Las valoraciones son posibles una vez celebrada la cita."
     },
-    "disclosurePending": "Se liberan en cuanto quede registrada la divulgación de la reserva.",
-    "disclosurePendingShort": "Los datos de contacto llegarán en breve"
+    "disclosure": {
+      "pending": {
+        "short": "Los datos de contacto llegarán en breve",
+        "reason": "Se liberan en cuanto quede registrada la comunicación de los datos de la reserva."
+      },
+      "withheld": {
+        "short": "Datos de contacto no liberados",
+        "reason": "La reserva se canceló antes de que se liberaran los datos de contacto."
+      }
+    }
   },
   "intake": {
     "inviteOnlyTitle": "El alta de proveedores es solo por invitación.",
