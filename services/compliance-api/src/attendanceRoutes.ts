@@ -4,6 +4,7 @@ import { supabaseApi } from "./supabase.js";
 import { notify } from "./notifications.js";
 import { sendNoShowMail } from "./mailer.js";
 import { evaluateProviderIncidents, evaluateUserNoShows } from "./performanceRoutes.js";
+import { revealAfterAudit } from "./disclosure.js";
 import {
     attendanceReportable, disputeOpen, loadAttendancePolicy, rebookDeadline, canReschedule,
     type AttendancePolicy,
@@ -243,7 +244,8 @@ export async function rebookWithoutFee(b: Json, slotStartIso: string, actorUserI
     const inserted = (await supabaseApi.insert('scheduling', {
         provider_key: b.provider_key, user_id: b.user_id, slot_start: slotStartIso, slot_end: slotEnd, status: 'confirmed',
         message: b.message ?? null, lead_charged: false, identity_revealed: true, service_id: b.service_id ?? null,
-        price_snapshot: b.price_snapshot ?? null, shared_fields: b.shared_fields ?? null, sharing_confirmed_at: b.sharing_confirmed_at ?? nowIso,
+        // Nur uebernehmen, was bestaetigt war — kein erfundenes Bestaetigungsdatum.
+        price_snapshot: b.price_snapshot ?? null, shared_fields: b.shared_fields ?? null, sharing_confirmed_at: b.sharing_confirmed_at ?? null,
         // Schritt 4 (B1): die Neubuchung teilt dasselbe, was der Nutzer bestaetigt hat.
         shared_snapshot: b.shared_snapshot ?? null,
         acknowledgement_version: b.acknowledgement_version ?? null, lead_ledger_id: b.lead_ledger_id ?? null,
@@ -251,8 +253,20 @@ export async function rebookWithoutFee(b: Json, slotStartIso: string, actorUserI
         rebooked_from: b.id,
     })) as Json[];
     const row = inserted[0];
+    // Die Neubuchung legt dieselben Daten dem Anbieter offen — auch sie erst
+    // nach dem Audit (disclosure.ts). War die alte Buchung nie freigegeben,
+    // wird es die neue auch erst hier; scheitert das Audit, holt der Tick es nach.
+    if (row?.id) {
+        await revealAfterAudit({
+            id: String(row.id), provider_key: String(b.provider_key), user_id: (b.user_id as string) ?? null,
+            shared_fields: (b.shared_fields as string[]) ?? null, acknowledgement_version: (b.acknowledgement_version as string) ?? null,
+            sharing_confirmed_at: (b.sharing_confirmed_at as string) ?? null,
+        }, { extra: { rebookedFrom: b.id } });
+    }
     await supabaseApi.update('scheduling', { id: String(b.id) }, { credit_decided_at: nowIso, updated_at: nowIso });
-    await supabaseApi.insert('event_log', { type: 'booking_rebooked', payload: { bookingId: row?.id, fromBookingId: b.id, providerKey: b.provider_key, userId: b.user_id ?? null, slotStart: slotStartIso, by: actorUserId } });
+    // Betriebsspur, kein Grenzuebertritt — scheitert sie, bleibt die Neubuchung.
+    await supabaseApi.insert('event_log', { type: 'booking_rebooked', payload: { bookingId: row?.id, fromBookingId: b.id, providerKey: b.provider_key, userId: b.user_id ?? null, slotStart: slotStartIso, by: actorUserId } })
+        .catch((err) => structuredLog('error', 'event_log insert failed', { errorCode: 'ERR_EVENT_LOG', severity: 'error', type: 'booking_rebooked', bookingId: row?.id, detail: String(err).slice(0, 200) }));
     return row;
 }
 

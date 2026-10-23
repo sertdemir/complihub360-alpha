@@ -54,18 +54,25 @@ describe('computeAdminStats', () => {
         expect(s.bookings).toMatchObject({ cancelled7: 1, noShows7: 0 });
     });
 
-    it('Offenlegung: gezaehlt wird die Audit-Spur ab dem ersten Bestaetigungstext', () => {
-        const old = booking({ created_at: h(-200) });
-        const a = booking({ created_at: h(-100), acknowledgement_version: 'v2' });
-        const b = booking({ created_at: h(-50), acknowledgement_version: 'v2' });
-        const rebooked = booking({ created_at: h(-20), acknowledgement_version: 'v2' });
+    it('Offenlegung: Basis sind freigegebene Buchungen ab dem ersten Bestaetigungstext, gezaehlt die Audit-Spur', () => {
+        const old = booking({ created_at: h(-200), shared_released_at: h(-200) });
+        const a = booking({ created_at: h(-100), acknowledgement_version: 'v2', shared_released_at: h(-100) });
+        const b = booking({ created_at: h(-50), acknowledgement_version: 'v2', shared_released_at: h(-50) });
+        const rebooked = booking({ created_at: h(-20), acknowledgement_version: 'v2', shared_released_at: h(-20) });
+        // Storniert, bevor freigegeben: keine Offenlegung, kein Fehlalarm.
+        const never = booking({ created_at: h(-10), acknowledgement_version: 'v2', status: 'cancelled', shared_released_at: null });
         const s = run({
-            bookings: [old, a, b, rebooked],
+            bookings: [old, a, b, rebooked, never],
             disclosureEvents: [ev('lead.revealed', a.created_at, { bookingId: a.id }), ev('booking_rebooked', rebooked.created_at, { bookingId: rebooked.id })],
         });
         expect(disclosureSince([old, a, b])).toBe(a.created_at);
-        // b hat keine Spur — genau der Fall, den die Quote sichtbar machen soll.
+        // b ist freigegeben, hat aber keine Spur — genau der Fall, den die Quote sichtbar machen soll.
         expect(s.bookings.disclosureAuditedRate).toBeCloseTo(2 / 3);
+    });
+
+    it('Offenlegungen je Buchung einmal — ein rekonstruiertes Audit neben einem echten zaehlt nicht doppelt', () => {
+        const s = run({ events7: [ev('lead.revealed', h(-1), { bookingId: 'x' }), ev('lead.revealed', h(-1), { bookingId: 'x', reconstructed: true }), ev('lead.revealed', h(-2), { bookingId: 'y' })] });
+        expect(s.privacy.reveals7).toBe(2);
     });
 
     it('Erinnerungsquote ab dem ersten erinnerten Termin, nur wo mehr als 24 h lagen', () => {

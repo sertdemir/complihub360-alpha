@@ -666,6 +666,18 @@
     "rateNotHeld": {
       "heading": "This lead can’t be rated yet",
       "message": "Ratings are possible once the appointment has taken place."
+    },
+    "disclosure": {
+      "pending": {
+        "short": "Contact details follow shortly",
+        "reason": "They are released once the booking’s disclosure has been recorded.",
+        "context": "Follows with the contact details."
+      },
+      "withheld": {
+        "short": "Contact details not released",
+        "reason": "The booking was cancelled before the contact details were released.",
+        "context": "Not released."
+      }
     }
   },
   "intake": {

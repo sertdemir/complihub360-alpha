@@ -165,7 +165,8 @@ function validSince(raw: string | null): string | null | 'invalid' {
 /** Buchungen des Anbieters als Leads — nur nach Offenlegung, nur freigegebene Felder. */
 async function loadLeads(providerKey: string): Promise<Json[]> {
     const rows = (await supabaseApi.select('scheduling', { provider_key: providerKey }, { order: 'created_at.desc', limit: 1000 })) as Json[];
-    const revealed = rows.filter((b) => b.identity_revealed);
+    // Freigegeben heisst: das Audit der Offenlegung steht (disclosure.ts).
+    const revealed = rows.filter((b) => b.shared_released_at);
     if (!revealed.length) return [];
     const userIds = [...new Set(revealed.map((b) => b.user_id).filter(Boolean))] as string[];
     const users = (await Promise.all(userIds.map((id) => supabaseApi.select('users', { id }, { limit: 1 }) as Promise<Json[]>))).flat();
@@ -239,7 +240,7 @@ export async function handleExtRoutes(req: IncomingMessage, res: ServerResponse,
         if (!isExtStatus(body.status)) { json(res, 400, { errorCode: 'VALIDATION_ERROR', message: `status must be one of ${EXT_STATUSES.join(', ')}`, correlationId }); return true; }
         const [b] = (await supabaseApi.select('scheduling', { id: leadPatch[1], provider_key: client.provider_key }, { limit: 1 })) as Json[];
         // Fremde oder noch nicht offengelegte Buchung: 404, nicht 403 — die Antwort verraet nichts.
-        if (!b || !b.identity_revealed) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Lead not found', correlationId }); return true; }
+        if (!b || !b.shared_released_at) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Lead not found', correlationId }); return true; }
         const at = new Date().toISOString();
         await supabaseApi.update('scheduling', { id: b.id }, { ext_status: body.status, ext_status_at: at });
         await supabaseApi.insert('event_log', { type: 'lead_ext_status_set', payload: { bookingId: b.id, providerKey: client.provider_key, clientId: client.id, status: body.status, from: b.ext_status ?? null } });
