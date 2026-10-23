@@ -67,6 +67,7 @@ describe('answerCheck / factLine (Prüfrunde 3)', () => {
         expect(factLine('FR', 'registration_threshold_established', 'None (franchise en base below EUR 85,000 goods / EUR 37,500 services)'))
             .toMatch(/^- VAT registration threshold for businesses ESTABLISHED in FR \(resident businesses only/);
         expect(factLine('FR', 'registration_threshold_nonestablished', 'None')).toMatch(/NOT established in FR/);
+        expect(factLine('FR', 'distance_selling_threshold', 'EUR 10,000 (EU-wide OSS threshold)')).toMatch(/ANOTHER EU country selling goods to consumers in FR/);
         expect(factLine('ES', 'penalty_late_filing', '1% per month', 'up to 15%')).toMatch(/1% per month \(up to 15%\) \[mention only if/);
         expect(factLine('DE', 'standard_rate', '19%')).toBe('- standard rate: 19%');
     });

@@ -108,7 +108,7 @@ export function answerCheck(question: string): string {
 const FACT_LABEL: Record<string, string> = {
     registration_threshold_established: 'VAT registration threshold for businesses ESTABLISHED in {c} (resident businesses only, not for foreign sellers)',
     registration_threshold_nonestablished: 'VAT registration threshold for businesses NOT established in {c} (foreign sellers, including sellers from other EU countries)',
-    distance_selling_threshold: 'Threshold for cross-border B2C distance sales',
+    distance_selling_threshold: 'Distance-selling threshold for sellers established in ANOTHER EU country selling goods to consumers in {c} (EU-wide; OSS = One-Stop Shop)',
 };
 
 export function factLine(country: string, key: string, value: string, notes?: string | null): string {
