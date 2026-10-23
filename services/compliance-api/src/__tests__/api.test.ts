@@ -520,7 +520,7 @@ describe('POST /api/v1/search', () => {
         expect(r.body.providers).toHaveLength(1);
     });
 
-    it('returns enriched laws: focus domains confirmed and sorted first, with statute + severity', async () => {
+    it('returns enriched laws: focus domains sorted first, with statute + severity', async () => {
         seedProvider();
         const r = await api('/api/v1/search', {
             method: 'POST',
@@ -530,16 +530,41 @@ describe('POST /api/v1/search', () => {
         const laws = r.body.laws as any[];
         expect(laws.length).toBeGreaterThan(0);
         const vat = laws.find((l) => l.id === 'tax-vat-registration');
-        expect(vat?.state).toBe('confirmed');
         expect(vat?.severity).toBe('high');
         expect(vat?.source).toContain('UStG');
         // LOGISTICS is a focus domain → its templates must be present…
         expect(laws.some((l) => l.id === 'log-eori')).toBe(true);
-        // …and every focus law sorts before the first score-ranked 'likely' law.
-        const firstLikely = laws.findIndex((l) => l.state === 'likely');
-        if (firstLikely !== -1) {
-            expect(laws.slice(0, firstLikely).every((l) => l.state === 'confirmed')).toBe(true);
-        }
+    });
+
+    // Wizard-Audit F1 (23.10.2026): ein angeklickter Bereich ist Interesse,
+    // kein Beleg. "confirmed" traegt nur eine Angabe; ohne Angaben ist alles offen.
+    it('never confirms an obligation from the category click alone', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], categories: ['product-compliance', 'data-privacy'] } }),
+        });
+        const laws = r.body.laws as any[];
+        expect(laws.length).toBeGreaterThan(0);
+        expect(laws.every((l) => l.state === 'open')).toBe(true);
+        expect(laws.find((l) => l.id === 'prod-epr')?.evidence).toEqual({ supports: [], decides: ['physical_goods', 'consumer_sales', 'packaging_role'] });
+    });
+
+    it('confirms what the answers carry, keeps the rest likely or open', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: {
+                markets: ['DE', 'NL'], categories: ['data-privacy', 'tax-vat', 'product-packaging'],
+                businessType: 'ecommerce', businessTypeNote: 'D2C e-commerce',
+            } }),
+        });
+        const byId = Object.fromEntries((r.body.laws as any[]).map((l) => [l.id, l]));
+        expect(byId['data-privacy']).toMatchObject({ state: 'confirmed', evidence: { supports: ['online_sales', 'consumer_sales', 'eu_market'], decides: [] } });
+        expect(byId['tax-vat-registration']).toMatchObject({ state: 'likely', evidence: { decides: ['establishment'] } });
+        // Verkauf an Verbraucher spricht fuer EPR; ob physische Waren dabei
+        // sind, sagt "D2C e-commerce" aber nicht — also wahrscheinlich, nicht bestaetigt.
+        expect(byId['prod-epr'].state).toBe('likely');
+        // Der EU-Markt allein belegt keine Verpackungspflicht.
+        expect(byId['prod-packaging-conformity'].state).toBe('open');
     });
 
     it('survives an unknown engine country (laws empty, providers still scored)', async () => {

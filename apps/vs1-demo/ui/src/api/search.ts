@@ -112,7 +112,12 @@ export interface SearchLaw {
   /** ISO date (YYYY-MM-DD) the obligation starts to apply; null = already in
    *  force. Drives the "applies in N days" countdown on the risk map. */
   applies_from?: string | null;
-  state?: 'confirmed' | 'likely';
+  /** Seit Wizard-Audit F1 (23.10.2026) beruht die Stufe auf den Antworten:
+   *  'open' = nichts in den Antworten zeigt bisher, dass die Pflicht greift.
+   *  Die Oberflaeche zeigt 'open' bis zum F1-Rollout noch als "Likely". */
+  state?: 'confirmed' | 'likely' | 'open';
+  /** Was die Stufe traegt und was noch entscheidet (Schluessel, keine Texte). */
+  evidence?: { supports: string[]; decides: string[] };
 }
 
 export interface SearchResult {

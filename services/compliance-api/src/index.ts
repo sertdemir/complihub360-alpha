@@ -7,7 +7,7 @@ import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
-import { generateRelevantSubdomains, isKnownCountry, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
+import { generateRelevantSubdomains, factsFromAnswers, isKnownCountry, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
@@ -3391,7 +3391,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const engineCountries = [...new Set([requestData.country || 'DE', ...requestedMarkets])]
                     .filter((c): c is CountryCode => isKnownCountry(String(c)));
                 // Wizard domain slugs → engine domains (focus = user-selected;
-                // always included and marked 'confirmed' in the payload).
+                // always included and sorted first — interest, not proof).
                 const requestedSlugs: string[] = requestData.structured_answers?.domains
                     || requestData.structured_answers?.categories
                     || requestData.domains || [];
@@ -3405,6 +3405,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             industry: requestData.structured_answers?.industry as IndustryType,
                             businessModel: requestData.structured_answers?.businessModel as BusinessModel,
                             focusDomains,
+                            // Ob eine Pflicht gilt, sagen die Antworten, nicht
+                            // der Klick auf den Bereich (Wizard-Audit F1).
+                            facts: factsFromAnswers(requestData.structured_answers),
                         });
                     }
                 } catch (engineErr) {
@@ -3689,7 +3692,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         // adopted but not yet applicable, so the map can show a
                         // countdown instead of claiming the duty is live.
                         applies_from: r.appliesFrom ?? null,
-                        state: r.focus ? 'confirmed' : 'likely',
+                        // Bis 23.10.2026: r.focus ? 'confirmed' : 'likely' —
+                        // ein angeklickter Bereich galt als bestaetigt. Jetzt
+                        // traegt nur eine Angabe "confirmed"; ohne Beleg "open".
+                        state: r.evidence.state,
+                        evidence: { supports: r.evidence.supports, decides: r.evidence.decides },
                     })),
                 }));
             } catch (err) {
