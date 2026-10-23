@@ -2901,13 +2901,20 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         req.on('end', async () => {
             try {
                 const d = JSON.parse(body);
-                if (!d.guest_key && !d.user_id) {
+                // Eigentuemer kommt aus dem verifizierten JWT, nie aus dem Body
+                // (Wizard-Audit F3, 23.10.2026): sonst legt jeder Aufrufer
+                // Sitzungen in fremde Konten, und die Sitzung eines angemeldeten
+                // Nutzers landet mit user_id null ausserhalb seines Kontos.
+                // Nur der Server-Schluessel darf einen Eigentuemer benennen.
+                const ownerId: string | null = authUserId
+                    ?? (authViaApiKey && typeof d.user_id === 'string' && d.user_id ? d.user_id : null);
+                if (!d.guest_key && !ownerId) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'guest_key or user_id required', correlationId }));
                     return;
                 }
                 const inserted = (await supabaseApi.insert('sessions', {
-                    user_id: d.user_id || null,
+                    user_id: ownerId,
                     guest_key: d.guest_key || null,
                     country: d.country || null,
                     markets: d.markets || [],
@@ -2915,7 +2922,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     answers: d.answers || {},
                     risk_summary: d.risk_summary || null,
                 })) as Array<{ id: string }>;
-                await supabaseApi.insert('event_log', { type: 'session_saved', payload: { sessionId: inserted?.[0]?.id, guest: !d.user_id } });
+                await supabaseApi.insert('event_log', { type: 'session_saved', payload: { sessionId: inserted?.[0]?.id, guest: !ownerId } });
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: inserted?.[0]?.id }));
@@ -3725,7 +3732,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/chat') {
         // Chatbot plan phase ②: RAG assistant over knowledge_chunks +
-        // jurisdiction_facts (assistant.ts). 503 until GEMINI_API_KEY is set.
+        // jurisdiction_facts (assistant.ts). 503 until LLM_API_KEY (Scaleway) or, during the transition, GEMINI_API_KEY is set.
         handleAssistantChat(req, res, correlationId, ip, { userId: authUserId, email: authEmail });
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/checkout') {
         // Phase ③: Stripe Checkout for Assistant Pro (12 $/month).

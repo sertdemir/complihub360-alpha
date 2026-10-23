@@ -242,7 +242,7 @@
       },
       "other": {
         "title": "Diğer",
-        "desc": "Tek cümleyle anlatın"
+        "desc": "Bunlardan hiçbiri uymuyor"
       },
       "vatTax": {
         "title": "Vergi ve KDV",
@@ -282,8 +282,7 @@
       }
     },
     "footer": {
-      "next": "İleri",
-      "skipRoute": "Atla ve yönlendir"
+      "next": "İleri"
     },
     "review": {
       "title": "Durumunuz, özetlendi.",
@@ -294,7 +293,8 @@
       "edit": "Düzenle",
       "trust": "Anonim · Risk Map'inizi görmek için hesap gerekmez · ~4 saniyede işlenir"
     },
-    "skipHint": "Emin değil misiniz? Atlayın; iş modelinize ve pazarlarınıza göre yönlendirelim.",
+    "skipHint": "Emin değil misiniz? En uygun olanı seçin — haritanızı oluşturmadan önce her yanıtı değiştirebilirsiniz.",
+    "needsMarket": "Devam etmek için en az bir pazar seçin.",
     "back": "Geri",
     "generate": "Risk Map'imi oluştur",
     "removeMarket": "{{market}} seçimini kaldır",
@@ -549,6 +549,7 @@
     },
     "footNote": "20 saniye sürer · Şifre yok · Kredi kartı yok.",
     "done": "Tamam",
+    "sendFailed": "Bağlantıyı şu anda gönderemedik. Lütfen adresi kontrol edip birazdan tekrar deneyin.",
     "drawerLabel": "İlerlemenizi kaydedin"
   },
   "riskMapPreview": {

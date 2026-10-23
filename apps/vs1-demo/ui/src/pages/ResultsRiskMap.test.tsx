@@ -944,3 +944,43 @@ describe('ResultsRiskMap provider coverage from the coverage data', () => {
     expect(screen.getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['common:states.scope.areas', 'DE', 'NL']);
   });
 });
+
+// ─── Wizard-Audit F4 (23.10.2026): eine geoeffnete Sitzung ist keine neue ─────
+// Bis hierher legte jedes Oeffnen von /results?session=… das zuletzt lokal
+// gespeicherte Profil als NEUE Sitzung an, und fiel das Laden der Sitzung aus,
+// zeigte die Seite unter ihrer Adresse die Ergebnisse dieses fremden Profils.
+describe('ResultsRiskMap · reopening a saved session', () => {
+  const STALE = { country: 'IT', markets: ['IT'], categories: ['marketing-seo'] };
+  beforeEach(() => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify(STALE));
+    vi.mocked(saveWizardSession).mockClear();
+  });
+  afterEach(() => {
+    localStorage.removeItem('ch360_last_profile');
+    fetchSessions.mockReset();
+  });
+
+  it('searches with the session and saves nothing new', async () => {
+    fetchSessions.mockResolvedValue([{
+      id: 's1', country: 'NL', markets: ['NL'], categories: ['data-privacy'], label: 'Netherlands',
+      answers: null, status: 'active', risk_summary: null,
+      created_at: '2026-09-01T00:00:00Z', updated_at: '2026-09-01T00:00:00Z',
+    }]);
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage('/en/results?session=s1');
+
+    await waitFor(() => expect(runSearch).toHaveBeenCalled());
+    expect(runSearch.mock.calls.at(-1)?.[0]).toMatchObject({ country: 'NL', markets: ['NL'] });
+    expect(saveWizardSession).not.toHaveBeenCalled();
+  });
+
+  it('fails openly when the session cannot be loaded — no stale profile in its place', async () => {
+    fetchSessions.mockRejectedValue(new Error('offline'));
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage('/en/results?session=s1');
+
+    expect(await screen.findByText('common:states.riskMapFailed.heading')).toBeInTheDocument();
+    expect(runSearch).not.toHaveBeenCalledWith(expect.objectContaining({ country: 'IT' }));
+    expect(saveWizardSession).not.toHaveBeenCalled();
+  });
+});

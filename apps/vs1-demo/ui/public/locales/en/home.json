@@ -243,7 +243,7 @@
       },
       "other": {
         "title": "Other",
-        "desc": "Tell us in a sentence"
+        "desc": "None of the above fits"
       },
       "vatTax": {
         "title": "Tax & VAT",
@@ -283,8 +283,7 @@
       }
     },
     "footer": {
-      "next": "Next",
-      "skipRoute": "Skip & route"
+      "next": "Next"
     },
     "review": {
       "title": "Your situation, summarized.",
@@ -295,7 +294,8 @@
       "edit": "Edit",
       "trust": "Anonymous · No account required to see your risk map · Processed in ~4 seconds"
     },
-    "skipHint": "Not sure? Skip and we'll route based on your business model and markets.",
+    "skipHint": "Not sure? Choose what fits best — you can change every answer before you create your map.",
+    "needsMarket": "Choose at least one market to continue.",
     "back": "Back",
     "generate": "Create my Risk Map",
     "removeMarket": "Remove {{market}}",
@@ -550,6 +550,7 @@
     },
     "footNote": "Takes 20 seconds · No password · No credit card.",
     "done": "Done",
+    "sendFailed": "We couldn't send the link just now. Please check the address and try again in a moment.",
     "drawerLabel": "Save your progress"
   },
   "riskMapPreview": {

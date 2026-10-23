@@ -29,6 +29,7 @@ import { Logo } from '../ui/Logo';
 import { WizardDrawerLayer, COUNTRY_INFO } from './MarketsDrawer';
 import type { SearchProfile, WizardCategory, BusinessType } from '../wizard/WizardContext';
 import { Badge } from '../ui/Badge';
+import { track } from '../../lib/analytics';
 
 // ─── AnimatedWizard — auto-playing hero key-visual ───────────────────────────
 // A fake cursor moves across the wizard, clicks option cards (they select), then
@@ -44,7 +45,7 @@ export type StepDef = {
   key: 'markets' | 'operations' | 'domains';
   cards: Card[];
   picks: string[]; // ids clicked in order, then the footer
-  footerKey: 'next' | 'skipRoute';
+  footerKey: 'next';
 };
 
 const RAIL = ['markets', 'operations', 'domains', 'review'] as const;
@@ -98,7 +99,9 @@ export const STEPS: StepDef[] = [
       { id: 'Environmental Compliance', key: 'environment', icon: Leaf },
     ],
     picks: ['Tax & VAT', 'EPR & Packaging', 'Data & Privacy'],
-    footerKey: 'skipRoute',
+    // Frueher "Skip & route" — eine Weiche, die es im echten Wizard nicht gibt
+    // (Wizard-Audit B6). Die Demo zeigt jetzt denselben Knopf wie der Wizard.
+    footerKey: 'next',
   },
 ];
 
@@ -110,6 +113,13 @@ const FOOTER = '__footer';
 export const MARKET_CODE: Record<string, string> = {
   Germany: 'DE', 'United Kingdom': 'UK', Netherlands: 'NL', France: 'FR',
   Italy: 'IT', Spain: 'ES', 'United States': 'US', 'Türkiye': 'TR',
+};
+// Die Drawer-Maerkte tragen Namen als ids (i18n-Schluessel); gespeichert und
+// gesucht wird mit ISO-Code. Vorher landeten die Namen im Profil und die Engine
+// verwarf sie still (Wizard-Audit B5).
+const EXTRA_MARKET_CODE: Record<string, string> = {
+  Switzerland: 'CH', Austria: 'AT', Belgium: 'BE', Sweden: 'SE', Denmark: 'DK', Poland: 'PL',
+  Czechia: 'CZ', Romania: 'RO', Norway: 'NO', Ireland: 'IE', Finland: 'FI', Portugal: 'PT',
 };
 const CATEGORY_CODE: Record<string, WizardCategory> = {
   'Tax & VAT': 'tax-vat', 'EPR & Packaging': 'product-packaging', 'Data & Privacy': 'data-privacy',
@@ -127,10 +137,13 @@ const BUSINESS_CODE: Record<string, BusinessType> = {
 export function selectionFromProfile(p: SearchProfile): { selected: Set<string>; extraMarkets: string[] } {
   const sel = new Set<string>();
   const codeToCard = Object.fromEntries(Object.entries(MARKET_CODE).map(([k, v]) => [v, k]));
+  const codeToExtra = Object.fromEntries(Object.entries(EXTRA_MARKET_CODE).map(([k, v]) => [v, k]));
   const extra: string[] = [];
   for (const m of p.markets ?? []) {
     if (codeToCard[m]) sel.add(codeToCard[m]);
-    else { sel.add('Others'); extra.push(m); }
+    // Aeltere Profile tragen noch den Namen statt des Codes — beide fuehren
+    // zurueck auf dieselbe Drawer-Auswahl.
+    else { sel.add('Others'); extra.push(codeToExtra[m] ?? m); }
   }
   const catToCard = Object.fromEntries(Object.entries(CATEGORY_CODE).map(([k, v]) => [v, k]));
   for (const c of p.categories ?? []) if (catToCard[c]) sel.add(catToCard[c]);
@@ -145,7 +158,7 @@ export function selectionFromProfile(p: SearchProfile): { selected: Set<string>;
 export function buildProfile(selected: Set<string>, extraMarkets: string[]): SearchProfile {
   const markets = [
     ...STEPS[0].cards.filter((c) => c.id !== 'Others' && selected.has(c.id)).map((c) => MARKET_CODE[c.id] ?? c.id),
-    ...extraMarkets,
+    ...extraMarkets.map((m) => EXTRA_MARKET_CODE[m] ?? m),
   ];
   const categories = STEPS[2].cards.filter((c) => selected.has(c.id)).map((c) => CATEGORY_CODE[c.id]).filter(Boolean);
   const ops = STEPS[1].cards.find((c) => selected.has(c.id));
@@ -155,13 +168,16 @@ export function buildProfile(selected: Set<string>, extraMarkets: string[]): Sea
     categories,
     businessType: ops ? BUSINESS_CODE[ops.id] ?? 'other' : '',
     businessTypeNote: ops?.id ?? '',
-    marketScope: markets.length > 1 ? 'eu' : markets.length ? 'local' : '',
+    // Nicht mehr abgeleitet: "mehr als ein Markt = EU" machte aus US + TR eine
+    // EU-Reichweite, und kein Verbraucher las das Feld (Wizard-Audit B8).
+    marketScope: '',
     riskSignals: [],
     revenueBand: '',
     intent: '',
     urgency: '',
     note: '',
-    existingProvider: false,
+    // Nicht gefragt heisst unbekannt, nicht "nein" (Wizard-Audit F8).
+    existingProvider: null,
   };
 }
 
@@ -307,20 +323,35 @@ export function AnimatedWizard({
   };
 
   // Interactive handlers (no-ops in auto-play mode).
+  // Operations ist eine Einzelwahl: gespeichert wird genau ein Geschaeftsmodell,
+  // also darf die Oberflaeche auch nur eines annehmen (Wizard-Audit B1).
+  const OPERATION_IDS = new Set(STEPS[1].cards.map((c) => c.id));
   const toggle = (id: string) =>
     setSelected((prev) => {
       const n = new Set(prev);
       if (n.has(id)) n.delete(id);
-      else n.add(id);
+      else {
+        if (OPERATION_IDS.has(id)) for (const o of OPERATION_IDS) n.delete(o);
+        n.add(id);
+      }
       return n;
     });
+  // Ohne Markt keine Auswertung: frueher wurde daraus still eine deutsche
+  // (Wizard-Audit B12). Weiter vom Markt-Schritt und Erstellen brauchen einen.
+  const hasMarket = extraMarkets.length > 0 || STEPS[0].cards.some((c) => c.id !== 'Others' && selected.has(c.id));
+  const needsMarket = interactive && !hasMarket && (stepIndex === 0 || stepIndex >= STEPS.length);
+  const completedRef = useRef(false);
   const goNext = () => {
+    if (needsMarket) return;
     // stepIndex runs 0..STEPS.length-1 (card steps) then STEPS.length (Review).
     if (stepIndex < STEPS.length) {
       setStepIndex(stepIndex + 1);
       setActive(null);
     } else {
-      onComplete?.(buildProfile(selected, extraMarkets));
+      const profile = buildProfile(selected, extraMarkets);
+      completedRef.current = true;
+      track('Wizard Completed', { markets: profile.markets.length, areas: profile.categories.length });
+      onComplete?.(profile);
     }
   };
   const goBack = () => {
@@ -329,6 +360,22 @@ export function AnimatedWizard({
       setActive(null);
     }
   };
+
+  // Messgrundlage (Wizard-Audit B14): Start, jeder Schritt, Abschluss, Abbruch.
+  // Nur Schritt und Anzahlen — keine Antworten, keine Maerkte, keine Bereiche.
+  // Die Demo auf der Startseite zaehlt nicht mit.
+  const stepRef = useRef(stepIndex);
+  stepRef.current = stepIndex;
+  useEffect(() => {
+    if (!interactive) return;
+    track('Wizard Started', { step: RAIL[Math.min(stepRef.current, RAIL.length - 1)] });
+    return () => {
+      if (!completedRef.current) track('Wizard Abandoned', { step: RAIL[Math.min(stepRef.current, RAIL.length - 1)] });
+    };
+  }, [interactive]);
+  useEffect(() => {
+    if (interactive) track('Wizard Step', { step: RAIL[Math.min(stepIndex, RAIL.length - 1)] });
+  }, [interactive, stepIndex]);
 
   // Measure the active target relative to the wizard root → cursor position.
   // Uses layout offsets (not getBoundingClientRect) so it stays correct even when
@@ -454,8 +501,14 @@ export function AnimatedWizard({
 
       {/* Body — flex column so step changes never resize the window. */}
       <div className={'flex flex-1 flex-col overflow-hidden ' + (sp ? 'px-16 pb-8 pt-12' : 'px-7 pb-5 pt-5')}>
-        {/* Compact (hero) keeps the rail in the body; spacious puts it in the header. */}
-        {!sp && <StepRail current={step.rail} spacious={sp} />}
+        {/* Compact (hero) keeps the rail in the body; spacious puts it in the header.
+            Ohne Header (Workspace-Drawer) faellt der Header-Platz weg — dann steht
+            die Leiste im Body, sonst gaebe es keine Fortschrittsanzeige (B15). */}
+        {(!sp || !showHeader) && (
+          <div className={sp ? 'mb-10' : undefined}>
+            <StepRail current={isReview ? STEPS.length : step.rail} spacious={sp} />
+          </div>
+        )}
 
         {/* In spacious mode, content sits in a centered 880px column; the body's
             extra height becomes whitespace above the footer. */}
@@ -603,9 +656,20 @@ export function AnimatedWizard({
           (sp ? 'relative px-16 py-5' : 'px-7 py-3.5')
         }
       >
-        {sp && !isReview && (
+        {sp && !isReview && !needsMarket && (
           <p className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 px-4 text-center text-body-xs text-fg-tertiary lg:block">
             {t('wizard.skipHint')}
+          </p>
+        )}
+        {needsMarket && (
+          <p
+            id="wizard-needs-market"
+            className={
+              'text-center text-fg-secondary ' +
+              (sp ? 'pointer-events-none absolute left-1/2 -translate-x-1/2 px-4 text-body-xs' : 'order-1 mx-3 flex-1 text-body-3xs')
+            }
+          >
+            {t('wizard.needsMarket')}
           </p>
         )}
         {interactive ? (
@@ -624,8 +688,10 @@ export function AnimatedWizard({
             <button
               type="button"
               onClick={goNext}
+              disabled={needsMarket}
+              aria-describedby={needsMarket ? 'wizard-needs-market' : undefined}
               className={
-                'inline-flex items-center gap-1.5 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 ' +
+                'order-2 inline-flex items-center gap-1.5 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40 ' +
                 (sp ? 'px-6 py-3 text-body-md' : 'px-5 py-2.5 text-body-xs') +
                 ' bg-brand text-fg-on-brand'
               }
@@ -688,6 +754,7 @@ export function AnimatedWizard({
           onSelectCountry={(id) => setSelected((prev) => new Set(prev).add(id))}
           saveOpen={saveOpen}
           onSaveClose={() => setSaveOpen(false)}
+          draft={saveOpen ? buildProfile(selected, extraMarkets) : undefined}
         />
       )}
     </div>

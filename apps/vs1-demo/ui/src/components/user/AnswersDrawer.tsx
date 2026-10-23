@@ -54,7 +54,7 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
   const initial = useMemo(() => {
     const full: SearchProfile = {
       country: '', markets: [], categories: [], businessType: '', businessTypeNote: '', marketScope: '',
-      riskSignals: [], revenueBand: '', intent: '', urgency: '', note: '', existingProvider: false,
+      riskSignals: [], revenueBand: '', intent: '', urgency: '', note: '', existingProvider: null,
       ...profile,
     };
     return { full, ...selectionFromProfile(full) };

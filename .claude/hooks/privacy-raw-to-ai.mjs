@@ -27,6 +27,10 @@ const AI_MARKERS = [
   /\bgenerateContent\b/, /\bembedContent\b/, /generativelanguage\.googleapis/, /\bGEMINI_\w+/,
   /@google\/gen(erative-)?ai/, /@anthropic-ai\/sdk/, /api\.anthropic\.com/, /\/v1\/messages\b/,
   /\bopenai\b/i, /chat\/completions/, /api\.mistral\.ai/,
+  // OpenAI-kompatible EU-Anbieter (llm.ts, seit 2026-10-18) und ihr Embedding-Pfad.
+  /\/v1\/embeddings\b/, /api\.scaleway\.ai/, /inference\.[\w-]+\.ionos\.com/, /\bLLM_API_KEY\b/,
+  // Wer llm.ts nutzt, spricht über sie mit dem Anbieter — auch ohne eigenen Endpoint.
+  /\bresolveLlm\b/, /from\s+['"](?:\.{1,2}\/)+llm(?:\.js)?['"]/,
 ];
 
 /** Entfernt Block- und Zeilenkommentare (grob; `https://` bleibt erhalten). */

@@ -334,7 +334,12 @@ export function ResultsRiskMap() {
         // haette dann nur eine Spalte gekannt, und Pflichten der Zielmaerkte
         // fehlten, obwohl der Gast sie fuer dasselbe Profil sieht.
         if (s) { session = s; query = { country: s.country ?? 'DE', markets: s.markets ?? [], categories: s.categories as SearchProfile['categories'] }; }
-      } catch { /* fall back to the local profile */ }
+      } catch { /* handled below */ }
+      // Keine Sitzung geladen → Fehlerzustand, nicht das zuletzt lokal
+      // gespeicherte Profil. Das gehoerte zu einer anderen Auswertung und
+      // haette unter der Adresse dieser Sitzung fremde Ergebnisse gezeigt
+      // (Wizard-Audit F4).
+      if (!session) throw new Error('session unavailable');
     }
     const res = await runSearch(query);
     // Engine nicht gerechnet → riskMapFailed mit Referenz, nicht "keine
@@ -391,7 +396,10 @@ export function ResultsRiskMap() {
   const savedRef = useRef(false);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
   useEffect(() => {
-    if (!profile || savedRef.current) return;
+    // Eine geoeffnete Sitzung ist schon gespeichert. Ohne diese Sperre legte
+    // jedes Oeffnen aus dem Workspace das alte lokale Profil als neue Sitzung
+    // an (Wizard-Audit F4).
+    if (!profile || savedRef.current || sessionId) return;
     savedRef.current = true;
     localStorage.setItem('ch360_last_profile', JSON.stringify(profile));
     setSaveState('saving');
@@ -402,7 +410,7 @@ export function ResultsRiskMap() {
   }, []);
   // Antworten gelten als gespeichert, wenn das Speichern bestaetigt ist oder
   // die Suche aus einer gespeicherten Sitzung kommt.
-  const answersSaved = saveState === 'saved' || (!!sessionId && !profile);
+  const answersSaved = saveState === 'saved' || !!sessionId;
   const delayed = pageState === 'loading' && slow && answersSaved;
 
   // marketUnavailable (Canvas D3 · E3 · F3, Figma 3470:2011/2129/2221): die

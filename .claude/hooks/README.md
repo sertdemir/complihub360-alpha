@@ -10,7 +10,7 @@ zugeschnitten.
 |---|---|---|
 | `block-no-verify.mjs` | vor jedem Bash-Aufruf | **sperrt** `--no-verify`, `git commit -n` und umgebogenes `core.hooksPath` bei commit/push/merge/cherry-pick/rebase/am |
 | `config-protection.mjs` | vor Edit/Write | **fragt den Menschen**, bevor eine bestehende Lint-/Format-Config, die Hook-Konfiguration, `.agents/rules/`, die DNA (`KN-BRAND-001`), `.knowledge/vault/` oder ein `scripts/check-*.mjs` geändert wird |
-| `privacy-raw-to-ai.mjs` | vor Edit/Write | **sperrt** Edits, die Raw-Ref (`raw://`, `rawVault` …) und AI-Endpoint (Gemini, Anthropic, OpenAI …) neu in einer Code-Datei zusammenführen — [privacy-no-raw-to-ai](../../.agents/rules/privacy-no-raw-to-ai.md) |
+| `privacy-raw-to-ai.mjs` | vor Edit/Write | **sperrt** Edits, die Raw-Ref (`raw://`, `rawVault` …) und AI-Endpoint (Gemini, Anthropic, OpenAI, OpenAI-kompatible wie Scaleway und IONOS …) neu in einer Code-Datei zusammenführen — [privacy-no-raw-to-ai](../../.agents/rules/privacy-no-raw-to-ai.md) |
 | `ui-typecheck.mjs` | nach Edit/Write unter `apps/vs1-demo/ui/src/` | meldet UI-Typfehler sofort an Claude zurück (`npm run typecheck` deckt die UI nicht ab) |
 
 ## Grenzen
