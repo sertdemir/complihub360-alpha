@@ -2,14 +2,18 @@ import { ComplianceDomain, DomainTemplateLibrary, ObligationSeverity, severityFr
 import { CountryCode, CountryRiskProfile, getCountryRiskProfile } from './country-profile.js';
 import { calculateBusinessModifier, IndustryType, BusinessModel } from './business-modifier.js';
 import { resolveEnrichment, resolveEnrichmentKey, type PenaltyCeiling } from './obligation-enrichment.js';
+import { evaluateEvidence, type Evidence, type Facts } from './evidence.js';
 
 export interface GeneratorContext {
     countries: CountryCode[];
     industry?: IndustryType;
     businessModel?: BusinessModel;
     /** Domains the user explicitly selected (wizard step 3). Always included
-     *  on top of the score-ranked selection; laws from them are 'confirmed'. */
+     *  on top of the score-ranked selection and sorted first — selection is
+     *  interest, not proof: whether a duty applies comes from `facts`. */
     focusDomains?: ComplianceDomain[];
+    /** What the answers say about the business (evidence.ts, Wizard-Audit F1). */
+    facts?: Facts;
 }
 
 export interface EnrichedSubdomain {
@@ -23,6 +27,8 @@ export interface EnrichedSubdomain {
     markets: CountryCode[];
     /** true when the user explicitly picked this domain in the wizard. */
     focus: boolean;
+    /** Whether the answers carry this duty — confirmed, likely or open. */
+    evidence: Evidence;
     source?: string;
     penalty?: string;
     /** How the entry stands to national law, set only where it came from the
@@ -157,6 +163,7 @@ export function generateRelevantSubdomains(context: GeneratorContext): EnrichedS
                 riskWeight: template.riskWeight,
                 markets: enrichment?.scope === 'eu' ? [] : context.countries,
                 focus: focus.has(domain),
+                evidence: evaluateEvidence(template.id, context.facts ?? {}),
                 source: scope === 'placeholder' ? undefined : enrichment?.source,
                 scope,
                 penalty: enrichment?.penalty,
