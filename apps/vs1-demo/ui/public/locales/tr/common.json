@@ -11,51 +11,7 @@
     "signOut": "Çıkış yap"
   },
   "hero": {
-    "scenarios": {
-      "shortcut": {
-        "seg1": "Küresel Pazarlara Giden ",
-        "seg2": "Uyumluluk Kısayolunuz",
-        "seg3": "",
-        "text": "Mevzuat boşluklarını anında belirleyin ve sorunsuz uygulama için doğrulanmış yerel uzmanlarla eşleşin.",
-        "cta": "Uyumluluk kısayolumu bul",
-        "usp1": "Anında boşluk analizi",
-        "usp2": "Doğrulanmış yerel uzmanlar",
-        "usp3": "Hızlı uygulama"
-      },
-      "actionPlan": {
-        "seg1": "Mevzuat Riskinden ",
-        "seg2": "Eylem Planına",
-        "seg3": " Birkaç Dakikada",
-        "text": "Yerel parçalanmayı net bir yol haritasına dönüştürün. Daha hızlı anlamanıza ve daha güvenli karar vermenize yardımcı oluyoruz.",
-        "cta": "Hemen eylem planımı oluştur",
-        "usp1": "Daha hızlı anla",
-        "usp2": "Daha güvenli karar ver",
-        "usp3": "Net yol haritası"
-      },
-      "experts": {
-        "seg1": "Yerel Uyumluluk Uzmanlarına ",
-        "seg2": "Ulaşmanın En Hızlı Yolu",
-        "cta": "Şimdi bir uzmanla bağlan",
-        "usp1": "Anında eşleştirme",
-        "usp2": "Ön elemeye tabi tutulmuş uzmanlar",
-        "usp3": "Özel değerlendirme"
-      }
-    },
-    "companies": "Yenilikçi şirketler tarafından güveniliyor",
-    "scroll": "Platformu Keşfet",
-    "funnel": {
-      "countryLabel": "Hedef Pazar",
-      "countryUk": "Birleşik Krallık",
-      "countryEu": "Avrupa Birliği",
-      "countryGlobal": "Küresel / Diğer",
-      "categoryLabel": "Uyumluluk Kategorisi",
-      "catTaxVat": "Vergi ve KDV",
-      "catEpr": "EPR Ambalaj",
-      "catPrivacy": "Veri Gizliliği",
-      "catMarketing": "Pazarlama Uyumu",
-      "catCorporate": "Kurumsal Kurulum",
-      "cta": "Şimdi nitele"
-    }
+    "scroll": "Platformu Keşfet"
   },
   "components": {
     "engagementModal": {
@@ -81,10 +37,10 @@
       "body": "Kurucuların akademik hukuki açıklamalara değil, hıza ve netliğe ihtiyacı vardır. CompliHub360, mevzuat karmaşıklığını uygulayabileceğiniz kararlara dönüştürür: işletmeniz için neyin geçerli olduğu, bunun neden önemli olduğu ve kimin yardımcı olabileceği. Sınır ötesi büyüme bu kararlardan biridir, tek karar değil.",
       "cta": "Uyum Kontrolünü Başlatın",
       "pain1Title": "Sınır ötesi kör nokta",
-      "pain1Desc": "Uluslararası genişliyor musunuz? KDV eşikleri, EPR ambalaj yasaları ve GDPR ülkeye göre farklılık gösterir. Kaçırılan bir kayıt para cezası anlamına gelebilir.",
-      "pain2Title": "Güvenilmez uzman tuzağı",
-      "pain2Desc": "Uyumluluk sağlayıcılarına soğuk e-posta göndermek ve haftalarca belirsiz yanıtlar beklemek bir strateji değildir. Bu bir sorumluluktur.",
-      "pain3Title": "Biz bunu çözüyoruz",
+      "pain1Desc": "Uluslararası büyüyor musunuz? KDV eşikleri, EPR ambalaj kuralları ve GDPR ülkeye göre farklıdır ve her kaydın kendi tetikleyicisi vardır. Harita hangilerinin sizin için geçerli olduğunu gösterir.",
+      "pain2Title": "Doğru uzmana giden uzun yol",
+      "pain2Desc": "Sağlayıcılara soğuk e-posta gönderip haftalarca yanıt beklemek, belki de sahip olmadığınız zamanı alır. Bağlamınızı içeren yapılandırılmış bir talep 48 saat içinde özlü bir yanıt alır.",
+      "pain3Title": "CompliHub360 bunun yerine ne yapar",
       "diagramTitle": "Bağlamdan doğru uzmana",
       "node1Label": "Ülke Kapısı",
       "node1Desc": "Hedef pazar seçin",
@@ -97,7 +53,6 @@
       "stat1Label": "Risk profili için adımlar",
       "stat2Label": "Maks. onay süresi",
       "stat3Label": "Maks. yanıt penceresi",
-      "stat4Label": "Mevzuat sürprizleri",
       "railSub": "Mütalaa yerine hız ve netlik"
     },
     "operations": {
@@ -106,7 +61,7 @@
       "body": "Operasyon yöneticileri ve ajans operatörleri, dağınık devlet sitelerine ve kaotik e-posta zincirlerine değil, yapılandırılmış bilgiye ve birleşik bir sisteme ihtiyaç duyar. CompliHub360 size sınır ötesi uyumluluk için tek bir kontrol merkezi sunar.",
       "card1Title": "Dağınık araştırma",
       "card1Problem": "Reklam kısıtlamaları, EPR ve vergi mevzuatına ilişkin bilgiler, yapılandırılmamış devlet siteleri genelinde dağınıktır.",
-      "card1Solution": "Bilgi Merkezimiz, kaynağa dayalı yasaları, öğreticileri ve rehberleri bir araya getirir — hepsi tam arama profilinize göre uyarlanmıştır.",
+      "card1Solution": "Pazarlar ve Uyumluluk Alanları sayfaları, kontrol ettiğimiz yükümlülükleri her biri kendi yasasıyla içerir. Rehberler ve öğreticiler okunmaya değer olduklarında gelecek.",
       "card2Title": "Süreklilik kaybı",
       "card2Problem": "Sağlayıcı taleplerini, kaydedilmiş oturumları ve hukuki güncellemeleri birleşik bir sistem olmadan takip etmek kaotiktir.",
       "card2Solution": "Kontrol Paneli Merkezi, oturumları kaydetmenizi, engagement durumlarını gerçek zamanlı takip etmenizi ve görevleri izlemenizi sağlar.",
@@ -133,12 +88,12 @@
     "counsel": {
       "overline": "Kurum İçi Hukuk Danışmanları için",
       "title": "Savunulabilir zeka. Güvenli orkestrasyon.",
-      "body": "Hukuk profesyonelleri katı veri gizliliği ve sıfır yapay zeka halüsinasyonu talep eder. CompliHub360, hukuki araştırmayı hızlandıran ve harici görevleri güvenli şekilde yapılandıran güvenli, AB Yapay Zeka Yasası'na hazır bir altyapı katmanıdır.",
+      "body": "Hukuk profesyonelleri katı veri gizliliğine ve izlenebilir çıktılara ihtiyaç duyar. CompliHub360, AB Yapay Zeka Yasası göz önünde bulundurularak oluşturulmuş gizlilik odaklı bir katmandır: araştırmayı ve harici görevleri yapılandırır ve her ifade kaynağını taşır.",
       "cta": "Güvenli Araştırmayı Deneyin",
-      "benefit1Title": "Sıfır halüsinasyon",
-      "benefit1Desc": "Her özet, risk etiketi ve ipucu, resmi, doğrulanmış hukuki kaynaklara ve otoritelere bağlantılarla doğrudan desteklenmektedir. Uydurulmuş iddia yoktur.",
+      "benefit1Title": "Kaynağa bağlı çıktı",
+      "benefit1Desc": "Her özet, risk etiketi ve ipucu dayandığı resmi kaynağa bağlanır. Kaynağımız olmayan yerde boşluğu doldurmak yerine bunu söyleriz.",
       "benefit2Title": "Gizlilik öncelikli mimari",
-      "benefit2Desc": "Belgeler yerel bir PII Düzeltme Hattı'ndan geçer. İsimler, e-postalar ve telefon numaraları herhangi bir yapay zeka işleminden önce maskelenir.",
+      "benefit2Desc": "Belgeler yerel bir düzeltme hattından geçer. E-posta adresleri, telefon numaraları ve bilinen tanımlayıcı kalıpları, herhangi bir yapay zeka işleminden önce maskelenir. Kalıp kuralları her ismi yakalamaz — Trust Center neyi kapsadıklarını söyler.",
       "benefit3Title": "Yapılandırılmış engagement dosyaları",
       "benefit3Desc": "Belirsiz e-postaları, doğrulanmış yerel danışmanlara gönderilen yapılandırılmış uyumluluk dosyalarıyla değiştirin — görevlendirme sürecini hızlandırın.",
       "privacyGateTitle": "Gizlilik Öncelikli Yapay Zeka Kapısı",
@@ -152,7 +107,7 @@
       "stage4Desc": "Kaynağa dayalı özet",
       "codeCommentBefore": "// Düzeltmeden önce",
       "codeCommentAfter": "// Düzeltmeden sonra",
-      "stat1Label": "Yapay zekadan önce maskelenen PII",
+      "stat1Label": "Girdiler redaksiyon kapısından geçer",
       "stat2Label": "Kaynağa bağlı çıktılar",
       "railSub": "Kaynaklı ifadeler, maskelenmiş veriler"
     },
@@ -307,7 +262,7 @@
     "startAssessment": "{{title}} Değerlendirmesini Başlatın",
     "riskPanel": {
       "eyebrow": "Motor tarafından ağırlıklandırıldı",
-      "title": "Önce nerede yanıyor — pazarınız için hesaplanmış.",
+      "title": "Önce neyin dikkat gerektirdiği — pazarınız için ağırlıklandırılmış.",
       "lead": "Uyum motoru her alanı yasal dayanaklar, ceza aralıkları ve sürelerden ağırlıklandırır. Sıralama önce neyin dikkat gerektirdiğini gösterir; karşılaştırma görünümü risk, harekete geçme süresi ve tipik maruziyeti yan yana koyar.",
       "marketNote": "{{market}} için ağırlıklandırıldı — üstteki pazar seçici sıralamayı ve aralıkları yeniden hesaplar.",
       "tabRanking": "Risk sıralaması",
@@ -336,11 +291,11 @@
       "title": "Tüm alanlar bir bakışta",
       "body": "Araştırmacılar ve karar vericiler için hızlı karşılaştırma. Önceliklendirmek için riske göre sıralayın.",
       "area": "Uyumluluk Alanı",
-      "disclaimer": "Kamuya açık düzenleyici kaynaklara dayanan gösterge niteliğinde aralıklar. Nihai risk, özel durumunuza bağlıdır — kesin yönlendirme için değerlendirmeyi asistan üzerinden yapın.",
+      "disclaimer": "Kamuya açık düzenleyici kaynaklara dayanan gösterge niteliğinde aralıklar. Nihai risk, özel durumunuza bağlıdır — değerlendirme bunu sizin durumunuza daraltır.",
       "col": {
         "risk": "Risk",
         "time": "Harekete Geçme Süresi",
-        "fine": "Tipik Risk Tutarı",
+        "fine": "Azami ceza",
         "markets": "Aktif Pazarlar",
         "proven": "belgelenmiş"
       },
@@ -350,7 +305,7 @@
     "howItWorks": {
       "overline": "Orkestrasyon, dizin değil",
       "title": "Belirsizlikten yapılandırılmış eyleme — dört adımda",
-      "body": "CompliHub360 etkileşim hunisini yönetir ve yanıt hesap verebilirliğini güvence altına alır. Kontrol baştan sona sizde kalır.",
+      "body": "CompliHub360 talebinizi yapılandırır ve sağlayıcıları yanıt sürelerine bağlı tutar. Kontrol baştan sona sizde kalır.",
       "stepLabel": "Adım {{num}}",
       "define": {
         "title": "Tanımlayın",
@@ -380,7 +335,7 @@
       "openCta": "Aç",
       "library": {
         "title": "Uyumluluk Kütüphanesi",
-        "body": "Her alan için derlenmiş düzenlemeler, resmi kaynaklar ve yapılandırılmış rehberler."
+        "body": "Her alanın arkasındaki düzenlemeler ve resmi kaynaklar."
       },
       "countries": {
         "title": "Ülke Rehberleri",
@@ -388,7 +343,7 @@
       },
       "tutorials": {
         "title": "Eğitimler ve Uygulamalı Rehberler",
-        "body": "Yaygın uyumluluk senaryoları için adım adım kılavuzlar."
+        "body": "Adım adım kılavuzlar — yazıldıkça eklenir."
       }
     },
     "meta": {
@@ -439,7 +394,7 @@
       "personaFit": "En uygun: Üreticiler ve satıcılar",
       "cov1": "EPR ve Ambalaj Asistanı — ticari rolü, hedef pazarları, ürün kategorilerini değerlendirir",
       "cov2": "Pazar başına üretici sorumluluğu – EPR yükümlüsü olma olasılığınızı hesaplar",
-      "cov3": "Sınır durumlarında güvenlik mantığı – şüphede yükümlülük varsayılır, göz ardı edilmez",
+      "cov3": "Sınır durumları göz ardı edilmez, açık olarak işaretlenir — bir yükümlülüğün nerede olası olduğunu ve nerede doğrulanması gerektiğini görürsünüz",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
       },
@@ -550,7 +505,7 @@
       "personaFit": "En uygun: Uluslararası büyüme ekipleri",
       "cov1": "Şirket Kuruluşu ve Bildirimler Asistanı — mevcut durumu, istenen pazarları, ekip karmaşıklığını değerlendirir",
       "cov2": "Pazar başına şirket ihtiyacı – kurulumunuzun kendi şirketini gerektirip gerektirmediğini belirler",
-      "cov3": "Belirsiz kurucular için eğitim rehberi yollarına akıllı yönlendirme",
+      "cov3": "Yapı sorusu hâlâ açıkken açıklayıcı sayfalara yönlendirir",
       "fines": {
         "authorities": "Yerel ticaret sicilleri · Vergi otoriteleri · AML denetçileri"
       },
@@ -1130,7 +1085,7 @@
     },
     "cta": {
       "title": "Ya da kendi durumunuzla başlayın.",
-      "lead": "Altı dakika, dört soru, hesap gerekmiyor."
+      "lead": "Dört soru, yaklaşık beş dakika, hesap gerekmez."
     }
   },
   "aiGov": {
@@ -1142,7 +1097,7 @@
     "dimOrgTitle": "Kurumsal Hesap Verebilirlik",
     "dimOrgDesc": "Yapay zeka özelliklerini kimin devreye alabileceğini, erişebileceğini ve denetleyebileceğini net yönetişim hatları belirler. Tüm yapay zeka etkileşimleri için kapsamlı denetim günlükleri (audit logs) tutuyoruz.",
     "dimTechTitle": "Teknik Sağlamlık",
-    "dimTechDesc": "Altyapımız sıfır kesinti süresi ve dayanıklı yedekler sağlar. Özel Gizlilik Kapıları, herhangi bir LLM'ye ulaşmadan önce tüm girdileri temizler.",
+    "dimTechDesc": "Altyapımız dayanıklılık için tasarlandı: bir yapay zeka adımı başarısız olursa akış deterministik bir sürece geri döner. Özel Gizlilik Kapıları, herhangi bir LLM'ye ulaşmadan önce her girdiyi temizler.",
     "dimRegTitle": "Mevzuat Uyumluluğu",
     "dimRegDesc": "AB Yapay Zeka Yasası (EU AI Act) ve ISO 42001 için oluşturulmuştur. Küresel standartları doğrudan kodumuza haritalıyor, sıkı AB ve Birleşik Krallık kurallarını önceliklendiriyoruz.",
     "dimRiskTitle": "Risk Yönetimi",
@@ -1374,7 +1329,7 @@
     },
     "cta": {
       "title": "Nereden mantıklıysa oradan başlayın.",
-      "lead": "Altı dakika, dört soru, hesap gerekmez."
+      "lead": "Dört soru, yaklaşık beş dakika, hesap gerekmez."
     },
     "seeAll": "Her adımın nasıl işlediğini görün"
   },
@@ -1595,7 +1550,7 @@
     },
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
-      "lead": "Altı dakika, dört soru, hesap gerekmiyor."
+      "lead": "Dört soru, yaklaşık beş dakika, hesap gerekmez."
     },
     "vignette": {
       "confirmed": "Randevu onaylandı",
@@ -1762,7 +1717,7 @@
       "description": "{{country}} ülkesinde hangi uyum yükümlülüklerinin geçerli olduğu, alanların nasıl ağırlıklandırıldığı ve hukuki kaynağı."
     },
     "complianceArea": {
-      "title": "{{area}} — Yükümlülükler ve cezalar | CompliHub360",
+      "title": "{{area}} — Yükümlülükler ve kaynaklar | CompliHub360",
       "description": "Her {{area}} yükümlülüğü; dayandığı mevzuat, ceza riski ve pazara göre süreler. Doğrulanmış uzmanlarla eşleştirilir."
     }
   },
@@ -1861,7 +1816,7 @@
       "sales": {
         "short": "Fiyatlar",
         "title": "Fiyatlar ve planlar",
-        "desc": "Hangi plan uyar, bir ekip ne tutar, faturalama nasıl işler.",
+        "desc": "Sağlayıcılar için: hangi plan uyar, ne tutar, faturalama nasıl işler. İşletmeler için platform ücretsiz kalır.",
         "sla": "Ertesi iş günü yanıt"
       },
       "partner": {

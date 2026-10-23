@@ -1,60 +1,71 @@
 import { apiFetch } from './client';
 
 // ─── Admin API ────────────────────────────────────────────────────────────────
-// GET /api/v1/admin/stats → one aggregated read for the Control Center
-// (engagements funnel + SLA watchlist + privacy pipeline + audit feed).
+// GET /api/v1/admin/stats → one aggregated read for the Control Center.
+// Seit 20.10.2026 aus Buchungen (`scheduling`), Audit-Log und Nachweisen —
+// vorher aus Tabellen, in die nichts mehr schreibt (Rechnung und Begruendung:
+// services/compliance-api/src/adminStats.ts). Quoten ohne Grundlage sind null.
+
+export type AdminWatchFlag = 'dispute' | 'reminder_missing' | 'soon' | 'upcoming';
 
 export interface AdminWatchRow {
   id: string;
   provider_key: string;
-  country: string;
-  category: string;
-  status: string;
-  deadline?: string;
-  msLeft: number | null;
+  slot_start: string;
+  flag: AdminWatchFlag;
+  msUntil: number;
 }
 
 export interface AdminEventRow {
   type: string;
   payload?: Record<string, unknown>;
-  created_at?: string;
+  created_at?: string | null;
 }
 
 export interface AdminSeries {
   /** 7 day labels, oldest → newest, "DD.MM". */
   dates: string[];
-  requests: number[];
-  confirmRate: number[];
-  breaches: number[];
-  uploads: number[];
-  pii: number[];
-  consent: number[];
-  aiBlocks: number[];
+  bookings: number[];
+  cancelled: number[];
+  noShows: number[];
+  aiRequests: number[];
+  aiRedacted: number[];
+  reveals: number[];
 }
 
+export type AdminSource = 'scheduling' | 'event_log' | 'provider_evidence';
+
 export interface AdminStats {
-  stats: {
-    requestsToday: number;
-    requestsTotal: number;
-    confirmRate: number | null;
-    replyRate: number | null;
-    avgConfirmMs: number | null;
-    breaches: number;
+  generatedAt: string;
+  /** Quellen, deren Lesegrenze erreicht ist — Zahlen daraus sind eine Untergrenze. */
+  truncated: AdminSource[];
+  bookings: {
+    today: number;
+    last7: number;
+    total: number;
+    upcoming7: number;
+    cancelled7: number;
+    noShows7: number;
+    disputesOpen: number;
+    unreported: number;
+    heldRate: number | null;
+    /** Anteil mit Audit-Spur der Offenlegung (lead.revealed / booking_rebooked). */
+    disclosureAuditedRate: number | null;
+    reminderRate: number | null;
   };
   watchlist: AdminWatchRow[];
   privacy: {
-    uploads: number;
-    piiRedacted: number;
-    consentRate: number | null;
-    aiBlocks: number;
+    aiRequests7: number;
+    aiRedacted7: number;
+    reveals7: number;
+    evidenceStored: number;
+    evidenceToReview: number;
+    /** Upload-Pipeline fuer Kundendokumente ist nicht live — immer null. */
+    customerUploads: null;
   };
-  security: {
-    invalidTokenBlocks: number;
-    aiGateBlocks: number;
-  };
+  security: { rateLimitPerMinute: number; accessEvents7: number; errorEvents7: number };
   events: AdminEventRow[];
-  /** 7-day trend series for the metric charts (absent on older API builds). */
-  series?: AdminSeries;
+  series: AdminSeries;
 }
 
 export async function fetchAdminStats(): Promise<AdminStats> {

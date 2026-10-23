@@ -1,6 +1,6 @@
 {
   "topbar": {
-    "guestBadge": "Mapa de invitado · caduca en 30 min",
+    "guestBadge": "Mapa de invitado · se conserva 30 min — guárdelo para conservarlo",
     "backHome": "Volver al inicio",
     "saveMap": "Guardar este mapa"
   },
@@ -58,14 +58,14 @@
     "eyebrow_other": "{{count}} Verified Providers encontrados",
     "title": "Hemos encontrado quién puede actuar sobre esto.",
     "none": "Aún no hay proveedor con cobertura en esta área.",
-    "unlocked": "Coincidencias desbloqueadas",
+    "unlocked": "Coincidencias guardadas",
     "unlockCta": "Vea sus mejores coincidencias con una cuenta gratuita",
     "match": "{{pct}} de coincidencia",
     "requestQuote": "Solicitar presupuesto"
   },
   "cta": {
-    "title": "Guarde este mapa. Desbloquee los proveedores.",
-    "body": "Cuenta gratuita. Sin tarjeta de crédito. Acceso de miembro fundador hasta el lanzamiento de la Beta.",
+    "title": "Guarde este mapa. Conserve sus coincidencias.",
+    "body": "Cuenta gratuita. Sin tarjeta de crédito. Su mapa y sus coincidencias quedan guardados.",
     "button": "Crear cuenta gratuita"
   },
   "quote": {
@@ -187,7 +187,7 @@
     "pickSlot": "Elija una hora a la izquierda.",
     "revealNote": "Tras la reserva se muestran el nombre y el contacto del proveedor, con la invitación de calendario.",
     "messagePh": "Brevemente, de qué se trata (opcional) …",
-    "confirmCta": "Reservar en firme",
+    "confirmCta": "Confirmar reserva",
     "freeNote": "Gratuito y sin compromiso · cancelable en cualquier momento",
     "doneEyebrow": "RESERVADO",
     "doneTitle": "Su cita está confirmada.",
@@ -294,7 +294,7 @@
     "kpiOpenSub_one": "{{count}} obligación espera su respuesta",
     "kpiOpenSub_other": "{{count}} obligaciones esperan sus respuestas",
     "group": {
-      "now": "Actuar ahora",
+      "now": "Vence ahora",
       "month": "Este mes",
       "open": "Primero aclarar",
       "later": "Más adelante"

@@ -11,52 +11,7 @@
     "signOut": "Sign out"
   },
   "hero": {
-    "scenarios": {
-      "shortcut": {
-        "seg1": "Your Compliance ",
-        "seg2": "Shortcut",
-        "seg3": " to Global Markets",
-        "text": "Identify regulatory gaps instantly and match with vetted local experts for seamless execution.",
-        "cta": "Find my compliance shortcut",
-        "usp1": "Instant gap analysis",
-        "usp2": "Vetted local experts",
-        "usp3": "Fast execution"
-      },
-      "actionPlan": {
-        "seg1": "From Regulatory Risk to ",
-        "seg2": "Action Plan",
-        "seg3": " in Minutes",
-        "text": "Translate local fragmentation into a clear roadmap. We help you understand faster and decide safer.",
-        "cta": "Build my action plan now",
-        "usp1": "Understand faster",
-        "usp2": "Decide safer",
-        "usp3": "Clear roadmap"
-      },
-      "experts": {
-        "seg1": "The Fastest Way to ",
-        "seg2": "Local Compliance Experts",
-        "text": "Stop guessing. Get your assessment and see the Verified Providers who fit your case.",
-        "cta": "Connect with an expert now",
-        "usp1": "Match instantly",
-        "usp2": "Pre-qualified experts",
-        "usp3": "Custom assessment"
-      }
-    },
-    "companies": "Trusted by innovative companies",
-    "scroll": "Explore Platform",
-    "funnel": {
-      "countryLabel": "Target Market",
-      "countryUk": "United Kingdom",
-      "countryEu": "European Union",
-      "countryGlobal": "Global / Other",
-      "categoryLabel": "Compliance Category",
-      "catTaxVat": "Tax & VAT",
-      "catEpr": "EPR Packaging",
-      "catPrivacy": "Data Privacy",
-      "catMarketing": "Marketing Compliance",
-      "catCorporate": "Corporate Setup",
-      "cta": "Qualify now"
-    }
+    "scroll": "Explore Platform"
   },
   "components": {
     "engagementModal": {
@@ -82,10 +37,10 @@
       "body": "Founders need speed and clarity — not academic legal explanations. CompliHub360 turns regulatory complexity into decisions you can act on: what applies to your business, why it matters, and who can help. Expanding across borders is one of those decisions, not the only one.",
       "cta": "Start Your Compliance Check",
       "pain1Title": "The Cross-Border Blind Spot",
-      "pain1Desc": "Expanding internationally? VAT thresholds, EPR packaging laws, and GDPR differ by country. One missed registration can mean fines.",
-      "pain2Title": "The Unreliable Expert Trap",
-      "pain2Desc": "Cold-emailing compliance providers and waiting weeks for vague replies is not a strategy. It's a liability.",
-      "pain3Title": "We Fix This",
+      "pain1Desc": "Expanding internationally? VAT thresholds, EPR packaging rules and GDPR differ by country — and each registration has its own trigger. The map shows which ones apply to you.",
+      "pain2Title": "The long way to the right specialist",
+      "pain2Desc": "Cold-emailing providers and waiting weeks for a reply costs time you may not have. A structured request with your context gets a substantive answer within 48 hours.",
+      "pain3Title": "What CompliHub360 does instead",
       "pain3Desc": "The assessment captures your context in four steps, maps the risks that apply in your markets, and connects you with Verified Providers who confirm within 24 hours and reply within 48.",
       "diagramTitle": "From context to the right specialist",
       "node1Label": "Country Gate",
@@ -99,7 +54,6 @@
       "stat1Label": "Steps to risk profile",
       "stat2Label": "Max confirmation time",
       "stat3Label": "Max reply window",
-      "stat4Label": "Regulatory surprises",
       "railSub": "Speed and clarity instead of legal opinions"
     },
     "operations": {
@@ -108,7 +62,7 @@
       "body": "Operations managers and agency operators need structured knowledge and a unified system — not scattered government sites and chaotic email threads. CompliHub360 gives you a single control center for cross-border compliance.",
       "card1Title": "Scattered Research",
       "card1Problem": "Information on advertising restrictions, EPR, and tax laws is fragmented across unstructured government sites.",
-      "card1Solution": "Our Knowledge Hub aggregates source-backed laws, tutorials, and guides — all tailored to your exact search profile.",
+      "card1Solution": "The Markets and Compliance Areas pages hold the duties we check against, each with its statute. Guides and tutorials follow once they are worth reading.",
       "card2Title": "Loss of Continuity",
       "card2Problem": "Tracking provider requests, saved risk maps, and legal updates is chaotic without a unified system.",
       "card2Solution": "The Dashboard Control Center lets you save risk maps, track engagement statuses in real-time, and monitor tasks.",
@@ -135,12 +89,12 @@
     "counsel": {
       "overline": "For In-House Counsel",
       "title": "Defensible Intelligence. Secure Orchestration.",
-      "body": "Legal professionals demand strict data privacy and zero AI hallucinations. CompliHub360 is a secure, EU-AI-Act ready infrastructure layer that accelerates legal research and safely structures external mandates.",
+      "body": "Legal professionals need strict data privacy and output they can trace. CompliHub360 is a privacy-first layer built with the EU AI Act in view: it structures research and external mandates, and every statement carries its source.",
       "cta": "Try Secure Research",
-      "benefit1Title": "Zero Hallucinations",
-      "benefit1Desc": "Every summary, risk label, and tip is directly backed by links to official, validated legal sources and authorities. No invented claims.",
+      "benefit1Title": "Source-bound output",
+      "benefit1Desc": "Every summary, risk label and tip links to the official source it rests on. Where we hold no source, we say so instead of filling the gap.",
       "benefit2Title": "Privacy-First Architecture",
-      "benefit2Desc": "Documents pass through a local PII Redaction Pipeline. Names, emails, and phone numbers are masked before any AI processing.",
+      "benefit2Desc": "Documents pass through a local redaction pipeline. E-mail addresses, phone numbers and known identifier patterns are masked before any AI processing. Pattern rules do not catch every name — the Trust Center says what they cover.",
       "benefit3Title": "Structured Engagement Dossiers",
       "benefit3Desc": "Replace vague emails with structured compliance dossiers sent to verified local counsel — accelerating the mandate process.",
       "privacyGateTitle": "The Privacy-First AI Gate",
@@ -154,7 +108,7 @@
       "stage4Desc": "Source-backed summary",
       "codeCommentBefore": "// Before redaction",
       "codeCommentAfter": "// After redaction",
-      "stat1Label": "PII masked before AI",
+      "stat1Label": "Inputs pass the redaction gate",
       "stat2Label": "Source-linked outputs",
       "railSub": "Sourced statements, masked data"
     },
@@ -310,7 +264,7 @@
     "startAssessment": "Start {{title}} Assessment",
     "riskPanel": {
       "eyebrow": "Weighted by the engine",
-      "title": "Where it burns first — computed for your market.",
+      "title": "What needs attention first — weighted for your market.",
       "lead": "The compliance engine weighs every area from statutes, penalty ranges and deadlines. The ranking shows what needs attention first; the comparison view puts risk, time to act and typical exposure side by side.",
       "marketNote": "Weighted for {{market}} — the market selector above recalculates ranking and ranges.",
       "tabRanking": "Risk ranking",
@@ -339,11 +293,11 @@
       "title": "Every area at a glance",
       "body": "Quick-scan comparison for researchers and decision-makers. Sort by risk to triage first.",
       "area": "Compliance Area",
-      "disclaimer": "Indicative ranges based on public regulatory references. Final exposure depends on your specific case — assess via the wizard for accurate guidance.",
+      "disclaimer": "Indicative ranges based on public regulatory references. Final exposure depends on your specific case — the assessment narrows it to yours.",
       "col": {
         "risk": "Risk",
         "time": "Time to Act",
-        "fine": "Typical Exposure",
+        "fine": "Maximum penalty",
         "markets": "Active Markets",
         "proven": "Proven"
       },
@@ -353,7 +307,7 @@
     "howItWorks": {
       "overline": "Orchestration, not directory",
       "title": "From uncertainty to structured action — in four steps",
-      "body": "CompliHub360 controls the engagement funnel and enforces response accountability. You stay in control end-to-end.",
+      "body": "CompliHub360 structures your request and holds providers to their response times. You stay in control end-to-end.",
       "stepLabel": "Step {{num}}",
       "define": {
         "title": "Define",
@@ -384,7 +338,7 @@
       "openCta": "Open",
       "library": {
         "title": "Compliance Library",
-        "body": "Curated regulations, official sources, and structured guides for every area."
+        "body": "The regulations and official sources behind every area."
       },
       "countries": {
         "title": "Country Guides",
@@ -392,7 +346,7 @@
       },
       "tutorials": {
         "title": "Tutorials & Walkthroughs",
-        "body": "Step-by-step playbooks for common compliance scenarios."
+        "body": "Step-by-step walkthroughs — added as they are written."
       }
     },
     "meta": {
@@ -443,7 +397,7 @@
       "personaFit": "Best for: Manufacturers & resellers",
       "cov1": "EPR & Packaging Wizard — assesses commercial role, target markets, product categories",
       "cov2": "Producer responsibility per market – calculates how likely you are EPR-liable",
-      "cov3": "Edge cases with safety-first logic – in doubt a duty is assumed, not defined away",
+      "cov3": "Edge cases are flagged as open, not defined away — you see where a duty is likely and where it needs confirming",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
       },
@@ -554,7 +508,7 @@
       "personaFit": "Best for: International expansion teams",
       "cov1": "Company Setup & Filings Wizard — evaluates current status, desired markets, team complexity",
       "cov2": "Entity need per market – determines whether your setup requires its own company",
-      "cov3": "Intelligent routing to educational guide paths for uncertain founders",
+      "cov3": "Routes to the explanatory pages when the setup question is still open",
       "fines": {
         "authorities": "Local commercial registries · Tax authorities · AML supervisors"
       },
@@ -1134,7 +1088,7 @@
     },
     "cta": {
       "title": "Or start with your own situation.",
-      "lead": "Six minutes, four questions, no account needed."
+      "lead": "Four questions, about five minutes, no account needed."
     }
   },
   "aiGov": {
@@ -1147,7 +1101,7 @@
     "dimOrgTitle": "Organizational Accountability",
     "dimOrgDesc": "Clear governance pipelines dictate who can deploy, access, and audit AI features. We maintain comprehensive audit logs for all AI interactions.",
     "dimTechTitle": "Technical Robustness",
-    "dimTechDesc": "Our infrastructure ensures zero downtime and resilient fallbacks. Dedicated Privacy Gates sanitize all inputs before they reach any LLM.",
+    "dimTechDesc": "Our infrastructure is built for resilience: if an AI step fails, the workflow falls back to a deterministic process. Dedicated Privacy Gates sanitize every input before it reaches any LLM.",
     "dimRegTitle": "Regulatory Compliance",
     "dimRegDesc": "Built for the EU AI Act and ISO 42001. We map global standards directly into our Code, prioritizing strict EU and UK privacy rules.",
     "dimRiskTitle": "Risk Management",
@@ -1380,7 +1334,7 @@
     },
     "cta": {
       "title": "Start wherever makes sense.",
-      "lead": "Six minutes, four questions, no account required."
+      "lead": "Four questions, about five minutes, no account needed."
     },
     "seeAll": "See how each step works"
   },
@@ -1642,7 +1596,7 @@
     },
     "cta": {
       "title": "Start where it makes sense for you.",
-      "lead": "Six minutes, four questions, no account needed."
+      "lead": "Four questions, about five minutes, no account needed."
     },
     "vignette": {
       "confirmed": "Appointment confirmed",
@@ -1810,7 +1764,7 @@
       "description": "Which compliance obligations apply in {{country}}, how the areas are weighted there, and the legal source for each."
     },
     "complianceArea": {
-      "title": "{{area}} — Obligations & Penalties | CompliHub360",
+      "title": "{{area}} — Obligations & Sources | CompliHub360",
       "description": "Every {{area}} duty with the statute behind it, penalty exposure and filing deadlines per market. Matched to verified specialists."
     }
   },
@@ -1909,7 +1863,7 @@
       "sales": {
         "short": "Pricing",
         "title": "Pricing and plans",
-        "desc": "Which plan fits, what a team costs, how invoicing works.",
+        "desc": "For providers: which plan fits, what it costs, how invoicing works. For businesses, the platform stays free.",
         "sla": "Reply the next business day"
       },
       "partner": {

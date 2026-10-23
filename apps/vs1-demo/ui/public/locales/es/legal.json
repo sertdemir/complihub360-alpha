@@ -1,8 +1,8 @@
 {
-  "draftBanner": "BORRADOR — Esta página describe el tratamiento de datos real del sistema, pero no constituye asesoramiento jurídico. Finalícela con un abogado o un generador de cumplimiento y complete los marcadores señalados antes del lanzamiento.",
+  "draftBanner": "BETA — Esta página describe el tratamiento de datos real del sistema y se redactó sin revisión de un abogado. No constituye asesoramiento jurídico. Lo que sigue pendiente está marcado en el texto.",
   "privacy": {
     "title": "Política de Privacidad",
-    "updated": "Última actualización: julio de 2026 · Borrador",
+    "updated": "Última actualización: octubre de 2026 · Beta",
     "headings": {
       "controller": "1. Responsable",
       "data": "2. Datos que tratamos",
@@ -16,7 +16,7 @@
   },
   "imprint": {
     "title": "Aviso legal",
-    "updated": "Información conforme al § 5 DDG (legislación alemana) · Borrador",
+    "updated": "Información conforme al § 5 DDG (legislación alemana) · Beta",
     "headings": {
       "provider": "Proveedor",
       "representedBy": "Representado por",
@@ -57,6 +57,65 @@
       "manage": "Cómo eliminar estos datos",
       "thirdParty": "Contenidos de terceros",
       "contact": "Consultas"
+    }
+  },
+  "beta": {
+    "eyebrow": "Acuerdo de la beta",
+    "lede": "Usted prueba CompliHub360 antes del lanzamiento, por invitación. Estas nueve frases dicen qué significa eso y qué no.",
+    "meta": "Versión {{version}} · redactado sin revisión de un abogado · operadora: véase el aviso legal",
+    "contactHeading": "¿Preguntas sobre esta hoja?",
+    "contact": "Escríbanos a {{email}}. Si cambiamos esta hoja, le pedimos de nuevo su conformidad.",
+    "back": "Volver a su espacio de trabajo",
+    "loading": "Cargando la hoja …",
+    "error": "La hoja no se ha podido cargar ahora mismo.",
+    "retry": "Intentarlo de nuevo"
+  },
+  "betaStep": {
+    "steps": {
+      "login": "1 Inicio de sesión",
+      "agreement": "2 Acuerdo de la beta",
+      "workspace": "3 Su espacio de trabajo"
+    },
+    "eyebrow": "Beta cerrada",
+    "title": "Una hoja antes de empezar.",
+    "lead": "Nueve frases, una conformidad, revocable en cualquier momento.",
+    "cardTitle": "Antes de empezar: una hoja",
+    "cardLead": "Está invitado como probador. Nueve frases dicen qué es esta prueba y qué no.",
+    "listLabel": "Acuerdo de la beta · versión {{version}}",
+    "fullText": "Leer la hoja completa",
+    "checkbox": "He leído el acuerdo de la beta (versión {{version}}) y estoy de acuerdo.",
+    "cta": "Continuar a su espacio de trabajo",
+    "exitQuestion": "¿Mejor no?",
+    "exit": "Cerrar sesión",
+    "fineprint": "Redactado sin revisión de un abogado, no es asesoramiento jurídico. Se aplica la política de privacidad. Una nueva versión la confirma de nuevo.",
+    "needCheck": "Marque la casilla si está de acuerdo.",
+    "outdated": "La hoja ha cambiado entretanto. Esta es la nueva versión.",
+    "failed": "Su conformidad no se ha podido guardar ahora mismo. No es culpa suya.",
+    "retry": "Intentarlo de nuevo",
+    "saving": "Guardando …"
+  },
+  "account": {
+    "title": "Cuenta",
+    "cardTitle": "Acuerdo de la beta",
+    "cardLead": "Su conformidad tal como la dio. Sigue visible aquí, también después de la beta.",
+    "version": "Versión",
+    "current": "actual",
+    "acceptedAt": "Aceptado",
+    "notAccepted": "Aún no aceptado",
+    "acceptNow": "Leer y aceptar ahora",
+    "fullText": "Texto completo",
+    "read": "Leer el acuerdo de la beta",
+    "exit": "Salida",
+    "signOut": "Cerrar sesión",
+    "write": "escribirnos",
+    "note": "Redactado sin revisión de un abogado. Si cambiamos la hoja, le pedimos de nuevo su conformidad antes del siguiente paso.",
+    "loading": "Cargando …",
+    "error": "Su estado no se ha podido cargar ahora mismo.",
+    "langs": {
+      "en": "Inglés",
+      "de": "Alemán",
+      "es": "Español",
+      "tr": "Turco"
     }
   }
 }

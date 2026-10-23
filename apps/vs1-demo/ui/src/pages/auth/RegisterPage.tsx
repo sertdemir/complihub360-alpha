@@ -50,12 +50,12 @@ const GoogleIcon = () => (
 interface FormData {
     name: string; email: string; password: string; consent: boolean;
     companyName: string; industry: string; companySize: string; country: string; targetMarkets: string[];
-    complianceAreas: string[]; intent: string; urgency: string;
+    complianceAreas: string[]; intent: string;
 }
 const DEFAULT_DATA: FormData = {
     name: "", email: "", password: "", consent: false,
     companyName: "", industry: "", companySize: "", country: "", targetMarkets: [],
-    complianceAreas: [], intent: "", urgency: "",
+    complianceAreas: [], intent: "",
 };
 
 /* Option definitions carry stable values + i18n key segments; labels resolve
@@ -81,7 +81,6 @@ const INTENT_DEFS = [
     { value: "expert", tKey: "expert" },
     { value: "full-service", tKey: "fullService" },
 ] as const;
-const URGENCY_DEFS = ["today", "week", "month", "researching"] as const;
 
 const FIELD =
     "mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35";
@@ -259,7 +258,6 @@ export function RegisterPage() {
                     target_markets: data.targetMarkets,
                     compliance_areas: data.complianceAreas,
                     intent: data.intent,
-                    urgency: data.urgency,
                 },
             },
         });
@@ -496,12 +494,9 @@ export function RegisterPage() {
                                             );
                                         })}
                                     </div>
-                                    <SegmentGroup
-                                        label={t("register.urgencyLabel")}
-                                        options={URGENCY_DEFS.map((k) => ({ value: k, label: t(`register.urgencyOptions.${k}`) }))}
-                                        selected={data.urgency ? [data.urgency] : []}
-                                        onChange={(v) => patch({ urgency: v[v.length - 1] ?? "" })}
-                                    />
+                                    {/* Bis 2026-10-19 stand hier „Dringlichkeit" (Sofort / Diese Woche / …).
+                                        Nichts auf der Nutzerseite hing daran — ein Feld zur Lead-Qualifizierung
+                                        im Moment der Anmeldung. „Ask only what matters" (DNA-Copy-Durchgang). */}
                                 </>
                             )}
                         </motion.div>

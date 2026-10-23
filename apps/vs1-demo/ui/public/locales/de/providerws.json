@@ -78,7 +78,7 @@
     "title": "Markt hinzufügen",
     "addButton": "Markt hinzufügen",
     "addSelected": "{{code}} hinzufügen",
-    "footerNote": "Neue Märkte benötigen eine Re-Verifizierung von 2 Werktagen, bevor sie ranken.",
+    "footerNote": "Neue Märkte werden vor dem Ranking erneut verifiziert — meist etwa 2 Werktage.",
     "coverageToday": "Ihre Abdeckung heute: {{markets}}. Wählen Sie den Markt für die Expansion — Nachfragezahlen beziehen sich auf die letzten 30 Tage.",
     "addedTitle": "{{code}} hinzugefügt",
     "addedBody": " — Verifizierung ausstehend (≈ 2 Werktage). Nach der Verifizierung erscheint der Markt im Ranking.",
@@ -95,7 +95,7 @@
   "invoiceDetail": {
     "eyebrow": "RECHNUNG",
     "fallbackTitle": "Rechnung",
-    "pdfNote": "Der PDF-Download kommt mit dem Stripe-Portal (C3).",
+    "pdfNote": "Der PDF-Download wird über das Abrechnungsportal verfügbar.",
     "downloadPdf": "PDF herunterladen",
     "statusPaid": "bezahlt",
     "statusFailed": "fehlgeschlagen",
@@ -107,8 +107,8 @@
     "paid": "Bezahlt",
     "lineItems": "Positionen",
     "total": "Gesamt",
-    "failedNote": "Zahlung fehlgeschlagen — bitte erneut versuchen oder die Zahlungsmethode unter Abrechnung aktualisieren, um eine Workspace-Sperre zu vermeiden.",
-    "pricingNote": "Preismodell: 92 € pro bestätigtem Mandat · 2 € pro Affiliate-Klick · 0 € Abo.",
+    "failedNote": "Die Zahlung ist nicht durchgegangen. Sie können die Rechnung begleichen oder Ihr Zahlungsmittel unter Abrechnung ändern. Ihr Profil bleibt sichtbar; Buchungen pausieren nur, wenn die Rechnung 7 Tage nach Fälligkeit noch offen ist.",
+    "pricingNote": "Preismodell: Ihr Plan-Abo plus eine Lead-Gebühr je Buchung nach deren Opportunity-Band — Plan-Rabatte bereits abgezogen. Details unter Abrechnung.",
     "payAtStripe": "Rechnung bei Stripe bezahlen",
     "viewAtStripe": "Bei Stripe ansehen"
   },
@@ -169,7 +169,7 @@
       "network": "Keine Verbindung. An Ihrem Konto hat sich nichts geändert — bitte versuchen Sie es erneut.",
       "rateLimit": "Zu viele Nachrichten in kurzer Zeit. Bitte warten Sie einen Moment."
     },
-    "scope": "Nicht Teil des Supports: Verhandlungen mit Unternehmen, fachliche Beratung, Streit über Honorare. Dafür sind Sie die Fachperson — wir sind die Plattform."
+    "scope": "Nicht Teil des Supports: Ihre Honorarverhandlungen mit Mandanten und fachliche Beratung — Sie sind die Fachperson, wir die Plattform. Fragen zu einer Lead-Gebühr, einem Band oder einer Gutschrift gehören sehr wohl hierher, unter Abrechnung."
   },
   "billing": {
     "title": "Abrechnung",
@@ -202,7 +202,7 @@
     "rowActionFailed": "Im Portal ansehen",
     "rowActionView": "Details anzeigen",
     "currentPeriodTitle": "Laufender Monat · {{period}}",
-    "currentPeriodHint": "Live-Vorschau — exakt die Positionen der Monatsrechnung.",
+    "currentPeriodHint": "Live-Vorschau — die Positionen der Monatsrechnung bis jetzt.",
     "currentPeriodEmpty": "Diesen Monat noch keine abrechenbare Aktivität.",
     "currentPeriodTotal": "Zwischensumme",
     "planLabel": "Tarif",
@@ -215,7 +215,7 @@
     "readinessLabel": "Zahlungsbereitschaft",
     "readinessChecked": "zuletzt geprüft {{when}}",
     "blockedTitle": "Buchungen gesperrt",
-    "readyTitle": "Buchbar und zahlungsbereit",
+    "readyTitle": "Buchbar — Zahlungsmittel bestätigt",
     "checkNow": "Jetzt prüfen",
     "changePaymentInPortal": "Zahlungsmittel im Portal ändern",
     "stillVisibleNote": "Sie bleiben in den Ergebnissen sichtbar — nur die Buchung ist gesperrt, bis die Punkte oben erledigt sind.",
@@ -226,8 +226,8 @@
       "inactive_subscription": "Ihr Abo ist nicht aktiv. Aktivieren Sie es, um Buchungen anzunehmen.",
       "withdrawn_authorization": "Das Zahlungsmandat wurde widerrufen. Bestätigen Sie die aktuelle Fassung, um weiterzumachen.",
       "overdue_invoice": "Eine Rechnung ist überfällig. Bezahlen Sie sie im Portal.",
-      "account_paused": "Ihr Konto ist pausiert.",
-      "payment_failed": "Die letzte Lead-Belastung ist gescheitert. Ein anderes Zahlungsmittel hebt die Sperre auf — dieselbe Karte nicht.",
+      "account_paused": "Ihr Konto ist pausiert. Wenn Sie wissen möchten, warum, oder darüber sprechen wollen, schreiben Sie uns über Hilfe & Support.",
+      "payment_failed": "Die letzte Lead-Belastung ist nicht durchgegangen. Lassen Sie dieselbe Karte erneut prüfen oder hinterlegen Sie ein anderes Zahlungsmittel — beides hebt die Pause auf, sobald es bestätigt ist.",
       "payment_unresolved": "Eine Belastung wird noch mit dem Zahlungsdienst abgeglichen. Buchungen laufen von selbst wieder an, sobald das geklärt ist — meist innerhalb weniger Minuten."
     },
     "graceTitleOne": "Eine Rechnung ist offen",
@@ -273,7 +273,7 @@
   },
   "notifications": {
     "title": "Benachrichtigungen",
-    "subtitle": "Aggregierter Ereignis-Feed aus dem kanonischen Ereignismodell. Neue Anfragen · SLA-Erinnerungen · Downgrade-Warnungen · Zahlungsereignisse · Anhang-Verarbeitung. Konfigurieren Sie die Zustellung pro Kanal (E-Mail + In-App) unter Einstellungen → Benachrichtigungen.",
+    "subtitle": "Alles, was wir Ihnen geschickt haben, an einem Ort: neue Anfragen, SLA-Erinnerungen, Plan- und Zahlungsmeldungen, Bewertungen. Zustellung per E-Mail oder in der App wählen Sie unter Einstellungen → Benachrichtigungen.",
     "markAllRead": "Alle als gelesen markieren",
     "preferences": "Einstellungen",
     "chipAll": "Alle",
@@ -297,7 +297,7 @@
     "descRq0234": "EPR-Setup für DE-Marktplatz-Launch · 4,2 M € Umsatz · 91 % Match-Score · SLA 24 h ab jetzt",
     "descRq0233": "USt-Prüfung für DE+AT · 1,8 M € Umsatz · OSS-Expansion · 84 % Match-Score",
     "descRq0232": "Erinnerung #1 (T+24 h) gesendet · 14 h 12 m bis zur Umleitung · DPIA-Workshop für SaaS-Unternehmen",
-    "descEngagementClosed": "Mandant hat das Mandat als abgeschlossen markiert · 5-Sterne-Bewertung · 3.600 € abgerechnet · quality_score +2",
+    "descEngagementClosed": "Mandant hat das Mandat als abgeschlossen markiert · 5-Sterne-Bewertung · 3.600 € abgerechnet · Performance-Wert aktualisiert",
     "actionOpenRq": "{{id}} öffnen →"
   },
   "performance": {
@@ -352,7 +352,7 @@
       "reverification": "Erneute Prüfung",
       "suspension": "Konto ausgesetzt"
     },
-    "enforcementBody": "Seit {{date}}, nach {{count}} Vorfällen im Zeitraum. Ihr Profil bleibt sichtbar; neue Buchungen sind pausiert, bis das Team entschieden hat.",
+    "enforcementBody": "Seit {{date}}, nach {{count}} Vorfällen im Zeitraum. Neue Buchungen sind pausiert, bis das Team entschieden hat; was das für Ihre Sichtbarkeit heißt, zeigt der Status oben.",
     "appealLabel": "Einspruch — was sollten wir wissen?",
     "appealPlaceholder": "Zum Beispiel: was an den Terminen passiert ist, Belege, Umstände.",
     "appealSend": "Einspruch einlegen",
@@ -414,8 +414,8 @@
     "anonymizedDossier": "Anonymisiertes Dossier",
     "identityLockedNote": "🔒 Die Identität des Anfragenden wird nach Ihrer Bestätigung freigeschaltet — Namen und Kontaktdaten sind bis dahin maskiert.",
     "replyPlaceholder": "Ihre Antwort an den Mandanten…",
-    "pressNoteAccept": "Mit dem Klick nehmen Sie dieses Mandat an und der Link verfällt. Diese Aktion wird im Audit-Log erfasst.",
-    "pressNoteDecline": "Mit dem Klick lehnen Sie dieses Mandat ab und der Link verfällt. Diese Aktion wird im Audit-Log erfasst.",
+    "pressNoteAccept": "Damit nehmen Sie das Mandat an; der Link funktioniert danach nicht mehr. Wir halten die Annahme fest, damit sich beide Seiten darauf verlassen können.",
+    "pressNoteDecline": "Damit lehnen Sie das Mandat ab; der Link funktioniert danach nicht mehr. Wir halten die Entscheidung fest, damit sich beide Seiten darauf verlassen können.",
     "workingButton": "Wird ausgeführt…",
     "doneTitle": "Erledigt ✓",
     "dossierUnlocked": "🔓 Dossier freigeschaltet",
@@ -424,7 +424,7 @@
   },
   "requests": {
     "title": "Anfragen",
-    "subtitle": "Alle Anfragen, die in Ihren Workspace geleitet wurden · push-verankert (E-Mail + Magic-Link). Neue Anfragen bleiben mit einem Banner hervorgehoben, bis sie bestätigt sind. Der Standardfilter zeigt Anfragen, die auf Ihre Aktion warten.",
+    "subtitle": "Jede Anfrage, die an Sie geleitet wurde. Neue Anfragen kommen per E-Mail mit einem Einmal-Link und bleiben hier hervorgehoben, bis Sie bestätigen. Der Standardfilter zeigt, was auf Sie wartet.",
     "outOfOffice": "Abwesend",
     "oooBannerTitle": "Abwesenheit aktiv",
     "oooBannerBody": "Neue Anfragen sind pausiert und werden umgeleitet · Ihr Ranking ist während der Abwesenheit eingefroren · SLA-Timer laufen bei Rückkehr weiter.",
@@ -482,7 +482,7 @@
     "pricingRemoveRow": "Zeile entfernen",
     "pricingServicePh": "Leistung",
     "pricingPricePh": "Preis",
-    "pricingNoteV2": "Auf der Karte in der Ergebnisliste erscheint kein konkreter Preis — nur das Abrechnungsmodell. Die volle Tabelle zeigt die (abgerechnete) Detailansicht.",
+    "pricingNoteV2": "Die Karte in der Ergebnisliste zeigt nur Ihr Abrechnungsmodell, keine Preise. Ihre volle Preistabelle erscheint auf Ihrer Detailseite. Lead-Gebühren entstehen je Buchung, nicht je Profilaufruf.",
     "matchmakingSave": "Matchmaking-Profil speichern",
     "matchmakingSaved": "Gespeichert.",
     "previewTitle": "So erscheinen Sie vor der Buchung",
@@ -577,7 +577,7 @@
     "dossierEyebrow": "LEAD-DOSSIER",
     "dossierContact": "Kontakt & Termin",
     "dossierContext": "Intake-Kontext",
-    "dossierNote": "Geliefert bei Buchung — kein Confirm-Gate. Lead-Gebühren werden pro Buchung berechnet (auch bei No-Show).",
+    "dossierNote": "Geliefert bei Buchung, nichts zu bestätigen. Die Lead-Gebühr wird je Buchung berechnet; erscheint der Mandant nicht und bucht innerhalb von 14 Tagen nicht neu, erhalten Sie eine Gutschrift von 30 %.",
     "emptyUpcoming": "Keine anstehenden Termine.",
     "emptyPast": "Noch keine vergangenen Termine.",
     "status": {
@@ -590,7 +590,7 @@
     },
     "rateLead": "Lead bewerten",
     "rated": "✓ Lead bewertet",
-    "rateNote": "War der Lead qualifiziert? Deine Bewertung speist unsere interne Lead-Qualität.",
+    "rateNote": "Hat der Lead gepasst? Ihre Bewertung hilft uns, Anfragen besser zu Ihnen zu führen. Sie wird nicht veröffentlicht.",
     "leadBand": "Band {{band}} · {{label}}",
     "leadDiscountCounter": "Tarif-Rabatt {{pct}} % · Lead {{n}} in diesem Zyklus",
     "leadStandardFee": "Standardgebühr · Kontingent verbraucht",
@@ -631,7 +631,22 @@
     "attLinePlatform": "Plattformfehler · der Nutzer kann bis {{deadline}} neu buchen",
     "attRebookedFrom": "Neubuchung zu einem früheren Termin · keine zweite Lead-Gebühr",
     "reportOpen": "Rückmeldung offen",
-    "proposalSaveFailed": "Nicht gespeichert. Bitte versuchen Sie es noch einmal."
+    "proposalSaveFailed": "Nicht gespeichert. Bitte versuchen Sie es noch einmal.",
+    "rateSubmit": "Bewertung senden",
+    "rateStar": "{{n}} von 5 Sternen",
+    "rateRequired": "Bitte wählen Sie eine Bewertung von 1 bis 5 Sternen.",
+    "rateFailed": {
+      "heading": "Wir konnten Ihre Bewertung nicht senden",
+      "message": "Ihre Sterne sind noch ausgewählt. Bitte versuchen Sie es erneut. Wenn das Problem bleibt, wenden Sie sich an den Support."
+    },
+    "rateAlready": {
+      "heading": "Sie haben diesen Lead bereits bewertet",
+      "message": "Ihre frühere Bewertung ist gespeichert. Jeder Lead kann einmal bewertet werden."
+    },
+    "rateNotHeld": {
+      "heading": "Dieser Lead kann noch nicht bewertet werden",
+      "message": "Bewertungen sind möglich, sobald der Termin stattgefunden hat."
+    }
   },
   "intake": {
     "inviteOnlyTitle": "Anbieter-Intake nur mit Einladung.",
@@ -1456,7 +1471,7 @@
     "notEligibleNow": "Ihr aktueller Tarif enthält die API nicht.",
     "requestedBody": "Antrag vom {{date}} · {{name}} · {{scopes}}. Das Team prüft Zweck und Umfang und meldet sich bei {{email}}. Sie werden hier und per Benachrichtigung informiert.",
     "rejectedTitle": "Das Team hat den Antrag nicht freigegeben",
-    "rejectedNoNote": "Eine Begründung liegt nicht vor. Sie können erneut beantragen.",
+    "rejectedNoNote": "Eine Begründung wurde nicht festgehalten. Sie können erneut beantragen oder uns über Hilfe & Support fragen, wenn Sie mehr wissen möchten.",
     "approvedBody": "Freigegeben mit {{scopes}} · {{limit}} Aufrufe je Minute. Erzeugen Sie jetzt Ihren Schlüssel — er wird genau einmal angezeigt.",
     "createKey": "Schlüssel erzeugen",
     "keyFailed": "Der Schlüssel konnte nicht erzeugt werden. Bitte versuchen Sie es noch einmal.",

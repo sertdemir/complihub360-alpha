@@ -347,37 +347,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /engagement:
-    post:
-      summary: Create an engagement request
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [provider_key, message, country]
-              properties:
-                provider_key:
-                  type: string
-                message:
-                  type: string
-                structured_answers:
-                  type: object
-                country:
-                  type: string
-      responses:
-        '201':
-          description: Engagement created — {ok, id, status, magicLinks}
-        '400':
-          description: >-
-            `BAD_REQUEST` — Body nicht lesbar oder `provider_key` fehlt. Seit
-            2026-10-18 (Befund P9) nur noch fuer den Body; ein Datenbankfehler
-            ist 500 `INTERNAL` und wird strukturiert geloggt, ohne den rohen
-            Fehlertext.
-        '500':
-          description: '`INTERNAL` — die Anfrage konnte nicht gespeichert werden; nichts davon erreicht den Client ausser der correlationId.'
-
   /engagement/{id}:
     get:
       summary: Get engagement status
@@ -438,20 +407,6 @@ paths:
         '200':
           description: Declined
 
-  /document/upload:
-    post:
-      summary: Upload a raw document
-      responses:
-        '200':
-          description: Uploaded
-
-  /document/request-ai:
-    post:
-      summary: Request AI processing for a document
-      responses:
-        '200':
-          description: Processed
-
   # ─── Anbieter-Identitaet und Ownership (Phase 0, 2026-09-22) ───────────────
   # Alle Anbieter-eigenen Routen /provider/{key}/(bookings|coverage|profile|
   # invoices|availability|billing-portal|change-email|billing/preview|
@@ -459,6 +414,66 @@ paths:
   # fuer Mitglieder des Anbieters (provider_members), Admins und den
   # Server-Key erreichbar. Fremde bekommen 404, damit die Antwort nicht
   # verraet, welche Anbieter-Schluessel existieren.
+
+  /agreements/{agreement}:
+    get:
+      summary: Nutzer-Vereinbarung lesen (Beta-Vereinbarung, spaeter AGB)
+      description: >-
+        Die aktuelle Fassung in der gewuenschten Sprache, Rueckfall Englisch.
+        Oeffentlich: Rechtstext, der ohnehin auf dem Bildschirm steht. In der
+        geschlossenen Beta ersetzt `beta` (neun Saetze, Fassung
+        `beta-2026-10`, ohne anwaltliche Pruefung erstellt) die AGB.
+      parameters:
+        - { name: agreement, in: path, required: true, schema: { type: string, enum: [beta, terms] } }
+        - { name: lang, in: query, schema: { type: string, maxLength: 2 } }
+      responses:
+        '200': { description: "`{ agreement, version, language, title, points: [{ lead, text }], effective_from }`" }
+        '404': { description: Unbekannte Vereinbarung (`AGREEMENT_UNKNOWN`) }
+        '503': { description: Keine Fassung konfiguriert (`AGREEMENT_MISSING`) }
+
+  /me/agreements:
+    get:
+      summary: Stand des Nutzers je Vereinbarung
+      description: >-
+        Je Vereinbarung die geltende Fassung, die zuletzt angenommene Fassung
+        mit Zeitpunkt und Sprache und `required` — true, wenn der Nutzer die
+        geltende Fassung noch nicht angenommen hat. Das Frontend zeigt dann
+        den Schritt nach dem Login (Canvas-Wahl 2A).
+      security: [ { bearerAuth: [] } ]
+      responses:
+        '200': { description: "`{ agreements: { beta: { current_version, accepted_version, accepted_at, language, required }, terms: {…} } }`" }
+        '401': { description: Kein Nutzer-Login }
+
+  /me/agreements/{agreement}:
+    post:
+      summary: Vereinbarung annehmen
+      description: >-
+        Schreibt die Annahme (append-only) fuer genau die Fassung, die der
+        Nutzer gesehen hat. Eine andere als die geltende Fassung wird nicht
+        angenommen: 409 mit `current_version`, das Frontend laedt den Text neu.
+        Dieselbe Fassung ein zweites Mal: 200 mit `replay: true`, nichts
+        Neues geschrieben. Ereignis `agreement_accepted` im event_log.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: agreement, in: path, required: true, schema: { type: string, enum: [beta, terms] } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version]
+              properties:
+                version: { type: string }
+                language: { type: string, maxLength: 2 }
+      responses:
+        '201': { description: "`{ agreement, version, language, accepted_at }`" }
+        '200': { description: Schon angenommen (`replay: true`) }
+        '400': { description: "`version` fehlt (`VALIDATION_ERROR`)" }
+        '401': { description: Kein Nutzer-Login }
+        '404': { description: Unbekannte Vereinbarung (`AGREEMENT_UNKNOWN`) }
+        '409': { description: "Andere als die geltende Fassung (`AGREEMENT_OUTDATED`, `current_version`)" }
+        '503': { description: Keine Fassung konfiguriert (`AGREEMENT_MISSING`) }
 
   /me/provider:
     get:
@@ -1722,6 +1737,36 @@ paths:
       security: [ { bearerAuth: [] } ]
       responses:
         '200': { description: Termine }
+
+  /admin/stats:
+    get:
+      summary: Control Center — Kennzahlen aus Buchungen, Audit-Log und Nachweisen
+      description: >-
+        Seit 20.10.2026 aus `scheduling`, `event_log` (7-Tage-Fenster serverseitig, ohne `*_shadow`-Marker; Offenlegung
+        ueber `lead.revealed`/`booking_rebooked`) und `provider_evidence`; vorher aus `engagement_requests` und `documents`,
+        in die nichts mehr schreibt. Quoten ohne Grundlage sind null, nicht 0. `privacy.customerUploads` ist null — die
+        Upload-Pipeline fuer Kundendokumente ist nicht live. Audit-Stream-Payloads nur mit freigegebenen Schluesseln (keine
+        E-Mail, kein Freitext, keine Nutzer-ID). `truncated` nennt Quellen, deren Lesegrenze erreicht ist.
+        Rechnung in services/compliance-api/src/adminStats.ts.
+      security: [ { bearerAuth: [] } ]
+      responses:
+        '200': { description: "generatedAt, truncated[], bookings, watchlist[], privacy, security, events[], series" }
+        '403': { description: Kein Admin }
+
+  /admin/cockpit:
+    get:
+      summary: Founder Cockpit — Plattform, Produkt, Umsatz, Kundenstimme, Vertrauen
+      description: >-
+        Seit 22.10.2026 aus `scheduling`, `sessions`, `invoices`, `provider_subscriptions` (Preis aus dem Tarifkatalog),
+        `provider_lead_ledger` mit Status aus `provider_lead_ledger_payment_events` (gezaehlt wie im Billing-Lauf: captured, n/a),
+        `provider_credits`, `reviews`, `providers` (Lebenszyklus), Vorfaellen und Massnahmen; vorher aus `engagement_requests`
+        und einem angenommenen Assistant-Preis. Betraege je Waehrung (`Amounts`), nie ueber Waehrungen summiert. Eine Quelle,
+        die nicht gelesen werden kann, steht in `unavailable` — ihre Zahlen sind null. Nur Spaltenauswahl ohne Freitext und
+        Kontaktdaten. Rechnung in services/compliance-api/src/cockpit.ts.
+      security: [ { bearerAuth: [] } ]
+      responses:
+        '200': { description: "cockpit: generatedAt, unavailable[], truncated[], platformHealth, product, money, voice, trust, rates, events[], series" }
+        '403': { description: Kein Admin }
 
   # ─── Phase 2: Review-Arbeitsplatz (Admin-JWT oder Server-Key, sonst 403) ───
 

@@ -87,10 +87,20 @@ const REBOOKED: Array<{ id: string; from: string; key: string; slot_start: strin
 // Punkt 1 (Canvas E1): Bewertungen des Nutzers je Buchung, wie der Server sie
 // ueber `reviewed` an der Termin-Liste meldet.
 const REVIEWED = new Set<string>();
+// Lead-Bewertungen des Anbieters (from_role=provider) — eigene Menge, wie beim Server.
+const PROVIDER_REVIEWED = new Set<string>();
 
 // POST /reviews wie der Server: einmal je Buchung, nur nach dem Termin.
 function submitReviewMock(body: Record<string, unknown>) {
   const id = String(body.booking_id ?? '');
+  if (body.from_role === 'provider') {
+    const lead = partnerBookings().find((x) => x.id === id);
+    if (!lead) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Booking not found' };
+    if (lead.status === 'cancelled' || (lead.status !== 'completed' && Date.parse(lead.slot_start) > Date.now())) return { __status: 409, errorCode: 'BOOKING_NOT_HELD', message: 'Reviews are possible after the consultation took place' };
+    if (PROVIDER_REVIEWED.has(id)) return { __status: 409, errorCode: 'ALREADY_REVIEWED', message: 'This booking has already been reviewed' };
+    PROVIDER_REVIEWED.add(id);
+    return { ok: true, __status: 201 };
+  }
   const row = bookings().find((x) => x.id === id);
   if (!row) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Booking not found' };
   const held = row.status !== 'cancelled' && (row.status === 'completed' || Date.parse(row.slot_start) <= Date.now());
@@ -261,7 +271,7 @@ function partnerBookings() {
   const k = (id: string, start: string, status: string, email: string, company: string | null, category: string, country: string, message: string, l: ReturnType<typeof lead> | null) => {
     const end = new Date(new Date(start).getTime() + 30 * 60_000).toISOString(); const st = STATUS_OVERRIDE[id] ?? status;
     return { id, slot_start: start, slot_end: end, status: st, lead_charged: true, user_email: email, user_company: company, category, country, message,
-       lead: l, user_discount_pct: l ? 10 : null, proposal: PROPOSALS[id] ?? null, acknowledgement_version: l ? 'booking-ack-v1' : null, price_snapshot: null, ...attendanceFields(id, st, end) };
+       lead: l, user_discount_pct: l ? 10 : null, proposal: PROPOSALS[id] ?? null, acknowledgement_version: l ? 'booking-ack-v1' : null, price_snapshot: null, reviewed: PROVIDER_REVIEWED.has(id), ...attendanceFields(id, st, end) };
   };
   return [
     k('m0ck-b02', iso(1, 9), 'confirmed', 'a.weber@acme-gmbh.example', 'Acme GmbH', 'product-packaging', 'DE', 'LUCID-Registrierung und Mengenmeldung für den Marktplatz-Start.', lead(2, 14900, 10, 3)),
@@ -665,6 +675,57 @@ function acknowledgement(lang: string) {
   return { ok: true, version: ACK_VERSION, language: l, body: ACK_BODY[l], shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1, recurring_treatment: 'undecided' },
     // B1 (Schritt 4): wie der Server mit Login — die Werte, die die Buchung festhaelt.
     shared_preview: DEMO_SHARED_PREVIEW };
+}
+
+// ─── Beta-Vereinbarung (Canvas-Wahl 1A · 2A · 3A+3C · 4C) ─────────────────
+// Wie der Server: Text versioniert je Sprache, Annahme je Nutzer. Der Demo-
+// Nutzer hat die Fassung angenommen (sonst sperrte der Schritt jede E2E-Fahrt
+// aus); `POST /api/v1/mock/agreements/reset` macht ihn zum Neuling.
+const BETA_VERSION = 'beta-2026-10';
+const BETA_POINTS: Record<string, { title: string; points: Array<{ lead: string; text: string }> }> = {
+  de: { title: 'Beta-Vereinbarung', points: [
+    { lead: 'Das ist ein Test.', text: 'Sie nutzen eine unfertige Version von CompliHub360, auf Einladung, für eine begrenzte Zeit. Was offen ist, sagen wir Ihnen, bevor Sie es brauchen.' },
+    { lead: 'Es kostet nichts.', text: 'In der Beta wird nichts berechnet und nichts abgebucht. Zahlungsfunktionen laufen im Testmodus. Sollte sich das je ändern, bestätigen Sie vorher eine neue Fassung dieses Blatts.' },
+    { lead: 'Es kann schiefgehen.', text: 'Ausfälle, Fehler und Datenverlust sind in einer Beta möglich. Wir übernehmen keine Gewähr für Verfügbarkeit oder Ergebnisse. Wenn etwas passiert ist, sagen wir es Ihnen, ohne dass Sie fragen müssen.' },
+    { lead: 'Keine Rechtsberatung.', text: 'Risk Map und Antworten sind Orientierung, kein Ersatz für eine Prüfung Ihres Falls. Verified Provider beraten in eigener beruflicher Verantwortung; CompliHub360 ist keine Kanzlei.' },
+    { lead: 'Ihre Daten.', text: 'Es gilt die Datenschutzerklärung. Laden Sie bitte nur Dokumente hoch, die Sie dafür verwenden dürfen, am besten keine echten Kundendaten.' },
+    { lead: 'Ihr Feedback hilft.', text: 'Was Sie uns melden, dürfen wir nutzen, um das Produkt zu verbessern, ohne Vergütung und ohne Ihren Namen.' },
+    { lead: 'Bitte nicht öffentlich.', text: 'Screenshots und Inhalte der Beta bleiben im Kreis der Tester, bis wir starten.' },
+    { lead: 'Das Ende.', text: 'Die Beta endet mit Ankündigung. Ihr Konto und Ihre Daten löschen wir 30 Tage danach, außer Sie übernehmen das Konto in den Regelbetrieb. Dazu fragen wir Sie rechtzeitig.' },
+    { lead: 'Jederzeit raus.', text: 'Sie können das Konto jederzeit löschen oder uns schreiben. Ändern wir dieses Blatt, bitten wir Sie neu um Ihre Zustimmung. Dieses Blatt ist ohne anwaltliche Prüfung erstellt.' },
+  ] },
+  en: { title: 'Beta agreement', points: [
+    { lead: 'This is a test.', text: 'You are using an unfinished version of CompliHub360, by invitation, for a limited time. Whatever is still open, we tell you before you need it.' },
+    { lead: 'It costs nothing.', text: 'Nothing is charged or debited during the beta. Payment features run in test mode. Should that ever change, you confirm a new version of this sheet first.' },
+    { lead: 'Things can go wrong.', text: 'Outages, bugs and data loss are possible in a beta. We give no warranty for availability or results. If something has happened, we tell you without you having to ask.' },
+    { lead: 'No legal advice.', text: 'The risk map and answers are orientation, not a substitute for a review of your case. Verified Providers advise under their own professional responsibility; CompliHub360 is not a law firm.' },
+    { lead: 'Your data.', text: 'The privacy policy applies. Please upload only documents you are allowed to use for this, ideally no real client data.' },
+    { lead: 'Your feedback helps.', text: 'What you report to us we may use to improve the product, without payment and without your name.' },
+    { lead: 'Please keep it private.', text: 'Screenshots and content of the beta stay within the circle of testers until we launch.' },
+    { lead: 'The end.', text: 'The beta ends with notice. We delete your account and data 30 days after that, unless you take the account into regular operation. We will ask you in good time.' },
+    { lead: 'Leave any time.', text: 'You can delete your account or write to us at any time. If we change this sheet, we ask for your consent again. This sheet was written without review by legal counsel.' },
+  ] },
+};
+let BETA_ACCEPTED: { version: string; language: string; accepted_at: string } | null = { version: BETA_VERSION, language: 'en', accepted_at: plus(-5 * 24 * H) };
+function betaAgreement(lang: string) {
+  const l = BETA_POINTS[lang] ? lang : 'en';
+  return { ok: true, agreement: 'beta', version: BETA_VERSION, language: l, title: BETA_POINTS[l].title, points: BETA_POINTS[l].points, effective_from: '2026-10-22' };
+}
+function myAgreements() {
+  const a = BETA_ACCEPTED;
+  return { ok: true, agreements: {
+    beta: { agreement: 'beta', current_version: BETA_VERSION, accepted_version: a?.version ?? null, accepted_at: a?.accepted_at ?? null, language: a?.language ?? null, required: a?.version !== BETA_VERSION },
+    terms: { agreement: 'terms', current_version: null, accepted_version: null, accepted_at: null, language: null, required: false },
+  } };
+}
+function acceptBeta(body: unknown) {
+  const d = (body ?? {}) as { version?: unknown; language?: unknown };
+  if (typeof d.version !== 'string' || !d.version) return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'version is required' };
+  if (d.version !== BETA_VERSION) return { __status: 409, errorCode: 'AGREEMENT_OUTDATED', message: 'A newer version applies', current_version: BETA_VERSION };
+  const language = typeof d.language === 'string' && BETA_POINTS[d.language] ? d.language : 'en';
+  if (BETA_ACCEPTED?.version === BETA_VERSION) return { ok: true, replay: true, agreement: 'beta', version: BETA_VERSION, language: BETA_ACCEPTED.language, accepted_at: BETA_ACCEPTED.accepted_at };
+  BETA_ACCEPTED = { version: BETA_VERSION, language, accepted_at: new Date().toISOString() };
+  return { __status: 201, ok: true, agreement: 'beta', version: BETA_VERSION, language, accepted_at: BETA_ACCEPTED.accepted_at };
 }
 
 // POST /scheduling — die Buchung ist der bezahlte Lead UND der Moment, in dem
@@ -1215,6 +1276,67 @@ function apiAccessLog(key: string) {
   ];
   return { ok: true, calls, today: { count: 318, limited: 3, failed: 0 }, events };
 }
+// Control Center (GET /admin/stats) in der Form des Servers (adminStats.ts).
+// Bewusst mit einer Quote ohne Grundlage (Erinnerung: null) — so sieht man im
+// Mock den Zustand „noch keine Grundlage" statt eines erfundenen 0 %.
+function adminStats() {
+  const days = [6, 5, 4, 3, 2, 1, 0].map((n) => { const d = new Date(Date.now() - n * 24 * H); return `${String(d.getUTCDate()).padStart(2, '0')}.${String(d.getUTCMonth() + 1).padStart(2, '0')}`; });
+  return {
+    ok: true, generatedAt: plus(0), truncated: [],
+    bookings: { today: 1, last7: 4, total: 10, upcoming7: 3, cancelled7: 1, noShows7: 0, disputesOpen: 0, unreported: 1, heldRate: 0.8, disclosureAuditedRate: 1, reminderRate: null },
+    watchlist: [
+      { id: 'a1f30c92-0000-4000-8000-000000000001', provider_key: PARTNER_KEY, slot_start: plus(5 * H), flag: 'soon', msUntil: 5 * H },
+      { id: 'b7d21e40-0000-4000-8000-000000000002', provider_key: PARTNER_KEY, slot_start: plus(20 * H), flag: 'soon', msUntil: 20 * H },
+      { id: 'c9e84a17-0000-4000-8000-000000000003', provider_key: 'dahlmann-cpa', slot_start: plus(3 * 24 * H), flag: 'upcoming', msUntil: 3 * 24 * H },
+    ],
+    privacy: { aiRequests7: 0, aiRedacted7: 0, reveals7: 4, evidenceStored: 5, evidenceToReview: 1, customerUploads: null },
+    security: { rateLimitPerMinute: 100, accessEvents7: 3, errorEvents7: 1 },
+    events: [
+      { type: 'scheduling_confirmed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-2 * H) },
+      { type: 'lead.revealed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-2 * H) },
+      { type: 'calendar_event_failed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-9 * H) },
+      { type: 'api_key_issued', payload: {}, created_at: plus(-30 * H) },
+    ],
+    series: { dates: days, bookings: [0, 1, 0, 1, 0, 1, 1], cancelled: [0, 0, 0, 1, 0, 0, 0], noShows: [0, 0, 0, 0, 0, 0, 0], aiRequests: [0, 0, 0, 0, 0, 0, 0], aiRedacted: [0, 0, 0, 0, 0, 0, 0], reveals: [0, 1, 0, 1, 0, 1, 1] },
+  };
+}
+
+// Founder Cockpit (GET /admin/cockpit) in der Form des Servers (cockpit.ts).
+// Mit einer Quote ohne Grundlage (Abrechnungsbereit: null) und einer Quelle,
+// die nicht gelesen werden konnte (reviews) — so sieht man im Mock beide
+// ehrlichen Zustaende statt erfundener Zahlen.
+function adminCockpit() {
+  const days = [6, 5, 4, 3, 2, 1, 0].map((n) => { const d = new Date(Date.now() - n * 24 * H); return `${String(d.getUTCDate()).padStart(2, '0')}.${String(d.getUTCMonth() + 1).padStart(2, '0')}`; });
+  return {
+    ok: true,
+    cockpit: {
+      generatedAt: plus(0), watchersShadow: true, unavailable: ['reviews'], truncated: [],
+      platformHealth: { api: 'up', db: 'degraded', errorEvents7: 1, latestEventAt: plus(-2 * H) },
+      product: { bookingsToday: 1, bookings7: 4, bookingsTotal: 10, heldRate: 0.71, sessionsActive: 37, sessions7: 6 },
+      // Wie auf Staging: Katalog in USD, aeltere Rechnungen in EUR.
+      money: {
+        baseCurrency: 'USD', mrr: { USD: 24700 }, unpriced: 0, subscriptions: { active: 3, pastDue: 0 },
+        invoices: { open: 2, paid: 6, failed: 1, overdue: 1, openAmounts: { USD: 9900, EUR: 4900 }, paidAmounts: { USD: 29500, EUR: 9900 } },
+        leadFees7: { charges: 3, collected: { USD: 7000 }, pending: 1, failed: 0 }, credits7: { USD: 1200 }, assistantActive: 1,
+      },
+      voice: { reviews: null, userCancellations7: 1, disputesOpen: 0 },
+      trust: {
+        providers: { live: 3, onboarding: 1, paused: 0, suspended: 0, reverification: 0, ended: 0 },
+        providerNoShows30: 0, incidents30: 0, enforcementOpen: 0, appealsPending: 0, attentionTotal: 1,
+        attention: [{ provider_key: PARTNER_KEY, reason: 'billing_blocked', since: null }],
+      },
+      rates: { heldRate: 0.71, invoicesPaid: 0.67, billingReady: null, subscriptionsCurrent: 1 },
+      events: [
+        { type: 'scheduling_confirmed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-2 * H) },
+        { type: 'provider_lead_charged', payload: { providerKey: PARTNER_KEY, band: 2 }, created_at: plus(-2 * H) },
+        { type: 'invoice_issued', payload: {}, created_at: plus(-30 * H) },
+        { type: 'calendar_event_failed', payload: { providerKey: PARTNER_KEY }, created_at: plus(-40 * H) },
+      ],
+      series: { dates: days, bookings: [0, 1, 0, 1, 0, 1, 1], sessions: [1, 0, 2, 1, 0, 1, 1], leadFeeCents: [0, 3500, 0, 0, 0, 0, 3500] },
+    },
+  };
+}
+
 function adminApiClients() {
   return { ok: true, clients: API_STATE.clients.map((c) => ({ ...c, provider_name: c.provider_key === PARTNER_KEY ? 'Schmidt & Partner' : 'Lund Nordic AB', plan_code: 'global', eligible: true, fee_note: null, approved_by: null, last_used_ip: c.last_used_at ? '203.0.113.7' : null })) };
 }
@@ -1245,6 +1367,7 @@ function adminApiDecide(id: string, body: Record<string, unknown>) {
 const INITIAL_MOCK_STATE = JSON.stringify({ ATT, STATUS_OVERRIDE, READINESS, AVAIL, API_STATE });
 export function resetMockState(): void {
   SEEN_REQUESTS.clear();
+  BETA_ACCEPTED = { version: BETA_VERSION, language: 'en', accepted_at: plus(-5 * 24 * H) };
   for (const k of Object.keys(ACCOUNT_OVERRIDE)) delete ACCOUNT_OVERRIDE[k];
   const init = JSON.parse(INITIAL_MOCK_STATE) as { ATT: typeof ATT; STATUS_OVERRIDE: typeof STATUS_OVERRIDE; READINESS: typeof READINESS; AVAIL: typeof AVAIL; API_STATE: typeof API_STATE };
   for (const k of Object.keys(ATT)) delete ATT[k];
@@ -1260,12 +1383,17 @@ export function resetMockState(): void {
   AVAIL.timezone = init.AVAIL.timezone;
   API_STATE.clients = init.API_STATE.clients;
   REVIEWED.clear();
+  PROVIDER_REVIEWED.clear();
 }
 
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
   if (p[0] === 'mock' && p[1] === 'reset' && method === 'POST') { resetMockState(); return { ok: true }; }
+  if (p[0] === 'mock' && p[1] === 'agreements' && p[2] === 'reset' && method === 'POST') { BETA_ACCEPTED = null; return { ok: true }; }
+  if (p[0] === 'agreements' && p[1] && method === 'GET') return p[1] === 'beta' ? betaAgreement((query.get('lang') ?? 'en').slice(0, 2).toLowerCase()) : { __status: 404, errorCode: 'AGREEMENT_UNKNOWN', message: 'Unknown agreement' };
+  if (p[0] === 'me' && p[1] === 'agreements' && !p[2] && method === 'GET') return myAgreements();
+  if (p[0] === 'me' && p[1] === 'agreements' && p[2] === 'beta' && method === 'POST') return acceptBeta(body);
   if (method === 'GET') {
     // Kalender-Status (nylasAuth.ts) — vor dem allgemeinen GET-Rueckfall unten.
     if (p[0] === 'provider' && p[2] === 'calendar' && p.length === 3) return calendarStatus();
@@ -1288,6 +1416,8 @@ export function route(method: string, path: string, body: Record<string, unknown
     if (p[0] === 'provider' && p[2] === 'api-access' && p[3] === 'log') return apiAccessLog(p[1]);
     if (p[0] === 'provider' && p[2] === 'api-access') return apiAccess(p[1]);
     if (p[0] === 'admin' && p[1] === 'api-access') return adminApiClients();
+    if (p[0] === 'admin' && p[1] === 'stats') return role === 'admin' ? adminStats() : { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin stats are admin-only' };
+    if (p[0] === 'admin' && p[1] === 'cockpit') return role === 'admin' ? adminCockpit() : { __status: 403, errorCode: 'FORBIDDEN', message: 'Cockpit is admin-only' };
     if (p[0] === 'provider' && p[2] === 'coverage') { const c = partnerCoverage(); return { ...c, coverage: { ...c.coverage, availability_hours: AVAIL.hours, timezone: AVAIL.timezone, booking_paused_at: null } }; }
     if (p[0] === 'provider' && p[2] === 'invoices') return partnerInvoices();
     if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'preview') return partnerBillingPreview();

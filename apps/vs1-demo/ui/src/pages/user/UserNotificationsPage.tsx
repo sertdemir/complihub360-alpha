@@ -132,7 +132,7 @@ export function UserNotificationsPage() {
           tragen — bis 2026-08-31 sass diese Seite als einzige Arbeitsfläche
           auf blankem Weiss. Negative Ränder heben das Shell-Padding auf,
           damit die Tönung randlos steht. */}
-      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+      <div className="-mx-4 -my-5 min-h-[calc(100%+2.5rem)] bg-gradient-stage lg:-mx-8 lg:-my-6 lg:min-h-[calc(100%+3rem)] px-8 py-7">
       <div className="mx-auto max-w-[1140px] space-y-5">
         {/* Kopfzeile — Variante B (Nutzer-Wahl 2026-08-31, Canvas
             "Benachrichtigungen · Varianten"): die erklaerende Unterzeile faellt
@@ -141,8 +141,12 @@ export function UserNotificationsPage() {
             er zaehlt. Verworfen wurden A (Unterzeile bleibt, kein Zaehler) und
             C (kompakte Postfach-Leiste ohne Serif-Titel: flacher, aber die
             Flaeche verliert den Auftritt der uebrigen Arbeitsbereich-Seiten). */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
+        {/* Umbruch statt Ueberlauf: auf 390 px passten Titel, Zaehler und
+            "Mark all as read" nicht in eine Zeile, der Knopf ragte 24 px ueber
+            den Rand und war abgeschnitten (Beta 20.10.2026). Jetzt rutscht er
+            in eine eigene Zeile, sobald der Platz fehlt. */}
+        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
               <span className="text-fg-accent-emphasis">{t('notifications.title')}</span>
             </h1>

@@ -36,6 +36,29 @@ vi.mock('../supabase.js', () => ({
             if (opts.limit) rows = rows.slice(0, opts.limit);
             return rows;
         },
+        // Spiegelt supabaseApi.selectWhere fuer die Ausdruecke, die gebraucht
+        // werden ('eq.', 'gte.', 'not.like.*x', 'in.("a","b")'); alles andere
+        // wirft — sonst haette der Test den Filter still ignoriert.
+        async selectWhere(table: string, filters: Record<string, string>, opts: { order?: string; limit?: number } = {}) {
+            // `select` ist die Spaltenauswahl, kein Filter. Der Store liefert die
+            // ganze Zeile; dass der Server nur Spalten liest, prueft der Aufrufer.
+            const passt = (r: any) => Object.entries(filters).filter(([k]) => k !== 'select').every(([k, expr]) => {
+                const v = r[k];
+                if (expr.startsWith('eq.')) return String(v) === expr.slice(3);
+                if (expr === 'is.null') return v === null || v === undefined;
+                if (expr.startsWith('gte.')) return v !== undefined && v !== null && String(v) >= expr.slice(4);
+                if (expr.startsWith('not.like.*')) return !String(v ?? '').endsWith(expr.slice(10));
+                if (expr.startsWith('in.(')) return expr.slice(4, -1).split(',').map((x) => x.replace(/^"|"$/g, '')).includes(String(v));
+                throw new Error(`unsupported filter in test store: ${expr}`);
+            });
+            let rows = (db[table] ?? []).filter(passt);
+            if (opts.order) {
+                const [col, dir] = opts.order.split('.');
+                rows = [...rows].sort((a, b) => (a[col] < b[col] ? -1 : 1) * (dir === 'desc' ? -1 : 1));
+            }
+            if (opts.limit) rows = rows.slice(0, opts.limit);
+            return rows;
+        },
         async insert(table: string, data: any) {
             const rows = (Array.isArray(data) ? data : [data]).map((r) => ({ id: randomUUID(), ...r }));
             (db[table] ??= []).push(...rows);
@@ -559,6 +582,28 @@ describe('POST /api/v1/search', () => {
         } finally {
             rpc.mockRestore();
             select.mockRestore();
+        }
+    });
+
+    // 19.10.2026 auf Staging ausgeloest: markets: ["toString"] galt als
+    // bekanntes Land (isKnownCountry pruefte mit `in`), die Engine warf, und
+    // jeder Gast bekam "We couldn't create your Risk Map". Geerbte Merkmale
+    // sind jetzt unbekannte Laender — die Suche rechnet mit dem Rest.
+    it('treats inherited object keys in markets as unknown countries, not as an engine failure', async () => {
+        seedProvider();
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        try {
+            const r = await api('/api/v1/search', {
+                method: 'POST',
+                auth: 'none',
+                body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE', 'toString', 'constructor', '__proto__'], domains: ['tax-vat'] } }),
+            });
+            expect(r.status).toBe(200);
+            expect(r.body.laws_status).toBe('ok');
+            expect(r.body.laws.length).toBeGreaterThan(0);
+            expect(log.mock.calls.some((c) => String(c[0]).includes('Compliance engine failed'))).toBe(false);
+        } finally {
+            log.mockRestore();
         }
     });
 
@@ -1304,6 +1349,16 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(b.proposal).toBeNull();
         expect(b.acknowledgement_version).toBe('booking-ack-v1');
         expect(b.price_snapshot).toBeTruthy();
+    });
+
+    it('GET /provider/:key/bookings sagt, ob der Anbieter den Lead schon bewertet hat — eine Nutzer-Bewertung zaehlt nicht', async () => {
+        const bookingId = await gebucht();
+        (db.reviews ??= []).push({ id: randomUUID(), booking_id: bookingId, provider_key: 'test-kanzlei', from_role: 'user', rating: 5 });
+        let b = (await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'key' })).body.bookings.find((x: any) => x.id === bookingId);
+        expect(b.reviewed).toBe(false);
+        db.reviews.push({ id: randomUUID(), booking_id: bookingId, provider_key: 'test-kanzlei', from_role: 'provider', rating: 4 });
+        b = (await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'key' })).body.bookings.find((x: any) => x.id === bookingId);
+        expect(b.reviewed).toBe(true);
     });
 
     it('das Thema der Lead-Karte kommt aus dem Ledger, nicht aus einer aelteren Anfrage', async () => {
@@ -2949,44 +3004,38 @@ describe('Benachrichtigungen entstehen aus Vorgaengen', () => {
 
 
 describe('Anfragen gehoeren ihrem Ersteller', () => {
-    // Bis 2026-08-31 nahm POST /engagement die user_id aus dem BODY (und das
-    // Frontend schickte keine — alle UI-Anfragen gehoerten niemandem), und
+    // Bis 2026-08-31 nahm POST /engagement die user_id aus dem BODY, und
     // GET /requests lieferte mit leerem Filter die Anfragen ALLER Nutzer,
-    // samt requester_email und Firmenname. Diese Tests pinnen beides fest.
-    const anlegen = (body: Record<string, unknown> = {}) =>
-        api('/api/v1/engagement', {
-            method: 'POST', auth: 'jwt',
-            body: JSON.stringify({ provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', message: 'Bitte um Angebot', ...body }),
-        });
+    // samt requester_email und Firmenname. POST /engagement gibt es seit
+    // 2026-10-19 nicht mehr (siehe unten); die Liste bleibt festgepinnt.
 
-    it('P9: unlesbarer Body oder fehlender provider_key ist 400 — ein Datenbankfehler ist 500 ohne rohen Fehlertext', async () => {
+    it('POST /engagement gibt es nicht mehr: 404, keine Anfrage, keine Magic-Links, keine Mail', async () => {
+        // Die Route hatte keinen Client mehr, legte Anfragen an Buchung,
+        // Bestaetigungstext und Abrechnung vorbei an — und gab dem Aufrufer
+        // die rohen Magic-Link-Tokens des Anbieters zurueck (bestaetigen,
+        // antworten, ablehnen in dessen Namen).
         seedProvider();
-        const kaputt = await api('/api/v1/engagement', { method: 'POST', auth: 'jwt', body: '{not json' });
-        expect(kaputt.status).toBe(400);
-        expect(kaputt.body.errorCode).toBe('BAD_REQUEST');
-        const ohne = await anlegen({ provider_key: undefined });
-        expect(ohne.status).toBe(400);
-        const { supabaseApi } = await import('../supabase.js');
-        const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string) => {
-            if (table === 'engagement_requests') throw new Error('PostgREST: null value in column "country" — row (geheim@kunde.example, Kunde GmbH)');
-            throw new Error('unexpected insert ' + table);
+        const r = await api('/api/v1/engagement', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', message: 'Bitte um Angebot' }),
         });
-        try {
-            const r = await anlegen();
-            expect(r.status).toBe(500);
-            expect(r.body.errorCode).toBe('INTERNAL');
-            expect(JSON.stringify(r.body)).not.toMatch(/geheim@|Kunde GmbH|PostgREST/);
-        } finally { spy.mockRestore(); }
+        expect(r.status).toBe(404);
+        expect(r.body).not.toHaveProperty('magicLinks');
+        expect(db.engagement_requests ?? []).toEqual([]);
+        expect(db.magic_link_tokens ?? []).toEqual([]);
     });
 
-    it('schreibt den Ersteller aus dem Token — ein fremdes user_id im Body zaehlt nicht', async () => {
-        seedProvider();
-        const fremd = randomUUID();
-        const r = await anlegen({ user_id: fremd });
-        expect([200, 201]).toContain(r.status);
-        const row = (db.engagement_requests ?? []).find((e: any) => e.id === r.body.id);
-        expect(row.user_id).toBe(USER_ID);
-        expect(row.user_id).not.toBe(fremd);
+    it('POST /document/upload und /document/request-ai gibt es nicht mehr: 404, nichts gespeichert', async () => {
+        // Ohne Client; nahm user_id und engagement_id aus dem Body. Nachweise
+        // laufen ueber die Upload-URL der Bewerbung (packages/storage).
+        const up = await api('/api/v1/document/upload', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ filename: 'x.txt', text: 'Max Mustermann, max@example.com', userId: randomUUID(), consentAI: true }),
+        });
+        expect(up.status).toBe(404);
+        const ai = await api('/api/v1/document/request-ai', { method: 'POST', auth: 'jwt', body: JSON.stringify({ documentId: randomUUID() }) });
+        expect(ai.status).toBe(404);
+        expect(db.documents ?? []).toEqual([]);
     });
 
     it('listet nur die eigenen Anfragen, keine fremden', async () => {
@@ -3206,6 +3255,53 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         expect((await api('/api/v1/admin/review/neue-kanzlei', { auth: 'jwt' })).status).toBe(403);
         expect((await api('/api/v1/admin/stats', { auth: 'jwt' })).status).toBe(403);
         expect((await api('/api/v1/admin/review/queue', { auth: 'none' })).status).toBe(401);
+    });
+
+    it('/admin/cockpit liest Buchungen, Tarife und Bewertungen, nicht engagement_requests', async () => {
+        // 22.10.2026: vorher engagement_requests (tot) und 12 $ je Assistant-Abo.
+        const iso = (dh: number) => new Date(Date.now() + dh * 3_600_000).toISOString();
+        db.engagement_requests = [{ id: 'alt', status: 'replied', created_at: iso(0) }];
+        db.scheduling = [{ id: 'b1', provider_key: 'studio', status: 'confirmed', slot_start: iso(5), created_at: iso(0), message: 'geheime Nachricht' }];
+        db.reviews = [{ from_role: 'user', rating: 4, body: 'Freitext' }];
+        db.event_log = [
+            { type: 'lead.revealed', timestamp: iso(0), payload: { userId: 'u-geheim', providerKey: 'studio' } },
+            { type: 'appointment_reminder_shadow', timestamp: iso(0), payload: {} },
+        ];
+        const r = await adminApi('/api/v1/admin/cockpit');
+        expect(r.status).toBe(200);
+        expect(r.body.cockpit.product).toMatchObject({ bookingsToday: 1, bookingsTotal: 1 });
+        expect(r.body.cockpit.voice.reviews).toMatchObject({ count: 1, avgRating: 4 });
+        expect(r.body.cockpit.events.map((e: any) => e.type)).toEqual(['lead.revealed']);
+        expect(JSON.stringify(r.body)).not.toMatch(/u-geheim|geheime Nachricht|Freitext/);
+        expect(r.body.cockpit).not.toHaveProperty('productEngagement');
+        expect((await api('/api/v1/admin/cockpit', { auth: 'jwt' })).status).toBe(403);
+    });
+
+    it('/admin/stats liest Buchungen und Audit-Log, nicht die toten Tabellen', async () => {
+        // 20.10.2026: vorher engagement_requests + documents — beide leer im Betrieb.
+        const now = Date.now();
+        const iso = (dh: number) => new Date(now + dh * 3_600_000).toISOString();
+        db.engagement_requests = [{ id: 'alt', status: 'replied', created_at: iso(0) }];
+        db.documents = [{ classification: 'x', consent_ai: true, created_at: iso(0) }];
+        db.scheduling = [{ id: 'b1', provider_key: 'studio', status: 'confirmed', slot_start: iso(5), created_at: iso(0), acknowledgement_version: 'v2' }];
+        db.event_log = [
+            { type: 'assistant_chat', timestamp: iso(-1), payload: { redacted: true } },
+            { type: 'lead.revealed', timestamp: iso(0), payload: { bookingId: 'b1', userId: 'u-geheim', providerKey: 'studio' } },
+            // Shadow-Marker zaehlen nirgends mit und verdraengen nichts.
+            { type: 'appointment_reminder_shadow', timestamp: iso(0), payload: { bookingId: 'b1' } },
+            { type: 'sla_breach_shadow', timestamp: iso(0), payload: {} },
+            // ausserhalb des Fensters
+            { type: 'calendar_event_failed', timestamp: iso(-24 * 10), payload: {} },
+        ];
+        const r = await adminApi('/api/v1/admin/stats');
+        expect(r.status).toBe(200);
+        expect(r.body.bookings).toMatchObject({ today: 1, total: 1, upcoming7: 1, disclosureAuditedRate: 1 });
+        expect(r.body.privacy).toMatchObject({ aiRequests7: 1, aiRedacted7: 1, reveals7: 1, customerUploads: null });
+        expect(r.body.security).toMatchObject({ errorEvents7: 0 });
+        expect(r.body.watchlist).toEqual([expect.objectContaining({ id: 'b1', flag: 'soon' })]);
+        expect(r.body.events.map((e: any) => e.type)).not.toContain('appointment_reminder_shadow');
+        expect(JSON.stringify(r.body.events)).not.toContain('u-geheim');
+        expect(r.body).not.toHaveProperty('stats');
     });
 
     it('zeigt eingereichte Bewerbungen in der Queue mit Risiko', async () => {
@@ -5952,5 +6048,74 @@ describe('Retention api_request_log (P8): Audit-Ereignis, Fehler zaehlen statt a
         } finally { spy.mockRestore(); }
         expect(db.api_request_log.map((r: any) => r.id)).toEqual([a]);
         expect(db.event_log.find((e) => e.type === 'retention_deleted')?.payload).toMatchObject({ count: 1, errors: 1 });
+    });
+});
+
+// ─── Beta-Vereinbarung (Canvas-Wahl 1A · 2A · 3A+3C · 4C, 22.10.2026) ────────
+
+function seedBetaAgreement(over: Record<string, any> = {}) {
+    const points = [{ lead: 'Das ist ein Test.', text: 'Sie nutzen eine unfertige Version.' }, { lead: 'Es kostet nichts.', text: 'Nichts wird abgebucht.' }];
+    (db.user_agreements ??= []).push(
+        { agreement: 'beta', version: 'beta-2026-10', language: 'en', title: 'Beta agreement', points, effective_from: '2026-10-22', ...over },
+        { agreement: 'beta', version: 'beta-2026-10', language: 'de', title: 'Beta-Vereinbarung', points, effective_from: '2026-10-22', ...over },
+    );
+}
+
+describe('Beta-Vereinbarung — Text, Stand, Annahme', () => {
+    it('GET /agreements/beta ist oeffentlich, kennt die Sprache und faellt auf Englisch zurueck', async () => {
+        seedBetaAgreement();
+        const de = await api('/api/v1/agreements/beta?lang=de', { auth: 'none' });
+        expect(de.status).toBe(200);
+        expect(de.body).toMatchObject({ agreement: 'beta', version: 'beta-2026-10', language: 'de', title: 'Beta-Vereinbarung' });
+        expect(de.body.points).toHaveLength(2);
+        const tr = await api('/api/v1/agreements/beta?lang=tr', { auth: 'none' });
+        expect(tr.body.language).toBe('en');
+    });
+
+    it('GET /agreements/foo ist 404, ohne Fassung 503', async () => {
+        expect((await api('/api/v1/agreements/foo', { auth: 'none' })).status).toBe(404);
+        expect((await api('/api/v1/agreements/beta', { auth: 'none' })).status).toBe(503);
+    });
+
+    it('GET /me/agreements verlangt einen Nutzer und meldet required, solange nichts angenommen ist', async () => {
+        seedBetaAgreement();
+        expect((await api('/api/v1/me/agreements', { auth: 'none' })).status).toBe(401);
+        expect((await api('/api/v1/me/agreements', { auth: 'key' })).status).toBe(401);
+        const r = await api('/api/v1/me/agreements', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.agreements.beta).toMatchObject({ current_version: 'beta-2026-10', accepted_version: null, required: true });
+        expect(r.body.agreements.terms).toMatchObject({ current_version: null, required: false });
+    });
+
+    it('POST /me/agreements/beta schreibt die Annahme einmal, wiederholt als replay, danach required=false', async () => {
+        seedBetaAgreement();
+        const r1 = await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: JSON.stringify({ version: 'beta-2026-10', language: 'de' }) });
+        expect(r1.status).toBe(201);
+        expect(r1.body).toMatchObject({ agreement: 'beta', version: 'beta-2026-10', language: 'de' });
+        expect(db.user_agreement_acceptance).toEqual([expect.objectContaining({ user_id: USER_ID, agreement: 'beta', version: 'beta-2026-10', language: 'de' })]);
+        expect(db.event_log.some((e) => e.type === 'agreement_accepted' && e.payload.userId === USER_ID)).toBe(true);
+        const r2 = await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: JSON.stringify({ version: 'beta-2026-10', language: 'de' }) });
+        expect(r2.status).toBe(200);
+        expect(r2.body.replay).toBe(true);
+        expect(db.user_agreement_acceptance).toHaveLength(1);
+        const state = await api('/api/v1/me/agreements', { auth: 'jwt' });
+        expect(state.body.agreements.beta).toMatchObject({ accepted_version: 'beta-2026-10', required: false, language: 'de' });
+    });
+
+    it('POST mit veralteter Fassung: 409 mit current_version, nichts geschrieben', async () => {
+        seedBetaAgreement();
+        const r = await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: JSON.stringify({ version: 'beta-2026-09' }) });
+        expect(r.status).toBe(409);
+        expect(r.body).toMatchObject({ errorCode: 'AGREEMENT_OUTDATED', current_version: 'beta-2026-10' });
+        expect(db.user_agreement_acceptance ?? []).toHaveLength(0);
+    });
+
+    it('POST ohne version: 400; ohne Nutzer: 401; mit Sprache ohne Zeile: speichert die gelieferte Sprache', async () => {
+        seedBetaAgreement();
+        expect((await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: '{}' })).status).toBe(400);
+        expect((await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'key', body: JSON.stringify({ version: 'beta-2026-10' }) })).status).toBe(401);
+        const tr = await api('/api/v1/me/agreements/beta', { method: 'POST', auth: 'jwt', body: JSON.stringify({ version: 'beta-2026-10', language: 'tr' }) });
+        expect(tr.status).toBe(201);
+        expect(tr.body.language).toBe('en');
     });
 });

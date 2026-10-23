@@ -11,51 +11,7 @@
     "signOut": "Abmelden"
   },
   "hero": {
-    "scenarios": {
-      "shortcut": {
-        "seg1": "Ihre Compliance ",
-        "seg2": "Abkürzung",
-        "seg3": " zu globalen Märkten",
-        "text": "Identifizieren Sie rechtliche Lücken sofort und finden Sie geprüfte lokale Experten für die Umsetzung.",
-        "cta": "Finde meine Compliance-Abkürzung",
-        "usp1": "Sofortige Analyse",
-        "usp2": "Geprüfte lokale Experten",
-        "usp3": "Schnelle Umsetzung"
-      },
-      "actionPlan": {
-        "seg1": "Vom regulatorischen Risiko zum ",
-        "seg2": "Aktionsplan",
-        "seg3": " in Minuten",
-        "text": "Verwandeln Sie lokale Fragmentierung in eine klare Roadmap. Schneller verstehen und sicherer entscheiden.",
-        "cta": "Erstelle jetzt meinen Aktionsplan",
-        "usp1": "Schneller verstehen",
-        "usp2": "Sicherer entscheiden",
-        "usp3": "Klare Roadmap"
-      },
-      "experts": {
-        "seg1": "Der schnellste Weg zu ",
-        "seg2": "lokalen Compliance-Experten",
-        "cta": "Jetzt mit Experten vernetzen",
-        "usp1": "Sofortiges Matching",
-        "usp2": "Geprüfte Experten",
-        "usp3": "Maßgeschneidertes Assessment"
-      }
-    },
-    "companies": "Innovativen Unternehmen vertrauen uns",
-    "scroll": "Plattform entdecken",
-    "funnel": {
-      "countryLabel": "Zielmarkt",
-      "countryUk": "Vereinigtes Königreich",
-      "countryEu": "Europäische Union",
-      "countryGlobal": "Global / Andere",
-      "categoryLabel": "Compliance Kategorie",
-      "catTaxVat": "Steuern & USt",
-      "catEpr": "EPR Verpackung",
-      "catPrivacy": "Datenschutz",
-      "catMarketing": "Marketing-Compliance",
-      "catCorporate": "Unternehmensgründung",
-      "cta": "Jetzt qualifizieren"
-    }
+    "scroll": "Plattform entdecken"
   },
   "components": {
     "engagementModal": {
@@ -81,10 +37,10 @@
       "body": "Gründer brauchen Geschwindigkeit und Klarheit – keine akademischen Rechtserklärungen. CompliHub360 übersetzt regulatorische Komplexität in Entscheidungen, die Sie treffen können: was für Ihr Unternehmen gilt, warum es zählt und wer dabei hilft. Die Expansion ins Ausland ist eine dieser Entscheidungen, nicht die einzige.",
       "cta": "Compliance-Check starten",
       "pain1Title": "Der grenzüberschreitende blinde Fleck",
-      "pain1Desc": "International expandieren? Umsatzsteuerschwellen, EPR-Verpackungsgesetze und DSGVO unterscheiden sich je nach Land. Eine versäumte Registrierung kann Bußgelder bedeuten.",
-      "pain2Title": "Die unzuverlässige Expertenfalle",
-      "pain2Desc": "Compliance-Anbieter kalt anzuschreiben und wochenlang auf vage Antworten zu warten ist keine Strategie. Es ist ein Haftungsrisiko.",
-      "pain3Title": "Wir lösen das",
+      "pain1Desc": "International expandieren? Umsatzsteuerschwellen, EPR-Verpackungsregeln und DSGVO unterscheiden sich je Land — und jede Registrierung hat ihren eigenen Auslöser. Die Karte zeigt, welche für Sie gelten.",
+      "pain2Title": "Der lange Weg zu den richtigen Fachleuten",
+      "pain2Desc": "Anbieter kalt anzuschreiben und wochenlang auf Antwort zu warten kostet Zeit, die Sie vielleicht nicht haben. Eine strukturierte Anfrage mit Ihrem Kontext bekommt innerhalb von 48 Stunden eine Antwort in der Sache.",
+      "pain3Title": "Was CompliHub360 stattdessen tut",
       "diagramTitle": "Vom Kontext zur richtigen Fachperson",
       "node1Label": "Länder-Gate",
       "node1Desc": "Zielmarkt auswählen",
@@ -97,7 +53,6 @@
       "stat1Label": "Schritte zum Risikoprofil",
       "stat2Label": "Max. Bestätigungszeit",
       "stat3Label": "Max. Antwortfenster",
-      "stat4Label": "Regulatorische Überraschungen",
       "railSub": "Tempo und Klarheit statt Rechtsgutachten"
     },
     "operations": {
@@ -106,7 +61,7 @@
       "body": "Operations-Manager und Agentur-Betreiber brauchen strukturiertes Wissen und ein einheitliches System – keine fragmentierten Behörden-Webseiten und chaotische E-Mail-Threads. CompliHub360 gibt Ihnen ein einziges Kontrollzentrum für grenzüberschreitende Compliance.",
       "card1Title": "Fragmentierte Recherche",
       "card1Problem": "Informationen zu Werbebeschränkungen, EPR und Steuerrecht sind über unstrukturierte Behördenwebseiten verstreut.",
-      "card1Solution": "Unser Knowledge Hub aggregiert quellengestützte Gesetze, Tutorials und Leitfäden – alles auf Ihr genaues Suchprofil zugeschnitten.",
+      "card1Solution": "Die Seiten Märkte und Compliance-Bereiche führen die Pflichten, gegen die wir prüfen, jede mit ihrer Norm. Leitfäden und Tutorials folgen, sobald sie das Lesen wert sind.",
       "card2Title": "Verlust der Kontinuität",
       "card2Problem": "Das Verfolgen von Anbieteranfragen, gespeicherten Sitzungen und rechtlichen Updates ist ohne ein einheitliches System chaotisch.",
       "card2Solution": "Das Dashboard-Kontrollzentrum ermöglicht es Ihnen, Sitzungen zu speichern, Engagement-Status in Echtzeit zu verfolgen und Aufgaben zu überwachen.",
@@ -133,12 +88,12 @@
     "counsel": {
       "overline": "Für In-House Counsel",
       "title": "Verteidigbare Erkenntnisse. Sichere Orchestrierung.",
-      "body": "Juristen fordern strikte Datenschutzmaßnahmen und null KI-Halluzinationen. CompliHub360 ist eine sichere, EU-KI-Gesetz-bereite Infrastrukturschicht, die Rechtsrecherche beschleunigt und externe Mandate sicher strukturiert.",
+      "body": "Juristen brauchen strikten Datenschutz und Ausgaben, die sich nachvollziehen lassen. CompliHub360 ist eine datenschutzorientierte Schicht, gebaut mit Blick auf den EU AI Act: Sie strukturiert Recherche und externe Mandate, und jede Aussage trägt ihre Quelle.",
       "cta": "Sichere Recherche testen",
-      "benefit1Title": "Null Halluzinationen",
-      "benefit1Desc": "Jede Zusammenfassung, jedes Risikolabel und jeder Tipp ist direkt durch Links zu offiziellen, validierten Rechtsquellen und Behörden belegt. Keine erfundenen Behauptungen.",
+      "benefit1Title": "Quellengebundene Ausgaben",
+      "benefit1Desc": "Jede Zusammenfassung, jedes Risikolabel und jeder Hinweis verlinkt auf die offizielle Quelle, auf der er beruht. Wo wir keine Quelle haben, sagen wir das, statt die Lücke zu füllen.",
       "benefit2Title": "Datenschutz-zuerst-Architektur",
-      "benefit2Desc": "Dokumente werden durch eine lokale PII-Schwärzungs-Pipeline geleitet. Namen, E-Mails und Telefonnummern werden vor jeder KI-Verarbeitung maskiert.",
+      "benefit2Desc": "Dokumente laufen durch eine lokale Schwärzungs-Pipeline. E-Mail-Adressen, Telefonnummern und bekannte Kennungsmuster werden vor jeder KI-Verarbeitung maskiert. Musterregeln fangen nicht jeden Namen — das Trust Center sagt, was sie abdecken.",
       "benefit3Title": "Strukturierte Engagement-Dossiers",
       "benefit3Desc": "Ersetzen Sie vage E-Mails durch strukturierte Compliance-Dossiers, die an verifizierte lokale Anwälte gesendet werden – und beschleunigen Sie den Mandatsprozess.",
       "privacyGateTitle": "Das Datenschutz-zuerst-KI-Gate",
@@ -152,7 +107,7 @@
       "stage4Desc": "Quellengestützte Zusammenfassung",
       "codeCommentBefore": "// Vor der Schwärzung",
       "codeCommentAfter": "// Nach der Schwärzung",
-      "stat1Label": "PII vor KI maskiert",
+      "stat1Label": "Eingaben durchlaufen das Redaktions-Gate",
       "stat2Label": "Quellenverknüpfte Ausgaben",
       "railSub": "Belegte Aussagen, maskierte Daten"
     },
@@ -307,7 +262,7 @@
     "startAssessment": "{{title}}-Assessment starten",
     "riskPanel": {
       "eyebrow": "Von der Engine gewichtet",
-      "title": "Wo es zuerst brennt — für Ihren Markt gerechnet.",
+      "title": "Was zuerst Aufmerksamkeit braucht — gewichtet für Ihren Markt.",
       "lead": "Die Compliance-Engine gewichtet jeden Bereich aus Rechtsgrundlagen, Bußgeldrahmen und Fristen. Das Ranking zeigt, was zuerst Aufmerksamkeit braucht; die Vergleichsansicht stellt Risiko, Handlungsfrist und typische Exposition nebeneinander.",
       "marketNote": "Gewichtet für {{market}} — der Markt-Selector oben rechnet Rangfolge und Spannen neu.",
       "tabRanking": "Risiko-Ranking",
@@ -336,11 +291,11 @@
       "title": "Alle Bereiche auf einen Blick",
       "body": "Schnell-Vergleich für Recherchierende und Entscheider. Nach Risiko sortieren, um zuerst zu triagieren.",
       "area": "Compliance-Bereich",
-      "disclaimer": "Indikative Spannen basierend auf öffentlichen regulatorischen Quellen. Die tatsächliche Exposition hängt von Ihrem Fall ab – über den Wizard für genaue Empfehlungen prüfen.",
+      "disclaimer": "Indikative Spannen basierend auf öffentlichen regulatorischen Quellen. Die tatsächliche Exposition hängt von Ihrem Fall ab – die Erhebung grenzt sie auf Ihren ein.",
       "col": {
         "risk": "Risiko",
         "time": "Handlungsfrist",
-        "fine": "Typische Exposition",
+        "fine": "Höchststrafe",
         "markets": "Aktive Märkte",
         "proven": "belegt"
       },
@@ -350,7 +305,7 @@
     "howItWorks": {
       "overline": "Orchestrierung, kein Verzeichnis",
       "title": "Von Unsicherheit zu strukturiertem Handeln – in vier Schritten",
-      "body": "CompliHub360 steuert den Engagement-Funnel und erzwingt Antwort-Verantwortlichkeit. Sie behalten durchgängig die Kontrolle.",
+      "body": "CompliHub360 strukturiert Ihre Anfrage und hält Anbieter an ihre Antwortzeiten. Sie behalten durchgängig die Kontrolle.",
       "stepLabel": "Schritt {{num}}",
       "define": {
         "title": "Definieren",
@@ -380,7 +335,7 @@
       "openCta": "Öffnen",
       "library": {
         "title": "Compliance-Bibliothek",
-        "body": "Kuratierte Verordnungen, offizielle Quellen und strukturierte Leitfäden für jeden Bereich."
+        "body": "Die Verordnungen und offiziellen Quellen hinter jedem Bereich."
       },
       "countries": {
         "title": "Länder-Leitfäden",
@@ -388,7 +343,7 @@
       },
       "tutorials": {
         "title": "Tutorials & Walkthroughs",
-        "body": "Schritt-für-Schritt-Playbooks für gängige Compliance-Szenarien."
+        "body": "Schritt-für-Schritt-Anleitungen — ergänzt, sobald sie geschrieben sind."
       }
     },
     "meta": {
@@ -439,7 +394,7 @@
       "personaFit": "Ideal für: Hersteller & Reseller",
       "cov1": "Produkt- & Verpackungsassistent – bewertet Handelsrolle, Zielmärkte, Produktkategorien",
       "cov2": "Herstellerverantwortung je Markt – berechnet, wie wahrscheinlich Sie EPR-pflichtig sind",
-      "cov3": "Randfälle mit Sicherheitslogik – im Zweifel wird eine Pflicht angenommen, nicht wegdefiniert",
+      "cov3": "Randfälle werden als offen markiert, nicht wegdefiniert — Sie sehen, wo eine Pflicht wahrscheinlich ist und wo sie Bestätigung braucht",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
       },
@@ -550,7 +505,7 @@
       "personaFit": "Ideal für: Internationale Expansionsteams",
       "cov1": "Gründungs- & Meldungsassistent – bewertet aktuellen Status, gewünschte Märkte, Team-Komplexität",
       "cov2": "Strukturbedarf je Markt – bestimmt, ob Ihr Setup eine eigene Gesellschaft braucht",
-      "cov3": "Intelligente Weiterleitung zu Bildungsleitfaden-Pfaden für unsichere Gründer",
+      "cov3": "Leitet zu den erklärenden Seiten, wenn die Strukturfrage noch offen ist",
       "fines": {
         "authorities": "Lokale Handelsregister · Finanzbehörden · Geldwäsche-Aufseher"
       },
@@ -1130,7 +1085,7 @@
     },
     "cta": {
       "title": "Oder fangen Sie mit Ihrer eigenen Lage an.",
-      "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
+      "lead": "Vier Fragen, etwa fünf Minuten, kein Konto nötig."
     }
   },
   "aiGov": {
@@ -1142,7 +1097,7 @@
     "dimOrgTitle": "Organisatorische Verantwortung",
     "dimOrgDesc": "Klare Governance-Richtlinien definieren, wer KI-Funktionen einsetzen, darauf zugreifen und diese prüfen darf. Wir führen umfassende Audit-Protokolle für alle KI-Interaktionen.",
     "dimTechTitle": "Technische Robustheit",
-    "dimTechDesc": "Unsere Infrastruktur gewährleistet null Ausfallzeiten und belastbare Fallbacks. Dedizierte Privacy Gates bereinigen alle Eingaben, bevor sie ein LLM erreichen.",
+    "dimTechDesc": "Unsere Infrastruktur ist auf Belastbarkeit gebaut: Fällt ein KI-Schritt aus, fällt der Ablauf auf einen deterministischen Prozess zurück. Dedizierte Privacy Gates bereinigen jede Eingabe, bevor sie ein LLM erreicht.",
     "dimRegTitle": "Regulatorische Compliance",
     "dimRegDesc": "Entwickelt für den EU AI Act und ISO 42001. Wir verankern globale Standards direkt in unserem Code und priorisieren strenge EU- und UK-Datenschutzregeln.",
     "dimRiskTitle": "Risikomanagement",
@@ -1374,7 +1329,7 @@
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
-      "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
+      "lead": "Vier Fragen, etwa fünf Minuten, kein Konto nötig."
     },
     "seeAll": "Ansehen, wie jeder Schritt funktioniert"
   },
@@ -1595,7 +1550,7 @@
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
-      "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
+      "lead": "Vier Fragen, etwa fünf Minuten, kein Konto nötig."
     },
     "vignette": {
       "confirmed": "Termin bestätigt",
@@ -1762,7 +1717,7 @@
       "description": "Welche Compliance-Pflichten in {{country}} gelten, wie stark die Bereiche dort gewichtet sind und mit welcher Rechtsquelle."
     },
     "complianceArea": {
-      "title": "{{area}} — Pflichten & Bußgelder | CompliHub360",
+      "title": "{{area}} — Pflichten & Quellen | CompliHub360",
       "description": "Jede {{area}}-Pflicht mit Rechtsgrundlage, Bußgeldrisiko und Fristen je Markt. Vermittlung an geprüfte Spezialisten."
     }
   },
@@ -1861,7 +1816,7 @@
       "sales": {
         "short": "Preise",
         "title": "Preise und Pläne",
-        "desc": "Welcher Plan passt, was ein Team kostet, wie Rechnungen laufen.",
+        "desc": "Für Anbieter: welcher Plan passt, was er kostet, wie Rechnungen laufen. Für Unternehmen bleibt die Plattform kostenlos.",
         "sla": "Antwort am nächsten Werktag"
       },
       "partner": {

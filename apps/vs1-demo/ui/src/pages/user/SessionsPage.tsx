@@ -255,7 +255,7 @@ export function SessionsPage() {
   if (live !== null && rows.length === 0) {
     return (
       <UserShell>
-        <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+        <div className="-mx-4 -my-5 min-h-[calc(100%+2.5rem)] bg-gradient-stage lg:-mx-8 lg:-my-6 lg:min-h-[calc(100%+3rem)] px-8 py-7">
           <div className="mx-auto max-w-[1240px]">
             <h1 className="font-serif text-[23px] font-bold leading-tight text-fg">
               <Trans t={t} i18nKey="riskMaps.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
@@ -286,7 +286,7 @@ export function SessionsPage() {
 
   return (
     <UserShell>
-      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+      <div className="-mx-4 -my-5 min-h-[calc(100%+2.5rem)] bg-gradient-stage lg:-mx-8 lg:-my-6 lg:min-h-[calc(100%+3rem)] px-8 py-7">
         <div className="mx-auto max-w-[1240px]">
           {/* 1B · Kopf mit Lage-Satz */}
           <div className="flex items-start justify-between gap-6">

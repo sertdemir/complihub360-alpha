@@ -1,6 +1,6 @@
 {
   "topbar": {
-    "guestBadge": "Misafir haritası · 30 dk içinde sona erer",
+    "guestBadge": "Misafir haritası · 30 dk saklanır — kalıcı olması için kaydedin",
     "backHome": "Başa dön",
     "saveMap": "Bu haritayı kaydedin"
   },
@@ -58,14 +58,14 @@
     "eyebrow_other": "{{count}} Verified Provider eşleşti",
     "title": "Bu konuda kimin harekete geçebileceğini bulduk.",
     "none": "Bu alanı kapsayan sağlayıcı henüz yok.",
-    "unlocked": "Eşleşmeler açıldı",
+    "unlocked": "Eşleşmeler kaydedildi",
     "unlockCta": "En iyi eşleşmelerinizi ücretsiz bir hesapla görün",
     "match": "{{pct}} uyum",
     "requestQuote": "Teklif isteyin"
   },
   "cta": {
-    "title": "Bu haritayı kaydedin. Sağlayıcıların kilidini açın.",
-    "body": "Ücretsiz hesap. Kredi kartı gerekmez. Beta lansmanına kadar kurucu üye erişimi.",
+    "title": "Bu haritayı kaydedin. Eşleşmelerinizi saklayın.",
+    "body": "Ücretsiz hesap. Kredi kartı gerekmez. Haritanız ve eşleşmeleriniz kayıtlı kalır.",
     "button": "Ücretsiz hesap oluşturun"
   },
   "quote": {
@@ -187,7 +187,7 @@
     "pickSlot": "Soldan bir saat seçin.",
     "revealNote": "Randevudan sonra sağlayıcının adı ve iletişim bilgileri görünür olur — takvim daveti dahil.",
     "messagePh": "Kısaca konunuz (isteğe bağlı) …",
-    "confirmCta": "Kesin olarak al",
+    "confirmCta": "Rezervasyonu onayla",
     "freeNote": "Ücretsiz ve taahhütsüz · istediğiniz zaman iptal edilebilir",
     "doneEyebrow": "ALINDI",
     "doneTitle": "Randevunuz hazır.",
@@ -294,7 +294,7 @@
     "kpiOpenSub_one": "{{count}} yükümlülük yanıtınızı bekliyor",
     "kpiOpenSub_other": "{{count}} yükümlülük yanıtlarınızı bekliyor",
     "group": {
-      "now": "Hemen harekete geçin",
+      "now": "Şimdi vadesi geliyor",
       "month": "Bu ay",
       "open": "Önce netleştirin",
       "later": "Daha sonra"

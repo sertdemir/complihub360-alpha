@@ -11,8 +11,8 @@ import { generateRelevantSubdomains, isKnownCountry, type CountryCode, type Indu
 
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
-import { verifySupabaseJwt } from "./supabaseJwt.js";
-import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
+import { checkSupabaseJwt } from "./supabaseJwt.js";
+import { sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleDomain } from "./domain.js";
 import { handleAuthAdopt } from "./adoption.js";
@@ -35,12 +35,14 @@ import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { handleProviderApplication } from "./providerApplication.js";
+import { handleAgreementsRoute } from "./agreements.js";
 import { handleSubscriptionGet, handleSubscriptionSelect, handleSubscriptionSchedule, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
 import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpact.js";
 import { plannedPrices } from "./changeSchedule.js";
 import { readActiveSince } from "./activeSince.js";
 import { redactText } from "@complihub360/redaction";
+import { computeAdminStats, disclosureSince, windowStart, type BookingRow, type EventRow, type EvidenceRow } from './adminStats.js';
 import {
     loadVisibility, maskIdentity, publicTitle, rankBasis, requiredFor, scanFields, serializeProvider, verificationDepth,
     type IdentityContext, type RegisterRow,
@@ -309,6 +311,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         ['POST', /^\/api\/v1\/contact$/],
         ['GET', /^\/api\/v1\/nylas\/callback(\?|$)/],      // Nylas Hosted Auth: der signierte state ist das Credential                  // Kontaktseite + Partner-Bewerbung (eigenes Limit)
         ['GET', /^\/api\/v1\/acknowledgement(\?|$)/],       // booking acknowledgement text (public legal copy)
+        ['GET', /^\/api\/v1\/agreements\/[a-z-]+(\?|$)/],  // Beta-Vereinbarung / AGB: Text ist oeffentlich
         ['GET', /^\/api\/v1\/sessions(\?|$)/],             // guest session list (guest_key = bearer)
         ['POST', /^\/api\/v1\/provider\/intake$/],         // intake token checked in-handler
         ['GET', /^\/api\/v1\/provider\/magic\//],          // single-use token IS the credential
@@ -327,7 +330,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         //    key via JWKS — supabaseJwt.ts): signature there, exp/nbf/role here.
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.substring(7);
-            const payload = await verifySupabaseJwt(token);
+            const check = await checkSupabaseJwt(token);
+            const payload = check.payload;
+            // Bis 20.10.2026 lehnte das Tor still ab: Beta-Login, sofortiger
+            // Logout, kein Wort im Log. Jetzt steht der Grund da — ohne Token.
+            let rejected: string | null = check.reason;
             if (payload) {
                 const nowSec = Math.floor(Date.now() / 1000);
                 const notExpired = typeof payload.exp !== 'number' || payload.exp > nowSec;
@@ -345,7 +352,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const appRole = (payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined)
                         ?? (payload.user_metadata && typeof payload.user_metadata.role === 'string' ? payload.user_metadata.role : undefined);
                     if (appRole === 'admin') authIsAdmin = true;
+                } else {
+                    rejected = !notExpired ? 'expired' : !active ? 'not_yet_valid' : 'role';
                 }
+            }
+            if (rejected) {
+                structuredLog("warn", "Bearer token rejected", {
+                    correlationId, errorCode: "ERR_JWT_REJECTED", severity: "warn", route: (req.url || '').split('?')[0],
+                    reason: rejected, alg: check.alg, kid: check.kid, knownKeys: check.knownKeys,
+                });
             }
         }
 
@@ -457,6 +472,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     if (req.method === 'GET' && req.url === '/api/v1/me/provider') {
         await handleMeProvider(res, correlationId, authUserId);
         return;
+    }
+
+    // Beta-Vereinbarung: Text (oeffentlich), Stand und Annahme des Nutzers.
+    if (/^\/api\/v1\/(agreements\/|me\/agreements)/.test(req.url || '')) {
+        if (await handleAgreementsRoute(req, res, { correlationId, authUserId })) return;
     }
 
     const linkMatch = /^\/api\/v1\/admin\/provider\/([a-z0-9-]+)\/member$/.exec(req.url || '');
@@ -1415,13 +1435,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             switch (r.result) {
                 case 'not_found': send(404, { errorCode: 'NOT_FOUND', message: 'Provider not found' }); return;
                 case 'rate_limited': send(429, { errorCode: 'RECHECK_LIMIT', message: 'Too many checks — try again later', retry_after: r.retryAfter }); return;
-                case 'stripe_error': send(502, { errorCode: 'STRIPE_ERROR', message: 'Stripe request failed' }); return;
+                case 'stripe_error': send(502, { errorCode: 'STRIPE_ERROR', message: 'The payment service did not respond right now. Please try again in a moment.' }); return;
                 case 'declined': case 'needs_action': send(200, { ok: true, result: r.result, reason: r.reason }); return;
                 default: send(200, { ok: true, result: r.result, readiness: readiness(r.readiness) });
             }
         } catch (err) {
             structuredLog('error', 'Payment method recheck failed', { correlationId, errorCode: 'ERR_RECHECK', severity: 'error', route: req.url, detail: err instanceof Error ? err.message : String(err) } as any);
-            send(500, { errorCode: 'INTERNAL', message: 'Recheck failed' });
+            send(500, { errorCode: 'INTERNAL', message: 'The card could not be rechecked right now. Nothing was changed — please try again in a moment.' });
         }
     } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing\/sync$/.test(req.url || '')) {
         // Phase 4: Zahlungsbereitschaft aus Stripe und Datenbank neu berechnen —
@@ -1449,7 +1469,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             const detail = err instanceof StripeError ? { stripeStatus: err.status, stripeCode: err.code, stripeType: err.type, detail: err.message } : { detail: err instanceof Error ? err.message : String(err) };
             structuredLog('error', 'Billing sync failed', { correlationId, errorCode: 'ERR_BILLING_SYNC', severity: 'error', route: req.url, ...detail });
             res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'The payment service did not respond right now. Please try again in a moment.', correlationId }));
         }
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/bookings$/.test(req.url || '')) {
         // Matchmaking v2: the provider's paid leads (bookings). The dossier —
@@ -1488,6 +1508,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             const reports = (await supabaseApi.select('lead_proposal_reports', { provider_key: providerKey }, { limit: 500 })) as any[];
             const ledgerById: Record<string, any> = {}; ledgerRows.forEach((l: any) => { ledgerById[l.id] = l; });
             const reportByBooking: Record<string, any> = {}; reports.forEach((r: any) => { reportByBooking[r.booking_id] = r; });
+            // Lead-Bewertung (wie Punkt 1 beim Nutzer): ob der Anbieter den
+            // Lead schon bewertet hat, kommt vom Server. Vorher kannte das nur
+            // der Speicher der Seite — nach dem Neuladen standen die Sterne
+            // wieder da. Scheitert der Abgleich, bleiben die Termine lesbar;
+            // der Server antwortet dann ALREADY_REVIEWED, und die Seite sagt es.
+            const reviewedByProvider = new Set<string>();
+            try {
+                const revs = (await supabaseApi.select('reviews', { provider_key: providerKey, from_role: 'provider' }, { limit: 1000 })) as any[];
+                for (const r of revs) if (r.booking_id) reviewedByProvider.add(r.booking_id);
+            } catch {
+                structuredLog('warn', 'Provider reviewed flag lookup failed', { correlationId, errorCode: 'ERR_PROVIDER_BOOKINGS_REVIEWED', severity: 'warn', route: req.url });
+            }
             const bookings = rows.map((b: any) => {
                 const anfrage = b.user_id ? anfrageVon[b.user_id] : undefined;
                 const company = typeof anfrage?.structured_answers?.company === 'string' ? anfrage.structured_answers.company.trim() : '';
@@ -1519,6 +1551,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     } : null,
                     user_discount_pct: b.user_discount_pct ?? null,
                     proposal: rep ? { proposal_issued: !!rep.proposal_issued, discount_shown: !!rep.discount_shown, reported_at: rep.reported_at } : null,
+                    reviewed: reviewedByProvider.has(b.id),
                     ...attendanceFields(b, attPolicy, nowIso),
                 };
             });
@@ -2546,7 +2579,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         } catch {
             structuredLog('error', 'Billing portal failed', { correlationId, errorCode: 'ERR_BILLING_PORTAL', severity: 'error', route: req.url });
             res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'The payment service did not respond right now. Please try again in a moment.', correlationId }));
         }
     } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/change-email$/.test(req.url || '')) {
         // B8: request a contact-email change. A single-use verify link (1h)
@@ -2835,7 +2868,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             } catch (err) {
                 structuredLog('error', 'Market request failed', { correlationId, errorCode: 'ERR_MARKET_REQUEST', severity: 'error', route: req.url, detail: String(err).slice(0, 500) });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Market request failed', correlationId }));
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'The market request could not be saved right now. Nothing was changed — please try again in a moment.', correlationId }));
             }
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/session') {
@@ -2867,7 +2900,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             } catch {
                 structuredLog('error', 'Session save failed', { correlationId, errorCode: 'ERR_SESSION', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session save failed', correlationId }));
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Your session could not be saved right now. Nothing was changed — please try again in a moment.', correlationId }));
             }
         });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/sessions')) {
@@ -3026,7 +3059,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         } else if (reminderOutcome === 'error') {
             structuredLog('error', 'Reminder failed', { correlationId, errorCode: 'ERR_REMIND', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Reminder failed', correlationId }));
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'The reminder could not be sent right now. Nothing was changed — please try again in a moment.', correlationId }));
         } else {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, id: engagementId, reminded: true }));
@@ -3074,9 +3107,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Withdraw failed', correlationId }));
         }
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/stats')) {
-        // Admin control center: one aggregated read across engagements, the
-        // audit log and the privacy pipeline. Approximations share the caveats
-        // of /metrics (no per-transition timestamps yet).
+        // Admin control center: eine aggregierte Lesung ueber die lebenden
+        // Quellen — Buchungen, Audit-Log, Nachweise. Die Rechnung steht in
+        // adminStats.ts (20.10.2026: vorher tote Tabellen, siehe dort).
         // Befund Phase 2 (2026-09-22): bis dahin reichte jeder Login — das
         // Protokoll mit Anbieter-Schluesseln und Anfragen-Status war fuer jeden
         // Nutzer lesbar. Jetzt wie Cockpit: Admin-JWT oder Server-Key.
@@ -3087,309 +3120,32 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             return;
         }
         try {
-            const dayStart = new Date(); dayStart.setUTCHours(0, 0, 0, 0);
-            const engagements = (await supabaseApi.select('engagement_requests', {}, { order: 'created_at.desc', limit: 500 })) as
-                Array<{ id: string; provider_key: string; country: string; category: string; status: string; created_at: string; updated_at?: string; sla_confirm_deadline?: string; sla_reply_deadline?: string }>;
-            const events = (await supabaseApi.select('event_log', {}, { order: 'timestamp.desc', limit: 100 })) as
-                Array<{ type: string; payload?: Record<string, unknown>; timestamp?: string; created_at?: string }>;
-            const documents = (await supabaseApi.select('documents', {}, { order: 'created_at.desc', limit: 200 })) as
-                Array<{ classification: string; sanitized_ready: boolean; consent_ai?: boolean; ai_allowed: boolean; created_at?: string; redaction_report?: { countsByType?: Record<string, number> } }>;
-
-            const total = engagements.length;
-            const confirmedPlus = engagements.filter(r => r.status === 'confirmed' || r.status === 'replied');
-            const requestsToday = engagements.filter(r => new Date(r.created_at) >= dayStart).length;
-            const avgMs = (subset: typeof engagements) => {
-                const ds = subset.filter(r => r.updated_at)
-                    .map(r => new Date(r.updated_at as string).getTime() - new Date(r.created_at).getTime())
-                    .filter(d => d > 0);
-                return ds.length ? Math.round(ds.reduce((a, b) => a + b, 0) / ds.length) : null;
-            };
-            const now = Date.now();
-            const OPEN_CONFIRM = ['created', 'delivered', 'viewed'];
-            const watchlist = engagements
-                .filter(r => OPEN_CONFIRM.includes(r.status) || r.status === 'confirmed')
-                .map(r => {
-                    const deadline = OPEN_CONFIRM.includes(r.status) ? r.sla_confirm_deadline : r.sla_reply_deadline;
-                    return { id: r.id, provider_key: r.provider_key, country: r.country, category: r.category, status: r.status, deadline, msLeft: deadline ? new Date(deadline).getTime() - now : null };
-                })
-                .sort((a, b) => (a.msLeft ?? Infinity) - (b.msLeft ?? Infinity))
-                .slice(0, 10);
-            const redacted = documents.reduce((s, d) => s + Object.values(d.redaction_report?.countsByType || {}).reduce((a, b) => a + b, 0), 0);
-            const consentGiven = documents.filter(d => d.consent_ai === true).length;
-            const stats = {
-                requestsToday,
-                requestsTotal: total,
-                confirmRate: total ? confirmedPlus.length / total : null,
-                replyRate: confirmedPlus.length ? engagements.filter(r => r.status === 'replied').length / confirmedPlus.length : null,
-                avgConfirmMs: avgMs(confirmedPlus),
-                breaches: engagements.filter(r => r.status === 'expired').length + watchlist.filter(w => (w.msLeft ?? 1) < 0).length,
-            };
-            const privacy = {
-                uploads: documents.length,
-                piiRedacted: redacted,
-                consentRate: documents.length ? consentGiven / documents.length : null,
-                aiBlocks: events.filter(e => e.type === 'document_ai_blocked').length,
-            };
-            const security = {
-                invalidTokenBlocks: events.filter(e => /invalid_token|magic.*(invalid|expired|used)/i.test(e.type)).length,
-                aiGateBlocks: events.filter(e => e.type === 'document_ai_blocked').length,
-            };
-            const feed = events.slice(0, 12).map(e => ({ ...e, created_at: e.created_at || e.timestamp }));
-
-            // ── 7-day trend series (for the Control Center metric charts) ──────
-            // Aggregated from the same in-memory reads; UTC day buckets, oldest → newest.
-            const dayKeys: string[] = [];
-            for (let i = 6; i >= 0; i--) {
-                const dt = new Date(); dt.setUTCHours(0, 0, 0, 0); dt.setUTCDate(dt.getUTCDate() - i);
-                dayKeys.push(dt.toISOString().slice(0, 10));
-            }
-            const dates = dayKeys.map(k => `${k.slice(8, 10)}.${k.slice(5, 7)}`);
-            const idxOf = (iso?: string) => dayKeys.indexOf((iso || '').slice(0, 10));
-            const bucket = () => new Array(7).fill(0) as number[];
-            const reqB = bucket(), confB = bucket(), breachB = bucket(), upB = bucket(), piiB = bucket(), aiB = bucket(), docTotB = bucket(), consB = bucket();
-            for (const e of engagements) {
-                const ci = idxOf(e.created_at); if (ci >= 0) reqB[ci]++;
-                const ui = idxOf(e.updated_at);
-                if (ui >= 0 && (e.status === 'confirmed' || e.status === 'replied')) confB[ui]++;
-                if (ui >= 0 && e.status === 'expired') breachB[ui]++;
-            }
-            for (const d of documents) {
-                const di = idxOf(d.created_at); if (di < 0) continue;
-                upB[di]++; docTotB[di]++;
-                piiB[di] += Object.values(d.redaction_report?.countsByType || {}).reduce((a, b) => a + b, 0);
-                if (d.consent_ai === true) consB[di]++;
-            }
-            for (const ev of events) {
-                if (ev.type === 'document_ai_blocked') { const ei = idxOf(ev.created_at || ev.timestamp); if (ei >= 0) aiB[ei]++; }
-            }
-            const series = {
-                dates,
-                requests: reqB,
-                confirmRate: reqB.map((r, i) => (r ? Math.round((confB[i] / r) * 100) : 0)),
-                breaches: breachB,
-                uploads: upB,
-                pii: piiB,
-                consent: docTotB.map((tt, i) => (tt ? Math.round((consB[i] / tt) * 100) : 0)),
-                aiBlocks: aiB,
-            };
-
-            res.setHeader('x-correlation-id', correlationId);
+            const LIMITS = { bookings: 500, events: 5000 };
+            const NO_SHADOW = 'not.like.*_shadow';
+            const bookings = (await supabaseApi.select('scheduling', {}, { order: 'created_at.desc', limit: LIMITS.bookings })) as BookingRow[];
+            const from = windowStart().toISOString();
+            const since = disclosureSince(bookings);
+            const [events7, disclosureEvents, feed, evidence, policy] = await Promise.all([
+                supabaseApi.selectWhere('event_log', { timestamp: `gte.${from}`, type: NO_SHADOW }, { order: 'timestamp.desc', limit: LIMITS.events }),
+                since
+                    ? supabaseApi.selectWhere('event_log', { timestamp: `gte.${since}`, type: 'in.("lead.revealed","booking_rebooked")' }, { limit: LIMITS.events })
+                    : Promise.resolve([]),
+                supabaseApi.selectWhere('event_log', { type: NO_SHADOW }, { order: 'timestamp.desc', limit: 12 }),
+                supabaseApi.select('provider_evidence', {}, { limit: LIMITS.events }),
+                loadAttendancePolicy(),
+            ]);
+            const stats = computeAdminStats({
+                bookings, events7: events7 as EventRow[], disclosureEvents: disclosureEvents as EventRow[], feed: feed as EventRow[],
+                evidence: evidence as EvidenceRow[], rateLimitPerMinute: RATE_LIMIT_MAX,
+                reminder24h: policy.reminderOffsetsMin.includes(1440), limits: LIMITS,
+            });
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, stats, watchlist, privacy, security, events: feed, series }));
-        } catch {
-            structuredLog('error', 'Admin stats failed', { correlationId, errorCode: 'ERR_ADMIN_STATS', severity: 'error', route: req.url });
-            res.setHeader('x-correlation-id', correlationId);
+            res.end(JSON.stringify({ ok: true, ...stats }));
+        } catch (err) {
+            structuredLog('error', 'Admin stats failed', { correlationId, errorCode: 'ERR_ADMIN_STATS', severity: 'error', route: req.url, detail: String(err).slice(0, 200) });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to compute admin stats', correlationId }));
         }
-    } else if (req.method === 'POST' && req.url === '/api/v1/document/upload') {
-        // P0 #5: document upload runs through the redaction pipeline BEFORE any
-        // persistence — only sanitized content is stored; raw text is discarded
-        // here (raw-vault storage is a separate, later concern). The AI gate
-        // (sanitized_ready + ai_allowed) is derived from the redaction result.
-        let body = '';
-        req.on('data', (chunk: any) => body += chunk.toString());
-        req.on('end', async () => {
-            try {
-                const requestData = JSON.parse(body);
-                const { filename, mimeType, text, engagementId, userId } = requestData;
-                if (!filename || typeof filename !== 'string' || !text || typeof text !== 'string') {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'filename and text are required', correlationId }));
-                    return;
-                }
-                // Consent gate (Art. 6(1)(a) / Art. 7 GDPR): AI eligibility requires
-                // an explicit opt-in with this upload — absence or anything other
-                // than boolean true counts as NO consent. The document is still
-                // stored (sanitized); it just never becomes ai_allowed.
-                const consentAI = requestData.consentAI === true;
-                const redaction = redactText(text, { profile: 'strict' });
-                const aiAllowed = redaction.sanitized_ready && redaction.classification !== 'restricted' && consentAI;
-                const inserted = (await supabaseApi.insert('documents', {
-                    engagement_id: engagementId || null,
-                    user_id: userId || null,
-                    filename,
-                    mime_type: mimeType || null,
-                    content_sanitized: redaction.sanitizedText,
-                    redaction_report: redaction.report,
-                    classification: redaction.classification,
-                    sanitized_ready: redaction.sanitized_ready,
-                    consent_ai: consentAI,
-                    ai_allowed: aiAllowed
-                })) as Array<{ id: string }>;
-                const documentId = inserted?.[0]?.id;
-                await supabaseApi.insert('event_log', {
-                    type: 'document_uploaded',
-                    payload: { documentId, filename, classification: redaction.classification, sanitized_ready: redaction.sanitized_ready, consentAI, riskScore: redaction.report.riskScore }
-                });
-                res.setHeader('x-correlation-id', correlationId);
-                res.writeHead(201, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, id: documentId, sanitized_ready: redaction.sanitized_ready, consent_ai: consentAI, ai_allowed: aiAllowed, classification: redaction.classification, report: redaction.report }));
-            } catch {
-                structuredLog('error', 'Document upload failed', { correlationId, errorCode: 'ERR_DOC_UPLOAD', severity: 'error', route: req.url });
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Document upload failed', correlationId }));
-            }
-        });
-    } else if (req.method === 'POST' && req.url === '/api/v1/document/request-ai') {
-        // P0 #5: the AI gate — a document may only enter any AI flow when the
-        // privacy pipeline marked it sanitized_ready AND ai_allowed.
-        let body = '';
-        req.on('data', (chunk: any) => body += chunk.toString());
-        req.on('end', async () => {
-            try {
-                const { documentId } = JSON.parse(body);
-                if (!documentId) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'documentId is required', correlationId }));
-                    return;
-                }
-                const rows = (await supabaseApi.select('documents', { id: documentId }, { limit: 1 })) as
-                    Array<{ id: string; sanitized_ready: boolean; consent_ai: boolean; ai_allowed: boolean; classification: string; content_sanitized: string }>;
-                const doc = rows[0];
-                if (!doc) {
-                    res.writeHead(404, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Document not found', correlationId }));
-                    return;
-                }
-                // Defense in depth: ai_allowed already encodes consent at upload
-                // time, but the gate re-checks each condition so a later data fix
-                // or consent withdrawal (consent_ai=false) is honored immediately.
-                if (!doc.sanitized_ready || !doc.consent_ai || !doc.ai_allowed) {
-                    const reason = !doc.consent_ai ? 'NO_CONSENT' : 'NOT_SANITIZED';
-                    await supabaseApi.insert('event_log', { type: 'document_ai_blocked', payload: { documentId, classification: doc.classification, reason } });
-                    res.writeHead(403, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'PRIVACY_GATE', reason, message: 'Document is not cleared for AI processing', classification: doc.classification, correlationId }));
-                    return;
-                }
-                await supabaseApi.insert('event_log', { type: 'document_ai_requested', payload: { documentId } });
-                res.setHeader('x-correlation-id', correlationId);
-                res.writeHead(202, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, id: documentId, status: 'queued', message: 'Document accepted for AI processing (sanitized content only)' }));
-            } catch {
-                structuredLog('error', 'Document AI request failed', { correlationId, errorCode: 'ERR_DOC_AI', severity: 'error', route: req.url });
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Document AI request failed', correlationId }));
-            }
-        });
-    } else if (req.method === 'POST' && req.url === '/api/v1/engagement') {
-        let body = '';
-        req.on('data', (chunk: any) => body += chunk.toString());
-        req.on('end', async () => {
-            // P9: ein unlesbarer Body ist 400 — alles danach (Datenbank, Tokens)
-            // ist 500 und wird strukturiert geloggt, ohne den rohen Fehler
-            // (PostgREST nennt darin Spaltenwerte, also Nutzerdaten).
-            let requestData: any;
-            try {
-                requestData = JSON.parse(body);
-                if (!requestData || typeof requestData !== 'object' || typeof requestData.provider_key !== 'string' || !requestData.provider_key) throw new Error('provider_key required');
-            } catch {
-                res.setHeader('x-correlation-id', correlationId);
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'BAD_REQUEST', message: 'Invalid payload: provider_key required', correlationId }));
-                return;
-            }
-            try {
-                // Note: The ID generation will be handled by the DB via uuid_generate_v4()
-                // so we don't strictly need to generate it, but we can generate one to return it immediately
-                const crypto = await import('crypto');
-                const engagementId = crypto.randomUUID();
-
-                const newEngagement = {
-                    id: engagementId,
-                    // Der Ersteller kommt aus dem GEPRUEFTEN Token, nie aus dem
-                    // Body. Vorher stand hier requestData.user_id — ein
-                    // angemeldetes Konto haette Anfragen im Namen jedes anderen
-                    // anlegen koennen. Und weil das Frontend das Feld nie
-                    // schickte, gehoerte bis 2026-08-31 KEINE einzige
-                    // UI-Anfrage jemandem (user_id NULL) — womit auch jede
-                    // provider_confirmed/replied/declined-Benachrichtigung ins
-                    // Leere lief: notify() hat ohne Empfaenger nichts zu tun.
-                    user_id: authUserId || undefined,
-                    // Wave A7: link the wizard session + carry the requester
-                    // identity (revealed only via the dossier unlock).
-                    session_id: requestData.session_id || undefined,
-                    provider_key: requestData.provider_key,
-                    country: requestData.country,
-                    category: requestData.category,
-                    structured_answers: {
-                        ...(requestData.structured_answers || {}),
-                        ...(requestData.requester_email ? { requester_email: requestData.requester_email } : {}),
-                        ...(requestData.company ? { company: requestData.company } : {}),
-                    },
-                    message: requestData.message || "",
-                    status: 'created',
-                    sla_confirm_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-                    // Contract (Provider Flows §6.1 / Marketplace Ops §5.1): reply SLA is 48h, not 72h.
-                    sla_reply_deadline: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                };
-
-                await supabaseApi.insert('engagement_requests', newEngagement);
-
-                // P0 #1: issue signed, expiring, single-use magic-link tokens
-                // (one per provider action). Only the SHA-256 hash is stored;
-                // the raw tokens go into the e-mail links.
-                const nodeCrypto = await import('node:crypto');
-                const magicLinks: Record<string, string> = {};
-                for (const action of ['confirm', 'reply', 'decline'] as const) {
-                    const rawToken = nodeCrypto.randomBytes(32).toString('base64url');
-                    const tokenHash = nodeCrypto.createHash('sha256').update(rawToken).digest('hex');
-                    await supabaseApi.insert('magic_link_tokens', {
-                        engagement_id: engagementId,
-                        action,
-                        token_hash: tokenHash,
-                        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-                    });
-                    magicLinks[action] = `?id=${engagementId}&token=${rawToken}`;
-                }
-
-                // Wave B: the requester's opening message seeds the thread.
-                if (newEngagement.message) {
-                    await supabaseApi.insert('engagement_messages', {
-                        engagement_id: engagementId, author: 'user', body: newEngagement.message,
-                    }).catch(() => { /* thread is best-effort at creation time */ });
-                }
-
-                await supabaseApi.insert('event_log', {
-                    type: 'primary_request_submitted',
-                    payload: { engagementId, provider_key: newEngagement.provider_key }
-                });
-
-                // Funnel: deliver the magic links to the provider (Resend if
-                // configured, e-mail outbox log otherwise). Fire-and-forget —
-                // the engagement + tokens exist regardless of delivery.
-                (async () => {
-                    const provRows = (await supabaseApi.select('providers', { provider_key: newEngagement.provider_key }, { limit: 1 })) as
-                        Array<{ name: string; contact_email?: string | null }>;
-                    await sendMagicLinkMail({
-                        engagementId,
-                        providerKey: newEngagement.provider_key,
-                        providerName: provRows[0]?.name || newEngagement.provider_key,
-                        contactEmail: provRows[0]?.contact_email ?? null,
-                        country: newEngagement.country,
-                        category: newEngagement.category,
-                        message: newEngagement.message,
-                        magicLinks,
-                        correlationId,
-                        locale: typeof requestData.locale === 'string' ? requestData.locale : undefined,
-                    });
-                })().catch(() => { /* logged inside the mailer */ });
-
-                res.setHeader('x-correlation-id', correlationId);
-                res.writeHead(201, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, id: engagementId, status: 'created', magicLinks }));
-            } catch (err) {
-                structuredLog('error', 'Engagement create failed', {
-                    correlationId, errorCode: 'ERR_ENGAGEMENT_CREATE', severity: 'error', route: req.url,
-                    detail: err instanceof Error ? err.message.slice(0, 200) : String(err).slice(0, 200),
-                });
-                res.setHeader('x-correlation-id', correlationId);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'The request could not be saved. Please try again.', correlationId }));
-            }
-        });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/provider/magic/')) {
         // P0 #1: real token lookup — hash, match, expiry + single-use check.
         const token = req.url.split('/').pop() || '';
@@ -3980,18 +3736,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         handleBillingRun(req, res, correlationId, authViaApiKey);
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/cockpit')) {
         // Founder cockpit read-model: five lenses aggregated across the live
-        // systems (cockpit.ts) — server-to-server key only.
+        // systems (cockpit.ts) — Admin-JWT oder Server-Key.
         res.setHeader('x-correlation-id', correlationId);
         if (!authViaApiKey && !authIsAdmin) {
             res.writeHead(403, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Cockpit is admin-only', correlationId }));
         } else {
             try {
-                const cockpit = await buildCockpit();
+                const cockpit = await buildCockpit(correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, cockpit, correlationId }));
-            } catch {
-                structuredLog('error', 'Cockpit build failed', { correlationId, errorCode: 'ERR_COCKPIT', severity: 'error', route: req.url });
+            } catch (err) {
+                structuredLog('error', 'Cockpit build failed', { correlationId, errorCode: 'ERR_COCKPIT', severity: 'error', route: req.url, detail: String(err).slice(0, 200) });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Cockpit build failed', correlationId }));
             }

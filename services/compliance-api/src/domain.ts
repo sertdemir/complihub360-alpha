@@ -118,7 +118,7 @@ export function domainKnowledge(slug: string, markets: string[]): string[] {
                 const source = !national && e.scope === 'placeholder'
                     ? 'no named statute on file (a gap in our coverage, not in the law — do not name one)'
                     : e.source;
-                return `${tag}: ${source}; penalty ${e.penalty}; cadence ${e.due}`;
+                return `${tag}: ${source}; legal consequence if missed: ${e.penalty}; cadence ${e.due}`;
             }).filter(Boolean);
             lines.push(`- ${sub.label}: ${sub.description}${perMarket.length ? '\n  ' + perMarket.join('\n  ') : ''}`);
         }

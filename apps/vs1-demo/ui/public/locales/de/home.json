@@ -31,13 +31,13 @@
     "seeIfApplies": "Prüfen Sie, ob das auf Sie zutrifft"
   },
   "hero": {
-    "eyebrow": "Plattform für Compliance-Intelligence & Provider-Matching",
+    "eyebrow": "Compliance-Klarheit und die richtigen Fachleute",
     "title": {
       "pre": "Die Compliance-Arbeit, die Sie ",
       "gold": "nicht",
       "post": " allein erledigen sollten."
     },
-    "subtitleDesktop": "CompliHub360 kartiert die Regeln, die für Ihre Geschäftstätigkeit in europäischen Märkten gelten, und verbindet Sie mit einem verifizierten Spezialisten, sobald etwas Umsetzung braucht. Sechs Minuten bis zu Ihrer ersten Risk Map. Kein Konto erforderlich.",
+    "subtitleDesktop": "CompliHub360 kartiert die Regeln, die für Ihre Geschäftstätigkeit in europäischen Märkten gelten, und verbindet Sie mit einem verifizierten Spezialisten, sobald etwas Umsetzung braucht. Etwa fünf Minuten bis zu Ihrer ersten Risk Map. Kein Konto erforderlich.",
     "subtitleMobile": "CompliHub360 kartiert die Regeln in europäischen Märkten und verbindet Sie mit einem verifizierten Spezialisten, sobald etwas Umsetzung braucht. Sechs Minuten bis zu Ihrer ersten Risk Map. Kein Konto erforderlich.",
     "cta": {
       "start": "Meinen Bedarf ermitteln",
@@ -49,7 +49,7 @@
       "Keine Kreditkarte",
       "Ergebnisse in Ihrem Browser"
     ],
-    "visualCaption": "Sechs Minuten · 4 Fragen · Kein Konto erforderlich",
+    "visualCaption": "Etwa fünf Minuten · 4 Fragen · Kein Konto erforderlich",
     "preview": {
       "context": "Cross-Border-Launch — DE → UK + NL",
       "steps": [
@@ -75,18 +75,20 @@
       "placeholder": "Beschreiben Sie Ihr Anliegen in eigenen Worten…",
       "answer": "Eine Compliance-Frage stellen",
       "guided": "Meinen Bedarf ermitteln",
-      "trust": "Kostenlos · anonym · in unter 3 Minuten"
+      "trust": "Kostenlos · anonym · etwa fünf Minuten"
     }
   },
   "heroWorld": {
     "title": {
-      "line2": "Vereinfacht."
+      "line2": "Wissen Sie, was zu tun ist.",
+      "line1": "Verstehen Sie, was für Ihr Unternehmen gilt."
     },
-    "lead": "Verstehen Sie Ihre Pflichten. Finden Sie die richtigen Fachleute. Bleiben Sie konform — überall, wo Sie verkaufen.",
+    "lead": "Ihre Pflichten in {{markets}} Märkten, jede mit Quelle. Die richtigen Fachleute, wenn Sie sie brauchen.",
     "ctaRiskMap": "Bedarf ermitteln",
     "ask": {
       "placeholder": "Beschreiben Sie Ihr Anliegen",
-      "send": "Senden"
+      "send": "Senden",
+      "note": "In der Beta führt Ihre Frage zum passenden Bereich und in die Erhebung — noch nicht zu einer direkten Antwort."
     },
     "promises": [
       {
@@ -112,7 +114,7 @@
       },
       {
         "title": "Experten-Netzwerk",
-        "desc": "Verifizierte Fachleute, denen Sie vertrauen können."
+        "desc": "Fachleute, geprüft anhand von Nachweisen je Leistung und Markt."
       },
       {
         "title": "Smarte Technologie",
@@ -124,7 +126,7 @@
       },
       {
         "title": "Ihre Daten, geschützt",
-        "desc": "Sicherheit und Datenschutz auf Enterprise-Niveau."
+        "desc": "Anonyme Erhebung. Kennungen werden maskiert, bevor eine KI Ihren Text sieht."
       }
     ]
   },
@@ -143,7 +145,7 @@
       },
       {
         "title": "Mehr verkauft als nötig.",
-        "desc": "Der Anreiz liegt darin, den größten Umfang anzubieten. Niemand wird dafür bezahlt, Ihnen zu sagen, dass eine Aufgabe klein ist — oder längst erledigt."
+        "desc": "Der Anreiz belohnt meist den größten Umfang. Wenige werden dafür bezahlt, Ihnen zu sagen, dass eine Aufgabe klein ist — oder längst erledigt."
       },
       {
         "title": "Wochen, die im Scoping verschwinden.",
@@ -550,7 +552,7 @@
     "drawerLabel": "Fortschritt speichern"
   },
   "riskMapPreview": {
-    "guestNote": "Gast-Map · läuft in 30 Min. ab",
+    "guestNote": "Gast-Map · 30 Min. gespeichert — sichern Sie sie, um sie zu behalten",
     "eyebrow": "Ihre Risk Map",
     "title": "Das gilt für Sie.",
     "stats": [
@@ -574,28 +576,28 @@
     "rows": [
       {
         "title": "OSS-Quartalsmeldung",
-        "detail": "Zuletzt eingereicht: Q1 2025 · Strafe: €5,000 + 1 %/Monat · UStG §18i",
+        "detail": "Zuletzt eingereicht: Q1 2025 · Nächste Meldung fällig · UStG §18i",
         "market": "DE · NL",
         "due": "30. Apr",
         "dueSub": "6 Tage"
       },
       {
         "title": "USt-Registrierung — UK",
-        "detail": "Schwellenprüfung nach dem Brexit · bis zu €20,000 · VATA §3",
+        "detail": "Schwellenprüfung nach dem Brexit · VATA §3",
         "market": "UK",
         "due": "15. Mai",
         "dueSub": "21 Tage"
       },
       {
         "title": "EPR-Verpackungsregistrierung (LUCID)",
-        "detail": "Herstellerstatus zu bestätigen · bis zu €50,000 · VerpackG",
+        "detail": "Herstellerstatus zu bestätigen · VerpackG",
         "market": "DE",
         "due": "02. Mai",
         "dueSub": "8 Tage"
       },
       {
         "title": "EPR-Registrierungsverlängerung (PackUK)",
-        "detail": "Zuletzt eingereicht: Apr 2024 · 4 % des UK-Umsatzes · Packaging Regs",
+        "detail": "Zuletzt eingereicht: Apr 2024 · Verlängerung fällig · Packaging Regs",
         "market": "UK",
         "due": "15. Mai",
         "dueSub": "21 Tage"
@@ -652,28 +654,28 @@
     "rows": [
       {
         "title": "OSS-Quartalsmeldung",
-        "detail": "Zuletzt eingereicht: Q1 2025 · Strafe: €5,000 + 1 %/Monat · UStG §18i (OSS)",
+        "detail": "Zuletzt eingereicht: Q1 2025 · Nächste Meldung fällig · UStG §18i (OSS)",
         "market": "DE · NL",
         "due": "30. Apr",
         "dueSub": "6 Tage"
       },
       {
         "title": "USt-Registrierung — UK",
-        "detail": "Schwellenprüfung nach dem Brexit erforderlich · Strafe: bis zu €20,000 · UK VATA 1994 §3",
+        "detail": "Schwellenprüfung nach dem Brexit erforderlich · UK VATA 1994 §3",
         "market": "UK",
         "due": "15. Mai",
         "dueSub": "21 Tage"
       },
       {
         "title": "EPR-Verpackungsregistrierung (LUCID)",
-        "detail": "Herstellerstatus zu bestätigen · Strafe: bis zu €50,000 · VerpackG Art. 9 Abs. 1",
+        "detail": "Herstellerstatus vor der ersten Lieferung bestätigen · VerpackG §9",
         "market": "DE",
         "due": "02. Mai",
         "dueSub": "8 Tage"
       },
       {
         "title": "EPR-Registrierungsverlängerung (PackUK)",
-        "detail": "Zuletzt eingereicht: Apr 2024 · Strafe: 4 % des UK-Umsatzes · UK Packaging Regs. 2023 §7",
+        "detail": "Zuletzt eingereicht: Apr 2024 · Verlängerung fällig · UK Packaging Regs. 2023 §7",
         "market": "UK",
         "due": "15. Mai",
         "dueSub": "21 Tage"
@@ -701,7 +703,7 @@
       },
       {
         "title": "Aktualisierung wirtschaftlich Berechtigter",
-        "detail": "Zuletzt gemeldet: Mär 2025 · Strafe: €1,000–5,000 · GwG §20 Abs. 1",
+        "detail": "Zuletzt gemeldet: Mär 2025 · Aktualisierung fällig · GwG §20 Abs. 1",
         "market": "DE",
         "due": "30. Jun",
         "dueSub": "laufend"
@@ -711,8 +713,8 @@
     "partnersTitle": "Wir haben gefunden, wer das umsetzen kann.",
     "unlock": "Meine besten Matches mit kostenlosem Konto ansehen",
     "save": {
-      "title": "Diese Map speichern. Anbieter freischalten.",
-      "subtitle": "Kostenloses Konto. Keine Kreditkarte. Founding-Member-Zugang bis zum Beta-Launch.",
+      "title": "Diese Map speichern. Treffer behalten.",
+      "subtitle": "Kostenloses Konto. Keine Kreditkarte. Ihre Karte und Ihre Treffer bleiben gespeichert.",
       "cta": "Kostenloses Konto erstellen"
     },
     "statsCompact": [
@@ -737,7 +739,7 @@
   "matchmaking": {
     "eyebrow": "Der Unterschied",
     "title": {
-      "line1": "Andere Tools zeigen Ihnen, was falsch läuft.",
+      "line1": "Eine Liste von Regeln ist kein Plan.",
       "pre": "Wir ",
       "gold": "verbinden",
       "post": " Sie mit denen, die es lösen."
@@ -784,15 +786,15 @@
     "steps": [
       {
         "title": "Assessment starten",
-        "desc": "4–5 Fragen. Unter 2 Minuten. Kein Konto nötig."
+        "desc": "Vier Fragen. Etwa fünf Minuten. Kein Konto nötig."
       },
       {
         "title": "Risk Map ansehen",
         "desc": "Anonyme Vorschau, strukturiert, mit Quellenangaben."
       },
       {
-        "title": "Registrieren, um Matches zu sehen",
-        "desc": "Das Anbieter-Matching ist registrierten Konten vorbehalten."
+        "title": "Karte speichern, um Matches zu sehen",
+        "desc": "Ein kostenloses Konto lässt uns Ihre Karte halten und Ihre Anfrage an den richtigen Anbieter geben. Keine Kreditkarte."
       },
       {
         "title": "Strukturierte Übergaben erhalten",
@@ -1082,7 +1084,7 @@
       {
         "label": "Markenzeichen — Verified Provider",
         "title": "Ein leises Zeichen von Verantwortung.",
-        "desc": "Verified Provider sind geprüfte Berater, die gemeinsame Verantwortung für Ihre Sache übernehmen. Das goldene Zeichen ist Zurückhaltung, keine Werbung."
+        "desc": "Verified Provider sind geprüfte Berater, die für Ihre Sache in eigener beruflicher Verantwortung einstehen. Das goldene Zeichen ist Zurückhaltung, keine Werbung."
       }
     ],
     "demo": {
@@ -1153,12 +1155,12 @@
       "reqEprMeta": "EPR · Frankreich",
       "chipTaxIt": "STEUERN & UST · IT",
       "chipPackFr": "VERPACKUNG · FR",
-      "riskHigh": "● Hohes Risiko · Schwelle erreicht",
-      "riskMedium": "● Mittleres Risiko · Frist Q3",
+      "riskHigh": "● Hohe Priorität · Schwelle erreicht",
+      "riskMedium": "● Mittlere Priorität · fällig Q3",
       "chipMonitoring": "MONITORING",
       "chipRequest": "ANFRAGE",
       "chipSla": "SLA",
-      "feedThreshold": "Risikoschwelle erreicht · USt Italien",
+      "feedThreshold": "Schwelle erreicht · USt Italien",
       "feedReplied": "Anbieter hat geantwortet · Verifizierte Steuerkanzlei",
       "feedSla": "SLA-Erinnerung · Datenschutzkanzlei · UK",
       "time6h": "6 Std.",
@@ -1270,7 +1272,7 @@
     "cardTitle": "Das monatliche Briefing"
   },
   "footer": {
-    "tagline": "Die Orchestrierungsebene zwischen Compliance-Komplexität und betrieblicher Realität.",
+    "tagline": "Wir helfen Ihnen zu verstehen, was für Ihr Unternehmen gilt — und die richtige Person zu erreichen, wenn es eine braucht.",
     "notLawFirm": "Keine Kanzlei. Wir orchestrieren verifizierte Spezialisten.",
     "beta": "Beta",
     "columns": {
@@ -1330,7 +1332,7 @@
     "copyright": "© 2026 CompliHub360.",
     "legal": {
       "privacy": "Datenschutzerklärung",
-      "terms": "AGB",
+      "terms": "Beta-Vereinbarung",
       "imprint": "Impressum",
       "cookies": "Cookie-Richtlinie",
       "subProcessors": "Unterauftragsverarbeiter"

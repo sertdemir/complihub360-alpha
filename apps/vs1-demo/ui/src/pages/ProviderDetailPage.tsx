@@ -155,7 +155,7 @@ export function ProviderDetailPage() {
 
   return (
     <UserShell activeDomain={activeDomain}>
-      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+      <div className="-mx-4 -my-5 min-h-[calc(100%+2.5rem)] bg-gradient-stage lg:-mx-8 lg:-my-6 lg:min-h-[calc(100%+3rem)] px-8 py-7">
         <div className="mx-auto max-w-[1240px]">
           {state.kind === 'loading' && <p className="text-body-sm text-fg-tertiary">{t('detail.loading')}</p>}
 

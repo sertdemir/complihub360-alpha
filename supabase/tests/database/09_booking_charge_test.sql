@@ -19,8 +19,12 @@ select plan(16);
 
 -- ─── 1. Bestaetigungstext ───────────────────────────────────────────────────
 
-select is((select count(distinct version)::int from public.booking_acknowledgements), 1,
-          'Genau eine Fassung des Bestaetigungstexts');
+-- Seit 20261020000000 gibt es v2 (dieselben Saetze mit Diakritika); jede
+-- Fassung muss in allen vier Sprachen vorliegen, sonst faellt die Sprachwahl
+-- in currentAcknowledgement auf Englisch zurueck.
+select is((select count(*)::int from (
+            select version from public.booking_acknowledgements group by version having count(*) <> 4) luecken), 0,
+          'Jede Fassung des Bestaetigungstexts liegt in vier Sprachen vor');
 select is((select array_agg(language order by language) from public.booking_acknowledgements where version = 'booking-ack-v1'),
           array['de', 'en', 'es', 'tr']::char(2)[], 'Die Fassung v1 gibt es in de, en, es, tr');
 select is((select count(*)::int from public.booking_acknowledgements
