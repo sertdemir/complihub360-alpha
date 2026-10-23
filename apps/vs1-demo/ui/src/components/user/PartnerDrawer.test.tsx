@@ -117,3 +117,26 @@ describe('PartnerDrawer · Termin waehlen (V2)', () => {
     expect(screen.getByRole('button', { name: /detail\.bookCta/ })).toBeDisabled();
   });
 });
+
+// Beta-Testbuchung 23.10.2026: Karte "3 of 5", Schublade "5/7" — die Detail-
+// Antwort zaehlt ueber alle Maerkte, die Suche nur den angefragten.
+describe('PartnerDrawer · Nachweise wie auf der Karte', () => {
+  const basis = (v: number, r: number) => ({
+    verification: 'partial', verified_count: v, required_count: r, response_hours: null, confirmation_rate: null,
+    rating: null, reviews_count: null, completed: null, bookings: null, incidents: null, window_days: null, neutral: [],
+  });
+
+  it('zeigt die Zahl aus der Suche, nicht die aus der Detail-Antwort', async () => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, rank_basis: basis(5, 7) });
+    fetchSlots.mockReset().mockResolvedValue([]);
+    fetchAcknowledgement.mockReset().mockResolvedValue(null);
+    render(
+      <MemoryRouter>
+        <PartnerDrawer open onClose={() => {}} provider={{ ...PROVIDER, rank_basis: basis(3, 5) } as unknown as AnonProvider} />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(fetchProviderDetail).toHaveBeenCalled());
+    expect(await screen.findByText('3/5')).toBeInTheDocument();
+    expect(screen.queryByText('5/7')).not.toBeInTheDocument();
+  });
+});

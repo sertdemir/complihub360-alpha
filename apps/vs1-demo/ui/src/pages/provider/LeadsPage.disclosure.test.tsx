@@ -55,4 +55,12 @@ describe('Termine · Offenlegung ausstehend', () => {
     expect(await screen.findByText('kunde@example.com')).toBeInTheDocument();
     expect(screen.queryByText('termine.disclosure.pending.short')).not.toBeInTheDocument();
   });
+
+  it('Dossier ohne Firmennamen: die E-Mail traegt die Ueberschrift (Beta 23.10.2026)', async () => {
+    api.fetchProviderBookings.mockResolvedValue([lead({ disclosure: 'released', userEmail: 'kunde@example.com' })]);
+    render(<MemoryRouter><LeadsPage /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole('button', { name: 'termine.openDossier' }));
+    expect(await screen.findByRole('heading', { name: 'kunde@example.com' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'termine.companyMissing' })).not.toBeInTheDocument();
+  });
 });
