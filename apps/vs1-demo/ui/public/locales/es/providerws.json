@@ -576,7 +576,7 @@
     "minutes": "{{count}} min",
     "dossierEyebrow": "DOSSIER DEL LEAD",
     "dossierContact": "Contacto y cita",
-    "dossierContext": "Contexto de admisión",
+    "dossierContext": "Solicitud",
     "dossierNote": "Entregado al reservar, nada que confirmar. La tarifa de lead se factura por reserva; si el cliente no se presenta y no vuelve a reservar en 14 días, recibe un abono del 30 %.",
     "emptyUpcoming": "No hay citas próximas.",
     "emptyPast": "Aún no hay citas pasadas.",
