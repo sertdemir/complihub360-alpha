@@ -524,7 +524,14 @@ function search(body: unknown) {
   // der Trefferliste. So ist "kein freigegebener Anbieter" (P1 · Q1) lokal
   // erreichbar — Wizard: z. B. nur Umwelt oder nur Recht.
   const matching = providers.filter((p) => p.match_basis.domains_matched.length > 0);
-  return { ok: true, providers: matching, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
+  // F2 wie der Server (#385): passt niemand, kommen die Anbieter im Markt ohne
+  // Ueberschneidung getrennt — ohne match, match_tier und Preisspanne, mit
+  // eigenen Buchstaben. So ist der Block lokal erreichbar (Mock-Sitzung 3:
+  // ES, Marketing + Recht).
+  const outside = matching.length ? [] : providers
+    .filter((p) => p.match_basis.country_covered)
+    .map(({ match: _m, match_tier: _t, price_range: _pr, ...rest }, j) => ({ ...rest, title: `Verified Provider ${LETTER(j)}`, letter: LETTER(j) }));
+  return { ok: true, providers: matching, providers_outside: outside, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
 }
 
 type MockDetail = {
