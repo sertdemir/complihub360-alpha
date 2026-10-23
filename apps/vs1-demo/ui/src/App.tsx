@@ -22,7 +22,12 @@ import { ResourcesPage } from "./pages/ResourcesPage";
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { AiGovernancePage } from "./pages/AiGovernancePage";
-import { PrivacyPage, ImprintPage, TermsPage, CookiePage } from "./pages/legal/LegalPages";
+import { PrivacyPage, ImprintPage, CookiePage } from "./pages/legal/LegalPages";
+// Beta-Vereinbarung (Canvas-Wahl 1A · 2A · 3A+3C, 22.10.2026): /terms zeigt in der
+// geschlossenen Beta das Blatt; die AGB-Entwurfsseite (TermsPage) wartet auf den Launch.
+const BetaAgreementPage = lazy(() => import("./pages/legal/BetaAgreementPage").then((m) => ({ default: m.BetaAgreementPage })));
+const BetaAgreementStepPage = lazy(() => import("./pages/auth/BetaAgreementStepPage").then((m) => ({ default: m.BetaAgreementStepPage })));
+const AccountPage = lazy(() => import("./pages/user/AccountPage").then((m) => ({ default: m.AccountPage })));
 
 // Rollen-Bereiche werden nachgeladen, nicht mitgeliefert. Bis 20.08. steckte
 // der komplette Admin-, Provider-, User-, Auth- und Onboarding-Code im selben
@@ -215,7 +220,9 @@ function AppContent() {
                     {/* Legal (launch requirement: Art. 13 GDPR + Impressumspflicht) */}
                     <Route path="privacy" element={<PrivacyPage />} />
                     <Route path="imprint" element={<ImprintPage />} />
-                    <Route path="terms" element={<TermsPage />} />
+                    <Route path="terms" element={<BetaAgreementPage />} />
+                    {/* Schritt nach dem ersten Login; die Seite selbst verlangt den Login. */}
+                    <Route path="beta-agreement" element={<BetaAgreementStepPage />} />
                     <Route path="cookies" element={<CookiePage />} />
                     {/* Magic-link target from provider e-mails — public by design,
                         the single-use token IS the credential. */}
@@ -242,6 +249,7 @@ function AppContent() {
                         <Route path="p/:ref/schedule" element={<ProviderSchedulePage />} />
                         <Route path="dashboard/workbench/:domain" element={<DomainPage />} />
                         <Route path="dashboard/notifications" element={<UserNotificationsPage />} />
+                        <Route path="dashboard/account" element={<AccountPage />} />
                         <Route path="dashboard/saved-providers" element={<ComingSoonPage page="savedProviders" />} />
                         <Route path="dashboard/alerts" element={<ComingSoonPage page="alerts" />} />
                         <Route path="dashboard/calendar" element={<ComingSoonPage page="calendar" />} />

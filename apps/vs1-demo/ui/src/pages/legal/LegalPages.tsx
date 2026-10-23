@@ -5,9 +5,10 @@ import { SiteFooter } from '../../components/home/SiteFooter';
 // ─── Legal pages: Privacy Policy (Datenschutzerklärung) + Imprint (Impressum) ─
 // Launch requirement (GDPR Art. 13 information duties + German Impressumspflicht).
 // Structure and processing descriptions match the real system (RLS-guarded
-// profiles, redaction pipeline, consent-gated AI). Company identity fields are
-// [PLACEHOLDER]s — they MUST be filled and the final wording reviewed by legal
-// counsel before the public launch.
+// profiles, redaction pipeline, consent-gated AI). Operator data was filled on
+// 2026-10-22 (Demet Kale, sole proprietor, Bellevue WA). The wording has NOT
+// been reviewed by legal counsel — the banner says so. The Terms page keeps its
+// [PLACEHOLDER]s for contract substance until counsel drafts them.
 
 const PLACEHOLDER = (label: string) => (
   <span className="rounded bg-warning-bg px-1.5 py-0.5 font-mono text-[0.85em] text-warning-700 ring-1 ring-inset ring-warning-500/30">
@@ -15,7 +16,7 @@ const PLACEHOLDER = (label: string) => (
   </span>
 );
 
-function LegalShell({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {
+export function LegalShell({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {
   return (
     <>
       <main className="bg-surface">
@@ -30,7 +31,7 @@ function LegalShell({ title, updated, children }: { title: string; updated: stri
   );
 }
 
-function Section({ heading, children }: { heading: string; children: React.ReactNode }) {
+export function Section({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
     <section>
       <h2 className="text-[17px] font-semibold text-fg">{heading}</h2>
@@ -61,8 +62,15 @@ export function PrivacyPage() {
         <DraftBanner />
         <Section heading={t('privacy.headings.controller')}>
           <p>
-            {PLACEHOLDER('Firmenname')}, {PLACEHOLDER('Anschrift')}, {PLACEHOLDER('E-Mail Datenschutzkontakt')}.
-            Verantwortlicher im Sinne der DSGVO für alle auf dieser Plattform beschriebenen Verarbeitungen.
+            Demet Kale (Einzelunternehmerin), 14645 NE 35th St, Bellevue, WA 98007, USA,{' '}
+            <a href="mailto:dataprivacy@complihub360.com" className="text-fg-brand underline">dataprivacy@complihub360.com</a>.
+            Verantwortliche im Sinne der DSGVO für alle auf dieser Plattform beschriebenen Verarbeitungen.
+          </p>
+          <p>
+            Die Verantwortliche hat keine Niederlassung in der EU. Für die geschlossene Beta ist kein Vertreter nach
+            Art. 27 DSGVO benannt; wir stützen uns auf die Ausnahme für gelegentliche Verarbeitung (Art. 27 Abs. 2 lit. a).
+            Diese Einschätzung wird vor dem öffentlichen Start neu bewertet. Die Daten selbst werden in Frankfurt am Main
+            gespeichert (Abschnitt 5); der Zugriff durch die Verantwortliche erfolgt aus den USA.
           </p>
         </Section>
         <Section heading={t('privacy.headings.data')}>
@@ -93,28 +101,37 @@ export function PrivacyPage() {
         </Section>
         <Section heading={t('privacy.headings.recipients')}>
           <p>
-            Hosting: Hostinger ({PLACEHOLDER('Serverstandort, z. B. Deutschland')}) · Datenbank/Auth: Supabase (Region EU) ·
-            KI-Dienste: Anthropic (nur bereinigte Inhalte, gemäß Abschnitt 4). Mit allen Dienstleistern bestehen
-            Auftragsverarbeitungsverträge nach Art. 28 DSGVO. Verified Provider erhalten Ihre Anfragedaten nur, wenn Sie eine
-            Anfrage an sie richten.
+            Hosting: Hostinger (Rechenzentrum Frankfurt am Main, Deutschland) · Datenbank/Auth: Supabase (Region eu-central-1, Frankfurt) ·
+            KI-Dienste: Google (Gemini API; nur bereinigte Inhalte, gemäß Abschnitt 4; ein Wechsel auf Scaleway, Paris, ist in
+            Vorbereitung) · E-Mail-Versand: Resend (USA) · Besuchszahlen: Plausible, von uns selbst auf dem Server in
+            Frankfurt betrieben, ohne Cookies. Für Anbieter zusätzlich: Zahlungen über Stripe und, nur wenn Sie Ihren
+            Kalender verbinden, Nylas. Mit den Dienstleistern bestehen Vereinbarungen zur Auftragsverarbeitung nach
+            Art. 28 DSGVO; für Dienstleister außerhalb der EU stützen wir die Übermittlung auf die Standardvertragsklauseln
+            der EU-Kommission oder das EU-US Data Privacy Framework, soweit der Dienstleister dort zertifiziert ist.
+            Verified Provider erhalten Ihre Anfragedaten nur, wenn Sie eine Anfrage an sie richten.
           </p>
         </Section>
         <Section heading={t('privacy.headings.retention')}>
           <p>
             Kontodaten bis zur Löschung des Kontos · Anfragedaten für die Dauer des Mandatsverhältnisses zzgl. gesetzlicher
-            Aufbewahrungsfristen · Protokolldaten {PLACEHOLDER('Frist, z. B. 12 Monate')}. Details regelt unser Löschkonzept.
+            Aufbewahrungsfristen · Audit- und Anfrageprotokolle der Anwendung 90 Tage · Zugriffsprotokolle des Servers 30 Tage ·
+            hochgeladene Dokumente in bereinigter Fassung 90 Tage nach dem Upload, sofern Sie sie nicht früher löschen.
           </p>
         </Section>
         <Section heading={t('privacy.headings.rights')}>
           <p>
             Sie haben das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18),
             Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21 DSGVO) sowie das Recht, erteilte Einwilligungen jederzeit
-            mit Wirkung für die Zukunft zu widerrufen. Beschwerden richten Sie an die zuständige Aufsichtsbehörde:{' '}
-            {PLACEHOLDER('zuständige Landesdatenschutzbehörde')}.
+            mit Wirkung für die Zukunft zu widerrufen. Beschwerden können Sie bei einer Datenschutz-Aufsichtsbehörde einreichen,
+            insbesondere bei der Behörde an Ihrem Wohn- oder Arbeitsort. Da die Verantwortliche keine Niederlassung in der EU
+            hat, gibt es keine federführende Aufsichtsbehörde.
           </p>
         </Section>
         <Section heading={t('privacy.headings.contact')}>
-          <p>Für Datenschutzanfragen: {PLACEHOLDER('datenschutz@… E-Mail-Adresse')}.</p>
+          <p>
+            Für Datenschutzanfragen:{' '}
+            <a href="mailto:dataprivacy@complihub360.com" className="text-fg-brand underline">dataprivacy@complihub360.com</a>.
+          </p>
         </Section>
       </LegalShell>
     );
@@ -125,8 +142,15 @@ export function PrivacyPage() {
       <DraftBanner />
       <Section heading={t('privacy.headings.controller')}>
         <p>
-          {PLACEHOLDER('Company name')}, {PLACEHOLDER('Address')}, {PLACEHOLDER('Privacy contact e-mail')}. Controller within
-          the meaning of the GDPR for all processing described on this platform.
+          Demet Kale (sole proprietor), 14645 NE 35th St, Bellevue, WA 98007, USA,{' '}
+          <a href="mailto:dataprivacy@complihub360.com" className="text-fg-brand underline">dataprivacy@complihub360.com</a>.
+          Controller within the meaning of the GDPR for all processing described on this platform.
+        </p>
+        <p>
+          The controller has no establishment in the EU. For the closed beta no representative under Art. 27 GDPR has been
+          designated; we rely on the exemption for occasional processing (Art. 27(2)(a)). This assessment will be revisited
+          before the public launch. The data itself is stored in Frankfurt am Main (section 5); the controller accesses it
+          from the United States.
         </p>
       </Section>
       <Section heading={t('privacy.headings.data')}>
@@ -156,26 +180,36 @@ export function PrivacyPage() {
       </Section>
       <Section heading={t('privacy.headings.recipients')}>
         <p>
-          Hosting: Hostinger ({PLACEHOLDER('server location, e.g. Germany')}) · Database/Auth: Supabase (EU region) · AI
-          services: Anthropic (sanitized content only, per section 4). Data processing agreements under Art. 28 GDPR are in
-          place with all providers. Verified Providers receive your request data only when you direct a request to them.
+          Hosting: Hostinger (data centre Frankfurt am Main, Germany) · Database/Auth: Supabase (region eu-central-1, Frankfurt) · AI
+          services: Google (Gemini API; sanitized content only, per section 4; a move to Scaleway, Paris, is being prepared) ·
+          e-mail delivery: Resend (USA) · visitor counts: Plausible, self-hosted by us on the Frankfurt server, without
+          cookies. For providers additionally: payments via Stripe and, only if you connect your calendar, Nylas. Data
+          processing agreements under Art. 28 GDPR are in place with these providers; for providers outside the EU we rely on
+          the EU Commission&apos;s standard contractual clauses or the EU-US Data Privacy Framework where the provider is
+          certified. Verified Providers receive your request data only when you direct a request to them.
         </p>
       </Section>
       <Section heading={t('privacy.headings.retention')}>
         <p>
           Account data until account deletion · request data for the duration of the engagement plus statutory retention
-          periods · log data {PLACEHOLDER('period, e.g. 12 months')}. Details are governed by our deletion policy.
+          periods · application audit and request logs 90 days · server access logs 30 days · uploaded documents, in their
+          sanitized form, 90 days after upload unless you delete them earlier.
         </p>
       </Section>
       <Section heading={t('privacy.headings.rights')}>
         <p>
           You have the right of access (Art. 15), rectification (Art. 16), erasure (Art. 17), restriction (Art. 18), data
           portability (Art. 20) and objection (Art. 21 GDPR), and the right to withdraw any consent at any time with future
-          effect. Complaints may be directed to the competent supervisory authority: {PLACEHOLDER('competent authority')}.
+          effect. You may lodge a complaint with a data protection supervisory authority, in particular the authority at your
+          place of residence or work. As the controller has no establishment in the EU, there is no lead supervisory
+          authority.
         </p>
       </Section>
       <Section heading={t('privacy.headings.contact')}>
-        <p>For privacy inquiries: {PLACEHOLDER('privacy@… e-mail address')}.</p>
+        <p>
+          For privacy inquiries:{' '}
+          <a href="mailto:dataprivacy@complihub360.com" className="text-fg-brand underline">dataprivacy@complihub360.com</a>.
+        </p>
       </Section>
     </LegalShell>
   );
@@ -194,28 +228,32 @@ export function ImprintPage() {
         <DraftBanner />
         <Section heading={t('imprint.headings.provider')}>
           <p>
-            {PLACEHOLDER('Firmenname + Rechtsform')}
+            Demet Kale (Einzelunternehmerin)
             <br />
-            {PLACEHOLDER('Straße, Hausnummer')}
+            14645 NE 35th St
             <br />
-            {PLACEHOLDER('PLZ, Ort')}
+            Bellevue, WA 98007
+            <br />
+            USA
           </p>
         </Section>
         <Section heading={t('imprint.headings.representedBy')}>
-          <p>{PLACEHOLDER('Geschäftsführer')}</p>
+          <p>Demet Kale, Inhaberin</p>
         </Section>
         <Section heading={t('imprint.headings.contact')}>
           <p>
-            E-Mail: {PLACEHOLDER('kontakt@…')} · Telefon: {PLACEHOLDER('Telefonnummer')}
+            E-Mail: <a href="mailto:demet@complihub360.com" className="text-fg-brand underline">demet@complihub360.com</a> ·
+            Telefon: +1 954 955-2585
           </p>
         </Section>
         <Section heading={t('imprint.headings.register')}>
           <p>
-            {PLACEHOLDER('Registergericht')} · {PLACEHOLDER('HRB-Nummer')} · USt-IdNr.: {PLACEHOLDER('DE…')}
+            Kein Registereintrag: Einzelunternehmen nach dem Recht des US-Bundesstaats Washington. Keine
+            Umsatzsteuer-Identifikationsnummer.
           </p>
         </Section>
         <Section heading={t('imprint.headings.responsible')}>
-          <p>{PLACEHOLDER('Name, Anschrift')}</p>
+          <p>Demet Kale, Anschrift wie oben.</p>
         </Section>
         <Section heading={t('imprint.headings.dispute')}>
           <p>
@@ -242,24 +280,28 @@ export function ImprintPage() {
       <DraftBanner />
       <Section heading={t('imprint.headings.provider')}>
         <p>
-          {PLACEHOLDER('Company name + legal form')}
+          Demet Kale (sole proprietor)
           <br />
-          {PLACEHOLDER('Street, number')}
+          14645 NE 35th St
           <br />
-          {PLACEHOLDER('Postal code, city')}
+          Bellevue, WA 98007
+          <br />
+          USA
         </p>
       </Section>
       <Section heading={t('imprint.headings.representedBy')}>
-        <p>{PLACEHOLDER('Managing director')}</p>
+        <p>Demet Kale, owner</p>
       </Section>
       <Section heading={t('imprint.headings.contact')}>
         <p>
-          E-mail: {PLACEHOLDER('contact@…')} · Phone: {PLACEHOLDER('phone number')}
+          E-mail: <a href="mailto:demet@complihub360.com" className="text-fg-brand underline">demet@complihub360.com</a> ·
+          Phone: +1 954 955-2585
         </p>
       </Section>
       <Section heading={t('imprint.headings.register')}>
         <p>
-          {PLACEHOLDER('Register court')} · {PLACEHOLDER('HRB number')} · VAT ID: {PLACEHOLDER('DE…')}
+          No register entry: sole proprietorship under the law of the US state of Washington. No VAT identification
+          number.
         </p>
       </Section>
       <Section heading={t('imprint.headings.dispute')}>
@@ -301,7 +343,7 @@ export function TermsPage() {
         <DraftBanner />
         <Section heading={t('terms.headings.scope')}>
           <p>
-            Diese Bedingungen gelten zwischen {PLACEHOLDER('Firmenname + Rechtsform')} (&bdquo;CompliHub360&ldquo;) und
+            Diese Bedingungen gelten zwischen Demet Kale, Einzelunternehmerin, Bellevue, WA, USA (&bdquo;CompliHub360&ldquo;) und
             Unternehmen, die die Plattform nutzen. Das Angebot richtet sich ausschließlich an Unternehmer im Sinne des
             § 14 BGB, nicht an Verbraucher. {PLACEHOLDER('Abgrenzung zu abweichenden AGB der Kundenseite')}
           </p>
@@ -358,7 +400,7 @@ export function TermsPage() {
         </Section>
         <Section heading={t('terms.headings.law')}>
           <p>
-            {PLACEHOLDER('Anwendbares Recht und Gerichtsstand — beachten: Gesellschaft in den USA registriert, Kunden in der EU')}
+            {PLACEHOLDER('Anwendbares Recht und Gerichtsstand — beachten: Betreiberin in den USA, Kunden in der EU')}
           </p>
         </Section>
       </LegalShell>
@@ -370,7 +412,7 @@ export function TermsPage() {
       <DraftBanner />
       <Section heading={t('terms.headings.scope')}>
         <p>
-          These terms govern the relationship between {PLACEHOLDER('company name + legal form')} (&ldquo;CompliHub360&rdquo;)
+          These terms govern the relationship between Demet Kale, sole proprietor, Bellevue, WA, USA (&ldquo;CompliHub360&rdquo;)
           and businesses using the platform. The service is offered to businesses only, not to consumers.{' '}
           {PLACEHOLDER('treatment of conflicting customer terms')}
         </p>
@@ -422,7 +464,7 @@ export function TermsPage() {
       </Section>
       <Section heading={t('terms.headings.law')}>
         <p>
-          {PLACEHOLDER('governing law and venue — note: company incorporated in the US, customers in the EU')}
+          {PLACEHOLDER('governing law and venue — note: operator based in the US, customers in the EU')}
         </p>
       </Section>
     </LegalShell>
@@ -436,7 +478,8 @@ export function TermsPage() {
 // key list below was taken from the code and must be kept in step with it —
 // grep for localStorage./sessionStorage. before editing. The one genuinely
 // legal call, whether each entry is "strictly necessary" under §25 TDDDG /
-// ePrivacy or needs consent, is left to counsel.
+// ePrivacy, is our own assessment (all necessary, no consent) and is flagged
+// as such on the page; counsel has not reviewed it.
 
 const STORAGE_KEYS: { name: string; scope: 'local' | 'session'; en: string; de: string }[] = [
   // Anmeldung: schreibt das Supabase-SDK selbst (lib/supabase.ts, persistSession,
@@ -563,8 +606,11 @@ export function CookiePage() {
         <Section heading={t('cookies.headings.consent')}>
           <p>
             Die Speicherung auf Ihrem Endgerät richtet sich nach § 25 TDDDG. Welche der oben genannten Einträge als
-            unbedingt erforderlich einzustufen sind und für welche gegebenenfalls eine Einwilligung einzuholen ist, ist
-            rechtlich zu bewerten: {PLACEHOLDER('Einstufung je Eintrag durch Rechtsberatung')}
+            unbedingt erforderlich sind, haben wir je Eintrag geprüft: Alle oben genannten Einträge dienen ausschließlich
+            dazu, eine von Ihnen ausdrücklich gewünschte Funktion bereitzustellen (Anmeldung, Sprach- und Darstellungswahl,
+            Erhalt Ihrer Eingaben, Speichern vor der Registrierung). Sie sind damit unbedingt erforderlich im Sinne von
+            § 25 Abs. 2 Nr. 2 TDDDG; eine Einwilligung holen wir deshalb nicht ein. Diese Einstufung ist unsere eigene und
+            nicht anwaltlich geprüft.
           </p>
         </Section>
         <Section heading={t('cookies.headings.manage')}>
@@ -577,12 +623,17 @@ export function CookiePage() {
         </Section>
         <Section heading={t('cookies.headings.thirdParty')}>
           <p>
-            Eingebundene Inhalte Dritter können eigene Speichermechanismen mitbringen. Derzeit betrifft das:{' '}
-            {PLACEHOLDER('eingebundene Drittinhalte prüfen und auflisten, z. B. Schriftarten, Karten, Videos')}
+            Eingebundene Inhalte Dritter können eigene Speichermechanismen mitbringen. Derzeit betrifft das nur die
+            Schriftarten und Symbole, die wir von Google Fonts laden (fonts.googleapis.com, fonts.gstatic.com). Beim Laden
+            wird Ihre IP-Adresse an Google übermittelt; Google setzt dabei nach eigenen Angaben keine Cookies. Karten,
+            Videos oder andere Inhalte Dritter binden wir nicht ein.
           </p>
         </Section>
         <Section heading={t('cookies.headings.contact')}>
-          <p>Fragen zu dieser Seite beantworten wir unter {PLACEHOLDER('datenschutz@… E-Mail-Adresse')}.</p>
+          <p>
+            Fragen zu dieser Seite beantworten wir unter{' '}
+            <a href="mailto:dataprivacy@complihub360.com" className="text-fg-brand underline">dataprivacy@complihub360.com</a>.
+          </p>
         </Section>
       </LegalShell>
     );
@@ -623,8 +674,10 @@ export function CookiePage() {
       <Section heading={t('cookies.headings.consent')}>
         <p>
           Storing information on your device is governed by §&nbsp;25 TDDDG (implementing the ePrivacy Directive). Which of
-          the entries above count as strictly necessary, and which may require consent, is a legal assessment:{' '}
-          {PLACEHOLDER('per-entry classification by legal counsel')}
+          the entries above count as strictly necessary we have assessed entry by entry: every entry listed serves solely
+          to provide a function you explicitly asked for (signing in, language and appearance choice, keeping your input,
+          saving before registration). They are therefore strictly necessary within the meaning of §&nbsp;25(2) no. 2
+          TDDDG, and we do not ask for consent. This is our own assessment and has not been reviewed by legal counsel.
         </p>
       </Section>
       <Section heading={t('cookies.headings.manage')}>
@@ -637,12 +690,16 @@ export function CookiePage() {
       </Section>
       <Section heading={t('cookies.headings.thirdParty')}>
         <p>
-          Embedded third-party content can bring its own storage. Currently this concerns:{' '}
-          {PLACEHOLDER('review and list embedded third-party content, e.g. fonts, maps, video')}
+          Embedded third-party content can bring its own storage. Currently this concerns only the fonts and icons we load
+          from Google Fonts (fonts.googleapis.com, fonts.gstatic.com). Loading them transmits your IP address to Google;
+          according to Google, no cookies are set in the process. We embed no maps, videos or other third-party content.
         </p>
       </Section>
       <Section heading={t('cookies.headings.contact')}>
-        <p>Questions about this page: {PLACEHOLDER('privacy@… e-mail address')}.</p>
+        <p>
+          Questions about this page:{' '}
+          <a href="mailto:dataprivacy@complihub360.com" className="text-fg-brand underline">dataprivacy@complihub360.com</a>.
+        </p>
       </Section>
     </LegalShell>
   );

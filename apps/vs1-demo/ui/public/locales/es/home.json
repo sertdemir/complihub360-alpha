@@ -75,8 +75,7 @@
       "placeholder": "Describa su situación con sus propias palabras…",
       "answer": "Hacer una pregunta de compliance",
       "guided": "Evaluar mis necesidades",
-      "trust": "Gratis · anónimo · unos cinco minutos",
-      "note": "En la beta, su pregunta lleva al área adecuada y a la evaluación — todavía no a una respuesta directa."
+      "trust": "Gratis · anónimo · unos cinco minutos"
     }
   },
   "heroWorld": {
@@ -88,7 +87,8 @@
     "ctaRiskMap": "Evaluar mis necesidades",
     "ask": {
       "placeholder": "Describa su caso",
-      "send": "Enviar"
+      "send": "Enviar",
+      "note": "En la beta, su pregunta lleva al área adecuada y a la evaluación — todavía no a una respuesta directa."
     },
     "promises": [
       {
@@ -1332,7 +1332,7 @@
     "copyright": "© 2026 CompliHub360.",
     "legal": {
       "privacy": "Política de privacidad",
-      "terms": "Condiciones (AGB)",
+      "terms": "Acuerdo de la beta",
       "imprint": "Aviso legal (Impressum)",
       "cookies": "Política de cookies",
       "subProcessors": "Subencargados"

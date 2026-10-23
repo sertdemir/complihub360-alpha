@@ -1,8 +1,8 @@
 {
-  "draftBanner": "TASLAK — Bu sayfa sistemin gerçek veri işleme süreçlerini açıklar ancak hukuki danışmanlık yerine geçmez. Yayından önce bir avukatla veya uyum aracıyla son haline getirin ve işaretli yer tutucuları doldurun.",
+  "draftBanner": "BETA — Bu sayfa sistemin gerçek veri işleme süreçlerini açıklar ve avukat incelemesi olmadan hazırlanmıştır. Hukuki danışmanlık yerine geçmez. Henüz açık olan noktalar metinde işaretlidir.",
   "privacy": {
     "title": "Gizlilik Politikası",
-    "updated": "Son güncelleme: Temmuz 2026 · Taslak",
+    "updated": "Son güncelleme: Ekim 2026 · Beta",
     "headings": {
       "controller": "1. Veri sorumlusu",
       "data": "2. İşlediğimiz veriler",
@@ -16,7 +16,7 @@
   },
   "imprint": {
     "title": "Künye",
-    "updated": "§ 5 DDG (Alman hukuku) uyarınca bilgiler · Taslak",
+    "updated": "§ 5 DDG (Alman hukuku) uyarınca bilgiler · Beta",
     "headings": {
       "provider": "Sağlayıcı",
       "representedBy": "Temsilci",
@@ -57,6 +57,65 @@
       "manage": "Bu verileri nasıl silersiniz",
       "thirdParty": "Üçüncü taraf içerikler",
       "contact": "Sorularınız"
+    }
+  },
+  "beta": {
+    "eyebrow": "Beta sözleşmesi",
+    "lede": "CompliHub360'ı lansmandan önce davetle test ediyorsunuz. Bu dokuz cümle bunun ne anlama geldiğini ve gelmediğini söyler.",
+    "meta": "Sürüm {{version}} · avukat incelemesi olmadan hazırlandı · işletmeci: künyeye bakın",
+    "contactHeading": "Bu sayfa hakkında sorularınız mı var?",
+    "contact": "Bize {{email}} adresinden yazın. Bu sayfayı değiştirirsek onayınızı yeniden isteriz.",
+    "back": "Çalışma alanınıza dön",
+    "loading": "Sayfa yükleniyor …",
+    "error": "Sayfa şu anda yüklenemedi.",
+    "retry": "Yeniden dene"
+  },
+  "betaStep": {
+    "steps": {
+      "login": "1 Giriş",
+      "agreement": "2 Beta sözleşmesi",
+      "workspace": "3 Çalışma alanınız"
+    },
+    "eyebrow": "Kapalı beta",
+    "title": "Başlamadan önce bir sayfa.",
+    "lead": "Dokuz cümle, bir onay, her zaman geri alınabilir.",
+    "cardTitle": "Başlamadan önce: bir sayfa",
+    "cardLead": "Test kullanıcısı olarak davet edildiniz. Dokuz cümle bu testin ne olduğunu ve ne olmadığını söyler.",
+    "listLabel": "Beta sözleşmesi · sürüm {{version}}",
+    "fullText": "Sayfanın tamamını oku",
+    "checkbox": "Beta sözleşmesini (sürüm {{version}}) okudum ve kabul ediyorum.",
+    "cta": "Çalışma alanına devam et",
+    "exitQuestion": "Vazgeçtiniz mi?",
+    "exit": "Çıkış yap",
+    "fineprint": "Avukat incelemesi olmadan hazırlandı, hukuki danışmanlık değildir. Gizlilik politikası geçerlidir. Yeni bir sürümü yeniden onaylarsınız.",
+    "needCheck": "Kabul ediyorsanız lütfen kutuyu işaretleyin.",
+    "outdated": "Sayfa bu arada değişti. İşte yeni sürüm.",
+    "failed": "Onayınız şu anda kaydedilemedi. Bu sizden kaynaklanmıyor.",
+    "retry": "Yeniden dene",
+    "saving": "Kaydediliyor …"
+  },
+  "account": {
+    "title": "Hesap",
+    "cardTitle": "Beta sözleşmesi",
+    "cardLead": "Verdiğiniz haliyle onayınız. Betadan sonra da burada görünür kalır.",
+    "version": "Sürüm",
+    "current": "güncel",
+    "acceptedAt": "Kabul edildi",
+    "notAccepted": "Henüz kabul edilmedi",
+    "acceptNow": "Şimdi oku ve kabul et",
+    "fullText": "Tam metin",
+    "read": "Beta sözleşmesini oku",
+    "exit": "Ayrılma",
+    "signOut": "Çıkış yap",
+    "write": "bize yazın",
+    "note": "Avukat incelemesi olmadan hazırlandı. Sayfayı değiştirirsek bir sonraki adımdan önce onayınızı yeniden isteriz.",
+    "loading": "Yükleniyor …",
+    "error": "Durumunuz şu anda yüklenemedi.",
+    "langs": {
+      "en": "İngilizce",
+      "de": "Almanca",
+      "es": "İspanyolca",
+      "tr": "Türkçe"
     }
   }
 }

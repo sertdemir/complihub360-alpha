@@ -35,12 +35,14 @@ import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { handleProviderApplication } from "./providerApplication.js";
+import { handleAgreementsRoute } from "./agreements.js";
 import { handleSubscriptionGet, handleSubscriptionSelect, handleSubscriptionSchedule, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
 import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpact.js";
 import { plannedPrices } from "./changeSchedule.js";
 import { readActiveSince } from "./activeSince.js";
 import { redactText } from "@complihub360/redaction";
+import { computeAdminStats, disclosureSince, windowStart, type BookingRow, type EventRow, type EvidenceRow } from './adminStats.js';
 import {
     loadVisibility, maskIdentity, publicTitle, rankBasis, requiredFor, scanFields, serializeProvider, verificationDepth,
     type IdentityContext, type RegisterRow,
@@ -309,6 +311,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         ['POST', /^\/api\/v1\/contact$/],
         ['GET', /^\/api\/v1\/nylas\/callback(\?|$)/],      // Nylas Hosted Auth: der signierte state ist das Credential                  // Kontaktseite + Partner-Bewerbung (eigenes Limit)
         ['GET', /^\/api\/v1\/acknowledgement(\?|$)/],       // booking acknowledgement text (public legal copy)
+        ['GET', /^\/api\/v1\/agreements\/[a-z-]+(\?|$)/],  // Beta-Vereinbarung / AGB: Text ist oeffentlich
         ['GET', /^\/api\/v1\/sessions(\?|$)/],             // guest session list (guest_key = bearer)
         ['POST', /^\/api\/v1\/provider\/intake$/],         // intake token checked in-handler
         ['GET', /^\/api\/v1\/provider\/magic\//],          // single-use token IS the credential
@@ -469,6 +472,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     if (req.method === 'GET' && req.url === '/api/v1/me/provider') {
         await handleMeProvider(res, correlationId, authUserId);
         return;
+    }
+
+    // Beta-Vereinbarung: Text (oeffentlich), Stand und Annahme des Nutzers.
+    if (/^\/api\/v1\/(agreements\/|me\/agreements)/.test(req.url || '')) {
+        if (await handleAgreementsRoute(req, res, { correlationId, authUserId })) return;
     }
 
     const linkMatch = /^\/api\/v1\/admin\/provider\/([a-z0-9-]+)\/member$/.exec(req.url || '');
@@ -3099,9 +3107,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Withdraw failed', correlationId }));
         }
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/stats')) {
-        // Admin control center: one aggregated read across engagements, the
-        // audit log and the privacy pipeline. Approximations share the caveats
-        // of /metrics (no per-transition timestamps yet).
+        // Admin control center: eine aggregierte Lesung ueber die lebenden
+        // Quellen — Buchungen, Audit-Log, Nachweise. Die Rechnung steht in
+        // adminStats.ts (20.10.2026: vorher tote Tabellen, siehe dort).
         // Befund Phase 2 (2026-09-22): bis dahin reichte jeder Login — das
         // Protokoll mit Anbieter-Schluesseln und Anfragen-Status war fuer jeden
         // Nutzer lesbar. Jetzt wie Cockpit: Admin-JWT oder Server-Key.
@@ -3112,98 +3120,29 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             return;
         }
         try {
-            const dayStart = new Date(); dayStart.setUTCHours(0, 0, 0, 0);
-            const engagements = (await supabaseApi.select('engagement_requests', {}, { order: 'created_at.desc', limit: 500 })) as
-                Array<{ id: string; provider_key: string; country: string; category: string; status: string; created_at: string; updated_at?: string; sla_confirm_deadline?: string; sla_reply_deadline?: string }>;
-            const events = (await supabaseApi.select('event_log', {}, { order: 'timestamp.desc', limit: 100 })) as
-                Array<{ type: string; payload?: Record<string, unknown>; timestamp?: string; created_at?: string }>;
-            const documents = (await supabaseApi.select('documents', {}, { order: 'created_at.desc', limit: 200 })) as
-                Array<{ classification: string; sanitized_ready: boolean; consent_ai?: boolean; ai_allowed: boolean; created_at?: string; redaction_report?: { countsByType?: Record<string, number> } }>;
-
-            const total = engagements.length;
-            const confirmedPlus = engagements.filter(r => r.status === 'confirmed' || r.status === 'replied');
-            const requestsToday = engagements.filter(r => new Date(r.created_at) >= dayStart).length;
-            const avgMs = (subset: typeof engagements) => {
-                const ds = subset.filter(r => r.updated_at)
-                    .map(r => new Date(r.updated_at as string).getTime() - new Date(r.created_at).getTime())
-                    .filter(d => d > 0);
-                return ds.length ? Math.round(ds.reduce((a, b) => a + b, 0) / ds.length) : null;
-            };
-            const now = Date.now();
-            const OPEN_CONFIRM = ['created', 'delivered', 'viewed'];
-            const watchlist = engagements
-                .filter(r => OPEN_CONFIRM.includes(r.status) || r.status === 'confirmed')
-                .map(r => {
-                    const deadline = OPEN_CONFIRM.includes(r.status) ? r.sla_confirm_deadline : r.sla_reply_deadline;
-                    return { id: r.id, provider_key: r.provider_key, country: r.country, category: r.category, status: r.status, deadline, msLeft: deadline ? new Date(deadline).getTime() - now : null };
-                })
-                .sort((a, b) => (a.msLeft ?? Infinity) - (b.msLeft ?? Infinity))
-                .slice(0, 10);
-            const redacted = documents.reduce((s, d) => s + Object.values(d.redaction_report?.countsByType || {}).reduce((a, b) => a + b, 0), 0);
-            const consentGiven = documents.filter(d => d.consent_ai === true).length;
-            const stats = {
-                requestsToday,
-                requestsTotal: total,
-                confirmRate: total ? confirmedPlus.length / total : null,
-                replyRate: confirmedPlus.length ? engagements.filter(r => r.status === 'replied').length / confirmedPlus.length : null,
-                avgConfirmMs: avgMs(confirmedPlus),
-                breaches: engagements.filter(r => r.status === 'expired').length + watchlist.filter(w => (w.msLeft ?? 1) < 0).length,
-            };
-            const privacy = {
-                uploads: documents.length,
-                piiRedacted: redacted,
-                consentRate: documents.length ? consentGiven / documents.length : null,
-                aiBlocks: events.filter(e => e.type === 'document_ai_blocked').length,
-            };
-            const security = {
-                invalidTokenBlocks: events.filter(e => /invalid_token|magic.*(invalid|expired|used)/i.test(e.type)).length,
-                aiGateBlocks: events.filter(e => e.type === 'document_ai_blocked').length,
-            };
-            const feed = events.slice(0, 12).map(e => ({ ...e, created_at: e.created_at || e.timestamp }));
-
-            // ── 7-day trend series (for the Control Center metric charts) ──────
-            // Aggregated from the same in-memory reads; UTC day buckets, oldest → newest.
-            const dayKeys: string[] = [];
-            for (let i = 6; i >= 0; i--) {
-                const dt = new Date(); dt.setUTCHours(0, 0, 0, 0); dt.setUTCDate(dt.getUTCDate() - i);
-                dayKeys.push(dt.toISOString().slice(0, 10));
-            }
-            const dates = dayKeys.map(k => `${k.slice(8, 10)}.${k.slice(5, 7)}`);
-            const idxOf = (iso?: string) => dayKeys.indexOf((iso || '').slice(0, 10));
-            const bucket = () => new Array(7).fill(0) as number[];
-            const reqB = bucket(), confB = bucket(), breachB = bucket(), upB = bucket(), piiB = bucket(), aiB = bucket(), docTotB = bucket(), consB = bucket();
-            for (const e of engagements) {
-                const ci = idxOf(e.created_at); if (ci >= 0) reqB[ci]++;
-                const ui = idxOf(e.updated_at);
-                if (ui >= 0 && (e.status === 'confirmed' || e.status === 'replied')) confB[ui]++;
-                if (ui >= 0 && e.status === 'expired') breachB[ui]++;
-            }
-            for (const d of documents) {
-                const di = idxOf(d.created_at); if (di < 0) continue;
-                upB[di]++; docTotB[di]++;
-                piiB[di] += Object.values(d.redaction_report?.countsByType || {}).reduce((a, b) => a + b, 0);
-                if (d.consent_ai === true) consB[di]++;
-            }
-            for (const ev of events) {
-                if (ev.type === 'document_ai_blocked') { const ei = idxOf(ev.created_at || ev.timestamp); if (ei >= 0) aiB[ei]++; }
-            }
-            const series = {
-                dates,
-                requests: reqB,
-                confirmRate: reqB.map((r, i) => (r ? Math.round((confB[i] / r) * 100) : 0)),
-                breaches: breachB,
-                uploads: upB,
-                pii: piiB,
-                consent: docTotB.map((tt, i) => (tt ? Math.round((consB[i] / tt) * 100) : 0)),
-                aiBlocks: aiB,
-            };
-
-            res.setHeader('x-correlation-id', correlationId);
+            const LIMITS = { bookings: 500, events: 5000 };
+            const NO_SHADOW = 'not.like.*_shadow';
+            const bookings = (await supabaseApi.select('scheduling', {}, { order: 'created_at.desc', limit: LIMITS.bookings })) as BookingRow[];
+            const from = windowStart().toISOString();
+            const since = disclosureSince(bookings);
+            const [events7, disclosureEvents, feed, evidence, policy] = await Promise.all([
+                supabaseApi.selectWhere('event_log', { timestamp: `gte.${from}`, type: NO_SHADOW }, { order: 'timestamp.desc', limit: LIMITS.events }),
+                since
+                    ? supabaseApi.selectWhere('event_log', { timestamp: `gte.${since}`, type: 'in.("lead.revealed","booking_rebooked")' }, { limit: LIMITS.events })
+                    : Promise.resolve([]),
+                supabaseApi.selectWhere('event_log', { type: NO_SHADOW }, { order: 'timestamp.desc', limit: 12 }),
+                supabaseApi.select('provider_evidence', {}, { limit: LIMITS.events }),
+                loadAttendancePolicy(),
+            ]);
+            const stats = computeAdminStats({
+                bookings, events7: events7 as EventRow[], disclosureEvents: disclosureEvents as EventRow[], feed: feed as EventRow[],
+                evidence: evidence as EvidenceRow[], rateLimitPerMinute: RATE_LIMIT_MAX,
+                reminder24h: policy.reminderOffsetsMin.includes(1440), limits: LIMITS,
+            });
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, stats, watchlist, privacy, security, events: feed, series }));
-        } catch {
-            structuredLog('error', 'Admin stats failed', { correlationId, errorCode: 'ERR_ADMIN_STATS', severity: 'error', route: req.url });
-            res.setHeader('x-correlation-id', correlationId);
+            res.end(JSON.stringify({ ok: true, ...stats }));
+        } catch (err) {
+            structuredLog('error', 'Admin stats failed', { correlationId, errorCode: 'ERR_ADMIN_STATS', severity: 'error', route: req.url, detail: String(err).slice(0, 200) });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to compute admin stats', correlationId }));
         }
@@ -3797,18 +3736,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         handleBillingRun(req, res, correlationId, authViaApiKey);
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/cockpit')) {
         // Founder cockpit read-model: five lenses aggregated across the live
-        // systems (cockpit.ts) — server-to-server key only.
+        // systems (cockpit.ts) — Admin-JWT oder Server-Key.
         res.setHeader('x-correlation-id', correlationId);
         if (!authViaApiKey && !authIsAdmin) {
             res.writeHead(403, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Cockpit is admin-only', correlationId }));
         } else {
             try {
-                const cockpit = await buildCockpit();
+                const cockpit = await buildCockpit(correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, cockpit, correlationId }));
-            } catch {
-                structuredLog('error', 'Cockpit build failed', { correlationId, errorCode: 'ERR_COCKPIT', severity: 'error', route: req.url });
+            } catch (err) {
+                structuredLog('error', 'Cockpit build failed', { correlationId, errorCode: 'ERR_COCKPIT', severity: 'error', route: req.url, detail: String(err).slice(0, 200) });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Cockpit build failed', correlationId }));
             }

@@ -75,8 +75,7 @@
       "placeholder": "Beschreiben Sie Ihr Anliegen in eigenen Worten…",
       "answer": "Eine Compliance-Frage stellen",
       "guided": "Meinen Bedarf ermitteln",
-      "trust": "Kostenlos · anonym · etwa fünf Minuten",
-      "note": "In der Beta führt Ihre Frage zum passenden Bereich und in die Erhebung — noch nicht zu einer direkten Antwort."
+      "trust": "Kostenlos · anonym · etwa fünf Minuten"
     }
   },
   "heroWorld": {
@@ -88,7 +87,8 @@
     "ctaRiskMap": "Bedarf ermitteln",
     "ask": {
       "placeholder": "Beschreiben Sie Ihr Anliegen",
-      "send": "Senden"
+      "send": "Senden",
+      "note": "In der Beta führt Ihre Frage zum passenden Bereich und in die Erhebung — noch nicht zu einer direkten Antwort."
     },
     "promises": [
       {
@@ -1332,7 +1332,7 @@
     "copyright": "© 2026 CompliHub360.",
     "legal": {
       "privacy": "Datenschutzerklärung",
-      "terms": "AGB",
+      "terms": "Beta-Vereinbarung",
       "imprint": "Impressum",
       "cookies": "Cookie-Richtlinie",
       "subProcessors": "Unterauftragsverarbeiter"
