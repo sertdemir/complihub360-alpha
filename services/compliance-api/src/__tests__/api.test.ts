@@ -46,6 +46,10 @@ vi.mock('../supabase.js', () => ({
                 const v = r[k];
                 if (expr.startsWith('eq.')) return String(v) === expr.slice(3);
                 if (expr === 'is.null') return v === null || v === undefined;
+                if (expr === 'not.is.null') return v !== null && v !== undefined;
+                if (expr === 'is.false') return v === false;
+                if (expr.startsWith('neq.')) return String(v) !== expr.slice(4);
+                if (expr.startsWith('lt.')) return v !== undefined && v !== null && String(v) < expr.slice(3);
                 if (expr.startsWith('gte.')) return v !== undefined && v !== null && String(v) >= expr.slice(4);
                 if (expr.startsWith('not.like.*')) return !String(v ?? '').endsWith(expr.slice(10));
                 if (expr.startsWith('in.(')) return expr.slice(4, -1).split(',').map((x) => x.replace(/^"|"$/g, '')).includes(String(v));
@@ -1224,6 +1228,67 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
             expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured']);
         });
 
+        // ─── Offenlegung erst nach dem Audit (23.10.2026, disclosure.ts) ──────
+        const MEMBER = () => signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+        const auditKaputt = async () => {
+            const { supabaseApi } = await import('../supabase.js');
+            const realInsert = supabaseApi.insert;
+            return vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+                if (table === 'event_log' && data?.type === 'lead.revealed') throw new Error('event_log unavailable');
+                return realInsert(table, data);
+            });
+        };
+
+        it('scheitert das Audit der Offenlegung, bleibt sie zu — der Termin steht, der Anbieter sieht keine Daten', async () => {
+            const { session } = seedBookable();
+            const spy = await auditKaputt();
+            let r: any;
+            try { r = await book(standardBody(session)); } finally { spy.mockRestore(); }
+            expect(r.status).toBe(201);
+            const row = db.scheduling[0];
+            expect(row.identity_revealed).toBe(false);
+            expect(row.shared_snapshot).toBeTruthy();
+            expect(db.event_log.some((e) => e.type === 'lead.revealed')).toBe(false);
+            // Das Dashboard des Anbieters gibt nichts heraus, sagt aber, dass etwas kommt.
+            const dash = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'none', headers: { authorization: `Bearer ${MEMBER()}` } });
+            expect(dash.status).toBe(200);
+            expect(dash.body.bookings[0]).toMatchObject({ user_email: null, user_company: null, message: null, disclosure_pending: true });
+        }, 15_000);
+
+        it('der Tick traegt das Audit aus der Buchungszeile nach und gibt erst dann frei', async () => {
+            const { session } = seedBookable();
+            const spy = await auditKaputt();
+            try { await book(standardBody(session)); } finally { spy.mockRestore(); }
+            const row = db.scheduling[0];
+            // Den Zeitstempel setzt sonst die Datenbank.
+            row.created_at = new Date().toISOString();
+            const { runDisclosureAuditTick } = await import('../disclosure.js');
+            // Zu frisch: eine laufende Buchung schreibt ihr Audit gerade selbst.
+            expect((await runDisclosureAuditTick(false, new Date(Date.parse(row.created_at) + 60_000))).checked).toBe(0);
+            const later = new Date(Date.parse(row.created_at) + 5 * 60_000);
+            const c = await runDisclosureAuditTick(false, later);
+            expect(c).toEqual({ checked: 1, audited: 1, revealed: 1, errors: 0 });
+            expect(row.identity_revealed).toBe(true);
+            expect(db.event_log.find((e) => e.type === 'lead.revealed')?.payload).toMatchObject({
+                bookingId: row.id, sharedFields: row.shared_fields, acknowledgementVersion: 'booking-ack-v1', reconstructed: true,
+            });
+            // Ein zweiter Lauf tut nichts mehr — kein doppeltes Audit.
+            expect((await runDisclosureAuditTick(false, later)).checked).toBe(0);
+            expect(db.event_log.filter((e) => e.type === 'lead.revealed')).toHaveLength(1);
+            const dash = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'none', headers: { authorization: `Bearer ${MEMBER()}` } });
+            expect(dash.body.bookings[0]).toMatchObject({ disclosure_pending: false });
+            expect(dash.body.bookings[0].user_email).toBeTruthy();
+        }, 15_000);
+
+        it('das Audit nennt die Felder aus dem Bestaetigungstext, nicht die Liste v1', async () => {
+            const { session } = seedBookable();
+            for (const a of db.booking_acknowledgements) a.shared_fields = ['email', 'message'];
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            expect(db.scheduling[0]).toMatchObject({ identity_revealed: true, shared_fields: ['email', 'message'] });
+            expect(db.event_log.find((e) => e.type === 'lead.revealed')?.payload.sharedFields).toEqual(['email', 'message']);
+        });
+
         it('die Offenlegung wird vor allem anderen protokolliert — lead.revealed ist das erste Ereignis nach dem Insert', async () => {
             const { session } = seedBookable();
             const r = await book(standardBody(session));
@@ -2006,8 +2071,8 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
             { id: randomUUID(), provider_key: 'andere-kanzlei', user_id: ohneAnfrage, category: 'tax-vat', country: 'DE', structured_answers: { company: 'Fremde Firma' }, created_at: '2026-09-30T08:00:00Z' },
         );
         (db.scheduling ??= []).push(
-            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, slot_start: '2026-10-02T07:00:00Z', slot_end: '2026-10-02T07:30:00Z', status: 'confirmed' },
-            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: ohneAnfrage, slot_start: '2026-09-13T13:00:00Z', slot_end: '2026-09-13T13:30:00Z', status: 'no_show' },
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, slot_start: '2026-10-02T07:00:00Z', slot_end: '2026-10-02T07:30:00Z', status: 'confirmed', identity_revealed: true },
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: ohneAnfrage, slot_start: '2026-09-13T13:00:00Z', slot_end: '2026-09-13T13:30:00Z', status: 'no_show', identity_revealed: true },
         );
         const r = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'jwt' });
         expect(r.status).toBe(200);

@@ -646,7 +646,9 @@
     "rateNotHeld": {
       "heading": "Bu lead henüz değerlendirilemez",
       "message": "Değerlendirme, randevu gerçekleştikten sonra mümkündür."
-    }
+    },
+    "disclosurePending": "Rezervasyonun paylaşım kaydı oluşturulduğunda açılır.",
+    "disclosurePendingShort": "İletişim bilgileri kısa süre içinde gelecek"
   },
   "intake": {
     "inviteOnlyTitle": "Sağlayıcı kaydı yalnızca davetle.",

@@ -178,6 +178,8 @@ export interface ProviderBooking {
   attendance: BookingAttendance;
   /** Hat der Anbieter den Lead schon bewertet? (Server, from_role=provider) */
   reviewed: boolean;
+  /** Offenlegung bestaetigt, aber noch nicht protokolliert — Kontaktdaten folgen (disclosure.ts). */
+  disclosurePending: boolean;
 }
 
 interface ApiProviderBookingRow extends ApiAttendanceFields {
@@ -188,6 +190,7 @@ interface ApiProviderBookingRow extends ApiAttendanceFields {
   proposal?: { proposal_issued: boolean; discount_shown: boolean; reported_at: string } | null;
   acknowledgement_version?: string | null;
   reviewed?: boolean;
+  disclosure_pending?: boolean;
 }
 
 export async function fetchProviderBookings(providerKey?: string): Promise<ProviderBooking[]> {
@@ -213,6 +216,7 @@ export async function fetchProviderBookings(providerKey?: string): Promise<Provi
     proposal: b.proposal ? { proposalIssued: b.proposal.proposal_issued, discountShown: b.proposal.discount_shown, reportedAt: b.proposal.reported_at } : null,
     acknowledgementVersion: b.acknowledgement_version ?? null,
     attendance: attendanceFrom(b),
+    disclosurePending: b.disclosure_pending === true,
     reviewed: !!b.reviewed,
   }));
 }

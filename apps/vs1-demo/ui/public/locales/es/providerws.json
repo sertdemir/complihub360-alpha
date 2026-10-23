@@ -646,7 +646,9 @@
     "rateNotHeld": {
       "heading": "Este lead aún no se puede valorar",
       "message": "Las valoraciones son posibles una vez celebrada la cita."
-    }
+    },
+    "disclosurePending": "Se liberan en cuanto quede registrada la divulgación de la reserva.",
+    "disclosurePendingShort": "Los datos de contacto llegarán en breve"
   },
   "intake": {
     "inviteOnlyTitle": "El alta de proveedores es solo por invitación.",

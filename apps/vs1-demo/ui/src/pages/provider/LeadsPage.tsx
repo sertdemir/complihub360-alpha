@@ -46,6 +46,8 @@ const CREDIT_PCT = 30;
 
 interface Row {
   id: string;
+  /** Offenlegung bestaetigt, aber noch nicht protokolliert (disclosure.ts). */
+  pending: boolean;
   start: string;        // ISO — Datumsmarke
   dateLine: string;
   timeLine: string;
@@ -100,6 +102,7 @@ export function LeadsPage() {
         timeLine: `${tf.format(start)}${end ? `–${tf.format(end)}` : ''}`,
         minutes: end ? Math.round((end.getTime() - start.getTime()) / 60_000) : undefined,
         company: b.userCompany,
+        pending: b.disclosurePending,
         email: b.userEmail ?? '—',
         category: b.category ?? undefined,
         countries: b.countries?.length ? b.countries : b.country ? [b.country] : [],
@@ -347,8 +350,14 @@ export function LeadsPage() {
       <div className="flex items-center gap-4 px-6 py-4">
       <DateMark iso={r.start} locale={locale} size="md" soon={r.id === upcoming[0]?.id} />
       <div className="min-w-0 flex-1">
-        <p className={`truncate text-[15px] ${r.company ? 'font-semibold text-fg' : 'font-medium text-fg-tertiary'}`}>{r.company ?? t('termine.companyMissing')}</p>
-        <p className="truncate text-[13px] text-fg-secondary">{r.email}</p>
+        {/* Offenlegung noch nicht protokolliert: weder „Firma nicht angegeben"
+            noch ein leeres „—" — beides stimmt nicht. Der Grund steht im Dossier. */}
+        {r.pending ? (
+          <p className="truncate text-[15px] font-medium text-fg-tertiary">{t('termine.disclosurePendingShort')}</p>
+        ) : (<>
+          <p className={`truncate text-[15px] ${r.company ? 'font-semibold text-fg' : 'font-medium text-fg-tertiary'}`}>{r.company ?? t('termine.companyMissing')}</p>
+          <p className="truncate text-[13px] text-fg-secondary">{r.email}</p>
+        </>)}
         <p className="truncate text-[12px] text-fg-tertiary">{[r.dateLine, r.timeLine, minuten(r), thema(r)].filter(Boolean).join(' · ')}</p>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
@@ -401,13 +410,13 @@ export function LeadsPage() {
         open={!!dossierFor}
         onClose={() => openDossier(null)}
         eyebrow={t('termine.dossierEyebrow')}
-        title={dossierFor ? (dossierFor.company ?? t('termine.companyMissing')) : ''}
+        title={dossierFor ? (dossierFor.pending ? t('termine.disclosurePendingShort') : dossierFor.company ?? t('termine.companyMissing')) : ''}
       >
         {dossierFor && (
           <div className="space-y-4">
             <div className={DRAWER_BOX}>
               <p className={DRAWER_EYEBROW}>{t('termine.dossierContact')}</p>
-              <p className="mt-1 text-[14px] text-fg">{dossierFor.email}</p>
+              <p className="mt-1 text-[14px] text-fg">{dossierFor.pending ? t('termine.disclosurePending') : dossierFor.email}</p>
               <p className="text-[12px] text-fg-tertiary">{dossierFor.dateLine} · {dossierFor.timeLine}</p>
             </div>
             <div className={DRAWER_BOX}>

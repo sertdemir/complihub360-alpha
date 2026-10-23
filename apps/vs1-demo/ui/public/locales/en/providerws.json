@@ -666,7 +666,9 @@
     "rateNotHeld": {
       "heading": "This lead can’t be rated yet",
       "message": "Ratings are possible once the appointment has taken place."
-    }
+    },
+    "disclosurePending": "They are released once the booking’s disclosure has been recorded.",
+    "disclosurePendingShort": "Contact details follow shortly"
   },
   "intake": {
     "inviteOnlyTitle": "Provider intake is invite-only.",
