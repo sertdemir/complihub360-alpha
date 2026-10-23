@@ -15,9 +15,10 @@ In der geschlossenen Beta ersetzt ein Blatt in neun Sätzen die zwölf leeren AG
 - [x] Migration `20261022000000_user_agreements.sql`: `user_agreements` (öffentlich, versioniert, vier Sprachen, Fassung `beta-2026-10`) und `user_agreement_acceptance` (append-only); pgTAP 22.
 - [x] API: `GET /agreements/:agreement`, `GET /me/agreements`, `POST /me/agreements/:agreement` (409 bei veralteter Fassung, 200 replay bei Wiederholung), Ereignis `agreement_accepted`; Tests.
 - [x] Typen in `@complihub360/types`, OpenAPI.
-- [ ] Figma-Review durch den Nutzer (Seite `3855:7584`).
-- [ ] UI lokal: `/terms` zeigt in der Beta das Blatt (Footer „Beta-Vereinbarung"), Schritt nach dem Login-Callback bei `required`, Konto-Seite mit Nachweis; Locales en/de/es/tr; Mock-Routen; Screenshots.
-- [ ] Staging-Migration, Prüfung des Schritts mit einem Testkonto.
+- [x] Figma-Review durch den Nutzer (Seite `3855:7584`), 22.10.: „Figma passt".
+- [x] UI lokal: `/terms` zeigt das Blatt (Footer „Beta-Vereinbarung"), Gate im AuthGuard bei `required` → `/beta-agreement`, Konto-Seite `/dashboard/account` mit Nachweis; Locales en/de/es/tr; Mock-Routen (`POST /api/v1/mock/agreements/reset` macht den Demo-Nutzer zum Neuling); Unit- und E2E-Tests; Screenshots. Abweichung zu Figma: der Ausstieg heißt „Abmelden" statt „Konto schließen", weil es im Produkt keine Kontolöschung gibt und das Blatt nichts verspricht, was nicht existiert.
+- [x] Staging-Migration (22.10., in Häppchen) und Prüfung des Schritts mit einem Testkonto (23.10.: Gate → Schritt → Haken → Konto; Annahme `beta-2026-10`, de, in `user_agreement_acceptance`, Ereignis `agreement_accepted`). Review-Befunde Layout behoben in #371.
+- [ ] Nutzer-Festlegung 23.10.: der Link „Das ganze Blatt lesen" im Schritt entfällt, das ganze Blatt steht im Frame selbst.
 
 ## Design / Tech Details
 

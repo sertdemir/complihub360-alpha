@@ -54,7 +54,8 @@
     "navCalendar": "Takvim",
     "signOut": "Oturumu kapat",
     "search": "Ara",
-    "switchTo": "Şuraya git"
+    "switchTo": "Şuraya git",
+    "navAccount": "Hesap"
   },
   "home": {
     "title": "Tekrar hoş geldiniz, <accent>{{name}}</accent>.",

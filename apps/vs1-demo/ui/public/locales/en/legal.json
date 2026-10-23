@@ -58,5 +58,64 @@
       "thirdParty": "Third-party content",
       "contact": "Questions"
     }
+  },
+  "beta": {
+    "eyebrow": "Beta agreement",
+    "lede": "You are testing CompliHub360 before launch, by invitation. These nine sentences say what that means and what it does not.",
+    "meta": "Version {{version}} · written without review by legal counsel · operator: see imprint",
+    "contactHeading": "Questions about this sheet?",
+    "contact": "Write to us at {{email}}. If we change this sheet, we ask for your consent again.",
+    "back": "Back to your workspace",
+    "loading": "Loading the sheet …",
+    "error": "The sheet could not be loaded right now.",
+    "retry": "Try again"
+  },
+  "betaStep": {
+    "steps": {
+      "login": "1 Sign-in",
+      "agreement": "2 Beta agreement",
+      "workspace": "3 Your workspace"
+    },
+    "eyebrow": "Closed beta",
+    "title": "One sheet before we start.",
+    "lead": "Nine sentences, one consent, revocable any time.",
+    "cardTitle": "Before we start: one sheet",
+    "cardLead": "You are invited as a tester. Nine sentences say what this test is and what it is not.",
+    "listLabel": "Beta agreement · version {{version}}",
+    "fullText": "Read the whole sheet",
+    "checkbox": "I have read the beta agreement (version {{version}}) and agree.",
+    "cta": "Continue to your workspace",
+    "exitQuestion": "Rather not?",
+    "exit": "Sign out",
+    "fineprint": "Written without review by legal counsel, not legal advice. The privacy policy applies. A new version you confirm again.",
+    "needCheck": "Please tick the box if you agree.",
+    "outdated": "The sheet has changed in the meantime. Here is the new version.",
+    "failed": "Your consent could not be saved right now. This is not on you.",
+    "retry": "Try again",
+    "saving": "Saving …"
+  },
+  "account": {
+    "title": "Account",
+    "cardTitle": "Beta agreement",
+    "cardLead": "Your consent as you gave it. It stays visible here, also after the beta.",
+    "version": "Version",
+    "current": "current",
+    "acceptedAt": "Accepted",
+    "notAccepted": "Not accepted yet",
+    "acceptNow": "Read and accept now",
+    "fullText": "Full text",
+    "read": "Read the beta agreement",
+    "exit": "Leaving",
+    "signOut": "Sign out",
+    "write": "write to us",
+    "note": "Written without review by legal counsel. If we change the sheet, we ask for your consent again before the next step.",
+    "loading": "Loading …",
+    "error": "Your status could not be loaded right now.",
+    "langs": {
+      "en": "English",
+      "de": "German",
+      "es": "Spanish",
+      "tr": "Turkish"
+    }
   }
 }

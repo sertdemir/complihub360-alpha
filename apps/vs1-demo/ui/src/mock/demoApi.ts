@@ -677,6 +677,57 @@ function acknowledgement(lang: string) {
     shared_preview: DEMO_SHARED_PREVIEW };
 }
 
+// ─── Beta-Vereinbarung (Canvas-Wahl 1A · 2A · 3A+3C · 4C) ─────────────────
+// Wie der Server: Text versioniert je Sprache, Annahme je Nutzer. Der Demo-
+// Nutzer hat die Fassung angenommen (sonst sperrte der Schritt jede E2E-Fahrt
+// aus); `POST /api/v1/mock/agreements/reset` macht ihn zum Neuling.
+const BETA_VERSION = 'beta-2026-10';
+const BETA_POINTS: Record<string, { title: string; points: Array<{ lead: string; text: string }> }> = {
+  de: { title: 'Beta-Vereinbarung', points: [
+    { lead: 'Das ist ein Test.', text: 'Sie nutzen eine unfertige Version von CompliHub360, auf Einladung, für eine begrenzte Zeit. Was offen ist, sagen wir Ihnen, bevor Sie es brauchen.' },
+    { lead: 'Es kostet nichts.', text: 'In der Beta wird nichts berechnet und nichts abgebucht. Zahlungsfunktionen laufen im Testmodus. Sollte sich das je ändern, bestätigen Sie vorher eine neue Fassung dieses Blatts.' },
+    { lead: 'Es kann schiefgehen.', text: 'Ausfälle, Fehler und Datenverlust sind in einer Beta möglich. Wir übernehmen keine Gewähr für Verfügbarkeit oder Ergebnisse. Wenn etwas passiert ist, sagen wir es Ihnen, ohne dass Sie fragen müssen.' },
+    { lead: 'Keine Rechtsberatung.', text: 'Risk Map und Antworten sind Orientierung, kein Ersatz für eine Prüfung Ihres Falls. Verified Provider beraten in eigener beruflicher Verantwortung; CompliHub360 ist keine Kanzlei.' },
+    { lead: 'Ihre Daten.', text: 'Es gilt die Datenschutzerklärung. Laden Sie bitte nur Dokumente hoch, die Sie dafür verwenden dürfen, am besten keine echten Kundendaten.' },
+    { lead: 'Ihr Feedback hilft.', text: 'Was Sie uns melden, dürfen wir nutzen, um das Produkt zu verbessern, ohne Vergütung und ohne Ihren Namen.' },
+    { lead: 'Bitte nicht öffentlich.', text: 'Screenshots und Inhalte der Beta bleiben im Kreis der Tester, bis wir starten.' },
+    { lead: 'Das Ende.', text: 'Die Beta endet mit Ankündigung. Ihr Konto und Ihre Daten löschen wir 30 Tage danach, außer Sie übernehmen das Konto in den Regelbetrieb. Dazu fragen wir Sie rechtzeitig.' },
+    { lead: 'Jederzeit raus.', text: 'Sie können das Konto jederzeit löschen oder uns schreiben. Ändern wir dieses Blatt, bitten wir Sie neu um Ihre Zustimmung. Dieses Blatt ist ohne anwaltliche Prüfung erstellt.' },
+  ] },
+  en: { title: 'Beta agreement', points: [
+    { lead: 'This is a test.', text: 'You are using an unfinished version of CompliHub360, by invitation, for a limited time. Whatever is still open, we tell you before you need it.' },
+    { lead: 'It costs nothing.', text: 'Nothing is charged or debited during the beta. Payment features run in test mode. Should that ever change, you confirm a new version of this sheet first.' },
+    { lead: 'Things can go wrong.', text: 'Outages, bugs and data loss are possible in a beta. We give no warranty for availability or results. If something has happened, we tell you without you having to ask.' },
+    { lead: 'No legal advice.', text: 'The risk map and answers are orientation, not a substitute for a review of your case. Verified Providers advise under their own professional responsibility; CompliHub360 is not a law firm.' },
+    { lead: 'Your data.', text: 'The privacy policy applies. Please upload only documents you are allowed to use for this, ideally no real client data.' },
+    { lead: 'Your feedback helps.', text: 'What you report to us we may use to improve the product, without payment and without your name.' },
+    { lead: 'Please keep it private.', text: 'Screenshots and content of the beta stay within the circle of testers until we launch.' },
+    { lead: 'The end.', text: 'The beta ends with notice. We delete your account and data 30 days after that, unless you take the account into regular operation. We will ask you in good time.' },
+    { lead: 'Leave any time.', text: 'You can delete your account or write to us at any time. If we change this sheet, we ask for your consent again. This sheet was written without review by legal counsel.' },
+  ] },
+};
+let BETA_ACCEPTED: { version: string; language: string; accepted_at: string } | null = { version: BETA_VERSION, language: 'en', accepted_at: plus(-5 * 24 * H) };
+function betaAgreement(lang: string) {
+  const l = BETA_POINTS[lang] ? lang : 'en';
+  return { ok: true, agreement: 'beta', version: BETA_VERSION, language: l, title: BETA_POINTS[l].title, points: BETA_POINTS[l].points, effective_from: '2026-10-22' };
+}
+function myAgreements() {
+  const a = BETA_ACCEPTED;
+  return { ok: true, agreements: {
+    beta: { agreement: 'beta', current_version: BETA_VERSION, accepted_version: a?.version ?? null, accepted_at: a?.accepted_at ?? null, language: a?.language ?? null, required: a?.version !== BETA_VERSION },
+    terms: { agreement: 'terms', current_version: null, accepted_version: null, accepted_at: null, language: null, required: false },
+  } };
+}
+function acceptBeta(body: unknown) {
+  const d = (body ?? {}) as { version?: unknown; language?: unknown };
+  if (typeof d.version !== 'string' || !d.version) return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'version is required' };
+  if (d.version !== BETA_VERSION) return { __status: 409, errorCode: 'AGREEMENT_OUTDATED', message: 'A newer version applies', current_version: BETA_VERSION };
+  const language = typeof d.language === 'string' && BETA_POINTS[d.language] ? d.language : 'en';
+  if (BETA_ACCEPTED?.version === BETA_VERSION) return { ok: true, replay: true, agreement: 'beta', version: BETA_VERSION, language: BETA_ACCEPTED.language, accepted_at: BETA_ACCEPTED.accepted_at };
+  BETA_ACCEPTED = { version: BETA_VERSION, language, accepted_at: new Date().toISOString() };
+  return { __status: 201, ok: true, agreement: 'beta', version: BETA_VERSION, language, accepted_at: BETA_ACCEPTED.accepted_at };
+}
+
 // POST /scheduling — die Buchung ist der bezahlte Lead UND der Moment, in dem
 // beide Seiten Namen und Kontakt bekommen. Seit Phase 4 nur mit der Fassung
 // der Bestaetigung; die 15:30-Termine spielen den Fall durch, dass die Karte
@@ -1316,6 +1367,7 @@ function adminApiDecide(id: string, body: Record<string, unknown>) {
 const INITIAL_MOCK_STATE = JSON.stringify({ ATT, STATUS_OVERRIDE, READINESS, AVAIL, API_STATE });
 export function resetMockState(): void {
   SEEN_REQUESTS.clear();
+  BETA_ACCEPTED = { version: BETA_VERSION, language: 'en', accepted_at: plus(-5 * 24 * H) };
   for (const k of Object.keys(ACCOUNT_OVERRIDE)) delete ACCOUNT_OVERRIDE[k];
   const init = JSON.parse(INITIAL_MOCK_STATE) as { ATT: typeof ATT; STATUS_OVERRIDE: typeof STATUS_OVERRIDE; READINESS: typeof READINESS; AVAIL: typeof AVAIL; API_STATE: typeof API_STATE };
   for (const k of Object.keys(ATT)) delete ATT[k];
@@ -1338,6 +1390,10 @@ export function route(method: string, path: string, body: Record<string, unknown
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
   if (p[0] === 'mock' && p[1] === 'reset' && method === 'POST') { resetMockState(); return { ok: true }; }
+  if (p[0] === 'mock' && p[1] === 'agreements' && p[2] === 'reset' && method === 'POST') { BETA_ACCEPTED = null; return { ok: true }; }
+  if (p[0] === 'agreements' && p[1] && method === 'GET') return p[1] === 'beta' ? betaAgreement((query.get('lang') ?? 'en').slice(0, 2).toLowerCase()) : { __status: 404, errorCode: 'AGREEMENT_UNKNOWN', message: 'Unknown agreement' };
+  if (p[0] === 'me' && p[1] === 'agreements' && !p[2] && method === 'GET') return myAgreements();
+  if (p[0] === 'me' && p[1] === 'agreements' && p[2] === 'beta' && method === 'POST') return acceptBeta(body);
   if (method === 'GET') {
     // Kalender-Status (nylasAuth.ts) — vor dem allgemeinen GET-Rueckfall unten.
     if (p[0] === 'provider' && p[2] === 'calendar' && p.length === 3) return calendarStatus();

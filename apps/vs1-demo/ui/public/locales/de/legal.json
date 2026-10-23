@@ -58,5 +58,64 @@
       "thirdParty": "Inhalte Dritter",
       "contact": "Fragen"
     }
+  },
+  "beta": {
+    "eyebrow": "Beta-Vereinbarung",
+    "lede": "Sie testen CompliHub360 vor dem Start, auf Einladung. Diese neun Sätze sagen, was das heißt und was nicht.",
+    "meta": "Fassung {{version}} · ohne anwaltliche Prüfung erstellt · Betreiberin: siehe Impressum",
+    "contactHeading": "Fragen zu diesem Blatt?",
+    "contact": "Schreiben Sie uns an {{email}}. Ändern wir dieses Blatt, bitten wir Sie neu um Ihre Zustimmung.",
+    "back": "Zurück zum Workspace",
+    "loading": "Das Blatt wird geladen …",
+    "error": "Das Blatt konnte gerade nicht geladen werden.",
+    "retry": "Noch einmal versuchen"
+  },
+  "betaStep": {
+    "steps": {
+      "login": "1 Anmeldung",
+      "agreement": "2 Beta-Vereinbarung",
+      "workspace": "3 Ihr Workspace"
+    },
+    "eyebrow": "Geschlossene Beta",
+    "title": "Ein Blatt, bevor es losgeht.",
+    "lead": "Neun Sätze, eine Zustimmung, jederzeit widerrufbar.",
+    "cardTitle": "Bevor es losgeht: ein Blatt",
+    "cardLead": "Sie sind als Tester eingeladen. Neun Sätze sagen, was dieser Test ist und was nicht.",
+    "listLabel": "Beta-Vereinbarung · Fassung {{version}}",
+    "fullText": "Das ganze Blatt lesen",
+    "checkbox": "Ich habe die Beta-Vereinbarung (Fassung {{version}}) gelesen und bin einverstanden.",
+    "cta": "Weiter zum Workspace",
+    "exitQuestion": "Lieber nicht?",
+    "exit": "Abmelden",
+    "fineprint": "Erstellt ohne anwaltliche Prüfung, keine Rechtsberatung. Es gilt die Datenschutzerklärung. Eine neue Fassung bestätigen Sie neu.",
+    "needCheck": "Bitte setzen Sie den Haken, wenn Sie einverstanden sind.",
+    "outdated": "Das Blatt hat sich inzwischen geändert. Hier ist die neue Fassung.",
+    "failed": "Die Zustimmung konnte gerade nicht gespeichert werden. Es liegt nicht an Ihnen.",
+    "retry": "Noch einmal versuchen",
+    "saving": "Wird gespeichert …"
+  },
+  "account": {
+    "title": "Konto",
+    "cardTitle": "Beta-Vereinbarung",
+    "cardLead": "Ihre Zustimmung, wie Sie sie gegeben haben. Sie bleibt hier einsehbar, auch nach der Beta.",
+    "version": "Fassung",
+    "current": "aktuell",
+    "acceptedAt": "Angenommen",
+    "notAccepted": "Noch nicht angenommen",
+    "acceptNow": "Jetzt lesen und annehmen",
+    "fullText": "Volltext",
+    "read": "Beta-Vereinbarung lesen",
+    "exit": "Ausstieg",
+    "signOut": "Abmelden",
+    "write": "uns schreiben",
+    "note": "Erstellt ohne anwaltliche Prüfung. Ändern wir das Blatt, bitten wir Sie vor dem nächsten Schritt neu um Ihre Zustimmung.",
+    "loading": "Wird geladen …",
+    "error": "Der Stand konnte gerade nicht geladen werden.",
+    "langs": {
+      "en": "Englisch",
+      "de": "Deutsch",
+      "es": "Spanisch",
+      "tr": "Türkisch"
+    }
   }
 }
