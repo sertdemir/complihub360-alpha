@@ -56,6 +56,17 @@ paths:
                   providers:
                     type: array
                     items: { $ref: '#/components/schemas/AnonProviderCard' }
+                    description: >-
+                      Nur Anbieter mit mindestens einem angefragten Bereich (F2,
+                      Entscheidung 23.10.2026). Ohne angefragte Bereiche alle.
+                  other_providers:
+                    type: array
+                    items: { $ref: '#/components/schemas/AnonProviderCard' }
+                    description: >-
+                      Anbieter im Markt ohne Ueberschneidung mit den angefragten
+                      Bereichen. Nur gefuellt, wenn `providers` leer ist; `match`
+                      und `match_tier` sind dann null, die Buchstaben zaehlen
+                      in dieser Liste neu.
                   laws: { type: array, items: { type: object } }
                   laws_status:
                     type: string
@@ -2356,8 +2367,8 @@ components:
         avg_response_hours: { type: number, nullable: true }
         billing_model: { type: string, enum: [abo, hourly, project, mixed] }
         is_verified: { type: boolean }
-        match: { type: integer }
-        match_tier: { type: string, enum: [high, strong, moderate] }
+        match: { type: integer, nullable: true, description: null nur in `other_providers` (keine Bereichs-Ueberschneidung). }
+        match_tier: { type: string, enum: [high, strong, moderate], nullable: true }
         match_basis: { type: object }
         rank_basis: { $ref: '#/components/schemas/RankBasis' }
         price_range:

@@ -3610,6 +3610,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             is_verified: true,
                             match,                       // percentage, relevance-normalised
                             match_tier: tierOf(match),
+                            _fit: rawCats.length === 0 || coveredIdx.length > 0,
                             // The percentage decomposed, so the UI can show WHY it is
                             // what it is instead of asserting a bare number:
                             //   match = 60 * country_covered + 40 * (matched / requested)
@@ -3633,13 +3634,25 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             _region: p.region ?? null,
                         };
                     })
-                    .sort((a: any, b: any) => b._rank - a._rank)
+                    .sort((a: any, b: any) => b._rank - a._rank);
+                // F2 (Wizard-Audit, Entscheidung 23.10.2026): ohne Ueberschneidung
+                // mit den angefragten Bereichen kein Match-Prozent. Solche Anbieter
+                // stehen nicht in `providers`, sondern in `other_providers` — und
+                // nur, wenn sonst niemand passt. Die Luecke bleibt sichtbar
+                // (`providers` leer, `coverage` meldet sie), sie wird nicht gefuellt.
+                const publish = (list: any[]) => list
                     // Der Buchstabe ist die Position in DIESER Liste (A, B, C …);
                     // die Beschreibung kommt aus freigegebenen Bereichen und Region.
-                    .map(({ _rank, _areas, _region, ...pub }: any, i: number) => {
+                    .map(({ _rank, _areas, _region, _fit, ...pub }: any, i: number) => {
                         const title = publicTitle(i, _areas.map((a: string) => labels.get(a) ?? a), pub.region ?? _region);
                         return { ...pub, title: title.label, letter: title.letter, descriptor: title.descriptor, area_codes: [..._areas].sort(), descriptor_region: pub.region ?? _region };
                     });
+                const fitting = anonProviders.filter((p: any) => p._fit);
+                const providersOut = publish(fitting);
+                const otherProvidersOut = fitting.length > 0 ? [] : publish(
+                    anonProviders.filter((p: any) => !p._fit)
+                        .map((p: any) => ({ ...p, match: null, match_tier: null })),
+                );
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
@@ -3658,7 +3671,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // braucht nur sie); ob sie erscheinen, entscheidet die Flaeche.
                     laws_status: engineFailed ? 'failed' : 'ok',
                     ...(engineFailed ? { correlationId } : {}),
-                    providers: anonProviders,
+                    providers: providersOut,
+                    // F2: nur gefuellt, wenn `providers` leer ist. Ohne Prozent,
+                    // eigene Buchstaben — die UI zeigt sie getrennt und benannt.
+                    other_providers: otherProvidersOut,
                     // Bereich × Markt: deckt ein freigegebener Anbieter das ab?
                     // Nur Booleans je Zelle — kein Anbieter, keine Anzahl.
                     coverage: coverage.public,

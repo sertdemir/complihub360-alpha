@@ -545,6 +545,38 @@ describe('POST /api/v1/search', () => {
         expect(r.body.providers).toEqual([]);
     });
 
+    // F2 (Wizard-Audit, 23.10.2026): ohne Bereichs-Ueberschneidung kein
+    // Prozentwert. Beta-Testbuchung: "Verified Provider C" stand mit 60 % unter
+    // drei Karten, obwohl er Tax & VAT nicht abdeckt.
+    it('keeps a provider without area overlap out of the list when someone fits (F2)', async () => {
+        seedProvider();
+        seedProvider({ provider_key: 'nur-umwelt', areas: ['environmental'] });
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('test-kanzlei')]);
+        expect(r.body.other_providers).toEqual([]);
+    });
+
+    it('shows providers without overlap separately and without a percentage when no one fits (F2)', async () => {
+        seedProvider({ provider_key: 'nur-umwelt', areas: ['environmental'] });
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.providers).toEqual([]);
+        expect(r.body.other_providers).toHaveLength(1);
+        const o = r.body.other_providers[0];
+        expect(o.match).toBeNull();
+        expect(o.match_tier).toBeNull();
+        expect(o.letter).toBe('A');
+        expect(o.match_basis.domains_matched).toEqual([]);
+        expect(o._fit).toBeUndefined();
+    });
+
     // §14: die Abrechnung darf die Sichtbarkeit nicht steuern. Die View meldet
     // `bookable_chargeable` nur — wer daraus einen Filter macht, faellt hier.
     it('still matches a provider that is not billing-ready (§14)', async () => {
@@ -643,7 +675,7 @@ describe('POST /api/v1/search', () => {
             expect(r.body).not.toHaveProperty('tutorials');
             expect(r.body).not.toHaveProperty('articles');
             expect(r.body).not.toHaveProperty('tips');
-            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'overview_summary', 'providers']);
+            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'other_providers', 'overview_summary', 'providers']);
             // Erfolg: kein Fehlersignal, keine Referenz im Koerper.
             expect(r.body.laws_status).toBe('ok');
         } finally {
