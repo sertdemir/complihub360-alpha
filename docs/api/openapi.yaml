@@ -56,6 +56,18 @@ paths:
                   providers:
                     type: array
                     items: { $ref: '#/components/schemas/AnonProviderCard' }
+                    description: >-
+                      Nur Anbieter, die mindestens einen angefragten Bereich
+                      freigegeben haben (Wizard-Audit F2). Wer keinen abdeckt,
+                      bekommt keinen Prozentwert.
+                  providers_outside:
+                    type: array
+                    items: { $ref: '#/components/schemas/AnonProviderCard' }
+                    description: >-
+                      Nur gefuellt, wenn `providers` leer ist: Anbieter im Markt,
+                      die keinen der angefragten Bereiche abdecken. Ohne `match`,
+                      `match_tier` und `price_range`. Die Oberflaeche zeigt sie
+                      getrennt und sagt, dass sie das Angefragte nicht abdecken.
                   laws: { type: array, items: { type: object } }
                   laws_status:
                     type: string

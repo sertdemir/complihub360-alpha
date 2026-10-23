@@ -123,6 +123,10 @@ export interface SearchLaw {
 export interface SearchResult {
   overview_summary: string;
   providers: AnonProvider[];
+  /** Wizard-Audit F2: nur gefuellt, wenn `providers` leer ist, weil niemand
+   *  einen angefragten Bereich abdeckt. Ohne match, match_tier und Preisspanne;
+   *  nie mit `providers` mischen. Die Oberflaeche zeigt sie noch nicht. */
+  providers_outside?: Omit<AnonProvider, 'match' | 'match_tier' | 'price_range'>[];
   laws: SearchLaw[];
   /** Aeltere Antworten kennen sie nicht — dann gibt es keinen Befund
    *  "begrenzt", statt einen zu raten. */
