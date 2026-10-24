@@ -632,7 +632,7 @@ export function UserHomePage() {
                     <div className="mt-3.5 rounded-[10px] border border-warning-200 bg-warning-bg px-3.5 py-3 dark:border-amber-500/30 dark:bg-amber-500/15">
                       <p className="text-body-xs font-bold text-warning-800 dark:text-amber-300">{t('termine.outcomeQuestion')}</p>
                       <p className="mt-1.5 truncate text-body-xs font-bold text-fg">{o.providerName}</p>
-                      <p className="text-body-3xs text-fg-tertiary">{wann(o.slotStart)}</p>
+                      <p className="text-body-3xs text-fg-tertiary dark:text-fg-secondary">{wann(o.slotStart)}</p>
                       <div className="mt-2.5 flex flex-wrap gap-2">
                         <Button size="sm" variant="primary" onClick={() => ergebnis(o.id, 'completed')}>{t('home.outcomeYes')}</Button>
                         <Button size="sm" variant="outline" onClick={() => ergebnis(o.id, 'no_show')}>{t('termine.outcomeNo')}</Button>

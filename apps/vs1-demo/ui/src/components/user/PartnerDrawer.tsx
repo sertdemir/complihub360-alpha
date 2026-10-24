@@ -276,7 +276,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
                   </span>
                 )}
               </div>
-              <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950">
+              <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950 dark:text-fg">
                 {provider.match}
               </span>
             </div>

@@ -124,7 +124,12 @@ export function SectionEyebrow({
  * text-fg-accent-strong, #8C672A / 5,14:1).
  */
 export function GoldWord({ children }: { children: React.ReactNode }) {
-  return <span className="whitespace-nowrap text-fg-accent-emphasis">{children}</span>;
+  // Kein whitespace-nowrap mehr (A11y-Audit 23.10.2026): seit Zeile 2 des
+  // Heros ein ganzer Satz ist ("Know what to do next."), schob das die Seite
+  // auf 390 px auf 432 (EN) bis 602 px (ES); body schneidet waagerecht ab,
+  // also war der Satz auf dem Handy abgeschnitten. Ein einzelnes Wort bricht
+  // ohnehin nicht.
+  return <span className="text-fg-accent-emphasis">{children}</span>;
 }
 
 export function SectionHeading({

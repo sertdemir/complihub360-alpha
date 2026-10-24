@@ -191,7 +191,7 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
                 />
               )}
               <div
-                className="min-w-0 flex-1 basis-0 transition-[opacity,transform] duration-500 ease-out"
+                className="flex min-w-0 flex-1 basis-0 flex-col transition-[opacity,transform] duration-500 ease-out"
                 style={{
                   opacity: inView ? 1 : 0,
                   transform: inView ? 'none' : 'translateY(12px)',
@@ -200,13 +200,15 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
               >
                 {/* tabular-nums is not decoration here: these sit in a row and a
                     reader compares them across it. */}
+                {/* dt zuerst im DOM (dl verlangt dt vor dd), die Zahl steht per
+                    order trotzdem oben. Die Notiz ist ein zweites dd. */}
+                <dt className="order-2 mt-2 text-body-xs font-semibold leading-snug text-fg">{m.label}</dt>
                 <dd
-                  className={`font-serif text-[1.625rem] font-bold leading-none tracking-tight tabular-nums ${m.tone}`}
+                  className={`order-1 font-serif text-[1.625rem] font-bold leading-none tracking-tight tabular-nums ${m.tone}`}
                 >
                   {m.value}
                 </dd>
-                <dt className="mt-2 text-body-xs font-semibold leading-snug text-fg">{m.label}</dt>
-                <p className="mt-1 text-body-2xs leading-relaxed text-fg-tertiary">{m.note}</p>
+                <dd className="order-3 mt-1 text-body-2xs leading-relaxed text-fg-tertiary">{m.note}</dd>
               </div>
             </Fragment>
           ))}

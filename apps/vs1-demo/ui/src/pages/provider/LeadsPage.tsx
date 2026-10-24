@@ -210,7 +210,7 @@ export function LeadsPage() {
       disabled={disabled}
       onClick={onClick}
       className={'rounded-full border px-2.5 py-[3px] text-[11px] font-semibold transition-colors disabled:opacity-60 '
-        + (on ? 'border-brand bg-brand text-white' : 'border-stroke bg-surface text-fg-secondary hover:border-brand hover:text-fg-brand')}
+        + (on ? 'border-brand bg-brand text-fg-on-brand' : 'border-stroke bg-surface text-fg-secondary hover:border-brand hover:text-fg-brand')}
     >
       {label}
     </button>

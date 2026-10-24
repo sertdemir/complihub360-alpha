@@ -19,7 +19,7 @@ import type { DomainObligation, DomainSession } from '../../api/domain';
 type Turn = { question: string; answer?: string; sources?: AssistantSource[]; error?: string };
 
 const TAG = 'inline-flex whitespace-nowrap rounded-md bg-brand-light px-2 py-[3px] text-[9.5px] font-extrabold uppercase tracking-[0.07em] text-fg-brand';
-const TAG_BETA = 'inline-flex whitespace-nowrap rounded border border-[#d4af37]/35 bg-[#d4af37]/10 px-[7px] py-[2px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-fg-accent-strong dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40';
+const TAG_BETA = 'inline-flex whitespace-nowrap rounded border border-[#d4af37]/35 bg-[#d4af37]/10 px-[7px] py-[2px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-fg-accent-strong dark:text-gold-300 dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40';
 
 export function DomainAssistant({ slug, areaLabel, sessions, markets, openDuties, inputRef, onPartner }: {
   slug: string;

@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { cn } from '../../lib/utils';
 
 // ─── Tooltip ──────────────────────────────────────────────────────────────────
 // Mirrors the Compass "Tooltip" (683:2). Inverse bubble (dark on light, light on
 // dark) + small arrow, shown on hover/focus. side = top·bottom·left·right.
+// Checklist v1.0 (A11y): nicht nur per Hover — Fokus oeffnet, Escape schliesst,
+// und der Ausloeser verweist per aria-describedby auf den Text. Auf Touch
+// oeffnet das Antippen den Fokus und damit den Tooltip.
 
 export type TooltipSide = 'top' | 'bottom' | 'left' | 'right';
 
@@ -41,7 +44,18 @@ export interface TooltipProps {
 
 export function Tooltip({ content, title, side = 'top', size = 'md', children, className }: TooltipProps) {
   const [open, setOpen] = useState(false);
+  const tipId = useId();
   const rich = title != null;
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+  // Den Verweis traegt das ausloesende Element selbst, nicht die Huelle.
+  const trigger = React.isValidElement<{ 'aria-describedby'?: string }>(children)
+    ? React.cloneElement(children, { 'aria-describedby': open ? tipId : children.props['aria-describedby'] })
+    : children;
   return (
     <span
       className="relative inline-flex"
@@ -50,9 +64,10 @@ export function Tooltip({ content, title, side = 'top', size = 'md', children, c
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
     >
-      {children}
+      {trigger}
       {open && (
         <span
+          id={tipId}
           role="tooltip"
           className={cn(
             'pointer-events-none absolute z-50 rounded-md bg-neutral-900 font-medium text-white shadow-md dark:bg-neutral-50 dark:text-neutral-900',

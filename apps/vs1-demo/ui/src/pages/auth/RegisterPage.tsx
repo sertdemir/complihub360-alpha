@@ -307,7 +307,7 @@ export function RegisterPage() {
                         <Trans
                             t={t}
                             i18nKey={`register.left.title${step === 0 ? "" : step + 1}`}
-                            components={{ gold: <span className="text-accent-700 dark:text-fg-accent-strong" />, br: <br /> }}
+                            components={{ gold: <span className="text-fg-accent-strong" />, br: <br /> }}
                         />
                     </h1>
                     {step === 0 && (

@@ -982,7 +982,7 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
       <div className="flex flex-wrap items-baseline gap-2">
         <h3 className="text-[12px] font-semibold text-fg">{titel}</h3>
         <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em]',
-          pflicht ? 'bg-warning-50 text-warning-700' : 'bg-surface-secondary text-fg-tertiary')}>{marke}</span>
+          pflicht ? 'bg-warning-50 text-warning-800' : 'bg-surface-secondary text-fg-tertiary')}>{marke}</span>
       </div>
       <p className="max-w-3xl text-[12px] leading-relaxed text-fg-tertiary">{hinweis}</p>
       {typen.map((a) => row(a, pflicht))}

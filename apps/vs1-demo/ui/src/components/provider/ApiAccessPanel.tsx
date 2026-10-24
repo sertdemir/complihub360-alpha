@@ -281,7 +281,7 @@ function RequestForm({ terms, busy, onSubmit }: { terms: string; busy: boolean; 
             <label key={s} className={scopes.includes(s)
               ? 'flex cursor-pointer items-center gap-2 rounded-full border border-stroke-brand/50 bg-brand-light px-3 py-1.5 text-[12px] font-medium text-fg-brand'
               : 'flex cursor-pointer items-center gap-2 rounded-full border border-stroke bg-surface px-3 py-1.5 text-[12px] font-medium text-fg-secondary'}>
-              <Checkbox size="sm" checked={scopes.includes(s)} onChange={() => toggle(s)} />
+              <Checkbox size="sm" checked={scopes.includes(s)} onChange={() => toggle(s)} aria-label={s} />
               <Mono>{s}</Mono>
             </label>
           ))}

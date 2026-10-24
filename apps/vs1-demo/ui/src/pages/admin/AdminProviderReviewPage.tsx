@@ -75,7 +75,7 @@ export function LicenceLine({ licence, country, locale }: { licence: CellLicence
     return <p className="mt-1 flex items-center gap-1.5 text-[12px] font-semibold text-fg-brand"><ShieldCheck size={13} aria-hidden />Licence reviewed{licence.expires_at ? ` · until ${fmt(licence.expires_at, locale)}` : ''}</p>;
   }
   return (
-    <p className="mt-1 flex items-center gap-1.5 text-[12px] font-semibold text-warning-700 dark:text-amber-300">
+    <p className="mt-1 flex items-center gap-1.5 text-[12px] font-semibold text-warning-800 dark:text-amber-300">
       <Info size={13} aria-hidden />
       {licence.state === 'expired' ? `Licence expired${licence.expires_at ? ` · ${fmt(licence.expires_at, locale)}` : ''}` : `No reviewed licence for ${country}`}
     </p>
@@ -151,7 +151,7 @@ export function AdminProviderReviewPage() {
                   return (
                     <div key={g} className={cn('rounded-md px-3 py-2 text-[12px]', missing ? 'bg-warning-bg text-fg' : 'bg-surface-secondary text-fg-secondary')}>
                       <span className="flex items-center gap-1.5">{missing ? <AlertCircle size={14} className="text-warning-600" /> : <CheckCircle2 size={14} className="text-success-600" />}{GATE_LABEL[g]}</span>
-                      {missing && reasons.length > 0 && <span className="block pl-5 text-warning-700">{reasons.join(' · ')}</span>}
+                      {missing && reasons.length > 0 && <span className="block pl-5 text-warning-800">{reasons.join(' · ')}</span>}
                     </div>
                   );
                 })}

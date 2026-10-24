@@ -11,7 +11,7 @@ import { SiteFooter } from '../../components/home/SiteFooter';
 // [PLACEHOLDER]s for contract substance until counsel drafts them.
 
 const PLACEHOLDER = (label: string) => (
-  <span className="rounded bg-warning-bg px-1.5 py-0.5 font-mono text-[0.85em] text-warning-700 ring-1 ring-inset ring-warning-500/30">
+  <span className="rounded bg-warning-bg px-1.5 py-0.5 font-mono text-[0.85em] text-warning-800 ring-1 ring-inset ring-warning-500/30">
     [{label}]
   </span>
 );
@@ -43,7 +43,7 @@ export function Section({ heading, children }: { heading: string; children: Reac
 function DraftBanner() {
   const { t } = useTranslation('legal');
   return (
-    <div className="rounded-lg border border-warning-500/30 bg-warning-bg px-4 py-3 text-[13px] leading-relaxed text-warning-700">
+    <div className="rounded-lg border border-warning-500/30 bg-warning-bg px-4 py-3 text-[13px] leading-relaxed text-warning-800">
       {t('draftBanner')}
     </div>
   );

@@ -209,7 +209,7 @@ export function BillingPage() {
               <ul className="mt-3 space-y-1.5">
                 {readiness.reasons.map((r) => (
                   <li key={r} className="flex items-start gap-2 text-[13px] text-fg">
-                    <span className="mt-[1px] font-bold text-warning-700 dark:text-warning-300" aria-hidden>!</span>
+                    <span className="mt-[1px] font-bold text-warning-800 dark:text-warning-300" aria-hidden>!</span>
                     {/* Bei payment_failed erklaeren die beiden Wege darunter den Rest. */}
                     <span>{r === 'payment_failed' ? t('billing.recheck.failedLine') : t(`billing.reason.${r}`)}</span>
                   </li>

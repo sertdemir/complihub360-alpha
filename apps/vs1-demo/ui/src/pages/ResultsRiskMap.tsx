@@ -1048,6 +1048,9 @@ export function ResultsRiskMap() {
               size="xl"
               shape="soft"
               type="button"
+              // wrap (A11y-Audit 23.10.2026, Reflow 320 px): "Kostenloses Konto
+              // erstellen" in xl lief 12 px ueber den Rand.
+              wrap
               onClick={() => setSaveOpen(true)}
               className="mt-8 shadow-[0_18px_34px_-14px_rgba(0,77,64,0.55)] transition-transform duration-200 hover:-translate-y-0.5"
             >

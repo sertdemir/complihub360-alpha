@@ -84,9 +84,33 @@ Sie gehört zum **Website Implementation Handover V1.1**. V1.0 des Handovers ist
     - `copy:check` sucht in der EN-Copy nach Reichweitenversprechen.
     - Der Unavailable-Zustand richtet sich nach den Abdeckungsdaten, die Zellfreigabe verlangt eine Lizenz, und auch Gäste sehen begrenzte Abdeckung (#314).
   - Nachgeprüft am 23.10.2026: Alle sieben Availability-Tests tragen. Eine Restaussage war falsch und ist korrigiert: „Company Setup & Filings" nannte die DACH-Region, aber AT und CH prüft die Engine nicht.
+- **A11y-Audit 23./24.10.2026:**
+  - **Messung:**
+    - axe-core 4.11 (WCAG 2.2 AA) auf 22 Seiten, hell und dunkel.
+    - Tab-Durchlauf auf 8 Seiten.
+    - Überlauf bei 320, 360 und 390 px in DE, ES und TR.
+  - **Behoben:**
+    - Hero-Zeile in Gold mit `nowrap`: Sie war auf dem Handy in allen Sprachen abgeschnitten.
+    - Überlauf der Marktkarten und Badges bei 320 px.
+    - Kleintext in Gold und Warnfarbe unter AA.
+    - Tertiärtext auf getönten Flächen unter AA.
+    - Dark-Mode-Chips.
+    - Logo-Link ohne Namen.
+    - Länderauswahl (Combobox) ohne Namen.
+    - `dl`-Struktur.
+    - API-Scope-Checkboxen ohne Label.
+    - Tooltip ohne Escape und ohne `aria-describedby`.
+  - **Ohne Befund:**
+    - sichtbarer Fokus bei jedem Tab-Schritt
+    - Lade- und Buchungszustand über `role="status"` (polite, einmal)
+    - `FormErrorSummary` fokussiert das erste fehlerhafte Feld
+    - Inhalte nur bei Hover stecken nur in nicht eingebundenen Komponenten
+  - **Bewusste Abweichung:** Das Gold-Wort in Überschriften (#C5913B) misst 2,80:1 auf Weiß, AA-large verlangt 3:1. Das ist im Token dokumentiert als Markenentscheidung des Nutzers. Die Checkliste verlangt AA, die Entscheidung liegt beim Nutzer.
 - **Offen:**
-  - A11y: Tastatur und Fokus, Lade-Ansagen, Tooltips, Farbe. Die Designbefunde vom 11.10. sind an die Design-Session gegangen. Die Fehlerübersicht (`FormErrorSummary`) steht in 20 Komponenten. Am 23.10. fehlte sie in 6 Dateien mit `<form>`: in vier Such- und Frageleisten (`AreaAskBand`, `DomainAssistant`, `HomeHeroWorld`, `SearchResultPage`), im Beta-Schritt (`BetaAgreementStepPage`) und im nicht eingebundenen `HomeHero`.
-  - Prüfung mit langen deutschen und türkischen Strings.
+  - `FormErrorSummary` steht in 20 Komponenten. Ohne sie sind sechs Dateien mit `<form>`:
+    - fünf Such- und Frageleisten mit einem Feld (`AreaAskBand`, `DomainAssistant`, `HomeHeroWorld`, `SearchResultPage`, `HomeHero`, letzteres nicht eingebunden)
+    - der Beta-Schritt (`BetaAgreementStepPage`)
+    - Ein Feld braucht keine Übersicht. Ob der Beta-Schritt eine braucht, ist offen.
   - Lokalisierter Rückfall: Punkt e vom 11.10., zurückgestellt, solange EN first gilt.
   - Owner und Datum je Gate, Sign-off: Das entscheidet der Mensch.
   - Aufbewahrungsfrist für den Audit-Record: Die Zahl kommt vom Nutzer.
