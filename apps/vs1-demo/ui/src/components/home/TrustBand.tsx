@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
-import { Container } from '../ui/Container';
 import { Photo } from '../ui/Photo';
 import { TermTip } from '../ui/TermTip';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../providers/SectionHeading';
@@ -17,9 +16,12 @@ import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../provi
 // heading is new (trustBand.*). Hairlines between the cells carry the rhythm,
 // same language as the hero's proof strip.
 //
-// Photo left (canvas "Marketing-Fotos · Look B" · Trust-A, 2026-10-24): two
-// people at one screen — "on your side", shown rather than claimed. The copy
-// moves right and the proofs go two across; below lg the photo stacks on top.
+// Photo to the page edge (canvas "Marketing-Fotos · Look B" · Trust-D,
+// 2026-10-24; Trust-A was dropped, the photo was too small for the copy): two
+// people at one screen — "on your side", shown rather than claimed. On lg the
+// photo fills the left column from the viewport edge and is exactly as tall as
+// the copy; the right padding lines the copy up with the 1200px container
+// edge of every other section. Below lg it runs full width above the copy.
 
 // row-major cell order: the four map proofs, then the two network proofs.
 const POINT_KEYS = ['row1.0', 'row1.1', 'row1.2', 'row1.3', 'row2.0', 'row2.1'] as const;
@@ -34,17 +36,18 @@ export function TrustBand() {
   const { t } = useTranslation('home');
 
   return (
-    <section id="why-both" className="bg-surface py-16 lg:py-20">
-      <Container size="xl" className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
-        <Reveal className="relative aspect-[4/3] overflow-hidden rounded-xl lg:aspect-[5/6]">
-          <Photo
-            slug="side-by-side"
-            sizes="(min-width: 1024px) 500px, 100vw"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        </Reveal>
+    <section id="why-both" className="bg-surface lg:grid lg:grid-cols-[minmax(0,46fr)_minmax(0,54fr)]">
+      <Reveal className="relative aspect-[4/3] overflow-hidden lg:aspect-auto lg:min-h-[40rem]">
+        {/* The column is ~46vw wide and as tall as the copy (~900px): the
+            near-square photo then renders ~950px wide under object-cover. */}
+        <Photo
+          slug="side-by-side"
+          sizes="(min-width: 1024px) 960px, 100vw"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </Reveal>
 
-        <div>
+      <div className="px-4 py-16 md:px-10 lg:py-24 lg:pl-[4.5rem] lg:pr-[max(5rem,calc((100vw-75rem)/2+5rem))]">
         <Reveal className="mx-auto flex max-w-[780px] flex-col items-center gap-3.5 text-center lg:mx-0 lg:items-start lg:text-left">
           <SectionEyebrow tone="brand">{t('trustBand.eyebrow')}</SectionEyebrow>
           <h2 className="font-serif text-[1.75rem] font-semibold leading-[1.3] tracking-tight text-fg lg:text-[1.875rem]">
@@ -83,8 +86,7 @@ export function TrustBand() {
             </StaggerItem>
           ))}
         </Stagger>
-        </div>
-      </Container>
+      </div>
     </section>
   );
 }
