@@ -161,13 +161,37 @@ export function ObligationClusters({ rows }: { rows: ClusterRow[] }) {
   );
 }
 
-/** Wizard-Antworten, die heute schon eine offene Angabe klaeren: die
- *  Geschaeftsmodell-Karte liefert Verkauf an Verbraucher, an Unternehmen und
- *  online (factsFromAnswers in der Engine). Andere offene Angaben fragt der
- *  Wizard noch nicht — dafuer verspricht der Hinweis (5B) nichts. */
+/** Wizard-Antworten, die eine offene Angabe klaeren (factsFromAnswers in der
+ *  Engine), je Frage. Der Hinweis (5B) verspricht "one answer settles N" —
+ *  gezaehlt wird deshalb die EINE Frage, die am meisten klaert, nie die Summe
+ *  ueber mehrere Fragen (Nutzer-Entscheid 24.10.2026). */
 export const WIZARD_ANSWERABLE = new Set(['consumer_sales', 'business_sales', 'online_sales']);
 
-/** Wie viele Pflichten eine Antwort im heutigen Wizard klaeren wuerde. */
-export function settledByWizard(rows: ClusterRow[]): number {
-  return rows.filter((r) => r.evidence !== 'confirmed' && r.decides.some((k) => WIZARD_ANSWERABLE.has(k))).length;
+type AnswerContext = {
+  /** Der Knopf fuehrt in den vollen Wizard (Gast, keine gespeicherte Sitzung).
+   *  Die Antworten-Schublade kennt nur Maerkte, Taetigkeit und Bereiche — dort
+   *  zaehlen die Wizard-v1a-Fragen nicht, sonst verspraeche der Hinweis eine
+   *  Frage, die man dort nicht findet. */
+  fullWizard?: boolean;
+  /** Das Profil, mit dem gesucht wurde. */
+  profile?: { categories?: string[]; details?: { establishment?: string[] } } | null;
+};
+
+function answerableQuestions({ fullWizard = false, profile }: AnswerContext): Array<Set<string>> {
+  const questions = [WIZARD_ANSWERABLE];
+  if (!fullWizard) return questions;
+  // Angebot (S04) fragt der Wizard immer.
+  questions.push(new Set(['physical_goods']));
+  // Sitz (S03) nur, solange er offen ist: bei teilweiser Ueberdeckung bleibt
+  // der Fakt nach der Antwort unbekannt, der Hinweis stuende fuer immer da.
+  if (!profile?.details?.establishment?.length) questions.push(new Set(['established_in_market']));
+  // EPR 1/2 stellt der Wizard nur mit EPR & Packaging.
+  if (profile?.categories?.includes('product-packaging')) questions.push(new Set(['electronics', 'batteries']));
+  return questions;
+}
+
+/** Wie viele Pflichten die eine Antwort klaeren wuerde, die am meisten klaert. */
+export function settledByWizard(rows: ClusterRow[], ctx: AnswerContext = {}): number {
+  const pending = rows.filter((r) => r.evidence !== 'confirmed');
+  return Math.max(0, ...answerableQuestions(ctx).map((q) => pending.filter((r) => r.decides.some((k) => q.has(k))).length));
 }

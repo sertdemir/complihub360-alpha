@@ -1055,3 +1055,29 @@ describe('ResultsRiskMap · reopening a saved session', () => {
     expect(saveWizardSession).not.toHaveBeenCalled();
   });
 });
+
+// ─── 5B nach D1 (24.10.2026): der Hinweis zaehlt nur, was der Knopf erreicht ──
+describe('ResultsRiskMap · hint "one answer makes your map more precise"', () => {
+  const physical = law({ id: 'prod-safety', title: 'Product safety', state: 'likely', evidence: { supports: ['consumer_sales'], decides: ['physical_goods'] } });
+
+  it('a guest is sent to the full wizard, so the offering question counts', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', markets: ['DE'], categories: ['product-compliance'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [physical] });
+    renderPage();
+    expect(await screen.findByText('Product safety')).toBeInTheDocument();
+    expect(screen.getByText('hint.title')).toBeInTheDocument();
+  });
+
+  it('a saved risk map opens the answers drawer, which cannot ask it — no promise', async () => {
+    auth.isLoggedIn = true;
+    fetchSessions.mockResolvedValue([{
+      id: 's1', country: 'DE', markets: ['DE'], categories: ['product-compliance'], label: 'Germany',
+      answers: null, status: 'active', risk_summary: null,
+      created_at: '2026-09-01T00:00:00Z', updated_at: '2026-09-01T00:00:00Z',
+    }]);
+    runSearch.mockResolvedValue({ providers: [], laws: [physical] });
+    renderPage('/en/results?session=s1');
+    expect(await screen.findByText('Product safety')).toBeInTheDocument();
+    expect(screen.queryByText('hint.title')).not.toBeInTheDocument();
+  });
+});

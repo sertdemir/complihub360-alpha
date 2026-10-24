@@ -1,0 +1,98 @@
+{
+  "lut": "complihub-look-b.cube",
+  "photos": [
+    {
+      "slug": "owner-laptop-boxes",
+      "file": "owner-laptop-boxes.jpg",
+      "motif": "Mensch im eigenen Betrieb",
+      "source": "Pexels",
+      "id": "7857526",
+      "author": "Kampus Production",
+      "url": "https://www.pexels.com/photo/person-looking-at-charts-displayed-on-a-laptop-and-sitting-at-the-table-with-cardboard-boxes-7857526/",
+      "license": "Pexels License",
+      "crop": null
+    },
+    {
+      "slug": "owner-packing-table",
+      "file": "owner-packing-table.jpg",
+      "motif": "Mensch im eigenen Betrieb, zweites Bild",
+      "source": "Unsplash",
+      "id": "V5XaBkW6PO8",
+      "author": "M. Cooper",
+      "url": "https://unsplash.com/photos/V5XaBkW6PO8",
+      "license": "Unsplash License",
+      "crop": null
+    },
+    {
+      "slug": "side-by-side",
+      "file": "side-by-side.jpg",
+      "motif": "Seite an Seite",
+      "source": "Unsplash",
+      "id": "YqBORf3ggKA",
+      "author": "CoWomen",
+      "url": "https://unsplash.com/photos/YqBORf3ggKA",
+      "license": "Unsplash License",
+      "crop": [600, 0, 2000, 1333],
+      "note": "Links beschnitten: Der Laptop-Aufkleber mit politischer Botschaft ist nicht im Bild."
+    },
+    {
+      "slug": "expert-review",
+      "file": "expert-review.jpg",
+      "motif": "Expertengespräch",
+      "source": "Unsplash",
+      "id": "TFFn3BYLc5s",
+      "author": "Van Tay Media",
+      "url": "https://unsplash.com/photos/TFFn3BYLc5s",
+      "license": "Unsplash License",
+      "crop": [0, 90, 2000, 1334],
+      "note": "Oben beschnitten: Der fremde Logo-Anschnitt rechts oben ist nicht im Bild."
+    },
+    {
+      "slug": "calm-review",
+      "file": "calm-review.jpg",
+      "motif": "Ruhige Prüfung",
+      "source": "Unsplash",
+      "id": "Vvn0OD0IxBM",
+      "author": null,
+      "url": "https://unsplash.com/photos/Vvn0OD0IxBM",
+      "license": "Unsplash License",
+      "crop": null,
+      "note": "Fotograf noch offen: Name auf der Unsplash-Seite nachtragen."
+    },
+    {
+      "slug": "warehouse-shelves",
+      "file": "warehouse-shelves.jpg",
+      "motif": "Ware und Lager",
+      "source": "Pexels",
+      "id": "38195854",
+      "author": "ALHawraa",
+      "url": "https://www.pexels.com/photo/warehouse-storage-with-stacked-cardboard-boxes-38195854/",
+      "license": "Pexels License",
+      "crop": null,
+      "note": "Hochformat. Ersetzt Unsplash RVP3wAw9gJY (Verdacht auf 3D-Render oder KI-Bild)."
+    },
+    {
+      "slug": "port-aerial",
+      "file": "port-aerial.jpg",
+      "motif": "Hafen",
+      "source": "Pexels",
+      "id": "3856440",
+      "author": "Tom Fisk",
+      "url": "https://www.pexels.com/photo/drone-shot-of-a-docked-cargo-ship-at-a-port-3856440/",
+      "license": "Pexels License",
+      "crop": null
+    },
+    {
+      "slug": "parcel-car",
+      "file": "parcel-car.jpg",
+      "motif": "Verpackung",
+      "source": "Pixabay",
+      "id": "1511683",
+      "author": null,
+      "url": "https://pixabay.com/photos/package-packaging-delivery-1511683/",
+      "license": "Pixabay Content License",
+      "crop": [0, 0, 1712, 1339],
+      "note": "Rechts beschnitten: Das Logo „Der Grüne Punkt“ (geschützte Marke) ist nicht im Bild. Fotograf noch offen. Upload 2016, also vor generativen Bildmodellen."
+    }
+  ]
+}
