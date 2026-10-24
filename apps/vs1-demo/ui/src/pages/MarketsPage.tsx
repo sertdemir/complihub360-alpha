@@ -207,8 +207,11 @@ export function MarketsIndexPage() {
                       {FLAG_BY_CODE.get(m.code)}
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="flex items-start justify-between gap-3">
-                        <span className="font-serif text-[1.25rem] font-bold leading-snug text-fg">
+                      {/* flex-wrap + min-w-0 (A11y-Audit 23.10.2026, Reflow 320 px):
+                          "Großbritannien" neben "Vollzug 8/10" schob die Karte
+                          auf 376 px. */}
+                      <span className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1.5">
+                        <span className="min-w-0 break-words font-serif text-[1.25rem] font-bold leading-snug text-fg">
                           {t(`markets.countries.${m.code}`)}
                         </span>
                         <RiskBadge level={severity} size="sm" className="shrink-0 rounded-full tabular-nums">

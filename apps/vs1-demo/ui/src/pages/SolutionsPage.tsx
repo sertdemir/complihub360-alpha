@@ -130,7 +130,7 @@ export function SolutionsPage() {
             <div className="grid grid-cols-1 gap-y-7 sm:grid-cols-3 sm:divide-x sm:divide-stroke-subtle">
               {ROLE_IDS.map((id, i) => (
                 <div key={id} className="min-w-0 sm:px-8 sm:first:pl-0 sm:last:pr-0">
-                  <p className="text-body-3xs font-extrabold uppercase tracking-[0.12em] tabular-nums text-accent-700 dark:text-fg-accent-strong">
+                  <p className="text-body-3xs font-extrabold uppercase tracking-[0.12em] tabular-nums text-fg-accent-strong">
                     {t('solutions.hero.roleKicker', { num: `0${i + 1}`, defaultValue: 'Role {{num}}' })}
                   </p>
                   <p className="mt-2.5 font-serif text-[1.25rem] font-bold leading-snug text-fg">
@@ -165,7 +165,7 @@ export function SolutionsPage() {
             const id = item.id as RoleId;
             return (
               <div className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-8">
-                <p className="text-body-3xs font-bold uppercase tracking-[0.12em] text-accent-700 dark:text-fg-accent-strong">
+                <p className="text-body-3xs font-bold uppercase tracking-[0.12em] text-fg-accent-strong">
                   {t(`solutions.${id}.overline`)}
                 </p>
                 <h3 className="mt-3 font-serif text-[1.5rem] font-semibold leading-tight text-fg">

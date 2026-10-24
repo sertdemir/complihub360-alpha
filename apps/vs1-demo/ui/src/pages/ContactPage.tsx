@@ -35,7 +35,7 @@ import { CONTACT_INBOX, EMAIL_RE, failureOf, invalidFieldOf, sendContact, type S
 /** Wie in LegalPages.tsx: sichtbar offen, nicht heimlich erfunden. */
 function Placeholder({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded bg-warning-bg px-1.5 py-0.5 font-mono text-[0.85em] text-warning-700 ring-1 ring-inset ring-warning-500/30">
+    <span className="rounded bg-warning-bg px-1.5 py-0.5 font-mono text-[0.85em] text-warning-800 ring-1 ring-inset ring-warning-500/30">
       [{children}]
     </span>
   );
@@ -259,7 +259,7 @@ export function ContactPage() {
                       // dann steht dort kein Haken, sondern der Hinweis.
                       <div className="flex flex-col gap-2 rounded-xl border border-warning-500/30 bg-warning-bg dark:bg-amber-500/10 px-[18px] py-[15px]">
                         <p className="font-serif text-[1.125rem] font-bold text-fg">{t('contact.sent.title')}</p>
-                        <p className="text-body-sm leading-relaxed text-warning-700 dark:text-amber-200">{t('contactSend.ackFailed', { email: sentTo })}</p>
+                        <p className="text-body-sm leading-relaxed text-warning-800 dark:text-amber-200">{t('contactSend.ackFailed', { email: sentTo })}</p>
                       </div>
                     )}
                     <div>

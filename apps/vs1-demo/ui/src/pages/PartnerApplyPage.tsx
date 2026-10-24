@@ -135,7 +135,7 @@ export function PartnerApplyPage() {
                             const done = sent && i === 0;
                             return (
                                 <div key={k} className="flex gap-3.5 py-3.5" data-step={k} data-done={done}>
-                                    <span className={'w-5 font-serif text-body-md font-bold ' + (done ? 'text-brand' : 'text-accent-700 dark:text-fg-accent-strong')}>
+                                    <span className={'w-5 font-serif text-body-md font-bold ' + (done ? 'text-brand' : 'text-fg-accent-strong')}>
                                         {done ? '✓' : `0${i + 1}`}
                                     </span>
                                     <span className="min-w-0">
@@ -177,7 +177,7 @@ export function PartnerApplyPage() {
                             ) : (
                                 <div className="flex flex-col gap-2 rounded-xl border border-warning-500/30 bg-warning-bg p-[22px] dark:bg-amber-500/10">
                                     <h2 className="font-serif text-[1.25rem] font-bold leading-snug text-fg">{t('partnerApply.sent.title')}</h2>
-                                    <p className="text-body-sm leading-relaxed text-warning-700 dark:text-amber-200">{t('contactSend.ackFailed', { email: email.trim() })}</p>
+                                    <p className="text-body-sm leading-relaxed text-warning-800 dark:text-amber-200">{t('contactSend.ackFailed', { email: email.trim() })}</p>
                                 </div>
                             )}
                             {/* Kein „Zurueck zum Formular": eine zweite Bewerbung waere ein Duplikat (D2). */}

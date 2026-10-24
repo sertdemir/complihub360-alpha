@@ -160,7 +160,7 @@ export function AiGovernancePage() {
               <div className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-8">
                 <div className="flex items-start justify-between gap-6">
                   <div className="min-w-0">
-                    <p className="text-body-3xs font-bold uppercase tracking-[0.12em] text-accent-700 dark:text-fg-accent-strong">
+                    <p className="text-body-3xs font-bold uppercase tracking-[0.12em] text-fg-accent-strong">
                       {t('aiGov.dimCounter', {
                         num: index,
                         total: DIMENSIONS.length,

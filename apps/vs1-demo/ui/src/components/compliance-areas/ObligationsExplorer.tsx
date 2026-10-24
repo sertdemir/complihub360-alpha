@@ -604,7 +604,7 @@ function Fact({
       >
         {value}
       </dd>
-      {note && <p className="mt-1 text-body-3xs text-fg-tertiary">{note}</p>}
+      {note && <dd className="mt-1 text-body-3xs text-fg-tertiary">{note}</dd>}
     </div>
   );
 }

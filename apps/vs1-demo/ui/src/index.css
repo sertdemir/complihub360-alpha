@@ -127,7 +127,12 @@
     /* Text */
     --color-text-primary: var(--neutral-900);   /* #0f172a */
     --color-text-secondary: var(--neutral-600);  /* #5f5b5b */
-    --color-text-tertiary: var(--neutral-500);   /* #6b7280 */
+    /* #666d7b statt neutral-500 (#6b7280), A11y-Audit 23.10.2026: Tertiaertext
+       steht oft auf getoenten Flaechen, und dort hielt #6b7280 kein AA mehr
+       (4,34:1 auf warning-bg, 4,23:1 auf brand-light). #666d7b: 5,20 auf
+       Weiss · 4,67 auf warning-bg · 4,55 auf brand-light — kaum sichtbar
+       dunkler. */
+    --color-text-tertiary: 102 109 123;
     --color-text-disabled: var(--neutral-400);
     --color-text-inverse: 255 255 255;
     --color-text-brand: var(--petrol-500);

@@ -88,7 +88,7 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, boo
         </div>
         <span
           className={'grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] text-body-xs font-extrabold '
-            + (top ? 'bg-accent text-primary-950' : 'bg-brand-light text-fg-brand')}
+            + (top ? 'bg-accent text-primary-950 dark:text-fg' : 'bg-brand-light text-fg-brand')}
         >
           {p.match}
         </span>

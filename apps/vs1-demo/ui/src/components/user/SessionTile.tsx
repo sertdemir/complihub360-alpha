@@ -32,7 +32,7 @@ const RISK_TAG: Record<SessionSeverity, string> = {
 };
 // Gold-Rezept wie die Status-Pills der RequestCard — bg-warning-bg blieb im
 // Dark Mode hell und frass die Schrift.
-const TAG_STALE = 'inline-flex whitespace-nowrap rounded border border-[#d4af37]/35 bg-[#d4af37]/10 px-[7px] py-[2px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-fg-accent-strong dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40';
+const TAG_STALE = 'inline-flex whitespace-nowrap rounded border border-[#d4af37]/35 bg-[#d4af37]/10 px-[7px] py-[2px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-fg-accent-strong dark:text-gold-300 dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40';
 const TAG_MUTED = 'inline-flex whitespace-nowrap rounded border border-stroke bg-surface-secondary px-[7px] py-[2px] text-[9.5px] font-bold uppercase tracking-[0.06em] text-fg-tertiary';
 
 export const SESSION_TILE_CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';

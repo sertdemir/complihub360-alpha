@@ -260,7 +260,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
       <Sidebar
         className="hidden lg:flex"
         logo={
-          <NavLink to={`${base}/dashboard`} className="flex items-center gap-2">
+          <NavLink to={`${base}/dashboard`} aria-label={`CompliHub360 — ${t('shell.navDashboard')}`} className="flex items-center gap-2">
             {/* 32 statt 36 px: die Sidebar ist w-60 (240 px), mit px-4 bleiben
                 208 px Spur. Bei 36 px waere das Lockup 177 px breit — es
                 passt, fuellt die schmale Spur aber zu 85 %. Bei 32 px sind

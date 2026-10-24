@@ -524,7 +524,7 @@ export function TerminePage() {
           <div className="flex flex-col gap-4 rounded-xl border border-stroke-brand/30 bg-brand-light px-6 py-5 sm:flex-row sm:items-center">
             <DateMark iso={next.slotStartIso} locale={locale} size="lg" soon />
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-fg-brand/70">
+              <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-fg-brand">
                 {t('termine.nextLabel')} · {nextRelativ}
               </p>
               <p className="truncate font-serif text-[26px] font-bold leading-tight text-fg-brand">{next.provider}</p>

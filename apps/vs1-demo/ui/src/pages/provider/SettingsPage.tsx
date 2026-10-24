@@ -348,10 +348,10 @@ export function MatchmakingPanel() {
           im System aus freigegebenen Bereichen und Region — hier die Vorschau. */}
       <div className="rounded-lg border border-brand/40 bg-brand-light px-3.5 py-3">
         <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-fg-brand">{t('settings.previewTitle')}</p>
-        <p className="mt-1 text-[14px] font-bold text-fg">Verified Provider <span className="text-fg-tertiary">A/B/C</span></p>
+        <p className="mt-1 text-[14px] font-bold text-fg">Verified Provider <span className="text-fg-tertiary dark:text-fg-secondary">A/B/C</span></p>
         {/* S1: die Vorschau zeigt, was die Karte zeigt — das Jahr eingeschlossen. */}
         <p className="text-[12px] text-fg-secondary">{[t('settings.previewAreas'), region.trim(), activeSince != null ? t('settings.previewActiveSince', { year: activeSince }) : ''].filter(Boolean).join(' · ')}</p>
-        <p className="mt-1.5 text-[11px] text-fg-tertiary">{t('settings.previewNote')}</p>
+        <p className="mt-1.5 text-[11px] text-fg-tertiary dark:text-fg-secondary">{t('settings.previewNote')}</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>

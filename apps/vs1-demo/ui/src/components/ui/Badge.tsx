@@ -55,7 +55,7 @@ const TONE: Record<BadgeTone, { solid: string; soft: string; outline: string; do
     // does not — pairing them measured 1.98:1 in dark mode. Where a ground
     // deliberately does not flip, the text on it must not either.
     soft: 'bg-accent-50 text-accent-800 dark:bg-accent-500/20 dark:text-accent-200',
-    outline: 'border border-accent-500 text-accent-700 dark:border-accent-400 dark:text-accent-200',
+    outline: 'border border-accent-500 text-fg-accent-strong dark:border-accent-400 dark:text-accent-200',
     dot: 'bg-accent-500',
   },
   success: {
@@ -66,8 +66,8 @@ const TONE: Record<BadgeTone, { solid: string; soft: string; outline: string; do
   },
   warning: {
     solid: 'bg-warning-500 text-white',
-    soft: 'bg-warning-bg text-warning-700 dark:bg-amber-500/15 dark:text-amber-300',
-    outline: 'border border-warning-500 text-warning-700 dark:border-amber-500/50 dark:text-amber-300',
+    soft: 'bg-warning-bg text-warning-800 dark:bg-amber-500/15 dark:text-amber-300',
+    outline: 'border border-warning-500 text-warning-800 dark:border-amber-500/50 dark:text-amber-300',
     dot: 'bg-warning-500 dark:bg-amber-400',
   },
   error: {

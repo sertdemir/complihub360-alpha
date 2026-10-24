@@ -21,7 +21,7 @@ export type RequestStatus = 'awaiting-confirm' | 'awaiting-reply' | 'active' | '
 // Seit 2026-09-27 ohne Hex: Palette gold-500/petrol-500 und stroke-brand-soft
 // (Figma: color/border/brand-soft) — optisch unveraendert.
 const PILL: Record<RequestStatus, string> = {
-  'awaiting-confirm': 'bg-gold-500/10 border-gold-500/35 text-fg-accent-strong dark:bg-gold-500/15 dark:border-gold-500/40',
+  'awaiting-confirm': 'bg-gold-500/10 border-gold-500/35 text-fg-accent-strong dark:text-gold-300 dark:bg-gold-500/15 dark:border-gold-500/40',
   'awaiting-reply': 'bg-surface-secondary border-stroke text-fg-secondary',
   active: 'bg-petrol-500/10 border-stroke-brand-soft/35 text-fg-brand dark:bg-petrol-500/25 dark:border-stroke-brand-soft/40',
   // Abgeschlossen (abgelehnt, zurueckgezogen): neutral — kein Teal, das nach

@@ -37,6 +37,10 @@ export interface SelectMenuProps {
   defaultOpen?: boolean;
   id?: string;
   className?: string;
+  /** Eine Combobox bekommt ihren Namen nicht aus dem Inhalt — ohne sichtbares
+   *  <label for> braucht sie einen dieser beiden. */
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
 }
 
 export function SelectMenu({
@@ -52,6 +56,8 @@ export function SelectMenu({
   defaultOpen,
   id,
   className,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
 }: SelectMenuProps) {
   // Two SelectMenus without an explicit id both fell back to 'sm', so their
   // option ids collided and aria-activedescendant could point into the wrong
@@ -134,6 +140,8 @@ export function SelectMenu({
         id={id}
         disabled={disabled}
         role="combobox"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? listId : undefined}

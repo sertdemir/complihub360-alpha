@@ -31,7 +31,7 @@ const TONE_CLS: Record<IconTone, string> = {
   secondary: 'text-fg-secondary',
   tertiary: 'text-fg-tertiary',
   brand: 'text-fg-brand',
-  accent: 'text-accent-700 dark:text-accent-300',
+  accent: 'text-fg-accent-strong dark:text-accent-300',
   success: 'text-emerald-600 dark:text-emerald-400',
   warning: 'text-amber-600 dark:text-amber-400',
   error: 'text-error-700 dark:text-red-400',

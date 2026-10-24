@@ -52,7 +52,7 @@ const errKey = (k: ErrKind) => (k === "rate-limited" ? "rateLimited" : k);
 // Marketing-Flaeche.
 const goldComponents = {
     br: <br />,
-    gold: <span className="text-accent-700 dark:text-fg-accent-strong" />,
+    gold: <span className="text-fg-accent-strong" />,
 };
 
 const FIELD =
@@ -545,8 +545,8 @@ export function LoginPage() {
                                 </>
                             ) : (
                                 <>
-                                    <AlertTriangle size={30} strokeWidth={1.6} className="mx-auto text-warning-700" aria-hidden />
-                                    <p className="mt-5 text-body-3xs font-bold uppercase tracking-[0.14em] text-warning-700">
+                                    <AlertTriangle size={30} strokeWidth={1.6} className="mx-auto text-warning-800" aria-hidden />
+                                    <p className="mt-5 text-body-3xs font-bold uppercase tracking-[0.14em] text-warning-800">
                                         {t(`login.errors.kindLabels.${errKey(errKind)}`)}
                                     </p>
                                     <h1 className="mt-3 font-serif text-[2.25rem] font-bold leading-tight tracking-tight text-fg">

@@ -216,7 +216,10 @@ function Tile({
         big ? 'p-6 lg:p-8' : 'p-6'
       } ${goldFrame ? 'border-[1.5px] border-accent-500/55' : ''}`}
     >
-      <div className={`flex w-full items-center justify-between gap-3 ${big ? 'mb-5' : 'mb-4'}`}>
+      {/* flex-wrap (A11y-Audit 23.10.2026): bei 320-390 px und langem Titel
+          ("Bugün kullanılabilir", "Startet mit der Beta") lief das Badge sonst
+          ueber den Rand. */}
+      <div className={`flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 ${big ? 'mb-5' : 'mb-4'}`}>
         <p className={`font-serif font-bold text-fg ${big ? 'text-[1.375rem]' : 'text-[1.125rem]'}`}>{title}</p>
         {pill}
       </div>

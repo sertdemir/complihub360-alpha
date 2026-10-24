@@ -55,6 +55,7 @@ export function CountrySelector({ value, onChange, size = 'md' }: CountrySelecto
       }}
       inputSize={compact ? 'sm' : 'md'}
       id={compact ? 'country-select-compact' : 'country-select'}
+      aria-labelledby={compact ? 'country-select-compact-label' : undefined}
     />
   );
 

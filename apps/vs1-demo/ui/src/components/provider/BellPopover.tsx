@@ -125,7 +125,7 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
               )}
               {needs.length > 0 && (
                 <>
-                  <p className="px-4 pb-1 pt-2.5 text-[10.5px] font-medium uppercase tracking-[0.07em] text-warning-700 dark:text-warning-300">{t('partnerNotif.needsYou')}</p>
+                  <p className="px-4 pb-1 pt-2.5 text-[10.5px] font-medium uppercase tracking-[0.07em] text-warning-800 dark:text-warning-300">{t('partnerNotif.needsYou')}</p>
                   {needs.map(row)}
                 </>
               )}

@@ -260,7 +260,7 @@ function FeeVignette() {
         <div className="h-9 w-9 rounded-full bg-brand-light/70" />
         <div className="flex flex-col gap-1.5">
           <div className="h-2 w-[7.5rem] rounded-full bg-brand/15" />
-          <span className="text-body-4xs font-extrabold uppercase tracking-[0.1em] text-accent-700 dark:text-fg-accent-strong">
+          <span className="text-body-4xs font-extrabold uppercase tracking-[0.1em] text-fg-accent-strong">
             {t('pricing.vignette.verified')}
           </span>
         </div>
@@ -425,7 +425,7 @@ export function PricingPage() {
                     <span className="text-body-2xs text-fg-tertiary">
                       {t('pricing.receipt.specialistFee', "The specialist's fee")}
                     </span>
-                    <span className="text-body-2xs font-bold tabular-nums text-accent-700 dark:text-fg-accent-strong">
+                    <span className="text-body-2xs font-bold tabular-nums text-fg-accent-strong">
                       {t('pricing.vignette.range')} {t('pricing.vignette.perHour')}
                     </span>
                   </div>
@@ -460,7 +460,7 @@ export function PricingPage() {
               {Array.from({ length: FREE_COUNT }, (_, i) => (
                 <StaggerItem key={i} className="h-full">
                   <div className="flex h-full flex-col rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.35)] dark:bg-surface-secondary">
-                    <span className="text-body-3xs font-extrabold uppercase tracking-[0.12em] tabular-nums text-accent-700 dark:text-fg-accent-strong">
+                    <span className="text-body-3xs font-extrabold uppercase tracking-[0.12em] tabular-nums text-fg-accent-strong">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <p className="mt-2.5 font-serif text-[1.25rem] font-bold leading-snug text-fg">

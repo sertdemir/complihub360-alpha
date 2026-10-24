@@ -174,7 +174,7 @@ export function PlatformPage() {
                     <div className="flex h-[3.375rem] w-[3.375rem] items-center justify-center rounded-full border border-stroke-subtle bg-surface">
                       <Icon size={24} strokeWidth={1.6} className="text-brand" aria-hidden />
                     </div>
-                    <p className="mt-3.5 text-body-3xs font-extrabold uppercase tracking-[0.12em] tabular-nums text-accent-700 dark:text-fg-accent-strong">
+                    <p className="mt-3.5 text-body-3xs font-extrabold uppercase tracking-[0.12em] tabular-nums text-fg-accent-strong">
                       {t('platform.flow.step', { num: `0${i + 1}`, defaultValue: 'Step {{num}}' })}
                     </p>
                     <p className="mt-1.5 text-body-md font-bold leading-snug text-fg">
@@ -245,7 +245,7 @@ export function PlatformPage() {
                 <div className="mt-6 divide-y divide-stroke-subtle border-y border-stroke-subtle">
                   {INTAKE_STEPS.map((id, i) => (
                     <div key={id} className="flex gap-4 py-4">
-                      <span className="w-6 shrink-0 font-serif text-body-md font-bold tabular-nums text-accent-700 dark:text-fg-accent-strong">
+                      <span className="w-6 shrink-0 font-serif text-body-md font-bold tabular-nums text-fg-accent-strong">
                         {`0${i + 1}`}
                       </span>
                       <div className="min-w-0">
