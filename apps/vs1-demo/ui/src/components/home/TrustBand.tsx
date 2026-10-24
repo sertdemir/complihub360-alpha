@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 import { Container } from '../ui/Container';
+import { Photo } from '../ui/Photo';
 import { TermTip } from '../ui/TermTip';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../providers/SectionHeading';
 
@@ -15,6 +16,10 @@ import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../provi
 // The six points reuse twoReflexes.row1.* / row2.* verbatim — only the
 // heading is new (trustBand.*). Hairlines between the cells carry the rhythm,
 // same language as the hero's proof strip.
+//
+// Photo left (canvas "Marketing-Fotos · Look B" · Trust-A, 2026-10-24): two
+// people at one screen — "on your side", shown rather than claimed. The copy
+// moves right and the proofs go two across; below lg the photo stacks on top.
 
 // row-major cell order: the four map proofs, then the two network proofs.
 const POINT_KEYS = ['row1.0', 'row1.1', 'row1.2', 'row1.3', 'row2.0', 'row2.1'] as const;
@@ -30,8 +35,17 @@ export function TrustBand() {
 
   return (
     <section id="why-both" className="bg-surface py-16 lg:py-20">
-      <Container size="xl">
-        <Reveal className="mx-auto flex max-w-[780px] flex-col items-center gap-3.5 text-center">
+      <Container size="xl" className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+        <Reveal className="relative aspect-[4/3] overflow-hidden rounded-xl lg:aspect-[5/6]">
+          <Photo
+            slug="side-by-side"
+            sizes="(min-width: 1024px) 500px, 100vw"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </Reveal>
+
+        <div>
+        <Reveal className="mx-auto flex max-w-[780px] flex-col items-center gap-3.5 text-center lg:mx-0 lg:items-start lg:text-left">
           <SectionEyebrow tone="brand">{t('trustBand.eyebrow')}</SectionEyebrow>
           <h2 className="font-serif text-[1.75rem] font-semibold leading-[1.3] tracking-tight text-fg lg:text-[1.875rem]">
             {t('trustBand.title.line1')}
@@ -46,11 +60,11 @@ export function TrustBand() {
           )}
         </Reveal>
 
-        <Stagger stagger={0.08} className="mx-auto mt-11 grid sm:grid-cols-2 lg:grid-cols-3">
+        <Stagger stagger={0.08} className="mx-auto mt-9 grid sm:grid-cols-2">
           {POINT_KEYS.map((key, i) => (
             <StaggerItem
               key={key}
-              className={`border-stroke-subtle py-5 lg:pr-7 ${i % 3 < 2 ? 'lg:mr-7 lg:border-r' : ''} ${i < 3 ? 'lg:border-b' : ''}`}
+              className={`border-stroke-subtle py-5 lg:pr-7 ${i % 2 === 0 ? 'lg:mr-7 lg:border-r' : ''} ${i < 4 ? 'lg:border-b' : ''}`}
             >
               <p className="flex items-start gap-2 text-body-md font-bold text-fg">
                 <Check size={15} strokeWidth={2.5} className="mt-1 shrink-0 text-fg-brand" />
@@ -69,6 +83,7 @@ export function TrustBand() {
             </StaggerItem>
           ))}
         </Stagger>
+        </div>
       </Container>
     </section>
   );
