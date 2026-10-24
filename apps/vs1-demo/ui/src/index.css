@@ -145,7 +145,8 @@
        Gemessen: 2,80:1 auf Weiss · 2,69:1 auf bg-secondary · 2,20:1 auf dem
        Gold-Ende des Stage-Gradients · 5,23:1 auf der dunklen Karte. Auf hellem
        Grund liegt das unter der 3:1-Schwelle fuer AA-large — bewusste
-       Marken-Entscheidung des Nutzers, kein Versehen. DISPLAY-GROESSE ONLY:
+       Marken-Entscheidung des Nutzers, kein Versehen — nach dem A11y-Audit am
+       24.10.2026 erneut bestaetigt (ein dunklerer Ton wirkt fad). DISPLAY-GROESSE ONLY:
        nie unter 24 px / 19 px bold, nie fuer Fliesstext (dort
        --color-text-brand), nie fuer Kleintext (dort -accent-strong). */
     --color-text-accent-emphasis: var(--gold-brand);
