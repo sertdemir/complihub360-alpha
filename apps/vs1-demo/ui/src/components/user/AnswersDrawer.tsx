@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, ChevronDown, X } from 'lucide-react';
+import { Check, ChevronDown, Info, X } from 'lucide-react';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
+import { Banner } from '../ui/Banner';
 import {
   STEPS, selectionFromProfile, buildProfile, flowFor, stepDefFor, toggleAnswer, ownMarketsOf, isOthers,
   COUNTRY_PREFIX, type StepKey, type StepDef, type CountryStep, type CountryExtras,
@@ -246,7 +247,9 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
     <div className="flex flex-col gap-3">
       <FormErrorSummary errors={errors} />
       {removals.map((r) => (
-        <p key={r} className="rounded-lg bg-accent-light px-3 py-2 text-body-2xs text-fg-secondary">{r}</p>
+        // Gold wie der Rest der Schublade, aber mit Info statt Sparkles: Das
+        // ist eine Folge der Aenderung, kein Angebot.
+        <Banner key={r} status="accent" icon={<Info size={18} strokeWidth={2} />} title={r} className="px-3 py-2.5" />
       ))}
       <div className="flex items-center justify-between gap-3">
         <span className="text-body-2xs text-fg-secondary">
