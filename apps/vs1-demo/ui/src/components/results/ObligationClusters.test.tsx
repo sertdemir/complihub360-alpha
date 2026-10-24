@@ -62,6 +62,38 @@ describe('ObligationClusters', () => {
     expect(settledByWizard(rows)).toBe(0);
     expect(settledByWizard([row({ evidence: 'open', decides: ['consumer_sales', 'physical_goods'] }), row({ evidence: 'open', decides: ['electronics'] })])).toBe(1);
   });
+
+  // 24.10.2026 (nach D1): der volle Wizard klaert mehr — aber nur, was der
+  // Knopf erreicht, und gezaehlt wird die eine Antwort, die am meisten klaert.
+  const physical = row({ evidence: 'likely', decides: ['physical_goods'] });
+  const weee = row({ evidence: 'open', decides: ['electronics'] });
+  const battery = row({ evidence: 'open', decides: ['batteries'] });
+  const seat = row({ evidence: 'open', decides: ['established_in_market'] });
+  const consumer = row({ evidence: 'likely', decides: ['consumer_sales'] });
+
+  it('the answers drawer (saved risk map) keeps today\'s set', () => {
+    expect(settledByWizard([physical, weee, seat, consumer], { fullWizard: false, profile: { categories: ['product-packaging'] } })).toBe(1);
+  });
+
+  it('the full wizard settles offering, seat and EPR facts', () => {
+    const profile = { categories: ['product-packaging'] };
+    expect(settledByWizard([physical], { fullWizard: true, profile })).toBe(1);
+    expect(settledByWizard([seat], { fullWizard: true, profile })).toBe(1);
+    // Elektronik und Batterien sind EINE Frage (EPR 1/2): beide zaehlen zusammen.
+    expect(settledByWizard([weee, battery, physical], { fullWizard: true, profile })).toBe(2);
+  });
+
+  it('counts the best single answer, never the sum over questions', () => {
+    expect(settledByWizard([physical, seat, consumer], { fullWizard: true, profile: {} })).toBe(1);
+  });
+
+  it('EPR facts only count when the wizard asks them (EPR & Packaging chosen)', () => {
+    expect(settledByWizard([weee, battery], { fullWizard: true, profile: { categories: ['environment'] } })).toBe(0);
+  });
+
+  it('an answered seat is not promised again', () => {
+    expect(settledByWizard([seat], { fullWizard: true, profile: { details: { establishment: ['DE'] } } })).toBe(0);
+  });
 });
 
 describe('ObligationClusters · only open duties', () => {
