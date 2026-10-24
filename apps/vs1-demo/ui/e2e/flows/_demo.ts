@@ -39,19 +39,29 @@ export function recordWrites(page: Page) {
   return writes;
 }
 
-/** Die drei Wizard-Schritte bis zur Risk Map: ein Markt, eine Betriebsart, ein Bereich. */
+/** Der Wizard bis zur Risk Map (v1a: Business · Markets · Areas · Review) —
+ *  ein Markt, eine Betriebsart, ein Bereich. Die neuen Fragen (Situation,
+ *  Angebot, Sitz) bleiben unbeantwortet: Weiter geht ohne Antwort, und ohne
+ *  physische Produkte und ohne EPR fallen Lager und EPR-Fragen weg. */
 export async function runWizard(page: Page, picks = { market: /Germany/, operation: /D2C e-commerce/, domain: /Tax & VAT/ }) {
+  const next = () => page.getByRole('button', { name: /^Next/ }).click();
   await page.goto('/en/wizard', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { name: 'Which best describes your situation?' })).toBeVisible();
+  await next();
+  await expect(page.getByRole('heading', { name: 'What do your operations look like?' })).toBeVisible();
+  await page.getByRole('button', { name: picks.operation }).first().click();
+  await next();
+  await expect(page.getByRole('heading', { name: 'What do you sell or provide?' })).toBeVisible();
+  await next();
   await expect(page.getByRole('heading', { name: 'Where do you operate?' })).toBeVisible();
   // Die Karte traegt den Info-Knopf („About Germany“) in sich — die Karte ist das erste Treffer-Element.
   await page.getByRole('button', { name: picks.market }).first().click();
-  await page.getByRole('button', { name: /^Next/ }).click();
-  await expect(page.getByRole('heading', { name: 'What do your operations look like?' })).toBeVisible();
-  await page.getByRole('button', { name: picks.operation }).first().click();
-  await page.getByRole('button', { name: /^Next/ }).click();
+  await next();
+  await expect(page.getByRole('heading', { name: 'Where is your business established?' })).toBeVisible();
+  await next();
   await expect(page.getByRole('heading', { name: 'Which compliance areas concern you?' })).toBeVisible();
   await page.getByRole('button', { name: picks.domain }).first().click();
-  await page.getByRole('button', { name: /^Next/ }).click();
+  await next();
   await expect(page.getByRole('heading', { name: 'Your situation, summarized.' })).toBeVisible();
   await page.getByRole('button', { name: /Create my Risk Map/ }).click();
 }
