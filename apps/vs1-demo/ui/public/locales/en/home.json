@@ -1024,6 +1024,20 @@
         ],
         "matters": [
           "You sell or ship physical products through a marketplace, your own website, or another sales channel."
+        ],
+        "terms": [
+          {
+            "term": "EPR",
+            "tip": "Rules that place responsibility for a product’s end-of-life environmental impact on certain businesses."
+          },
+          {
+            "term": "WEEE",
+            "tip": "Rules covering waste electrical and electronic equipment."
+          },
+          {
+            "term": "Eco-modulation fees",
+            "tip": "Fees adjusted according to environmental characteristics such as recyclability or material use."
+          }
         ]
       },
       {
@@ -1041,6 +1055,28 @@
         ],
         "matters": [
           "You handle information connected to customers, employees, website visitors, app users, or other individuals in one or more markets."
+        ],
+        "terms": [
+          {
+            "term": "Personal data",
+            "tip": "Information relating to an identified or identifiable individual."
+          },
+          {
+            "term": "GDPR",
+            "tip": "The European Union’s General Data Protection Regulation."
+          },
+          {
+            "term": "UK GDPR",
+            "tip": "The United Kingdom’s data-protection framework based on the retained GDPR."
+          },
+          {
+            "term": "DPIA",
+            "tip": "A Data Protection Impact Assessment used to evaluate higher-risk processing."
+          },
+          {
+            "term": "RoPA",
+            "tip": "A Record of Processing Activities documenting how an organization handles personal data."
+          }
         ]
       },
       {
@@ -1058,6 +1094,24 @@
         ],
         "matters": [
           "You use analytics or cookies, send marketing messages, advertise products or services, or work with influencers and affiliates."
+        ],
+        "terms": [
+          {
+            "term": "Consent",
+            "tip": "A valid, informed, and freely given agreement where required by applicable law."
+          },
+          {
+            "term": "Suppression list",
+            "tip": "A record used to prevent marketing messages from being sent to people who opted out."
+          },
+          {
+            "term": "Dark pattern",
+            "tip": "A design practice that manipulates or obstructs a user’s choices."
+          },
+          {
+            "term": "Tracking technology",
+            "tip": "Technology such as cookies, pixels, or software development kits used to observe user activity."
+          }
         ]
       },
       {
@@ -1077,6 +1131,24 @@
         ],
         "matters": [
           "You are starting a company, entering a new market, opening a branch, changing ownership, or managing ongoing company filings."
+        ],
+        "terms": [
+          {
+            "term": "Beneficial owner",
+            "tip": "An individual who ultimately owns or controls a company."
+          },
+          {
+            "term": "Foreign qualification",
+            "tip": "Registering an existing company to conduct business in another jurisdiction."
+          },
+          {
+            "term": "Registered agent or local representative",
+            "tip": "A person or organization officially appointed for specified local functions."
+          },
+          {
+            "term": "Branch or subsidiary",
+            "tip": "Different ways of operating in another market, with different legal and tax consequences."
+          }
         ]
       },
       {
@@ -1095,6 +1167,28 @@
         ],
         "matters": [
           "You manufacture, import, distribute, or sell a physical product."
+        ],
+        "terms": [
+          {
+            "term": "Placed on the market",
+            "tip": "The first time a product is made available in a particular market."
+          },
+          {
+            "term": "Conformity assessment",
+            "tip": "The process used to show that a product meets applicable requirements."
+          },
+          {
+            "term": "CE marking",
+            "tip": "A marking used for certain products covered by harmonized EU requirements."
+          },
+          {
+            "term": "Technical documentation",
+            "tip": "Records demonstrating how a product meets applicable requirements."
+          },
+          {
+            "term": "Responsible person or authorized representative",
+            "tip": "A locally established party performing defined regulatory responsibilities where required."
+          }
         ]
       },
       {
@@ -1116,6 +1210,32 @@
         ],
         "matters": [
           "You import, export, store, or deliver physical goods across borders."
+        ],
+        "terms": [
+          {
+            "term": "EORI",
+            "tip": "An Economic Operators Registration and Identification number used for customs activities in relevant markets."
+          },
+          {
+            "term": "HS classification",
+            "tip": "The tariff classification assigned to goods for customs purposes."
+          },
+          {
+            "term": "Customs value",
+            "tip": "The value used to calculate customs duties and certain taxes."
+          },
+          {
+            "term": "Origin",
+            "tip": "The country treated as the origin of goods under applicable origin rules."
+          },
+          {
+            "term": "Incoterms",
+            "tip": "Standard trade terms allocating specified delivery tasks, costs, and risks; they do not determine ownership or every form of liability."
+          },
+          {
+            "term": "3PL",
+            "tip": "A third-party logistics provider that performs services such as warehousing, fulfillment, or transportation."
+          }
         ]
       },
       {
@@ -1136,6 +1256,28 @@
         ],
         "matters": [
           "A contract, business decision, consumer issue, legal filing, dispute, or jurisdiction-specific matter requires qualified legal support."
+        ],
+        "terms": [
+          {
+            "term": "Legal information",
+            "tip": "General information about legal requirements or processes; it is not advice for a specific situation."
+          },
+          {
+            "term": "Legal advice",
+            "tip": "A qualified professional’s recommendation based on the facts and applicable law."
+          },
+          {
+            "term": "Applicable law",
+            "tip": "The body of law governing a matter or agreement."
+          },
+          {
+            "term": "Jurisdiction",
+            "tip": "The country, state, or legal authority whose courts or rules apply."
+          },
+          {
+            "term": "Verified Legal Provider",
+            "tip": "An independent legal professional or firm reviewed against CompliHub360’s applicable provider criteria."
+          }
         ]
       },
       {
@@ -1590,5 +1732,25 @@
       "post": "."
     },
     "body": "Reliable information helps you understand what matters. Fair matching helps you find the right professional when support is needed."
+  },
+  "tips": {
+    "label": "Key terms",
+    "verifiedProvider": "A provider reviewed by CompliHub360 against applicable business, experience, coverage, and quality criteria.",
+    "matchScore": "Shows how closely the provider’s verified capabilities fit the needs identified in your assessment.",
+    "responseTime": "The provider’s typical or expected time to respond to a consultation request.",
+    "completedEngagements": "Professional engagements recorded as completed through CompliHub360.",
+    "identity": "The provider’s name and full profile are shown after you select the provider and book a consultation.",
+    "officialSource": "The authority’s own publication, such as a law, regulation, or official guidance, linked where it is available online.",
+    "priority": "How soon a requirement needs your attention, from Immediate to Low, based on its deadline and its consequences.",
+    "terms": {
+      "officialSource": "Official Source",
+      "verifiedProvider": "Verified Provider",
+      "priority": "Priority"
+    },
+    "status": {
+      "confirmed": "This requirement applies based on the information you provided.",
+      "likely": "This requirement probably applies, but additional information or professional confirmation may be needed.",
+      "moreInfo": "Answer a few additional questions so we can assess this requirement more accurately."
+    }
   }
 }

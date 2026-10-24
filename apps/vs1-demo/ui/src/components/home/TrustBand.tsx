@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 import { Container } from '../ui/Container';
+import { TermTip } from '../ui/TermTip';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../providers/SectionHeading';
 
 // ─── S5 — The trust band (canvas "Warum diese Lücke" · Variante A, 2026-08-25) ─
@@ -17,6 +18,12 @@ import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../provi
 
 // row-major cell order: the four map proofs, then the two network proofs.
 const POINT_KEYS = ['row1.0', 'row1.1', 'row1.2', 'row1.3', 'row2.0', 'row2.1'] as const;
+// Handover 1.0 §8: drei Begriffe mit Erklaerung, je am Punkt, der sie traegt.
+const POINT_TIPS: Partial<Record<(typeof POINT_KEYS)[number], 'priority' | 'officialSource' | 'verifiedProvider'>> = {
+  'row1.0': 'priority',
+  'row1.1': 'officialSource',
+  'row2.0': 'verifiedProvider',
+};
 
 export function TrustBand() {
   const { t } = useTranslation('home');
@@ -52,6 +59,13 @@ export function TrustBand() {
               <p className="ml-[23px] mt-1.5 text-body-xs leading-relaxed text-fg-secondary">
                 {t(`twoReflexes.${key}.desc`)}
               </p>
+              {POINT_TIPS[key] && (
+                <span className="ml-[23px] mt-2.5 inline-flex">
+                  <TermTip variant="chip" tip={t(`tips.${POINT_TIPS[key]}`)}>
+                    {t(`tips.terms.${POINT_TIPS[key]}`)}
+                  </TermTip>
+                </span>
+              )}
             </StaggerItem>
           ))}
         </Stagger>

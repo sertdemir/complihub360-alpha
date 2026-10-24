@@ -4,6 +4,7 @@ import { Star, Lock, ArrowRight } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { FreeAccountDrawer } from './MarketsDrawer';
+import { TermTip } from '../ui/TermTip';
 import { Tag } from '../ui/Tag';
 import { PartnerStatusBadge } from '../ui/ProviderBadges';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../providers/SectionHeading';
@@ -91,11 +92,15 @@ function AnonMatchCard({ m }: { m: (typeof MATCHES)[number] }) {
             <span className="h-2.5 w-16 rounded bg-neutral-300/50 dark:bg-white/[0.14]" />
           </div>
         </div>
-        <PartnerStatusBadge status="verified" styleVariant="solid" label={t('badge.verified')} />
+        {/* Handover 1.0 §5, Tooltips: Badge, Identitaet, Match, Antwortzeit,
+            abgeschlossene Auftraege. */}
+        <TermTip variant="plain" tip={t('tips.verifiedProvider')}>
+          <PartnerStatusBadge status="verified" styleVariant="solid" label={t('badge.verified')} />
+        </TermTip>
       </div>
       {/* Handover 1.0 §5: das Schloss sagt, wann die Identitaet sichtbar wird. */}
       <p className="mt-2 flex items-center gap-1.5 text-body-3xs font-semibold text-fg-tertiary">
-        <Lock size={11} aria-hidden /> {t('matchmaking.identityLabel')}
+        <Lock size={11} aria-hidden /> <TermTip tip={t('tips.identity')}>{t('matchmaking.identityLabel')}</TermTip>
       </p>
       <p className="mt-3 border-b border-stroke-subtle pb-2.5 text-body-xs text-fg-secondary">{t(`${base}.specialty`)}</p>
       <div className="mt-2.5 flex flex-wrap gap-1.5">
@@ -103,10 +108,13 @@ function AnonMatchCard({ m }: { m: (typeof MATCHES)[number] }) {
           <Tag key={i} tone="neutral">{t(`${base}.tags.${i}`)}</Tag>
         ))}
       </div>
-      <p className="mt-3 text-body font-bold text-fg-brand">{t('risk.match', { pct: m.pct })}</p>
+      <p className="mt-3 text-body font-bold text-fg-brand">
+        <TermTip tip={t('tips.matchScore')}>{t('risk.match', { pct: m.pct })}</TermTip>
+      </p>
       <p className="text-body-2xs text-fg-secondary">{t(`${base}.covers`)}</p>
       <p className="mt-auto flex items-center gap-1.5 border-t border-stroke-subtle pt-2.5 text-body-3xs text-fg-tertiary">
-        {t(`${base}.response`)} · {m.rating} <Star size={10} className="-ml-0.5 fill-accent-500 text-accent-500" /> · {t(`${base}.engagements`)}
+        <TermTip tip={t('tips.responseTime')}>{t(`${base}.response`)}</TermTip> · {m.rating} <Star size={10} className="-ml-0.5 fill-accent-500 text-accent-500" /> ·{' '}
+        <TermTip tip={t('tips.completedEngagements')}>{t(`${base}.engagements`)}</TermTip>
       </p>
     </div>
   );

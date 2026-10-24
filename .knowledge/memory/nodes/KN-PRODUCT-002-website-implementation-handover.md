@@ -75,12 +75,13 @@ Umgesetzt auf der Startseite (EN), Sektion für Sektion:
 
 ## Noch offen
 
-- **Tooltips:**
-  - Begriffe der Bereiche, etwa EPR, WEEE, DPIA, EORI und Incoterms
-  - Matching: Verified Provider, Match score, Response time, Completed engagements, Identity revealed
-  - Status der Risk Map
-  - Trust Band: Official Source, Verified Provider, Priority
-  - Die Texte stehen im Handover. Die Bedienung (Tastatur, Escape, Touch) leistet die `Tooltip`-Komponente seit #403.
+- ~~**Tooltips**~~ umgesetzt am 24.10.2026 (`TermTip` auf `Tooltip`):
+  - Bereiche: Leiste „Key terms“ je Bereich mit den Begriffen aus §7; Tax & VAT führt keine.
+  - Matching: Badge Verified, Identitäts-Label, Match-Prozent, Antwortzeit, abgeschlossene Aufträge (§5).
+  - Risk Map: Status Confirmed und Likely to Apply (§4). „Answer 2 Questions“ ist eine Aktion und bekommt keinen.
+  - Trust Band: Priority, Official Source, Verified Provider (§8).
+  - Wortlaut aus dem Handover. Ausnahme: **Official Source** und **Priority** nennt §8 nur als Begriff. Diese beiden Erklärungen hat Claude geschrieben, der Nutzer prüft sie im PR.
+  - Bedienung: Hover, Fokus, Escape, Antippen und Antippen daneben. `aria-describedby` ist ab dem ersten Rendern gesetzt, die Blase liegt per Portal fixed im Viewport und wird von keiner Karte abgeschnitten.
 - **Anbieterkarte im Produkt:** Die Felder aus §5, etwa „Add to Selection“, sind eine Funktionsfrage und keine Copy.
 - **Lokalisierung:** DE, ES und TR tragen den alten Satz und fallen für neue Schlüssel auf EN zurück (Entscheidung 09.10.2026).
 - **Unterseiten:** `/how-it-works` und das Dashboard gehören nicht zum Handover. Ihre Zwischentitel und Dashboard-Labels sind unverändert.

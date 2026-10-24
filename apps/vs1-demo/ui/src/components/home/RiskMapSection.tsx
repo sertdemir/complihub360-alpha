@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Lock, Check, Info, ArrowRight } from 'lucide-react';
 import { Container } from '../ui/Container';
+import { TermTip } from '../ui/TermTip';
 import { Button } from '../ui/Button';
 import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
 import { Stat } from '../ui/Stat';
@@ -48,17 +49,23 @@ export function StateCell({ kind }: { kind: StateKind }) {
       </span>
     );
   }
+  // Handover 1.0 §4: jeder Status erklaert sich selbst. "Answer 2 Questions"
+  // ist eine Aktion, kein Status, und bekommt deshalb keinen Tooltip.
   if (kind === 'confirmed') {
     return (
-      <Badge shape="pill" tone="neutral" appearance="soft" size="md" className="font-medium">
-        <Check size={13} className="text-fg-brand" /> {label}
-      </Badge>
+      <TermTip variant="plain" tip={t('tips.status.confirmed')}>
+        <Badge shape="pill" tone="neutral" appearance="soft" size="md" className="font-medium">
+          <Check size={13} className="text-fg-brand" /> {label}
+        </Badge>
+      </TermTip>
     );
   }
   return (
-    <Badge shape="pill" tone="neutral" appearance="outline" size="md" className="font-medium">
-      <Info size={13} /> {label}
-    </Badge>
+    <TermTip variant="plain" tip={t('tips.status.likely')}>
+      <Badge shape="pill" tone="neutral" appearance="outline" size="md" className="font-medium">
+        <Info size={13} /> {label}
+      </Badge>
+    </TermTip>
   );
 }
 
