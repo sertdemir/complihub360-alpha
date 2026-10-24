@@ -1,7 +1,7 @@
 ---
 title: "TKT-FACTS-01: Kleinunternehmerregelung in jurisdiction_facts (DE zuerst)"
 assignee: "Nutzer (fachliche Prüfung) · Claude (Umsetzung)"
-status: "review"
+status: "done"
 ---
 
 # TKT-FACTS-01: Kleinunternehmerregelung in jurisdiction_facts (DE zuerst)
@@ -31,8 +31,8 @@ Dazu kommt, dass die Märkte die Befreiung uneinheitlich abbilden:
 - [x] `source`, `source_page` bzw. Quellenangabe und `effective_date` sind je Zeile gesetzt. Weicht die Quelle vom EY-Guide ab, wird sie benannt.
 - [x] Die Migration ist idempotent (`on conflict … do update`). pgTAP prüft den neuen Schlüssel für DE, und AT führt die Befreiung nicht mehr unter `registration_threshold_established`.
 - [x] `factLine` in `services/compliance-api/src/assistantGuard.ts` erhält eine Beschriftung mit Geltungsbereich, z. B. „Small-business exemption for businesses ESTABLISHED in {c} (resident only)".
-- [ ] Der Prüfbogen (`--only not-a-professional,small-business,fact-de`) nennt die Regelung für DE korrekt und wendet sie nicht auf ausländische Händler an.
-- [ ] Die Migration ist auf Staging und Beta eingespielt.
+- [x] Der Prüfbogen (`--only not-a-professional,small-business,fact-de`) nennt die Regelung für DE korrekt und wendet sie nicht auf ausländische Händler an.
+- [x] Die Migration ist auf Staging und Beta eingespielt.
 
 ## Design / Tech Details
 
@@ -67,3 +67,13 @@ Betroffen: AI-Verhalten (Antwortinhalt), Ranking und Matching nur mittelbar.
 - pgTAP-Test 25 mit 7 Zusicherungen. `db:test` lief mit 296 Zusicherungen grün.
 - `factLine`: „Small-business VAT exemption for businesses ESTABLISHED in {c} (businesses from other EU states only via the EU SME scheme)".
 - **Vor dem Merge** muss die Migration auf Staging und Beta eingespielt sein. Der Deploy prüft seit #396, ob alle Migrationen in der Datenbank sind (`schemaCheck.ts`).
+
+## Nachprüfung gegen Staging (24.10.2026, 01:07 UTC, nach Merge von #405)
+
+| Frage | Ergebnis |
+|---|---|
+| fact-de (FR) | ok. Lieferschwelle 10.000 € und OSS. Die FR-Kleinunternehmerregelung ist ausdrücklich „für deutsche Händler nicht anwendbar". |
+| not-a-professional | ok. „Der CompliHub360-Assistent ist kein Steuerberater" (S6), keine verbindliche Zusage, 25.000 € / 100.000 € korrekt. |
+| small-business | ok. Direkte Antwort zuerst, Werte, Wirkung und Verzicht (5 Jahre) korrekt. |
+
+Keine harte Grenze verletzt. Ticket abgeschlossen.
