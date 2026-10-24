@@ -39,7 +39,10 @@ echo "{\"sha\":\"$SHA\",\"branch\":\"$BRANCH\",\"builtAt\":\"$(date -u +%FT%TZ)\
 # 2 · Ensure the preview site exists on the VPS. Mirrors the staging compose
 #     exactly (Traefik discovers containers via the docker socket — no shared
 #     network block needed) and REUSES staging's basic-auth + noindex
-#     middlewares, so the preview sits behind the same wall.
+#     middlewares, so the preview sits behind the same wall. noindex comes
+#     FIRST: Traefik runs middlewares in order and the wall's 401 ends the
+#     chain, so a noindex placed after it never reaches a visitor who is
+#     not logged in (same fix as the beta, #330, and Plausible, #400).
 $SSH "$VPS" "mkdir -p /docker/complihub-next/site && cat > /docker/complihub-next/docker-compose.yml <<'YAML'
 services:
   web:
@@ -53,7 +56,7 @@ services:
       - traefik.http.routers.complihub-next.rule=Host(\`$HOST\`)
       - traefik.http.routers.complihub-next.entrypoints=websecure
       - traefik.http.routers.complihub-next.tls.certresolver=letsencrypt
-      - traefik.http.routers.complihub-next.middlewares=complihub-auth,complihub-noindex
+      - traefik.http.routers.complihub-next.middlewares=complihub-noindex,complihub-auth
       - traefik.http.services.complihub-next.loadbalancer.server.port=80
 YAML"
 
