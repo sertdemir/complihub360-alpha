@@ -1,4 +1,4 @@
-import { searchCoverage, priceRangeOf } from './searchCoverage.js';
+import { searchCoverage, priceRangeOf, timelineRangeOf } from './searchCoverage.js';
 import { buildSharedSnapshot, providerSharedView, sharedPreview } from './sharedSnapshot.js';
 import { logAccessDenied } from './accessDenied.js';
 import { createServer, IncomingMessage, ServerResponse } from "http";
@@ -3641,6 +3641,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             // Spanne ueber die Leistungen in den angefragten
                             // Bereichen, nur bei einer Waehrung — sonst keine.
                             price_range: priceRangeOf(viewByKey.get(p.provider_key) ?? [], rawCats),
+                            // Handover 1.0 §5: geschaetzte Leistungsdauer, Klasse
+                            // anonymous, ueber dieselben Leistungen wie die Spanne.
+                            timeline_days: timelineRangeOf(viewByKey.get(p.provider_key) ?? [], rawCats),
                             markets_covered: coverage.marketsOf(p.provider_key),
                             _rank: total,
                             _areas: Array.from(approvedAreas.get(p.provider_key) ?? []),
@@ -3660,7 +3663,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 // Ohne Passung kein Prozentwert, keine Stufe und keine Spanne fuer
                 // Leistungen, die er in den angefragten Bereichen gar nicht hat.
                 const outsideProviders = listOf(outside)
-                    .map(({ match: _m, match_tier: _t, price_range: _pr, ...rest }: any) => rest);
+                    .map(({ match: _m, match_tier: _t, price_range: _pr, timeline_days: _td, ...rest }: any) => rest);
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({

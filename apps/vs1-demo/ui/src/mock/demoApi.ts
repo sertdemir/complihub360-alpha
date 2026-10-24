@@ -468,6 +468,19 @@ const PRICE_RANGE: Record<string, { min: number | null; max: number | null; curr
   'lucid-reg': { min: 600, max: 900, currency: 'EUR' },
 };
 
+// Handover 1.0 §5: geschaetzte Leistungsdauer in Tagen (provider_services.
+// completion_days_estimate). lucid-reg ohne Schaetzung — die Karte zeigt dann
+// keine Zeile.
+const TIMELINE_DAYS: Record<string, { min: number; max: number }> = {
+  'studio-bianchi': { min: 10, max: 15 },
+  'schmidt-partner': { min: 7, max: 21 },
+  'thames-vat': { min: 5, max: 10 },
+  'dahlmann-cpa': { min: 14, max: 30 },
+  'datenschutz-nord': { min: 20, max: 45 },
+  'costa-legal': { min: 10, max: 20 },
+  'oss-experts': { min: 5, max: 12 },
+};
+
 const PROVIDERS = [
   { _key: 'studio-bianchi', public_ref: REF['studio-bianchi'], region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.7, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high', match_basis: BASIS(['tax-vat', 'product-packaging', 'data-privacy']), rank_basis: RANK('independent', 5, 5, 3, 0.97, 4.7, 3) },
   { _key: 'schmidt-partner', public_ref: REF['schmidt-partner'], region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong', match_basis: BASIS(['tax-vat', 'product-packaging']), rank_basis: RANK('independent', 4, 4, 5, 0.92, 4.7, 3) },
@@ -504,6 +517,7 @@ function search(body: unknown) {
       // Wie der Server (searchCoverage.ts): Spanne ueber die angefragten
       // Bereiche, Maerkte aus der Freigabe.
       price_range: PRICE_RANGE[p._key] ?? null,
+      timeline_days: TIMELINE_DAYS[p._key] ?? null,
       markets_covered: knownMarkets.filter((m) => (PROVIDER_DETAIL[p._key]?.markets ?? []).includes(m)),
       match_basis: {
         country,
@@ -530,7 +544,7 @@ function search(body: unknown) {
   // ES, Marketing + Recht).
   const outside = matching.length ? [] : providers
     .filter((p) => p.match_basis.country_covered)
-    .map(({ match: _m, match_tier: _t, price_range: _pr, ...rest }, j) => ({ ...rest, title: `Verified Provider ${LETTER(j)}`, letter: LETTER(j) }));
+    .map(({ match: _m, match_tier: _t, price_range: _pr, timeline_days: _td, ...rest }, j) => ({ ...rest, title: `Verified Provider ${LETTER(j)}`, letter: LETTER(j) }));
   return { ok: true, providers: matching, providers_outside: outside, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
 }
 

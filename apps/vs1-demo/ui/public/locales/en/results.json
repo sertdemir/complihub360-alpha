@@ -508,5 +508,15 @@
     "profileTitle": "This provider doesn’t cover what you asked about",
     "profileBody": "You reached this profile from providers who work in the same market but not in {{areas}}. Booking from here is not offered.",
     "profileBodyGeneric": "You reached this profile from providers who work in the same market but not in the area you asked about. Booking from here is not offered."
+  },
+  "card": {
+    "book": "Book a Consultation",
+    "markets": "Markets",
+    "priorities": "Priorities covered",
+    "timeline": "Estimated service timeline",
+    "completed": "Completed engagements",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "daysRange": "{{min}}–{{max}} days"
   }
 }

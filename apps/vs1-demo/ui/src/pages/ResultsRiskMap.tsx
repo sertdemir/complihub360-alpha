@@ -53,6 +53,7 @@ import {
   useMarketRequests,
 } from '../components/results/MarketRequest';
 import { topMatches } from '../lib/topMatches';
+import { priorityOf, type Priority } from '../lib/priority';
 
 /** J3: ab hier gilt das Laden als "laenger als erwartet" (Entscheidung 2026-10-09). */
 const DELAYED_AFTER_MS = 8000;
@@ -141,6 +142,20 @@ type RiskT = TFunction<['results', 'common']>;
 // denselben drei Funktionen. Bis 2026-09-22 hatte die Sitzungsseite keine
 // eigene Abbildung und nahm deshalb die Design-Fixture — jede Sitzung
 // exportierte dieselben acht erfundenen Pflichten.
+
+/** Handover 1.0 §5 "Relevant priorities covered": die Pflichten dieser Karte
+ *  in Bereichen, die der Anbieter abdeckt, nach Stufe. `rows[i]` gehoert zu
+ *  `laws[i]` (liveObligations bildet 1:1 ab); "On the radar" zaehlt nicht. */
+export function prioritiesCoveredBy(laws: SearchLaw[], rows: Pick<Obligation, 'radar'>[], p: Pick<AnonProvider, 'match_basis'>): Partial<Record<Priority, number>> {
+  const matched = new Set(p.match_basis?.domains_matched ?? []);
+  const out: Partial<Record<Priority, number>> = {};
+  laws.forEach((l, i) => {
+    if (!l.domain || !matched.has(l.domain) || !l.severity || rows[i]?.radar) return;
+    const k = priorityOf(l.severity);
+    out[k] = (out[k] ?? 0) + 1;
+  });
+  return out;
+}
 
 /** Engine-Pflichten → Tabellenzeilen. Nur Pflichten mit `severity` zaehlen;
  *  die uebrigen sind Knowledge-Treffer ohne Bewertung. */
@@ -280,6 +295,7 @@ export function ResultsRiskMap() {
   // Partner oeffnen als Schublade ueber der Sitzung (Canvas 1C, 2026-09-15) —
   // wie auf der Bereichsseite. Kein Seitenwechsel, die Ergebnisse bleiben stehen.
   const [partnerOpen, setPartnerOpen] = useState<AnonProvider | null>(null);
+  const [partnerStart, setPartnerStart] = useState<'profil' | 'termin'>('profil');
   // Termine des Nutzers je Anbieter: wo einer liegt, traegt die Karte den
   // Klarnamen statt des Pseudonyms (Stufe 3).
   const [booked, setBooked] = useState<BookingByKey>({});
@@ -457,6 +473,7 @@ export function ResultsRiskMap() {
   // eine Map, die man speichern kann, und eine Aussage "what applies to you".
   const hasResult = pageState === 'live' || pageState === 'none';
   const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale) : [];
+  const prioritiesCovered = (p: AnonProvider) => prioritiesCoveredBy(liveLaws, rows, p);
   // F1: Stufe je Pflicht aus den Antworten. Aeltere Zustaende ('answer')
   // zaehlen als offen — sie sind ebenfalls noch keine Aussage.
   const evidenceOf = (o: Obligation): 'confirmed' | 'likely' | 'open' =>
@@ -689,9 +706,12 @@ export function ResultsRiskMap() {
         // Mit gespeicherter Sitzung oeffnet sich die Schublade; ohne (Fixture,
         // Gast-Profil) bleibt der Weg zum Erst-Wizard.
         onEditAnswers={() => (sessionId && session ? setAnswersOpen(true) : navigate(`/${locale}/wizard`))}
-        onProviderDetails={(ref) => setPartnerOpen(anonProviders.find((p) => p.public_ref === ref) ?? null)}
+        onProviderDetails={(ref) => { setPartnerStart('profil'); setPartnerOpen(anonProviders.find((p) => p.public_ref === ref) ?? null); }}
+        onProviderBook={(ref) => { setPartnerStart('termin'); setPartnerOpen(anonProviders.find((p) => p.public_ref === ref) ?? null); }}
+        providerPriorities={prioritiesCovered}
         partnerDrawer={
           <PartnerDrawer
+            startAt={partnerStart}
             open={partnerOpen !== null}
             onClose={() => setPartnerOpen(null)}
             provider={partnerOpen}

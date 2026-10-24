@@ -156,3 +156,26 @@ describe('PartnerDrawer · Nachweise wie auf der Karte', () => {
     expect(screen.queryByText('rankBasis.never')).not.toBeInTheDocument();
   });
 });
+
+// ─── Handover 1.0 §5 · "Book a Consultation" ─────────────────────────────────
+// Der Knopf auf der Karte oeffnet die Schublade direkt im Termin-Schritt. Ist
+// der Anbieter nicht buchbar, faellt sie ins Profil zurueck, das den Grund nennt.
+describe('PartnerDrawer · startAt', () => {
+  beforeEach(() => {
+    fetchSlots.mockReset().mockResolvedValue([]);
+    fetchAcknowledgement.mockReset().mockResolvedValue(null);
+  });
+
+  it('startAt="termin": die Terminwahl steht sofort', async () => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, bookable_chargeable: true });
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    expect(await screen.findByRole('group', { name: 'schedule.title' })).toBeInTheDocument();
+  });
+
+  it('nicht buchbar: zurueck ins Profil mit dem Hinweis, keine Terminwahl', async () => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, bookable_chargeable: false });
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    expect(await screen.findByText('detail.notBookableNote')).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'schedule.title' })).not.toBeInTheDocument();
+  });
+});

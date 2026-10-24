@@ -61,8 +61,11 @@ import type { AnonProvider } from '../../api/search';
 type Detail = { kind: 'loading' } | { kind: 'ready'; d: ProviderDetail } | { kind: 'missing' } | { kind: 'error' };
 type Step = 'profil' | 'termin';
 
-export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, sessionLabel, requestScope, opportunity, booking, onBooked }: {
+export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, sessionLabel, requestScope, opportunity, booking, onBooked, startAt = 'profil' }: {
   open: boolean;
+  /** Handover 1.0 §5: "Book a Consultation" auf der Karte oeffnet direkt den
+   *  Termin-Schritt, "View details" das Profil. */
+  startAt?: 'profil' | 'termin';
   onClose: () => void;
   /** Die Sitzung hinter der Suche — Bereich und Maerkte der Opportunity
    *  kommen daraus; ohne Sitzung leitet der Server sie aus dem Angebot ab. */
@@ -124,16 +127,25 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
 
   // Jeder neu geoeffnete Anbieter faengt beim Profil an — sonst stuende der
   // naechste Anbieter im Buchungsschritt des vorigen.
+  // Nur ob, nicht welcher Termin: das Objekt entsteht je Rendern neu und
+  // wuerde den Schritt sonst laufend zuruecksetzen.
+  const hasBooking = !!booking;
   useEffect(() => {
     if (!open) return;
-    setStep('profil');
+    setStep(hasBooking ? 'profil' : startAt);
     setSelected(null);
     setMessage(sessionMessage ?? '');
     setSending(false);
     setFailure(null);
     setReviewOpen(false);
     setSlotTried(false);
-  }, [open, key, sessionMessage]);
+  }, [open, key, sessionMessage, startAt, hasBooking]);
+
+  // Nicht buchbar: zurueck ins Profil, das den Grund nennt — kein
+  // Termin-Schritt, der in die 409 fuehrt (wie 2026-10-01 entschieden).
+  useEffect(() => {
+    if (step === 'termin' && detail.kind === 'ready' && detail.d.bookable_chargeable === false) setStep('profil');
+  }, [step, detail]);
 
   // Die Bestaetigung in der Sprache des Nutzers — geladen, sobald der
   // Termin-Schritt offen ist; neu geladen, wenn der Server eine neuere

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { priceRangeOf, searchCoverage } from '../searchCoverage';
+import { priceRangeOf, searchCoverage, timelineRangeOf } from '../searchCoverage';
 
 // EN-Launch Schritt 2: "Limited coverage" und "expected price range" duerfen
 // nur sagen, was die Freigabe-View hergibt — nie mehr.
@@ -51,5 +51,28 @@ describe('priceRangeOf', () => {
 
   it('ohne Preis: null, nie 0', () => {
     expect(priceRangeOf([rows[2]], ['tax-vat'])).toBeNull();
+  });
+});
+
+describe('timelineRangeOf (Handover 1.0 §5)', () => {
+  const svc = [
+    { provider_key: 'a', country_code: 'DE', area_code: 'tax-vat', completion_days_estimate: 10 },
+    { provider_key: 'a', country_code: 'DE', area_code: 'tax-vat', completion_days_estimate: '15' },
+    { provider_key: 'a', country_code: 'DE', area_code: 'product-packaging', completion_days_estimate: 40 },
+    { provider_key: 'a', country_code: 'DE', area_code: 'tax-vat', completion_days_estimate: null },
+  ];
+
+  it('spannt ueber die Schaetzungen der angefragten Bereiche', () => {
+    expect(timelineRangeOf(svc, ['tax-vat'])).toEqual({ min: 10, max: 15 });
+    expect(timelineRangeOf(svc, ['tax-vat', 'product-packaging'])).toEqual({ min: 10, max: 40 });
+  });
+
+  it('ohne Schaetzung: null, keine erfundene Dauer', () => {
+    expect(timelineRangeOf([svc[3]], ['tax-vat'])).toBeNull();
+    expect(timelineRangeOf(svc, ['data-privacy'])).toBeNull();
+  });
+
+  it('nimmt nur ganze, nicht negative Tage', () => {
+    expect(timelineRangeOf([{ provider_key: 'a', country_code: 'DE', area_code: 'tax-vat', completion_days_estimate: -3 }, { provider_key: 'a', country_code: 'DE', area_code: 'tax-vat', completion_days_estimate: 2.5 }], ['tax-vat'])).toBeNull();
   });
 });

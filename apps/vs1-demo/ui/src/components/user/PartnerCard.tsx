@@ -6,6 +6,7 @@ import { Check } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { usePriceText } from '../results/ProviderStates';
 import type { AnonProvider, RankBasis as RankBasisData } from '../../api/search';
+import { PRIORITY_LEVELS, type Priority } from '../../lib/priority';
 
 // ─── Partner-Karte des Arbeitsbereichs ───────────────────────────────────────
 // EINE Darstellung fuer Anbieter im Arbeitsbereich (Nutzer-Vorgabe
@@ -46,7 +47,7 @@ export function Monogram({ letter, size = 40, className = '' }: { letter: string
   );
 }
 
-export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, booking, className = '' }: {
+export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, onBook, priorities, booking, className = '' }: {
   provider: AnonProvider;
   /** Bester Match: goldener Match-Kasten. */
   top?: boolean;
@@ -56,6 +57,13 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, boo
    *  Fehlt er, rendert die Karte ihn selbst aus `p.rank_basis`. */
   rankBasis?: ReactNode;
   onDetails: () => void;
+  /** Handover 1.0 §5 "Book a Consultation": oeffnet die Schublade direkt im
+   *  Termin-Schritt. Ohne ihn bleibt "View details" der einzige Knopf. */
+  onBook?: () => void;
+  /** Handover 1.0 §5 "Relevant priorities covered": wie viele Pflichten der
+   *  Risk Map je Stufe in Bereichen liegen, die der Anbieter abdeckt. Der
+   *  Aufrufer kennt die Pflichten, die Karte nicht. */
+  priorities?: Partial<Record<Priority, number>>;
   /** Gibt es einen Termin bei diesem Anbieter, traegt die Karte seinen
    *  KLARNAMEN statt des Titels (Stufe 3, spec §5) — und darunter die
    *  Herkunft „war Verified Provider B". */
@@ -70,6 +78,18 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, boo
     : null;
   const rank = rankBasis ?? (p.rank_basis ? <RankBasis basis={p.rank_basis} /> : null);
   const priceText = usePriceText();
+  // Handover 1.0 §5: die Felder der anonymen Karte. Jede Zeile nur mit Daten —
+  // eine leere Zeile oder eine erfundene Zahl waere schlechter als keine.
+  const specs = (p.specializations ?? []).slice(0, 3);
+  const markets = (p.markets_covered ?? []).map((c) => t(`common:markets.countries.${c}`, { defaultValue: c }));
+  const prio = PRIORITY_LEVELS
+    .filter((k) => (priorities?.[k] ?? 0) > 0)
+    .map((k) => `${priorities![k]} ${t(`priority.${k}`)}`);
+  const days = p.timeline_days
+    ? p.timeline_days.min === p.timeline_days.max
+      ? t('card.days', { count: p.timeline_days.min })
+      : t('card.daysRange', { min: p.timeline_days.min, max: p.timeline_days.max })
+    : null;
   return (
     <div className={`${CARD} flex flex-col p-4 ${className}`}>
       <div className="flex items-center gap-2.5">
@@ -101,12 +121,25 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, boo
           p.avg_response_hours != null ? t('snapshot.responseTime', { hours: p.avg_response_hours }) : null,
           t(`snapshot.billing.${p.billing_model}`)].filter(Boolean).join(' · ')}
       </p>
-      {/* Die Preisspanne (EN-Launch Schritt 2): der abgenommene Satz ueber den
-          Karten nennt "expected price range" — ohne sie waere er hier unwahr.
-          Kein Preis: "Pricing on request.", keine erfundene Zahl. */}
-      <p className="mt-1 text-[10.5px] text-fg-secondary">
-        <span className="text-fg-tertiary">{t('matchStates.factPrice')}: </span>{priceText(p.price_range)}
-      </p>
+      {specs.length > 0 && (
+        <ul aria-label={t('matchStates.factExpertise')} className="mt-2 flex flex-wrap gap-1">
+          {specs.map((s) => (
+            <li key={s} className="rounded-full bg-surface-secondary px-2 py-[2px] text-[10px] font-semibold text-fg-secondary">{s}</li>
+          ))}
+        </ul>
+      )}
+      <dl className="mt-2 flex flex-col gap-0.5 text-[10.5px]">
+        {markets.length > 0 && <CardFact label={t('card.markets')}>{markets.join(' · ')}</CardFact>}
+        {prio.length > 0 && <CardFact label={t('card.priorities')}>{prio.join(' · ')}</CardFact>}
+        {/* Die Preisspanne (EN-Launch Schritt 2): der abgenommene Satz ueber den
+            Karten nennt "expected price range" — ohne sie waere er hier unwahr.
+            Kein Preis: "Pricing on request.", keine erfundene Zahl. */}
+        <CardFact label={t('matchStates.factPrice')}>{priceText(p.price_range)}</CardFact>
+        {/* Die Dauer der Leistung beim Anbieter, nicht die Bearbeitungszeit
+            einer Behoerde (Handover 1.0 §9). */}
+        {days && <CardFact label={t('card.timeline')}>{days}</CardFact>}
+        {(p.completed_count ?? 0) > 0 && <CardFact label={t('card.completed')}>{p.completed_count}</CardFact>}
+      </dl>
       {/* Die Zahl allein waere eine Behauptung — hier steht, woraus sie
           besteht (DNA-Addendum V2 P1), und darunter, warum der Anbieter an
           dieser Stelle steht (Canvas 2B). */}
@@ -116,12 +149,38 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, boo
           {rank && <Group title={t('rankBasis.group')}>{rank}</Group>}
         </div>
       )}
-      {/* Der einzige gefuellte Knopf: der Weg zum einzelnen Anbieter. */}
-      <div className="mt-auto pt-5">
-        <Button variant={booking ? 'secondary' : 'primary'} className="w-full" onClick={onDetails}>
-          {booking ? t('snapshot.providerBooked') : t('snapshot.providerDetails')}
-        </Button>
+      {/* Der einzige gefuellte Knopf: der Weg zum einzelnen Anbieter. Mit
+          onBook (Handover 1.0 §5) ist das die Buchung, die Details stehen
+          als Textlink darunter. */}
+      <div className="mt-auto flex flex-col items-center gap-2 pt-5">
+        {!booking && onBook ? (
+          <>
+            <Button variant="primary" className="w-full" onClick={onBook}>
+              {t('card.book')}
+            </Button>
+            <button
+              type="button"
+              onClick={onDetails}
+              className="text-body-3xs font-semibold text-fg-brand underline underline-offset-2 hover:text-brand"
+            >
+              {t('snapshot.providerDetails')}
+            </button>
+          </>
+        ) : (
+          <Button variant={booking ? 'secondary' : 'primary'} className="w-full" onClick={onDetails}>
+            {booking ? t('snapshot.providerBooked') : t('snapshot.providerDetails')}
+          </Button>
+        )}
       </div>
+    </div>
+  );
+}
+
+function CardFact({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex gap-1">
+      <dt className="shrink-0 text-fg-tertiary">{label}:</dt>
+      <dd className="min-w-0 text-fg-secondary">{children}</dd>
     </div>
   );
 }
