@@ -277,7 +277,7 @@ function GroupCard({ label, sub, dot, rows, entered, offset, taskOf, statusRowOf
 }
 
 export function SessionSnapshot({
-  rows, providers, sessionId, title, meta, kpis, matchBasis, providerPriorities, onExportPdf, onEditAnswers, onProviderDetails, onProviderBook, answersDrawer, partnerDrawer, bookings, emptyState, providersEmptyState, providersTop,
+  rows, providers, sessionId, title, meta, kpis, matchBasis, providerPriorities, savedRefs, saveFailed, onToggleSave, onExportPdf, onEditAnswers, onProviderDetails, onProviderBook, answersDrawer, partnerDrawer, bookings, emptyState, providersEmptyState, providersTop,
 }: {
   rows: SnapshotRow[];
   providers: AnonProvider[];
@@ -295,6 +295,11 @@ export function SessionSnapshot({
   onExportPdf?: () => void;
   onEditAnswers: () => void;
   onProviderDetails: (publicRef: string) => void;
+  /** Handover 1.0 §5 "Add to Selection": gemerkte Refs und das Umschalten. */
+  savedRefs?: ReadonlySet<string>;
+  /** Der letzte Versuch ist gescheitert; `full`: die Merkliste ist voll (409). */
+  saveFailed?: { ref: string; full: boolean } | null;
+  onToggleSave?: (publicRef: string) => void;
   /** Handover 1.0 §5: "Book a Consultation" auf der Karte. */
   onProviderBook?: (publicRef: string) => void;
   /** Handover 1.0 §5: abgedeckte Pflichten der Karte je Stufe. `settled`:
@@ -532,6 +537,9 @@ export function SessionSnapshot({
                     onDetails={() => onProviderDetails(p.public_ref)}
                     onBook={onProviderBook ? () => onProviderBook(p.public_ref) : undefined}
                     priorities={providerPriorities?.(p, settled)}
+                    saved={savedRefs?.has(p.public_ref)}
+                    onToggleSave={onToggleSave ? () => onToggleSave(p.public_ref) : undefined}
+                    saveFailed={saveFailed?.ref === p.public_ref ? (saveFailed.full ? 'full' : true) : false}
                   />
                 ))}
               </motion.aside>

@@ -354,16 +354,6 @@
       "feature2": "Ülke rehberleri",
       "feature3": "Uzmanlarla web seminerleri",
       "feature4": "Hesaplayıcılar ve şablonlar"
-    },
-    "savedProviders": {
-      "title": "Kaydedilen sağlayıcılar",
-      "sub": "Sağlayıcıları kaydedin ve yeniden bulun · yakında",
-      "panelTitle": "Sağlayıcıları kaydetme",
-      "panelSub": "Her sağlayıcıda bir yer imi — risk haritasında, görüşmede, sağlayıcı sayfasında. Burada toplanır.",
-      "feature1": "Her yerden kaydetme",
-      "feature2": "Nereden kaydedildiği birlikte kalır",
-      "feature3": "Alana ve pazara göre filtreleme",
-      "feature4": "Listeden doğrudan talep gönderme"
     }
   },
   "domainPage": {

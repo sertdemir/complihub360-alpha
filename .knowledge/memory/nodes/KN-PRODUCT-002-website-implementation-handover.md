@@ -92,7 +92,13 @@ Umgesetzt auf der Startseite (EN), Sektion für Sektion:
     - abgeschlossene Aufträge
   - **Woher:** Die Leistungsdauer ist neu im anonymen Payload, aus `provider_services.completion_days_estimate`, Klasse anonymous. Gerechnet wird über dieselben Leistungen wie die Preisspanne. Ohne Passung steht sie nicht im Payload.
   - **„Book a Consultation“:** öffnet die Schublade direkt im Termin-Schritt. Ist der Anbieter nicht buchbar, springt sie ins Profil mit dem Grund zurück. „View details“ bleibt als Textlink.
-  - **Zurückgestellt:** „Add to Selection“. Es gibt keine Auswahl- oder Merkliste (`/dashboard/saved-providers` ist „Coming soon“), und ein Knopf ohne Wirkung wäre eine leere Zusage. Der Nutzer hat am 24.10.2026 entschieden: kommt zusammen mit „Saved providers“.
+  - **„Add to Selection“:** zunächst zurückgestellt, weil es keine Merkliste gab (ein Knopf ohne Wirkung wäre eine leere Zusage). Am 24.10.2026 zusammen mit „Saved providers“ umgesetzt, siehe unten.
+- **„Add to Selection“ und Saved Providers**, umgesetzt am 24.10.2026:
+  - **Karte:** Outline-Knopf „Add to Selection“ / „In your selection“ mit `aria-pressed`. Nur für eingeloggte Nutzer und nur, wenn die Merkliste geladen ist. Sonst gibt es keinen Knopf statt eines falschen „nicht gemerkt“.
+  - **Seite** `/dashboard/saved-providers` (vorher „Coming soon“): anonyme Karten mit „Book a Consultation“, „View details“, „Remove“. Ehrliche Zustände für laden, leer, nicht ladbar und „nicht mehr verfügbar“.
+  - **Server:** Tabelle `saved_providers` (FK auf Nutzer und Anbieter, beide `ON DELETE CASCADE`, RLS ohne Policy), Routen `GET/PUT/DELETE /api/v1/me/saved-providers`. Höchstens 200 Einträge; der 201. wird mit 409 abgelehnt, statt alte still zu verlieren.
+  - **Regeln:** anonym bis zur Buchung (ADR-0004). Die Liste ist kein Detail-Aufruf und schreibt kein billable Event. Der Anbieter erfährt nichts.
+  - **Buchstabe:** Er ist die Position in der jeweiligen Liste, wie in der Suche. Derselbe Anbieter kann auf der Risk Map „C“ und in der Merkliste „A“ heißen.
 - **Lokalisierung:** DE, ES und TR tragen den alten Satz und fallen für neue Schlüssel auf EN zurück (Entscheidung 09.10.2026).
 - **Unterseiten:** `/how-it-works` und das Dashboard gehören nicht zum Handover. Ihre Zwischentitel und Dashboard-Labels sind unverändert.
 

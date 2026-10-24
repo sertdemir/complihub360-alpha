@@ -1386,8 +1386,56 @@ function adminApiDecide(id: string, body: Record<string, unknown>) {
 // die echte API kennt die Route nicht, und der Demo-Login auf Staging ruft
 // sie nie.
 const INITIAL_MOCK_STATE = JSON.stringify({ ATT, STATUS_OVERRIDE, READINESS, AVAIL, API_STATE });
+// ─── Gemerkte Anbieter (savedProviders.ts) ───────────────────────────────────
+// Wie der Server: anonym, nie ein Detail-Aufruf, neueste zuerst; der Buchstabe
+// ist die Position in DIESER Liste. Der Demo-Nutzer hat einen gemerkt.
+const SAVED: Array<{ key: string; at: string; session_id: string | null }> = [];
+const INITIAL_SAVED = () => [{ key: 'studio-bianchi', at: plus(-3 * 24 * H), session_id: uuid(1, 1) }];
+SAVED.push(...INITIAL_SAVED());
+function savedList() {
+  const sorted = [...SAVED].sort((a, b) => b.at.localeCompare(a.at));
+  return {
+    ok: true,
+    providers: sorted.map((s, i) => {
+      const p = PROVIDERS.find((x) => x._key === s.key);
+      if (!p) return { available: false, public_ref: REF[s.key] ?? null, saved_at: s.at };
+      return {
+        available: true,
+        public_ref: REF[s.key],
+        title: `Verified Provider ${LETTER(i)}`,
+        letter: LETTER(i),
+        descriptor: DESCRIPTOR[s.key] ?? '',
+        area_codes: AREAS[s.key] ?? [],
+        descriptor_region: REGION[s.key] ?? null,
+        specializations: p.specializations,
+        markets: PROVIDER_DETAIL[s.key]?.markets ?? [],
+        completed_count: p.completed_count,
+        avg_response_hours: p.avg_response_hours,
+        billing_model: p.billing_model,
+        price_range: PRICE_RANGE[s.key] ?? null,
+        timeline_days: TIMELINE_DAYS[s.key] ?? null,
+        saved_at: s.at,
+        session_id: s.session_id,
+      };
+    }),
+  };
+}
+function saveProvider(ref: string, body: Record<string, unknown>) {
+  const key = keyOfRef(ref);
+  if (!key || !PROVIDERS.some((x) => x._key === key)) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
+  if (!SAVED.some((s) => s.key === key)) SAVED.push({ key, at: new Date().toISOString(), session_id: typeof body.session_id === 'string' ? body.session_id : null });
+  return { ok: true, saved: true, public_ref: ref };
+}
+function forgetProvider(ref: string) {
+  const key = keyOfRef(ref);
+  const i = SAVED.findIndex((s) => s.key === key);
+  if (i >= 0) SAVED.splice(i, 1);
+  return { ok: true, removed: i >= 0 };
+}
+
 export function resetMockState(): void {
   SEEN_REQUESTS.clear();
+  SAVED.splice(0, SAVED.length, ...INITIAL_SAVED());
   BETA_ACCEPTED = { version: BETA_VERSION, language: 'en', accepted_at: plus(-5 * 24 * H) };
   for (const k of Object.keys(ACCOUNT_OVERRIDE)) delete ACCOUNT_OVERRIDE[k];
   const init = JSON.parse(INITIAL_MOCK_STATE) as { ATT: typeof ATT; STATUS_OVERRIDE: typeof STATUS_OVERRIDE; READINESS: typeof READINESS; AVAIL: typeof AVAIL; API_STATE: typeof API_STATE };
@@ -1415,6 +1463,9 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'agreements' && p[1] && method === 'GET') return p[1] === 'beta' ? betaAgreement((query.get('lang') ?? 'en').slice(0, 2).toLowerCase()) : { __status: 404, errorCode: 'AGREEMENT_UNKNOWN', message: 'Unknown agreement' };
   if (p[0] === 'me' && p[1] === 'agreements' && !p[2] && method === 'GET') return myAgreements();
   if (p[0] === 'me' && p[1] === 'agreements' && p[2] === 'beta' && method === 'POST') return acceptBeta(body);
+  if (p[0] === 'me' && p[1] === 'saved-providers' && !p[2] && method === 'GET') return savedList();
+  if (p[0] === 'me' && p[1] === 'saved-providers' && p[2] && method === 'PUT') return saveProvider(p[2], body);
+  if (p[0] === 'me' && p[1] === 'saved-providers' && p[2] && method === 'DELETE') return forgetProvider(p[2]);
   if (method === 'GET') {
     // Kalender-Status (nylasAuth.ts) — vor dem allgemeinen GET-Rueckfall unten.
     if (p[0] === 'provider' && p[2] === 'calendar' && p.length === 3) return calendarStatus();

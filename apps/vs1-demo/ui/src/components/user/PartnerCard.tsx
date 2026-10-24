@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRequestContext } from '../../lib/requestContext';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
-import { Check } from 'lucide-react';
+import { Check, Bookmark, BookmarkCheck } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { usePriceText } from '../results/ProviderStates';
 import type { AnonProvider, RankBasis as RankBasisData } from '../../api/search';
@@ -47,7 +47,7 @@ export function Monogram({ letter, size = 40, className = '' }: { letter: string
   );
 }
 
-export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, onBook, priorities, booking, className = '' }: {
+export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, onBook, priorities, saved, onToggleSave, saveFailed, booking, className = '' }: {
   provider: AnonProvider;
   /** Bester Match: goldener Match-Kasten. */
   top?: boolean;
@@ -64,6 +64,13 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, onB
    *  Risk Map je Stufe in Bereichen liegen, die der Anbieter abdeckt. Der
    *  Aufrufer kennt die Pflichten, die Karte nicht. */
   priorities?: Partial<Record<Priority, number>>;
+  /** Handover 1.0 §5 "Add to Selection": in der Merkliste? Ohne onToggleSave
+   *  kein Knopf (Gast, Fixture). */
+  saved?: boolean;
+  onToggleSave?: () => void;
+  /** Der letzte Versuch, die Merkliste zu aendern, ist gescheitert;
+   *  'full': die Merkliste ist voll, ein neuer Versuch hilft nicht. */
+  saveFailed?: boolean | 'full';
   /** Gibt es einen Termin bei diesem Anbieter, traegt die Karte seinen
    *  KLARNAMEN statt des Titels (Stufe 3, spec §5) — und darunter die
    *  Herkunft „war Verified Provider B". */
@@ -71,7 +78,7 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, onB
   className?: string;
 }) {
   const { t, i18n } = useTranslation('results');
-  const { beschreibung } = useRequestContext();
+  const { beschreibung, markt } = useRequestContext();
   const locale = i18n.resolvedLanguage || 'en';
   const when = booking
     ? new Date(booking.slotStart).toLocaleString(locale, { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
@@ -81,7 +88,9 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, onB
   // Handover 1.0 §5: die Felder der anonymen Karte. Jede Zeile nur mit Daten —
   // eine leere Zeile oder eine erfundene Zahl waere schlechter als keine.
   const specs = (p.specializations ?? []).slice(0, 3);
-  const markets = (p.markets_covered ?? []).map((c) => t(`common:markets.countries.${c}`, { defaultValue: c }));
+  // Ländernamen ueber Intl wie die Beschreibung — die Sprachdateien fuehren nur
+  // die Engine-Maerkte, ein Anbieter deckt auch andere ab (PT, AT …).
+  const markets = (p.markets_covered ?? []).map(markt);
   const prio = PRIORITY_LEVELS
     .filter((k) => (priorities?.[k] ?? 0) > 0)
     .map((k) => `${priorities![k]} ${t(`priority.${k}`)}`);
@@ -158,6 +167,18 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, onB
             <Button variant="primary" className="w-full" onClick={onBook}>
               {t('card.book')}
             </Button>
+            {onToggleSave && (
+              <Button
+                variant="outline"
+                className="w-full"
+                aria-pressed={!!saved}
+                onClick={onToggleSave}
+              >
+                {saved ? <BookmarkCheck size={15} aria-hidden /> : <Bookmark size={15} aria-hidden />}
+                {saved ? t('card.inSelection') : t('card.addToSelection')}
+              </Button>
+            )}
+            {saveFailed && <p role="alert" className="text-center text-[10.5px] text-error-700 dark:text-red-300">{t(saveFailed === 'full' ? 'card.saveFull' : 'card.saveFailed')}</p>}
             <button
               type="button"
               onClick={onDetails}

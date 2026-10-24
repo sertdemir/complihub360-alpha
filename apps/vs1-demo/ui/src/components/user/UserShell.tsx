@@ -6,7 +6,7 @@ import {
   LayoutGrid, FolderClosed, Bell, CalendarCheck,
   Search, Landmark, Package, ShieldCheck, Megaphone, Building2,
   PackageCheck, Truck, Scale,
-  Leaf, ChevronRight, Plus, UserRound } from 'lucide-react';
+  Leaf, ChevronRight, Plus, UserRound, Bookmark } from 'lucide-react';
 import { DOMAINS as CANONICAL_DOMAINS, type DomainSlug } from '../../lib/domains';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
@@ -47,6 +47,9 @@ const SIDEBAR: { group: string; groupKey: string; badgeKey?: string; items: Side
       { to: 'dashboard/sessions', labelKey: 'navRiskMaps', icon: FolderClosed },
       // v2: Termine (bookings) replace the retired engagement-request center.
       { to: 'dashboard/termine', labelKey: 'navTermine', icon: CalendarCheck },
+      // Handover 1.0 §5 "Add to Selection" (24.10.2026): die Merkliste ist keine
+      // Bald-Seite mehr.
+      { to: 'dashboard/saved-providers', labelKey: 'navSavedProviders', icon: Bookmark },
       { to: 'dashboard/notifications', labelKey: 'navNotifications', icon: Bell },
       // Beta-Vereinbarung (Canvas-Wahl 3C, 22.10.2026): der Nachweis der Annahme gehoert dem Nutzer.
       { to: 'dashboard/account', labelKey: 'navAccount', icon: UserRound },

@@ -10,7 +10,7 @@ import { lawsOf, runSearch, type AnonProvider, type SearchCoverage, type SearchL
 import { coverageGaps, isLimitedCoverage } from '../lib/matchState';
 import { LimitedCoverageCard, OneMatchGuest, ProviderStateHead } from '../components/results/ProviderStates';
 import { useApiData } from '../lib/useApiData';
-import { referenceOf } from '../api/client';
+import { ApiError, referenceOf } from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { Lock, ArrowRight, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
@@ -54,6 +54,7 @@ import {
 } from '../components/results/MarketRequest';
 import { topMatches } from '../lib/topMatches';
 import { priorityOf, type Priority } from '../lib/priority';
+import { fetchSavedProviders, saveProvider, forgetProvider } from '../api/savedProviders';
 import { slugForSubdomain } from '../lib/areaProfiles';
 import { DOMAIN_BY_SLUG } from '../lib/domains';
 import { ComplianceDomain } from '@complihub/compliance-engine';
@@ -339,6 +340,45 @@ export function ResultsRiskMap() {
   // ?session=<id> re-queries /search with that session's stored profile.
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session');
+
+  // Handover 1.0 §5 "Add to Selection": die Merkliste des Nutzers. Laedt sie
+  // nicht, gibt es keinen Knopf — ein "Add" fuer etwas schon Gemerktes waere
+  // eine falsche Auskunft.
+  const [savedRefs, setSavedRefs] = useState<Set<string> | null>(null);
+  const [saveFailed, setSaveFailed] = useState<{ ref: string; full: boolean } | null>(null);
+  // Je Anbieter hoechstens eine Anfrage unterwegs: ein Doppelklick schickte
+  // sonst PUT und DELETE parallel, und der Server haette in beliebiger
+  // Reihenfolge entschieden — der Knopf zeigte dann etwas anderes als die Liste.
+  const savePending = useRef(new Set<string>());
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    let alive = true;
+    fetchSavedProviders()
+      .then((list) => { if (alive) setSavedRefs(new Set(list.flatMap((s) => (s.available ? [s.public_ref] : [])))); })
+      .catch(() => { if (alive) setSavedRefs(null); });
+    return () => { alive = false; };
+  }, [isLoggedIn]);
+  // Optimistisch umschalten, bei Fehler zurueck und sagen, dass es nicht ging.
+  const toggleSave = async (ref: string) => {
+    if (!savedRefs || savePending.current.has(ref)) return;
+    const was = savedRefs.has(ref);
+    const flip = (on: boolean) => setSavedRefs((prev) => {
+      const next = new Set(prev ?? []);
+      if (on) next.add(ref); else next.delete(ref);
+      return next;
+    });
+    savePending.current.add(ref);
+    setSaveFailed(null);
+    flip(!was);
+    try {
+      if (was) await forgetProvider(ref); else await saveProvider(ref, sessionId);
+    } catch (err) {
+      flip(was);
+      setSaveFailed({ ref, full: err instanceof ApiError && err.status === 409 });
+    } finally {
+      savePending.current.delete(ref);
+    }
+  };
   // `query` haelt fest, womit tatsaechlich gesucht wurde — der Umfang der
   // leeren Zustaende (welche Maerkte geprueft wurden) muss dieselbe Frage
   // beschreiben, nicht das lokale Profil, wenn eine Sitzung es ersetzt hat.
@@ -732,6 +772,9 @@ export function ResultsRiskMap() {
         onProviderDetails={(ref) => { setPartnerStart('profil'); setPartnerOpen(anonProviders.find((p) => p.public_ref === ref) ?? null); }}
         onProviderBook={(ref) => { setPartnerStart('termin'); setPartnerOpen(anonProviders.find((p) => p.public_ref === ref) ?? null); }}
         providerPriorities={prioritiesCovered}
+        savedRefs={savedRefs ?? undefined}
+        saveFailed={saveFailed}
+        onToggleSave={savedRefs ? toggleSave : undefined}
         partnerDrawer={
           <PartnerDrawer
             startAt={partnerStart}
