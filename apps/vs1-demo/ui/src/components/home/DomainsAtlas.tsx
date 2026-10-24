@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
+import { TermTip } from '../ui/TermTip';
 import { SectionEyebrow, GoldWord, Reveal } from '../providers/SectionHeading';
 import { DOMAINS, type DomainSlug } from '../../lib/domains';
 import { areaReachLine } from '../../lib/coverage';
@@ -61,6 +62,9 @@ const CYCLE_MS = 6000;
 
 /** returnObjects liefert bei fehlendem Schluessel den Schluessel selbst. */
 const listOf = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
+type Term = { term: string; tip: string };
+const termsOf = (v: unknown): Term[] =>
+  Array.isArray(v) ? v.filter((x): x is Term => !!x && typeof x.term === 'string' && typeof x.tip === 'string') : [];
 
 export function DomainsAtlas() {
   const { t } = useTranslation('home');
@@ -143,7 +147,14 @@ export function DomainsAtlas() {
           </motion.div>
 
           {/* The Gradient panel with the active area's dossier */}
-          <div className="flex flex-1 items-center rounded-xl bg-gradient-stage p-5 sm:p-8 lg:p-11">
+          {/* Wer im Panel liest oder einen Begriff aufklappt, haelt den Selbstlauf an —
+              sonst wechselte der Bereich unter dem offenen Tooltip weg. */}
+          <div
+            className="flex flex-1 items-center rounded-xl bg-gradient-stage p-5 sm:p-8 lg:p-11"
+            onFocusCapture={() => setPicked(true)}
+            onPointerEnter={(e) => { if (e.pointerType !== 'touch') setPicked(true); }}
+            onPointerDown={() => setPicked(true)}
+          >
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={active}
@@ -189,6 +200,18 @@ export function DomainsAtlas() {
                     </li>
                   ))}
                 </ul>
+                {/* Handover 1.0 §7: die Fachbegriffe eines Bereichs mit Erklaerung.
+                    Tax & VAT fuehrt keine, dann faellt die Leiste weg. */}
+                {termsOf(t(`${base}.terms`, { returnObjects: true })).length > 0 && (
+                  <div className="mt-6">
+                    <p className="text-body-4xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{t('tips.label')}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {termsOf(t(`${base}.terms`, { returnObjects: true })).map((term) => (
+                        <TermTip key={term.term} variant="chip" tip={term.tip}>{term.term}</TermTip>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <hr className="my-6 border-stroke-subtle" />
                 <div className="flex justify-end">
                   <Button
