@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SaveProgressContent } from './MarketsDrawer';
+import { SaveProgressContent, WizardDrawerLayer } from './MarketsDrawer';
 import type { SearchProfile } from '../wizard/WizardContext';
 
 // ─── Save progress (Wizard-Audit B7a · B7b, 23.10.2026) ──────────────────────
@@ -54,5 +54,28 @@ describe('SaveProgressContent', () => {
     expect(localStorage.getItem('ch360_last_profile')).toBeNull();
     expect(screen.queryByText(/account\.saveProgress\.confirm/)).not.toBeInTheDocument();
     expect(screen.getByText(/account\.freeAccount\.confirm/)).toBeInTheDocument();
+  });
+});
+
+// ─── Fusszeile je Variante (24.10.2026) ───────────────────────────────────────
+// Die Laenderliste fuer Niederlassung und Lager zeigte "Selections add to your
+// risk map. Edit anytime in Step 4." — falsch: diese Laender werden keine Maerkte.
+describe('WizardDrawerLayer copy per variant', () => {
+  const layer = (variant: 'markets' | 'countries') => render(
+    <WizardDrawerLayer marketsOpen onMarketsClose={vi.fn()} value={[]} onChange={vi.fn()} variant={variant}
+      infoCountry={null} onInfoClose={vi.fn()} onSelectCountry={vi.fn()} saveOpen={false} onSaveClose={vi.fn()} />,
+  );
+  it('the markets list points to the markets step', () => {
+    layer('markets');
+    expect(screen.getByText('marketsDrawer.footNote')).toBeInTheDocument();
+    expect(screen.getByText('marketsDrawer.header')).toBeInTheDocument();
+  });
+  it('the country list says its answer leaves the markets alone', () => {
+    layer('countries');
+    expect(screen.getByText('marketsDrawer.countries.footNote')).toBeInTheDocument();
+    expect(screen.queryByText('marketsDrawer.footNote')).not.toBeInTheDocument();
+    // Kopf und Zaehler sprechen von Laendern, nicht von Maerkten.
+    expect(screen.getByText('marketsDrawer.countries.header')).toBeInTheDocument();
+    expect(screen.getByText('marketsDrawer.countries.count')).toBeInTheDocument();
   });
 });

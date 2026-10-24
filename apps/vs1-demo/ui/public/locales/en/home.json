@@ -485,7 +485,10 @@
     "countries": {
       "title": "Other countries",
       "desc": "Choose every country that applies.",
-      "main": "Main markets"
+      "main": "Main markets",
+      "footNote": "Used only for this answer — your markets stay as they are.",
+      "header": "Countries",
+      "count": "{{selected}} selected · {{total}} countries"
     }
   },
   "countryInfo": {
