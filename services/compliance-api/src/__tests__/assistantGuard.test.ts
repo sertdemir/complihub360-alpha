@@ -76,6 +76,8 @@ describe('answerCheck / factLine (Prüfrunde 3)', () => {
         expect(factLine('FR', 'distance_selling_threshold', 'EUR 10,000 (EU-wide OSS threshold)')).toMatch(/ANOTHER EU country selling goods to consumers in FR/);
         expect(factLine('ES', 'penalty_late_filing', '1% per month', 'up to 15%')).toMatch(/1% per month \(up to 15%\) \[mention only if/);
         expect(factLine('DE', 'standard_rate', '19%')).toBe('- standard rate: 19%');
+        expect(factLine('DE', 'small_business_exemption', 'EUR 25,000 total turnover in the prior year and EUR 100,000 in the current year (net)'))
+            .toMatch(/^- Small-business VAT exemption for businesses ESTABLISHED in DE \(businesses from other EU states only via the EU SME scheme\): EUR 25,000/);
     });
 });
 
