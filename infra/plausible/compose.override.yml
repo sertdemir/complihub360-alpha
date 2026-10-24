@@ -47,8 +47,11 @@ services:
       # ── 2 · Alles andere: Dashboard, Login, Settings ─────────────────────
       # Hinter derselben Basic-Auth-Wall wie Staging (Doppel-Login: erst
       # Basic Auth, dann Plausibles eigener Login — Absicht, defense in depth).
-      # Soll das weg, hier `complihub-auth,` streichen; Plausible ist durch
+      # Soll das weg, hier `,complihub-auth` streichen; Plausible ist durch
       # DISABLE_REGISTRATION=invite_only weiterhin geschlossen.
+      # noindex VOR der Wand: Traefik arbeitet die Middlewares der Reihe nach
+      # ab, und ein 401 der Wand beendet die Kette — dahinter kommt der
+      # X-Robots-Tag nie an (Beta-Befund 18.10.2026, #330).
       # Öffentliche Shared-Dashboards (/share/…) laufen ebenfalls über diesen
       # Router und sind damit auth-pflichtig — falls die wirklich öffentlich
       # sein sollen, `PathPrefix(`/share/`)` oben in den Ingest-Router ziehen.
@@ -56,7 +59,7 @@ services:
       - traefik.http.routers.plausible.priority=1
       - traefik.http.routers.plausible.entrypoints=websecure
       - traefik.http.routers.plausible.tls.certresolver=letsencrypt
-      - traefik.http.routers.plausible.middlewares=complihub-auth,complihub-noindex
+      - traefik.http.routers.plausible.middlewares=complihub-noindex,complihub-auth
       - traefik.http.routers.plausible.service=plausible
 
       # Muss zu HTTP_PORT in der .env passen.

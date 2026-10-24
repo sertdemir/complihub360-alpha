@@ -4,7 +4,7 @@ import {
     EMBED_DIMS, LEGACY_EMBED_MODEL, DEFAULT_BASE_URL, DEFAULT_CHAT_MODEL, DEFAULT_EMBED_MODEL,
 } from '../llm.js';
 
-// Scaleway und Gemini sind externe Dienste — fetch ist gestubbt, die Suite
+// Scaleway ist ein externer Dienst — fetch ist gestubbt, die Suite
 // bleibt offline. Geprüft wird der Vertrag, den wir mit dem Anbieter haben.
 
 describe('resolveLlm', () => {
@@ -20,10 +20,9 @@ describe('resolveLlm', () => {
         expect(llm.embedModel).toBe(DEFAULT_EMBED_MODEL);
     });
 
-    it('prefers LLM_API_KEY over GEMINI_API_KEY — Gemini is only the transition', () => {
+    it('ignores a leftover GEMINI_API_KEY — Gemini was removed after the cutover (23.10.2026)', () => {
+        expect(resolveLlm({ GEMINI_API_KEY: 'g' })).toBeNull();
         expect(resolveLlm({ LLM_API_KEY: 'scw', GEMINI_API_KEY: 'g' })!.id).toBe('openai-compatible');
-        expect(resolveLlm({ GEMINI_API_KEY: 'g' })!.id).toBe('gemini');
-        expect(resolveLlm({ GEMINI_API_KEY: 'g' })!.embedModel).toBe(LEGACY_EMBED_MODEL);
     });
 
     it('takes model and endpoint overrides from the environment', () => {
@@ -60,7 +59,7 @@ describe('queryInput', () => {
 });
 
 describe('sameEmbedModel', () => {
-    it('treats untagged chunks as the legacy Gemini corpus', () => {
+    it('treats untagged chunks as the old Gemini corpus, which no current model matches', () => {
         expect(sameEmbedModel(null, LEGACY_EMBED_MODEL)).toBe(true);
         expect(sameEmbedModel({}, 'qwen3-embedding-8b')).toBe(false);
     });

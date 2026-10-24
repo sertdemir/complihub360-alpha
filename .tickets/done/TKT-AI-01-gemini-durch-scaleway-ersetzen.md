@@ -1,7 +1,7 @@
 ---
 title: "Assistent: Gemini durch offene Modelle über Scaleway ersetzen (ADR-0011)"
 assignee: "Nutzer (Entscheidung, Zugang, Prüfbogen) · Claude (Umsetzung)"
-status: "review"
+status: "done"
 ---
 
 # Gemini durch Scaleway ersetzen
@@ -234,3 +234,29 @@ DNA-Check zu den festen Sätzen:
 - **Kein Zwang zum Menschen:** Der Anbieter wird als Möglichkeit angeboten, die genauere Frage als Alternative.
 - **Ruhig bei Sorge, ohne falsche Beruhigung:** Der Satz nennt die Abhängigkeit vom eigenen Fall, verspricht aber nichts.
 - **Gleicher Respekt:** Alle bekommen dieselbe Formulierung in derselben formellen Anrede.
+
+
+## Abschluss (23.10.2026)
+
+- **Staging:** `LLM_API_KEY` gesetzt, Korpus mit `qwen3-embedding-8b` neu eingebettet (437 Chunks), Schwelle 0,6, Wächter live (#389).
+- **Beta:** „Deploy Beta" auf `77740bd3`, `LLM_API_KEY` gesetzt. Der erste eingefügte Wert war kein Secret Key („insufficient permissions"). Danach wurde der Staging-Schlüssel übernommen. Eigener Ingest: 437 Chunks.
+- **Gemini abgeschaltet:** `GEMINI_API_KEY` ist von beiden Servern entfernt, beide Schlüssel sind in AI Studio gelöscht. Beide Server liefen vorher über einen Schlüssel aus einem Projekt in der **kostenlosen** Gemini-Stufe. Ob das für frühere Beta-Fragen etwas bedeutet, entscheidet der Nutzer.
+- **Code aufgeräumt:**
+  - Gemini-Weg aus `llm.ts` und dem Ingest entfernt.
+  - Tests aus #346 auf Scaleway umgestellt.
+  - `.env.example` bereinigt.
+- **Prompt nachgeschärft (Nachprüfung 22:53 UTC):**
+  - S4: keine selbst errechneten Daten (ES nannte den 20.11. statt der Quartalsregel).
+  - S6: neutrale Selbstbezeichnung „der CompliHub360-Assistent" (OOC nannte sich „Assistentin").
+  - Prüfliste: zuerst die eigentliche Frage beantworten (small-business).
+- **Offen und außerhalb dieses Tickets:**
+  - TKT-FACTS-01 (Kleinunternehmerregelung)
+  - die drei alten DNA-Befunde (Abo-Fallback, Zähler vor dem Aufruf, Länder-Fallback)
+  - Schwelle nach einer Woche über `top_below_threshold` prüfen
+  - AVV mit Scaleway, sobald die Firma steht
+
+### DNA-Check der Prompt-Nachschärfung
+
+- **S6:** Die DNA verlangt keine öffentliche gegenderte Positionierung. Die AI gibt sich keine Persona und imitiert keinen menschlichen Berater.
+- **S4:** Unsicherheit wird nicht hinter selbstsicherer Sprache versteckt. Statt eines falsch gerechneten Datums nennt der Assistent die Regel.
+- **Direkte Antwort zuerst:** Ein kleines Unternehmen bekommt dieselbe direkte Antwort wie ein großes, nicht nur Regeln.

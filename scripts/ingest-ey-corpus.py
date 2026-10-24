@@ -7,10 +7,9 @@ corpus is INTERNAL ground truth for the assistant; the PDF itself must never
 land in the repo or be quoted verbatim to users.
 
 Embedding model (must match the one the assistant queries with, llm.ts):
-  LLM_API_KEY set   → OpenAI-compatible endpoint, default Scaleway
+  LLM_API_KEY (required) → OpenAI-compatible endpoint, default Scaleway
                       qwen3-embedding-8b (LLM_BASE_URL / LLM_EMBED_MODEL
-                      override). This is the target since 2026-10-18.
-  GEMINI_API_KEY    → legacy gemini-embedding-001, transition only.
+                      override). Gemini was removed after the cutover (2026-10-23).
 Every chunk records the model in metadata.embed_model; the assistant ignores
 chunks embedded with a different model than its query.
 
@@ -104,11 +103,10 @@ def chunk_chapter(code: str, text: str) -> list:
 
 
 EMBED_DIMS = 768
-LEGACY_EMBED_MODEL = 'gemini-embedding-001'
 
 
 def _fit(v: list) -> list:
-    # Matryoshka vectors (Qwen3-Embedding, truncated gemini-embedding-001) are
+    # Matryoshka vectors (Qwen3-Embedding) are
     # cut to the schema width and re-normalized so cosine similarity stays clean.
     if len(v) < EMBED_DIMS:
         raise ValueError(f'embedding has {len(v)} dims, schema needs {EMBED_DIMS}')
@@ -149,17 +147,6 @@ def openai_embed_batch(cfg: dict, texts: list) -> list:
     return [_fit(d['embedding']) for d in rows]
 
 
-def gemini_embed_batch(cfg: dict, texts: list) -> list:
-    req = urllib.request.Request(
-        f"https://generativelanguage.googleapis.com/v1beta/models/{LEGACY_EMBED_MODEL}:batchEmbedContents?key={cfg['key']}",
-        data=json.dumps({'requests': [
-            {'model': f'models/{LEGACY_EMBED_MODEL}', 'content': {'parts': [{'text': t}]},
-             'taskType': 'RETRIEVAL_DOCUMENT', 'outputDimensionality': EMBED_DIMS} for t in texts
-        ]}).encode(),
-        headers={'Content-Type': 'application/json'}, method='POST')
-    return [_fit(e['values']) for e in _post_with_backoff(req)['embeddings']]
-
-
 def embedder() -> dict:
     """Same precedence as resolveLlm() in services/compliance-api/src/llm.ts."""
     key = (os.environ.get('LLM_API_KEY') or '').strip()
@@ -167,11 +154,6 @@ def embedder() -> dict:
         return {'key': key, 'fn': openai_embed_batch, 'batch': 32,
                 'base_url': (os.environ.get('LLM_BASE_URL') or 'https://api.scaleway.ai/v1').strip().rstrip('/'),
                 'model': (os.environ.get('LLM_EMBED_MODEL') or 'qwen3-embedding-8b').strip()}
-    key = (os.environ.get('GEMINI_API_KEY') or '').strip()
-    if key:
-        print('! GEMINI_API_KEY only — legacy embeddings (transition). Set LLM_API_KEY for Scaleway.')
-        # small batches — free-tier TPM limits bite well below the API max of 100
-        return {'key': key, 'fn': gemini_embed_batch, 'batch': 10, 'model': LEGACY_EMBED_MODEL}
     sys.exit('LLM_API_KEY not set — create a Scaleway API key (Generative APIs), see docs/runbooks/llm-scaleway-umstellung.md')
 
 

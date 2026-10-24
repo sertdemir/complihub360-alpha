@@ -64,7 +64,7 @@
     "lede": "You are testing CompliHub360 before launch, by invitation. These nine sentences say what that means and what it does not.",
     "meta": "Version {{version}} · written without review by legal counsel · operator: see imprint",
     "contactHeading": "Questions about this sheet?",
-    "contact": "Write to us at {{email}}. If we change this sheet, we ask for your consent again.",
+    "contact": "Write to us at <mail>{{email}}</mail>. If we change this sheet, we ask for your consent again.",
     "back": "Back to your workspace",
     "loading": "Loading the sheet …",
     "error": "The sheet could not be loaded right now.",
