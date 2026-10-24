@@ -229,6 +229,8 @@ const FACT_LABEL: Record<string, string> = {
     registration_threshold_established: 'VAT registration threshold for businesses ESTABLISHED in {c} (resident businesses only, not for foreign sellers)',
     registration_threshold_nonestablished: 'VAT registration threshold for businesses NOT established in {c} (foreign sellers, including sellers from other EU countries)',
     distance_selling_threshold: 'Distance-selling threshold for sellers established in ANOTHER EU country selling goods to consumers in {c} (EU-wide; OSS = One-Stop Shop)',
+    // TKT-FACTS-01: die Befreiung gilt für Ansässige, nie für den ausländischen Händler.
+    small_business_exemption: 'Small-business VAT exemption for businesses ESTABLISHED in {c} (businesses from other EU states only via the EU SME scheme)',
 };
 
 export function factLine(country: string, key: string, value: string, notes?: string | null): string {
