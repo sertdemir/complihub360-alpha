@@ -1388,10 +1388,10 @@
     "placeholder": "siz@sirketiniz.com",
     "emailAria": "E-posta adresi",
     "subscribe": "Abone olun",
-    "success": "Listedesiniz — gelen kutunuzu kontrol edin.",
     "privacy": "E-postanızı yalnızca bülten için kullanırız. Tek tıkla abonelikten çıkabilirsiniz. Gizlilik politikamıza bakın.",
     "accountLink": "Veya Risk Map'inizi saklamak için ücretsiz hesap oluşturun",
-    "cardTitle": "Aylık briefing"
+    "cardTitle": "Aylık briefing",
+    "betaNote": "Aylık bültene kayıt henüz açık değil."
   },
   "footer": {
     "tagline": "İşletmeniz için neyin geçerli olduğunu anlamanıza — ve gerektiğinde doğru kişiye ulaşmanıza yardımcı oluyoruz.",

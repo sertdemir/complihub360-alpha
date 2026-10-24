@@ -1513,10 +1513,10 @@
     "placeholder": "you@yourcompany.com",
     "emailAria": "Email address",
     "subscribe": "Subscribe",
-    "success": "You're on the list — check your inbox.",
     "privacy": "We use your email only to send the monthly briefing. You can unsubscribe at any time. Read our <policy>Privacy Policy</policy>.",
     "accountLink": "Create a free account for personalized regulatory alerts",
-    "cardTitle": "Your Monthly Compliance Briefing"
+    "cardTitle": "Your Monthly Compliance Briefing",
+    "betaNote": "Sign-up for the monthly briefing is not open yet."
   },
   "footer": {
     "tagline": "Understand what applies. Find the right support.",

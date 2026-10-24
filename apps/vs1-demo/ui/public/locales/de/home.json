@@ -1388,10 +1388,10 @@
     "placeholder": "sie@ihrunternehmen.de",
     "emailAria": "E-Mail-Adresse",
     "subscribe": "Abonnieren",
-    "success": "Sie stehen auf der Liste — prüfen Sie Ihren Posteingang.",
     "privacy": "Wir nutzen Ihre E-Mail nur für das Briefing. Abmeldung mit einem Klick. Siehe unsere Datenschutzerklärung.",
     "accountLink": "Oder erstellen Sie ein kostenloses Konto und behalten Sie Ihre Risk Map",
-    "cardTitle": "Das monatliche Briefing"
+    "cardTitle": "Das monatliche Briefing",
+    "betaNote": "Die Anmeldung zum monatlichen Briefing ist noch nicht geöffnet."
   },
   "footer": {
     "tagline": "Wir helfen Ihnen zu verstehen, was für Ihr Unternehmen gilt — und die richtige Person zu erreichen, wenn es eine braucht.",

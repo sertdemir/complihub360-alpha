@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { FreeAccountDrawer } from './MarketsDrawer';
 import { SectionEyebrow, Reveal } from '../providers/SectionHeading';
 import { Button } from '../ui/Button';
-import { focusField } from '../ui/FormErrorSummary';
-import { FieldError, FIELD_ERROR_CLASS, errorAria } from '../ui/FieldError';
+import { Badge } from '../ui/Badge';
 
 // ─── S10 — Newsletter band (canvas "Auf dem Laufenden" · Split, 2026-08-25) ──
 // The slim grey band became the page's closing statement: a FULL-BLEED
@@ -33,15 +32,8 @@ const cardItem = {
 
 export function NewsletterBand() {
   const { t } = useTranslation('home');
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const { locale = 'en' } = useParams();
-  const valid = /.+@.+\..+/.test(email);
-  // Regel V2 (11.10.2026): ein Feld — der Satz steht am Feld, der Fokus geht
-  // hinein. Vorher tat ein Klick mit ungueltiger Adresse schlicht nichts.
-  const [tried, setTried] = useState(false);
-  const emailError = tried && !valid ? t('common:contactSend.field.email') : null;
 
   return (
     <section id="newsletter" className="bg-surface">
@@ -73,48 +65,32 @@ export function NewsletterBand() {
             viewport={{ once: true, margin: '-80px' }}
             className="w-full shrink-0 rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.35)] dark:bg-surface-secondary lg:w-[440px]"
           >
-            <motion.p variants={cardItem} className="font-serif text-[1.125rem] font-bold text-fg">
-              {t('newsletter.cardTitle')}
-            </motion.p>
-            {subscribed ? (
-              <motion.div
-                variants={cardItem}
-                className="mt-3 flex items-center gap-2 rounded-xl border border-stroke-subtle bg-surface-secondary px-4 py-3 text-body-sm font-semibold text-fg-brand"
-              >
-                <Check size={16} strokeWidth={2.5} /> {t('newsletter.success')}
-              </motion.div>
-            ) : (
-              <form
-                noValidate
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setTried(true);
-                  if (!valid) { focusField('newsletter-email'); return; }
-                  setSubscribed(true);
-                }}
-                className="mt-3 flex flex-col gap-3"
-              >
-                <motion.div variants={cardItem} className="flex flex-col">
-                  <input
-                    id="newsletter-email"
-                    type="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t('newsletter.placeholder')}
-                    aria-label={t('newsletter.emailAria')}
-                    className={'min-w-0 rounded-xl border border-stroke px-4 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand' + (emailError ? FIELD_ERROR_CLASS : '')}
-                    {...errorAria('newsletter-email', !!emailError)}
-                  />
-                  <FieldError id="newsletter-email" message={emailError} alert />
-                </motion.div>
-                <motion.div variants={cardItem}>
-                  <Button size="lg" shape="soft" type="submit" fullWidth>
-                    {t('newsletter.subscribe')}
-                  </Button>
-                </motion.div>
-              </form>
-            )}
+            <motion.div variants={cardItem} className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-serif text-[1.125rem] font-bold text-fg">{t('newsletter.cardTitle')}</p>
+              <Badge shape="pill" tone="accent" appearance="soft" size="sm" className="uppercase tracking-[0.08em] ring-1 ring-inset ring-accent-200 dark:ring-accent-500/45">
+                {t('beyond.pills.beta')}
+              </Badge>
+            </motion.div>
+            {/* Coming in beta (Nutzerentscheidung 2026-10-24): Hinter dem Formular
+                gibt es noch keinen Versand und kein Double-Opt-in. Bis dahin ist es
+                sichtbar, aber gesperrt — vorher meldete es eine Anmeldung, die nie
+                stattfand. */}
+            <motion.form variants={cardItem} aria-describedby="newsletter-beta-note" onSubmit={(e) => e.preventDefault()} className="mt-3 flex flex-col gap-3">
+              <input
+                id="newsletter-email"
+                type="email"
+                disabled
+                placeholder={t('newsletter.placeholder')}
+                aria-label={t('newsletter.emailAria')}
+                className="min-w-0 cursor-not-allowed rounded-xl border border-stroke bg-surface-secondary px-4 py-3 text-body-md text-fg-tertiary outline-none placeholder:text-fg-tertiary"
+              />
+              <Button size="lg" shape="soft" type="submit" fullWidth disabled>
+                {t('newsletter.subscribe')}
+              </Button>
+              <p id="newsletter-beta-note" className="text-body-xs leading-relaxed text-fg-secondary">
+                {t('newsletter.betaNote')}
+              </p>
+            </motion.form>
             <motion.p variants={cardItem} className="mt-3.5 text-body-2xs leading-relaxed text-fg-tertiary">
               {/* Handover 1.0 §12A: "Privacy Policy" ist ein Link. Sprachen ohne
                   <policy>-Markierung rendern den Satz unveraendert. (Nicht <link>:

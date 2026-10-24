@@ -64,14 +64,14 @@ Umgesetzt auf der Startseite (EN), Sektion für Sektion:
 | Priorität „Urgent“ | **Immediate** | DNA #54, vom Nutzer am 10.10.2026 bestätigt (wie in KN-PRODUCT-001) |
 | „Available in: Available globally“ (sechs Bereiche) | Marktzeile aus der Engine | Checkliste, Availability: nie „Available globally“ auf Absicht hin; `copy:check` Abschnitt 6 |
 | Footer „Global Coverage“ (sechs Weltregionen) und „supports businesses across global markets“ | Marktzeile aus der Engine plus der zweite Satz der Coverage Note | wie oben |
-| Ablauf, Schritt 1: „…receive a clear, source-backed answer“ | „In the beta, it leads to the right area and into the assessment, not yet to a direct answer.“ | Launch Scope: Beta ehrlich kennzeichnen. Direktantworten sind nicht live, der Hero sagt dasselbe. **Zur Entscheidung beim Nutzer.** |
+| Ablauf, Schritt 1: „…receive a clear, source-backed answer“ | „In the beta, it leads to the right area and into the assessment, not yet to a direct answer.“ | Launch Scope: Beta ehrlich kennzeichnen. Direktantworten sind nicht live, der Hero sagt dasselbe. Vom Nutzer am 24.10.2026 bestätigt: bleibt, bis die Antworten live sind. |
 | Wizard-Knopf „Skip This Step“ | nicht eingebaut | Den Sprung gibt es im echten Wizard nicht (Wizard-Audit B6). Die „Not sure“-Optionen übernehmen das. |
 | Engagement-Beispiel: Bewertungen, Nachweise, Auszeichnungen, Unternehmensprüfung (inkl. BBB) | nicht im Beispiel | Im selben Abschnitt als CONFIRM BEFORE LAUNCH markiert |
 | Rechtslink „Terms of Use“ | „Beta agreement“ | /terms ist während der Beta die Beta-Vereinbarung. Das Handover selbst: „Beta“ nur, solange Beta. |
 | Rechtslink „Privacy Choices“ | fehlt | Es gibt keine Einstellungsseite |
 | Footer „Provider Standards“ | fehlt | Es gibt keine Seite. Ein Eintrag ohne Ziel wäre ein toter Link. |
 | CTA mit Schlusspunkt („…best matches.“) | ohne Punkt | Button-Label |
-| Newsletter-Erfolgsmeldung „You're subscribed. Please check your inbox to confirm…“ | unverändert | Das Formular verschickt nichts (kein Backend, kein Double-Opt-in). Die heutige Meldung behauptet ebenfalls eine Anmeldung. **Zur Entscheidung beim Nutzer.** |
+| Newsletter-Formular mit Erfolgsmeldung „You're subscribed. Please check your inbox to confirm…“ | Karte mit Etikett **Coming in beta**, Feld und Knopf gesperrt, Satz „Sign-up for the monthly briefing is not open yet.“ | Das Formular verschickt nichts (kein Backend, kein Double-Opt-in); bis 24.10. meldete es trotzdem eine Anmeldung. Vom Nutzer am 24.10.2026 entschieden. |
 
 ## Noch offen
 
