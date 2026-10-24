@@ -947,9 +947,13 @@
         "desc": "Kritikten düşüğe. Her an dört ila on iki madde. 200 sayfalık kontrol listeleri yok."
       },
       {
-        "title": "Kaynağı doğrudan düzenleyiciler"
+        "title": "Kaynağı doğrudan düzenleyiciler",
+        "desc": "Her kayıt yasal dayanağını belirtir — ya da henüz kapsamadığımızı açıkça söyler."
       },
-      {},
+      {
+        "title": "İncelenmiş ve tarihli",
+        "desc": "Kurallar değişir. Kayıtlarımızı inceler ve her kaynağı tarihleriz; böylece ne kadar güncel olduğunu görürsünüz."
+      },
       {
         "title": "Varsayılan olarak yalın dil",
         "desc": "Bir madde açıklanmak için bir paragraf gerektiriyorsa, gördüğünüz paragraftır — madde değil."
@@ -957,9 +961,13 @@
     ],
     "row2": [
       {
-        "title": "Kendi kaydıyla değil, bizim doğrulamamızla"
+        "title": "Kendi kaydıyla değil, bizim doğrulamamızla",
+        "desc": "Her Verified Provider, eşleştirilebilmeden önce her hizmet ve her pazar için belgelenmiş kanıtlara göre incelenir."
       },
-      {}
+      {
+        "title": "Bağımsız uzmanlar",
+        "desc": "Verified Provider'lar hizmetlerini bağımsız olarak ve kendi mesleki sorumlulukları altında sunar."
+      }
     ]
   },
   "domains": {

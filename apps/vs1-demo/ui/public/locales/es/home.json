@@ -947,9 +947,13 @@
         "desc": "De crítico a bajo. Entre cuatro y doce elementos en cada momento. Sin checklists de 200 páginas."
       },
       {
-        "title": "Con origen en los propios reguladores"
+        "title": "Con origen en los propios reguladores",
+        "desc": "Cada entrada indica su base legal — o dice abiertamente que todavía no la cubrimos."
       },
-      {},
+      {
+        "title": "Revisado y fechado",
+        "desc": "Las normas cambian. Revisamos nuestras entradas y fechamos cada fuente para que usted vea lo actualizada que está."
+      },
       {
         "title": "Lenguaje claro por defecto",
         "desc": "Si una cláusula necesita un párrafo para explicarse, usted ve el párrafo — no la cláusula."
@@ -957,9 +961,13 @@
     ],
     "row2": [
       {
-        "title": "Verificados por nosotros, no autoinscritos"
+        "title": "Verificados por nosotros, no autoinscritos",
+        "desc": "Cada Verified Provider se revisa para cada servicio y cada mercado con evidencia documentada antes de poder recibir derivaciones."
       },
-      {}
+      {
+        "title": "Profesionales independientes",
+        "desc": "Los Verified Providers prestan sus servicios de forma independiente y bajo su propia responsabilidad profesional."
+      }
     ]
   },
   "domains": {
