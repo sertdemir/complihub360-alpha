@@ -484,7 +484,9 @@
       "title": "Otros países",
       "desc": "Elija todos los países que correspondan.",
       "main": "Mercados principales",
-      "footNote": "Solo se usa para esta respuesta: sus mercados no cambian."
+      "footNote": "Solo se usa para esta respuesta: sus mercados no cambian.",
+      "header": "Países",
+      "count": "{{selected}} seleccionados · {{total}} países"
     }
   },
   "countryInfo": {

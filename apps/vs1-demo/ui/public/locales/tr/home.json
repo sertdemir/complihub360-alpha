@@ -484,7 +484,9 @@
       "title": "Diğer ülkeler",
       "desc": "Geçerli olan tüm ülkeleri seçin.",
       "main": "Ana pazarlar",
-      "footNote": "Yalnızca bu yanıt için kullanılır — pazarlarınız değişmez."
+      "footNote": "Yalnızca bu yanıt için kullanılır — pazarlarınız değişmez.",
+      "header": "Ülkeler",
+      "count": "{{selected}} seçildi · {{total}} ülke"
     }
   },
   "countryInfo": {

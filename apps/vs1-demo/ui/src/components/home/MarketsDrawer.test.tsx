@@ -60,7 +60,7 @@ describe('SaveProgressContent', () => {
 // ─── Fusszeile je Variante (24.10.2026) ───────────────────────────────────────
 // Die Laenderliste fuer Niederlassung und Lager zeigte "Selections add to your
 // risk map. Edit anytime in Step 4." — falsch: diese Laender werden keine Maerkte.
-describe('WizardDrawerLayer footnote', () => {
+describe('WizardDrawerLayer copy per variant', () => {
   const layer = (variant: 'markets' | 'countries') => render(
     <WizardDrawerLayer marketsOpen onMarketsClose={vi.fn()} value={[]} onChange={vi.fn()} variant={variant}
       infoCountry={null} onInfoClose={vi.fn()} onSelectCountry={vi.fn()} saveOpen={false} onSaveClose={vi.fn()} />,
@@ -68,10 +68,14 @@ describe('WizardDrawerLayer footnote', () => {
   it('the markets list points to the markets step', () => {
     layer('markets');
     expect(screen.getByText('marketsDrawer.footNote')).toBeInTheDocument();
+    expect(screen.getByText('marketsDrawer.header')).toBeInTheDocument();
   });
   it('the country list says its answer leaves the markets alone', () => {
     layer('countries');
     expect(screen.getByText('marketsDrawer.countries.footNote')).toBeInTheDocument();
     expect(screen.queryByText('marketsDrawer.footNote')).not.toBeInTheDocument();
+    // Kopf und Zaehler sprechen von Laendern, nicht von Maerkten.
+    expect(screen.getByText('marketsDrawer.countries.header')).toBeInTheDocument();
+    expect(screen.getByText('marketsDrawer.countries.count')).toBeInTheDocument();
   });
 });
