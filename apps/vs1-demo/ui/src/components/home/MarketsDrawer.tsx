@@ -187,7 +187,7 @@ function MarketsContent({ value, onChange, onClose, primary = [], exclude = [], 
       </div>
 
       <div className="border-t border-stroke-subtle px-8 py-5">
-        <p className="text-body-xs text-fg-tertiary">{t('marketsDrawer.footNote')}</p>
+        <p className="text-body-xs text-fg-tertiary">{t(`${copy}.footNote`)}</p>
         <Button
           size="lg"
           shape="soft"

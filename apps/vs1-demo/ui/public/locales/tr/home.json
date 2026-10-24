@@ -483,7 +483,8 @@
     "countries": {
       "title": "Diğer ülkeler",
       "desc": "Geçerli olan tüm ülkeleri seçin.",
-      "main": "Ana pazarlar"
+      "main": "Ana pazarlar",
+      "footNote": "Yalnızca bu yanıt için kullanılır — pazarlarınız değişmez."
     }
   },
   "countryInfo": {

@@ -483,7 +483,8 @@
     "countries": {
       "title": "Otros países",
       "desc": "Elija todos los países que correspondan.",
-      "main": "Mercados principales"
+      "main": "Mercados principales",
+      "footNote": "Solo se usa para esta respuesta: sus mercados no cambian."
     }
   },
   "countryInfo": {
