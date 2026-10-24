@@ -63,6 +63,7 @@ Sie gehört zum **Website Implementation Handover V1.1**. V1.0 des Handovers ist
 | Checkliste | Produkt | Grund |
 |---|---|---|
 | „Immediate or Critical → **Urgent**" | oberste Stufe heißt **Immediate** | DNA #54 „Prioritize without panic": ein Zeitwort statt eines Druckworts. Vom Nutzer am 10.10.2026 bestätigt. Begründung in `scripts/check-terminology.mjs`. |
+| AA-large 3:1 für Display-Text | Gold-Wort in Überschriften #C5913B, **2,80:1** auf Weiß | Logo-Gold, ein dunklerer Ton wirkt fad. Vom Nutzer am 24.10.2026 bestätigt. Nur in Display-Größe, Begründung am Token `--color-text-accent-emphasis` in `index.css`. |
 
 ## Wo das im Code durchgesetzt wird
 
@@ -105,7 +106,7 @@ Sie gehört zum **Website Implementation Handover V1.1**. V1.0 des Handovers ist
     - Lade- und Buchungszustand über `role="status"` (polite, einmal)
     - `FormErrorSummary` fokussiert das erste fehlerhafte Feld
     - Inhalte nur bei Hover stecken nur in nicht eingebundenen Komponenten
-  - **Bewusste Abweichung:** Das Gold-Wort in Überschriften (#C5913B) misst 2,80:1 auf Weiß, AA-large verlangt 3:1. Das ist im Token dokumentiert als Markenentscheidung des Nutzers. Die Checkliste verlangt AA, die Entscheidung liegt beim Nutzer.
+  - **Bewusste Abweichung (vom Nutzer bestätigt am 24.10.2026):** Das Gold-Wort in Überschriften (#C5913B, Logo-Gold) misst 2,80:1 auf Weiß, AA-large verlangt 3:1. Ein dunklerer Ton ist verworfen: „ich möchte, dass das gold in diesem fall knalliger ist, sonst wirkt sie viel zu fad.“ Es gilt nur in Display-Größe (ab 24 px bzw. 19 px fett); Kleintext in Gold läuft über `text-fg-accent-strong`.
 - **Offen:**
   - `FormErrorSummary` steht in 20 Komponenten. Ohne sie sind sechs Dateien mit `<form>`:
     - fünf Such- und Frageleisten mit einem Feld (`AreaAskBand`, `DomainAssistant`, `HomeHeroWorld`, `SearchResultPage`, `HomeHero`, letzteres nicht eingebunden)
