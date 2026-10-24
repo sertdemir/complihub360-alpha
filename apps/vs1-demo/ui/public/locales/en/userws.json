@@ -695,6 +695,19 @@
     "saved": "Saved — the risk map is being recalculated.",
     "error": "Saving failed. Please try again.",
     "changed": "changed",
-    "none": "Nothing selected"
+    "none": "Nothing selected",
+    "steps": {
+      "situation": "Your situation",
+      "offering": "You sell",
+      "establishment": "Established in",
+      "stock": "Stock",
+      "eprProducts": "EPR · products",
+      "packaging": "EPR · packaging"
+    },
+    "otherCountry": "+ Other country…",
+    "removes": {
+      "stock": "Saving also removes your stock answer ({{answer}}) — it only applies to physical products.",
+      "epr": "Saving also removes your EPR answers ({{answer}}) — they only apply with EPR & Packaging."
+    }
   }
 }
