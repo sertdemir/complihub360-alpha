@@ -556,10 +556,10 @@ export function ResultsRiskMap() {
   // (SessionSnapshot, Slot emptyState — ohne Figma-Pendant). Die Gast-Seite
   // rendert ihn als ganze Seite nach Figma 3390:14594, s. u.
   const canReviewAnswers = !!(isLoggedIn && sessionId && searchData.session);
-  // 5B: Gezaehlt wird nur, was der Knopf auch erreicht — mit gespeicherter
-  // Sitzung die Antworten-Schublade (ohne die Wizard-v1a-Fragen), sonst der
-  // volle Wizard.
-  const settles = settledByWizard(clusterRows, { fullWizard: !canReviewAnswers, profile: searchData.query });
+  // 5B: Gezaehlt wird nur, was der Knopf auch erreicht. Seit 24.10.2026
+  // kennt auch die Antworten-Schublade (gespeicherte Sitzung) alle
+  // Wizard-v1a-Fragen — beide Wege erreichen dieselben Fragen.
+  const settles = settledByWizard(clusterRows, { fullWizard: true, profile: searchData.query });
 
   // Zurueck zur Marktwahl: mit gespeicherter Sitzung die Antworten-Schublade,
   // sonst der Wizard (wie "Edit answers" im Snapshot).

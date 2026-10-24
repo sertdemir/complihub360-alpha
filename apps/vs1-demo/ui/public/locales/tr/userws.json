@@ -690,6 +690,19 @@
     "saved": "Kaydedildi; risk haritası yeniden hesaplanıyor.",
     "error": "Kaydetme başarısız. Lütfen tekrar deneyin.",
     "changed": "değişti",
-    "none": "Seçim yok"
+    "none": "Seçim yok",
+    "steps": {
+      "situation": "Durumunuz",
+      "offering": "Sattıklarınız",
+      "establishment": "Kuruluş yeri",
+      "stock": "Stok",
+      "eprProducts": "EPR · ürünler",
+      "packaging": "EPR · ambalaj"
+    },
+    "otherCountry": "+ Başka ülke…",
+    "removes": {
+      "stock": "Kaydettiğinizde stok yanıtınız da ({{answer}}) silinir — yalnızca fiziksel ürünler için geçerlidir.",
+      "epr": "Kaydettiğinizde EPR yanıtlarınız da ({{answer}}) silinir — yalnızca EPR ve Ambalaj ile geçerlidir."
+    }
   }
 }

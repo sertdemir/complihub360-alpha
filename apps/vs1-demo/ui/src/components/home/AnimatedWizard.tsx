@@ -194,8 +194,8 @@ const PACKAGING: StepDef = {
 
 // Sitz (S03) und Lager (S08): die eigenen Maerkte zuerst (Wahl 3B), dann
 // "Others" mit allen uebrigen Laendern, dann die Antworten ohne Land.
-type CountryStep = 'establishment' | 'stock';
-const COUNTRY_PREFIX: Record<CountryStep, string> = { establishment: 'est:', stock: 'stock:' };
+export type CountryStep = 'establishment' | 'stock';
+export const COUNTRY_PREFIX: Record<CountryStep, string> = { establishment: 'est:', stock: 'stock:' };
 const COUNTRY_TAIL: Record<CountryStep, Card[]> = {
   establishment: [
     { id: 'est:not-yet', key: 'estNotYet' },
@@ -222,17 +222,17 @@ function countryStep(key: CountryStep, ownMarkets: string[]): StepDef {
   };
 }
 
-const isOthers = (id: string) => id === 'Others' || id.endsWith(':Others');
+export const isOthers = (id: string) => id === 'Others' || id.endsWith(':Others');
 
 /** Die eigenen Maerkte als Karten-Ids (Namen), Karten und Drawer zusammen. */
-function ownMarketsOf(selected: Set<string>, extraMarkets: string[]): string[] {
+export function ownMarketsOf(selected: Set<string>, extraMarkets: string[]): string[] {
   return [...MARKETS.cards.filter((c) => !isOthers(c.id) && selected.has(c.id)).map((c) => c.id), ...extraMarkets];
 }
 
 // Welche Schritte der interaktive Wizard zeigt — haengt von den Antworten ab.
 // Faellt eine Bedingung weg, fallen auch ihre Antworten aus dem Profil
 // (buildProfile), statt still mitzulaufen (Question Bank S17).
-function flowFor(selected: Set<string>): StepKey[] {
+export function flowFor(selected: Set<string>): StepKey[] {
   return [
     'situation', 'operations', 'offering',
     'markets', 'establishment',
@@ -243,6 +243,37 @@ function flowFor(selected: Set<string>): StepKey[] {
 }
 // Die Demo auf der Startseite zeigt nur die drei Kernschritte.
 const DEMO_FLOW: StepKey[] = ['operations', 'markets', 'domains'];
+
+/** Die Karten eines Schritts. Sitz und Lager haengen an den eigenen Maerkten.
+ *  Wizard und Antworten-Schublade teilen sich diese Definition. */
+export function stepDefFor(k: StepKey, ownMarkets: string[]): StepDef {
+  switch (k) {
+    case 'markets': return MARKETS;
+    case 'operations': return OPERATIONS;
+    case 'domains': return DOMAINS;
+    case 'situation': return SITUATION;
+    case 'offering': return OFFERING;
+    case 'eprProducts': return EPR_PRODUCTS;
+    case 'packaging': return PACKAGING;
+    default: return countryStep(k, ownMarkets);
+  }
+}
+
+/** Eine Karte an- oder abwaehlen. Einzelwahl ersetzt die bisherige Antwort;
+ *  eine exklusive Antwort (Not sure, None …) ersetzt alle anderen des
+ *  Schritts, jede andere Antwort hebt die exklusive auf. Wizard und
+ *  Antworten-Schublade teilen sich diese Regel. */
+export function toggleAnswer(def: StepDef, prev: Set<string>, id: string): Set<string> {
+  const n = new Set(prev);
+  if (n.has(id)) {
+    n.delete(id);
+    return n;
+  }
+  if (def.single || def.exclusive?.includes(id)) for (const c of def.cards) n.delete(c.id);
+  else for (const x of def.exclusive ?? []) n.delete(x);
+  n.add(id);
+  return n;
+}
 
 const FOOTER = '__footer';
 
@@ -531,15 +562,7 @@ export function AnimatedWizard({
   const flow = interactive ? flowFor(selected) : DEMO_FLOW;
   const isReview = stepKey === 'review';
   const ownMarkets = ownMarketsOf(selected, extraMarkets);
-  const stepOf = (k: StepKey): StepDef =>
-    k === 'markets' ? MARKETS
-    : k === 'operations' ? OPERATIONS
-    : k === 'domains' ? DOMAINS
-    : k === 'situation' ? SITUATION
-    : k === 'offering' ? OFFERING
-    : k === 'eprProducts' ? EPR_PRODUCTS
-    : k === 'packaging' ? PACKAGING
-    : countryStep(k, ownMarkets);
+  const stepOf = (k: StepKey): StepDef => stepDefFor(k, ownMarkets);
   const step = stepOf(isReview ? flow[flow.length - 1] : stepKey);
 
   // Commit the drawer's picks; the "Others" card of that step reflects them.
@@ -563,21 +586,14 @@ export function AnimatedWizard({
   // Interactive handlers (no-ops in auto-play mode). Einzelwahl ersetzt die
   // bisherige Antwort; eine exklusive Antwort (Not sure, None …) ersetzt alle
   // anderen des Schritts, jede andere Antwort hebt die exklusive auf.
-  const toggle = (def: StepDef, id: string) =>
-    setSelected((prev) => {
-      const n = new Set(prev);
-      if (n.has(id)) {
-        n.delete(id);
-        return n;
-      }
-      const ids = def.cards.map((c) => c.id);
-      if (def.single || def.exclusive?.includes(id)) {
-        for (const o of ids) n.delete(o);
-        if (def.key === 'establishment' || def.key === 'stock') setCountryExtras((p) => ({ ...p, [def.key]: [] }));
-      } else for (const x of def.exclusive ?? []) n.delete(x);
-      n.add(id);
-      return n;
-    });
+  const toggle = (def: StepDef, id: string) => {
+    const next = toggleAnswer(def, selected, id);
+    // Hat eine exklusive Antwort "Others" abgewaehlt, gehen dessen Laender mit.
+    if ((def.key === 'establishment' || def.key === 'stock') && !next.has(COUNTRY_PREFIX[def.key] + 'Others')) {
+      setCountryExtras((p) => ({ ...p, [def.key]: [] }));
+    }
+    setSelected(next);
+  };
   // Ohne Markt keine Auswertung: frueher wurde daraus still eine deutsche
   // (Wizard-Audit B12). Weiter vom Markt-Schritt und Erstellen brauchen einen.
   const hasMarket = ownMarkets.length > 0;

@@ -947,9 +947,13 @@
         "desc": "Von Kritisch bis Niedrig. Vier bis zwölf Punkte zu jedem Zeitpunkt. Keine 200-Seiten-Checklisten."
       },
       {
-        "title": "Direkt von den Regulierungsbehörden bezogen"
+        "title": "Direkt von den Regulierungsbehörden bezogen",
+        "desc": "Jeder Eintrag nennt seine Rechtsgrundlage — oder sagt offen, dass wir ihn noch nicht führen."
       },
-      {},
+      {
+        "title": "Geprüft und datiert",
+        "desc": "Regeln ändern sich. Wir prüfen unsere Einträge und datieren jede Quelle, damit Sie sehen, wie aktuell sie ist."
+      },
       {
         "title": "Klare Sprache als Standard",
         "desc": "Wenn eine Klausel einen Absatz zur Erklärung braucht, sehen Sie den Absatz — nicht die Klausel."
@@ -957,9 +961,13 @@
     ],
     "row2": [
       {
-        "title": "Von uns verifiziert, nicht selbst eingetragen"
+        "title": "Von uns verifiziert, nicht selbst eingetragen",
+        "desc": "Jeder Verified Provider wird für jede Leistung und jeden Markt anhand dokumentierter Nachweise geprüft, bevor er vermittelt werden kann."
       },
-      {}
+      {
+        "title": "Unabhängige Fachleute",
+        "desc": "Verified Provider erbringen ihre Leistungen unabhängig und in eigener fachlicher Verantwortung."
+      }
     ]
   },
   "domains": {
