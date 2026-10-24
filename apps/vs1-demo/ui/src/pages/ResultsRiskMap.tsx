@@ -471,7 +471,6 @@ export function ResultsRiskMap() {
     likely: clusterRows.filter((r) => r.evidence === 'likely').length,
     open: clusterRows.filter((r) => r.evidence === 'open').length,
   };
-  const settles = settledByWizard(clusterRows);
 
   // Reihenfolge der Engine; Gruppierung nach Beleg macht ObligationClusters.
   const indexed = rows.map((o, i) => ({ o, i }));
@@ -517,6 +516,10 @@ export function ResultsRiskMap() {
   // (SessionSnapshot, Slot emptyState — ohne Figma-Pendant). Die Gast-Seite
   // rendert ihn als ganze Seite nach Figma 3390:14594, s. u.
   const canReviewAnswers = !!(isLoggedIn && sessionId && searchData.session);
+  // 5B: Gezaehlt wird nur, was der Knopf auch erreicht — mit gespeicherter
+  // Sitzung die Antworten-Schublade (ohne die Wizard-v1a-Fragen), sonst der
+  // volle Wizard.
+  const settles = settledByWizard(clusterRows, { fullWizard: !canReviewAnswers, profile: searchData.query });
 
   // Zurueck zur Marktwahl: mit gespeicherter Sitzung die Antworten-Schublade,
   // sonst der Wizard (wie "Edit answers" im Snapshot).
