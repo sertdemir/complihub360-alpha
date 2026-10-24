@@ -1182,7 +1182,7 @@
           "label": "Kapsam üzerinde anlaşıldı"
         }
       ],
-      "export": "Dışa aktar"
+      "export": "Planlanan dışa aktarımlar"
     }
   },
   "brandCode": {
@@ -1299,7 +1299,6 @@
     }
   },
   "faq": {
-    "label": "Sık sorulanlar",
     "title": {
       "pre": "Muhtemelen ",
       "gold": "merak ettikleriniz",
@@ -1404,8 +1403,7 @@
         "links": {
           "howItWorks": "Nasıl çalışır",
           "forWhom": "Kimler için",
-          "startAssessment": "Değerlendirmeyi başlat",
-          "pricing": "Fiyatlar"
+          "startAssessment": "Değerlendirmeyi başlat"
         }
       },
       "areas": {
@@ -1422,25 +1420,10 @@
           "legalAdvisory": "Hukuki Destek"
         }
       },
-      "markets": {
-        "title": "Pazarlar",
-        "links": {
-          "marketsOverview": "Tüm pazarlar",
-          "market_DE": "Almanya",
-          "market_FR": "Fransa",
-          "market_US": "ABD",
-          "market_UK": "Birleşik Krallık",
-          "market_IT": "İtalya",
-          "market_ES": "İspanya",
-          "market_NL": "Hollanda",
-          "market_TR": "Türkiye"
-        }
-      },
       "company": {
         "title": "Şirket",
         "links": {
           "about": "Hakkımızda",
-          "partner": "Sağlayıcılar",
           "trustSecurity": "Güven ve Güvenlik",
           "contact": "İletişim",
           "support": "Destek"

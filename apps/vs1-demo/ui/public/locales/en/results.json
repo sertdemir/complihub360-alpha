@@ -57,10 +57,10 @@
   },
   "state": {
     "confirmed": "Confirmed",
-    "likely": "Likely",
+    "likely": "Likely to Apply",
     "answer_one": "Answer {{total}} question",
     "answer_other": "Answer {{total}} questions",
-    "open": "Open"
+    "open": "More Information Needed"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider matched",

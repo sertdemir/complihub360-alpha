@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Star, Lock, ArrowRight } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
+import { FreeAccountDrawer } from './MarketsDrawer';
 import { Tag } from '../ui/Tag';
 import { PartnerStatusBadge } from '../ui/ProviderBadges';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../providers/SectionHeading';
@@ -91,6 +93,10 @@ function AnonMatchCard({ m }: { m: (typeof MATCHES)[number] }) {
         </div>
         <PartnerStatusBadge status="verified" styleVariant="solid" label={t('badge.verified')} />
       </div>
+      {/* Handover 1.0 §5: das Schloss sagt, wann die Identitaet sichtbar wird. */}
+      <p className="mt-2 flex items-center gap-1.5 text-body-3xs font-semibold text-fg-tertiary">
+        <Lock size={11} aria-hidden /> {t('matchmaking.identityLabel')}
+      </p>
       <p className="mt-3 border-b border-stroke-subtle pb-2.5 text-body-xs text-fg-secondary">{t(`${base}.specialty`)}</p>
       <div className="mt-2.5 flex flex-wrap gap-1.5">
         {[0, 1].map((i) => (
@@ -108,6 +114,9 @@ function AnonMatchCard({ m }: { m: (typeof MATCHES)[number] }) {
 
 export function MatchShowcase() {
   const { t } = useTranslation('home');
+  // Der Knopf hatte bis 2026-10-24 kein onClick. Er oeffnet jetzt dieselbe
+  // Konto-Schublade wie der Newsletter-Link.
+  const [accountOpen, setAccountOpen] = useState(false);
 
   return (
     <section id="matchmaking" className="bg-surface py-20 lg:py-24">
@@ -139,7 +148,7 @@ export function MatchShowcase() {
           <GhostRow duration={120} />
         </div>
         <div className="relative px-4 py-24 md:px-6 lg:py-[120px]">
-          <Stagger className="mx-auto grid max-w-container-xl gap-5 md:grid-cols-3">
+          <Stagger className="mx-auto grid max-w-container-xl grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-[repeat(3,minmax(0,1fr))]">
             {MATCHES.map((m) => (
               <StaggerItem key={m.index} className="flex">
                 <AnonMatchCard m={m} />
@@ -150,13 +159,15 @@ export function MatchShowcase() {
           {/* The one conversion of this section, inside the band below the
               dossiers — the band's symmetric padding keeps the space above
               the cards and below the button equal. */}
-          <Reveal delay={0.1} className="mt-12 flex justify-center lg:mt-16">
-            <Button size="lg">
+          <Reveal delay={0.1} className="mt-12 flex flex-col items-center gap-4 lg:mt-16">
+            <p className="max-w-[56ch] text-center text-body-md text-fg-secondary">{t('matchmaking.supporting')}</p>
+            <Button size="lg" wrap onClick={() => setAccountOpen(true)}>
               {t('riskMap.unlock')} <ArrowRight size={16} className="ml-1.5" />
             </Button>
           </Reveal>
         </div>
       </div>
+      <FreeAccountDrawer open={accountOpen} onClose={() => setAccountOpen(false)} />
     </section>
   );
 }

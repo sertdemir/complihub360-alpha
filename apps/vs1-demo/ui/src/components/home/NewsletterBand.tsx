@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Check } from 'lucide-react';
 import { FreeAccountDrawer } from './MarketsDrawer';
@@ -35,6 +36,7 @@ export function NewsletterBand() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const { locale = 'en' } = useParams();
   const valid = /.+@.+\..+/.test(email);
   // Regel V2 (11.10.2026): ein Feld — der Satz steht am Feld, der Fokus geht
   // hinein. Vorher tat ein Klick mit ungueltiger Adresse schlicht nichts.
@@ -114,7 +116,14 @@ export function NewsletterBand() {
               </form>
             )}
             <motion.p variants={cardItem} className="mt-3.5 text-body-2xs leading-relaxed text-fg-tertiary">
-              {t('newsletter.privacy')}
+              {/* Handover 1.0 §12A: "Privacy Policy" ist ein Link. Sprachen ohne
+                  <policy>-Markierung rendern den Satz unveraendert. (Nicht <link>:
+                  das ist in HTML ein leeres Element und verliert seinen Text.) */}
+              <Trans
+                t={t}
+                i18nKey="newsletter.privacy"
+                components={{ policy: <Link to={`/${locale}/privacy`} className="font-semibold text-fg-brand underline underline-offset-2 hover:text-brand" /> }}
+              />
             </motion.p>
           </motion.div>
         </div>

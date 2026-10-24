@@ -4,9 +4,10 @@ import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../provi
 
 // ─── S2 — Problem Recognition · Brand & Marketing Map V1 §4/§5 ───────────────
 // The section the report found missing: the reader should recognise their own
-// situation before we say anything about the product. Four pains, named the way
-// someone would actually say them — contradictory advice, overselling, time lost
-// in scoping, nothing comparable.
+// situation before we say anything about the product. Four pains in the wording
+// of the Website Implementation Handover 1.0 (§2): answers that all sound right,
+// not knowing what you need, time to find help, providers hard to compare.
+// The handover replaces the earlier set, "Sold more than you need" included.
 //
 // §5 rules out fear, so there is deliberately no penalty, no deadline and no
 // "you may be exposed" anywhere in here. The closing note is the whole point of
@@ -54,9 +55,14 @@ export function ProblemRecognition() {
               <p className="mt-3 font-serif text-[1.25rem] font-bold leading-snug text-fg">
                 {t(`problemRecognition.items.${i}.title`)}
               </p>
-              <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
-                {t(`problemRecognition.items.${i}.desc`)}
-              </p>
+              {/* Seit dem Handover 1.0 (§2) ist ein Schmerzpunkt im Englischen ein
+                  einziger Satz; die anderen Sprachen tragen bis zur Lokalisierung
+                  noch Titel und Beschreibung. Leere Beschreibung → kein Absatz. */}
+              {t(`problemRecognition.items.${i}.desc`) && (
+                <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
+                  {t(`problemRecognition.items.${i}.desc`)}
+                </p>
+              )}
             </StaggerItem>
           ))}
         </Stagger>

@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Logo } from '../ui/Logo';
 import { supportedLngs } from '../../i18n/config';
 import { DOMAINS } from '../../lib/domains';
-import { MARKET_CODES } from '../../lib/marketProfiles';
 import { Badge } from '../ui/Badge';
 import { NewsletterBand } from './NewsletterBand';
 import { marketNames } from '../../lib/coverage';
@@ -39,37 +38,22 @@ const AREA_LINKS: Link[] = [
   ...DOMAINS.map((d) => ({ key: d.i18nKey, href: `/compliance/${d.slug}`, fallback: d.label })),
 ];
 
-// The eight markets, membership and order from the engine — same reasoning as
-// the areas column above, and the reason this column can exist at all: every
-// market has had its own page since 2026-08-28.
-const MARKET_LINKS: Link[] = [
-  { key: 'marketsOverview', href: '/markets' },
-  ...MARKET_CODES.map((code) => ({
-    key: `market_${code}`,
-    href: `/markets/${code.toLowerCase()}`,
-    fallback: code,
-  })),
-];
-
+// Spalten nach der freigegebenen Footer-Navigation des Website Implementation
+// Handover 1.0 (§12B): Platform · Areas of Support · For Providers · Company.
+// Die Marktspalte (seit 2026-08-28) ist damit raus — der Weg zu den Maerkten
+// ist der Link "Explore Markets and Coverage" unter der Marktzeile, die ihre
+// Laender weiter aus der Engine liest. "Pricing" fuehrt das Handover nicht.
+// "Provider Standards" fehlt, bis es eine Seite dafuer gibt; ein Eintrag ohne
+// Ziel waere ein toter Link.
 const COLUMNS: Column[] = [
   {
     key: 'platform',
     links: [
       { key: 'howItWorks', href: '/how-it-works' },
-      // "Für wen" sits right under "So funktioniert es" (user decision
-      // 2026-08-28): the by-role page answers the question the how-it-works
-      // page raises next.
       { key: 'forWhom', href: '/solutions' },
-      { key: 'pricing', href: '/pricing' },
-      // 'platformOverview' left this column 2026-08-28: the page it points at
-      // is the partner pitch (structured dossiers, magic-link workflow, the
-      // SLA the ranking rewards), so it belongs with the company, not with
-      // what a visitor gets. It is the 'partner' entry below now.
-      // 'exampleResult' left 2026-08-28 (user decision): /results renders the
-      // result of an assessment the visitor has taken — from the footer it
-      // opens an empty report, not an example. The wizard entry above is the
-      // honest way there, and the flow itself routes to /results on finish.
+      { key: 'askQuestion', href: '/search' },
       { key: 'startAssessment', href: '/wizard' },
+      { key: 'signIn', href: '/login' },
     ],
   },
   {
@@ -77,31 +61,23 @@ const COLUMNS: Column[] = [
     links: AREA_LINKS,
   },
   {
-    key: 'markets',
-    links: MARKET_LINKS,
+    key: 'providers',
+    links: [
+      { key: 'join', href: '/provider-apply' },
+      // /platform ist die Seite fuer Anbieter: Dossier, Magic Link, Ranking.
+      { key: 'matching', href: '/platform' },
+      // Dieselbe Anmeldung wie fuer Nutzer; das Konto entscheidet ueber das Ziel.
+      { key: 'providerSignIn', href: '/login' },
+    ],
   },
-  // The RESOURCES column is hidden until it has something to point at (user
-  // decision 2026-08-28): country guides only led back to /markets, tutorials
-  // and the glossary do not exist, news and the knowledge library are BETA
-  // placeholders, and the overview page itself is still empty. Listing six
-  // entries where five are dead is worse than not listing them.
-  // TODO(resources-live): restore this column — resourcesOverview,
-  // complianceNews (beta), knowledgeLibrary (beta), tutorials, glossary — once
-  // the resources surface carries content. Same trigger as the paused
-  // ResourceTeaser on the compliance hub.
   {
     key: 'company',
     links: [
       { key: 'about', href: '/about' },
-      // TODO(partner-redesign): /platform is the partner-facing page and still
-      // speaks the pre-redesign language — it is queued for its own pass after
-      // the current stages (user decision 2026-08-28).
-      { key: 'partner', href: '/platform' },
       { key: 'trustSecurity', href: '/ai-governance' },  // traegt selbst den Titel "Trust Center"
       // Beide zeigen auf DIESELBE Seite, und das ist Absicht: /contact sortiert
       // nach Anliegen, nicht nach Abteilung — "Support" ist dort einer der vier
-      // Wege, nicht ein eigenes Ziel. Bis 2026-08-28 waren beide tote Eintraege
-      // ohne href.
+      // Wege, nicht ein eigenes Ziel.
       // TODO(contact-live): echte Postfaecher, Anschrift, Telefonnummer und
       // Servicezeiten stehen noch aus; die Seite zeigt sie als Platzhalter und
       // haelt den Absendeweg offen, statt einen Versand vorzutaeuschen.
@@ -111,11 +87,16 @@ const COLUMNS: Column[] = [
   },
 ];
 
+// Handover 1.0 §12B nennt sechs Rechtslinks. "Privacy Choices" fehlt, bis es
+// eine Einstellungsseite gibt. /terms ist waehrend der Beta die Beta-Vereinbarung
+// und heisst deshalb weiter so ("Beta" nur, solange die Plattform in der Beta
+// ist — sie ist es). Die Subprocessor-Liste bleibt Text ohne Link, bis sie
+// gepflegt veroeffentlicht ist.
 const LEGAL: Link[] = [
   { key: 'privacy', href: '/privacy' },
   { key: 'terms', href: '/terms' },
-  { key: 'imprint', href: '/imprint' },
   { key: 'cookies', href: '/cookies' },
+  { key: 'imprint', href: '/imprint' },
   { key: 'subProcessors' },
 ];
 
@@ -233,6 +214,16 @@ export function SiteFooter() {
             {t('footer.markets.pre')}
             <span className="font-semibold text-fg">{marketNames((c) => t(`common:markets.countries.${c}`, { defaultValue: c })).join(' · ')}</span>
             {t('footer.markets.post')}
+          </p>
+          {/* Handover 1.0 §12B, Coverage Note: nur der zweite Satz. Der erste
+              ("supports businesses across global markets") und die Liste der
+              Weltregionen versprechen Reichweite, die die Engine nicht fuehrt
+              (Checkliste v1.0, Availability; copy:check Abschnitt 6). */}
+          <p className="mx-auto mt-2 max-w-2xl text-body-xs text-fg-tertiary">
+            {t('footer.coverageNote')}{' '}
+            <a href={localize('/markets')} className="font-semibold text-fg-brand transition-colors hover:text-brand">
+              {t('footer.coverageLink')} →
+            </a>
           </p>
           <p className="mx-auto mt-5 max-w-3xl text-body-2xs leading-relaxed text-fg-tertiary">
             {t('footer.disclaimer')}

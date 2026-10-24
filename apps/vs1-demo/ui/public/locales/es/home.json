@@ -1182,7 +1182,7 @@
           "label": "Alcance acordado"
         }
       ],
-      "export": "Exportar"
+      "export": "Exportaciones previstas"
     }
   },
   "brandCode": {
@@ -1299,7 +1299,6 @@
     }
   },
   "faq": {
-    "label": "Preguntas frecuentes",
     "title": {
       "pre": "Lo que ",
       "gold": "probablemente",
@@ -1404,8 +1403,7 @@
         "links": {
           "howItWorks": "Cómo funciona",
           "forWhom": "Para quién",
-          "startAssessment": "Iniciar evaluación",
-          "pricing": "Precios"
+          "startAssessment": "Iniciar evaluación"
         }
       },
       "areas": {
@@ -1422,25 +1420,10 @@
           "legalAdvisory": "Apoyo jurídico"
         }
       },
-      "markets": {
-        "title": "Mercados",
-        "links": {
-          "marketsOverview": "Todos los mercados",
-          "market_DE": "Alemania",
-          "market_FR": "Francia",
-          "market_US": "Estados Unidos",
-          "market_UK": "Reino Unido",
-          "market_IT": "Italia",
-          "market_ES": "España",
-          "market_NL": "Países Bajos",
-          "market_TR": "Turquía"
-        }
-      },
       "company": {
         "title": "Empresa",
         "links": {
           "about": "Sobre nosotros",
-          "partner": "Proveedores",
           "trustSecurity": "Confianza y seguridad",
           "contact": "Contacto",
           "support": "Soporte"
