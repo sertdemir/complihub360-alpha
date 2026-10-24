@@ -483,7 +483,10 @@
     "countries": {
       "title": "Weitere Länder",
       "desc": "Wählen Sie alle Länder, die zutreffen.",
-      "main": "Hauptmärkte"
+      "main": "Hauptmärkte",
+      "footNote": "Gilt nur für diese Antwort — Ihre Märkte bleiben unverändert.",
+      "header": "Länder",
+      "count": "{{selected}} ausgewählt · {{total}} Länder"
     }
   },
   "countryInfo": {

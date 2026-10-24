@@ -133,7 +133,7 @@ function MarketsContent({ value, onChange, onClose, primary = [], exclude = [], 
   return (
     <>
       <div className="flex items-center justify-between border-b border-stroke-subtle px-8 py-5">
-        <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t('marketsDrawer.header')}</span>
+        <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t(`${copy}.header`)}</span>
         <button onClick={onClose} aria-label={t('drawer.close')} className="text-fg-tertiary transition-colors hover:text-fg">
           <X size={22} />
         </button>
@@ -142,7 +142,7 @@ function MarketsContent({ value, onChange, onClose, primary = [], exclude = [], 
       <div className="flex-1 overflow-y-auto px-8 pt-6">
         <h3 className="font-serif text-[32px] font-bold leading-none text-fg">{t(`${copy}.title`)}</h3>
         <p className="mt-3 text-body-sm font-semibold text-fg-brand">
-          {t('marketsDrawer.count', { selected: local.length, total })}
+          {t(`${copy}.count`, { selected: local.length, total })}
         </p>
         <p className="mt-4 text-body-sm leading-relaxed text-fg-secondary">
           {t(`${copy}.desc`)}
@@ -187,7 +187,7 @@ function MarketsContent({ value, onChange, onClose, primary = [], exclude = [], 
       </div>
 
       <div className="border-t border-stroke-subtle px-8 py-5">
-        <p className="text-body-xs text-fg-tertiary">{t('marketsDrawer.footNote')}</p>
+        <p className="text-body-xs text-fg-tertiary">{t(`${copy}.footNote`)}</p>
         <Button
           size="lg"
           shape="soft"
