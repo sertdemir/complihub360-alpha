@@ -1182,7 +1182,7 @@
           "label": "Alcance acordado"
         }
       ],
-      "export": "Exportar"
+      "export": "Exportaciones previstas"
     }
   },
   "brandCode": {
@@ -1299,7 +1299,6 @@
     }
   },
   "faq": {
-    "label": "Preguntas frecuentes",
     "title": {
       "pre": "Lo que ",
       "gold": "probablemente",
@@ -1389,10 +1388,10 @@
     "placeholder": "usted@suempresa.com",
     "emailAria": "Dirección de correo electrónico",
     "subscribe": "Suscribirse",
-    "success": "Está en la lista — revise su bandeja de entrada.",
     "privacy": "Usamos su correo solo para el briefing. Baja con un clic. Consulte nuestra política de privacidad.",
     "accountLink": "O cree una cuenta gratuita para conservar su Risk Map",
-    "cardTitle": "El briefing mensual"
+    "cardTitle": "El briefing mensual",
+    "betaNote": "La suscripción al boletín mensual aún no está abierta."
   },
   "footer": {
     "tagline": "Le ayudamos a entender qué aplica a su empresa — y a llegar a la persona adecuada cuando hace falta.",
@@ -1404,8 +1403,7 @@
         "links": {
           "howItWorks": "Cómo funciona",
           "forWhom": "Para quién",
-          "startAssessment": "Iniciar evaluación",
-          "pricing": "Precios"
+          "startAssessment": "Iniciar evaluación"
         }
       },
       "areas": {
@@ -1422,25 +1420,10 @@
           "legalAdvisory": "Apoyo jurídico"
         }
       },
-      "markets": {
-        "title": "Mercados",
-        "links": {
-          "marketsOverview": "Todos los mercados",
-          "market_DE": "Alemania",
-          "market_FR": "Francia",
-          "market_US": "Estados Unidos",
-          "market_UK": "Reino Unido",
-          "market_IT": "Italia",
-          "market_ES": "España",
-          "market_NL": "Países Bajos",
-          "market_TR": "Turquía"
-        }
-      },
       "company": {
         "title": "Empresa",
         "links": {
           "about": "Sobre nosotros",
-          "partner": "Proveedores",
           "trustSecurity": "Confianza y seguridad",
           "contact": "Contacto",
           "support": "Soporte"

@@ -10,6 +10,7 @@ Register aller Wissensknoten. Ein Knoten ist die agentenlesbare, verdichtete Fas
 |---|---|---|---|---|---|
 | [`KN-BRAND-001`](nodes/KN-BRAND-001-complihub360-dna.md) | CompliHub360 DNA V1 — Brand, Experience & Voice Foundation | brand | V1 | source-of-truth | [`vault/brand/CompliHub360_DNA_V1.docx`](../vault/brand/CompliHub360_DNA_V1.docx) |
 | [`KN-PRODUCT-001`](nodes/KN-PRODUCT-001-technical-ux-acceptance-checklist.md) | Technical and UX Acceptance Checklist v1.0 — State-Copy, Privacy-Tests, Release-Gates (EN-Launch) | product | 1.0 | reference | [`vault/product/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx`](../vault/product/CompliHub360_Technical_UX_Acceptance_Checklist_V1.0.docx) |
+| [`KN-PRODUCT-002`](nodes/KN-PRODUCT-002-website-implementation-handover.md) | Website Copy & Implementation Handover 1.0 — abgenommene EN-Copy der Startseite, Tooltips, Footer | product | 1.0 | reference | [`vault/product/CompliHub360_Website_Implementation_Handover_V1.0.docx`](../vault/product/CompliHub360_Website_Implementation_Handover_V1.0.docx) |
 
 ## Autoritätsstufen
 

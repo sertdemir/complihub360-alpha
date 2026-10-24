@@ -2,9 +2,10 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { NewsletterBand } from './NewsletterBand';
 
-// ─── Newsletter · Regel V2 (11.10.2026) ──────────────────────────────────────
-// Vorher tat "Abonnieren" mit ungueltiger Adresse schlicht nichts. Jetzt steht
-// der Satz am Feld, der Fokus geht hinein.
+// ─── Newsletter · Coming in beta (24.10.2026) ────────────────────────────────
+// Hinter dem Formular gibt es noch keinen Versand. Bis 24.10. meldete es nach
+// dem Klick trotzdem eine Anmeldung. Jetzt ist es sichtbar, aber gesperrt, und
+// sagt warum.
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key, i18n: { resolvedLanguage: 'en' } }),
@@ -23,27 +24,21 @@ beforeAll(() => {
   }
 });
 
-describe('NewsletterBand · Fehler am Feld (V2)', () => {
-  it('ungueltige Adresse: Satz am Feld, Fokus im Feld, nicht abonniert', () => {
+describe('NewsletterBand · Coming in beta', () => {
+  it('Feld und Knopf sind gesperrt, das Etikett sagt Coming in beta', () => {
     render(<NewsletterBand />);
-    fireEvent.change(screen.getByLabelText('newsletter.emailAria'), { target: { value: 'anna@' } });
-    const knopf = screen.getByRole('button', { name: 'newsletter.subscribe' });
-    expect(knopf).toBeEnabled();
-    fireEvent.click(knopf);
-
-    const email = screen.getByLabelText('newsletter.emailAria');
-    expect(screen.getByRole('alert')).toHaveTextContent('common:contactSend.field.email');
-    expect(email).toHaveFocus();
-    expect(email).toHaveAttribute('aria-invalid', 'true');
-    expect(email).toHaveAttribute('aria-describedby', 'newsletter-email-error');
-    expect(screen.queryByText('newsletter.success')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('newsletter.emailAria')).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'newsletter.subscribe' })).toBeDisabled();
+    expect(screen.getByText('beyond.pills.beta')).toBeInTheDocument();
   });
 
-  it('gueltige Adresse: abonniert, kein Fehler', () => {
-    render(<NewsletterBand />);
-    fireEvent.change(screen.getByLabelText('newsletter.emailAria'), { target: { value: 'anna@firma.de' } });
-    fireEvent.click(screen.getByRole('button', { name: 'newsletter.subscribe' }));
+  it('der Grund steht am Formular, und kein Klick meldet eine Anmeldung', () => {
+    const { container } = render(<NewsletterBand />);
+    const form = container.querySelector('form')!;
+    expect(form).toHaveAttribute('aria-describedby', 'newsletter-beta-note');
+    expect(document.getElementById('newsletter-beta-note')).toHaveTextContent('newsletter.betaNote');
+    fireEvent.submit(form);
+    expect(screen.queryByText('newsletter.success')).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    expect(screen.getByText('newsletter.success')).toBeInTheDocument();
   });
 });

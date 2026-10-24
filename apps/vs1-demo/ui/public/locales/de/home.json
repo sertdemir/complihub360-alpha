@@ -1182,7 +1182,7 @@
           "label": "Umfang vereinbart"
         }
       ],
-      "export": "Export"
+      "export": "Geplante Exporte"
     }
   },
   "brandCode": {
@@ -1299,7 +1299,6 @@
     }
   },
   "faq": {
-    "label": "Häufig gefragt",
     "title": {
       "pre": "Was Sie sich ",
       "gold": "vermutlich",
@@ -1389,10 +1388,10 @@
     "placeholder": "sie@ihrunternehmen.de",
     "emailAria": "E-Mail-Adresse",
     "subscribe": "Abonnieren",
-    "success": "Sie stehen auf der Liste — prüfen Sie Ihren Posteingang.",
     "privacy": "Wir nutzen Ihre E-Mail nur für das Briefing. Abmeldung mit einem Klick. Siehe unsere Datenschutzerklärung.",
     "accountLink": "Oder erstellen Sie ein kostenloses Konto und behalten Sie Ihre Risk Map",
-    "cardTitle": "Das monatliche Briefing"
+    "cardTitle": "Das monatliche Briefing",
+    "betaNote": "Die Anmeldung zum monatlichen Briefing ist noch nicht geöffnet."
   },
   "footer": {
     "tagline": "Wir helfen Ihnen zu verstehen, was für Ihr Unternehmen gilt — und die richtige Person zu erreichen, wenn es eine braucht.",
@@ -1404,8 +1403,7 @@
         "links": {
           "howItWorks": "So funktioniert es",
           "forWhom": "Für wen",
-          "startAssessment": "Assessment starten",
-          "pricing": "Preise"
+          "startAssessment": "Assessment starten"
         }
       },
       "areas": {
@@ -1422,25 +1420,10 @@
           "legalAdvisory": "Rechtliche Unterstützung"
         }
       },
-      "markets": {
-        "title": "Märkte",
-        "links": {
-          "marketsOverview": "Alle Märkte",
-          "market_DE": "Deutschland",
-          "market_FR": "Frankreich",
-          "market_US": "USA",
-          "market_UK": "Großbritannien",
-          "market_IT": "Italien",
-          "market_ES": "Spanien",
-          "market_NL": "Niederlande",
-          "market_TR": "Türkei"
-        }
-      },
       "company": {
         "title": "Unternehmen",
         "links": {
           "about": "Über uns",
-          "partner": "Anbieter",
           "trustSecurity": "Vertrauen & Sicherheit",
           "contact": "Kontakt",
           "support": "Support"

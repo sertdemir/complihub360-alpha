@@ -29,7 +29,11 @@ function Card({ n, panel, title, desc }: { n: string; panel: React.ReactNode; ti
 }
 
 // Timeline copy lives in howItActs.panel3.timeline.<index>.* ('home' ns).
-const TIMELINE_COUNT = 4;
+type TimelineEntry = { date: string; label: string };
+/** Laenge aus der Sprachdatei: EN fuehrt seit dem Handover 1.0 sechs Stationen,
+ *  die anderen Sprachen bis zur Lokalisierung vier. */
+const entriesOf = (v: unknown): TimelineEntry[] =>
+  Array.isArray(v) ? v.filter((x): x is TimelineEntry => !!x && typeof x.date === 'string' && typeof x.label === 'string') : [];
 
 export function HowItActs() {
   const { t } = useTranslation('home');
@@ -55,7 +59,7 @@ export function HowItActs() {
             nach zwei Woertern. Dieselbe Staffelung wie MatchmakingDifference.
             repeat(3,minmax(0,1fr)) statt grid-cols-3, damit die Spalten nicht
             ueber min-width:auto an der breitesten Karte haengen. */}
-        <Stagger stagger={0.14} className="mx-auto grid max-w-container-xl gap-5 lg:grid-cols-[repeat(3,minmax(0,1fr))]">
+        <Stagger stagger={0.14} className="mx-auto grid max-w-container-xl grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[repeat(3,minmax(0,1fr))]">
           <Card
             n="01"
             title={t('howItActs.cards.0.title')}
@@ -70,6 +74,17 @@ export function HowItActs() {
                   <Label>{t('howItActs.panel1.scope')}</Label>
                   <p className="mt-1 text-body-sm font-medium text-fg">{t('howItActs.panel1.scopeValue')}</p>
                 </div>
+                {/* Handover 1.0 §9, Beispiel: die Dauer der Leistung, getrennt von
+                    jeder Bearbeitungszeit einer Behoerde. Bewertungen, Nachweise,
+                    Auszeichnungen und Unternehmenspruefung stehen dort ebenfalls —
+                    sie bleiben aus dem Beispiel, bis sie live geprueft sind
+                    (CONFIRM BEFORE LAUNCH im selben Abschnitt). */}
+                {t('howItActs.panel1.timeline') && (
+                  <div className="py-3">
+                    <Label>{t('howItActs.panel1.timeline')}</Label>
+                    <p className="mt-1 text-body-sm font-medium text-fg">{t('howItActs.panel1.timelineValue')}</p>
+                  </div>
+                )}
                 <div className="pt-3">
                   <Label>{t('howItActs.panel1.approval')}</Label>
                   <p className="mt-1 text-body-sm font-medium text-fg">{t('howItActs.panel1.approvalValue')}</p>
@@ -98,19 +113,19 @@ export function HowItActs() {
             panel={
               <div>
                 <ul className="space-y-2.5">
-                  {Array.from({ length: TIMELINE_COUNT }, (_, i) => (
+                  {entriesOf(t('howItActs.panel3.timeline', { returnObjects: true })).map((entry, i) => (
                     <li key={i} className="flex items-center gap-3 text-body-xs">
                       <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                      <span className="w-12 shrink-0 font-semibold text-fg">{t(`howItActs.panel3.timeline.${i}.date`)}</span>
+                      <span className="w-12 shrink-0 font-semibold text-fg">{entry.date}</span>
                       {/* min-w-0: als Flex-Kind erbt der Label-Text sonst
                           min-width:auto und laeuft, wenn die Spalte einmal zu
                           eng wird, aus der Karte heraus statt umzubrechen. */}
-                      <span className="min-w-0 text-fg-secondary">{t(`howItActs.panel3.timeline.${i}.label`)}</span>
+                      <span className="min-w-0 text-fg-secondary">{entry.label}</span>
                     </li>
                   ))}
                 </ul>
-                <p className="mt-4 flex items-center gap-1.5 border-t border-stroke pt-3 text-body-3xs font-semibold uppercase tracking-[0.08em] text-fg-brand">
-                  {t('howItActs.panel3.export')} <Download size={12} /> <span className="text-fg-tertiary">PDF</span>
+                <p className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-stroke pt-3 text-body-3xs font-semibold uppercase tracking-[0.08em] text-fg-brand">
+                  {t('howItActs.panel3.export')} <Download size={12} /> <span className="text-fg-tertiary">PDF · CSV · API</span>
                 </p>
               </div>
             }

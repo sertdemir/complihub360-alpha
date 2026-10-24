@@ -132,10 +132,9 @@ function StationCard({
           {index + 1} · {t(`howItWorks.stages.${index}.kicker`)}
         </motion.span>
       </div>
-      <motion.p {...part(0.32, { y: 8 })} className="mt-3.5 text-body-md font-bold leading-snug text-fg">
-        {t(`howItWorks.stages.${index}.title`)}
-      </motion.p>
-      <motion.p {...part(0.42, { y: 8 })} className="mt-[7px] text-body-xs leading-relaxed text-fg-secondary">
+      {/* Handover 1.0 §6: je Schritt ein Name und ein Satz. Die Zwischentitel
+          ("Quality before names." …) bleiben der Unterseite /how-it-works. */}
+      <motion.p {...part(0.32, { y: 8 })} className="mt-3.5 text-body-sm leading-relaxed text-fg">
         {t(`howItWorks.stages.${index}.short`)}
       </motion.p>
     </motion.div>
@@ -213,13 +212,24 @@ export function HowItWorksRoute() {
             ))}
           </div>
 
-          <div className="mt-12 flex justify-center">
-            {/* wrap: das deutsche Label braucht mit Pfeil 387 px, bei 375 stehen
-                343 zur Verfuegung — ohne Umbruch ragte der Button je 6 px ueber
-                beide Seiten hinaus. Ab sm ist er wieder einzeilig. */}
-            <Button size="lg" wrap onClick={() => navigate(`/${locale ?? 'en'}/how-it-works`)}>
-              {t('howItWorks.seeAll')} <ArrowRight size={16} className="ml-1.5" />
-            </Button>
+          {/* Handover 1.0 §6: zwei gleichwertige Wege, gleiche Variante und Groesse.
+              Der Link auf die Unterseite bleibt als Textlink darunter. */}
+          <div className="mt-12 flex flex-col items-center gap-5">
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button size="lg" variant="outline" onClick={() => navigate(`/${locale ?? 'en'}/search`)}>
+                {t('howItWorks.ctaAsk')}
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => navigate(`/${locale ?? 'en'}/wizard`)}>
+                {t('howItWorks.ctaAssess')}
+              </Button>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate(`/${locale ?? 'en'}/how-it-works`)}
+              className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand transition-colors hover:text-brand"
+            >
+              {t('howItWorks.seeAll')} <ArrowRight size={15} />
+            </button>
           </div>
         </div>
       </Container>

@@ -107,6 +107,9 @@ export function HomeHeroWorld() {
               <Button size="lg" fullWidth onClick={startRiskMap}>
                 {t('heroWorld.ctaRiskMap')} <ArrowRight size={17} />
               </Button>
+              {/* Zweiter Weg (Handover 1.0 §1): eine Zeile vor dem Fragefeld, damit es
+                  als Alternative zum Assessment gelesen wird, nicht als Pflichtfeld. */}
+              <p className="mt-2 text-body-sm text-fg-secondary">{t('heroWorld.ask.lead')}</p>
               <AskForm />
               <AskNote />
             </div>

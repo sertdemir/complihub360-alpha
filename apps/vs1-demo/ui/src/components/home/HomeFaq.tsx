@@ -16,9 +16,19 @@ import { COVERAGE_COUNTS } from '../../lib/coverage';
 // switching tabs crossfades the list and reopens its first question. The list
 // is 1120px wide — the same content width as the trust band above it.
 //
-// Copy lives in faq.groups.<g>.{label,items.<i>.{q,a}} ('home' ns).
+// Copy lives in faq.groups[] → { label, items[] → { q, a } } ('home' ns).
 
-const GROUP_COUNTS = [5, 5, 2] as const;
+type FaqItem = { q: string; a: string };
+type FaqGroup = { label: string; items: FaqItem[] };
+/** Gruppen und Fragen aus der Sprachdatei: EN fuehrt seit dem Handover 1.0
+ *  9/11/9 Fragen, die anderen Sprachen bis zur Lokalisierung ihren alten Satz.
+ *  Feste Zaehler haetten dort Fragen aus zwei Sprachen gemischt. */
+const groupsOf = (v: unknown): FaqGroup[] =>
+  Array.isArray(v)
+    ? v
+        .filter((g): g is FaqGroup => !!g && typeof g.label === 'string' && Array.isArray(g.items))
+        .map((g) => ({ label: g.label, items: g.items.filter((i) => typeof i?.q === 'string' && typeof i?.a === 'string') }))
+    : [];
 
 function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
   return (
@@ -44,7 +54,7 @@ function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean;
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <p className="max-w-[680px] pb-6 text-body-md leading-relaxed text-fg-secondary">{a}</p>
+            <p className="max-w-[680px] whitespace-pre-line pb-6 text-body-md leading-relaxed text-fg-secondary">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -77,6 +87,7 @@ export function HomeFaq() {
   const { t } = useTranslation('home');
   const [tab, setTab] = useState('0');
   const group = Number(tab);
+  const groups = groupsOf(t('faq.groups', { returnObjects: true, ...COVERAGE_COUNTS }));
 
   return (
     <section id="faq" className="bg-surface py-20 lg:py-28">
@@ -89,12 +100,11 @@ export function HomeFaq() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <span className="inline-flex items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
-            {t('faq.label')}
-          </span>
           <h2 className="font-serif text-[2rem] font-bold leading-tight tracking-tight text-fg sm:text-[2.75rem]">
             {t('faq.title.pre')}<GoldWord>{t('faq.title.gold')}</GoldWord>{t('faq.title.post')}
           </h2>
+          {/* Handover 1.0 §11: Ueberschrift und Unterzeile statt Eyebrow. */}
+          <p className="text-body-lg text-fg-secondary">{t('faq.subtitle')}</p>
         </motion.div>
 
         {/* Theme tabs + the active tab's disclosure list. Switching tabs
@@ -114,9 +124,9 @@ export function HomeFaq() {
             className="mt-10"
           >
             <TabList className="flex-wrap justify-center gap-2">
-              {GROUP_COUNTS.map((count, g) => (
-                <Tab key={g} value={String(g)} badge={count}>
-                  {t(`faq.groups.${g}.label`)}
+              {groups.map((g, i) => (
+                <Tab key={i} value={String(i)} badge={g.items.length}>
+                  {g.label}
                 </Tab>
               ))}
             </TabList>
@@ -131,12 +141,7 @@ export function HomeFaq() {
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className="mx-auto mt-9 border-t border-stroke-subtle"
             >
-              <FaqList
-                items={Array.from({ length: GROUP_COUNTS[group] }, (_, i) => ({
-                  q: t(`faq.groups.${group}.items.${i}.q`),
-                  a: t(`faq.groups.${group}.items.${i}.a`, COVERAGE_COUNTS),
-                }))}
-              />
+              <FaqList items={groups[group]?.items ?? []} />
             </motion.div>
           </AnimatePresence>
         </motion.div>

@@ -23,8 +23,8 @@ supersedes: []
 relates_to:
   - id: KN-BRAND-001
     relation: "untergeordnet — bei Widerspruch gewinnt die DNA"
-  - id: website-implementation-handover-v1.1
-    relation: "Die Checkliste stützt das Handover V1.1. Das Handover liegt nicht im Repo."
+  - id: KN-PRODUCT-002
+    relation: "Die Checkliste stützt das Handover V1.1. Im Repo liegt seit 24.10.2026 das Handover 1.0 (KN-PRODUCT-002); eine V1.1 gibt es dort nicht."
 tags: [launch, en-first, state-copy, privacy-tests, terminology, release-gates]
 ---
 
@@ -39,6 +39,8 @@ tags: [launch, en-first, state-copy, privacy-tests, terminology, release-gates]
 Die Checkliste ist der Maßstab für den **EN-Launch**. Englisch zuerst; Deutsch, Spanisch und Türkisch folgen über eine kontrollierte Lokalisierung. Sie ist `reference`, nicht `source-of-truth`. Widerspricht sie der DNA ([`KN-BRAND-001`](KN-BRAND-001-complihub360-dna.md)), gewinnt die DNA. Den Widerspruch benennen.
 
 Sie gehört zum **Website Implementation Handover V1.1**. V1.0 des Handovers ist nur Archiv und Vision. Es darf nicht als Umsetzungsvorlage dienen, und nichts, was nur dort steht, wird gebaut.
+
+> **Stand 24.10.2026:** Eine V1.1 liegt nicht vor. Der Nutzer hat die Datei *Website Copy & Implementation Handover* **Version 1.0** (18.09.2026) als Vorlage für den englischen Text übergeben, abgelegt als [`KN-PRODUCT-002`](KN-PRODUCT-002-website-implementation-handover.md). Übernommen ist daraus nur Copy für Fähigkeiten, die live sind. Was V1.0 als CONFIRM BEFORE LAUNCH führt oder was dieser Checkliste widerspricht, ist nicht gebaut; die Abweichungstabelle steht in KN-PRODUCT-002. Dieser Widerspruch zwischen den Dokumenten ist dem Nutzer benannt.
 
 ## Kernaussagen
 

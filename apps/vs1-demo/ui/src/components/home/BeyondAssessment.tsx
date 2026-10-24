@@ -75,6 +75,9 @@ function StatusPill({ children, tone }: { children: React.ReactNode; tone: 'ambe
   );
 }
 
+// Die vier Beschriftungen der Kachel stehen seit dem Handover 1.0 (§10, Tile 1)
+// in home.beyond.tile1, nicht mehr in den Dashboard-Schluesseln (userws) —
+// das Dashboard selbst ist nicht Teil dieses Handovers.
 function DashboardWindow() {
   const { t } = useTranslation('userws');
   const { t: th } = useTranslation('home');
@@ -85,7 +88,7 @@ function DashboardWindow() {
           <Trans t={t} i18nKey="home.title" values={{ name: 'Alex' }} components={{ accent: <span /> }} />
         </p>
         <span className="rounded-lg bg-[#14a89a] px-3 py-1.5 text-body-3xs font-semibold text-[#000b09]">
-          {t('shared.startNewSearch')}
+          {th('beyond.tile1.start')}
         </span>
       </motion.div>
       <motion.div variants={winItem} className="mx-5 flex items-center gap-3 rounded-[10px] border border-accent-500/40 bg-[#3c3e37] px-3.5 py-2.5">
@@ -93,7 +96,7 @@ function DashboardWindow() {
           <Play size={11} className="fill-current" />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-body-4xs font-bold uppercase tracking-[0.08em] text-accent-500">{t('home.resumeEyebrow')}</p>
+          <p className="truncate text-body-4xs font-bold uppercase tracking-[0.08em] text-accent-500">{th('beyond.tile1.resume')}</p>
           <p className="text-body-2xs font-semibold text-[#f5f6f8]">{th('beyond.mock.vatItaly')}</p>
         </div>
         <span className="ml-auto shrink-0 rounded-[7px] bg-accent-500 px-2.5 py-1 text-body-4xs font-semibold text-[#1f2937]">
@@ -102,7 +105,7 @@ function DashboardWindow() {
       </motion.div>
       <div className="px-5 pb-1.5 pt-3.5">
         <motion.p variants={winItem} className="mb-2 text-body-2xs font-bold text-[#f5f6f8]">
-          {t('home.activeRequests')} <span className="text-[#14a89a]">3</span>
+          {th('beyond.tile1.active')} <span className="text-[#14a89a]">3</span>
         </motion.p>
         <motion.div variants={winItem} className="flex items-center gap-2.5 rounded-[9px] border border-white/10 bg-[#1f2937] px-3 py-2">
           <StatusPill tone="amber">{t('status.awaitingConfirmation')}</StatusPill>
@@ -117,7 +120,7 @@ function DashboardWindow() {
       </div>
       <div className="px-5 pb-5 pt-2">
         <motion.p variants={winItem} className="mb-2 text-body-2xs font-bold text-[#f5f6f8]">
-          {t('home.savedRiskMaps')} <span className="text-[#14a89a]">4</span>
+          {th('beyond.tile1.saved')} <span className="text-[#14a89a]">4</span>
         </motion.p>
         <motion.div variants={winItem} className="grid gap-1.5 sm:grid-cols-2">
           <div className="rounded-[9px] border border-white/10 bg-[#1f2937] px-3 py-2">

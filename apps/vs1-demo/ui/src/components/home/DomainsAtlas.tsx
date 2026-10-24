@@ -57,8 +57,10 @@ const DOMAIN_ICONS: Record<DomainSlug, LucideIcon> = {
   'legal-advisory': Scale,
   'environment': Leaf,
 };
-const COVER_COUNT = 6;
 const CYCLE_MS = 6000;
+
+/** returnObjects liefert bei fehlendem Schluessel den Schluessel selbst. */
+const listOf = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
 
 export function DomainsAtlas() {
   const { t } = useTranslation('home');
@@ -164,17 +166,26 @@ export function DomainsAtlas() {
                     return <ActiveIcon size={52} strokeWidth={1.5} className="shrink-0 text-fg-brand" />;
                   })()}
                 </div>
-                <p className="mt-4 text-body-sm leading-relaxed text-fg-secondary">{t(`${base}.intro`)}</p>
-                <p className="mt-4 rounded-[10px] border border-accent-500/35 bg-accent-500/10 px-4 py-3 text-body-xs leading-relaxed text-fg-accent-strong">
-                  <span className="font-bold">{t('drawer.whenThisMatters')}:</span> {t(`${base}.matters.0`)}
-                </p>
+                <p className="mt-4 whitespace-pre-line text-body-sm leading-relaxed text-fg-secondary">{t(`${base}.intro`)}</p>
+                {/* Handover 1.0 §7: "You may need this when" fuehrt alle Anlaesse
+                    eines Bereichs, nicht nur den ersten. Ein Anlass → ein Satz. */}
+                <div className="mt-4 rounded-[10px] border border-accent-500/35 bg-accent-500/10 px-4 py-3 text-body-xs leading-relaxed text-fg-accent-strong">
+                  <p className="font-bold">{t('drawer.whenThisMatters')}:</p>
+                  <ul className="mt-1 list-disc space-y-0.5 pl-4">
+                    {listOf(t(`${base}.matters`, { returnObjects: true })).map((m, i) => (
+                      <li key={i}>{m}</li>
+                    ))}
+                  </ul>
+                </div>
                 <hr className="my-6 border-stroke-subtle" />
                 <p className="text-body-4xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{t('drawer.whatWeCover')}</p>
                 <ul className="mt-3.5 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
-                  {Array.from({ length: COVER_COUNT }, (_, i) => (
+                  {/* Laenge aus der Sprachdatei: das Handover fuehrt je Bereich sechs bis
+                      elf Leistungen, die anderen Sprachen bis zur Lokalisierung sechs. */}
+                  {listOf(t(`${base}.cover`, { returnObjects: true })).map((c, i) => (
                     <li key={i} className="flex gap-2.5 text-body-xs text-fg">
                       <Check size={14} strokeWidth={2.5} className="mt-0.5 shrink-0 text-fg-brand" />
-                      {t(`${base}.cover.${i}`)}
+                      {c}
                     </li>
                   ))}
                 </ul>

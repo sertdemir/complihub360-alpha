@@ -33,6 +33,10 @@ export function TrustBand() {
             <GoldWord>{t('trustBand.title.gold')}</GoldWord>
             {t('trustBand.title.post')}
           </h2>
+          {/* Handover 1.0 §8: ein Satz unter der Ueberschrift. */}
+          {t('trustBand.body') && (
+            <p className="max-w-[62ch] text-body-md leading-relaxed text-fg-secondary">{t('trustBand.body')}</p>
+          )}
         </Reveal>
 
         <Stagger stagger={0.08} className="mx-auto mt-11 grid sm:grid-cols-2 lg:grid-cols-3">

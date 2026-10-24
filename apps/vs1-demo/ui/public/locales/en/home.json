@@ -11,8 +11,8 @@
     },
     "state": {
       "confirmed": "Confirmed",
-      "likely": "Likely",
-      "action": "Answer 2 questions"
+      "likely": "Likely to Apply",
+      "action": "Answer 2 Questions"
     },
     "table": {
       "priority": "Priority",
@@ -25,8 +25,8 @@
   },
   "drawer": {
     "close": "Close",
-    "whatWeCover": "What we cover",
-    "whenThisMatters": "When this matters",
+    "whatWeCover": "Support available",
+    "whenThisMatters": "You may need this when",
     "continues": "Continues in the 6-minute assessment.",
     "seeIfApplies": "See if this applies to you"
   },
@@ -83,81 +83,82 @@
       "line1": "Understand what applies to your business.",
       "line2": "Know what to do next."
     },
-    "lead": "Your obligations in {{markets}} markets, each with its source. The right specialist when you need one.",
+    "lead": "Tell us where and how you operate. We help you understand what applies, decide what to do next, and find verified professionals who fit your needs.",
     "ctaRiskMap": "Assess My Needs",
     "ask": {
-      "placeholder": "Describe what you need",
-      "send": "Send",
-      "note": "In the beta, your question leads to the right area and into the assessment — not yet to a direct answer."
+      "placeholder": "What do you need help with?",
+      "send": "Ask CompliHub360",
+      "note": "In the beta, your question leads to the right area and into the assessment — not yet to a direct answer.",
+      "lead": "Or ask a question in your own words."
     },
     "promises": [
       {
-        "title": "Know your obligations",
-        "desc": "See clearly what applies to your business."
+        "title": "Understand what applies",
+        "desc": "See which requirements may affect your business."
       },
       {
-        "title": "The right specialists",
-        "desc": "We match you with Verified Providers who fit your case."
+        "title": "Find the right professionals",
+        "desc": "Get matched with verified providers who fit your needs."
       },
       {
-        "title": "Get things done",
-        "desc": "Connect, collaborate, complete."
+        "title": "Move forward with confidence",
+        "desc": "Connect with the right provider and manage the work in one place."
       },
       {
         "title": "Always on your side",
-        "desc": "Human support and AI help, with the source behind every answer."
+        "desc": "Smart technology for speed and real people when you need them."
       }
     ],
     "proofs": [
       {
-        "title": "360° view",
-        "desc": "{{areas}} compliance areas across {{markets}} markets, in one map."
+        "title": "360° coverage",
+        "desc": "Across countries, compliance areas, and business services."
       },
       {
-        "title": "Expert network",
-        "desc": "Specialists checked against evidence for each service and market."
+        "title": "Verified provider network",
+        "desc": "Professionals reviewed for expertise, service quality, and reliability."
       },
       {
-        "title": "Smart technology",
-        "desc": "AI guidance with human expertise."
+        "title": "Technology and human expertise",
+        "desc": "Smart guidance supported by experienced professionals."
       },
       {
-        "title": "Human first",
-        "desc": "Real people. Real support."
+        "title": "Human support",
+        "desc": "Real people when needed."
       },
       {
         "title": "Your data, protected",
-        "desc": "Anonymous assessment. Identifiers masked before any AI sees your text."
+        "desc": "Strong security and privacy built in."
       }
     ]
   },
   "problemRecognition": {
-    "eyebrow": "Why this is hard",
+    "eyebrow": "Why compliance feels complicated",
     "title": {
-      "pre": "Getting a ",
-      "gold": "straight",
-      "post": " answer is the hard part."
+      "pre": "Compliance is complex. Finding the right answer ",
+      "gold": "shouldn't be",
+      "post": "."
     },
-    "lead": "Most people we talk to have already tried. The problem is rarely effort — it is that the answers do not line up, and there is no way to tell which one fits your situation.",
+    "lead": "You may have searched online, spoken to different providers, and received different answers. The real challenge is knowing what applies to your business and what to do next.",
     "items": [
       {
-        "title": "Two advisors, two answers.",
-        "desc": "Ask the same question twice and you get two defensible answers. Without the source behind each one, you cannot tell which applies to you."
+        "title": "Different answers can all sound right.",
+        "desc": ""
       },
       {
-        "title": "Sold more than you need.",
-        "desc": "The incentive usually rewards the widest scope. Few are paid to tell you a task is small, or that you have already handled it."
+        "title": "It can be difficult to know what you really need.",
+        "desc": ""
       },
       {
-        "title": "Weeks that disappear into scoping.",
-        "desc": "Before the actual work starts you have explained your business five times and compared quotes that measure different things."
+        "title": "Finding the right help takes time.",
+        "desc": ""
       },
       {
-        "title": "No basis for comparison.",
-        "desc": "Every proposal is structured differently. Comparing them means guessing at what each one left out."
+        "title": "Providers can be difficult to compare.",
+        "desc": ""
       }
     ],
-    "note": "None of this means you have a problem. It means you do not have a clear picture yet — and that is a solvable one."
+    "note": "The problem is not that you have not tried. You simply need one clear view of what applies, what matters first, and where to find the right support."
   },
   "heroWizard": {
     "mobileAlt": "CompliHub360 compliance wizard — Areas step (mobile)"
@@ -165,16 +166,16 @@
   "wizard": {
     "rail": {
       "markets": "Markets",
-      "operations": "Operations",
-      "domains": "Areas",
+      "operations": "Business Model",
+      "domains": "Areas of Support",
       "review": "Review",
       "business": "Business"
     },
     "saveProgress": "Save progress",
     "steps": {
       "markets": {
-        "title": "Where do you operate?",
-        "subtitle": "Multi-select. We map regulations against the markets you sell into."
+        "title": "Where does your business operate?",
+        "subtitle": "Include countries where you sell, store goods, have a company, or otherwise conduct business."
       },
       "operations": {
         "title": "What do your operations look like?",
@@ -247,23 +248,23 @@
         "desc": "Open country list →"
       },
       "d2cEcommerce": {
-        "title": "D2C e-commerce",
+        "title": "Online sales to consumers (D2C)",
         "desc": "Direct-to-consumer online sales"
       },
       "b2bWholesale": {
-        "title": "B2B / wholesale",
+        "title": "Business sales (B2B or wholesale)",
         "desc": "Sell to businesses or distributors"
       },
       "marketplace": {
-        "title": "Marketplace",
+        "title": "Marketplace operator",
         "desc": "You connect buyers + sellers"
       },
       "saasDigital": {
-        "title": "SaaS / digital",
+        "title": "Software or digital services",
         "desc": "Software, no physical shipment"
       },
       "hybrid": {
-        "title": "Hybrid",
+        "title": "Multiple channels",
         "desc": "Mix of B2B and B2C channels"
       },
       "other": {
@@ -390,16 +391,16 @@
       }
     },
     "footer": {
-      "next": "Next"
+      "next": "Continue"
     },
     "review": {
       "title": "Your situation, summarized.",
-      "subtitle": "Here's what we'll use. Edit anything you need, then generate your risk map.",
+      "subtitle": "Review your answers. Edit anything that needs to change before creating your Risk Map.",
       "markets": "Markets",
       "operations": "Operations",
-      "domains": "Compliance areas",
+      "domains": "Areas of support",
       "edit": "Edit",
-      "trust": "Anonymous · No account required to see your risk map · Processed in ~4 seconds",
+      "trust": "Anonymous · No account required · Your Risk Map will be ready in seconds",
       "business": "Your business",
       "offering": "You sell",
       "marketsStock": "Markets · stock",
@@ -413,7 +414,7 @@
     "skipHint": "Not sure? Choose what fits best — you can change every answer before you create your map.",
     "needsMarket": "Choose at least one market to continue.",
     "back": "Back",
-    "generate": "Create my Risk Map",
+    "generate": "Create My Risk Map",
     "removeMarket": "Remove {{market}}",
     "aboutMarket": "About {{market}}",
     "situationHint": "A personal matter? CompliHub360 is built for businesses for now — a local advice centre is the better first step."
@@ -750,29 +751,29 @@
     ]
   },
   "riskMap": {
-    "eyebrow": "What a risk map looks like · anonymized example",
+    "eyebrow": "See an example Risk Map",
     "title": {
-      "pre": "Here's what ",
-      "gold": "applies",
-      "post": " to you."
+      "pre": "See what ",
+      "gold": "may apply",
+      "post": "—and what to do first."
     },
     "subtitle": "Based on Germany · United Kingdom · Netherlands. D2C e-commerce, €2M—€5M revenue. VAT · EPR · Privacy in scope.",
     "stats": [
       {
         "value": "8",
-        "label": "Obligations identified"
+        "label": "Potential requirements identified"
       },
       {
         "value": "4",
-        "label": "With a deadline in 30 days"
+        "label": "Actions due within 30 days"
       },
       {
         "value": "14 days",
-        "label": "Median deadline"
+        "label": "Until your next key deadline"
       },
       {
         "value": "3",
-        "label": "Verified Providers ready"
+        "label": "Matching Verified Providers"
       }
     ],
     "rows": [
@@ -835,7 +836,7 @@
     ],
     "partnersEyebrow": "3 Verified Providers matched",
     "partnersTitle": "We've found who can act on this.",
-    "unlock": "See my best matches with a free account",
+    "unlock": "Create a free account to see your best matches",
     "save": {
       "title": "Save this map. Keep your matches.",
       "subtitle": "Free account. No credit card. Your map and your matches stay saved.",
@@ -844,31 +845,31 @@
     "statsCompact": [
       {
         "value": "8",
-        "label": "Obligations identified"
+        "label": "Potential requirements identified"
       },
       {
         "value": "4",
-        "label": "Due within 30 days"
+        "label": "Actions due within 30 days"
       },
       {
         "value": "14",
-        "label": "Days median deadline"
+        "label": "Days until your next key deadline"
       },
       {
         "value": "3",
-        "label": "Verified Providers"
+        "label": "Matching Verified Providers"
       }
     ]
   },
   "matchmaking": {
-    "eyebrow": "The difference",
+    "eyebrow": "From understanding to action",
     "title": {
-      "line1": "A list of rules is not a plan.",
-      "pre": "We ",
-      "gold": "connect",
-      "post": " you with who fixes it."
+      "line1": "Understanding what you need is only the beginning.",
+      "pre": "Find the right ",
+      "gold": "professional",
+      "post": " to handle it."
     },
-    "subtitle": "A risk map is where it starts. What makes CompliHub360 different is what comes after: Verified Providers, checked against evidence, response-tracked, with structured handovers. You don’t search. We match.",
+    "subtitle": "Your best matches are based on relevant expertise, market coverage, service quality, response time, availability, and fit. Provider names remain hidden during the initial comparison so you can focus on what matters—not brand recognition.",
     "exampleLabel": "Example matches · anonymized",
     "matches": [
       {
@@ -926,7 +927,9 @@
         "title": "Get structured handovers",
         "desc": "Provider responds via Magic-Link in 24–48h. No discovery call."
       }
-    ]
+    ],
+    "identityLabel": "Identity revealed after you choose.",
+    "supporting": "Choose one or more providers. Their names and full profiles are revealed when you book consultations."
   },
   "twoReflexes": {
     "eyebrow": "Why this gap persists",
@@ -948,189 +951,191 @@
     "row2Lead": "Directories list everyone. We check every Verified Provider against documented evidence before they can be matched.",
     "row1": [
       {
-        "title": "Risk-prioritized, not exhaustive",
-        "desc": "Immediate to Low. Four to twelve items at any time. Not 200-page checklists."
+        "title": "Focused on what matters first",
+        "desc": "See priorities and next steps without an overwhelming checklist."
       },
       {
-        "title": "Sourced from the regulators themselves",
-        "desc": "Every entry names its legal basis — or says plainly that we don’t carry it yet."
+        "title": "Official sources behind every result",
+        "desc": "Review the authority, source link, and relevant date supporting the information."
       },
       {
-        "title": "Reviewed and dated",
-        "desc": "Rules change. We review our entries and date every source, so you can see how current it is."
+        "title": "Kept up to date",
+        "desc": "See when information was last reviewed or updated."
       },
       {
-        "title": "Plain language by default",
-        "desc": "If a clause needs a paragraph to explain, the paragraph is what you see — not the clause."
+        "title": "Clear language, precise terms",
+        "desc": "Understand the issue without losing the terminology used by authorities."
       }
     ],
     "row2": [
       {
-        "title": "Verified by us, not self-listed",
-        "desc": "Each Verified Provider is checked against documented evidence for every service and market before they can be matched."
+        "title": "Providers reviewed before they join",
+        "desc": "Providers are assessed against applicable business, expertise, coverage, and quality criteria."
       },
       {
-        "title": "Independent professionals",
-        "desc": "Verified Providers deliver their services independently, under their own professional responsibility."
+        "title": "Clear responsibility for every engagement",
+        "desc": "Professional services are provided by the selected independent provider under its own responsibility and terms."
       }
     ]
   },
   "domains": {
-    "eyebrow": "What we know",
+    "eyebrow": "Areas we cover",
     "title": {
-      "pre": "Your areas, ",
-      "gold": "one",
-      "post": " map."
+      "pre": "Different requirements. ",
+      "gold": "One clear view",
+      "post": "."
     },
-    "subtitle": "Pick an area to see the markets where we hold its rules and the obligations that follow from them.",
+    "subtitle": "From tax and product requirements to privacy, customs, company filings, and legal support, CompliHub360 brings your needs together and connects you with the right professionals across markets.",
     "cardCta": "Click to see more",
     "drawerEyebrow": "Area",
     "drawerAria": "{{domain}} detail",
-    "activeIn": "National rules in:",
+    "activeIn": "Available in:",
     "euWide": "EU-wide",
     "items": [
       {
         "title": "Tax & VAT",
         "desc": "Know which VAT regime applies in each market you sell into, and when a registration becomes due.",
-        "intro": "Cross-border VAT, OSS/IOSS, intra-community supply, distance-selling thresholds. Every market has its own VAT regime, registration threshold and filing cadence. We track each one we cover.",
+        "intro": "Understand which registrations, returns, and reporting requirements may apply based on where your business is established, where goods are stored, what you sell, and who your customers are.",
         "cover": [
-          "OSS / IOSS quarterly returns",
-          "Distance-selling threshold monitoring",
-          "Intra-community supply VAT",
-          "Reverse-charge mechanism",
-          "Per-market VAT registrations",
-          "Bilateral DTA implications"
+          "Country-specific VAT registrations",
+          "VAT returns and reporting",
+          "OSS and IOSS registration and filings",
+          "Threshold monitoring",
+          "Intra-EU transactions",
+          "Reverse-charge requirements"
         ],
         "matters": [
-          "You sell B2C into another EU market for the first time",
-          "You exceed €10,000 in cross-border B2C sales",
-          "You change your fulfilment model (e.g., add a UK warehouse)"
+          "You sell goods or services in another country.",
+          "You store inventory outside your home country.",
+          "You are entering a new market."
         ]
       },
       {
         "title": "EPR & Packaging",
         "desc": "Know whether you count as a producer in a market — and what you must register before the first shipment.",
-        "intro": "Extended Producer Responsibility across packaging, batteries, and electronics. Each market runs its own register, fee schedule, and reporting cadence. We map who you register with and when.",
+        "intro": "Sell physical products online? EPR and packaging requirements may apply—even if you did not manufacture the products. Find out which registrations and other steps may be required in each market.\n\nExtended Producer Responsibility (EPR) and packaging rules can apply when you sell or ship physical products into a country, including through an online marketplace or your own website. Depending on the market and product category, you may need to register, report volumes, contribute to recycling costs, meet take-back obligations, or appoint an authorized representative.",
         "cover": [
-          "LUCID / national packaging registers",
-          "Take-back & recycling obligations",
-          "Ecomodulation fee tiers",
-          "WEEE & battery registration",
-          "Annual reporting volumes",
-          "Authorised-representative requirements"
+          "Packaging EPR, including LUCID",
+          "WEEE and battery requirements",
+          "Volume reporting",
+          "Take-back and recycling obligations",
+          "Eco-modulation fees",
+          "Authorized representative services"
         ],
         "matters": [
-          "You ship physical goods into a new EU market",
-          "You sell packaged products to EU consumers",
-          "You add a product category (e.g., electronics)"
+          "You sell or ship physical products through a marketplace, your own website, or another sales channel."
         ]
       },
       {
         "title": "Data & Privacy",
         "desc": "Know what you may collect, on what basis, and what you have to be able to show.",
-        "intro": "Data protection across the EU and post-Brexit UK. From records of processing to international transfers, we surface the obligations that follow your data — not just your headquarters.",
+        "intro": "Understand what personal data your business collects, why you are allowed to use it, and what documentation or safeguards may be required. Privacy requirements differ between countries, U.S. states, industries, and activities. They can affect how you collect, use, store, share, transfer, and protect personal data.",
         "cover": [
-          "DPIAs for high-risk processing",
-          "Records of Processing (RoPA)",
-          "Processor / sub-processor agreements",
-          "International transfer mechanisms",
-          "Subject-access & deletion handling",
-          "Breach notification timelines"
+          "Privacy assessments for countries and U.S. states",
+          "DPIAs and similar risk assessments",
+          "Records of Processing Activities (RoPA)",
+          "Privacy notices and data processing agreements",
+          "International transfer safeguards",
+          "Individual rights requests",
+          "Breach assessment and notification"
         ],
         "matters": [
-          "You process personal data of EU/UK residents",
-          "You add a new tracking or analytics tool",
-          "You transfer data outside the EU/UK"
+          "You handle information connected to customers, employees, website visitors, app users, or other individuals in one or more markets."
         ]
       },
       {
         "title": "Marketing Compliance",
         "desc": "Know what you may claim, how you may reach people, and what consent has to look like.",
-        "intro": "Consent and fair-marketing rules under ePrivacy and consumer law. Cookie walls, opt-ins, and dark-pattern scrutiny vary by market — we track what each regulator actually enforces.",
+        "intro": "Understand the rules that may affect how you reach customers, use cookies and tracking technologies, collect consent, and make advertising claims.",
         "cover": [
-          "Cookie-consent banner validity",
-          "Consent records & proof",
-          "E-mail / SMS opt-in rules",
-          "Dark-pattern audits",
-          "Influencer & ad disclosure",
-          "Unsubscribe & suppression handling"
+          "Cookie banners and tracking reviews",
+          "Consent and preference management",
+          "Email, SMS, phone, and direct-message marketing",
+          "Advertising claims and promotional disclosures",
+          "Influencer and affiliate disclosures",
+          "User-choice and dark-pattern reviews",
+          "Unsubscribe and suppression processes"
         ],
         "matters": [
-          "You run paid acquisition into the EU",
-          "You launch an e-mail or SMS programme",
-          "You redesign your consent flow"
+          "You use analytics or cookies, send marketing messages, advertise products or services, or work with influencers and affiliates."
         ]
       },
       {
         "title": "Company Setup & Filings",
         "desc": "Know where your setup creates obligations — permanent establishment, filings, beneficial owners.",
-        "intro": "Entity-level obligations in each market we assess. Annual statements, beneficial-owner transparency, and intra-group contracts each carry their own deadlines and penalties.",
+        "intro": "Understand what may be required to establish, register, and maintain a business. Requirements depend on the country or local jurisdiction, entity type, ownership, and business activity.",
         "cover": [
-          "Annual financial statements",
-          "Transparency / UBO register filings",
-          "Beneficial-owner updates",
-          "Intra-group contract documentation",
-          "Local representation requirements",
-          "Filing-deadline tracking"
+          "Company formation and structure",
+          "Foreign qualification and local registration",
+          "Annual reports and accounts",
+          "Beneficial ownership and transparency filings",
+          "Director and officer updates",
+          "Registered agent, registered office, and local representative services",
+          "Branch, subsidiary, and group structures",
+          "Restructuring and closure",
+          "Ongoing deadlines and entity maintenance"
         ],
         "matters": [
-          "You operate a local entity or branch",
-          "Your ownership structure changes",
-          "You cross a local audit threshold"
+          "You are starting a company, entering a new market, opening a branch, changing ownership, or managing ongoing company filings."
         ]
       },
       {
         "title": "Product Compliance",
         "desc": "Know whether your product may go on the market, and what evidence you have to hold.",
-        "intro": "Whether a product may be placed on the market at all, and what proof stands behind it. Separate from packaging: this is the product itself — safety, conformity, documentation, and who inside the EU answers for it.",
+        "intro": "Understand what your product may need before it can be legally and safely sold. Requirements can include testing, certification, labeling, documentation, and local representation. They depend on the product, destination, intended use, customer group, and your role in the supply chain.",
         "cover": [
-          "General Product Safety Regulation (EU) 2023/988",
-          "CE marking and declaration of conformity",
-          "Technical documentation and its retention",
-          "Responsible person established in the EU",
-          "Incident reporting and recalls",
-          "UKCA marking for Great Britain"
+          "Product classification and applicable standards",
+          "General Product Safety Regulation (GPSR)",
+          "Testing, certification, and conformity assessment",
+          "CE, UKCA, and other market markings",
+          "Labels, warnings, and instructions",
+          "Technical documentation and retention",
+          "Responsible person, authorized representative, or local representative services",
+          "Incident reporting, corrective action, and recalls"
         ],
         "matters": [
-          "You place a physical product on the EU market for the first time",
-          "You add a product category with its own conformity rules",
-          "You sell into the EU without being established there"
+          "You manufacture, import, distribute, or sell a physical product."
         ]
       },
       {
         "title": "Logistics & Customs",
         "desc": "Know what your goods need to cross a border, and who carries the liability when they do.",
-        "intro": "What goods need in order to cross a border, and who carries the liability once they do. Customs identity, declarations, statistics and the terms of delivery that decide who pays and who answers.",
+        "intro": "Understand what may be required at the border, what a shipment may cost, and who is responsible at each stage. Cross-border goods movements can involve registrations, classification, declarations, duties and taxes, licenses, documentation, and trade reporting.",
         "cover": [
-          "EORI registration",
-          "Import and export declarations",
-          "Intrastat reporting once the threshold is crossed",
-          "Incoterms and where liability sits",
-          "Import VAT and deferment",
-          "GB ↔ EU movements after Brexit"
+          "Customs broker and freight forwarder matching",
+          "Importer, exporter, and EORI requirements",
+          "HS and tariff classification",
+          "Customs valuation and origin",
+          "Declarations and shipping documents",
+          "Duties and import taxes",
+          "Import and export licenses",
+          "Incoterms and delivery responsibilities",
+          "Intrastat reporting",
+          "Warehousing, fulfillment, and 3PL services",
+          "Route-specific support"
         ],
         "matters": [
-          "You ship across a customs border for the first time",
-          "Your trade volume crosses an Intrastat threshold",
-          "You change Incoterms or your fulfilment partner"
+          "You import, export, store, or deliver physical goods across borders."
         ]
       },
       {
         "title": "Legal Support",
         "desc": "Know when a question genuinely needs a lawyer — and reach one who already has your case.",
-        "intro": "The questions that need a qualified answer rather than a checklist: contracts, terms, consumer rights, disputes. CompliHub360 is not a law firm — Verified Providers advise under their own professional liability, and we make sure the one you reach already has your case.",
+        "intro": "Understand when qualified legal support may be needed and find a professional suited to the matter. CompliHub360 identifies the type of support and matches providers; it is not a law firm and does not provide legal advice.",
         "cover": [
-          "Terms and consumer information duties",
-          "Supplier and platform contracts",
-          "Withdrawal, returns and warranty",
-          "Liability and its limits",
-          "Handling a dispute across borders",
-          "Which jurisdiction actually applies"
+          "Commercial contracts",
+          "Website terms and consumer policies",
+          "Returns, warranties, and consumer rights",
+          "Liability matters",
+          "Corporate and commercial law",
+          "Employment and contractor matters",
+          "Intellectual property and trademarks",
+          "Disputes",
+          "Applicable law and jurisdiction",
+          "Local legal opinions and regulatory advice"
         ],
         "matters": [
-          "You enter a contract type you have not used before",
-          "A dispute involves a customer in another country",
-          "You receive a formal complaint or an enquiry from an authority"
+          "A contract, business decision, consumer issue, legal filing, dispute, or jurisdiction-specific matter requires qualified legal support."
         ]
       },
       {
@@ -1155,59 +1160,69 @@
     "learnMore": "Learn more"
   },
   "howItActs": {
-    "eyebrow": "Inside one engagement",
+    "eyebrow": "After you choose",
     "title": {
-      "pre": "What happens ",
-      "gold": "between",
-      "post": " the match and the resolution."
+      "pre": "From your provider choice to completed work—",
+      "gold": "clear",
+      "post": " at every step."
     },
-    "subtitle": "Once you’re matched, three things are clear from the start: how the fee is settled, when you’ll hear back, and what you take with you.",
+    "subtitle": "Choose and book a consultation. The provider’s identity is revealed and the information you approve is shared. Pricing, timing, scope, communication, and progress remain visible throughout the engagement.",
     "cards": [
       {
-        "title": "Cost, discussed up front.",
-        "desc": "Each Verified Provider sets their own fee. You discuss scope and price in the consultation, before you commit to anything. CompliHub360 never charges you."
+        "title": "See the price before you commit",
+        "desc": "An expected price range is shown before you choose. After the consultation, the provider confirms the final scope and estimate. No professional work begins until you approve it."
       },
       {
-        "title": "Response, on the clock.",
+        "title": "Clear timing from the beginning",
         "desc": "If a provider misses the agreed response time, we tell you and can show you another match. Nothing is shared with a new provider until you choose and book them."
       },
       {
-        "title": "A trail you keep.",
+        "title": "Your complete engagement record",
         "desc": "Every step is logged on a private timeline — request, reply, agreed scope, deliverables. Yours to keep."
       }
     ],
     "panel1": {
-      "estCost": "Fee",
-      "estValue": "Set by the provider",
-      "scope": "Scope",
-      "scopeValue": "OSS quarterly returns · DE + NL + FR",
-      "approval": "Approval",
-      "approvalValue": "Yours, before any work begins"
+      "estCost": "Expected price range",
+      "estValue": "€2,400–€3,800",
+      "scope": "Services included",
+      "scopeValue": "OSS quarterly returns · Germany · Netherlands · France",
+      "timeline": "Estimated service timeline",
+      "timelineValue": "Average 10–15 business days after all required information and documents are received",
+      "approval": "Your approval",
+      "approvalValue": "Required before professional work begins"
     },
     "panel2": {
-      "label": "Initial response SLA",
+      "label": "Expected response time",
       "note": "If missed, we tell you and can show you another match."
     },
     "panel3": {
       "timeline": [
         {
           "date": "Apr 24",
-          "label": "Request sent"
+          "label": "Consultation booked"
         },
         {
           "date": "Apr 25",
-          "label": "Provider accepted · 21h"
+          "label": "Provider confirmation"
         },
         {
           "date": "Apr 28",
-          "label": "Proposal received"
+          "label": "Scope and estimate"
         },
         {
-          "date": "May 02",
-          "label": "Scope agreed"
+          "date": "Apr 29",
+          "label": "User approval"
+        },
+        {
+          "date": "May 06",
+          "label": "Work and documents"
+        },
+        {
+          "date": "May 12",
+          "label": "Completion"
         }
       ],
-      "export": "Export"
+      "export": "Planned exports"
     }
   },
   "brandCode": {
@@ -1242,16 +1257,16 @@
     }
   },
   "beyond": {
-    "eyebrow": "Beyond the assessment",
+    "eyebrow": "Your CompliHub360 workspace",
     "title": {
-      "pre": "From one-time check to ",
-      "gold": "home base",
-      "post": " for everything compliance."
+      "pre": "Your compliance work, ",
+      "gold": "organized",
+      "post": " in one place."
     },
-    "subtitle": "The assessment is free. What comes after — your workspace, live news, expert content, your providers — is what makes CompliHub360 the place you come back to.",
+    "subtitle": "Save your Risk Maps, matches, consultations, deadlines, documents, and engagement history.",
     "pills": {
-      "live": "Available today",
-      "beta": "Launching with Beta"
+      "live": "Available now",
+      "beta": "Coming in beta"
     },
     "stats": [
       {
@@ -1282,18 +1297,18 @@
       }
     ],
     "workspace": {
-      "title": "Your map. Your providers. Your trail. Persistent.",
-      "desc": "The assessment becomes a saved dossier. Your engagement timeline lives in your dashboard. Provider relationships, compliance trail, risk map — all in one place, all yours."
+      "title": "Everything stays organized and available",
+      "desc": "Start a new assessment, continue where you left off, follow your active consultations and engagements, and return to your saved Risk Maps."
     },
     "newsCard": {
-      "title": "Updates that affect you.",
-      "desc": "Alerts when regulators move in markets you operate in — curated by area, scoped to your operation."
+      "title": "Regulatory updates relevant to your business",
+      "desc": "Each update names the authority, market, requirement, effective date, and official source — and why it matters for your business profile."
     },
     "learn": {
       "meta": "Webinar · 24 min",
       "video": "Cross-border VAT for D2C",
-      "title": "Learn from the pros.",
-      "desc": "Webinars and tutorials from specialists."
+      "title": "Learn from trusted professionals",
+      "desc": "Practical guides, webinars, and tutorials from qualified professionals."
     },
     "mock": {
       "vatItaly": "VAT registration · Italy",
@@ -1322,95 +1337,169 @@
       "libOssSource": "CompliHub360 Live · 90 min",
       "libItVat": "Italian VAT registration: step-by-step",
       "libItVatSource": "CompliHub360 Editorial · 8 min"
+    },
+    "tile1": {
+      "start": "Start New Assessment",
+      "resume": "Continue Where You Left Off",
+      "active": "Active Consultations and Engagements",
+      "saved": "Saved Risk Maps"
     }
   },
   "faq": {
-    "label": "Frequently asked",
     "title": {
-      "pre": "What you're ",
-      "gold": "probably",
-      "post": " wondering."
+      "pre": "Frequently Asked ",
+      "gold": "Questions",
+      "post": ""
     },
     "groups": [
       {
         "label": "Assessment & Risk Map",
         "items": [
           {
-            "q": "Is the assessment really free?",
-            "a": "Yes. No account, no credit card. You get a structured risk map at the end. Registering after — to keep it, to match with providers, to receive alerts — is the optional next step."
+            "q": "Is the assessment free?",
+            "a": "Yes. You can complete the assessment and view your Risk Map without an account or payment. A free account lets you save and update your Risk Map, see your best matches, book consultations, and receive available alerts."
           },
           {
-            "q": "Where does the Risk Map's data come from?",
-            "a": "Every entry names its legal basis — the statute, regulation or official register it comes from, linked where the official text is online. Where we don’t carry a national text yet, the entry says so. We review the entries and date every source."
+            "q": "How personalized is my Risk Map?",
+            "a": "Your Risk Map is based on the markets, business model, products or services, activities, and areas of support you select. The more complete your answers are, the more relevant the results can be. We will identify when more information is needed."
           },
           {
-            "q": "Can I export my Risk Map?",
-            "a": "Yes. As a PDF, for your records or your auditor."
+            "q": "What if I am unsure about an answer?",
+            "a": "You can skip questions you are unsure about, return to them later, or request professional support when confirmation is needed."
           },
           {
-            "q": "Can I check several markets and areas at once?",
-            "a": "Yes. Pick every market you operate in from the {{markets}} we cover today and the assessment merges their obligations into one map, prioritised across all of them. A market we don't cover yet is marked as such, and you can request it."
+            "q": "What do the Risk Map statuses mean?",
+            "a": "Confirmed means the requirement applies based on your answers. Likely to Apply means it probably applies, but more information or professional confirmation may be needed. More Information Needed means additional answers are required for a more accurate assessment."
           },
           {
-            "q": "What if my market isn't covered yet?",
-            "a": "Tell us where you operate. We add markets step by step, and requests help set the priority — if you choose to be notified, we let you know when your market goes live."
+            "q": "Where does the information come from?",
+            "a": "Regulatory information is based on official authority sources. Where available, we show the authority, source link, relevant date, and when the information was last reviewed."
+          },
+          {
+            "q": "Can I assess several markets or areas at once?",
+            "a": "Yes. You can include multiple markets and areas of support in one organized Risk Map."
+          },
+          {
+            "q": "Can I change my answers or update my Risk Map?",
+            "a": "Yes. Update your answers when your activities, markets, products, or business structure change."
+          },
+          {
+            "q": "Can I export my information?",
+            "a": "You can export your Risk Map as a PDF. Depending on availability and your account features, engagement records may also be available as PDF, CSV, or through an API."
+          },
+          {
+            "q": "What if my market is not available?",
+            "a": "You can request an additional market and, where available, choose to receive an alert when coverage becomes available."
           }
         ]
       },
       {
-        "label": "Providers & engagements",
+        "label": "Providers & Engagements",
         "items": [
           {
-            "q": "Are you giving me legal advice?",
-            "a": "No. CompliHub360 maps obligations and surfaces what is likely to apply to your operation — it is not legal advice. When a matter needs a binding opinion, we connect you to a Verified Provider who can give one."
+            "q": "Does CompliHub360 provide legal, tax, accounting, or other professional advice?",
+            "a": "No. CompliHub360 provides compliance information and matching services. We are not a law firm, accounting firm, tax adviser, customs broker, or regulatory authority. Advice and professional services are provided independently by the selected provider."
           },
           {
-            "q": "How are Verified Providers vetted?",
-            "a": "We check every Verified Provider against documented evidence for each service and market before they can be matched — not a self-listed directory. Providers deliver their services independently, under their own professional responsibility."
+            "q": "How are providers reviewed?",
+            "a": "Providers are reviewed against applicable criteria such as qualifications, expertise, market coverage, business information, experience, and service standards. Where available, we may also verify licenses, certifications, response history, reviews, and completed engagements."
           },
           {
-            "q": "What does an engagement cost?",
-            "a": "Each Verified Provider sets their own fee. You discuss scope and price in the consultation, before you commit to anything. CompliHub360 never charges you."
+            "q": "Why are provider names hidden at first?",
+            "a": "Provider names remain hidden during the initial comparison so you can focus on expertise and fit rather than brand recognition. This also gives providers of different sizes a fair opportunity to be selected."
           },
           {
-            "q": "How fast does a provider respond?",
-            "a": "Providers confirm within 24 hours and reply within 48. If a provider misses that, we tell you and can show you another match — nothing is shared with a new provider until you choose and book them."
+            "q": "When will I see the provider’s name and full profile?",
+            "a": "The provider’s identity and full profile are revealed after you choose the provider and book a consultation. You can then review its verified credentials, reviews, business-verification information, and contact details."
           },
           {
-            "q": "Am I tied to one provider?",
-            "a": "No. Every engagement is contracted individually. You can request further matches or switch at any time — your trail and your Risk Map remain yours."
+            "q": "Can providers pay to appear higher in my matches?",
+            "a": "No. Matching and ranking are based on relevant criteria and cannot be purchased. Advertising budgets, brand size, and commercial arrangements do not determine your best matches."
+          },
+          {
+            "q": "How much will the service cost?",
+            "a": "You see an expected price range before choosing a provider. After the consultation, the provider confirms the services, final price, expected timeline, and terms. Professional work begins only after you approve them."
+          },
+          {
+            "q": "How quickly will a provider respond?",
+            "a": "The provider’s expected response time is shown before you choose. If the provider does not respond within that period, CompliHub360 can suggest another match. Your information will not be shared with another provider without your approval."
+          },
+          {
+            "q": "Can I choose more than one provider?",
+            "a": "Yes. You can select and book consultations with more than one provider. Each booking and professional engagement remains separate."
+          },
+          {
+            "q": "What happens after I book?",
+            "a": "The provider’s identity and full profile are revealed, and only the information needed to process your request is shared. The provider then confirms the service, price, timeline, and terms. No professional work begins until you approve it."
+          },
+          {
+            "q": "Am I required to continue with the provider after the consultation?",
+            "a": "No. Booking a consultation does not require you to begin a professional engagement."
+          },
+          {
+            "q": "How does CompliHub360 support free access for users?",
+            "a": "CompliHub360 is free for businesses seeking support. We earn revenue through our commercial relationships with participating providers. These arrangements never influence which providers appear in your matches or how they are ranked."
           }
         ]
       },
       {
-        "label": "Account & data",
+        "label": "Account, Data & Privacy",
         "items": [
           {
             "q": "Do I need an account?",
-            "a": "Not for the assessment — it runs in your browser without one. You only need a free account to keep your Risk Map, see your best matches or receive alerts."
+            "a": "No account is required to ask a question, complete the assessment, or view your initial Risk Map. A free account is required to save and update results, see your best matches, book consultations, and use available workspace features."
           },
           {
-            "q": "How is my data handled?",
-            "a": "The assessment runs in your browser and needs no account. If you register, your dossier is stored under EU data-protection rules, encrypted, and never sold or shared without your instruction."
+            "q": "How is my information used?",
+            "a": "We use your information to provide the services you request, personalize relevant results, operate your account, and support the matching and booking process, as explained in our Privacy Policy."
+          },
+          {
+            "q": "What information is shared with a provider?",
+            "a": "If you choose to connect or book, we share only the information needed to process your request. You should be shown what will be shared before the connection is completed."
+          },
+          {
+            "q": "When is my information shared?",
+            "a": "Your information is shared after you choose to connect or book with a provider and complete the relevant confirmation step. It is not automatically shared with every provider shown in your matches."
+          },
+          {
+            "q": "Does CompliHub360 sell my personal or business information?",
+            "a": "No. CompliHub360 does not sell your personal or business information to unrelated third parties.\n\nIf you choose to connect or book with a service provider, we share only the information needed to process your request, as explained in our Privacy Policy."
+          },
+          {
+            "q": "How is my information protected?",
+            "a": "We use appropriate technical and organizational measures designed to protect personal and business information. Additional details are provided in our Privacy Policy and security information."
+          },
+          {
+            "q": "Can I control notifications?",
+            "a": "Yes. Where notification features are available, you can manage your email and regulatory-alert preferences from your account or use the unsubscribe option provided in the message."
+          },
+          {
+            "q": "Can I delete my account or request deletion of my information?",
+            "a": "You can request account deletion and exercise applicable privacy rights as explained in our Privacy Policy. Some information may need to be retained where required by law or for legitimate recordkeeping purposes."
+          },
+          {
+            "q": "Where is my information stored?",
+            "a": "Information is stored and processed through service providers and locations described in our Privacy Policy. Applicable safeguards are used where information is transferred between countries."
           }
         ]
       }
-    ]
+    ],
+    "subtitle": "Questions? Start here."
   },
   "entryDoor": {
     "journey": [
       "6 min",
-      "Risk map",
+      "Risk Map",
       "Register",
       "Workspace"
     ],
-    "eyebrow": "Begin here",
+    "eyebrow": "Start with a free assessment",
     "title": {
-      "pre": "One assessment. One result. The path becomes ",
-      "highlight": "legible",
+      "pre": "Tell us about your business. See what ",
+      "highlight": "applies to you",
       "post": "."
     },
-    "subtitle": "Six minutes. No account required. We map your operations against the regulations that actually apply, and show you what to do next.",
+    "subtitle": "Answer a few questions about where and how your business operates. In around six minutes, you will receive a personalized Risk Map. No account is required.",
     "cta": "Assess My Needs",
     "demo": {
       "pause": "Pause demo",
@@ -1418,35 +1507,36 @@
     }
   },
   "newsletter": {
-    "eyebrow": "Stay current",
-    "title": "When a regulation moves, you'll know.",
-    "desc": "One brief per month. New thresholds, deadlines, and authoritative source links — for the markets you operate in. No promotional content.",
+    "eyebrow": "Stay informed",
+    "title": "When requirements change, you’ll know what matters.",
+    "desc": "Receive one clear update each month with important regulatory changes, upcoming deadlines, and links to official sources for the markets and compliance areas you follow. No promotional emails.",
     "placeholder": "you@yourcompany.com",
     "emailAria": "Email address",
     "subscribe": "Subscribe",
-    "success": "You're on the list — check your inbox.",
-    "privacy": "We use your email only for the brief. Unsubscribe in one click. See our privacy policy.",
-    "accountLink": "Or create a free account to keep your risk map",
-    "cardTitle": "The monthly briefing"
+    "privacy": "We use your email only to send the monthly briefing. You can unsubscribe at any time. Read our <policy>Privacy Policy</policy>.",
+    "accountLink": "Create a free account for personalized regulatory alerts",
+    "cardTitle": "Your Monthly Compliance Briefing",
+    "betaNote": "Sign-up for the monthly briefing is not open yet."
   },
   "footer": {
-    "tagline": "We help you understand what applies to your business — and reach the right person when it needs one.",
-    "notLawFirm": "Not a law firm. We orchestrate verified specialists.",
+    "tagline": "Understand what applies. Find the right support.",
+    "notLawFirm": "Clear compliance information and fair matching with verified independent providers.",
     "beta": "Beta",
     "columns": {
       "platform": {
         "title": "Platform",
         "links": {
-          "howItWorks": "How it works",
-          "forWhom": "Who it is for",
-          "startAssessment": "Start Assessment",
-          "pricing": "Pricing"
+          "howItWorks": "How It Works",
+          "forWhom": "Who It Is For",
+          "askQuestion": "Ask a Question",
+          "startAssessment": "Assess My Needs",
+          "signIn": "Sign In"
         }
       },
       "areas": {
-        "title": "Compliance areas",
+        "title": "Areas of Support",
         "links": {
-          "areasOverview": "All areas",
+          "areasOverview": "All Areas",
           "taxVat": "Tax & VAT",
           "productPackaging": "EPR & Packaging",
           "dataPrivacy": "Data & Privacy",
@@ -1457,28 +1547,21 @@
           "legalAdvisory": "Legal Support"
         }
       },
-      "markets": {
-        "title": "Markets",
-        "links": {
-          "marketsOverview": "All markets",
-          "market_DE": "Germany",
-          "market_FR": "France",
-          "market_US": "United States",
-          "market_UK": "United Kingdom",
-          "market_IT": "Italy",
-          "market_ES": "Spain",
-          "market_NL": "Netherlands",
-          "market_TR": "Türkiye"
-        }
-      },
       "company": {
         "title": "Company",
         "links": {
-          "about": "About",
-          "partner": "Providers",
+          "about": "About CompliHub360",
           "trustSecurity": "Trust & Security",
           "contact": "Contact",
           "support": "Support"
+        }
+      },
+      "providers": {
+        "title": "For Providers",
+        "links": {
+          "join": "Join Our Provider Network",
+          "matching": "How Provider Matching Works",
+          "providerSignIn": "Provider Sign In"
         }
       }
     },
@@ -1486,23 +1569,26 @@
       "pre": "Markets we assess today: ",
       "post": ". Other markets on request."
     },
-    "disclaimer": "CompliHub360 is an orchestration platform — not a law firm. Legal, tax, and regulatory advice is delivered by Verified Providers under their own professional liability. We do not provide Rechtsberatung within the meaning of §§ RDG / StBerG.",
-    "copyright": "© 2026 CompliHub360.",
+    "disclaimer": "CompliHub360 provides compliance information and technology-based matching services. We are not a law firm, accounting firm, tax adviser, customs broker, or regulatory authority, and we do not provide legal, tax, accounting, customs, or other regulated professional advice. Any professional services are provided by independent service providers under their own responsibility and terms.",
+    "copyright": "© 2026 CompliHub360. All rights reserved.",
     "legal": {
       "privacy": "Privacy Policy",
       "terms": "Beta agreement",
-      "imprint": "Impressum",
+      "imprint": "Legal Notice",
       "cookies": "Cookie Policy",
-      "subProcessors": "Sub-Processors"
-    }
+      "subProcessors": "Subprocessor List"
+    },
+    "coverageNote": "Service availability depends on the country, compliance requirement, and coverage within our verified provider network.",
+    "coverageLink": "Explore Markets and Coverage"
   },
   "trustBand": {
-    "eyebrow": "Why both belong together",
+    "eyebrow": "Why CompliHub360 brings both together",
     "title": {
-      "line1": "Platforms know the rules, directories know the people.",
-      "pre": "CompliHub360 closes ",
-      "gold": "both halves",
-      "post": " at once."
-    }
+      "line1": "Clear information and the right professional",
+      "pre": "",
+      "gold": "belong together",
+      "post": "."
+    },
+    "body": "Reliable information helps you understand what matters. Fair matching helps you find the right professional when support is needed."
   }
 }
