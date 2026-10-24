@@ -604,6 +604,27 @@ describe('POST /api/v1/search', () => {
         expect(byId['prod-packaging-conformity'].state).toBe('open');
     });
 
+    // D1 (24.10.2026): die Wizard-v1a-Antworten kommen als `details` in
+    // structured_answers an und werden zu Fakten — nur was die Karte sagt.
+    it('reads the wizard details as facts (D1)', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: {
+                markets: ['DE'], categories: ['product-compliance', 'environment', 'corporate-structure', 'product-packaging'],
+                businessTypeNote: 'D2C e-commerce',
+                details: { situation: 'existing', offering: ['physical'], establishment: ['DE'], stock: ['DE'],
+                    eprProducts: ['electronics', 'batteries-inside'], packaging: ['shipping'] },
+            } }),
+        });
+        const byId = Object.fromEntries((r.body.laws as any[]).map((l) => [l.id, l]));
+        expect(byId['prod-safety']).toMatchObject({ state: 'confirmed' });
+        expect(byId['env-weee-registration']).toMatchObject({ state: 'confirmed', evidence: { supports: ['electronics'] } });
+        expect(byId['env-batteries-epr']).toMatchObject({ state: 'confirmed' });
+        expect(byId['corp-registration']).toMatchObject({ state: 'confirmed', evidence: { supports: ['established_in_market'] } });
+        // Die Verpackungs-Taetigkeit beantwortet die Rollenfrage nicht.
+        expect(byId['prod-epr']).toMatchObject({ state: 'likely', evidence: { decides: ['packaging_role'] } });
+    });
+
     it('survives an unknown engine country (laws empty, providers still scored)', async () => {
         // A provider may support a country the ENGINE has no profile for —
         // matching must keep working, only the laws payload stays empty.

@@ -52,3 +52,64 @@ describe('evidence · scope facts', () => {
     expect(evaluateEvidence('data-privacy', { eu_market: true }).state).toBe('open');
   });
 });
+
+// ─── D1 (24.10.2026): die Wizard-v1a-Antworten als Fakten ────────────────────
+describe('evidence · wizard details (D1)', () => {
+  const facts = (details: Record<string, unknown>, markets = ['DE']) => factsFromAnswers({ markets, details });
+
+  it('Physical products is a yes; only digital or services is a no; unsure is nothing', () => {
+    expect(facts({ offering: ['physical', 'services'] }).physical_goods).toBe(true);
+    expect(facts({ offering: ['digital', 'services'] }).physical_goods).toBe(false);
+    expect(facts({ offering: ['digital', 'deciding'] }).physical_goods).toBeUndefined();
+    expect(facts({ offering: ['not-sure'] }).physical_goods).toBeUndefined();
+    expect(facts({ offering: [] }).physical_goods).toBeUndefined();
+  });
+
+  it('an explicit Physical products beats the SaaS card', () => {
+    expect(factsFromAnswers({ businessTypeNote: 'SaaS / digital', markets: ['DE'], details: { offering: ['physical'] } }).physical_goods).toBe(true);
+  });
+
+  it('EPR cards only ever say yes — an unticked battery card is not a no', () => {
+    expect(facts({ eprProducts: ['electronics'] })).toMatchObject({ electronics: true, physical_goods: true });
+    expect(facts({ eprProducts: ['batteries-inside'] }).batteries).toBe(true);
+    expect(facts({ eprProducts: ['batteries-separate'] }).batteries).toBe(true);
+    const other = facts({ eprProducts: ['other'] });
+    expect(other.physical_goods).toBe(true);
+    expect(other.batteries).toBeUndefined();
+    expect(other.electronics).toBeUndefined();
+    expect(facts({ eprProducts: ['not-sure'] })).toEqual({ eu_market: true });
+  });
+
+  it('established in a market: yes only if it covers every target market', () => {
+    expect(facts({ establishment: ['DE'] }, ['DE']).established_in_market).toBe(true);
+    // Sitz DE, Maerkte DE + NL: die Zeile stuende fuer "DE · NL" — unbekannt.
+    expect(facts({ establishment: ['DE'] }, ['DE', 'NL']).established_in_market).toBeUndefined();
+    expect(facts({ establishment: ['FR'] }, ['DE', 'NL']).established_in_market).toBe(false);
+    expect(facts({ establishment: ['not-yet'] }, ['DE']).established_in_market).toBe(false);
+    expect(facts({ establishment: ['not-sure'] }, ['DE']).established_in_market).toBeUndefined();
+  });
+
+  it('situation, stock and packaging set no fact; deciding questions stay open', () => {
+    const f = facts({ situation: 'existing', stock: ['DE'], packaging: ['packaged', 'shipping'], offering: ['physical'] });
+    expect(f).toEqual({ eu_market: true, physical_goods: true });
+    expect(evaluateEvidence('prod-epr', { ...f, consumer_sales: true }).state).toBe('likely');
+  });
+
+  it('confirms what the answers carry: WEEE, batteries, product safety', () => {
+    const f = factsFromAnswers({
+      businessTypeNote: 'D2C e-commerce',
+      markets: ['DE'],
+      details: { offering: ['physical'], eprProducts: ['electronics', 'batteries-inside'], establishment: ['DE'] },
+    });
+    expect(evaluateEvidence('env-weee-registration', f).state).toBe('confirmed');
+    expect(evaluateEvidence('env-batteries-epr', f).state).toBe('confirmed');
+    expect(evaluateEvidence('prod-safety', f).state).toBe('confirmed');
+    expect(evaluateEvidence('corp-registration', f).state).toBe('confirmed');
+    expect(evaluateEvidence('tax-vat-registration', f).state).toBe('likely');
+  });
+
+  it('ignores malformed details', () => {
+    expect(factsFromAnswers({ markets: ['US'], details: 'x' })).toEqual({});
+    expect(factsFromAnswers({ markets: ['US'], details: { offering: 'physical', eprProducts: [1, null] } })).toEqual({});
+  });
+});

@@ -1027,6 +1027,24 @@ describe('ResultsRiskMap · reopening a saved session', () => {
     expect(saveWizardSession).not.toHaveBeenCalled();
   });
 
+  it('D9: searches with the stored answers, while markets and areas come from the columns', async () => {
+    const details = { situation: 'existing', offering: ['physical'], establishment: ['NL'], stock: [], eprProducts: ['electronics'], packaging: [] };
+    fetchSessions.mockResolvedValue([{
+      id: 's1', country: 'NL', markets: ['NL'], categories: ['data-privacy'], label: 'Netherlands',
+      // Veraltete Maerkte in den Antworten duerfen die Spalten nicht ueberschreiben.
+      answers: { businessTypeNote: 'D2C e-commerce', markets: ['IT'], categories: ['marketing-seo'], details },
+      status: 'active', risk_summary: null,
+      created_at: '2026-09-01T00:00:00Z', updated_at: '2026-09-01T00:00:00Z',
+    }]);
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage('/en/results?session=s1');
+
+    await waitFor(() => expect(runSearch).toHaveBeenCalled());
+    expect(runSearch.mock.calls.at(-1)?.[0]).toMatchObject({
+      country: 'NL', markets: ['NL'], categories: ['data-privacy'], businessTypeNote: 'D2C e-commerce', details,
+    });
+  });
+
   it('fails openly when the session cannot be loaded — no stale profile in its place', async () => {
     fetchSessions.mockRejectedValue(new Error('offline'));
     runSearch.mockResolvedValue({ providers: [], laws: [] });
