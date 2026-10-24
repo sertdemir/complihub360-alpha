@@ -92,7 +92,7 @@ Umgesetzt auf der Startseite (EN), Sektion für Sektion:
     - abgeschlossene Aufträge
   - **Woher:** Die Leistungsdauer ist neu im anonymen Payload, aus `provider_services.completion_days_estimate`, Klasse anonymous. Gerechnet wird über dieselben Leistungen wie die Preisspanne. Ohne Passung steht sie nicht im Payload.
   - **„Book a Consultation“:** öffnet die Schublade direkt im Termin-Schritt. Ist der Anbieter nicht buchbar, springt sie ins Profil mit dem Grund zurück. „View details“ bleibt als Textlink.
-  - **Offen:** „Add to Selection“. Es gibt keine Auswahl- oder Merkliste (`/dashboard/saved-providers` ist „Coming soon“). Ein Knopf ohne Wirkung wäre eine leere Zusage. **Zur Entscheidung beim Nutzer.**
+  - **Zurückgestellt:** „Add to Selection“. Es gibt keine Auswahl- oder Merkliste (`/dashboard/saved-providers` ist „Coming soon“), und ein Knopf ohne Wirkung wäre eine leere Zusage. Der Nutzer hat am 24.10.2026 entschieden: kommt zusammen mit „Saved providers“.
 - **Lokalisierung:** DE, ES und TR tragen den alten Satz und fallen für neue Schlüssel auf EN zurück (Entscheidung 09.10.2026).
 - **Unterseiten:** `/how-it-works` und das Dashboard gehören nicht zum Handover. Ihre Zwischentitel und Dashboard-Labels sind unverändert.
 
