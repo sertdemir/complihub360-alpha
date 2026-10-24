@@ -179,3 +179,39 @@ describe('PartnerDrawer · startAt', () => {
     expect(screen.queryByRole('group', { name: 'schedule.title' })).not.toBeInTheDocument();
   });
 });
+
+// ─── Silent-Failure-Befunde zu startAt (24.10.2026) ──────────────────────────
+describe('PartnerDrawer · startAt ehrlich', () => {
+  beforeEach(() => {
+    fetchAcknowledgement.mockReset().mockResolvedValue(null);
+  });
+
+  it('Anbieter nicht mehr gelistet: zurueck ins Profil mit dem Hinweis', async () => {
+    fetchSlots.mockReset().mockResolvedValue([]);
+    fetchProviderDetail.mockReset().mockResolvedValue(null);
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    expect(await screen.findByText('detail.notFoundBody')).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'schedule.title' })).not.toBeInTheDocument();
+  });
+
+  it('Termine nicht ladbar: eigener Satz und Wiederholen, nicht "keine freien Termine"', async () => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, bookable_chargeable: true });
+    fetchSlots.mockReset().mockRejectedValueOnce(new Error('500')).mockResolvedValue(['2026-10-01T09:00:00.000Z']);
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    expect(await screen.findByText('schedule.slotsFailed')).toBeInTheDocument();
+    expect(screen.queryByText('schedule.noSlots')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'schedule.slotsRetry' }));
+    await waitFor(() => expect(screen.queryByText('schedule.slotsFailed')).not.toBeInTheDocument());
+    expect(fetchSlots).toHaveBeenCalledTimes(2);
+  });
+
+  it('solange das Profil laedt, bleibt der Buchungsknopf gesperrt', async () => {
+    fetchSlots.mockReset().mockResolvedValue(['2026-10-01T09:00:00.000Z']);
+    fetchAcknowledgement.mockReset().mockResolvedValue({ version: 'v1', language: 'en', body: 'a', sharedFields: ['email'], userDiscount: { pct: 10, policyVersion: 1 }, lines: ['a'] });
+    fetchProviderDetail.mockReset().mockReturnValue(new Promise(() => {}));
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    await screen.findByRole('group', { name: 'schedule.title' });
+    await waitFor(() => expect(fetchAcknowledgement).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: /detail\.bookCta/ })).toBeDisabled();
+  });
+});

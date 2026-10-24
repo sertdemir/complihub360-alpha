@@ -79,6 +79,27 @@ describe('prioritiesCoveredBy', () => {
     expect(prioritiesCoveredBy(laws, [{}, { radar: true }, {}, {}, { radar: true }], BASE)).toEqual({ immediate: 1, high: 1 });
   });
 
+  it('Live-Format: domain als Engine-Enum, PRODUCT getrennt nach Subdomain', () => {
+    const live = [
+      { id: 'tax-vat-registration', domain: 'TAX', severity: 'critical' },
+      { id: 'prod-safety', domain: 'PRODUCT', severity: 'high' },
+      { id: 'prod-packaging', domain: 'PRODUCT', severity: 'medium' },
+    ] as SearchLaw[];
+    const verpackung = { match_basis: { country: 'DE', country_covered: true, domains_requested: ['product-packaging'], domains_matched: ['product-packaging'] } };
+    const produkt = { match_basis: { country: 'DE', country_covered: true, domains_requested: ['product-compliance'], domains_matched: ['product-compliance'] } };
+    expect(prioritiesCoveredBy(live, live.map(() => ({})), BASE)).toEqual({ immediate: 1 });
+    expect(prioritiesCoveredBy(live, live.map(() => ({})), verpackung)).toEqual({ medium: 1 });
+    expect(prioritiesCoveredBy(live, live.map(() => ({})), produkt)).toEqual({ high: 1 });
+  });
+
+  it('erledigt oder nicht zutreffend zaehlt nicht', () => {
+    const live = [
+      { id: 'a', domain: 'TAX', severity: 'critical' },
+      { id: 'b', domain: 'TAX', severity: 'high' },
+    ] as SearchLaw[];
+    expect(prioritiesCoveredBy(live, live.map(() => ({})), BASE, new Set(['a']))).toEqual({ high: 1 });
+  });
+
   it('ohne match_basis: nichts', () => {
     expect(prioritiesCoveredBy(laws, laws.map(() => ({})), { match_basis: undefined })).toEqual({});
   });

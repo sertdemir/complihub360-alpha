@@ -246,7 +246,9 @@
         "nothingShared": "Nothing was shared with the provider",
         "kept": "Your selection and message are kept"
       }
-    }
+    },
+    "slotsFailed": "We couldn’t load the available times. This says nothing about the provider’s availability.",
+    "slotsRetry": "Try again"
   },
   "search": {
     "navGuided": "Assess My Needs",

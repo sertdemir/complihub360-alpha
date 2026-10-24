@@ -49,7 +49,7 @@ const SUBDOMAIN_SLUG_OVERRIDE: Record<string, DomainSlug> = {
   'monitor-kyb': 'corporate-structure',  // GwG + Transparenzregister
 };
 
-function slugForSubdomain(subdomainId: string, domain: ComplianceDomain): DomainSlug {
+export function slugForSubdomain(subdomainId: string, domain: ComplianceDomain): DomainSlug {
   return SUBDOMAIN_SLUG_OVERRIDE[subdomainId] ?? DOMAIN_TO_SLUGS[domain][0];
 }
 

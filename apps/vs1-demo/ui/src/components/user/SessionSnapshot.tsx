@@ -297,8 +297,9 @@ export function SessionSnapshot({
   onProviderDetails: (publicRef: string) => void;
   /** Handover 1.0 §5: "Book a Consultation" auf der Karte. */
   onProviderBook?: (publicRef: string) => void;
-  /** Handover 1.0 §5: abgedeckte Pflichten der Karte je Stufe. */
-  providerPriorities?: (p: AnonProvider) => Partial<Record<Priority, number>>;
+  /** Handover 1.0 §5: abgedeckte Pflichten der Karte je Stufe. `settled`:
+   *  Pflicht-IDs, die der Nutzer erledigt oder als nicht zutreffend markiert hat. */
+  providerPriorities?: (p: AnonProvider, settled: ReadonlySet<string>) => Partial<Record<Priority, number>>;
   /** Die Partner-Schublade des Aufrufers (Canvas 1C) — sie haengt am Zustand
    *  der Seite, nicht an dieser Darstellung. */
   partnerDrawer?: React.ReactNode;
@@ -350,6 +351,7 @@ export function SessionSnapshot({
 
   const taskOf = (row: SnapshotRow): ObligationStatus =>
     (row.obligationId && tasks[row.obligationId]) || 'open';
+  const settled = new Set(rows.filter((r) => r.obligationId && ['done', 'not_applicable'].includes(taskOf(r))).map((r) => r.obligationId!));
   const statusRowOf = (row: SnapshotRow) => (row.obligationId ? statusRows[row.obligationId] : undefined);
 
   // Optimistisch setzen, bei Fehler zurueckdrehen — ein Haken, der bleibt
@@ -529,7 +531,7 @@ export function SessionSnapshot({
                     booking={bookings?.[p.public_ref] ?? null}
                     onDetails={() => onProviderDetails(p.public_ref)}
                     onBook={onProviderBook ? () => onProviderBook(p.public_ref) : undefined}
-                    priorities={providerPriorities?.(p)}
+                    priorities={providerPriorities?.(p, settled)}
                   />
                 ))}
               </motion.aside>

@@ -240,7 +240,9 @@
       "pickOtherSlot": "Elegir otra franja",
       "reread": "Leer las condiciones actualizadas",
       "keepNote": "Su mensaje y su selección se conservan."
-    }
+    },
+    "slotsFailed": "No hemos podido cargar los horarios disponibles. Esto no dice nada sobre la disponibilidad del proveedor.",
+    "slotsRetry": "Intentar de nuevo"
   },
   "search": {
     "navGuided": "Evaluar mis necesidades",
