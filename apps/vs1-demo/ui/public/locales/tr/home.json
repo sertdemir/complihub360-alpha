@@ -166,7 +166,8 @@
       "markets": "Pazarlar",
       "operations": "Faaliyet",
       "domains": "Alanlar",
-      "review": "Özet"
+      "review": "Özet",
+      "business": "İşletme"
     },
     "saveProgress": "İlerlemeyi kaydet",
     "steps": {
@@ -181,6 +182,30 @@
       "domains": {
         "title": "Hangi uyum alanları sizi ilgilendiriyor?",
         "subtitle": "Çoklu seçim. Bu alanlardaki yükümlülükleri önceliklendiririz."
+      },
+      "situation": {
+        "title": "Durumunuzu en iyi hangisi tanımlıyor?",
+        "subtitle": "Birini seçin. Sonraki soruları bu belirler."
+      },
+      "offering": {
+        "title": "Ne satıyor veya sunuyorsunuz?",
+        "subtitle": "Çoklu seçim."
+      },
+      "establishment": {
+        "title": "İşletmeniz nerede kurulu?",
+        "subtitle": "{{markets}} pazarlarına satış yapıyorsunuz. İşletmeniz bu ülkelerden birinde kayıtlı mı?"
+      },
+      "stock": {
+        "title": "Stoğunuzu nerede tutuyorsunuz?",
+        "subtitle": "Çoklu seçim; fulfillment ve pazaryeri depoları dahil. Yalnızca fiziksel ürün sattığınız için soruluyor."
+      },
+      "eprProducts": {
+        "title": "Hangi ürünleri satıyor veya satmayı planlıyorsunuz?",
+        "subtitle": "EPR ve Ambalaj · soru 1/2. Çoklu seçim. Piller bu sorunun parçasıdır."
+      },
+      "packaging": {
+        "title": "Hangi ambalaj faaliyetleri geçerli?",
+        "subtitle": "EPR ve Ambalaj · soru 2/2. Çoklu seçim."
       }
     },
     "cards": {
@@ -279,6 +304,88 @@
       "environment": {
         "title": "Çevre",
         "desc": "WEEE, piller, maddeler"
+      },
+      "sitExisting": {
+        "title": "Mevcut işletme / serbest çalışan",
+        "desc": "Zaten satış yapıyor veya hizmet veriyorsunuz"
+      },
+      "sitStarting": {
+        "title": "İşletme kuruyorum",
+        "desc": "Planlıyor veya kuruyorsunuz"
+      },
+      "sitNotSure": {
+        "title": "Emin değilim",
+        "desc": "Hiçbirini varsaymadan devam ediyoruz"
+      },
+      "offPhysical": {
+        "title": "Fiziksel ürünler",
+        "desc": "Gönderdiğiniz veya teslim ettiğiniz mallar"
+      },
+      "offDigital": {
+        "title": "Dijital ürünler / yazılım",
+        "desc": "İndirmeler, uygulamalar, abonelikler"
+      },
+      "offServices": {
+        "title": "Hizmetler",
+        "desc": "Müşteriler için yaptığınız işler"
+      },
+      "offDeciding": {
+        "title": "Henüz karar vermedim",
+        "desc": "Henüz netleşmedi"
+      },
+      "notSure": {
+        "title": "Emin değilim",
+        "desc": "Sorun değil — özet adımında değiştirebilirsiniz"
+      },
+      "estMarket": {
+        "desc": "Pazarlarınızdan biri"
+      },
+      "estNotYet": {
+        "title": "Henüz kurulmadı",
+        "desc": "Kuruluş aşamasında"
+      },
+      "stockMarket": {
+        "desc": "Burada satış yapıyorsunuz"
+      },
+      "stockNone": {
+        "title": "Stok tutulmuyor",
+        "desc": "Dropshipping veya siparişe göre üretim"
+      },
+      "eprElectronics": {
+        "title": "Elektrikli veya elektronik ürünler",
+        "desc": "Fişi veya pili olan her şey"
+      },
+      "eprBatteriesInside": {
+        "title": "Pilli ürünler",
+        "desc": "Pil üründe yerleşik veya ürünle birlikte veriliyor"
+      },
+      "eprBatteriesSeparate": {
+        "title": "Ayrı satılan piller",
+        "desc": "Tekli piller veya paketler"
+      },
+      "eprOther": {
+        "title": "Diğer fiziksel ürünler",
+        "desc": "Gönderdiğiniz diğer her şey"
+      },
+      "pkgPackaged": {
+        "title": "Ambalajlı ürün satmak",
+        "desc": "Ürünler ambalajlı olarak gelir"
+      },
+      "pkgRepack": {
+        "title": "Ürünleri ambalajlamak veya yeniden ambalajlamak",
+        "desc": "Ürünleri ambalaja siz koyarsınız"
+      },
+      "pkgShipping": {
+        "title": "Gönderim ambalajı eklemek",
+        "desc": "Kutular, dolgu malzemesi, zarflar"
+      },
+      "pkgEmpty": {
+        "title": "Boş ambalaj üretmek veya satmak",
+        "desc": "Ambalaj sizin ürününüz"
+      },
+      "pkgNone": {
+        "title": "Ambalaj yok",
+        "desc": "Hiçbir şey ambalajlanmıyor veya gönderilmiyor"
       }
     },
     "footer": {
@@ -291,14 +398,24 @@
       "operations": "Faaliyet",
       "domains": "Uyum alanları",
       "edit": "Düzenle",
-      "trust": "Anonim · Risk Map'inizi görmek için hesap gerekmez · ~4 saniyede işlenir"
+      "trust": "Anonim · Risk Map'inizi görmek için hesap gerekmez · ~4 saniyede işlenir",
+      "business": "İşletmeniz",
+      "offering": "Sattıklarınız",
+      "marketsStock": "Pazarlar · stok",
+      "epr": "EPR ve Ambalaj",
+      "notSure": "Emin değilim — hâlâ açık",
+      "establishedIn": "kuruluş yeri",
+      "establishmentOpen": "kuruluş:",
+      "stockIn": "stok yeri",
+      "stockOpen": "stok:"
     },
     "skipHint": "Emin değil misiniz? En uygun olanı seçin — haritanızı oluşturmadan önce her yanıtı değiştirebilirsiniz.",
     "needsMarket": "Devam etmek için en az bir pazar seçin.",
     "back": "Geri",
     "generate": "Risk Map'imi oluştur",
     "removeMarket": "{{market}} seçimini kaldır",
-    "aboutMarket": "{{market}} hakkında"
+    "aboutMarket": "{{market}} hakkında",
+    "situationHint": "Kişisel bir konu mu? CompliHub360 şimdilik işletmeler için tasarlandı — yerel bir danışma merkezi daha iyi bir ilk adımdır."
   },
   "marketsDrawer": {
     "header": "Pazarlar",
@@ -362,6 +479,11 @@
         "name": "Portekiz",
         "desc": "AB-KDV · SAF-T dosya biçimi"
       }
+    },
+    "countries": {
+      "title": "Diğer ülkeler",
+      "desc": "Geçerli olan tüm ülkeleri seçin.",
+      "main": "Ana pazarlar"
     }
   },
   "countryInfo": {

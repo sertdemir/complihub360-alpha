@@ -167,7 +167,8 @@
       "markets": "Markets",
       "operations": "Operations",
       "domains": "Areas",
-      "review": "Review"
+      "review": "Review",
+      "business": "Business"
     },
     "saveProgress": "Save progress",
     "steps": {
@@ -182,6 +183,30 @@
       "domains": {
         "title": "Which compliance areas concern you?",
         "subtitle": "Multi-select. We prioritize the obligations in these areas."
+      },
+      "situation": {
+        "title": "Which best describes your situation?",
+        "subtitle": "Choose one. It decides which questions follow."
+      },
+      "offering": {
+        "title": "What do you sell or provide?",
+        "subtitle": "Multi-select."
+      },
+      "establishment": {
+        "title": "Where is your business established?",
+        "subtitle": "You sell to {{markets}}. Is your business registered in one of these countries?"
+      },
+      "stock": {
+        "title": "Where do you hold stock?",
+        "subtitle": "Multi-select, including fulfilment and marketplace warehouses. Asked only because you sell physical products."
+      },
+      "eprProducts": {
+        "title": "Which products do you sell or plan to sell?",
+        "subtitle": "EPR & Packaging · question 1 of 2. Multi-select. Batteries are part of this question."
+      },
+      "packaging": {
+        "title": "Which packaging activities apply?",
+        "subtitle": "EPR & Packaging · question 2 of 2. Multi-select."
       }
     },
     "cards": {
@@ -280,6 +305,88 @@
       "environment": {
         "title": "Environmental",
         "desc": "WEEE, batteries, substances"
+      },
+      "sitExisting": {
+        "title": "Existing business / self-employed",
+        "desc": "You already sell or provide services"
+      },
+      "sitStarting": {
+        "title": "Starting a business",
+        "desc": "You are planning or setting up"
+      },
+      "sitNotSure": {
+        "title": "Not sure",
+        "desc": "We continue without assuming either"
+      },
+      "offPhysical": {
+        "title": "Physical products",
+        "desc": "Goods you ship or hand over"
+      },
+      "offDigital": {
+        "title": "Digital products / software",
+        "desc": "Downloads, apps, subscriptions"
+      },
+      "offServices": {
+        "title": "Services",
+        "desc": "Work you do for customers"
+      },
+      "offDeciding": {
+        "title": "Still deciding",
+        "desc": "Not settled yet"
+      },
+      "notSure": {
+        "title": "Not sure",
+        "desc": "No problem — you can change it on the review step"
+      },
+      "estMarket": {
+        "desc": "One of your markets"
+      },
+      "estNotYet": {
+        "title": "Not established yet",
+        "desc": "Still being set up"
+      },
+      "stockMarket": {
+        "desc": "You sell here"
+      },
+      "stockNone": {
+        "title": "No stock held",
+        "desc": "Drop shipping or made to order"
+      },
+      "eprElectronics": {
+        "title": "Electrical or electronic products",
+        "desc": "Anything with a plug or battery"
+      },
+      "eprBatteriesInside": {
+        "title": "Products with batteries",
+        "desc": "Batteries built in or supplied with the product"
+      },
+      "eprBatteriesSeparate": {
+        "title": "Batteries sold separately",
+        "desc": "Loose batteries or packs"
+      },
+      "eprOther": {
+        "title": "Other physical products",
+        "desc": "Everything else you ship"
+      },
+      "pkgPackaged": {
+        "title": "Sell already packaged products",
+        "desc": "Products arrive in their packaging"
+      },
+      "pkgRepack": {
+        "title": "Pack or repack products",
+        "desc": "You put products into packaging"
+      },
+      "pkgShipping": {
+        "title": "Add shipping packaging",
+        "desc": "Boxes, fillers, mailers"
+      },
+      "pkgEmpty": {
+        "title": "Make or sell empty packaging",
+        "desc": "Packaging is your product"
+      },
+      "pkgNone": {
+        "title": "No packaging",
+        "desc": "Nothing is packed or shipped"
       }
     },
     "footer": {
@@ -292,14 +399,24 @@
       "operations": "Operations",
       "domains": "Compliance areas",
       "edit": "Edit",
-      "trust": "Anonymous · No account required to see your risk map · Processed in ~4 seconds"
+      "trust": "Anonymous · No account required to see your risk map · Processed in ~4 seconds",
+      "business": "Your business",
+      "offering": "You sell",
+      "marketsStock": "Markets · stock",
+      "epr": "EPR & Packaging",
+      "notSure": "Not sure — still open",
+      "establishedIn": "established in",
+      "establishmentOpen": "established:",
+      "stockIn": "stock in",
+      "stockOpen": "stock:"
     },
     "skipHint": "Not sure? Choose what fits best — you can change every answer before you create your map.",
     "needsMarket": "Choose at least one market to continue.",
     "back": "Back",
     "generate": "Create my Risk Map",
     "removeMarket": "Remove {{market}}",
-    "aboutMarket": "About {{market}}"
+    "aboutMarket": "About {{market}}",
+    "situationHint": "A personal matter? CompliHub360 is built for businesses for now — a local advice centre is the better first step."
   },
   "marketsDrawer": {
     "header": "Markets",
@@ -363,6 +480,11 @@
         "name": "Portugal",
         "desc": "EU-VAT · SAF-T file format"
       }
+    },
+    "countries": {
+      "title": "Other countries",
+      "desc": "Choose every country that applies.",
+      "main": "Main markets"
     }
   },
   "countryInfo": {
