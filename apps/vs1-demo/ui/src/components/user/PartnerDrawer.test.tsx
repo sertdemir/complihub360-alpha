@@ -156,3 +156,62 @@ describe('PartnerDrawer · Nachweise wie auf der Karte', () => {
     expect(screen.queryByText('rankBasis.never')).not.toBeInTheDocument();
   });
 });
+
+// ─── Handover 1.0 §5 · "Book a Consultation" ─────────────────────────────────
+// Der Knopf auf der Karte oeffnet die Schublade direkt im Termin-Schritt. Ist
+// der Anbieter nicht buchbar, faellt sie ins Profil zurueck, das den Grund nennt.
+describe('PartnerDrawer · startAt', () => {
+  beforeEach(() => {
+    fetchSlots.mockReset().mockResolvedValue([]);
+    fetchAcknowledgement.mockReset().mockResolvedValue(null);
+  });
+
+  it('startAt="termin": die Terminwahl steht sofort', async () => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, bookable_chargeable: true });
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    expect(await screen.findByRole('group', { name: 'schedule.title' })).toBeInTheDocument();
+  });
+
+  it('nicht buchbar: zurueck ins Profil mit dem Hinweis, keine Terminwahl', async () => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, bookable_chargeable: false });
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    expect(await screen.findByText('detail.notBookableNote')).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'schedule.title' })).not.toBeInTheDocument();
+  });
+});
+
+// ─── Silent-Failure-Befunde zu startAt (24.10.2026) ──────────────────────────
+describe('PartnerDrawer · startAt ehrlich', () => {
+  beforeEach(() => {
+    fetchAcknowledgement.mockReset().mockResolvedValue(null);
+  });
+
+  it('Anbieter nicht mehr gelistet: zurueck ins Profil mit dem Hinweis', async () => {
+    fetchSlots.mockReset().mockResolvedValue([]);
+    fetchProviderDetail.mockReset().mockResolvedValue(null);
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    expect(await screen.findByText('detail.notFoundBody')).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'schedule.title' })).not.toBeInTheDocument();
+  });
+
+  it('Termine nicht ladbar: eigener Satz und Wiederholen, nicht "keine freien Termine"', async () => {
+    fetchProviderDetail.mockReset().mockResolvedValue({ ...DETAIL, bookable_chargeable: true });
+    fetchSlots.mockReset().mockRejectedValueOnce(new Error('500')).mockResolvedValue(['2026-10-01T09:00:00.000Z']);
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    expect(await screen.findByText('schedule.slotsFailed')).toBeInTheDocument();
+    expect(screen.queryByText('schedule.noSlots')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'schedule.slotsRetry' }));
+    await waitFor(() => expect(screen.queryByText('schedule.slotsFailed')).not.toBeInTheDocument());
+    expect(fetchSlots).toHaveBeenCalledTimes(2);
+  });
+
+  it('solange das Profil laedt, bleibt der Buchungsknopf gesperrt', async () => {
+    fetchSlots.mockReset().mockResolvedValue(['2026-10-01T09:00:00.000Z']);
+    fetchAcknowledgement.mockReset().mockResolvedValue({ version: 'v1', language: 'en', body: 'a', sharedFields: ['email'], userDiscount: { pct: 10, policyVersion: 1 }, lines: ['a'] });
+    fetchProviderDetail.mockReset().mockReturnValue(new Promise(() => {}));
+    render(<MemoryRouter><PartnerDrawer open onClose={() => {}} provider={PROVIDER} startAt="termin" /></MemoryRouter>);
+    await screen.findByRole('group', { name: 'schedule.title' });
+    await waitFor(() => expect(fetchAcknowledgement).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: /detail\.bookCta/ })).toBeDisabled();
+  });
+});

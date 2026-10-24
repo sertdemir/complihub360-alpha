@@ -240,7 +240,9 @@
       "pickOtherSlot": "Anderen Termin wählen",
       "reread": "Aktualisierte Bedingungen lesen",
       "keepNote": "Ihre Nachricht und Ihre Auswahl bleiben erhalten."
-    }
+    },
+    "slotsFailed": "Die freien Termine konnten nicht geladen werden. Über die Verfügbarkeit des Anbieters sagt das nichts.",
+    "slotsRetry": "Erneut versuchen"
   },
   "search": {
     "navGuided": "Meinen Bedarf ermitteln",

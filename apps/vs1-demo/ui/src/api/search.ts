@@ -62,6 +62,9 @@ export interface AnonProvider {
    *  (Klasse anonymous). null: kein Preis hinterlegt oder mehrere Waehrungen —
    *  die Oberflaeche sagt dann "Pricing on request.". */
   price_range?: PriceRange | null;
+  /** Geschaetzte Leistungsdauer in Tagen ueber dieselben Leistungen wie die
+   *  Spanne (Handover 1.0 §5). null: keine Schaetzung — keine Zeile. */
+  timeline_days?: { min: number; max: number } | null;
   /** Die angefragten Maerkte, in denen dieser Anbieter freigegeben ist. */
   markets_covered?: string[];
 }

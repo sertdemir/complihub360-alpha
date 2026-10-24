@@ -20,6 +20,7 @@ interface MatchableRow {
   price_min?: number | string | null;
   price_max?: number | string | null;
   currency?: string | null;
+  completion_days_estimate?: number | string | null;
 }
 
 export interface PublicCoverage {
@@ -78,4 +79,23 @@ export function priceRangeOf(rows: MatchableRow[], areas: string[]): PriceRange 
     max: maxs.length ? Math.max(...maxs) : null,
     currency: [...currencies][0],
   };
+}
+
+export interface TimelineRange {
+  min: number;
+  max: number;
+}
+
+/** Geschaetzte Leistungsdauer in Tagen ueber dieselben Leistungen wie die
+ *  Preisspanne (Handover 1.0 §5, "Estimated service timeline"). Die Angabe
+ *  ist Klasse anonymous (Register: provider_services.completion_days_estimate).
+ *  Ohne Schaetzung: null — die Oberflaeche zeigt dann keine Zeile, statt
+ *  eine Dauer zu erfinden. Eine Behoerden-Bearbeitungszeit ist das nicht. */
+export function timelineRangeOf(rows: MatchableRow[], areas: string[]): TimelineRange | null {
+  const days = rows
+    .filter((r) => !areas.length || (r.area_code && areas.includes(r.area_code)))
+    .map((r) => (r.completion_days_estimate == null ? null : Number(r.completion_days_estimate)))
+    .filter((n): n is number => n != null && Number.isInteger(n) && n >= 0);
+  if (!days.length) return null;
+  return { min: Math.min(...days), max: Math.max(...days) };
 }

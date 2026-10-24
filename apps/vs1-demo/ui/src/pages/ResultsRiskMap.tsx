@@ -53,6 +53,10 @@ import {
   useMarketRequests,
 } from '../components/results/MarketRequest';
 import { topMatches } from '../lib/topMatches';
+import { priorityOf, type Priority } from '../lib/priority';
+import { slugForSubdomain } from '../lib/areaProfiles';
+import { DOMAIN_BY_SLUG } from '../lib/domains';
+import { ComplianceDomain } from '@complihub/compliance-engine';
 
 /** J3: ab hier gilt das Laden als "laenger als erwartet" (Entscheidung 2026-10-09). */
 const DELAYED_AFTER_MS = 8000;
@@ -141,6 +145,40 @@ type RiskT = TFunction<['results', 'common']>;
 // denselben drei Funktionen. Bis 2026-09-22 hatte die Sitzungsseite keine
 // eigene Abbildung und nahm deshalb die Design-Fixture — jede Sitzung
 // exportierte dieselben acht erfundenen Pflichten.
+
+/** Bereich (Wizard-Slug) einer Pflicht. Die Engine liefert `domain` als
+ *  Enum ('TAX', 'PRODUCT' …); PRODUCT teilt sich in Verpackung und Produkt-
+ *  Compliance, deshalb ueber die Subdomain (lib/areaProfiles). Ein Slug als
+ *  `domain` (aeltere Payloads, Mock) gilt unveraendert. */
+function areaSlugOfLaw(l: SearchLaw): string | null {
+  if (!l.domain) return null;
+  if (DOMAIN_BY_SLUG[l.domain]) return l.domain;
+  return (Object.values(ComplianceDomain) as string[]).includes(l.domain)
+    ? slugForSubdomain(l.id, l.domain as ComplianceDomain)
+    : null;
+}
+
+/** Handover 1.0 §5 "Relevant priorities covered": die Pflichten dieser Karte
+ *  in Bereichen, die der Anbieter abdeckt, nach Stufe. `rows[i]` gehoert zu
+ *  `laws[i]` (liveObligations bildet 1:1 ab). Nicht mit: "On the radar" und
+ *  was der Nutzer als erledigt oder nicht zutreffend markiert hat (`settled`)
+ *  — sonst stuende dort ein Bedarf, den es nicht mehr gibt. */
+export function prioritiesCoveredBy(
+  laws: SearchLaw[],
+  rows: Pick<Obligation, 'radar'>[],
+  p: Pick<AnonProvider, 'match_basis'>,
+  settled: ReadonlySet<string> = new Set(),
+): Partial<Record<Priority, number>> {
+  const matched = new Set(p.match_basis?.domains_matched ?? []);
+  const out: Partial<Record<Priority, number>> = {};
+  laws.forEach((l, i) => {
+    const area = areaSlugOfLaw(l);
+    if (!area || !matched.has(area) || !l.severity || rows[i]?.radar || settled.has(l.id)) return;
+    const k = priorityOf(l.severity);
+    out[k] = (out[k] ?? 0) + 1;
+  });
+  return out;
+}
 
 /** Engine-Pflichten → Tabellenzeilen. Nur Pflichten mit `severity` zaehlen;
  *  die uebrigen sind Knowledge-Treffer ohne Bewertung. */
@@ -280,6 +318,7 @@ export function ResultsRiskMap() {
   // Partner oeffnen als Schublade ueber der Sitzung (Canvas 1C, 2026-09-15) —
   // wie auf der Bereichsseite. Kein Seitenwechsel, die Ergebnisse bleiben stehen.
   const [partnerOpen, setPartnerOpen] = useState<AnonProvider | null>(null);
+  const [partnerStart, setPartnerStart] = useState<'profil' | 'termin'>('profil');
   // Termine des Nutzers je Anbieter: wo einer liegt, traegt die Karte den
   // Klarnamen statt des Pseudonyms (Stufe 3).
   const [booked, setBooked] = useState<BookingByKey>({});
@@ -457,6 +496,7 @@ export function ResultsRiskMap() {
   // eine Map, die man speichern kann, und eine Aussage "what applies to you".
   const hasResult = pageState === 'live' || pageState === 'none';
   const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale) : [];
+  const prioritiesCovered = (p: AnonProvider, settled: ReadonlySet<string>) => prioritiesCoveredBy(liveLaws, rows, p, settled);
   // F1: Stufe je Pflicht aus den Antworten. Aeltere Zustaende ('answer')
   // zaehlen als offen — sie sind ebenfalls noch keine Aussage.
   const evidenceOf = (o: Obligation): 'confirmed' | 'likely' | 'open' =>
@@ -622,7 +662,7 @@ export function ResultsRiskMap() {
       <LimitedCoverageCard
         coverage={searchData.coverage}
         asGuest={!user}
-        onReviewMatch={() => setPartnerOpen(shownProviders[0])}
+        onReviewMatch={() => { setPartnerStart('profil'); setPartnerOpen(shownProviders[0]); }}
       />
     ) : <ProviderStateHead count={shownProviders.length} />;
 
@@ -689,11 +729,14 @@ export function ResultsRiskMap() {
         // Mit gespeicherter Sitzung oeffnet sich die Schublade; ohne (Fixture,
         // Gast-Profil) bleibt der Weg zum Erst-Wizard.
         onEditAnswers={() => (sessionId && session ? setAnswersOpen(true) : navigate(`/${locale}/wizard`))}
-        onProviderDetails={(ref) => setPartnerOpen(anonProviders.find((p) => p.public_ref === ref) ?? null)}
+        onProviderDetails={(ref) => { setPartnerStart('profil'); setPartnerOpen(anonProviders.find((p) => p.public_ref === ref) ?? null); }}
+        onProviderBook={(ref) => { setPartnerStart('termin'); setPartnerOpen(anonProviders.find((p) => p.public_ref === ref) ?? null); }}
+        providerPriorities={prioritiesCovered}
         partnerDrawer={
           <PartnerDrawer
+            startAt={partnerStart}
             open={partnerOpen !== null}
-            onClose={() => setPartnerOpen(null)}
+            onClose={() => { setPartnerOpen(null); setPartnerStart('profil'); }}
             provider={partnerOpen}
             basisNode={partnerOpen?.match_basis ? <MatchBasis basis={partnerOpen.match_basis} /> : undefined}
             sessionId={sessionId}

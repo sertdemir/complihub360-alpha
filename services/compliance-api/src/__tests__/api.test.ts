@@ -2405,6 +2405,7 @@ describe('Wizard-Audit F2: ohne Bereichs-Ueberschneidung kein Prozentwert', () =
         expect(p).not.toHaveProperty('match');
         expect(p).not.toHaveProperty('match_tier');
         expect(p).not.toHaveProperty('price_range');
+        expect(p).not.toHaveProperty('timeline_days');
         expect(p.match_basis.domains_matched).toEqual([]);
         expect(p.letter).toBe('A');
         expect(Object.keys(p).join(' ')).not.toMatch(/provider_key|pseudonym_label|contact|website/);

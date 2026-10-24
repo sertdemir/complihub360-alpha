@@ -240,7 +240,9 @@
       "pickOtherSlot": "Başka saat seç",
       "reread": "Güncellenen koşulları oku",
       "keepNote": "Mesajınız ve seçiminiz korunur."
-    }
+    },
+    "slotsFailed": "Uygun saatler yüklenemedi. Bu, sağlayıcının müsaitliği hakkında bir şey söylemez.",
+    "slotsRetry": "Tekrar dene"
   },
   "search": {
     "navGuided": "İhtiyaçlarımı değerlendir",

@@ -61,8 +61,11 @@ import type { AnonProvider } from '../../api/search';
 type Detail = { kind: 'loading' } | { kind: 'ready'; d: ProviderDetail } | { kind: 'missing' } | { kind: 'error' };
 type Step = 'profil' | 'termin';
 
-export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, sessionLabel, requestScope, opportunity, booking, onBooked }: {
+export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, sessionLabel, requestScope, opportunity, booking, onBooked, startAt = 'profil' }: {
   open: boolean;
+  /** Handover 1.0 §5: "Book a Consultation" auf der Karte oeffnet direkt den
+   *  Termin-Schritt, "View details" das Profil. */
+  startAt?: 'profil' | 'termin';
   onClose: () => void;
   /** Die Sitzung hinter der Suche — Bereich und Maerkte der Opportunity
    *  kommen daraus; ohne Sitzung leitet der Server sie aus dem Angebot ab. */
@@ -100,6 +103,9 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   const [detail, setDetail] = useState<Detail>({ kind: 'loading' });
   const [step, setStep] = useState<Step>('profil');
   const [slots, setSlots] = useState<string[] | null>(null);
+  // Ein Abruffehler ist keine Auskunft ueber den Anbieter: er bekommt einen
+  // eigenen Zustand statt der leeren Liste ("keine freien Termine").
+  const [slotsFailed, setSlotsFailed] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -124,16 +130,33 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
 
   // Jeder neu geoeffnete Anbieter faengt beim Profil an — sonst stuende der
   // naechste Anbieter im Buchungsschritt des vorigen.
+  // Nur ob, nicht welcher Termin: das Objekt entsteht je Rendern neu und
+  // wuerde den Schritt sonst laufend zuruecksetzen.
+  const hasBooking = !!booking;
   useEffect(() => {
     if (!open) return;
-    setStep('profil');
+    setStep(hasBooking ? 'profil' : startAt);
     setSelected(null);
     setMessage(sessionMessage ?? '');
     setSending(false);
     setFailure(null);
     setReviewOpen(false);
     setSlotTried(false);
-  }, [open, key, sessionMessage]);
+  }, [open, key, sessionMessage, startAt, hasBooking]);
+
+  // Nicht buchbar, nicht mehr gelistet oder nicht ladbar: zurueck ins Profil,
+  // das den Grund nennt — kein Termin-Schritt, der in die 409 fuehrt (wie
+  // 2026-10-01 entschieden) oder einen Ladefehler als "keine Termine" ausgibt.
+  // Eine offene Pruefung und ein gewaehlter Termin fallen mit.
+  useEffect(() => {
+    if (step !== 'termin') return;
+    const blocked = detail.kind === 'missing' || detail.kind === 'error'
+      || (detail.kind === 'ready' && detail.d.bookable_chargeable === false);
+    if (!blocked) return;
+    setStep('profil');
+    setReviewOpen(false);
+    setSelected(null);
+  }, [step, detail]);
 
   // Die Bestaetigung in der Sprache des Nutzers — geladen, sobald der
   // Termin-Schritt offen ist; neu geladen, wenn der Server eine neuere
@@ -165,9 +188,10 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
     if (step !== 'termin' || !key) return;
     let alive = true;
     setSlots(null);
+    setSlotsFailed(false);
     fetchSlots(key)
       .then((s) => { if (alive) setSlots(s); })
-      .catch(() => { if (alive) setSlots([]); });
+      .catch(() => { if (alive) { setSlots([]); setSlotsFailed(true); } });
     return () => { alive = false; };
   }, [step, key, slotsKey]);
 
@@ -341,7 +365,9 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
                 shape="soft"
                 fullWidth
                 type="button"
-                disabled={!ack || sending}
+                // Gebucht wird erst, wenn das Profil geladen ist — vorher ist
+                // offen, ob der Anbieter ueberhaupt buchbar ist.
+                disabled={!ack || sending || detail.kind !== 'ready'}
                 onClick={() => {
                   if (!selected) { setSlotTried(true); focusField('partner-slots'); return; }
                   setReviewOpen(true);
@@ -373,7 +399,20 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
           {slots === null ? (
             <p className="text-body-xs text-fg-tertiary">{t('detail.slotsLoading')}</p>
           ) : byDay.length === 0 ? (
-            <p className="text-body-xs leading-relaxed text-fg-tertiary">{t('schedule.noSlots')}</p>
+            slotsFailed ? (
+              <div role="alert" className="flex flex-col items-start gap-2">
+                <p className="text-body-xs leading-relaxed text-fg-secondary">{t('schedule.slotsFailed')}</p>
+                <button
+                  type="button"
+                  onClick={() => setSlotsKey((k) => k + 1)}
+                  className="text-body-3xs font-bold text-brand underline underline-offset-2 hover:text-brand-700"
+                >
+                  {t('schedule.slotsRetry')}
+                </button>
+              </div>
+            ) : (
+              <p className="text-body-xs leading-relaxed text-fg-tertiary">{t('schedule.noSlots')}</p>
+            )
           ) : (
             byDay.map(([day, isos]) => (
               <div key={day} className="mb-4">

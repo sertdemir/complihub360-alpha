@@ -82,7 +82,17 @@ Umgesetzt auf der Startseite (EN), Sektion für Sektion:
   - Trust Band: Priority, Official Source, Verified Provider (§8).
   - Wortlaut aus dem Handover. Ausnahme: **Official Source** und **Priority** nennt §8 nur als Begriff. Diese beiden Erklärungen hat Claude geschrieben, der Nutzer prüft sie im PR.
   - Bedienung: Hover, Fokus, Escape, Antippen und Antippen daneben. `aria-describedby` ist ab dem ersten Rendern gesetzt, die Blase liegt per Portal fixed im Viewport und wird von keiner Karte abgeschnitten.
-- **Anbieterkarte im Produkt:** Die Felder aus §5, etwa „Add to Selection“, sind eine Funktionsfrage und keine Copy.
+- **Anbieterkarte im Produkt (§5)**, umgesetzt am 24.10.2026 (`PartnerCard`):
+  - **Felder:**
+    - Expertise (höchstens drei freigegebene Leistungen)
+    - Märkte
+    - abgedeckte Prioritäten (Pflichten der Risk Map in den abgedeckten Bereichen, nach Stufe, ohne „On the radar“)
+    - Preisspanne
+    - geschätzte Leistungsdauer (`timeline_days`)
+    - abgeschlossene Aufträge
+  - **Woher:** Die Leistungsdauer ist neu im anonymen Payload, aus `provider_services.completion_days_estimate`, Klasse anonymous. Gerechnet wird über dieselben Leistungen wie die Preisspanne. Ohne Passung steht sie nicht im Payload.
+  - **„Book a Consultation“:** öffnet die Schublade direkt im Termin-Schritt. Ist der Anbieter nicht buchbar, springt sie ins Profil mit dem Grund zurück. „View details“ bleibt als Textlink.
+  - **Zurückgestellt:** „Add to Selection“. Es gibt keine Auswahl- oder Merkliste (`/dashboard/saved-providers` ist „Coming soon“), und ein Knopf ohne Wirkung wäre eine leere Zusage. Der Nutzer hat am 24.10.2026 entschieden: kommt zusammen mit „Saved providers“.
 - **Lokalisierung:** DE, ES und TR tragen den alten Satz und fallen für neue Schlüssel auf EN zurück (Entscheidung 09.10.2026).
 - **Unterseiten:** `/how-it-works` und das Dashboard gehören nicht zum Handover. Ihre Zwischentitel und Dashboard-Labels sind unverändert.
 

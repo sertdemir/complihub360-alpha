@@ -9,6 +9,7 @@ import { KpiRing, useEntered, EASE } from '../ui/Stats';
 import { duplicateSession } from '../../api/sessions';
 import { fetchObligationStatus, setObligationStatus, type ObligationStatus, type ObligationStatusRow } from '../../api/obligations';
 import type { AnonProvider } from '../../api/search';
+import type { Priority } from '../../lib/priority';
 
 // ─── Sitzungs-Snapshot · Canvas "Sitzungs-Snapshot", Gesamt · G8 ─────────────
 // Die Detailansicht EINER Sitzung fuer eingeloggte Nutzer. Aufbau nach der
@@ -276,7 +277,7 @@ function GroupCard({ label, sub, dot, rows, entered, offset, taskOf, statusRowOf
 }
 
 export function SessionSnapshot({
-  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails, answersDrawer, partnerDrawer, bookings, emptyState, providersEmptyState, providersTop,
+  rows, providers, sessionId, title, meta, kpis, matchBasis, providerPriorities, onExportPdf, onEditAnswers, onProviderDetails, onProviderBook, answersDrawer, partnerDrawer, bookings, emptyState, providersEmptyState, providersTop,
 }: {
   rows: SnapshotRow[];
   providers: AnonProvider[];
@@ -294,6 +295,11 @@ export function SessionSnapshot({
   onExportPdf?: () => void;
   onEditAnswers: () => void;
   onProviderDetails: (publicRef: string) => void;
+  /** Handover 1.0 §5: "Book a Consultation" auf der Karte. */
+  onProviderBook?: (publicRef: string) => void;
+  /** Handover 1.0 §5: abgedeckte Pflichten der Karte je Stufe. `settled`:
+   *  Pflicht-IDs, die der Nutzer erledigt oder als nicht zutreffend markiert hat. */
+  providerPriorities?: (p: AnonProvider, settled: ReadonlySet<string>) => Partial<Record<Priority, number>>;
   /** Die Partner-Schublade des Aufrufers (Canvas 1C) — sie haengt am Zustand
    *  der Seite, nicht an dieser Darstellung. */
   partnerDrawer?: React.ReactNode;
@@ -345,6 +351,7 @@ export function SessionSnapshot({
 
   const taskOf = (row: SnapshotRow): ObligationStatus =>
     (row.obligationId && tasks[row.obligationId]) || 'open';
+  const settled = new Set(rows.filter((r) => r.obligationId && ['done', 'not_applicable'].includes(taskOf(r))).map((r) => r.obligationId!));
   const statusRowOf = (row: SnapshotRow) => (row.obligationId ? statusRows[row.obligationId] : undefined);
 
   // Optimistisch setzen, bei Fehler zurueckdrehen — ein Haken, der bleibt
@@ -523,6 +530,8 @@ export function SessionSnapshot({
                     basis={matchBasis?.(p)}
                     booking={bookings?.[p.public_ref] ?? null}
                     onDetails={() => onProviderDetails(p.public_ref)}
+                    onBook={onProviderBook ? () => onProviderBook(p.public_ref) : undefined}
+                    priorities={providerPriorities?.(p, settled)}
                   />
                 ))}
               </motion.aside>
