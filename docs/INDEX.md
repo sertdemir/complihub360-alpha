@@ -15,6 +15,7 @@
 | `architecture/` | Architecture Diagrams/Notes | Empty |
 | `ops/self-hosted-runner.md` | Staging-Deploy über einen Runner auf dem VPS (Einrichtung, Betrieb, Sicherheitsschranken) | Active |
 | `ranking/` | Ranking Algorithm Docs | Empty |
+| `testing/beta-volltest-2026-10-26.md` | Beta-Volltest: beide Rollen, vier Sprachen, mobil; Fehlerprotokoll und Go/No-Go | Active |
 
 ## 2. Proposed Restructuring
 
