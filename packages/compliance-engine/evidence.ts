@@ -122,6 +122,7 @@ export function factsFromAnswers(answers: {
   businessTypeNote?: unknown;
   markets?: unknown;
   country?: unknown;
+  details?: unknown;
 } | null | undefined): Facts {
   const facts: Facts = {};
   if (!answers) return facts;
@@ -156,5 +157,47 @@ export function factsFromAnswers(answers: {
     ...(typeof answers.country === 'string' && answers.country ? [answers.country] : []),
   ].map(String);
   if (markets.some((m) => EU27.has(m.toUpperCase()))) facts.eu_market = true;
+  Object.assign(facts, factsFromDetails(answers.details, markets));
+  return facts;
+}
+
+const list = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
+
+/** Wizard v1a (D1, Nutzer-Entscheid 24.10.2026): die neuen Antworten als
+ *  Fakten. "Nein" nur, wo eine Antwort es ausdruecklich sagt — eine nicht
+ *  angeklickte Karte heisst nie "nein". Offene Fragen (packaging_role,
+ *  establishment …) bleiben offen; ob eine Antwort sie erledigt, ist eine
+ *  fachliche Pruefung je Markt. Situation, Lager und Verpackungs-Taetigkeit
+ *  setzen deshalb heute keinen Fakt. */
+function factsFromDetails(details: unknown, markets: string[]): Facts {
+  const facts: Facts = {};
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return facts;
+  const d = details as Record<string, unknown>;
+
+  // Angebot (S04): "Physical products" ist ein Ja. Nur Digital und/oder
+  // Services — ohne "Still deciding" oder "Not sure" — ist ein Nein.
+  const offering = list(d.offering);
+  if (offering.includes('physical')) facts.physical_goods = true;
+  else if (offering.length > 0 && offering.every((o) => o === 'digital' || o === 'services')) facts.physical_goods = false;
+
+  // EPR 1/2 (E01 + E02): nur angeklickte Karten zaehlen. Wer keine
+  // Batterie-Karte waehlt, hat nicht "keine Batterien" gesagt.
+  const epr = list(d.eprProducts);
+  if (epr.includes('electronics')) facts.electronics = true;
+  if (epr.includes('batteries-inside') || epr.includes('batteries-separate')) facts.batteries = true;
+  if (epr.some((e) => e !== 'not-sure')) facts.physical_goods = true;
+
+  // Sitz (S03): Die Engine bewertet eine Pflicht ueber alle Zielmaerkte
+  // zusammen ("DE · NL"). Wahr deshalb nur, wenn der Sitz JEDEN Zielmarkt
+  // abdeckt — sonst stuende z. B. die Registrierung in NL als bestaetigt da.
+  // Falsch, wenn der Sitz in keinem Zielmarkt liegt oder noch keiner
+  // besteht. Teilweise Ueberdeckung bleibt unbekannt.
+  const est = list(d.establishment).map((x) => x.toUpperCase());
+  const targets = [...new Set(markets.map((m) => m.toUpperCase()))];
+  if (!est.includes('NOT-SURE') && est.length > 0 && targets.length > 0) {
+    const countries = est.filter((x) => x !== 'NOT-YET');
+    if (targets.every((m) => countries.includes(m))) facts.established_in_market = true;
+    else if (!targets.some((m) => countries.includes(m))) facts.established_in_market = false;
+  }
   return facts;
 }

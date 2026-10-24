@@ -313,7 +313,12 @@ export function ResultsRiskMap() {
         // Sitzung nur im Heimatmarkt — die Matrix "Limited coverage" (C2)
         // haette dann nur eine Spalte gekannt, und Pflichten der Zielmaerkte
         // fehlten, obwohl der Gast sie fuer dasselbe Profil sieht.
-        if (s) { session = s; query = { country: s.country ?? 'DE', markets: s.markets ?? [], categories: s.categories as SearchProfile['categories'] }; }
+        // Mit den gespeicherten Antworten (D9, 24.10.2026): die Engine leitet
+        // aus ihnen die Fakten ab (Operations-Karte, Wizard-v1a-details).
+        // Ohne sie stand eine Pflicht, die der Gast als "confirmed" sah,
+        // beim Wiederoeffnen wieder als "likely" da. Maerkte und Bereiche
+        // kommen weiter aus den Spalten — die sind massgeblich.
+        if (s) { session = s; query = { ...(s.answers ?? {}), country: s.country ?? 'DE', markets: s.markets ?? [], categories: s.categories as SearchProfile['categories'] }; }
       } catch { /* handled below */ }
       // Keine Sitzung geladen → Fehlerzustand, nicht das zuletzt lokal
       // gespeicherte Profil. Das gehoerte zu einer anderen Auswertung und
