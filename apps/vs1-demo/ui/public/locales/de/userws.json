@@ -691,6 +691,19 @@
     "saved": "Gespeichert — die Risk Map wird neu berechnet.",
     "error": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
     "changed": "geändert",
-    "none": "Keine Auswahl"
+    "none": "Keine Auswahl",
+    "steps": {
+      "situation": "Ihre Situation",
+      "offering": "Sie verkaufen",
+      "establishment": "Ansässig in",
+      "stock": "Lager",
+      "eprProducts": "EPR · Produkte",
+      "packaging": "EPR · Verpackung"
+    },
+    "otherCountry": "+ Weiteres Land …",
+    "removes": {
+      "stock": "Beim Speichern entfällt auch Ihre Lager-Angabe ({{answer}}) — sie gilt nur für physische Produkte.",
+      "epr": "Beim Speichern entfallen auch Ihre EPR-Angaben ({{answer}}) — sie gelten nur mit EPR & Verpackung."
+    }
   }
 }

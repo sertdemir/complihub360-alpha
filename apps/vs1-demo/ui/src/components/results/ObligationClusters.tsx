@@ -168,10 +168,9 @@ export function ObligationClusters({ rows }: { rows: ClusterRow[] }) {
 export const WIZARD_ANSWERABLE = new Set(['consumer_sales', 'business_sales', 'online_sales']);
 
 type AnswerContext = {
-  /** Der Knopf fuehrt in den vollen Wizard (Gast, keine gespeicherte Sitzung).
-   *  Die Antworten-Schublade kennt nur Maerkte, Taetigkeit und Bereiche — dort
-   *  zaehlen die Wizard-v1a-Fragen nicht, sonst verspraeche der Hinweis eine
-   *  Frage, die man dort nicht findet. */
+  /** Der Knopf erreicht die Wizard-v1a-Fragen. Seit 24.10.2026 tun das
+   *  Wizard und Antworten-Schublade; false bleibt fuer einen Weg, der nur
+   *  Maerkte, Taetigkeit und Bereiche kennt. */
   fullWizard?: boolean;
   /** Das Profil, mit dem gesucht wurde. */
   profile?: { categories?: string[]; details?: { establishment?: string[] } } | null;

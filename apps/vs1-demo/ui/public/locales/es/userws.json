@@ -690,6 +690,19 @@
     "saved": "Guardado: el mapa de riesgos se está recalculando.",
     "error": "No se pudo guardar. Inténtelo de nuevo.",
     "changed": "cambiado",
-    "none": "Sin selección"
+    "none": "Sin selección",
+    "steps": {
+      "situation": "Su situación",
+      "offering": "Usted vende",
+      "establishment": "Establecida en",
+      "stock": "Existencias",
+      "eprProducts": "EPR · productos",
+      "packaging": "EPR · envases"
+    },
+    "otherCountry": "+ Otro país…",
+    "removes": {
+      "stock": "Al guardar también se elimina su respuesta sobre existencias ({{answer}}) — solo aplica a productos físicos.",
+      "epr": "Al guardar también se eliminan sus respuestas de EPR ({{answer}}) — solo aplican con EPR y envases."
+    }
   }
 }

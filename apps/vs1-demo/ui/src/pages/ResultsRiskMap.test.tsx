@@ -1068,7 +1068,11 @@ describe('ResultsRiskMap · hint "one answer makes your map more precise"', () =
     expect(screen.getByText('hint.title')).toBeInTheDocument();
   });
 
-  it('a saved risk map opens the answers drawer, which cannot ask it — no promise', async () => {
+  // Angemeldete sehen die Sitzungsansicht (SessionSnapshot): dort gibt es den
+  // Hinweis nicht, die Antworten erreicht man ueber "Edit answers". Bis
+  // 24.10.2026 stand hier "die Schublade kann es nicht" — der Test bestand,
+  // weil der Hinweis in dieser Ansicht gar nicht vorkommt.
+  it('the signed-in snapshot shows no 5B hint — answers are edited via "Edit answers"', async () => {
     auth.isLoggedIn = true;
     fetchSessions.mockResolvedValue([{
       id: 's1', country: 'DE', markets: ['DE'], categories: ['product-compliance'], label: 'Germany',
