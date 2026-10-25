@@ -9,6 +9,8 @@
     "title": "Here's what applies to you.",
     "subtitleProfile_one": "Based on your assessment. {{count}} area in scope.",
     "subtitleProfile_other": "Based on your assessment. {{count}} areas in scope.",
+    "subtitleChosen_one": "Based on your assessment. {{count}} area you chose, {{extra}} more checked for your markets.",
+    "subtitleChosen_other": "Based on your assessment. {{count}} areas you chose, {{extra}} more checked for your markets.",
     "titleConfirmed_one": "{{count}} obligation applies to you.",
     "titleConfirmed_other": "{{count}} obligations apply to you.",
     "titleMore_one": "{{count}} more is worth a closer look.",
@@ -463,6 +465,8 @@
     "supports": "What supports it:",
     "decides": "Still decides:",
     "onlyArea": "You chose this area. Nothing in your answers shows yet that this obligation applies.",
+    "outside": "You didn't choose this area — we checked it for your markets.",
+    "nothingYet": "Nothing in your answers shows yet that this obligation applies.",
     "fact": {
       "consumer_sales": "you sell to consumers",
       "business_sales": "you sell to businesses",
@@ -524,5 +528,6 @@
     "inSelection": "In your selection",
     "saveFailed": "That didn’t work. Please try again.",
     "saveFull": "Your selection holds up to 200 providers. Remove one under Saved Providers to add another."
-  }
+  },
+  "outsideTag": "Outside the areas you chose"
 }

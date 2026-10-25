@@ -9,6 +9,8 @@
     "title": "Das gilt für Sie.",
     "subtitleProfile_one": "Basierend auf Ihrer Einschätzung. {{count}} Bereich im Fokus.",
     "subtitleProfile_other": "Basierend auf Ihrer Einschätzung. {{count}} Bereiche im Fokus.",
+    "subtitleChosen_one": "Basierend auf Ihrer Einschätzung. {{count}} von Ihnen gewählter Bereich, {{extra}} weitere für Ihre Märkte geprüft.",
+    "subtitleChosen_other": "Basierend auf Ihrer Einschätzung. {{count}} von Ihnen gewählte Bereiche, {{extra}} weitere für Ihre Märkte geprüft.",
     "titleConfirmed_one": "{{count}} Pflicht gilt für Sie.",
     "titleConfirmed_other": "{{count}} Pflichten gelten für Sie.",
     "titleMore_one": "{{count}} weitere lohnt einen genauen Blick.",
@@ -421,6 +423,8 @@
     "supports": "Spricht dafür:",
     "decides": "Entscheidet noch:",
     "onlyArea": "Sie haben diesen Bereich gewählt. Noch zeigt nichts in Ihren Angaben, dass diese Pflicht greift.",
+    "outside": "Diesen Bereich haben Sie nicht gewählt — wir haben ihn für Ihre Märkte geprüft.",
+    "nothingYet": "Noch zeigt nichts in Ihren Angaben, dass diese Pflicht greift.",
     "fact": {
       "consumer_sales": "Sie verkaufen an Verbraucher",
       "business_sales": "Sie verkaufen an Unternehmen",
@@ -468,5 +472,6 @@
     "profileTitle": "Dieser Anbieter deckt Ihre Anfrage nicht ab",
     "profileBody": "Sie kommen von Anbietern, die im selben Markt arbeiten, aber nicht in {{areas}}. Eine Buchung bieten wir von hier aus nicht an.",
     "profileBodyGeneric": "Sie kommen von Anbietern, die im selben Markt arbeiten, aber nicht in dem angefragten Bereich. Eine Buchung bieten wir von hier aus nicht an."
-  }
+  },
+  "outsideTag": "Außerhalb Ihrer gewählten Bereiche"
 }

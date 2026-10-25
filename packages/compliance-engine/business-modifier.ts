@@ -57,3 +57,24 @@ export function calculateBusinessModifier(
 
     return delta;
 }
+
+/** Wizard-Geschaeftsart → Geschaeftsmodell der Engine. Der Wizard schickt
+ *  `businessType` (ecommerce, marketplace, …), die Engine filtert ueber
+ *  `businessModel` — bis 25.10.2026 kam deshalb nie ein Modell an, der Filter
+ *  war aus, und ein D2C-Shop bekam "Data Localization" (nur SaaS).
+ *  `other` (auch B2B und Hybrid) bleibt bewusst ohne Modell: lieber
+ *  ungefiltert als in die falsche Schublade. Ein ausdruecklich gesetztes
+ *  `businessModel` geht vor. */
+const MODEL_BY_BUSINESS_TYPE: Record<string, BusinessModel> = {
+    ecommerce: BusinessModel.DTC,
+    marketplace: BusinessModel.MARKETPLACE_SELLER,
+    saas: BusinessModel.SAAS_SUBSCRIPTION,
+    agency: BusinessModel.AGENCY,
+};
+
+export function businessModelFromAnswers(answers: { businessModel?: unknown; businessType?: unknown } | null | undefined): BusinessModel | undefined {
+    const explicit = answers?.businessModel;
+    if (typeof explicit === 'string' && (Object.values(BusinessModel) as string[]).includes(explicit)) return explicit as BusinessModel;
+    const type = answers?.businessType;
+    return typeof type === 'string' ? MODEL_BY_BUSINESS_TYPE[type] : undefined;
+}

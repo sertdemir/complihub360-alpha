@@ -121,6 +121,9 @@ export interface SearchLaw {
   state?: 'confirmed' | 'likely' | 'open';
   /** Was die Stufe traegt und was noch entscheidet (Schluessel, keine Texte). */
   evidence?: { supports: string[]; decides: string[] };
+  /** true = aus einem gewaehlten Bereich; false = die Engine hat den Bereich
+   *  aufgefuellt (mind. vier). Fehlt bei aelteren API-Staenden. */
+  focus?: boolean;
 }
 
 export interface SearchResult {

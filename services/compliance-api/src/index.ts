@@ -7,7 +7,7 @@ import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
-import { generateRelevantSubdomains, factsFromAnswers, isKnownCountry, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
+import { generateRelevantSubdomains, factsFromAnswers, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
@@ -3421,7 +3421,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         engineResults = generateRelevantSubdomains({
                             countries: engineCountries,
                             industry: requestData.structured_answers?.industry as IndustryType,
-                            businessModel: requestData.structured_answers?.businessModel as BusinessModel,
+                            businessModel: businessModelFromAnswers(requestData.structured_answers),
                             focusDomains,
                             // Ob eine Pflicht gilt, sagen die Antworten, nicht
                             // der Klick auf den Bereich (Wizard-Audit F1).
@@ -3743,6 +3743,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         // traegt nur eine Angabe "confirmed"; ohne Beleg "open".
                         state: r.evidence.state,
                         evidence: { supports: r.evidence.supports, decides: r.evidence.decides },
+                        // Ob die Pflicht aus einem gewaehlten Bereich stammt oder
+                        // aus dem Auffuellen der Engine (mind. vier Bereiche).
+                        // Die Risk Map sagt das dazu (Variante 1, 25.10.2026),
+                        // statt fremde Bereiche still unter "deine" zu mischen.
+                        focus: r.focus,
                     })),
                 }));
             } catch (err) {

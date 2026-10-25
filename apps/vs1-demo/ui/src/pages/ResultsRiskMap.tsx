@@ -76,6 +76,10 @@ type State =
   | { kind: 'answer'; count: number };
 
 type Obligation = {
+  /** Aus einem Bereich, den der Nutzer NICHT gewaehlt hat (Engine-Auffuellung). */
+  outside?: boolean;
+  /** Engine-Bereich (TAX, DATA, …) — zaehlt die zusaetzlich geprueften Bereiche. */
+  domain?: string;
   /** Engine-Template-ID ('tax-vat-registration', …). Nur auf Live-Zeilen —
    *  die Design-Fixture hat keine, ist also nicht abhakbar. */
   id?: string;
@@ -189,6 +193,9 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
   const keineNorm = t('common:compliance.area.fact.noNamedSource', { defaultValue: 'No named source yet' });
   return laws.filter((l) => l.severity).map((l) => ({
     id: l.id,
+    // Nur ein ausdrueckliches false: aeltere API-Staende kennen `focus` nicht.
+    outside: l.focus === false || undefined,
+    domain: l.domain,
     noSource: l.source_scope === 'placeholder' || undefined,
     severity: l.severity as Severity,
     // Der Engine-Titel ist englisch; die Sprachdateien fuehren ihn fuer alle
@@ -545,7 +552,12 @@ export function ResultsRiskMap() {
     title: o.title, severity: o.severity, market: o.market, due: o.due, dueSub: o.dueSub,
     sourceLabel: o.sourceLabel, sourceUrl: o.sourceUrl, law: o.law, noSource: o.noSource, penalty: o.penalty,
     radar: o.radar, evidence: evidenceOf(o), supports: o.supports ?? [], decides: o.decides ?? [],
+    outside: o.outside,
   }));
+  // Variante 1 (25.10.2026): Die Engine fuellt auf mindestens vier Bereiche
+  // auf. Die Unterzeile nennt diese Bereiche, statt nur die gewaehlten zu
+  // zaehlen und fremde Pflichten still darunter zu mischen.
+  const extraAreas = new Set(rows.filter((o) => o.outside && o.domain).map((o) => o.domain)).size;
   const evidenceCounts = {
     confirmed: clusterRows.filter((r) => r.evidence === 'confirmed').length,
     likely: clusterRows.filter((r) => r.evidence === 'likely').length,
@@ -962,7 +974,9 @@ export function ResultsRiskMap() {
             <p className="mt-4 text-body-md leading-relaxed text-fg-secondary">
               {/* `count`, nicht `total`: nur so waehlt i18next die Einzahl
                   ("1 Bereich im Fokus" statt "1 Bereiche"). */}
-              {t('header.subtitleProfile', { count: profile.categories?.length ?? 0 })}
+              {extraAreas > 0
+                ? t('header.subtitleChosen', { count: profile.categories?.length ?? 0, extra: extraAreas })
+                : t('header.subtitleProfile', { count: profile.categories?.length ?? 0 })}
             </p>
           )}
           {rows.length > 0 && evidenceCounts.likely + evidenceCounts.open > 0 && (

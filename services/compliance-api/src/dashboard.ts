@@ -1,7 +1,7 @@
 import type { ServerResponse } from 'http';
 import {
     generateRelevantSubdomains, isKnownCountry, ComplianceDomain,
-    type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain,
+    type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain,
 } from '@complihub/compliance-engine';
 import { structuredLog } from '@complihub360/types';
 import { supabaseApi } from './supabase.js';
@@ -78,7 +78,7 @@ export function obligationsForSession(row: SessionRow): EnrichedSubdomain[] {
         return generateRelevantSubdomains({
             countries,
             industry: answers.industry as IndustryType,
-            businessModel: answers.businessModel as BusinessModel,
+            businessModel: businessModelFromAnswers(answers),
             focusDomains,
         });
     } catch {
