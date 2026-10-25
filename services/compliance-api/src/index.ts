@@ -37,6 +37,7 @@ import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { handleProviderApplication } from "./providerApplication.js";
 import { handleAgreementsRoute } from "./agreements.js";
+import { handleSavedProvidersRoute } from "./savedProviders.js";
 import { handleSubscriptionGet, handleSubscriptionSelect, handleSubscriptionSchedule, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
 import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpact.js";
@@ -482,6 +483,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     // Beta-Vereinbarung: Text (oeffentlich), Stand und Annahme des Nutzers.
     if (/^\/api\/v1\/(agreements\/|me\/agreements)/.test(req.url || '')) {
         if (await handleAgreementsRoute(req, res, { correlationId, authUserId })) return;
+    }
+
+    // Gemerkte Anbieter (Handover 1.0 §5 "Add to Selection"): anonym, nicht
+    // abrechnend, der Anbieter erfaehrt nichts davon.
+    if (/^\/api\/v1\/me\/saved-providers(\/|$|\?)/.test(req.url || '')) {
+        if (await handleSavedProvidersRoute(req, res, { correlationId, authUserId }, { matchableRows, areaLabels })) return;
     }
 
     const linkMatch = /^\/api\/v1\/admin\/provider\/([a-z0-9-]+)\/member$/.exec(req.url || '');

@@ -63,6 +63,7 @@ import { ProviderSchedulePage } from "./pages/ProviderSchedulePage";
 const DomainPage = lazy(() => import("./pages/user/DomainPage").then((m) => ({ default: m.DomainPage })));
 const UserNotificationsPage = lazy(() => import("./pages/user/UserNotificationsPage").then((m) => ({ default: m.UserNotificationsPage })));
 const ComingSoonPage = lazy(() => import("./pages/user/ComingSoonPage").then((m) => ({ default: m.ComingSoonPage })));
+const SavedProvidersPage = lazy(() => import("./pages/user/SavedProvidersPage").then((m) => ({ default: m.SavedProvidersPage })));
 // Wizard Shell Steps
 // Individualized Category Wizards
 // Auth
@@ -250,7 +251,7 @@ function AppContent() {
                         <Route path="dashboard/workbench/:domain" element={<DomainPage />} />
                         <Route path="dashboard/notifications" element={<UserNotificationsPage />} />
                         <Route path="dashboard/account" element={<AccountPage />} />
-                        <Route path="dashboard/saved-providers" element={<ComingSoonPage page="savedProviders" />} />
+                        <Route path="dashboard/saved-providers" element={<SavedProvidersPage />} />
                         <Route path="dashboard/alerts" element={<ComingSoonPage page="alerts" />} />
                         <Route path="dashboard/calendar" element={<ComingSoonPage page="calendar" />} />
                         <Route path="dashboard/library" element={<ComingSoonPage page="library" />} />

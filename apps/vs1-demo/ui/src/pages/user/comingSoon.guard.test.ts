@@ -35,23 +35,34 @@ function seitenAusRouter(): string[] {
 }
 
 describe('ComingSoon-Flaechen', () => {
-  it('der Router kennt genau die vier unfertigen Flaechen', () => {
+  it('der Router kennt genau die drei unfertigen Flaechen', () => {
     // Waechst die Liste, muss die Copy unten mitwachsen — das ist der Zweck.
     expect(seitenAusRouter(), 'Neue ComingSoon-Seite? Dann auch Copy in vier Sprachen.').toEqual([
       'alerts',
       'calendar',
       'library',
-      'savedProviders',
     ]);
   });
 
   it('die Fixture-Seiten sind fort und laufen auf ComingSoonPage', () => {
     const quelle = readFileSync(join(__dirname, '../../App.tsx'), 'utf8');
     expect(quelle).toContain('<ComingSoonPage page="library" />');
-    expect(quelle).toContain('<ComingSoonPage page="savedProviders" />');
     // Die Fixture-Seiten sind geloescht; ein Wiederanlegen faellt hier auf.
     expect(quelle, 'LibraryPage ist am 2026-09-20 entfallen — 212 erfundene Eintraege.').not.toContain('LibraryPage');
-    expect(quelle, 'SavedProvidersPage ist entfallen — gemerkte Anbieter ohne Merken-Knopf.').not.toContain('SavedProvidersPage');
+  });
+
+  // ─── Saved Providers ist echt (24.10.2026) ────────────────────────────────
+  // Bis dahin ComingSoon: die alte Fixture-Seite listete gemerkte Anbieter,
+  // obwohl es keinen Merken-Knopf gab. Seit "Add to Selection" auf der Karte
+  // der Risk Map merkt, liest die Seite die Liste vom Server. Zurueck zu
+  // Fixtures darf sie nicht.
+  it('Saved Providers liest die echte Liste und hat einen Merken-Knopf', () => {
+    const app = readFileSync(join(__dirname, '../../App.tsx'), 'utf8');
+    expect(app).not.toContain('<ComingSoonPage page="savedProviders"');
+    const seite = readFileSync(join(__dirname, 'SavedProvidersPage.tsx'), 'utf8');
+    expect(seite, 'die Seite liest vom Server').toContain('fetchSavedProviders');
+    const karte = readFileSync(join(__dirname, '../../components/user/PartnerCard.tsx'), 'utf8');
+    expect(karte, 'ohne Merken-Knopf keine Merkliste').toContain('card.addToSelection');
   });
 
   // ─── Exporte ist ersatzlos fort (Festlegung 2026-09-20) ───────────────────

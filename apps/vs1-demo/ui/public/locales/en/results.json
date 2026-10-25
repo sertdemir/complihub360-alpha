@@ -519,6 +519,10 @@
     "completed": "Completed engagements",
     "days_one": "{{count}} day",
     "days_other": "{{count}} days",
-    "daysRange": "{{min}}–{{max}} days"
+    "daysRange": "{{min}}–{{max}} days",
+    "addToSelection": "Add to Selection",
+    "inSelection": "In your selection",
+    "saveFailed": "That didn’t work. Please try again.",
+    "saveFull": "Your selection holds up to 200 providers. Remove one under Saved Providers to add another."
   }
 }

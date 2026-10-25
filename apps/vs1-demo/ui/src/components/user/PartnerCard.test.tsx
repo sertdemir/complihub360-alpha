@@ -29,7 +29,7 @@ describe('PartnerCard · Felder', () => {
   it('zeigt Expertise (hoechstens drei), Maerkte, Prioritaeten, Dauer und Auftraege', () => {
     render(<PartnerCard provider={BASE} onDetails={() => {}} priorities={{ immediate: 2, high: 1 }} />);
     expect(screen.getAllByRole('listitem').map((li) => li.textContent)).toEqual(['VAT & OSS', 'E-Commerce', 'EU-weit']);
-    expect(screen.getByText('card.markets:').nextSibling).toHaveTextContent('common:markets.countries.DE');
+    expect(screen.getByText('card.markets:').nextSibling).toHaveTextContent('Germany · Netherlands');
     expect(screen.getByText('card.priorities:').nextSibling).toHaveTextContent('2 priority.immediate · 1 priority.high');
     expect(screen.getByText('card.timeline:').nextSibling).toHaveTextContent('card.daysRange{"min":10,"max":15}');
     expect(screen.getByText('card.completed:').nextSibling).toHaveTextContent('210');
@@ -58,6 +58,28 @@ describe('PartnerCard · Felder', () => {
     expect(onBook).toHaveBeenCalledOnce();
     fireEvent.click(screen.getByRole('button', { name: 'snapshot.providerDetails' }));
     expect(onDetails).toHaveBeenCalledOnce();
+  });
+
+  it('Add to Selection: Knopf mit aria-pressed, umschaltbar, Fehler sichtbar', () => {
+    const onToggleSave = vi.fn();
+    const { rerender } = render(<PartnerCard provider={BASE} onDetails={() => {}} onBook={() => {}} saved={false} onToggleSave={onToggleSave} />);
+    const knopf = screen.getByRole('button', { name: 'card.addToSelection' });
+    expect(knopf).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(knopf);
+    expect(onToggleSave).toHaveBeenCalledOnce();
+    rerender(<PartnerCard provider={BASE} onDetails={() => {}} onBook={() => {}} saved onToggleSave={onToggleSave} saveFailed />);
+    expect(screen.getByRole('button', { name: 'card.inSelection' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('alert')).toHaveTextContent('card.saveFailed');
+  });
+
+  it('volle Merkliste: sagt das statt "nochmal versuchen"', () => {
+    render(<PartnerCard provider={BASE} onDetails={() => {}} onBook={() => {}} saved={false} onToggleSave={() => {}} saveFailed="full" />);
+    expect(screen.getByRole('alert')).toHaveTextContent('card.saveFull');
+  });
+
+  it('ohne onToggleSave kein Merken-Knopf (Gast, Merkliste nicht ladbar)', () => {
+    render(<PartnerCard provider={BASE} onDetails={() => {}} onBook={() => {}} />);
+    expect(screen.queryByRole('button', { name: 'card.addToSelection' })).not.toBeInTheDocument();
   });
 
   it('nach der Buchung: kein Buchungsknopf mehr', () => {

@@ -6409,3 +6409,73 @@ describe('Beta-Vereinbarung — Text, Stand, Annahme', () => {
         expect(tr.body.language).toBe('en');
     });
 });
+
+// ─── Gemerkte Anbieter (Handover 1.0 §5 "Add to Selection", 24.10.2026) ─────
+
+describe('Saved providers — merken, Liste, vergessen', () => {
+    it('verlangt einen Nutzer: Gast und API-Schluessel bekommen 401', async () => {
+        expect((await api('/api/v1/me/saved-providers', { auth: 'none' })).status).toBe(401);
+        expect((await api('/api/v1/me/saved-providers', { auth: 'key' })).status).toBe(401);
+    });
+
+    it('merken, Liste anonym und ohne Abrechnung, vergessen', async () => {
+        seedProvider();
+        const ref = refOf('test-kanzlei');
+        const put = await api(`/api/v1/me/saved-providers/${ref}`, { method: 'PUT', auth: 'jwt', body: '{}' });
+        expect(put.status).toBe(200);
+        expect(db.saved_providers).toEqual([expect.objectContaining({ user_id: USER_ID, provider_key: 'test-kanzlei' })]);
+        // Zweimal merken bleibt ein Eintrag.
+        await api(`/api/v1/me/saved-providers/${ref}`, { method: 'PUT', auth: 'jwt', body: '{}' });
+        expect(db.saved_providers).toHaveLength(1);
+
+        const list = await api('/api/v1/me/saved-providers', { auth: 'jwt' });
+        expect(list.status).toBe(200);
+        expect(list.body.providers).toHaveLength(1);
+        const p = list.body.providers[0];
+        expect(p).toMatchObject({ available: true, public_ref: ref, letter: 'A', title: 'Verified Provider A' });
+        // ADR-0004: weder Name noch Kontakt noch Website noch Schluessel.
+        const wire = JSON.stringify(list.body);
+        expect(wire).not.toMatch(/Testkanzlei|testkanzlei|geheim@|provider_key|pseudonym_label/);
+        // Die Liste ist kein Detail-Aufruf: kein billable Event.
+        expect((db.event_log ?? []).some((e: any) => e.type === 'provider_detail_opened')).toBe(false);
+
+        const del = await api(`/api/v1/me/saved-providers/${ref}`, { method: 'DELETE', auth: 'jwt' });
+        expect(del.status).toBe(200);
+        expect(db.saved_providers ?? []).toHaveLength(0);
+    });
+
+    it('nur Anbieter aus der View; unbekannter Ref 404, nichts geschrieben', async () => {
+        expect((await api('/api/v1/me/saved-providers/000000000000', { method: 'PUT', auth: 'jwt', body: '{}' })).status).toBe(404);
+        expect((await api('/api/v1/me/saved-providers/nicht-hex', { method: 'PUT', auth: 'jwt', body: '{}' })).status).toBe(404);
+        expect(db.saved_providers ?? []).toHaveLength(0);
+    });
+
+    it('faellt ein gemerkter Anbieter aus der View, sagt die Liste das', async () => {
+        seedProvider();
+        await api(`/api/v1/me/saved-providers/${refOf('test-kanzlei')}`, { method: 'PUT', auth: 'jwt', body: '{}' });
+        db.matchable_provider_services = [];
+        const list = await api('/api/v1/me/saved-providers', { auth: 'jwt' });
+        expect(list.body.providers).toEqual([expect.objectContaining({ available: false })]);
+        expect(JSON.stringify(list.body)).not.toMatch(/Testkanzlei|Norddeutschland/);
+    });
+
+    it('eine volle Liste nimmt keinen weiteren an (409), statt alte still zu verlieren', async () => {
+        seedProvider();
+        db.saved_providers = Array.from({ length: 200 }, (_, i) => ({ user_id: USER_ID, provider_key: `alt-${i}`, session_id: null, created_at: new Date(2026, 0, 1, 0, i).toISOString() }));
+        const put = await api(`/api/v1/me/saved-providers/${refOf('test-kanzlei')}`, { method: 'PUT', auth: 'jwt', body: '{}' });
+        expect(put.status).toBe(409);
+        expect(put.body.errorCode).toBe('SELECTION_FULL');
+        expect(db.saved_providers).toHaveLength(200);
+        // Schon Gemerktes nochmal merken geht auch bei voller Liste.
+        db.saved_providers[0].provider_key = 'test-kanzlei';
+        expect((await api(`/api/v1/me/saved-providers/${refOf('test-kanzlei')}`, { method: 'PUT', auth: 'jwt', body: '{}' })).status).toBe(200);
+    });
+
+    it('eine fremde Sitzung wird nicht mitgespeichert', async () => {
+        seedProvider();
+        const fremd = randomUUID();
+        (db.sessions ??= []).push({ id: fremd, user_id: randomUUID() });
+        await api(`/api/v1/me/saved-providers/${refOf('test-kanzlei')}`, { method: 'PUT', auth: 'jwt', body: JSON.stringify({ session_id: fremd }) });
+        expect(db.saved_providers[0].session_id ?? null).toBeNull();
+    });
+});

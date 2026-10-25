@@ -354,16 +354,6 @@
       "feature2": "Guías por país",
       "feature3": "Seminarios web con especialistas",
       "feature4": "Calculadoras y plantillas"
-    },
-    "savedProviders": {
-      "title": "Proveedores guardados",
-      "sub": "Guarde proveedores y vuelva a encontrarlos · próximamente",
-      "panelTitle": "Guardar proveedores",
-      "panelSub": "Un marcador en cada proveedor — en un mapa de riesgos, en una conversación, en su ficha. Reunidos aquí.",
-      "feature1": "Guardar desde cualquier sitio",
-      "feature2": "Se conserva de dónde lo guardó",
-      "feature3": "Filtrar por área y mercado",
-      "feature4": "Enviar una solicitud desde la lista"
     }
   },
   "domainPage": {

@@ -355,16 +355,6 @@
       "feature2": "Country guides",
       "feature3": "Webinars with specialists",
       "feature4": "Calculators & templates"
-    },
-    "savedProviders": {
-      "title": "Saved providers",
-      "sub": "Bookmark providers and find them again · coming soon",
-      "panelTitle": "Bookmark providers",
-      "panelSub": "One bookmark on every provider — in a risk map, in a conversation, on the provider page. Collected here.",
-      "feature1": "Bookmark from anywhere",
-      "feature2": "Why you saved it, kept with it",
-      "feature3": "Filter by area and market",
-      "feature4": "Send an enquiry straight from the list"
     }
   },
   "domainPage": {
@@ -709,5 +699,21 @@
       "stock": "Saving also removes your stock answer ({{answer}}) — it only applies to physical products.",
       "epr": "Saving also removes your EPR answers ({{answer}}) — they only apply with EPR & Packaging."
     }
+  },
+  "savedProviders": {
+    "title": "Saved Providers",
+    "sub": "The providers you added to your selection from a Risk Map. They stay anonymous until you book a consultation, and they are not told that you saved them.",
+    "loading": "Loading your selection …",
+    "loadFailedTitle": "Your selection couldn’t be loaded",
+    "loadFailedBody": "This says nothing about the providers. Please try again.",
+    "retry": "Try again",
+    "emptyTitle": "No saved providers yet",
+    "emptyBody": "Open a Risk Map and choose “Add to Selection” on a provider you want to compare or book later.",
+    "emptyCta": "Open my Risk Maps",
+    "savedOn": "Saved on {{date}}",
+    "response": "Typical response time",
+    "remove": "Remove",
+    "removeFailed": "That didn’t work. Please try again.",
+    "unavailable": "This provider is no longer available on CompliHub360."
   }
 }

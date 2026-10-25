@@ -354,16 +354,6 @@
       "feature2": "Länder-Leitfäden",
       "feature3": "Webinare mit Fachleuten",
       "feature4": "Rechner & Vorlagen"
-    },
-    "savedProviders": {
-      "title": "Gespeicherte Anbieter",
-      "sub": "Anbieter merken und wiederfinden · bald verfügbar",
-      "panelTitle": "Anbieter merken",
-      "panelSub": "Ein Lesezeichen an jedem Anbieter — in der Risk Map, im Gespräch, auf der Anbieterseite. Hier gesammelt.",
-      "feature1": "Von überall merken",
-      "feature2": "Woher gemerkt, bleibt dabei",
-      "feature3": "Nach Bereich und Markt filtern",
-      "feature4": "Anfrage direkt aus der Liste"
     }
   },
   "domainPage": {

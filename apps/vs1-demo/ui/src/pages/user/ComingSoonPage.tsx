@@ -8,7 +8,7 @@ import { Card } from '../../components/ui/Card';
 // ─── User Dashboard · Coming Soon (Alerts / Calendar / Library / Anbieter) ────
 // Mirrors the "COMING IN WK3" pages (Alerts 2675:1020 / Calendar 2675:1359):
 // accent banner + centered feature panel with gold CTA. Copy lives in the
-// 'userws' namespace under comingSoon.{alerts,calendar,library,savedProviders}.*.
+// 'userws' namespace under comingSoon.{alerts,calendar,library}.*.
 //
 // Die Bibliothek kam am 2026-09-20 dazu. Vorher stand dort eine Seite, die
 // "212 Eintraege · 84 Videos" behauptete, waehrend zwoelf Fixtures im Code
@@ -28,7 +28,7 @@ import { Card } from '../../components/ui/Card';
 // und zwei Endpunkte.
 
 
-export function ComingSoonPage({ page }: { page: 'alerts' | 'calendar' | 'library' | 'savedProviders' }) {
+export function ComingSoonPage({ page }: { page: 'alerts' | 'calendar' | 'library' }) {
   const { t } = useTranslation('userws');
   const k = `comingSoon.${page}`;
   const features = [1, 2, 3, 4].map((n) => t(`${k}.feature${n}`));
