@@ -790,6 +790,18 @@ describe('ResultsRiskMap header subtitle', () => {
     // The mocked t appends `#count` — `total` would leave it off.
     expect(await screen.findByText('header.subtitleProfile#1')).toBeInTheDocument();
   });
+
+  it('names the areas the engine added on top of the chosen ones (Variante 1)', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', categories: ['tax-vat'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [
+      law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true }),
+      law({ id: 'data-privacy', title: 'Privacy', due: inDays(20), domain: 'DATA', focus: false }),
+      law({ id: 'env-weee-registration', title: 'WEEE', due: inDays(30), domain: 'ENVIRONMENT', focus: false }),
+    ] });
+    renderPage();
+    expect(await screen.findByText('header.subtitleChosen#1')).toBeInTheDocument();
+    expect(screen.queryByText('header.subtitleProfile#1')).not.toBeInTheDocument();
+  });
 });
 
 // ─── EN-Launch Schritt 2 · Treffer-Zustaende (A1 · B3 · C2) ──────────────────
