@@ -273,3 +273,31 @@ describe('ENVIRONMENT domain', () => {
         }
     });
 });
+
+// ─── Geschaeftsmodell aus dem Wizard (25.10.2026) ───────────────────────────
+// Der Wizard schickt businessType, die Engine filtert ueber businessModel. Ohne
+// Uebersetzung war der Filter aus: ein D2C-Shop bekam "Data Localization".
+import { businessModelFromAnswers } from '../business-modifier';
+
+describe('businessModelFromAnswers', () => {
+    it('maps the wizard business types; other stays unfiltered', () => {
+        expect(businessModelFromAnswers({ businessType: 'ecommerce' })).toBe(BusinessModel.DTC);
+        expect(businessModelFromAnswers({ businessType: 'marketplace' })).toBe(BusinessModel.MARKETPLACE_SELLER);
+        expect(businessModelFromAnswers({ businessType: 'saas' })).toBe(BusinessModel.SAAS_SUBSCRIPTION);
+        expect(businessModelFromAnswers({ businessType: 'other' })).toBeUndefined();
+        expect(businessModelFromAnswers(undefined)).toBeUndefined();
+    });
+    it('an explicit businessModel wins over businessType', () => {
+        expect(businessModelFromAnswers({ businessModel: 'AGENCY', businessType: 'ecommerce' })).toBe(BusinessModel.AGENCY);
+        expect(businessModelFromAnswers({ businessModel: 'nonsense', businessType: 'saas' })).toBe(BusinessModel.SAAS_SUBSCRIPTION);
+    });
+    it('a D2C shop no longer gets the SaaS-only data localization duty', () => {
+        const ids = (bm?: BusinessModel) => generateRelevantSubdomains({
+            countries: ['DE', 'IT'] as CountryCode[], businessModel: bm,
+            focusDomains: [ComplianceDomain.TAX, ComplianceDomain.PRODUCT],
+        }).map((r) => r.id);
+        expect(ids(undefined)).toContain('data-hosting');
+        expect(ids(businessModelFromAnswers({ businessType: 'ecommerce' }))).not.toContain('data-hosting');
+        expect(ids(businessModelFromAnswers({ businessType: 'ecommerce' }))).toContain('data-privacy');
+    });
+});

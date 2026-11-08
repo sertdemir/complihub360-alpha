@@ -32,6 +32,8 @@ export type ClusterRow = {
   evidence: EvidenceState;
   supports: string[];
   decides: string[];
+  /** Bereich nicht gewaehlt — die Engine hat ihn fuer die Maerkte aufgefuellt. */
+  outside?: boolean;
 };
 
 const ORDER: EvidenceState[] = ['confirmed', 'likely', 'open'];
@@ -42,8 +44,10 @@ function WhyPanel({ row, id }: { row: ClusterRow; id: string }) {
     keys.map((k) => t(`${prefix}.${k}`, { defaultValue: k })).join(', ');
   return (
     <div id={id} className="mt-2 rounded-md bg-surface-secondary px-3.5 py-3 text-body-2xs leading-relaxed text-fg">
+      {/* "You chose this area" stimmt nur fuer gewaehlte Bereiche. */}
+      {row.outside && <p className="mb-1">{t('why.outside')}</p>}
       {row.supports.filter((k) => k !== 'eu_market').length === 0 ? (
-        <p>{t('why.onlyArea')}</p>
+        <p>{row.outside ? t('why.nothingYet') : t('why.onlyArea')}</p>
       ) : (
         <p>
           <span className="font-semibold">{t('why.supports')}</span> {join(row.supports, 'why.fact')}.
@@ -73,7 +77,14 @@ function Row({ row }: { row: ClusterRow }) {
         </RiskBadge>
       </span>
       <span className="col-span-2 row-start-2 min-w-0 lg:col-span-1 lg:row-start-auto">
-        <span className="block text-body-md font-bold text-fg">{row.title}</span>
+        <span className="block text-body-md font-bold text-fg">
+          {row.title}
+          {row.outside && (
+            <span className="ml-2 inline-flex translate-y-[-1px] items-center whitespace-nowrap rounded-full bg-surface-tertiary px-2 py-0.5 align-middle text-body-3xs font-semibold text-fg-secondary">
+              {t('outsideTag')}
+            </span>
+          )}
+        </span>
         <span className="mt-1 block text-body-2xs leading-relaxed text-fg-brand lg:mt-0.5">
           {row.sourceUrl ? (
             <a

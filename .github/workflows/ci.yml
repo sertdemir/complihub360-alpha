@@ -18,7 +18,10 @@ permissions:
 jobs:
   quality-gates:
     name: "quality-gates"
-    runs-on: ubuntu-latest
+    # Fest auf noble: der DB-Schritt unten braucht das vorinstallierte
+    # Postgres 16 und die Pakete aus ubuntu/noble/universe. Mit ubuntu-latest
+    # auf einem neueren Image fand apt sie nicht mehr (08.11.2026).
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -625,6 +625,26 @@ describe('POST /api/v1/search', () => {
         expect(byId['prod-epr']).toMatchObject({ state: 'likely', evidence: { decides: ['packaging_role'] } });
     });
 
+    // 25.10.2026: businessType kommt als Geschaeftsmodell an (vorher nie —
+    // ein D2C-Shop bekam "Data Localization", nur SaaS), und jede Pflicht sagt,
+    // ob sie aus einem gewaehlten Bereich stammt (Variante 1).
+    it('filters by the wizard business type and marks top-up areas', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: {
+                markets: ['DE', 'IT'], categories: ['tax-vat', 'product-packaging'], businessType: 'ecommerce',
+            } }),
+        });
+        const byId = Object.fromEntries((r.body.laws as any[]).map((l) => [l.id, l]));
+        expect(byId['data-hosting']).toBeUndefined();
+        expect(byId['data-privacy']).toMatchObject({ focus: false });
+        expect(byId['tax-vat-registration']).toMatchObject({ focus: true });
+        // EPR & Packaging fragt Elektronik und Batterien ab — deren Pflichten
+        // liegen in der Engine unter ENVIRONMENT und zaehlen als gewaehlt.
+        expect(byId['env-weee-registration']).toMatchObject({ focus: true });
+        expect(byId['env-batteries-epr']).toMatchObject({ focus: true });
+    });
+
     it('survives an unknown engine country (laws empty, providers still scored)', async () => {
         // A provider may support a country the ENGINE has no profile for —
         // matching must keep working, only the laws payload stays empty.

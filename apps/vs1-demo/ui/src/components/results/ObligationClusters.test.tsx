@@ -102,3 +102,23 @@ describe('ObligationClusters · only open duties', () => {
     expect(screen.getByText('WEEE')).toBeInTheDocument();
   });
 });
+
+// ─── Variante 1 (25.10.2026): Bereiche, die die Engine auffuellt ─────────────
+describe('ObligationClusters · outside the chosen areas', () => {
+  it('tags the row and does not claim the user chose the area', () => {
+    render(<ObligationClusters rows={[
+      row({ title: 'Privacy', evidence: 'likely', outside: true }),
+      row({ title: 'VAT', evidence: 'likely' }),
+    ]} />);
+    const privacy = screen.getByText('Privacy').closest('[data-testid="obligation-row"]') as HTMLElement;
+    const vat = screen.getByText('VAT').closest('[data-testid="obligation-row"]') as HTMLElement;
+    expect(within(privacy).getByText('outsideTag')).toBeInTheDocument();
+    expect(within(vat).queryByText('outsideTag')).not.toBeInTheDocument();
+    fireEvent.click(within(privacy).getByRole('button', { name: /why\.toggle/ }));
+    expect(within(privacy).getByText('why.outside')).toBeInTheDocument();
+    expect(within(privacy).getByText('why.nothingYet')).toBeInTheDocument();
+    expect(within(privacy).queryByText('why.onlyArea')).not.toBeInTheDocument();
+    fireEvent.click(within(vat).getByRole('button', { name: /why\.toggle/ }));
+    expect(within(vat).getByText('why.onlyArea')).toBeInTheDocument();
+  });
+});

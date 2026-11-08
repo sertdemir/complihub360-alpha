@@ -9,6 +9,8 @@
     "title": "Esto es lo que le aplica.",
     "subtitleProfile_one": "Basado en su evaluación. {{count}} ámbito en alcance.",
     "subtitleProfile_other": "Basado en su evaluación. {{count}} ámbitos en alcance.",
+    "subtitleChosen_one": "Basado en su evaluación. {{count}} ámbito elegido por usted, {{extra}} más revisados para sus mercados.",
+    "subtitleChosen_other": "Basado en su evaluación. {{count}} ámbitos elegidos por usted, {{extra}} más revisados para sus mercados.",
     "titleConfirmed_one": "{{count}} obligación le aplica.",
     "titleConfirmed_other": "{{count}} obligaciones le aplican.",
     "titleMore_one": "{{count}} más merece una revisión detallada.",
@@ -421,6 +423,8 @@
     "supports": "Lo respalda:",
     "decides": "Aún decide:",
     "onlyArea": "Ha elegido esta área. Nada en sus respuestas indica todavía que esta obligación aplique.",
+    "outside": "No eligió esta área: la revisamos para sus mercados.",
+    "nothingYet": "Nada en sus respuestas indica todavía que esta obligación aplique.",
     "fact": {
       "consumer_sales": "vende a consumidores",
       "business_sales": "vende a empresas",
@@ -468,5 +472,6 @@
     "profileTitle": "Este proveedor no cubre lo que ha solicitado",
     "profileBody": "Llega a este perfil desde proveedores que trabajan en el mismo mercado, pero no en {{areas}}. Desde aquí no se ofrece la reserva.",
     "profileBodyGeneric": "Llega a este perfil desde proveedores que trabajan en el mismo mercado, pero no en el área solicitada. Desde aquí no se ofrece la reserva."
-  }
+  },
+  "outsideTag": "Fuera de las áreas elegidas"
 }

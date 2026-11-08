@@ -1,7 +1,7 @@
 import type { ServerResponse } from 'http';
 import {
     generateRelevantSubdomains, isKnownCountry, ComplianceDomain,
-    type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain,
+    type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain,
 } from '@complihub/compliance-engine';
 import { structuredLog } from '@complihub360/types';
 import { supabaseApi } from './supabase.js';
@@ -38,6 +38,20 @@ export const SLUG_TO_ENGINE: Record<string, ComplianceDomain> = {
     'environment': ComplianceDomain.ENVIRONMENT,
 };
 
+// Bereiche, die im Wizard mehr umfassen als ihre Haupt-Domaene. "EPR &
+// Packaging" fragt Elektronik und Batterien ab (Wizard v1a); deren Pflichten
+// (Batterien, WEEE, REACH) fuehrt die Engine unter ENVIRONMENT. Ohne diese
+// Zeile trugen sie auf der Risk Map "Outside the areas you chose", obwohl der
+// Nutzer genau danach gefragt worden war (Entscheidung 26.10.2026).
+const ALSO_FOCUS: Record<string, ComplianceDomain[]> = {
+    'product-packaging': [ComplianceDomain.ENVIRONMENT],
+};
+
+/** Gewaehlte Wizard-Bereiche → Fokus-Domaenen der Engine. */
+export function focusDomainsFor(slugs: string[]): ComplianceDomain[] {
+    return [...new Set(slugs.flatMap((s) => [SLUG_TO_ENGINE[s], ...(ALSO_FOCUS[s] ?? [])]).filter(Boolean))];
+}
+
 interface SessionRow {
     id: string;
     country: string | null;
@@ -72,13 +86,13 @@ export function obligationsForSession(row: SessionRow): EnrichedSubdomain[] {
     const slugs = (Array.isArray(row.categories) && row.categories.length
         ? row.categories
         : (Array.isArray(answers.categories) ? (answers.categories as string[]) : [])) as string[];
-    const focusDomains = [...new Set(slugs.map((s) => SLUG_TO_ENGINE[s]).filter(Boolean))];
+    const focusDomains = focusDomainsFor(slugs);
 
     try {
         return generateRelevantSubdomains({
             countries,
             industry: answers.industry as IndustryType,
-            businessModel: answers.businessModel as BusinessModel,
+            businessModel: businessModelFromAnswers(answers),
             focusDomains,
         });
     } catch {

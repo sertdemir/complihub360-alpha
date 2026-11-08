@@ -9,6 +9,8 @@
     "title": "Sizin için geçerli olanlar.",
     "subtitleProfile_one": "Değerlendirmenize dayanmaktadır. Kapsamda {{count}} alan bulunuyor.",
     "subtitleProfile_other": "Değerlendirmenize dayanmaktadır. Kapsamda {{count}} alan bulunuyor.",
+    "subtitleChosen_one": "Değerlendirmenize dayanmaktadır. Seçtiğiniz {{count}} alan, pazarlarınız için incelenen {{extra}} alan daha.",
+    "subtitleChosen_other": "Değerlendirmenize dayanmaktadır. Seçtiğiniz {{count}} alan, pazarlarınız için incelenen {{extra}} alan daha.",
     "titleConfirmed_one": "{{count}} yükümlülük sizin için geçerli.",
     "titleConfirmed_other": "{{count}} yükümlülük sizin için geçerli.",
     "titleMore_one": "{{count}} tanesine daha yakından bakmaya değer.",
@@ -421,6 +423,8 @@
     "supports": "Destekleyen:",
     "decides": "Hâlâ belirleyici:",
     "onlyArea": "Bu alanı siz seçtiniz. Yanıtlarınızda bu yükümlülüğün geçerli olduğunu gösteren bir şey henüz yok.",
+    "outside": "Bu alanı siz seçmediniz — pazarlarınız için inceledik.",
+    "nothingYet": "Yanıtlarınızda bu yükümlülüğün geçerli olduğunu gösteren bir şey henüz yok.",
     "fact": {
       "consumer_sales": "tüketicilere satış yapıyorsunuz",
       "business_sales": "işletmelere satış yapıyorsunuz",
@@ -468,5 +472,6 @@
     "profileTitle": "Bu sağlayıcı talebinizi kapsamıyor",
     "profileBody": "Bu profile aynı pazarda çalışan ancak {{areas}} alanında çalışmayan sağlayıcılardan ulaştınız. Buradan rezervasyon sunulmuyor.",
     "profileBodyGeneric": "Bu profile aynı pazarda çalışan ancak talep ettiğiniz alanda çalışmayan sağlayıcılardan ulaştınız. Buradan rezervasyon sunulmuyor."
-  }
+  },
+  "outsideTag": "Seçtiğiniz alanların dışında"
 }
