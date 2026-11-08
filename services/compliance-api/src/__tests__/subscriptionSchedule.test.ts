@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ─── Vormerken: Wechsel und Kuendigung zum Verlaengerungstermin ──────────────
 //
@@ -95,6 +95,13 @@ function zweiMitglieder(): void {
 }
 const nachrichten = () => db.events.filter((e) => e.t === 'notifications');
 
+// Die Fixtures datieren den Zyklus auf Oktober/November 2026, und das
+// Vormerken rechnet den Stichtag vom echten Heute aus. Ab dem 01.11.2026
+// landete er deshalb einen Monat spaeter, und neun Tests wurden rot — ohne
+// dass sich am Code etwas geaendert hatte. Die Uhr steht jetzt auf dem Tag,
+// den auch die effectiveDateFor-Tests annehmen. Nur Date, keine Timer.
+beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date('2026-10-09T12:00:00Z')); });
+afterEach(() => { vi.useRealTimers(); });
 beforeEach(() => { db.subs = []; db.services = []; db.cats = []; db.events = []; db.members = []; });
 
 describe('Der Stichtag ist die Verlaengerung, nicht das Zyklusende', () => {
