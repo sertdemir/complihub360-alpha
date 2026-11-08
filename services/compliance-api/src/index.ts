@@ -17,7 +17,7 @@ import { sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBook
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleDomain } from "./domain.js";
 import { handleAuthAdopt } from "./adoption.js";
-import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
+import { handleDashboard, focusDomainsFor } from "./dashboard.js";
 import { checkMarketRequest, mergeMarketRequest } from "./marketRequests.js";
 import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, revokeGrant, settingsUrl } from "./nylasAuth.js";
@@ -3413,7 +3413,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const requestedSlugs: string[] = requestData.structured_answers?.domains
                     || requestData.structured_answers?.categories
                     || requestData.domains || [];
-                const focusDomains = [...new Set(requestedSlugs.map((s) => SLUG_TO_ENGINE[s]).filter(Boolean))];
+                const focusDomains = focusDomainsFor(requestedSlugs);
                 try {
                     // No known market at all → no laws rather than a silent DE
                     // fallback (foreign users must not see German statutes).

@@ -639,6 +639,10 @@ describe('POST /api/v1/search', () => {
         expect(byId['data-hosting']).toBeUndefined();
         expect(byId['data-privacy']).toMatchObject({ focus: false });
         expect(byId['tax-vat-registration']).toMatchObject({ focus: true });
+        // EPR & Packaging fragt Elektronik und Batterien ab — deren Pflichten
+        // liegen in der Engine unter ENVIRONMENT und zaehlen als gewaehlt.
+        expect(byId['env-weee-registration']).toMatchObject({ focus: true });
+        expect(byId['env-batteries-epr']).toMatchObject({ focus: true });
     });
 
     it('survives an unknown engine country (laws empty, providers still scored)', async () => {
