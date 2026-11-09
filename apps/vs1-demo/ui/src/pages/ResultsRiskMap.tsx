@@ -330,16 +330,20 @@ export function ResultsRiskMap() {
   // Termine des Nutzers je Anbieter: wo einer liegt, traegt die Karte den
   // Klarnamen statt des Pseudonyms (Stufe 3).
   const [booked, setBooked] = useState<BookingByKey>({});
+  const [reloadKey, setReloadKey] = useState(0);
+  const { isLoggedIn, user } = useAuthStore();
 
+  // Nur angemeldet: ein Gast hat keine Termine, und die Anfrage endete fuer
+  // ihn in einem 401 (abgefangen, aber im Log und im Netzwerk). Meldet sich
+  // jemand auf der Seite an, laedt es nach.
   useEffect(() => {
+    if (!isLoggedIn) { setBooked({}); return; }
     let alive = true;
     loadBookingsByKey()
       .then((b) => { if (alive) setBooked(b); })
       .catch(() => { if (alive) setBooked({}); });
     return () => { alive = false; };
-  }, []);
-  const [reloadKey, setReloadKey] = useState(0);
-  const { isLoggedIn, user } = useAuthStore();
+  }, [isLoggedIn]);
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const locale = i18n.resolvedLanguage || 'en';

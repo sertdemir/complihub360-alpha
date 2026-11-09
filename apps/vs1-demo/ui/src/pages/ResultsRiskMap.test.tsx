@@ -44,6 +44,11 @@ const auth = vi.hoisted(() => ({ isLoggedIn: false, user: null as { email?: stri
 const requestMarket = vi.hoisted(() => vi.fn());
 vi.mock('../api/marketRequests', () => ({ requestMarket: (...a: unknown[]) => requestMarket(...a) }));
 vi.mock('../store/useAuthStore', () => ({ useAuthStore: () => auth }));
+const loadBookingsByKey = vi.hoisted(() => vi.fn(async (..._a: unknown[]) => ({})));
+vi.mock('../components/user/DomainProviders', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../components/user/DomainProviders')>()),
+  loadBookingsByKey: (...a: unknown[]) => loadBookingsByKey(...a),
+}));
 vi.mock('../components/user/UserShell', () => ({ UserShell: ({ children }: { children: ReactNode }) => <>{children}</> }));
 // t() resolves to the canonical EN default so assertions read as the user sees.
 // Without a default it returns the key, with `count` and `pct` appended — so a
@@ -1095,5 +1100,24 @@ describe('ResultsRiskMap · hint "one answer makes your map more precise"', () =
     renderPage('/en/results?session=s1');
     expect(await screen.findByText('Product safety')).toBeInTheDocument();
     expect(screen.queryByText('hint.title')).not.toBeInTheDocument();
+  });
+});
+
+// ─── Buchungen nur angemeldet (09.11.2026) ───────────────────────────────────
+// Ein Gast hat keine Termine; die Anfrage lief trotzdem und endete in 401.
+describe('ResultsRiskMap bookings', () => {
+  it('a guest does not ask for bookings', async () => {
+    loadBookingsByKey.mockClear();
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage();
+    await screen.findAllByText(/./);
+    expect(loadBookingsByKey).not.toHaveBeenCalled();
+  });
+  it('a signed-in user does', async () => {
+    loadBookingsByKey.mockClear();
+    auth.isLoggedIn = true;
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage();
+    await waitFor(() => expect(loadBookingsByKey).toHaveBeenCalled());
   });
 });
