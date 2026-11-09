@@ -1456,12 +1456,23 @@
     }
   },
   "trustBand": {
-    "eyebrow": "İkisi neden birlikte",
+    "eyebrow": "CompliHub360 neden ikisini bir araya getiriyor",
     "title": {
-      "line1": "Platformlar kuralları bilir, dizinler insanları.",
-      "pre": "CompliHub360 ",
-      "gold": "iki yarıyı",
-      "post": " aynı anda kapatır."
+      "line1": "Net bilgi ve doğru uzman",
+      "pre": "",
+      "gold": "birbirini tamamlar",
+      "post": "."
+    },
+    "body": "Güvenilir bilgi, neyin önemli olduğunu anlamanıza yardımcı olur. Adil eşleştirme, desteğe ihtiyaç duyduğunuzda doğru uzmanı bulmanızı sağlar."
+  },
+  "tips": {
+    "verifiedProvider": "CompliHub360'ın geçerli işletme, deneyim, kapsam ve kalite kriterlerine göre incelediği bir sağlayıcı.",
+    "officialSource": "Kurumun kendi yayını; örneğin bir kanun, yönetmelik ya da resmî rehber. Çevrimiçi erişilebiliyorsa bağlantısı verilir.",
+    "priority": "Bir gerekliliğe ne kadar yakında ilgilenmeniz gerektiğini gösterir: son tarihine ve sonuçlarına göre “Acil”den “Düşük”e kadar.",
+    "terms": {
+      "officialSource": "Resmî kaynak",
+      "verifiedProvider": "Verified Provider",
+      "priority": "Öncelik"
     }
   }
 }

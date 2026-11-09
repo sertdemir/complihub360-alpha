@@ -1456,12 +1456,23 @@
     }
   },
   "trustBand": {
-    "eyebrow": "Por qué ambas van juntas",
+    "eyebrow": "Por qué CompliHub360 reúne ambas cosas",
     "title": {
-      "line1": "Las plataformas conocen las reglas; los directorios, a las personas.",
-      "pre": "CompliHub360 cierra ",
-      "gold": "ambas mitades",
-      "post": " a la vez."
+      "line1": "La información clara y el profesional adecuado",
+      "pre": "",
+      "gold": "van de la mano",
+      "post": "."
+    },
+    "body": "La información fiable le ayuda a entender lo que importa. Un matching justo le ayuda a encontrar al profesional adecuado cuando necesita apoyo."
+  },
+  "tips": {
+    "verifiedProvider": "Un proveedor revisado por CompliHub360 según los criterios aplicables de empresa, experiencia, cobertura y calidad.",
+    "officialSource": "La publicación de la propia autoridad, como una ley, un reglamento o una guía oficial, enlazada cuando está disponible en línea.",
+    "priority": "Cuándo necesita su atención un requisito, de «Inmediata» a «Baja», según su plazo y sus consecuencias.",
+    "terms": {
+      "officialSource": "Fuente oficial",
+      "verifiedProvider": "Verified Provider",
+      "priority": "Prioridad"
     }
   }
 }

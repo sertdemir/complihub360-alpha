@@ -1456,12 +1456,23 @@
     }
   },
   "trustBand": {
-    "eyebrow": "Warum beides zusammengehört",
+    "eyebrow": "Warum CompliHub360 beides zusammenbringt",
     "title": {
-      "line1": "Die Plattformen kennen die Regeln, die Verzeichnisse die Menschen.",
-      "pre": "CompliHub360 schließt ",
-      "gold": "beide Hälften",
-      "post": " zugleich."
+      "line1": "Klare Informationen und die richtige Fachperson",
+      "pre": "",
+      "gold": "gehören zusammen",
+      "post": "."
+    },
+    "body": "Verlässliche Informationen helfen Ihnen zu verstehen, worauf es ankommt. Faires Matching hilft Ihnen, die richtige Fachperson zu finden, wenn Sie Unterstützung brauchen."
+  },
+  "tips": {
+    "verifiedProvider": "Ein Anbieter, den CompliHub360 anhand der jeweils geltenden Kriterien zu Unternehmen, Erfahrung, Abdeckung und Qualität geprüft hat.",
+    "officialSource": "Die Veröffentlichung der Behörde selbst, etwa ein Gesetz, eine Verordnung oder ein offizieller Leitfaden — verlinkt, wo sie online verfügbar ist.",
+    "priority": "Wie bald eine Anforderung Ihre Aufmerksamkeit braucht, von „Sofort“ bis „Niedrig“ — abhängig von ihrer Frist und ihren Folgen.",
+    "terms": {
+      "officialSource": "Amtliche Quelle",
+      "verifiedProvider": "Verified Provider",
+      "priority": "Priorität"
     }
   }
 }
