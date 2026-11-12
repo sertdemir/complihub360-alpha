@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Container } from '../ui/Container';
+import { Photo } from '../ui/Photo';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../providers/SectionHeading';
 
 // ─── S2 — Problem Recognition · Brand & Marketing Map V1 §4/§5 ───────────────
@@ -38,7 +39,21 @@ export function ProblemRecognition() {
           </p>
         </Reveal>
 
-        <div className="mx-auto mt-14 rounded-xl bg-gradient-stage p-5 sm:p-12">
+        {/* Photo on the panel (canvas "Marketing-Fotos · Look B" · S2-B,
+            2026-10-24): someone at their own table, boxes beside the laptop —
+            the reader's situation, calm, before any card names a pain. Stacks
+            above the cards below lg. */}
+        <div className="mx-auto mt-14 grid gap-5 rounded-xl bg-gradient-stage p-5 sm:p-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-7 lg:p-10">
+        <Reveal className="relative aspect-[3/2] overflow-hidden rounded-xl lg:aspect-auto lg:min-h-[22rem]">
+          {/* On lg the slot is portrait and as tall as the cards (~620px), so
+              object-cover renders the landscape photo ~930px wide — sizes says
+              so, or the browser picks the 640 file and upscales it. */}
+          <Photo
+            slug="owner-laptop-boxes"
+            sizes="(min-width: 1024px) 960px, 100vw"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </Reveal>
         {/* User spec 2026-08-25: the cards appear one after another, smooth —
             0.18s apart so the sequence is clearly readable, not one wave. */}
         <Stagger stagger={0.18} className="grid gap-5 sm:grid-cols-2">
