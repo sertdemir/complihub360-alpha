@@ -324,10 +324,9 @@
   "comingSoon": {
     "eyebrow": "En preparación",
     "bannerTitle": "EN PREPARACIÓN — {{title}}",
-    "joinEarlyAccess": "Unirse al acceso anticipado",
     "alerts": {
       "title": "Alertas",
-      "sub": "Monitorización de umbrales y regulación · próximamente — únase al acceso anticipado",
+      "sub": "Monitorización de umbrales y regulación · próximamente",
       "panelTitle": "Monitorización de umbrales y regulación",
       "panelSub": "Reciba una notificación en cuanto sus ingresos se acerquen a un umbral de IVA, un regulador cambie las normas o se acerque un plazo.",
       "feature1": "Alertas de umbral por país",
@@ -347,7 +346,7 @@
     },
     "library": {
       "title": "Biblioteca",
-      "sub": "Conocimiento, tutoriales y herramientas · próximamente — únase al acceso anticipado",
+      "sub": "Conocimiento, tutoriales y herramientas · próximamente",
       "panelTitle": "Conocimiento, tutoriales y herramientas",
       "panelSub": "Contenidos verificados de especialistas, ordenados por área y mercado — cada uno indica la norma que explica.",
       "feature1": "Tutoriales por área",
@@ -357,7 +356,7 @@
     }
   },
   "domainPage": {
-    "subEmpty": "Aún no hay sesión con esta área · el conocimiento y los proveedores están listos",
+    "subEmpty": "Aún no hay ningún risk map con esta área",
     "lageOpen_one": "{{count}} obligación abierta",
     "lageOpen_other": "{{count}} obligaciones abiertas",
     "lageRiskMaps_one": "en {{count}} sesión",
@@ -454,7 +453,7 @@
     "namePlaceholder": "Nombre de la sesión",
     "renamed": "Renombrada ✓",
     "archiveTitle": "Archivar",
-    "archiveDesc": "Oculta la sesión de la lista · la monitorización se pausa · restaurable en cualquier momento.",
+    "archiveDesc": "Oculta el risk map de la lista · restaurable en cualquier momento.",
     "archived": "Archivada ✓",
     "actionError": "La acción falló — inténtelo de nuevo en un momento.",
     "archiveQuestion": "¿Archivar esta sesión?"
@@ -528,7 +527,7 @@
     "disclaimer": "Información regulatoria general, no asesoramiento legal ni fiscal. Para una evaluación vinculante, contrate a un Verified Provider.",
     "error": "No ha funcionado — inténtelo de nuevo en un momento.",
     "notConfigured": "El asistente aún no está conectado en este entorno.",
-    "quota": "Límite diario alcanzado — el plan de mejora llegará pronto.",
+    "quota": "Ha alcanzado el límite de hoy. Podrá volver a preguntar mañana.",
     "upgradeTitle": "Assistant Pro",
     "upgradeBody": "Sus 5 preguntas gratuitas de hoy se han agotado. Assistant Pro eleva el límite diario a 200 — cancelable mensualmente.",
     "upgradeCta": "Mejorar · 12 € / mes",

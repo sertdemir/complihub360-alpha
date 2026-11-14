@@ -1203,13 +1203,13 @@
       {
         "kicker": "Einschätzen",
         "title": "Sehen Sie, was tatsächlich für Sie gilt.",
-        "body": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen ergeben eine Risk Map: die Pflichten, die für Ihren Betrieb gelten, jede mit Rechtsgrundlage und Frist. Sie stammen aus unserer eigenen Compliance-Engine und verweisen auf die EU-Rechtsdatenbank — sie werden nicht von einem Chatbot erzeugt.",
+        "body": "Erzählen Sie uns von Ihren Märkten, Ihrem Geschäftsmodell und den Bereichen, in denen Sie Unterstützung brauchen. Ihre Risk Map zeigt dann die Pflichten, die für Ihr Unternehmen gelten, jede mit ihrer Priorität und, wo vorhanden, mit amtlicher Quelle und Frist. Sie stammen aus unserer Compliance-Engine, nicht aus einem Chatbot.",
         "short": "Der Wizard fragt vier Dinge ab und erstellt Ihre Risk Map — jede Pflicht mit Rechtsgrundlage und Frist."
       },
       {
         "kicker": "Entscheiden",
         "title": "Entscheiden Sie, wofür Sie Hilfe brauchen.",
-        "body": "Die Karte trennt, was Sie intern erledigen können, von dem, was wirklich eine Fachperson braucht — und in welcher Reihenfolge. Stellt sich heraus, dass Sie bereits alles abgedeckt haben, sagen wir Ihnen das. Dann gibt es für uns nichts zu verkaufen.",
+        "body": "Sehen Sie Ihre Prioritäten, Fristen und Quellen und welche Themen Sie möglicherweise intern oder mit professioneller Unterstützung erledigen. Stellt sich heraus, dass Sie bereits alles abgedeckt haben, sagen wir Ihnen das. Dann gibt es für uns nichts zu verkaufen.",
         "short": "Die Risk Map trennt, was Sie intern erledigen, von dem, was eine Fachperson braucht."
       },
       {
@@ -1220,8 +1220,8 @@
       },
       {
         "kicker": "Handeln",
-        "title": "Buchen, dann übergeben.",
-        "body": "Wählen Sie einen Termin im Kalender der Fachperson. Die Identität wird bei der Buchung sichtbar, zusammen mit einem Dossier all dessen, was Sie uns bereits gesagt haben — Sie erklären Ihr Geschäft also kein sechstes Mal. Danach können Sie die Zusammenarbeit bewerten, und die Pflichten bleiben mit ihren Fristen auf Ihrer Karte.",
+        "title": "Beratung buchen.",
+        "body": "Wählen Sie einen Anbieter und einen Termin in seinem Kalender. Vor der Buchung sehen Sie genau, was geteilt wird. Die Identität des Anbieters wird bei der Buchung sichtbar, und geteilt wird nur, was für die Bearbeitung Ihrer Anfrage nötig ist. Danach können Sie den Termin bewerten, und Ihre Pflichten bleiben mit ihren Fristen in Ihrer Risk Map.",
         "short": "Termin wählen — Ihr Dossier reist mit, Sie erklären Ihr Geschäft kein sechstes Mal."
       }
     ],
@@ -1275,8 +1275,8 @@
         ]
       },
       "decide": {
-        "selfTitle": "Selbst erledigen",
-        "proTitle": "Fachperson nötig",
+        "selfTitle": "Intern möglich",
+        "proTitle": "Mit professioneller Unterstützung",
         "self": [
           "Cookie-Banner aktualisieren",
           "Impressum FR ergänzen"
@@ -1291,10 +1291,10 @@
       "match": {
         "rows": [
           {
-            "meta": "Antwort in 24h · 4.8 ★ · Verifiziert"
+            "meta": "Antwort in ~24 h · Verifiziert"
           },
           {
-            "meta": "Antwort in 21h · 4.9 ★ · Verifiziert"
+            "meta": "Antwort in ~21 h · Verifiziert"
           }
         ],
         "note": "Identität wird erst bei der Buchung sichtbar. Das Ranking ist nicht käuflich."
@@ -1308,15 +1308,15 @@
           "Do 11:30"
         ],
         "points": [
-          "Ihr Dossier reist mit — Sie erklären Ihr Geschäft kein sechstes Mal.",
+          "Vor der Buchung sehen Sie, was geteilt wird — nur, was Ihre Anfrage braucht.",
           "Pflichten bleiben mit ihren Fristen auf Ihrer Karte."
         ]
       }
     },
     "cost": {
       "kicker": "Was Sie das kostet",
-      "title": "Nichts.",
-      "body": "Die Plattform, die Risk Map und das Matching sind für Sie kostenlos. Bezahlt werden wir von den Fachleuten, wenn tatsächlich eine Buchung zustande kommt. Genau deshalb ist das Ranking nicht käuflich: ein bezahlter Platz würde das Match für beide Seiten wertlos machen."
+      "title": "Kostenlos: Anbieter finden und buchen.",
+      "body": "Die Einschätzung, Ihre Risk Map, das Matching und die Buchung sind für Sie kostenlos. Bezahlt werden wir von den Anbietern, wenn tatsächlich eine Buchung zustande kommt. Genau deshalb ist das Ranking nicht käuflich: ein bezahlter Platz würde das Match für beide Seiten wertlos machen. Nur der KI-Assistent im Arbeitsbereich hat einen optionalen Bezahlplan für mehr Fragen pro Tag."
     },
     "privacy": {
       "kicker": "Was mit Ihren Daten passiert",

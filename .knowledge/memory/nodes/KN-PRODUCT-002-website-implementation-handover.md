@@ -100,7 +100,19 @@ Umgesetzt auf der Startseite (EN), Sektion für Sektion:
   - **Regeln:** anonym bis zur Buchung (ADR-0004). Die Liste ist kein Detail-Aufruf und schreibt kein billable Event. Der Anbieter erfährt nichts.
   - **Buchstabe:** Er ist die Position in der jeweiligen Liste, wie in der Suche. Derselbe Anbieter kann auf der Risk Map „C“ und in der Merkliste „A“ heißen.
 - **Lokalisierung:** DE, ES und TR tragen den alten Satz und fallen für neue Schlüssel auf EN zurück (Entscheidung 09.10.2026).
-- **Unterseiten:** `/how-it-works` und das Dashboard gehören nicht zum Handover. Ihre Zwischentitel und Dashboard-Labels sind unverändert.
+- **Unterseiten**, geprüft am 14.11.2026 gegen DNA, Handover §6/§13/§14 und den Live-Stand:
+  - **`/how-it-works`:**
+    - Die drei Wendungen, die §6 ersetzt, sind fort: „Quality before names“, „Book, then hand over“, „legal basis“.
+    - Zwei gleichwertige Einstiege: „Ask a Question“ und „Assess My Needs“.
+    - Keine Sterne-Bewertungen im Beispiel (§15 Reviews).
+    - Kein „Dossier mit allem, was Sie uns gesagt haben“. Es gilt §13: nur, was die Anfrage braucht.
+    - Kosten: Gratis ist die Suche und Buchung eines Anbieters. Der optionale Bezahlplan des KI-Assistenten ist offen benannt.
+  - **Arbeitsbereich:**
+    - „Risk Map“ wird als Plattformbegriff großgeschrieben (§14).
+    - „New assessment“ statt „New search“, „consultation“ statt „intro call“, „provider“ statt „specialist“.
+    - Entfernt sind die „Join early access“-Knöpfe ohne Funktion und „monitoring pauses“ (es gibt noch kein Monitoring).
+    - Weg ist auch „the upgrade plan is coming soon“ (Assistant Pro gibt es) und „providers are ready“ (nicht in jedem Bereich).
+  - Sätze, die etwas Falsches behaupteten, sind in allen vier Sprachen ersetzt, der Rest nur in EN.
 
 ## Prüfkriterien für Agenten
 

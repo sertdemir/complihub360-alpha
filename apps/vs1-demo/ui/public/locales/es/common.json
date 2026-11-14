@@ -1203,13 +1203,13 @@
       {
         "kicker": "Evaluar",
         "title": "Vea qué se aplica realmente a su caso.",
-        "body": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen producen un risk map: las obligaciones que se aplican a su operación, cada una con su base legal y su plazo. Provienen de nuestro propio motor de compliance y enlazan con la base de datos jurídica de la UE; no las genera un chatbot.",
+        "body": "Cuéntenos sobre sus mercados, su modelo de negocio y las áreas en las que necesita apoyo. Su risk map muestra entonces las obligaciones que se aplican a su empresa, cada una con su prioridad y, cuando existe, su fuente oficial y su plazo. Provienen de nuestro motor de compliance, no de un chatbot.",
         "short": "El wizard pregunta cuatro cosas y crea su Risk Map — cada obligación con base legal y plazo."
       },
       {
         "kicker": "Decidir",
         "title": "Decida qué necesita ayuda externa.",
-        "body": "El mapa separa lo que puede resolver internamente de lo que realmente requiere un especialista, y en qué orden. Si resulta que ya lo tiene todo cubierto, se lo decimos: en ese caso no tenemos nada que venderle.",
+        "body": "Vea sus prioridades, plazos y fuentes, y qué asuntos podría gestionar internamente o con apoyo profesional. Si resulta que ya lo tiene todo cubierto, se lo decimos: en ese caso no hay nada que venderle.",
         "short": "La Risk Map separa lo que puede resolver internamente de lo que necesita un especialista."
       },
       {
@@ -1220,8 +1220,8 @@
       },
       {
         "kicker": "Actuar",
-        "title": "Reserve y entregue el caso.",
-        "body": "Elija una hora en el calendario del especialista. Su identidad se revela al reservar, junto con un dossier de todo lo que ya nos ha contado, de modo que no explique su negocio por sexta vez. Después puede valorar cómo fue, y las obligaciones siguen en su mapa con sus plazos.",
+        "title": "Reserve una consulta.",
+        "body": "Elija un proveedor y una hora en su calendario. Antes de reservar, ve exactamente qué se compartirá. La identidad del proveedor se revela al reservar, y solo se comparte la información necesaria para tramitar su solicitud. Después puede valorar la cita, y sus obligaciones siguen en su risk map con sus plazos.",
         "short": "Elija una cita — su dossier viaja con usted, no explicará su negocio una sexta vez."
       }
     ],
@@ -1275,8 +1275,8 @@
         ]
       },
       "decide": {
-        "selfTitle": "Hacerlo usted mismo",
-        "proTitle": "Se necesita especialista",
+        "selfTitle": "Posible internamente",
+        "proTitle": "Con apoyo profesional",
         "self": [
           "Actualizar el banner de cookies",
           "Completar el aviso legal FR"
@@ -1291,10 +1291,10 @@
       "match": {
         "rows": [
           {
-            "meta": "Responde en 24h · 4.8 ★ · Verificado"
+            "meta": "Responde en ~24 h · Verificado"
           },
           {
-            "meta": "Responde en 21h · 4.9 ★ · Verificado"
+            "meta": "Responde en ~21 h · Verificado"
           }
         ],
         "note": "La identidad se muestra solo al reservar. El orden nunca está en venta."
@@ -1308,15 +1308,15 @@
           "Jue 11:30"
         ],
         "points": [
-          "Su dossier viaja con usted — no explica su negocio una sexta vez.",
+          "Antes de reservar, ve qué se compartirá: solo lo que su solicitud necesita.",
           "Las obligaciones permanecen en su mapa con sus plazos."
         ]
       }
     },
     "cost": {
       "kicker": "Lo que esto le cuesta",
-      "title": "Nada.",
-      "body": "La plataforma, el risk map y el matching son gratuitos para usted. Nos pagan los especialistas cuando una reserva llega a producirse. Por eso mismo el orden no está en venta: una posición pagada dejaría el match sin valor para ambas partes."
+      "title": "Gratis para encontrar y reservar un proveedor.",
+      "body": "La evaluación, su risk map, el matching y la reserva son gratuitos para usted. Nos pagan los proveedores cuando una reserva llega a producirse. Por eso mismo el orden no está en venta: una posición pagada dejaría el match sin valor para ambas partes. Solo el asistente de IA de su espacio de trabajo tiene un plan de pago opcional para más preguntas al día."
     },
     "privacy": {
       "kicker": "Qué ocurre con sus datos",

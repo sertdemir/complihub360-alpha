@@ -324,10 +324,9 @@
   "comingSoon": {
     "eyebrow": "In Vorbereitung",
     "bannerTitle": "IN VORBEREITUNG — {{title}}",
-    "joinEarlyAccess": "Early Access beitreten",
     "alerts": {
       "title": "Alerts",
-      "sub": "Schwellenwert- & Regulierungs-Monitoring · bald verfügbar — sichern Sie sich Early Access",
+      "sub": "Schwellenwert- & Regulierungs-Monitoring · bald verfügbar",
       "panelTitle": "Schwellenwert- & Regulierungs-Monitoring",
       "panelSub": "Werden Sie benachrichtigt, sobald sich Ihr Umsatz einer USt-Schwelle nähert, eine Behörde Regeln ändert oder eine Frist naht.",
       "feature1": "Schwellenwert-Alerts pro Land",
@@ -347,7 +346,7 @@
     },
     "library": {
       "title": "Bibliothek",
-      "sub": "Wissen, Tutorials & Werkzeuge · bald verfügbar — zum Early Access anmelden",
+      "sub": "Wissen, Tutorials & Werkzeuge · bald verfügbar",
       "panelTitle": "Wissen, Tutorials & Werkzeuge",
       "panelSub": "Geprüfte Beiträge von Fachleuten, nach Bereich und Markt sortiert — jeder nennt die Vorschrift, die er erklärt.",
       "feature1": "Tutorials je Bereich",
@@ -357,7 +356,7 @@
     }
   },
   "domainPage": {
-    "subEmpty": "Noch keine Sitzung mit diesem Bereich · Wissen und Anbieter stehen bereit",
+    "subEmpty": "Noch keine Risk Map mit diesem Bereich",
     "lageOpen_one": "{{count}} offene Pflicht",
     "lageOpen_other": "{{count}} offene Pflichten",
     "lageRiskMaps_one": "in {{count}} Sitzung",
@@ -454,7 +453,7 @@
     "namePlaceholder": "Sitzungsname",
     "renamed": "Umbenannt ✓",
     "archiveTitle": "Archivieren",
-    "archiveDesc": "Blendet die Sitzung aus der Liste aus · Monitoring pausiert · jederzeit wiederherstellbar.",
+    "archiveDesc": "Blendet die Risk Map aus der Liste aus · jederzeit wiederherstellbar.",
     "archived": "Archiviert ✓",
     "actionError": "Aktion fehlgeschlagen — versuchen Sie es gleich erneut.",
     "archiveQuestion": "Diese Sitzung archivieren?"
@@ -528,7 +527,7 @@
     "disclaimer": "Allgemeine regulatorische Information, keine Rechts- oder Steuerberatung. Für eine verbindliche Einschätzung beauftragen Sie einen Verified Provider.",
     "error": "Das hat nicht geklappt — bitte versuchen Sie es gleich erneut.",
     "notConfigured": "Der Assistent ist in dieser Umgebung noch nicht angebunden.",
-    "quota": "Tageslimit erreicht — der Upgrade-Plan kommt in Kürze.",
+    "quota": "Das Tageslimit ist erreicht. Morgen können Sie wieder fragen.",
     "upgradeTitle": "Assistant Pro",
     "upgradeBody": "Ihre 5 kostenlosen Fragen für heute sind aufgebraucht. Assistant Pro hebt das Tageslimit auf 200 — monatlich kündbar.",
     "upgradeCta": "Upgrade · 12 € / Monat",
