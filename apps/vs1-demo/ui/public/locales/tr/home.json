@@ -1320,21 +1320,40 @@
         "label": "Değerlendirme ve Risk Map",
         "items": [
           {
-            "q": "Değerlendirme gerçekten ücretsiz mi?",
-            "a": "Evet. Hesap yok, kredi kartı yok. Sonunda yapılandırılmış bir Risk Map alırsınız. Sonrasında kaydolmak — haritayı saklamak, sağlayıcılarla eşleşmek, bildirim almak için — isteğe bağlı bir sonraki adımdır."
+            "q": "Değerlendirme ücretsiz mi?",
+            "a": "Evet. Değerlendirmeyi hesap açmadan ve ödeme yapmadan tamamlayabilir, Risk Map’inizi görüntüleyebilirsiniz. Ücretsiz bir hesapla Risk Map’inizi kaydedip güncelleyebilir, en iyi eşleşmelerinizi görebilir, ön görüşme ayırtabilir ve mevcut uyarıları alabilirsiniz."
           },
           {
-            "q": "Risk Map'teki bilgiler nereden geliyor?"
+            "q": "Risk Map’im ne kadar kişiselleştirilmiş?",
+            "a": "Risk Map’iniz; seçtiğiniz pazarlara, iş modeline, ürün veya hizmetlere, faaliyetlere ve destek alanlarına dayanır. Yanıtlarınız ne kadar eksiksiz olursa sonuçlar da o kadar isabetli olabilir. Daha fazla bilgiye ihtiyaç duyulduğunda bunu size belirtiriz."
           },
           {
-            "q": "Risk Map'imi dışa aktarabilir miyim?"
+            "q": "Bir yanıttan emin değilsem ne olur?",
+            "a": "Emin olmadığınız soruları atlayabilir, daha sonra bunlara geri dönebilir ya da doğrulama gerektiğinde profesyonel destek talep edebilirsiniz."
           },
           {
-            "q": "Birden fazla pazarı ve alanı aynı anda kontrol edebilir miyim?",
-            "a": "Evet. Değerlendirme, faaliyet gösterdiğiniz tüm pazarları ve alanları kapsar ve yükümlülükleri tek bir bütünlüklü haritada birleştirir — hepsi birlikte önceliklendirilir."
+            "q": "Risk Map’teki durumlar ne anlama geliyor?",
+            "a": "“Onaylandı”, yanıtlarınıza göre gerekliliğin geçerli olduğu anlamına gelir. “Muhtemel”, gerekliliğin büyük olasılıkla geçerli olduğu, ancak daha fazla bilgi veya profesyonel doğrulama gerekebileceği anlamına gelir. “Daha fazla bilgi gerekli”, daha doğru bir değerlendirme için ek yanıtlara ihtiyaç olduğu anlamına gelir."
           },
           {
-            "q": "Pazarım henüz kapsanmıyorsa ne olur?"
+            "q": "Bilgiler nereden geliyor?",
+            "a": "Mevzuat bilgileri resmî kurum kaynaklarına dayanır. Mümkün olduğunda kurumu, kaynak bağlantısını, ilgili tarihi ve bilginin en son ne zaman gözden geçirildiğini gösteririz."
+          },
+          {
+            "q": "Birden fazla pazarı veya alanı aynı anda değerlendirebilir miyim?",
+            "a": "Evet. Birden fazla pazarı ve destek alanını tek bir düzenli Risk Map’te bir araya getirebilirsiniz."
+          },
+          {
+            "q": "Yanıtlarımı değiştirebilir veya Risk Map’imi güncelleyebilir miyim?",
+            "a": "Evet. Faaliyetleriniz, pazarlarınız, ürünleriniz veya şirket yapınız değiştiğinde yanıtlarınızı güncelleyin."
+          },
+          {
+            "q": "Bilgilerimi dışa aktarabilir miyim?",
+            "a": "Risk Map’inizi PDF olarak dışa aktarabilirsiniz. Kullanılabilirliğe ve hesabınızın özelliklerine bağlı olarak iş kayıtları da PDF, CSV veya bir API üzerinden sunulabilir."
+          },
+          {
+            "q": "Pazarım mevcut değilse ne olur?",
+            "a": "Ek bir pazar talep edebilir ve mümkün olduğunda, pazar kapsama alındığında uyarı almayı seçebilirsiniz."
           }
         ]
       },
@@ -1342,35 +1361,94 @@
         "label": "Sağlayıcılar ve işler",
         "items": [
           {
-            "q": "Bana hukuki danışmanlık mı veriyorsunuz?",
-            "a": "Hayır. CompliHub360 yükümlülükleri haritalar ve operasyonunuza muhtemelen neyin uygulanacağını gösterir — bu hukuki danışmanlık değildir. Bir konu bağlayıcı görüş gerektirdiğinde, sizi bunu verebilecek bir Verified Provider ile buluştururuz."
+            "q": "CompliHub360 hukuki, vergi, muhasebe veya başka bir mesleki danışmanlık veriyor mu?",
+            "a": "Hayır. CompliHub360 uyum bilgileri ve eşleştirme hizmetleri sunar. Bir hukuk bürosu, muhasebe firması, vergi danışmanı, gümrük müşaviri veya düzenleyici kurum değiliz. Danışmanlık ve mesleki hizmetler, seçilen sağlayıcı tarafından bağımsız olarak sunulur."
           },
           {
-            "q": "Verified Provider'lar nasıl denetleniyor?"
+            "q": "Sağlayıcılar nasıl inceleniyor?",
+            "a": "Sağlayıcılar; nitelikler, uzmanlık, pazar kapsamı, işletme bilgileri, deneyim ve hizmet standartları gibi geçerli kriterlere göre incelenir. Mümkün olduğunda lisansları, sertifikaları, yanıt geçmişini, değerlendirmeleri ve tamamlanan işleri de doğrulayabiliriz."
           },
           {
-            "q": "Bir iş ne kadara mal olur?"
+            "q": "Sağlayıcı adları neden başta gizli?",
+            "a": "İlk karşılaştırma sırasında sağlayıcı adları gizli kalır; böylece marka bilinirliği yerine uzmanlığa ve uygunluğa odaklanabilirsiniz. Bu, farklı büyüklükteki sağlayıcılara da seçilmek için adil bir fırsat tanır."
           },
-          {},
           {
-            "a": "Hayır. Her iş ayrı ayrı sözleşmeye bağlanır. İstediğiniz zaman yeni eşleşmeler talep edebilir veya değiştirebilirsiniz — geçmişiniz ve Risk Map'iniz size aittir."
+            "q": "Sağlayıcının adını ve tam profilini ne zaman görürüm?",
+            "a": "Sağlayıcının kimliği ve tam profili, sağlayıcıyı seçip bir ön görüşme ayırttıktan sonra görünür hâle gelir. Ardından doğrulanmış yeterliliklerini, değerlendirmelerini, işletme doğrulama bilgilerini ve iletişim bilgilerini inceleyebilirsiniz."
+          },
+          {
+            "q": "Sağlayıcılar, eşleşmelerimde daha üstte görünmek için ödeme yapabilir mi?",
+            "a": "Hayır. Eşleştirme ve sıralama ilgili kriterlere dayanır ve satın alınamaz. Reklam bütçeleri, marka büyüklüğü ve ticari anlaşmalar en iyi eşleşmelerinizi belirlemez."
+          },
+          {
+            "q": "Hizmet ne kadar tutar?",
+            "a": "Bir sağlayıcı seçmeden önce tahmini bir fiyat aralığı görürsünüz. Ön görüşmeden sonra sağlayıcı hizmetleri, nihai fiyatı, öngörülen süreyi ve koşulları onaylar. Profesyonel çalışma ancak siz bunları onayladıktan sonra başlar."
+          },
+          {
+            "q": "Bir sağlayıcı ne kadar hızlı yanıt verir?",
+            "a": "Sağlayıcının öngörülen yanıt süresi, seçiminizi yapmadan önce gösterilir. Sağlayıcı bu süre içinde yanıt vermezse CompliHub360 size başka bir eşleşme önerebilir. Bilgileriniz, onayınız olmadan başka bir sağlayıcıyla paylaşılmaz."
+          },
+          {
+            "q": "Birden fazla sağlayıcı seçebilir miyim?",
+            "a": "Evet. Birden fazla sağlayıcı seçebilir ve her biriyle ön görüşme ayırtabilirsiniz. Her rezervasyon ve her profesyonel iş ayrı kalır."
+          },
+          {
+            "q": "Rezervasyondan sonra ne olur?",
+            "a": "Sağlayıcının kimliği ve tam profili görünür hâle gelir ve yalnızca talebinizin işlenmesi için gereken bilgiler paylaşılır. Ardından sağlayıcı hizmeti, fiyatı, süreyi ve koşulları onaylar. Siz onaylamadan hiçbir profesyonel çalışma başlamaz."
+          },
+          {
+            "q": "Ön görüşmeden sonra sağlayıcıyla devam etmek zorunda mıyım?",
+            "a": "Hayır. Bir ön görüşme ayırtmak, profesyonel bir işe başlamanızı gerektirmez."
+          },
+          {
+            "q": "CompliHub360, kullanıcılar için ücretsiz erişimi nasıl sağlıyor?",
+            "a": "CompliHub360, destek arayan işletmeler için ücretsizdir. Gelirimizi, katılımcı sağlayıcılarla olan ticari ilişkilerimizden elde ederiz. Bu düzenlemeler, eşleşmelerinizde hangi sağlayıcıların yer aldığını veya nasıl sıralandıklarını hiçbir zaman etkilemez."
           }
         ]
       },
       {
-        "label": "Hesap ve veriler",
+        "label": "Hesap, veriler ve gizlilik",
         "items": [
           {
             "q": "Hesaba ihtiyacım var mı?",
-            "a": "Değerlendirme için hayır — tarayıcınızda hesapsız çalışır. Ücretsiz bir hesaba yalnızca Risk Map'inizi saklamak, en iyi eşleşmelerinizi görmek veya bildirim almak istediğinizde ihtiyacınız olur."
+            "a": "Soru sormak, değerlendirmeyi tamamlamak veya ilk Risk Map’inizi görüntülemek için hesap gerekmez. Sonuçları kaydetmek ve güncellemek, en iyi eşleşmelerinizi görmek, ön görüşme ayırtmak ve mevcut çalışma alanı özelliklerini kullanmak için ücretsiz bir hesap gerekir."
           },
           {
-            "q": "Verilerim nasıl işleniyor?",
-            "a": "Değerlendirme tarayıcınızda çalışır ve hesap gerektirmez. Kaydolursanız dosyanız AB veri koruma kurallarına göre, şifrelenmiş olarak saklanır; talimatınız olmadan asla satılmaz veya paylaşılmaz."
+            "q": "Bilgilerim nasıl kullanılıyor?",
+            "a": "Bilgilerinizi; talep ettiğiniz hizmetleri sunmak, ilgili sonuçları kişiselleştirmek, hesabınızı yürütmek ve eşleştirme ile rezervasyon sürecini desteklemek için, Gizlilik Politikamızda açıklandığı şekilde kullanırız."
+          },
+          {
+            "q": "Bir sağlayıcıyla hangi bilgiler paylaşılır?",
+            "a": "Bağlantı kurmayı veya rezervasyon yapmayı seçerseniz yalnızca talebinizin işlenmesi için gereken bilgileri paylaşırız. Bağlantı tamamlanmadan önce neyin paylaşılacağı size gösterilmelidir."
+          },
+          {
+            "q": "Bilgilerim ne zaman paylaşılır?",
+            "a": "Bilgileriniz, bir sağlayıcıyla bağlantı kurmayı veya rezervasyon yapmayı seçip ilgili onay adımını tamamladıktan sonra paylaşılır. Eşleşmelerinizde gösterilen her sağlayıcıyla otomatik olarak paylaşılmaz."
+          },
+          {
+            "q": "CompliHub360 kişisel veya ticari bilgilerimi satıyor mu?",
+            "a": "Hayır. CompliHub360, kişisel veya ticari bilgilerinizi ilgisiz üçüncü taraflara satmaz.\n\nBir hizmet sağlayıcıyla bağlantı kurmayı veya rezervasyon yapmayı seçerseniz, Gizlilik Politikamızda açıklandığı şekilde yalnızca talebinizin işlenmesi için gereken bilgileri paylaşırız."
+          },
+          {
+            "q": "Bilgilerim nasıl korunuyor?",
+            "a": "Kişisel ve ticari bilgileri korumak için tasarlanmış uygun teknik ve idari tedbirler uygularız. Ayrıntılar Gizlilik Politikamızda ve güvenlik bilgilerimizde yer alır."
+          },
+          {
+            "q": "Bildirimleri yönetebilir miyim?",
+            "a": "Evet. Bildirim özellikleri mevcut olduğunda e-posta ve mevzuat uyarısı tercihlerinizi hesabınızdan yönetebilir ya da iletideki abonelikten çıkma seçeneğini kullanabilirsiniz."
+          },
+          {
+            "q": "Hesabımı silebilir veya bilgilerimin silinmesini talep edebilir miyim?",
+            "a": "Gizlilik Politikamızda açıklandığı şekilde hesabınızın silinmesini talep edebilir ve geçerli gizlilik haklarınızı kullanabilirsiniz. Bazı bilgilerin, yasaların gerektirdiği durumlarda veya meşru kayıt tutma amaçlarıyla saklanması gerekebilir."
+          },
+          {
+            "q": "Bilgilerim nerede saklanıyor?",
+            "a": "Bilgiler, Gizlilik Politikamızda açıklanan hizmet aldığımız şirketler aracılığıyla ve konumlarda saklanır ve işlenir. Bilgiler ülkeler arasında aktarıldığında geçerli güvenceler uygulanır."
           }
         ]
       }
-    ]
+    ],
+    "subtitle": "Sorularınız mı var? Buradan başlayın."
   },
   "entryDoor": {
     "journey": [

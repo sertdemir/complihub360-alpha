@@ -1320,21 +1320,40 @@
         "label": "Assessment & Risk Map",
         "items": [
           {
-            "q": "Ist das Assessment wirklich kostenlos?",
-            "a": "Ja. Kein Konto, keine Kreditkarte. Am Ende erhalten Sie eine strukturierte Risk Map. Die anschließende Registrierung — um sie zu behalten, sich mit Anbietern matchen zu lassen und Hinweise zu erhalten — ist der optionale nächste Schritt."
+            "q": "Ist das Assessment kostenlos?",
+            "a": "Ja. Sie können das Assessment ohne Konto und ohne Zahlung durchlaufen und Ihre Risk Map ansehen. Mit einem kostenlosen Konto können Sie Ihre Risk Map speichern und aktualisieren, Ihre besten Matches ansehen, Erstgespräche buchen und verfügbare Hinweise erhalten."
           },
           {
-            "q": "Woher stammen die Angaben in der Risk Map?"
+            "q": "Wie individuell ist meine Risk Map?",
+            "a": "Ihre Risk Map beruht auf den Märkten, dem Geschäftsmodell, den Produkten oder Leistungen, den Tätigkeiten und den Unterstützungsbereichen, die Sie auswählen. Je vollständiger Ihre Antworten sind, desto treffender können die Ergebnisse sein. Wir zeigen Ihnen, wenn weitere Informationen nötig sind."
           },
           {
-            "q": "Kann ich meine Risk Map exportieren?"
+            "q": "Was, wenn ich mir bei einer Antwort unsicher bin?",
+            "a": "Sie können Fragen, bei denen Sie unsicher sind, überspringen, später zu ihnen zurückkehren oder fachliche Unterstützung anfragen, wenn eine Bestätigung nötig ist."
           },
           {
-            "q": "Kann ich mehrere Märkte und Bereiche gleichzeitig prüfen?",
-            "a": "Ja. Das Assessment fragt alle Märkte und Bereiche ab, in denen Sie tätig sind, und führt die Pflichten in einer zusammenhängenden Karte zusammen — priorisiert über alles hinweg."
+            "q": "Was bedeuten die Status in der Risk Map?",
+            "a": "„Bestätigt“ heißt: Die Anforderung gilt aufgrund Ihrer Antworten. „Wahrscheinlich“ heißt: Sie gilt vermutlich, es können aber weitere Informationen oder eine fachliche Bestätigung nötig sein. „Weitere Informationen nötig“ heißt: Für eine genauere Einschätzung brauchen wir zusätzliche Antworten."
           },
           {
-            "q": "Was, wenn mein Markt noch nicht abgedeckt ist?"
+            "q": "Woher stammen die Informationen?",
+            "a": "Regulatorische Informationen beruhen auf amtlichen Quellen der Behörden. Wo verfügbar, zeigen wir die Behörde, den Link zur Quelle, das maßgebliche Datum und wann die Information zuletzt geprüft wurde."
+          },
+          {
+            "q": "Kann ich mehrere Märkte oder Bereiche auf einmal prüfen?",
+            "a": "Ja. Sie können mehrere Märkte und Unterstützungsbereiche in einer geordneten Risk Map zusammenführen."
+          },
+          {
+            "q": "Kann ich meine Antworten ändern oder meine Risk Map aktualisieren?",
+            "a": "Ja. Aktualisieren Sie Ihre Antworten, wenn sich Ihre Tätigkeiten, Märkte, Produkte oder Ihre Unternehmensstruktur ändern."
+          },
+          {
+            "q": "Kann ich meine Informationen exportieren?",
+            "a": "Sie können Ihre Risk Map als PDF exportieren. Je nach Verfügbarkeit und Funktionsumfang Ihres Kontos können auch die Aufzeichnungen zu Ihren Mandaten als PDF, als CSV oder über eine API verfügbar sein."
+          },
+          {
+            "q": "Was, wenn mein Markt nicht verfügbar ist?",
+            "a": "Sie können einen weiteren Markt anfragen und sich, wo verfügbar, benachrichtigen lassen, sobald er abgedeckt ist."
           }
         ]
       },
@@ -1342,35 +1361,94 @@
         "label": "Anbieter & Mandate",
         "items": [
           {
-            "q": "Erhalte ich hier Rechtsberatung?",
-            "a": "Nein. CompliHub360 kartiert Pflichten und zeigt auf, was wahrscheinlich für Ihren Betrieb gilt — das ist keine Rechtsberatung. Wenn eine Sache eine verbindliche Einschätzung braucht, verbinden wir Sie mit einem Verified Provider, der sie geben kann."
+            "q": "Bietet CompliHub360 Rechts-, Steuer-, Buchhaltungs- oder andere fachliche Beratung an?",
+            "a": "Nein. CompliHub360 bietet Compliance-Informationen und Matching an. Wir sind keine Anwaltskanzlei, kein Buchhaltungsbüro, keine Steuerberatung, kein Zolldienstleister und keine Aufsichtsbehörde. Beratung und fachliche Leistungen erbringt der ausgewählte Anbieter unabhängig."
           },
           {
-            "q": "Wie werden Verified Provider geprüft?"
+            "q": "Wie werden Anbieter geprüft?",
+            "a": "Anbieter werden anhand der jeweils geltenden Kriterien geprüft, etwa Qualifikationen, Fachkenntnis, Marktabdeckung, Unternehmensangaben, Erfahrung und Servicestandards. Wo verfügbar, können wir zusätzlich Zulassungen, Zertifizierungen, das bisherige Antwortverhalten, Bewertungen und abgeschlossene Mandate prüfen."
           },
           {
-            "q": "Was kostet ein Mandat?"
+            "q": "Warum sind die Namen der Anbieter anfangs verborgen?",
+            "a": "Die Namen der Anbieter bleiben beim ersten Vergleich verborgen, damit Sie sich auf Fachkenntnis und Passung konzentrieren können statt auf Bekanntheit. So haben auch Anbieter unterschiedlicher Größe eine faire Chance, ausgewählt zu werden."
           },
-          {},
           {
-            "a": "Nein. Jedes Mandat ist einzeln vertraglich geregelt. Sie können jederzeit weitere Matches anfragen oder wechseln — Ihr Verlauf und Ihre Risk Map gehören Ihnen."
+            "q": "Wann sehe ich den Namen und das vollständige Profil des Anbieters?",
+            "a": "Identität und vollständiges Profil des Anbieters werden sichtbar, nachdem Sie den Anbieter ausgewählt und ein Erstgespräch gebucht haben. Dann können Sie seine geprüften Nachweise, Bewertungen, Angaben zur Unternehmensprüfung und Kontaktdaten einsehen."
+          },
+          {
+            "q": "Können Anbieter dafür bezahlen, in meinen Matches weiter oben zu erscheinen?",
+            "a": "Nein. Matching und Ranking beruhen auf relevanten Kriterien und sind nicht käuflich. Werbebudgets, Markengröße und kommerzielle Vereinbarungen bestimmen nicht Ihre besten Matches."
+          },
+          {
+            "q": "Was kostet die Leistung?",
+            "a": "Bevor Sie einen Anbieter auswählen, sehen Sie eine voraussichtliche Preisspanne. Nach dem Erstgespräch bestätigt der Anbieter Leistungsumfang, Endpreis, voraussichtlichen Zeitrahmen und Konditionen. Die fachliche Arbeit beginnt erst, wenn Sie zugestimmt haben."
+          },
+          {
+            "q": "Wie schnell antwortet ein Anbieter?",
+            "a": "Die voraussichtliche Antwortzeit des Anbieters sehen Sie, bevor Sie wählen. Antwortet der Anbieter nicht innerhalb dieser Frist, kann CompliHub360 Ihnen ein anderes Match vorschlagen. Ihre Informationen werden ohne Ihre Zustimmung nicht an einen anderen Anbieter weitergegeben."
+          },
+          {
+            "q": "Kann ich mehr als einen Anbieter wählen?",
+            "a": "Ja. Sie können mehrere Anbieter auswählen und mit jedem ein Erstgespräch buchen. Jede Buchung und jedes Mandat bleibt eigenständig."
+          },
+          {
+            "q": "Was passiert nach der Buchung?",
+            "a": "Identität und vollständiges Profil des Anbieters werden sichtbar, und es werden nur die Informationen weitergegeben, die für die Bearbeitung Ihrer Anfrage nötig sind. Anschließend bestätigt der Anbieter Leistung, Preis, Zeitrahmen und Konditionen. Die fachliche Arbeit beginnt erst, wenn Sie zugestimmt haben."
+          },
+          {
+            "q": "Bin ich nach dem Erstgespräch verpflichtet, mit dem Anbieter weiterzuarbeiten?",
+            "a": "Nein. Ein gebuchtes Erstgespräch verpflichtet Sie nicht, ein Mandat zu erteilen."
+          },
+          {
+            "q": "Wie finanziert CompliHub360 den kostenlosen Zugang für Nutzer?",
+            "a": "CompliHub360 ist für Unternehmen, die Unterstützung suchen, kostenlos. Unsere Einnahmen stammen aus den Geschäftsbeziehungen mit den teilnehmenden Anbietern. Diese Vereinbarungen beeinflussen nie, welche Anbieter in Ihren Matches erscheinen oder in welcher Reihenfolge sie stehen."
           }
         ]
       },
       {
-        "label": "Konto & Daten",
+        "label": "Konto, Daten & Datenschutz",
         "items": [
           {
             "q": "Brauche ich ein Konto?",
-            "a": "Für das Assessment nicht — es läuft ohne Konto im Browser. Ein kostenloses Konto brauchen Sie erst, wenn Sie Ihre Risk Map behalten, Ihre besten Matches ansehen oder Hinweise erhalten wollen."
+            "a": "Um eine Frage zu stellen, das Assessment zu durchlaufen oder Ihre erste Risk Map anzusehen, brauchen Sie kein Konto. Ein kostenloses Konto brauchen Sie, um Ergebnisse zu speichern und zu aktualisieren, Ihre besten Matches anzusehen, Erstgespräche zu buchen und die verfügbaren Workspace-Funktionen zu nutzen."
           },
           {
-            "q": "Wie werden meine Daten behandelt?",
-            "a": "Das Assessment läuft in Ihrem Browser und braucht kein Konto. Wenn Sie sich registrieren, wird Ihr Dossier nach EU-Datenschutzregeln gespeichert, verschlüsselt und nie ohne Ihre Anweisung verkauft oder geteilt."
+            "q": "Wie werden meine Informationen verwendet?",
+            "a": "Wir verwenden Ihre Informationen, um die von Ihnen angefragten Leistungen zu erbringen, relevante Ergebnisse zu personalisieren, Ihr Konto zu betreiben und den Matching- und Buchungsprozess zu unterstützen — wie in unserer Datenschutzerklärung beschrieben."
+          },
+          {
+            "q": "Welche Informationen erhält ein Anbieter?",
+            "a": "Wenn Sie sich für eine Kontaktaufnahme oder Buchung entscheiden, geben wir nur die Informationen weiter, die für die Bearbeitung Ihrer Anfrage nötig sind. Bevor die Verbindung zustande kommt, sollte Ihnen angezeigt werden, was weitergegeben wird."
+          },
+          {
+            "q": "Wann werden meine Informationen weitergegeben?",
+            "a": "Ihre Informationen werden weitergegeben, nachdem Sie sich für eine Kontaktaufnahme oder Buchung bei einem Anbieter entschieden und den entsprechenden Bestätigungsschritt abgeschlossen haben. Sie werden nicht automatisch an jeden Anbieter weitergegeben, der in Ihren Matches erscheint."
+          },
+          {
+            "q": "Verkauft CompliHub360 meine personenbezogenen oder geschäftlichen Informationen?",
+            "a": "Nein. CompliHub360 verkauft Ihre personenbezogenen oder geschäftlichen Informationen nicht an unbeteiligte Dritte.\n\nWenn Sie sich für eine Kontaktaufnahme oder Buchung bei einem Anbieter entscheiden, geben wir nur die Informationen weiter, die für die Bearbeitung Ihrer Anfrage nötig sind — wie in unserer Datenschutzerklärung beschrieben."
+          },
+          {
+            "q": "Wie werden meine Informationen geschützt?",
+            "a": "Wir setzen geeignete technische und organisatorische Maßnahmen ein, die dem Schutz personenbezogener und geschäftlicher Informationen dienen. Weitere Einzelheiten finden Sie in unserer Datenschutzerklärung und in unseren Sicherheitsinformationen."
+          },
+          {
+            "q": "Kann ich Benachrichtigungen steuern?",
+            "a": "Ja. Wo Benachrichtigungsfunktionen verfügbar sind, können Sie Ihre Einstellungen für E-Mails und regulatorische Hinweise in Ihrem Konto verwalten oder die Abmeldeoption in der jeweiligen Nachricht nutzen."
+          },
+          {
+            "q": "Kann ich mein Konto löschen oder die Löschung meiner Informationen verlangen?",
+            "a": "Sie können die Löschung Ihres Kontos beantragen und Ihre geltenden Datenschutzrechte ausüben, wie in unserer Datenschutzerklärung beschrieben. Manche Informationen müssen unter Umständen aufbewahrt werden, wenn das Gesetz es verlangt oder es berechtigten Dokumentationszwecken dient."
+          },
+          {
+            "q": "Wo werden meine Informationen gespeichert?",
+            "a": "Informationen werden über die Dienstleister und an den Standorten gespeichert und verarbeitet, die in unserer Datenschutzerklärung beschrieben sind. Werden Informationen zwischen Ländern übermittelt, kommen die jeweils geltenden Schutzmaßnahmen zum Einsatz."
           }
         ]
       }
-    ]
+    ],
+    "subtitle": "Fragen? Hier finden Sie erste Antworten."
   },
   "entryDoor": {
     "journey": [
