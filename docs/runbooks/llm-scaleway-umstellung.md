@@ -102,6 +102,19 @@ Die Kennung im Ingest (`LLM_EMBED_MODEL` oder Standard `qwen3-embedding-8b`) mus
 
    **Erledigt am 23.10.2026** für Staging und Beta: Schlüssel aus beiden `.env` entfernt, Container mit `docker compose up -d --force-recreate api` neu erzeugt (ein `restart` liest die `.env` nicht neu), Probefrage auf beiden über Scaleway. Beide Gemini-Schlüssel in AI Studio gelöscht. Die Datenschutzerklärung nennt seit #384 Scaleway statt Gemini. Beta wurde zusätzlich mit „Deploy Beta" auf `main` gebracht und mit eigenem Ingest neu eingebettet (Supabase-Werte aus `/docker/complihub-beta-api/.env` laden, `SUPABASE_URL` vor dem Lauf prüfen).
 
+### Nachkalibrieren der Schwelle (seit 14.11.2026)
+
+Echte Fragen gab es bis Mitte November keine, weil das Widget nur mit `?assistant=1` erscheint. Deshalb hat der Prüfbogen 30 Fragen. Jede trägt `calibration`: 21 sollen zum Korpus passen (`match`), 9 nicht (`no-match`, z. B. Zoll, DSGVO, Polen, Smalltalk). Das Ergebnis-Ereignis führt `correlation_id`, und der Bogen schreibt `<out>.calibration.json`. So lässt sich jede Antwort genau ihrem `top_similarity` bzw. `top_below_threshold` zuordnen.
+
+```bash
+STAGING_KEY=$(ssh vps "grep '^API_KEY=' /docker/complihub-api/.env | cut -d= -f2-")
+node scripts/llm-eval/assistant-dna-review.mjs --api https://staging.complihub360.com --api-key "$STAGING_KEY" \
+  --on-limit "ssh vps 'cd /docker/complihub-api && docker compose restart api'" --out kalibrierung.md
+unset STAGING_KEY
+```
+
+`--on-limit` startet den API-Container bei der Gratis-Grenze neu (der Zähler lebt im Speicher) und stellt dieselbe Frage noch einmal. So läuft der ganze Bogen in einem Durchgang. Die Schwelle passt, wenn möglichst alle `match`-Fragen darüber und alle `no-match`-Fragen darunter liegen.
+
 ## 7. Aufräumen im Code
 
 Erledigt: `geminiLegacy` und `gemini_embed_batch` sind entfernt, `GEMINI_API_KEY` steht in keiner `.env.example` mehr. Ein übrig gebliebener `GEMINI_API_KEY` wird ignoriert; ohne `LLM_API_KEY` antwortet der Assistent 503. `LEGACY_EMBED_MODEL` bleibt nur, damit Chunks ohne `embed_model`-Feld nie als Treffer gelten.

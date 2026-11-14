@@ -190,6 +190,16 @@ describe('assistant chat with the Scaleway provider', () => {
         expect(events('assistant_chat_result')[0]).toMatchObject({ outcome: 'error', stage: 'generate_rewrite', rewrite_reason: { pressure: null, figures: 1 } });
     });
 
+    it('records the correlation id in the result event so a reply can be matched to it', async () => {
+        provider(ok({ choices: [{ message: { content: 'Antwort' }, finish_reason: 'stop' }] }));
+        rpc.mockResolvedValueOnce([{ content: 'x', metadata: { embed_model: 'qwen3-embedding-8b' }, similarity: 0.7 }]);
+
+        const r = await call({ message: 'Wie hoch ist der Regelsatz in Deutschland?', country: 'DE' }, `10.0.16.${++ipSeq}`);
+
+        expect(events('assistant_chat_result')[0]).toMatchObject({ correlation_id: 'corr-1', outcome: 'ok' });
+        expect(r.body.correlationId).toBe('corr-1');
+    });
+
     it('records how close the best chunk came when nothing passes the threshold', async () => {
         provider(ok({ choices: [{ message: { content: 'Antwort' }, finish_reason: 'stop' }] }));
         rpc.mockResolvedValueOnce([]).mockResolvedValueOnce([{ similarity: 0.5812 }]);
