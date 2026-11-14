@@ -1020,6 +1020,20 @@
           "Envía mercancías físicas a un nuevo mercado de la UE",
           "Vende productos envasados a consumidores de la UE",
           "Añade una categoría de producto (p. ej., electrónica)"
+        ],
+        "terms": [
+          {
+            "term": "RAP (EPR)",
+            "tip": "Responsabilidad ampliada del productor: normas que atribuyen a determinadas empresas la responsabilidad por el impacto ambiental de un producto al final de su vida útil."
+          },
+          {
+            "term": "RAEE",
+            "tip": "Normas sobre residuos de aparatos eléctricos y electrónicos (en inglés, WEEE)."
+          },
+          {
+            "term": "Ecomodulación de tarifas",
+            "tip": "Tarifas que se ajustan según características ambientales como la reciclabilidad o el uso de materiales."
+          }
         ]
       },
       {
@@ -1038,6 +1052,28 @@
           "Trata datos personales de residentes en la UE/UK",
           "Incorpora una nueva herramienta de tracking o analítica",
           "Transfiere datos fuera de la UE/UK"
+        ],
+        "terms": [
+          {
+            "term": "Datos personales",
+            "tip": "Información sobre una persona física identificada o identificable."
+          },
+          {
+            "term": "RGPD",
+            "tip": "El Reglamento General de Protección de Datos de la Unión Europea (en inglés, GDPR)."
+          },
+          {
+            "term": "UK GDPR",
+            "tip": "El marco de protección de datos del Reino Unido, basado en el RGPD conservado tras su salida de la UE."
+          },
+          {
+            "term": "EIPD",
+            "tip": "Evaluación de impacto relativa a la protección de datos (en inglés, DPIA), para tratamientos de mayor riesgo."
+          },
+          {
+            "term": "RAT",
+            "tip": "Registro de actividades de tratamiento (en inglés, RoPA), que documenta cómo una organización trata los datos personales."
+          }
         ]
       },
       {
@@ -1056,6 +1092,24 @@
           "Ejecuta adquisición de pago en la UE",
           "Lanza un programa de e-mail o SMS",
           "Rediseña su flujo de consentimiento"
+        ],
+        "terms": [
+          {
+            "term": "Consentimiento",
+            "tip": "Una manifestación de voluntad válida, informada y libre, cuando la exige la ley aplicable."
+          },
+          {
+            "term": "Lista de exclusión",
+            "tip": "Un registro que evita que se envíen mensajes de marketing a personas que se han dado de baja."
+          },
+          {
+            "term": "Patrón oscuro",
+            "tip": "Un diseño que manipula u obstaculiza las decisiones del usuario."
+          },
+          {
+            "term": "Tecnología de seguimiento",
+            "tip": "Tecnología como cookies, píxeles o kits de desarrollo de software (SDK) que se usa para observar la actividad del usuario."
+          }
         ]
       },
       {
@@ -1074,6 +1128,24 @@
           "Opera una entidad o sucursal local",
           "Cambia su estructura de propiedad",
           "Supera un umbral local de auditoría"
+        ],
+        "terms": [
+          {
+            "term": "Titular real",
+            "tip": "La persona física que en último término posee o controla una sociedad."
+          },
+          {
+            "term": "Registro como sociedad extranjera",
+            "tip": "La inscripción de una sociedad existente para operar en otra jurisdicción."
+          },
+          {
+            "term": "Agente registrado o representante local",
+            "tip": "Una persona u organización designada oficialmente para determinadas funciones locales."
+          },
+          {
+            "term": "Sucursal o filial",
+            "tip": "Dos formas de operar en otro mercado, con consecuencias jurídicas y fiscales distintas."
+          }
         ]
       },
       {
@@ -1092,6 +1164,28 @@
           "Comercializa por primera vez un producto físico en la UE",
           "Añade una categoría de producto con sus propias reglas de conformidad",
           "Vende a la UE sin estar establecido allí"
+        ],
+        "terms": [
+          {
+            "term": "Introducción en el mercado",
+            "tip": "La primera vez que un producto se pone a disposición en un mercado determinado."
+          },
+          {
+            "term": "Evaluación de la conformidad",
+            "tip": "El procedimiento que demuestra que un producto cumple los requisitos aplicables."
+          },
+          {
+            "term": "Marcado CE",
+            "tip": "Un marcado para determinados productos sujetos a requisitos armonizados de la UE."
+          },
+          {
+            "term": "Documentación técnica",
+            "tip": "Documentos que demuestran cómo un producto cumple los requisitos aplicables."
+          },
+          {
+            "term": "Persona responsable o representante autorizado",
+            "tip": "Una parte establecida en el mercado que asume determinadas responsabilidades regulatorias cuando se exige."
+          }
         ]
       },
       {
@@ -1110,6 +1204,32 @@
           "Envía por primera vez a través de una frontera aduanera",
           "Su volumen supera un umbral Intrastat",
           "Cambia los Incoterms o su socio logístico"
+        ],
+        "terms": [
+          {
+            "term": "EORI",
+            "tip": "Número de registro e identificación de operadores económicos (Economic Operators Registration and Identification) que se usa para trámites aduaneros en los mercados correspondientes."
+          },
+          {
+            "term": "Clasificación arancelaria (SA)",
+            "tip": "La clasificación arancelaria que se asigna a las mercancías a efectos aduaneros."
+          },
+          {
+            "term": "Valor en aduana",
+            "tip": "El valor sobre el que se calculan los derechos de aduana y determinados impuestos."
+          },
+          {
+            "term": "Origen",
+            "tip": "El país que se considera origen de las mercancías según las normas de origen aplicables."
+          },
+          {
+            "term": "Incoterms",
+            "tip": "Condiciones comerciales estándar que reparten determinadas tareas de entrega, costes y riesgos. No determinan la propiedad ni toda forma de responsabilidad."
+          },
+          {
+            "term": "3PL",
+            "tip": "Un proveedor logístico externo (third-party logistics) que presta servicios como almacenamiento, fulfillment o transporte."
+          }
         ]
       },
       {
@@ -1128,6 +1248,28 @@
           "Firma un tipo de contrato que no ha usado antes",
           "Un litigio afecta a un cliente de otro país",
           "Recibe una reclamación formal o una consulta de una autoridad"
+        ],
+        "terms": [
+          {
+            "term": "Información jurídica",
+            "tip": "Información general sobre requisitos o procedimientos legales. No es asesoramiento para un caso concreto."
+          },
+          {
+            "term": "Asesoramiento jurídico",
+            "tip": "La recomendación de un profesional cualificado basada en los hechos y en la ley aplicable."
+          },
+          {
+            "term": "Ley aplicable",
+            "tip": "El conjunto de normas que rige un asunto o un contrato."
+          },
+          {
+            "term": "Jurisdicción",
+            "tip": "El país, estado o autoridad jurídica cuyos tribunales o normas se aplican."
+          },
+          {
+            "term": "Verified Legal Provider",
+            "tip": "Un profesional o despacho jurídico independiente, revisado según los criterios aplicables de CompliHub360 para proveedores."
+          }
         ]
       },
       {
@@ -1466,13 +1608,23 @@
     "body": "La información fiable le ayuda a entender lo que importa. Un matching justo le ayuda a encontrar al profesional adecuado cuando necesita apoyo."
   },
   "tips": {
+    "label": "Términos clave",
     "verifiedProvider": "Un proveedor revisado por CompliHub360 según los criterios aplicables de empresa, experiencia, cobertura y calidad.",
+    "matchScore": "Muestra en qué medida las capacidades verificadas del proveedor se ajustan a las necesidades identificadas en su evaluación.",
+    "responseTime": "El tiempo habitual o previsto en que el proveedor responde a una solicitud de consulta.",
+    "completedEngagements": "Encargos profesionales registrados como completados a través de CompliHub360.",
+    "identity": "El nombre y el perfil completo del proveedor se muestran cuando usted lo selecciona y reserva una consulta.",
     "officialSource": "La publicación de la propia autoridad, como una ley, un reglamento o una guía oficial, enlazada cuando está disponible en línea.",
     "priority": "Cuándo necesita su atención un requisito, de «Inmediata» a «Baja», según su plazo y sus consecuencias.",
     "terms": {
       "officialSource": "Fuente oficial",
       "verifiedProvider": "Verified Provider",
       "priority": "Prioridad"
+    },
+    "status": {
+      "confirmed": "Este requisito se aplica según la información que usted ha facilitado.",
+      "likely": "Este requisito probablemente se aplica, pero puede ser necesaria información adicional o la confirmación de un profesional.",
+      "moreInfo": "Responda a algunas preguntas más para que podamos evaluar este requisito con mayor precisión."
     }
   }
 }

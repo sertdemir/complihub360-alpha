@@ -1020,6 +1020,20 @@
           "Sie versenden physische Waren in einen neuen EU-Markt",
           "Sie verkaufen verpackte Produkte an EU-Verbraucher",
           "Sie nehmen eine Produktkategorie hinzu (z. B. Elektronik)"
+        ],
+        "terms": [
+          {
+            "term": "EPR",
+            "tip": "Erweiterte Herstellerverantwortung: Regeln, die bestimmten Unternehmen die Verantwortung für die Umweltfolgen eines Produkts am Ende seiner Nutzung übertragen."
+          },
+          {
+            "term": "WEEE",
+            "tip": "Regeln für Elektro- und Elektronik-Altgeräte."
+          },
+          {
+            "term": "Ökomodulierte Entgelte",
+            "tip": "Entgelte, die sich nach Umwelteigenschaften wie Recyclingfähigkeit oder Materialeinsatz richten."
+          }
         ]
       },
       {
@@ -1038,6 +1052,28 @@
           "Sie verarbeiten personenbezogene Daten von EU-/UK-Ansässigen",
           "Sie führen ein neues Tracking- oder Analysetool ein",
           "Sie übermitteln Daten außerhalb der EU/des UK"
+        ],
+        "terms": [
+          {
+            "term": "Personenbezogene Daten",
+            "tip": "Informationen, die sich auf eine identifizierte oder identifizierbare Person beziehen."
+          },
+          {
+            "term": "DSGVO",
+            "tip": "Die Datenschutz-Grundverordnung der Europäischen Union (englisch GDPR)."
+          },
+          {
+            "term": "UK GDPR",
+            "tip": "Der Datenschutzrahmen des Vereinigten Königreichs, der auf der übernommenen DSGVO beruht."
+          },
+          {
+            "term": "DSFA",
+            "tip": "Datenschutz-Folgenabschätzung (englisch DPIA): eine Bewertung für Verarbeitungen mit höherem Risiko."
+          },
+          {
+            "term": "VVT",
+            "tip": "Verzeichnis von Verarbeitungstätigkeiten (englisch RoPA): dokumentiert, wie eine Organisation personenbezogene Daten verarbeitet."
+          }
         ]
       },
       {
@@ -1056,6 +1092,24 @@
           "Sie schalten bezahlte Akquise in der EU",
           "Sie starten ein E-Mail- oder SMS-Programm",
           "Sie gestalten Ihren Einwilligungs-Flow neu"
+        ],
+        "terms": [
+          {
+            "term": "Einwilligung",
+            "tip": "Eine gültige, informierte und freiwillige Zustimmung, wo das geltende Recht sie verlangt."
+          },
+          {
+            "term": "Sperrliste",
+            "tip": "Eine Liste, die verhindert, dass Marketingnachrichten an Personen gehen, die widersprochen haben."
+          },
+          {
+            "term": "Dark Pattern",
+            "tip": "Eine Gestaltung, die die Entscheidungen von Nutzern manipuliert oder behindert."
+          },
+          {
+            "term": "Tracking-Technologie",
+            "tip": "Technik wie Cookies, Pixel oder Software Development Kits, mit der das Verhalten von Nutzern beobachtet wird."
+          }
         ]
       },
       {
@@ -1074,6 +1128,24 @@
           "Sie betreiben eine lokale Gesellschaft oder Niederlassung",
           "Ihre Eigentümerstruktur ändert sich",
           "Sie überschreiten eine lokale Prüfungsschwelle"
+        ],
+        "terms": [
+          {
+            "term": "Wirtschaftlich Berechtigter",
+            "tip": "Eine natürliche Person, die ein Unternehmen letztlich besitzt oder kontrolliert."
+          },
+          {
+            "term": "Registrierung als ausländische Gesellschaft",
+            "tip": "Die Eintragung eines bestehenden Unternehmens, damit es in einem anderen Rechtsraum tätig werden darf."
+          },
+          {
+            "term": "Zustellungsbevollmächtigter oder lokaler Vertreter",
+            "tip": "Eine Person oder Organisation, die offiziell für bestimmte Aufgaben vor Ort bestellt ist."
+          },
+          {
+            "term": "Zweigniederlassung oder Tochtergesellschaft",
+            "tip": "Zwei Wege, in einem anderen Markt tätig zu sein, mit unterschiedlichen rechtlichen und steuerlichen Folgen."
+          }
         ]
       },
       {
@@ -1092,6 +1164,28 @@
           "Sie bringen erstmals ein physisches Produkt auf den EU-Markt",
           "Sie nehmen eine Produktkategorie mit eigenen Konformitätsregeln auf",
           "Sie verkaufen in die EU, ohne dort niedergelassen zu sein"
+        ],
+        "terms": [
+          {
+            "term": "Inverkehrbringen",
+            "tip": "Die erstmalige Bereitstellung eines Produkts auf einem bestimmten Markt."
+          },
+          {
+            "term": "Konformitätsbewertung",
+            "tip": "Das Verfahren, mit dem nachgewiesen wird, dass ein Produkt die geltenden Anforderungen erfüllt."
+          },
+          {
+            "term": "CE-Kennzeichnung",
+            "tip": "Eine Kennzeichnung für bestimmte Produkte, für die harmonisierte EU-Anforderungen gelten."
+          },
+          {
+            "term": "Technische Dokumentation",
+            "tip": "Unterlagen, die zeigen, wie ein Produkt die geltenden Anforderungen erfüllt."
+          },
+          {
+            "term": "Verantwortliche Person oder Bevollmächtigter",
+            "tip": "Eine vor Ort ansässige Stelle, die festgelegte regulatorische Pflichten übernimmt, wo das verlangt ist."
+          }
         ]
       },
       {
@@ -1110,6 +1204,32 @@
           "Sie versenden erstmals über eine Zollgrenze",
           "Ihr Handelsvolumen überschreitet eine Intrastat-Schwelle",
           "Sie ändern Incoterms oder Ihren Fulfilment-Partner"
+        ],
+        "terms": [
+          {
+            "term": "EORI",
+            "tip": "Die Registrierungs- und Identifizierungsnummer für Wirtschaftsbeteiligte (Economic Operators Registration and Identification), die in den betreffenden Märkten für Zollvorgänge genutzt wird."
+          },
+          {
+            "term": "Zolltarifliche Einreihung (HS)",
+            "tip": "Die Einreihung von Waren in den Zolltarif für Zollzwecke."
+          },
+          {
+            "term": "Zollwert",
+            "tip": "Der Wert, nach dem Zölle und bestimmte Steuern berechnet werden."
+          },
+          {
+            "term": "Ursprung",
+            "tip": "Das Land, das nach den geltenden Ursprungsregeln als Herkunft der Ware gilt."
+          },
+          {
+            "term": "Incoterms",
+            "tip": "Standardisierte Handelsklauseln, die bestimmte Lieferaufgaben, Kosten und Risiken verteilen. Sie regeln weder das Eigentum noch jede Form der Haftung."
+          },
+          {
+            "term": "3PL",
+            "tip": "Ein externer Logistikdienstleister (Third-Party Logistics), der etwa Lagerung, Fulfillment oder Transport übernimmt."
+          }
         ]
       },
       {
@@ -1128,6 +1248,28 @@
           "Sie schließen erstmals einen Vertragstyp ab, den Sie nicht kennen",
           "Ein Streitfall betrifft eine Kundin in einem anderen Land",
           "Sie erhalten eine förmliche Beschwerde oder eine behördliche Anfrage"
+        ],
+        "terms": [
+          {
+            "term": "Rechtsinformation",
+            "tip": "Allgemeine Informationen über rechtliche Anforderungen oder Abläufe. Sie sind keine Beratung für einen konkreten Fall."
+          },
+          {
+            "term": "Rechtsberatung",
+            "tip": "Die Empfehlung einer qualifizierten Fachperson auf Grundlage des Sachverhalts und des geltenden Rechts."
+          },
+          {
+            "term": "Anwendbares Recht",
+            "tip": "Das Recht, das für eine Angelegenheit oder einen Vertrag gilt."
+          },
+          {
+            "term": "Rechtsraum",
+            "tip": "Das Land, der Bundesstaat oder die Rechtsordnung, deren Gerichte oder Regeln gelten."
+          },
+          {
+            "term": "Verified Legal Provider",
+            "tip": "Eine unabhängige Rechtsfachperson oder Kanzlei, die anhand der geltenden Anbieterkriterien von CompliHub360 geprüft wurde."
+          }
         ]
       },
       {
@@ -1466,13 +1608,23 @@
     "body": "Verlässliche Informationen helfen Ihnen zu verstehen, worauf es ankommt. Faires Matching hilft Ihnen, die richtige Fachperson zu finden, wenn Sie Unterstützung brauchen."
   },
   "tips": {
+    "label": "Wichtige Begriffe",
     "verifiedProvider": "Ein Anbieter, den CompliHub360 anhand der jeweils geltenden Kriterien zu Unternehmen, Erfahrung, Abdeckung und Qualität geprüft hat.",
+    "matchScore": "Zeigt, wie gut die verifizierten Fähigkeiten des Anbieters zu dem Bedarf passen, der in Ihrer Analyse ermittelt wurde.",
+    "responseTime": "Die übliche oder erwartete Zeit, in der der Anbieter auf eine Beratungsanfrage antwortet.",
+    "completedEngagements": "Mandate, die über CompliHub360 als abgeschlossen erfasst wurden.",
+    "identity": "Name und vollständiges Profil des Anbieters sehen Sie, sobald Sie ihn auswählen und einen Beratungstermin buchen.",
     "officialSource": "Die Veröffentlichung der Behörde selbst, etwa ein Gesetz, eine Verordnung oder ein offizieller Leitfaden — verlinkt, wo sie online verfügbar ist.",
     "priority": "Wie bald eine Anforderung Ihre Aufmerksamkeit braucht, von „Sofort“ bis „Niedrig“ — abhängig von ihrer Frist und ihren Folgen.",
     "terms": {
       "officialSource": "Amtliche Quelle",
       "verifiedProvider": "Verified Provider",
       "priority": "Priorität"
+    },
+    "status": {
+      "confirmed": "Diese Anforderung gilt auf Grundlage Ihrer Angaben.",
+      "likely": "Diese Anforderung gilt wahrscheinlich. Es können aber weitere Angaben oder eine fachliche Bestätigung nötig sein.",
+      "moreInfo": "Beantworten Sie ein paar weitere Fragen, damit wir diese Anforderung genauer einschätzen können."
     }
   }
 }
