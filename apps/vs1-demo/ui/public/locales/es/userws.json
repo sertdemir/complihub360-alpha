@@ -687,7 +687,11 @@
       "establishment": "Establecida en",
       "stock": "Existencias",
       "eprProducts": "EPR · productos",
-      "packaging": "EPR · envases"
+      "packaging": "EPR · envases",
+      "reason": "Su motivo",
+      "customers": "Vende a",
+      "channels": "Canal de venta",
+      "planned": "Prevista en"
     },
     "otherCountry": "+ Otro país…",
     "removes": {

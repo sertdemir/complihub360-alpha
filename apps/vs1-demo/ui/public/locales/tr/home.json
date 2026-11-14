@@ -206,6 +206,22 @@
       "packaging": {
         "title": "Hangi ambalaj faaliyetleri geçerli?",
         "subtitle": "EPR ve Ambalaj · soru 2/2. Çoklu seçim."
+      },
+      "reason": {
+        "title": "Bugün sizi buraya ne getirdi?",
+        "subtitle": "Çoklu seçim."
+      },
+      "customers": {
+        "title": "Kime satış yapıyorsunuz?",
+        "subtitle": "Birini seçin."
+      },
+      "channels": {
+        "title": "Ürün veya hizmetinizi nasıl satıyor ya da sunuyorsunuz?",
+        "subtitle": "Çoklu seçim."
+      },
+      "planned": {
+        "title": "Nerede kurmayı planlıyorsunuz?",
+        "subtitle": "Değerlendirdiğiniz ülkeleri seçin."
       }
     },
     "cards": {
@@ -386,6 +402,48 @@
       "pkgNone": {
         "title": "Ambalaj yok",
         "desc": "Hiçbir şey ambalajlanmıyor veya gönderilmiyor"
+      },
+      "rsnLaunch": {
+        "title": "İşletme, ürün veya hizmet lansmanı"
+      },
+      "rsnExpansion": {
+        "title": "Genişleme"
+      },
+      "rsnCheck": {
+        "title": "Uyumluluk kontrolü"
+      },
+      "rsnOngoing": {
+        "title": "Sürekli destek"
+      },
+      "rsnProvider": {
+        "title": "Sağlayıcı değiştirme veya ekleme"
+      },
+      "rsnProblem": {
+        "title": "Sorun, bildirim veya son tarih"
+      },
+      "cuConsumers": {
+        "title": "Kişisel kullanım için tüketiciler"
+      },
+      "cuBusinesses": {
+        "title": "İşletmeler veya kuruluşlar"
+      },
+      "cuBoth": {
+        "title": "Her ikisi"
+      },
+      "chOwnSite": {
+        "title": "Kendi web sitesi / uygulaması"
+      },
+      "chMarketplaces": {
+        "title": "Pazar yerlerinde satış"
+      },
+      "chOperating": {
+        "title": "Pazar yeri işletme"
+      },
+      "chDirect": {
+        "title": "Doğrudan / toptan satış"
+      },
+      "chStores": {
+        "title": "Fiziksel mağazalar"
       }
     },
     "footer": {
@@ -407,7 +465,8 @@
       "establishedIn": "kuruluş yeri",
       "establishmentOpen": "kuruluş:",
       "stockIn": "stok yeri",
-      "stockOpen": "stok:"
+      "stockOpen": "stok:",
+      "plannedIn": "planlanan yer"
     },
     "skipHint": "Emin değil misiniz? En uygun olanı seçin — haritanızı oluşturmadan önce her yanıtı değiştirebilirsiniz.",
     "needsMarket": "Devam etmek için en az bir pazar seçin.",

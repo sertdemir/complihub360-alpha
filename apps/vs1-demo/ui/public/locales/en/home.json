@@ -208,6 +208,22 @@
       "packaging": {
         "title": "Which packaging activities apply?",
         "subtitle": "EPR & Packaging · question 2 of 2. Multi-select."
+      },
+      "reason": {
+        "title": "What brings you here today?",
+        "subtitle": "Choose all that apply."
+      },
+      "customers": {
+        "title": "Who do you sell to?",
+        "subtitle": "Choose one."
+      },
+      "channels": {
+        "title": "How do you sell or provide your offering?",
+        "subtitle": "Choose all that apply."
+      },
+      "planned": {
+        "title": "Where do you plan to establish it?",
+        "subtitle": "Choose the countries you are considering."
       }
     },
     "cards": {
@@ -388,6 +404,48 @@
       "pkgNone": {
         "title": "No packaging",
         "desc": "Nothing is packed or shipped"
+      },
+      "rsnLaunch": {
+        "title": "Business, product or service launch"
+      },
+      "rsnExpansion": {
+        "title": "Expansion"
+      },
+      "rsnCheck": {
+        "title": "Compliance check"
+      },
+      "rsnOngoing": {
+        "title": "Ongoing support"
+      },
+      "rsnProvider": {
+        "title": "Changing or adding a Provider"
+      },
+      "rsnProblem": {
+        "title": "Problem, notice or deadline"
+      },
+      "cuConsumers": {
+        "title": "Consumers for personal use"
+      },
+      "cuBusinesses": {
+        "title": "Businesses or organisations"
+      },
+      "cuBoth": {
+        "title": "Both"
+      },
+      "chOwnSite": {
+        "title": "Own website / app"
+      },
+      "chMarketplaces": {
+        "title": "Selling on marketplaces"
+      },
+      "chOperating": {
+        "title": "Operating a marketplace"
+      },
+      "chDirect": {
+        "title": "Direct / wholesale"
+      },
+      "chStores": {
+        "title": "Physical stores"
       }
     },
     "footer": {
@@ -409,7 +467,8 @@
       "establishedIn": "established in",
       "establishmentOpen": "established:",
       "stockIn": "stock in",
-      "stockOpen": "stock:"
+      "stockOpen": "stock:",
+      "plannedIn": "planned in"
     },
     "skipHint": "Not sure? Choose what fits best — you can change every answer before you create your map.",
     "needsMarket": "Choose at least one market to continue.",
