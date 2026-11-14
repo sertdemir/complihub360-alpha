@@ -1020,6 +1020,20 @@
           "Yeni bir AB pazarına fiziksel ürün gönderiyorsunuz",
           "AB tüketicilerine ambalajlı ürün satıyorsunuz",
           "Yeni bir ürün kategorisi ekliyorsunuz (ör. elektronik)"
+        ],
+        "terms": [
+          {
+            "term": "GÜS (EPR)",
+            "tip": "Genişletilmiş üretici sorumluluğu: bir ürünün kullanım ömrü sonundaki çevresel etkisinin sorumluluğunu belirli işletmelere yükleyen kurallar."
+          },
+          {
+            "term": "AEEE",
+            "tip": "Atık elektrikli ve elektronik eşyalara ilişkin kurallar (İngilizce WEEE)."
+          },
+          {
+            "term": "Eko-modülasyonlu ücretler",
+            "tip": "Geri dönüştürülebilirlik veya malzeme kullanımı gibi çevresel özelliklere göre belirlenen ücretler."
+          }
         ]
       },
       {
@@ -1038,6 +1052,28 @@
           "AB/UK'de yerleşik kişilerin kişisel verilerini işliyorsunuz",
           "Yeni bir izleme veya analitik aracı ekliyorsunuz",
           "AB/UK dışına veri aktarıyorsunuz"
+        ],
+        "terms": [
+          {
+            "term": "Kişisel veri",
+            "tip": "Kimliği belirli veya belirlenebilir bir gerçek kişiye ilişkin bilgi."
+          },
+          {
+            "term": "GDPR",
+            "tip": "Avrupa Birliği Genel Veri Koruma Tüzüğü."
+          },
+          {
+            "term": "UK GDPR",
+            "tip": "Birleşik Krallık'ın, devralınan GDPR'a dayanan veri koruma çerçevesi."
+          },
+          {
+            "term": "DPIA",
+            "tip": "Veri koruma etki değerlendirmesi: daha yüksek riskli işlemeleri değerlendirmek için kullanılır."
+          },
+          {
+            "term": "RoPA",
+            "tip": "İşleme faaliyetleri kaydı: bir kuruluşun kişisel verileri nasıl işlediğini belgeler."
+          }
         ]
       },
       {
@@ -1056,6 +1092,24 @@
           "AB'ye ücretli pazarlama yürütüyorsunuz",
           "Bir e-posta veya SMS programı başlatıyorsunuz",
           "Onay akışınızı yeniden tasarlıyorsunuz"
+        ],
+        "terms": [
+          {
+            "term": "Rıza",
+            "tip": "Geçerli hukukun gerektirdiği durumlarda, bilgilendirilmiş ve özgür iradeyle verilen geçerli onay."
+          },
+          {
+            "term": "Gönderim engelleme listesi",
+            "tip": "Pazarlama iletilerinin, aboneliğini iptal etmiş kişilere gönderilmesini önleyen kayıt."
+          },
+          {
+            "term": "Karanlık örüntü",
+            "tip": "Kullanıcının seçimlerini manipüle eden veya engelleyen tasarım uygulaması (dark pattern)."
+          },
+          {
+            "term": "İzleme teknolojisi",
+            "tip": "Kullanıcı etkinliğini gözlemlemek için kullanılan çerezler, pikseller veya yazılım geliştirme kitleri (SDK) gibi teknolojiler."
+          }
         ]
       },
       {
@@ -1074,6 +1128,24 @@
           "Yerel bir şirket veya şube işletiyorsunuz",
           "Ortaklık yapınız değişiyor",
           "Yerel bir denetim eşiğini aşıyorsunuz"
+        ],
+        "terms": [
+          {
+            "term": "Gerçek faydalanıcı",
+            "tip": "Bir şirkete nihai olarak sahip olan veya onu kontrol eden gerçek kişi."
+          },
+          {
+            "term": "Yabancı şirket olarak kayıt",
+            "tip": "Mevcut bir şirketin başka bir yargı alanında faaliyet gösterebilmesi için kaydettirilmesi."
+          },
+          {
+            "term": "Kayıtlı temsilci veya yerel temsilci",
+            "tip": "Belirli yerel görevler için resmî olarak atanmış kişi veya kuruluş."
+          },
+          {
+            "term": "Şube veya bağlı ortaklık",
+            "tip": "Başka bir pazarda faaliyet göstermenin, farklı hukuki ve vergisel sonuçları olan iki yolu."
+          }
         ]
       },
       {
@@ -1092,6 +1164,28 @@
           "AB pazarına ilk kez fiziksel bir ürün sunuyorsunuz",
           "Kendi uygunluk kuralları olan bir ürün kategorisi ekliyorsunuz",
           "AB’de yerleşik olmadan AB’ye satış yapıyorsunuz"
+        ],
+        "terms": [
+          {
+            "term": "Piyasaya arz",
+            "tip": "Bir ürünün belirli bir pazarda ilk kez bulundurulması."
+          },
+          {
+            "term": "Uygunluk değerlendirmesi",
+            "tip": "Bir ürünün geçerli gereklilikleri karşıladığını göstermek için izlenen süreç."
+          },
+          {
+            "term": "CE işareti",
+            "tip": "Uyumlaştırılmış AB gerekliliklerine tabi belirli ürünlerde kullanılan işaret."
+          },
+          {
+            "term": "Teknik dosya",
+            "tip": "Bir ürünün geçerli gereklilikleri nasıl karşıladığını gösteren belgeler."
+          },
+          {
+            "term": "Sorumlu kişi veya yetkili temsilci",
+            "tip": "Gerektiğinde belirli düzenleyici sorumlulukları üstlenen, pazarda yerleşik taraf."
+          }
         ]
       },
       {
@@ -1110,6 +1204,32 @@
           "İlk kez bir gümrük sınırının ötesine sevkiyat yapıyorsunuz",
           "Ticaret hacminiz bir Intrastat eşiğini aşıyor",
           "Incoterms’i ya da lojistik ortağınızı değiştiriyorsunuz"
+        ],
+        "terms": [
+          {
+            "term": "EORI",
+            "tip": "İlgili pazarlarda gümrük işlemleri için kullanılan Ekonomik Operatör Kayıt ve Tanımlama (Economic Operators Registration and Identification) numarası."
+          },
+          {
+            "term": "Tarife sınıflandırması (HS)",
+            "tip": "Eşyaya gümrük amaçlarıyla verilen tarife sınıflandırması."
+          },
+          {
+            "term": "Gümrük kıymeti",
+            "tip": "Gümrük vergilerinin ve belirli vergilerin hesaplanmasında esas alınan değer."
+          },
+          {
+            "term": "Menşe",
+            "tip": "Geçerli menşe kurallarına göre eşyanın menşei sayılan ülke."
+          },
+          {
+            "term": "Incoterms",
+            "tip": "Belirli teslim görevlerini, maliyetleri ve riskleri paylaştıran standart ticari terimler. Mülkiyeti veya her tür sorumluluğu belirlemezler."
+          },
+          {
+            "term": "3PL",
+            "tip": "Depolama, sipariş karşılama (fulfillment) veya taşıma gibi hizmetler sunan üçüncü taraf lojistik sağlayıcısı."
+          }
         ]
       },
       {
@@ -1128,6 +1248,28 @@
           "Daha önce kullanmadığınız bir sözleşme türünü imzalıyorsunuz",
           "Bir uyuşmazlık başka ülkedeki bir müşteriyi ilgilendiriyor",
           "Resmi bir şikâyet ya da bir kurumdan sorgu alıyorsunuz"
+        ],
+        "terms": [
+          {
+            "term": "Hukuki bilgi",
+            "tip": "Hukuki gereklilikler veya süreçler hakkında genel bilgi; belirli bir duruma yönelik danışmanlık değildir."
+          },
+          {
+            "term": "Hukuki danışmanlık",
+            "tip": "Nitelikli bir uzmanın olaylara ve geçerli hukuka dayanan önerisi."
+          },
+          {
+            "term": "Uygulanacak hukuk",
+            "tip": "Bir konuyu veya sözleşmeyi düzenleyen hukuk."
+          },
+          {
+            "term": "Yetki alanı",
+            "tip": "Mahkemeleri veya kuralları uygulanan ülke, eyalet ya da hukuki otorite."
+          },
+          {
+            "term": "Verified Legal Provider",
+            "tip": "CompliHub360'ın geçerli sağlayıcı kriterlerine göre incelenmiş bağımsız hukuk uzmanı veya hukuk bürosu."
+          }
         ]
       },
       {
@@ -1466,13 +1608,23 @@
     "body": "Güvenilir bilgi, neyin önemli olduğunu anlamanıza yardımcı olur. Adil eşleştirme, desteğe ihtiyaç duyduğunuzda doğru uzmanı bulmanızı sağlar."
   },
   "tips": {
+    "label": "Temel kavramlar",
     "verifiedProvider": "CompliHub360'ın geçerli işletme, deneyim, kapsam ve kalite kriterlerine göre incelediği bir sağlayıcı.",
+    "matchScore": "Sağlayıcının doğrulanmış yetkinliklerinin, değerlendirmenizde belirlenen ihtiyaçlara ne kadar uyduğunu gösterir.",
+    "responseTime": "Sağlayıcının bir danışmanlık talebine olağan veya beklenen yanıt süresi.",
+    "completedEngagements": "CompliHub360 üzerinden tamamlanmış olarak kaydedilen profesyonel işler.",
+    "identity": "Sağlayıcıyı seçip bir danışmanlık görüşmesi ayırttığınızda adı ve tam profili gösterilir.",
     "officialSource": "Kurumun kendi yayını; örneğin bir kanun, yönetmelik ya da resmî rehber. Çevrimiçi erişilebiliyorsa bağlantısı verilir.",
     "priority": "Bir gerekliliğe ne kadar yakında ilgilenmeniz gerektiğini gösterir: son tarihine ve sonuçlarına göre “Acil”den “Düşük”e kadar.",
     "terms": {
       "officialSource": "Resmî kaynak",
       "verifiedProvider": "Verified Provider",
       "priority": "Öncelik"
+    },
+    "status": {
+      "confirmed": "Bu gereklilik, verdiğiniz bilgilere göre geçerlidir.",
+      "likely": "Bu gereklilik muhtemelen geçerlidir; ancak ek bilgi veya bir uzmanın teyidi gerekebilir.",
+      "moreInfo": "Bu gerekliliği daha doğru değerlendirebilmemiz için birkaç ek soruyu yanıtlayın."
     }
   }
 }
