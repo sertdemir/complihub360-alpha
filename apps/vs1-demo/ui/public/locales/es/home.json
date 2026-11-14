@@ -1462,21 +1462,40 @@
         "label": "Evaluación y Risk Map",
         "items": [
           {
-            "q": "¿La evaluación es realmente gratuita?",
-            "a": "Sí. Sin cuenta y sin tarjeta de crédito. Al final obtiene una Risk Map estructurada. Registrarse después — para conservarla, hacer match con proveedores y recibir avisos — es el siguiente paso opcional."
+            "q": "¿La evaluación es gratuita?",
+            "a": "Sí. Puede completar la evaluación y ver su Risk Map sin cuenta y sin pagar. Con una cuenta gratuita puede guardar y actualizar su Risk Map, ver sus mejores matches, reservar consultas y recibir las alertas disponibles."
           },
           {
-            "q": "¿De dónde provienen los datos de la Risk Map?"
+            "q": "¿Hasta qué punto está personalizada mi Risk Map?",
+            "a": "Su Risk Map se basa en los mercados, el modelo de negocio, los productos o servicios, las actividades y las áreas de apoyo que usted seleccione. Cuanto más completas sean sus respuestas, más relevantes pueden ser los resultados. Le indicaremos cuándo se necesita más información."
           },
           {
-            "q": "¿Puedo exportar mi Risk Map?"
+            "q": "¿Y si no estoy seguro de una respuesta?",
+            "a": "Puede omitir las preguntas sobre las que tenga dudas, volver a ellas más tarde o solicitar apoyo profesional cuando se necesite una confirmación."
           },
           {
-            "q": "¿Puedo comprobar varios mercados y áreas a la vez?",
-            "a": "Sí. La evaluación cubre todos los mercados y áreas en los que opera y reúne las obligaciones en un mapa coherente — priorizado en conjunto."
+            "q": "¿Qué significan los estados de la Risk Map?",
+            "a": "«Confirmado» significa que el requisito aplica según sus respuestas. «Probable» significa que probablemente aplica, pero puede necesitarse más información o una confirmación profesional. «Se necesita más información» significa que hacen falta respuestas adicionales para una evaluación más precisa."
           },
           {
-            "q": "¿Y si mi mercado aún no está cubierto?"
+            "q": "¿De dónde procede la información?",
+            "a": "La información regulatoria se basa en fuentes oficiales de las autoridades. Cuando está disponible, mostramos la autoridad, el enlace a la fuente, la fecha pertinente y cuándo se revisó la información por última vez."
+          },
+          {
+            "q": "¿Puedo evaluar varios mercados o áreas a la vez?",
+            "a": "Sí. Puede incluir varios mercados y áreas de apoyo en una única Risk Map organizada."
+          },
+          {
+            "q": "¿Puedo cambiar mis respuestas o actualizar mi Risk Map?",
+            "a": "Sí. Actualice sus respuestas cuando cambien sus actividades, mercados, productos o la estructura de su empresa."
+          },
+          {
+            "q": "¿Puedo exportar mi información?",
+            "a": "Puede exportar su Risk Map en PDF. Según la disponibilidad y las funciones de su cuenta, los registros de sus encargos también pueden estar disponibles en PDF, en CSV o mediante una API."
+          },
+          {
+            "q": "¿Y si mi mercado no está disponible?",
+            "a": "Puede solicitar un mercado adicional y, cuando esta opción esté disponible, elegir recibir una alerta cuando haya cobertura."
           }
         ]
       },
@@ -1484,35 +1503,94 @@
         "label": "Proveedores y encargos",
         "items": [
           {
-            "q": "¿Me están dando asesoramiento jurídico?",
-            "a": "No. CompliHub360 mapea obligaciones y muestra lo que probablemente aplica a su operación — no es asesoramiento jurídico. Cuando un asunto requiere una opinión vinculante, le conectamos con un Verified Provider que puede darla."
+            "q": "¿CompliHub360 presta asesoramiento jurídico, fiscal, contable u otro asesoramiento profesional?",
+            "a": "No. CompliHub360 ofrece información sobre cumplimiento normativo y servicios de matching. No somos un despacho de abogados, una firma de contabilidad, un asesor fiscal, un agente de aduanas ni una autoridad reguladora. El asesoramiento y los servicios profesionales los presta de forma independiente el proveedor seleccionado."
           },
           {
-            "q": "¿Cómo se verifica a los Verified Providers?"
+            "q": "¿Cómo se revisa a los proveedores?",
+            "a": "Los proveedores se revisan según los criterios aplicables, como cualificaciones, conocimientos especializados, cobertura de mercados, información empresarial, experiencia y estándares de servicio. Cuando está disponible, también podemos verificar licencias, certificaciones, historial de respuesta, valoraciones y encargos completados."
           },
           {
-            "q": "¿Cuánto cuesta un encargo?"
+            "q": "¿Por qué no se muestran al principio los nombres de los proveedores?",
+            "a": "Los nombres de los proveedores permanecen ocultos durante la comparación inicial para que pueda centrarse en los conocimientos y la adecuación, y no en el reconocimiento de marca. Así, proveedores de distintos tamaños también tienen una oportunidad justa de ser elegidos."
           },
-          {},
           {
-            "a": "No. Cada encargo se contrata individualmente. Puede solicitar más matches o cambiar en cualquier momento — su historial y su Risk Map siguen siendo suyos."
+            "q": "¿Cuándo veré el nombre y el perfil completo del proveedor?",
+            "a": "La identidad y el perfil completo del proveedor se muestran después de que usted lo elija y reserve una consulta. Entonces podrá revisar sus credenciales verificadas, valoraciones, información de verificación empresarial y datos de contacto."
+          },
+          {
+            "q": "¿Pueden los proveedores pagar para aparecer más arriba en mis matches?",
+            "a": "No. El matching y la clasificación se basan en criterios relevantes y no se pueden comprar. Los presupuestos publicitarios, el tamaño de la marca y los acuerdos comerciales no determinan sus mejores matches."
+          },
+          {
+            "q": "¿Cuánto costará el servicio?",
+            "a": "Antes de elegir un proveedor, verá un rango de precios estimado. Después de la consulta, el proveedor confirma los servicios, el precio final, el plazo previsto y las condiciones. El trabajo profesional comienza solo después de que usted los apruebe."
+          },
+          {
+            "q": "¿Con qué rapidez responderá un proveedor?",
+            "a": "El tiempo de respuesta previsto del proveedor se muestra antes de que usted elija. Si el proveedor no responde en ese plazo, CompliHub360 puede proponerle otro match. Su información no se compartirá con otro proveedor sin su aprobación."
+          },
+          {
+            "q": "¿Puedo elegir más de un proveedor?",
+            "a": "Sí. Puede seleccionar a más de un proveedor y reservar consultas con cada uno. Cada reserva y cada encargo profesional se mantienen por separado."
+          },
+          {
+            "q": "¿Qué ocurre después de reservar?",
+            "a": "Se muestran la identidad y el perfil completo del proveedor, y solo se comparte la información necesaria para tramitar su solicitud. A continuación, el proveedor confirma el servicio, el precio, el plazo y las condiciones. Ningún trabajo profesional comienza hasta que usted lo apruebe."
+          },
+          {
+            "q": "¿Estoy obligado a continuar con el proveedor después de la consulta?",
+            "a": "No. Reservar una consulta no le obliga a iniciar un encargo profesional."
+          },
+          {
+            "q": "¿Cómo mantiene CompliHub360 el acceso gratuito para los usuarios?",
+            "a": "CompliHub360 es gratuito para las empresas que buscan apoyo. Obtenemos ingresos a través de nuestras relaciones comerciales con los proveedores participantes. Estos acuerdos nunca influyen en qué proveedores aparecen en sus matches ni en cómo se clasifican."
           }
         ]
       },
       {
-        "label": "Cuenta y datos",
+        "label": "Cuenta, datos y privacidad",
         "items": [
           {
             "q": "¿Necesito una cuenta?",
-            "a": "Para la evaluación no — funciona en su navegador sin cuenta. Solo necesita una cuenta gratuita para conservar su Risk Map, ver sus mejores matches o recibir avisos."
+            "a": "No necesita una cuenta para hacer una pregunta, completar la evaluación o ver su Risk Map inicial. Necesita una cuenta gratuita para guardar y actualizar los resultados, ver sus mejores matches, reservar consultas y usar las funciones disponibles del Workspace."
           },
           {
-            "q": "¿Cómo se tratan mis datos?",
-            "a": "La evaluación se ejecuta en su navegador y no necesita cuenta. Si se registra, su dossier se almacena conforme a las normas de protección de datos de la UE, cifrado, y nunca se vende ni se comparte sin su instrucción."
+            "q": "¿Cómo se utiliza mi información?",
+            "a": "Utilizamos su información para prestar los servicios que solicita, personalizar los resultados relevantes, gestionar su cuenta y apoyar el proceso de matching y reserva, tal como se explica en nuestra Política de privacidad."
+          },
+          {
+            "q": "¿Qué información se comparte con un proveedor?",
+            "a": "Si decide contactar o reservar, solo compartimos la información necesaria para tramitar su solicitud. Antes de que se complete la conexión, se le debería mostrar qué se va a compartir."
+          },
+          {
+            "q": "¿Cuándo se comparte mi información?",
+            "a": "Su información se comparte después de que decida contactar o reservar con un proveedor y complete el paso de confirmación correspondiente. No se comparte automáticamente con todos los proveedores que aparecen en sus matches."
+          },
+          {
+            "q": "¿CompliHub360 vende mi información personal o empresarial?",
+            "a": "No. CompliHub360 no vende su información personal o empresarial a terceros no vinculados.\n\nSi decide contactar o reservar con un proveedor de servicios, solo compartimos la información necesaria para tramitar su solicitud, tal como se explica en nuestra Política de privacidad."
+          },
+          {
+            "q": "¿Cómo se protege mi información?",
+            "a": "Aplicamos medidas técnicas y organizativas adecuadas, diseñadas para proteger la información personal y empresarial. Encontrará más detalles en nuestra Política de privacidad y en nuestra información de seguridad."
+          },
+          {
+            "q": "¿Puedo controlar las notificaciones?",
+            "a": "Sí. Cuando las funciones de notificación estén disponibles, puede gestionar sus preferencias de correo electrónico y de alertas regulatorias desde su cuenta o usar la opción para darse de baja incluida en el mensaje."
+          },
+          {
+            "q": "¿Puedo eliminar mi cuenta o solicitar que se borre mi información?",
+            "a": "Puede solicitar la eliminación de su cuenta y ejercer los derechos de privacidad aplicables, tal como se explica en nuestra Política de privacidad. Es posible que parte de la información deba conservarse cuando lo exija la ley o con fines legítimos de registro."
+          },
+          {
+            "q": "¿Dónde se almacena mi información?",
+            "a": "La información se almacena y se trata a través de los prestadores de servicios y en las ubicaciones que se describen en nuestra Política de privacidad. Cuando la información se transfiere entre países, se aplican las garantías correspondientes."
           }
         ]
       }
-    ]
+    ],
+    "subtitle": "¿Preguntas? Empiece aquí."
   },
   "entryDoor": {
     "journey": [
