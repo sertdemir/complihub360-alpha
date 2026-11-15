@@ -1512,9 +1512,9 @@
   },
   "faq": {
     "title": {
-      "pre": "Lo que ",
-      "gold": "probablemente",
-      "post": " se está preguntando."
+      "pre": "Preguntas ",
+      "gold": "frecuentes",
+      "post": ""
     },
     "groups": [
       {
@@ -1534,7 +1534,7 @@
           },
           {
             "q": "¿Qué significan los estados de la Risk Map?",
-            "a": "«Confirmado» significa que el requisito aplica según sus respuestas. «Probable» significa que probablemente aplica, pero puede necesitarse más información o una confirmación profesional. «Se necesita más información» significa que hacen falta respuestas adicionales para una evaluación más precisa."
+            "a": "«Confirmado» significa que el requisito aplica según sus respuestas. «Probable» significa que probablemente aplica, pero puede necesitarse más información o una confirmación profesional. «Abierta» significa que hacen falta respuestas adicionales para una evaluación más precisa."
           },
           {
             "q": "¿De dónde procede la información?",

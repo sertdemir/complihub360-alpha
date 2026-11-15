@@ -1512,9 +1512,9 @@
   },
   "faq": {
     "title": {
-      "pre": "Muhtemelen ",
-      "gold": "merak ettikleriniz",
-      "post": "."
+      "pre": "Sıkça Sorulan ",
+      "gold": "Sorular",
+      "post": ""
     },
     "groups": [
       {
@@ -1534,7 +1534,7 @@
           },
           {
             "q": "Risk Map’teki durumlar ne anlama geliyor?",
-            "a": "“Onaylandı”, yanıtlarınıza göre gerekliliğin geçerli olduğu anlamına gelir. “Muhtemel”, gerekliliğin büyük olasılıkla geçerli olduğu, ancak daha fazla bilgi veya profesyonel doğrulama gerekebileceği anlamına gelir. “Daha fazla bilgi gerekli”, daha doğru bir değerlendirme için ek yanıtlara ihtiyaç olduğu anlamına gelir."
+            "a": "“Onaylandı”, yanıtlarınıza göre gerekliliğin geçerli olduğu anlamına gelir. “Muhtemel”, gerekliliğin büyük olasılıkla geçerli olduğu, ancak daha fazla bilgi veya profesyonel doğrulama gerekebileceği anlamına gelir. “Açık”, daha doğru bir değerlendirme için ek yanıtlara ihtiyaç olduğu anlamına gelir."
           },
           {
             "q": "Bilgiler nereden geliyor?",
