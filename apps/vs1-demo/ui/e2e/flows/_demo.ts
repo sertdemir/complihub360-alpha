@@ -62,7 +62,7 @@ export async function runWizard(page: Page, picks = { market: /Germany/, channel
   await next();
   await expect(page.getByRole('heading', { name: 'Where is your business established?' })).toBeVisible();
   await next();
-  await expect(page.getByRole('heading', { name: 'Which compliance areas concern you?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'What do you need help with?' })).toBeVisible();
   await page.getByRole('button', { name: picks.domain }).first().click();
   await next();
   await expect(page.getByRole('heading', { name: 'Your situation, summarized.' })).toBeVisible();

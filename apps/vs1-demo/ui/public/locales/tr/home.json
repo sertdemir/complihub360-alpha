@@ -180,8 +180,8 @@
         "subtitle": "Yalnızca pazarınıza değil, faaliyetinize uygulanan mevzuatı kapsama alırız."
       },
       "domains": {
-        "title": "Hangi uyum alanları sizi ilgilendiriyor?",
-        "subtitle": "Çoklu seçim. Bu alanlardaki yükümlülükleri önceliklendiririz."
+        "title": "Hangi konuda desteğe ihtiyacınız var?",
+        "subtitle": "Çoklu seçim."
       },
       "situation": {
         "title": "Durumunuzu en iyi hangisi tanımlıyor?",
@@ -222,6 +222,10 @@
       "planned": {
         "title": "Nerede kurmayı planlıyorsunuz?",
         "subtitle": "Değerlendirdiğiniz ülkeleri seçin."
+      },
+      "suggest": {
+        "title": "Yanıtlarınıza uyabilecek konular",
+        "subtitle": "Bunlar verdiğiniz bilgilere dayanan önerilerdir; bir yükümlülüğün geçerli olduğu tespiti değildir. Risk Map'inizde görmek istediklerinizi seçin."
       }
     },
     "cards": {
@@ -318,7 +322,7 @@
         "desc": "Sözleşmeler, koşullar, tüketici hukuku"
       },
       "environment": {
-        "title": "Çevre",
+        "title": "Çevresel ve Kimyasal Uyum",
         "desc": "WEEE, piller, maddeler"
       },
       "sitExisting": {
@@ -444,6 +448,9 @@
       },
       "chStores": {
         "title": "Fiziksel mağazalar"
+      },
+      "helpIdentify": {
+        "title": "Neye ihtiyacım olduğunu belirlememe yardım edin"
       }
     },
     "footer": {
@@ -474,7 +481,17 @@
     "generate": "Risk Map'imi oluştur",
     "removeMarket": "{{market}} seçimini kaldır",
     "aboutMarket": "{{market}} hakkında",
-    "situationHint": "Kişisel bir konu mu? CompliHub360 şimdilik işletmeler için tasarlandı — yerel bir danışma merkezi daha iyi bir ilk adımdır."
+    "situationHint": "Kişisel bir konu mu? CompliHub360 şimdilik işletmeler için tasarlandı — yerel bir danışma merkezi daha iyi bir ilk adımdır.",
+    "suggest": {
+      "reasons": {
+        "market": "{{markets}} pazarlarına satış yapıyorsunuz",
+        "physical": "Fiziksel ürün satıyorsunuz",
+        "multiMarket": "Birden fazla ülkede fiziksel ürün satıyorsunuz",
+        "online": "Çevrimiçi satış yapıyor veya dijital ürün sunuyorsunuz",
+        "consumersOnline": "Kendi web siteniz üzerinden tüketicilere satış yapıyorsunuz",
+        "starting": "İşletmeniz hâlâ kuruluş aşamasında"
+      }
+    }
   },
   "marketsDrawer": {
     "header": "Pazarlar",
@@ -1332,7 +1349,7 @@
         ]
       },
       {
-        "title": "Çevresel Uyum",
+        "title": "Çevresel ve Kimyasal Uyum",
         "desc": "Cihaz ve pil kayıtları, ömrün sonunda geri alma ve maddeler hakkında bildirmeniz gerekenler.",
         "intro": "Ambalajın ötesindeki çevresel yükümlülükler: elektrikli cihazlar ve piller için ulusal kayıtlar, ömrünün sonunda geri alma ve sattığınız eşyalardaki maddelere ilişkin bilgilendirme yükümlülükleri.",
         "cover": [
