@@ -11,6 +11,7 @@
 //
 //   node scripts/llm-eval/assistant-dna-review.mjs \
 //     --api http://localhost:3005 [--api-key <API_KEY des Servers> | --token <JWT>] [--from 6] [--out bericht.md]
+//     [--on-limit "<Befehl>"]
 //
 // Anmeldung: Die Route verlangt einen Nutzer-JWT oder den Server-Schlüssel.
 // Lokal am einfachsten: API_KEY=<beliebig> in services/compliance-api/.env
@@ -21,6 +22,18 @@
 // Server neu starten (der Zähler lebt im Speicher), dann mit --from N weiter.
 // Jeder Teil bekommt eine eigene Datei. Mit einem Assistant-Pro-Konto
 // (--token) läuft der ganze Bogen in einem Durchgang.
+//
+// --on-limit "<Befehl>": statt anzuhalten führt der Bogen bei 402 diesen
+// Befehl aus (z. B. den API-Container neu starten, der Zähler lebt im
+// Speicher), wartet 15 s und stellt dieselbe Frage noch einmal. So läuft der
+// ganze Bogen in einem Durchgang, auch gegen Staging.
+//
+// Kalibrierung (seit 2026-11-14): Jede Frage trägt `calibration` ("match":
+// der Korpus sollte passen, "no-match": er sollte es nicht). Neben dem Bogen
+// entsteht <out>.calibration.json mit Frage-ID, Erwartung und correlationId.
+// Darüber lässt sich jede Antwort ihrem Ereignis `assistant_chat_result`
+// (payload.correlation_id) zuordnen und die Schwelle prüfen.
+import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -80,20 +93,27 @@ const headers = {
 const rows = [];
 let next = null;
 for (const [i, q] of questions.entries()) {
-    let status = 0, answer = "", sources = "", provider = "";
-    try {
-        const res = await fetch(`${api}/api/v1/assistant/chat`, {
-            method: 'POST', headers,
-            body: JSON.stringify({ message: q.message, ...(q.country ? { country: q.country } : {}) }),
-            signal: AbortSignal.timeout(90_000),
-        });
-        status = res.status;
-        provider = res.headers.get('x-llm-provider') || '';
-        const body = await res.json().catch(() => ({}));
-        answer = typeof body.answer === 'string' ? body.answer : (body.errorCode || '');
-        sources = (body.sources || []).map((s) => s.label).join(' · ');
-    } catch (e) {
-        answer = `Fehler: ${e.message}`;
+    let status = 0, answer = "", sources = "", provider = "", correlationId = "";
+    for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+            const res = await fetch(`${api}/api/v1/assistant/chat`, {
+                method: 'POST', headers,
+                body: JSON.stringify({ message: q.message, ...(q.country ? { country: q.country } : {}) }),
+                signal: AbortSignal.timeout(90_000),
+            });
+            status = res.status;
+            provider = res.headers.get('x-llm-provider') || '';
+            const body = await res.json().catch(() => ({}));
+            answer = typeof body.answer === 'string' ? body.answer : (body.errorCode || '');
+            sources = (body.sources || []).map((s) => s.label).join(' · ');
+            correlationId = typeof body.correlationId === 'string' ? body.correlationId : '';
+        } catch (e) {
+            answer = `Fehler: ${e.message}`;
+        }
+        if (status !== 402 || !args['on-limit'] || attempt > 0) break;
+        console.log(`402 bei ${q.id} — führe --on-limit aus und warte 15 s …`);
+        execSync(String(args['on-limit']), { stdio: 'inherit' });
+        await new Promise((r) => setTimeout(r, 15_000));
     }
     if (status === 402) { next = from + i; break; }
     if (status === 401 && i === 0) {
@@ -101,7 +121,7 @@ for (const [i, q] of questions.entries()) {
         process.exit(1);
     }
     const h = hints(q, status, answer, sources);
-    rows.push({ q, status, answer, sources, provider, h });
+    rows.push({ q, status, answer, sources, provider, h, correlationId });
     console.log(`${q.id.padEnd(20)} ${status} ${provider || '?'} ${h.length ? '⚑ ' + h.join(' | ') : 'ok'}`);
 }
 
@@ -139,6 +159,9 @@ const md = [
 ].join('\n');
 fs.writeFileSync(out, md);
 console.log(`\nPrüfbogen: ${path.resolve(out)}`);
+const calOut = out.replace(/\.md$/, '') + '.calibration.json';
+fs.writeFileSync(calOut, JSON.stringify(rows.map(({ q, status, correlationId }) => ({ id: q.id, calibration: q.calibration ?? null, status, correlationId })), null, 2) + '\n');
+console.log(`Kalibrierung: ${path.resolve(calOut)}`);
 if (next) {
     console.log(`\nGratis-Grenze erreicht (402). Lokalen Server neu starten (Ctrl+C, npm run dev:service), dann weiter mit:`);
     console.log(`  node scripts/llm-eval/assistant-dna-review.mjs --api ${api}${args['api-key'] ? ' --api-key <dein API_KEY>' : ''} --from ${next}`);

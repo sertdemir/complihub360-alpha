@@ -112,7 +112,8 @@ const MATCH_COUNT = 6;
 // (P2, `assistant_chat` VOR dem ersten Anbieter-Aufruf). Dieses hier bleibt
 // nicht-blockierend, aber nie still.
 async function logAssistantEvent(payload: Record<string, unknown>, correlationId: string): Promise<void> {
-    await supabaseApi.insert('event_log', { type: 'assistant_chat_result', payload }).catch((err: unknown) => {
+    // correlation_id: ordnet das Ergebnis einer Antwort zu (Prüfbogen-Kalibrierung, Support). Kein Frageinhalt.
+    await supabaseApi.insert('event_log', { type: 'assistant_chat_result', payload: { ...payload, correlation_id: correlationId } }).catch((err: unknown) => {
         structuredLog('warn', 'Assistant result event not written', { correlationId, errorCode: 'ERR_ASSISTANT_AUDIT_RESULT', severity: 'warn', detail: String(err).slice(0, 200) });
     });
 }
