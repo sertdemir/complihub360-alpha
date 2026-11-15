@@ -1512,9 +1512,9 @@
   },
   "faq": {
     "title": {
-      "pre": "Was Sie sich ",
-      "gold": "vermutlich",
-      "post": " fragen."
+      "pre": "Häufig gestellte ",
+      "gold": "Fragen",
+      "post": ""
     },
     "groups": [
       {
@@ -1534,7 +1534,7 @@
           },
           {
             "q": "Was bedeuten die Status in der Risk Map?",
-            "a": "„Bestätigt“ heißt: Die Anforderung gilt aufgrund Ihrer Antworten. „Wahrscheinlich“ heißt: Sie gilt vermutlich, es können aber weitere Informationen oder eine fachliche Bestätigung nötig sein. „Weitere Informationen nötig“ heißt: Für eine genauere Einschätzung brauchen wir zusätzliche Antworten."
+            "a": "„Bestätigt“ heißt: Die Anforderung gilt aufgrund Ihrer Antworten. „Wahrscheinlich“ heißt: Sie gilt vermutlich, es können aber weitere Informationen oder eine fachliche Bestätigung nötig sein. „Offen“ heißt: Für eine genauere Einschätzung brauchen wir zusätzliche Antworten."
           },
           {
             "q": "Woher stammen die Informationen?",
