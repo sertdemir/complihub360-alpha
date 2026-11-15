@@ -1561,7 +1561,7 @@
           },
           {
             "q": "¿Qué información se comparte con un proveedor?",
-            "a": "Si decide contactar o reservar, solo compartimos la información necesaria para tramitar su solicitud. Antes de que se complete la conexión, se le debería mostrar qué se va a compartir."
+            "a": "Si decide contactar o reservar, solo compartimos la información necesaria para tramitar su solicitud. Antes de que se complete la conexión, se le muestra qué se va a compartir."
           },
           {
             "q": "¿Cuándo se comparte mi información?",
