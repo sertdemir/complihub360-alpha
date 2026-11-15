@@ -1620,7 +1620,7 @@
           },
           {
             "q": "Bir sağlayıcıyla hangi bilgiler paylaşılır?",
-            "a": "Bağlantı kurmayı veya rezervasyon yapmayı seçerseniz yalnızca talebinizin işlenmesi için gereken bilgileri paylaşırız. Bağlantı tamamlanmadan önce neyin paylaşılacağı size gösterilmelidir."
+            "a": "Bağlantı kurmayı veya rezervasyon yapmayı seçerseniz yalnızca talebinizin işlenmesi için gereken bilgileri paylaşırız. Bağlantı tamamlanmadan önce neyin paylaşılacağı size gösterilir."
           },
           {
             "q": "Bilgilerim ne zaman paylaşılır?",
