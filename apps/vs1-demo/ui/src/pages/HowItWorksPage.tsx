@@ -59,14 +59,17 @@ function InfoCard({ base, icon }: { base: 'cost' | 'privacy'; icon: React.ReactN
 }
 
 export function HowItWorksPage() {
-  const { t } = useTranslation('common');
+  // 'home' carries the shared "Assess My Needs" label and the ask link.
+  const { t } = useTranslation(['common', 'home']);
   const navigate = useNavigate();
   const { locale } = useParams();
 
 
-  // Single CTA on purpose: the report's secondary entry ("Ask a Compliance
-  // Question") belongs to the search page, which is not on this branch yet.
+  // Handover 1.0 §6: two equal entries, "Ask a Question" and "Assess My
+  // Needs" (same variant, same size) — as on the homepage route. The hero
+  // keeps its primary button and names the second way as a quiet link.
   const startAssessment = () => navigate(`/${locale ?? 'en'}/wizard`);
+  const askQuestion = () => navigate(`/${locale ?? 'en'}/search`);
 
   return (
     <main className="bg-surface">
@@ -98,6 +101,14 @@ export function HowItWorksPage() {
               </Button>
               <span className="text-body-xs font-medium text-fg-tertiary">{t('howItWorks.cta.lead')}</span>
             </div>
+            <button
+              type="button"
+              onClick={askQuestion}
+              className="mt-4 inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand underline-offset-4 transition-colors hover:text-brand hover:underline"
+            >
+              {t('heroWorld.ask.lead', { ns: 'home' })}
+              <ArrowRight size={15} aria-hidden />
+            </button>
           </Reveal>
 
           <motion.div
@@ -168,10 +179,14 @@ export function HowItWorksPage() {
               </h3>
               <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{t('howItWorks.cta.lead')}</p>
             </div>
-            <Button size="lg" variant="primary" className="shrink-0" onClick={startAssessment}>
-              {t('hero.cta.start', { ns: 'home', defaultValue: 'Assess My Needs' })}
-              <ArrowRight size={17} className="ml-1.5" />
-            </Button>
+            <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
+              <Button size="lg" variant="outline" onClick={askQuestion}>
+                {t('howItWorks.ctaAsk')}
+              </Button>
+              <Button size="lg" variant="outline" onClick={startAssessment}>
+                {t('howItWorks.ctaAssess')}
+              </Button>
+            </div>
           </Reveal>
         </div>
       </section>

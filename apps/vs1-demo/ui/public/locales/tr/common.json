@@ -1203,13 +1203,13 @@
       {
         "kicker": "Değerlendirin",
         "title": "Size gerçekte neyin geçerli olduğunu görün.",
-        "body": "Pazarlarınız, iş modeliniz ve hacminize dair dört soru bir risk haritası oluşturur: işletmeniz için geçerli yükümlülükler, her biri yasal dayanağı ve süresiyle. Bunlar kendi uyum motorumuzdan gelir ve AB hukuk veritabanına bağlanır — bir sohbet botu tarafından üretilmezler.",
+        "body": "Bize pazarlarınızı, iş modelinizi ve destek almak istediğiniz alanları anlatın. Risk haritanız, işletmeniz için geçerli yükümlülükleri her birini önceliğiyle ve varsa resmi kaynağı ve süresiyle gösterir. Bunlar bir sohbet botundan değil, kendi uyum motorumuzdan gelir.",
         "short": "Wizard dört şey sorar ve Risk Map’inizi oluşturur — her yükümlülük yasal dayanağı ve süresiyle."
       },
       {
         "kicker": "Karar verin",
         "title": "Neye dışarıdan destek gerektiğine karar verin.",
-        "body": "Harita, kendi içinizde halledebileceklerinizi gerçekten uzman gerektirenlerden ve hangi sırayla yapılacağından ayırır. Her şeyin zaten karşılandığı ortaya çıkarsa bunu size söyleriz — o durumda size satacağımız bir şey yoktur.",
+        "body": "Önceliklerinizi, sürelerinizi ve kaynaklarınızı; hangi konuları kurum içinde, hangilerini profesyonel destekle halledebileceğinizi görün. Her şeyi zaten karşıladığınız ortaya çıkarsa bunu söyleriz — o durumda size satacak bir şeyimiz yoktur.",
         "short": "Risk Map, kendi başınıza halledebileceklerinizi bir uzman gerektirenlerden ayırır."
       },
       {
@@ -1220,8 +1220,8 @@
       },
       {
         "kicker": "Harekete geçin",
-        "title": "Randevu alın, sonra devredin.",
-        "body": "Uzmanın takviminden bir saat seçin. Kimlik, randevu anında, bize daha önce anlattığınız her şeyi içeren bir dosyayla birlikte açılır — işinizi altıncı kez anlatmazsınız. Sonrasında süreci değerlendirebilirsiniz ve yükümlülükler süreleriyle birlikte haritanızda kalır.",
+        "title": "Danışmanlık randevusu alın.",
+        "body": "Bir sağlayıcı seçin ve takviminden bir saat belirleyin. Randevu almadan önce neyin paylaşılacağını tam olarak görürsünüz. Sağlayıcının kimliği randevu anında açılır ve yalnızca talebinizin işlenmesi için gereken bilgiler paylaşılır. Sonrasında randevuyu değerlendirebilirsiniz; yükümlülükleriniz süreleriyle birlikte risk haritanızda kalır.",
         "short": "Randevu seçin — dosyanız sizinle gelir, işinizi altıncı kez anlatmazsınız."
       }
     ],
@@ -1275,8 +1275,8 @@
         ]
       },
       "decide": {
-        "selfTitle": "Kendiniz halledin",
-        "proTitle": "Uzman gerekli",
+        "selfTitle": "Kurum içinde mümkün",
+        "proTitle": "Profesyonel destekle",
         "self": [
           "Çerez bandını güncelleyin",
           "FR künyesini tamamlayın"
@@ -1291,10 +1291,10 @@
       "match": {
         "rows": [
           {
-            "meta": "24 saat içinde yanıt · 4.8 ★ · Doğrulanmış"
+            "meta": "~24 saat içinde yanıt · Doğrulanmış"
           },
           {
-            "meta": "21 saat içinde yanıt · 4.9 ★ · Doğrulanmış"
+            "meta": "~21 saat içinde yanıt · Doğrulanmış"
           }
         ],
         "note": "Kimlik yalnızca rezervasyonda görünür. Sıralama asla satılık değildir."
@@ -1308,15 +1308,15 @@
           "Per 11:30"
         ],
         "points": [
-          "Dosyanız sizinle gelir — işinizi altıncı kez anlatmazsınız.",
+          "Randevu almadan önce neyin paylaşılacağını görürsünüz — yalnızca talebinizin gerektirdiği kadarı.",
           "Yükümlülükler, süreleriyle birlikte haritanızda kalır."
         ]
       }
     },
     "cost": {
       "kicker": "Bunun size maliyeti",
-      "title": "Hiç.",
-      "body": "Platform, risk haritası ve eşleştirme sizin için ücretsizdir. Bize, gerçekten bir randevu gerçekleştiğinde uzmanlar öder. Sıralamanın satılık olmamasının nedeni de budur: ücretli bir konum, eşleşmeyi her iki taraf için de değersiz kılardı."
+      "title": "Sağlayıcı bulmak ve randevu almak ücretsiz.",
+      "body": "Değerlendirme, risk haritanız, eşleştirme ve randevu sizin için ücretsizdir. Bize, gerçekten bir randevu gerçekleştiğinde sağlayıcılar öder. Sıralamanın satılık olmamasının nedeni de budur: ücretli bir konum, eşleşmeyi her iki taraf için de değersiz kılardı. Yalnızca çalışma alanınızdaki yapay zekâ asistanının, günde daha fazla soru için isteğe bağlı ücretli bir planı vardır."
     },
     "privacy": {
       "kicker": "Verilerinize ne olur",

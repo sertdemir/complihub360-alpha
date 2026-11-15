@@ -20,7 +20,7 @@ import { join } from 'node:path';
 // die Seite rendert dann den rohen Schluesselnamen.
 const SPRACHEN = ['en', 'de', 'es', 'tr'] as const;
 const FELDER = ['title', 'sub', 'panelTitle', 'panelSub', 'feature1', 'feature2', 'feature3', 'feature4'] as const;
-const GETEILT = ['eyebrow', 'bannerTitle', 'joinEarlyAccess'] as const;
+const GETEILT = ['eyebrow', 'bannerTitle'] as const;
 
 const wurzel = join(__dirname, '../../..');
 
@@ -91,6 +91,19 @@ describe('ComingSoon-Flaechen', () => {
     for (const sprache of SPRACHEN) {
       const roh = JSON.stringify(locale(sprache));
       expect(roh, `${sprache}: Art.-20-Versprechen im Arbeitsbereich`).not.toMatch(/workspace-data|Art\.? ?20|GDPR Art/i);
+    }
+  });
+
+  // "Join early access" stand zweimal je Flaeche als Knopf ohne onClick —
+  // eine Zusage ohne Liste dahinter (entfernt 2026-11-14). Kommt sie zurueck,
+  // dann mit echter Anmeldung, nicht als Attrappe.
+  it('kein Early-Access-Knopf ohne Anmeldung dahinter', () => {
+    const seite = readFileSync(join(__dirname, 'ComingSoonPage.tsx'), 'utf8');
+    expect(seite).not.toContain('joinEarlyAccess');
+    for (const sprache of SPRACHEN) {
+      const cs = locale(sprache).comingSoon;
+      expect(cs.joinEarlyAccess, `${sprache}: comingSoon.joinEarlyAccess ist zurueck`).toBeUndefined();
+      expect(JSON.stringify(cs), `${sprache}: Early Access wird noch versprochen`).not.toMatch(/early access|acceso anticipado|erken erişim/i);
     }
   });
 

@@ -324,10 +324,9 @@
   "comingSoon": {
     "eyebrow": "Hazırlanıyor",
     "bannerTitle": "HAZIRLANIYOR — {{title}}",
-    "joinEarlyAccess": "Erken erişime katılın",
     "alerts": {
       "title": "Uyarılar",
-      "sub": "Eşik ve mevzuat izleme · yakında — erken erişime katılın",
+      "sub": "Eşik ve mevzuat izleme · yakında",
       "panelTitle": "Eşik ve mevzuat izleme",
       "panelSub": "Cironuz bir KDV eşiğine yaklaştığında, bir düzenleyici kuralları değiştirdiğinde veya bir son tarih yaklaştığında anında bildirim alın.",
       "feature1": "Ülke bazında eşik uyarıları",
@@ -347,7 +346,7 @@
     },
     "library": {
       "title": "Kitaplık",
-      "sub": "Bilgi, eğitimler ve araçlar · yakında — erken erişime katılın",
+      "sub": "Bilgi, eğitimler ve araçlar · yakında",
       "panelTitle": "Bilgi, eğitimler ve araçlar",
       "panelSub": "Uzmanlardan doğrulanmış içerikler, alana ve pazara göre sıralanır — her biri açıkladığı mevzuatı belirtir.",
       "feature1": "Alana göre eğitimler",
@@ -357,7 +356,7 @@
     }
   },
   "domainPage": {
-    "subEmpty": "Bu alanı kapsayan oturum henüz yok · bilgi ve sağlayıcılar hazır",
+    "subEmpty": "Bu alanı kapsayan risk haritası henüz yok",
     "lageOpen_one": "{{count}} açık yükümlülük",
     "lageOpen_other": "{{count}} açık yükümlülük",
     "lageRiskMaps_one": "{{count}} oturumda",
@@ -454,7 +453,7 @@
     "namePlaceholder": "Oturum adı",
     "renamed": "Yeniden adlandırıldı ✓",
     "archiveTitle": "Arşivle",
-    "archiveDesc": "Oturumu listeden gizler · izleme duraklatılır · her zaman geri yüklenebilir.",
+    "archiveDesc": "Risk haritasını listeden gizler · her zaman geri yüklenebilir.",
     "archived": "Arşivlendi ✓",
     "actionError": "İşlem başarısız — lütfen birazdan tekrar deneyin.",
     "archiveQuestion": "Bu oturum arşivlensin mi?"
@@ -528,7 +527,7 @@
     "disclaimer": "Genel düzenleyici bilgidir; hukuki veya vergi danışmanlığı değildir. Bağlayıcı bir değerlendirme için bir Verified Provider görevlendirin.",
     "error": "Bu işlem başarısız oldu — lütfen birazdan tekrar deneyin.",
     "notConfigured": "Asistan bu ortamda henüz bağlı değil.",
-    "quota": "Günlük ücretsiz limite ulaşıldı — yükseltme planı yakında geliyor.",
+    "quota": "Bugünkü sınıra ulaştınız. Yarın yeniden sorabilirsiniz.",
     "upgradeTitle": "Assistant Pro",
     "upgradeBody": "Bugünkü 5 ücretsiz sorunuz tükendi. Assistant Pro günlük sınırı 200'e çıkarır — aylık iptal edilebilir.",
     "upgradeCta": "Yükselt · Ayda 12 €",
