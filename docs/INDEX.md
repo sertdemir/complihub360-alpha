@@ -16,6 +16,8 @@
 | `ops/self-hosted-runner.md` | Staging-Deploy über einen Runner auf dem VPS (Einrichtung, Betrieb, Sicherheitsschranken) | Active |
 | `ranking/` | Ranking Algorithm Docs | Empty |
 | `testing/beta-volltest-2026-10-26.md` | Beta-Volltest: beide Rollen, vier Sprachen, mobil; Fehlerprotokoll und Go/No-Go | Active |
+| `testing/halime-briefing.md` | Briefing für Halime (Test-Agent der Mitgründerin, ChatGPT): Regeln, Personas, vier Läufe, Berichtsformat | Active |
+| `runbooks/beta-test-users.md` | Bestätigte Test-Nutzerkonten in der Beta anlegen und entfernen (`seed-test-users.sh`), Zuschnitt für Halime | Active |
 
 ## 2. Proposed Restructuring
 
