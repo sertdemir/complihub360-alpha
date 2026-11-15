@@ -180,8 +180,8 @@
         "subtitle": "Delimitamos la normativa que aplica a su actividad, no solo a su mercado."
       },
       "domains": {
-        "title": "¿Qué áreas de compliance le preocupan?",
-        "subtitle": "Selección múltiple. Priorizamos las obligaciones de estas áreas."
+        "title": "¿Con qué necesita ayuda?",
+        "subtitle": "Selección múltiple."
       },
       "situation": {
         "title": "¿Qué describe mejor su situación?",
@@ -222,6 +222,10 @@
       "planned": {
         "title": "¿Dónde tiene previsto establecerla?",
         "subtitle": "Elija los países que está considerando."
+      },
+      "suggest": {
+        "title": "Temas que pueden encajar con sus respuestas",
+        "subtitle": "Sugerencias basadas en lo que nos ha indicado; no es una constatación de que se aplique una obligación. Elija lo que quiere ver en su Risk Map."
       }
     },
     "cards": {
@@ -318,7 +322,7 @@
         "desc": "Contratos, condiciones, derecho del consumidor"
       },
       "environment": {
-        "title": "Medio ambiente",
+        "title": "Cumplimiento ambiental y químico",
         "desc": "RAEE, baterías, sustancias"
       },
       "sitExisting": {
@@ -444,6 +448,9 @@
       },
       "chStores": {
         "title": "Tiendas físicas"
+      },
+      "helpIdentify": {
+        "title": "Ayúdeme a identificar lo que necesito"
       }
     },
     "footer": {
@@ -474,7 +481,17 @@
     "generate": "Crear mi Risk Map",
     "removeMarket": "Quitar {{market}}",
     "aboutMarket": "Acerca de {{market}}",
-    "situationHint": "¿Un asunto personal? Por ahora, CompliHub360 está pensado para empresas — un servicio de asesoramiento local es el mejor primer paso."
+    "situationHint": "¿Un asunto personal? Por ahora, CompliHub360 está pensado para empresas — un servicio de asesoramiento local es el mejor primer paso.",
+    "suggest": {
+      "reasons": {
+        "market": "Vende en {{markets}}",
+        "physical": "Vende productos físicos",
+        "multiMarket": "Vende productos físicos en más de un país",
+        "online": "Vende en línea u ofrece productos digitales",
+        "consumersOnline": "Vende a consumidores a través de su propio sitio web",
+        "starting": "Su empresa aún se está constituyendo"
+      }
+    }
   },
   "marketsDrawer": {
     "header": "Mercados",
@@ -1332,7 +1349,7 @@
         ]
       },
       {
-        "title": "Cumplimiento ambiental",
+        "title": "Cumplimiento ambiental y químico",
         "desc": "Registros para aparatos y baterías, recogida al final de la vida útil y qué debe informar sobre las sustancias.",
         "intro": "Obligaciones ambientales más allá del envase: registros nacionales para aparatos eléctricos y baterías, recogida al final de la vida útil, y los deberes de información sobre sustancias en los artículos que vende.",
         "cover": [

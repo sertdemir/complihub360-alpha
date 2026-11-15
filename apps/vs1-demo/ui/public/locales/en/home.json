@@ -182,8 +182,8 @@
         "subtitle": "We scope the regulations that apply to your operation, not just your market."
       },
       "domains": {
-        "title": "Which compliance areas concern you?",
-        "subtitle": "Multi-select. We prioritize the obligations in these areas."
+        "title": "What do you need help with?",
+        "subtitle": "Choose all that apply."
       },
       "situation": {
         "title": "Which best describes your situation?",
@@ -224,6 +224,10 @@
       "planned": {
         "title": "Where do you plan to establish it?",
         "subtitle": "Choose the countries you are considering."
+      },
+      "suggest": {
+        "title": "Topics that may fit your answers",
+        "subtitle": "Suggestions based on what you told us — not a finding that an obligation applies. Choose the ones you want on your Risk Map."
       }
     },
     "cards": {
@@ -320,7 +324,7 @@
         "desc": "Contracts, T&Cs, consumer law"
       },
       "environment": {
-        "title": "Environmental",
+        "title": "Environmental & Chemical Compliance",
         "desc": "WEEE, batteries, substances"
       },
       "sitExisting": {
@@ -446,6 +450,9 @@
       },
       "chStores": {
         "title": "Physical stores"
+      },
+      "helpIdentify": {
+        "title": "Help me identify what I need"
       }
     },
     "footer": {
@@ -476,7 +483,17 @@
     "generate": "Create My Risk Map",
     "removeMarket": "Remove {{market}}",
     "aboutMarket": "About {{market}}",
-    "situationHint": "A personal matter? CompliHub360 is built for businesses for now — a local advice centre is the better first step."
+    "situationHint": "A personal matter? CompliHub360 is built for businesses for now — a local advice centre is the better first step.",
+    "suggest": {
+      "reasons": {
+        "market": "You sell in {{markets}}",
+        "physical": "You sell physical products",
+        "multiMarket": "You sell physical products in more than one country",
+        "online": "You sell online or offer digital products",
+        "consumersOnline": "You sell to consumers through your own website",
+        "starting": "Your business is still being set up"
+      }
+    }
   },
   "marketsDrawer": {
     "header": "Markets",
@@ -1343,7 +1360,7 @@
         ]
       },
       {
-        "title": "Environmental Compliance",
+        "title": "Environmental & Chemical Compliance",
         "desc": "Registers for devices and batteries, take-back at end of life, and what you must disclose about substances.",
         "intro": "Environmental duties beyond packaging: national registers for electrical equipment and batteries, take-back at end of life, and the information duties that attach to substances in the articles you sell.",
         "cover": [

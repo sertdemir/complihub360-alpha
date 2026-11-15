@@ -180,8 +180,8 @@
         "subtitle": "Wir grenzen die Vorschriften ein, die für Ihre Tätigkeit gelten — nicht nur für Ihren Markt."
       },
       "domains": {
-        "title": "Welche Compliance-Bereiche beschäftigen Sie?",
-        "subtitle": "Mehrfachauswahl. Wir priorisieren die Pflichten in diesen Bereichen."
+        "title": "Wobei brauchen Sie Unterstützung?",
+        "subtitle": "Mehrfachauswahl."
       },
       "situation": {
         "title": "Was beschreibt Ihre Situation am besten?",
@@ -222,6 +222,10 @@
       "planned": {
         "title": "Wo planen Sie die Gründung?",
         "subtitle": "Wählen Sie die Länder, die infrage kommen."
+      },
+      "suggest": {
+        "title": "Themen, die zu Ihren Antworten passen könnten",
+        "subtitle": "Vorschläge auf Basis Ihrer Angaben — keine Feststellung, dass eine Pflicht gilt. Wählen Sie, was auf Ihre Risk Map soll."
       }
     },
     "cards": {
@@ -318,7 +322,7 @@
         "desc": "Verträge, AGB, Verbraucherrecht"
       },
       "environment": {
-        "title": "Umwelt",
+        "title": "Umwelt- & Chemikalien-Compliance",
         "desc": "WEEE, Batterien, Stoffrecht"
       },
       "sitExisting": {
@@ -444,6 +448,9 @@
       },
       "chStores": {
         "title": "Ladengeschäfte"
+      },
+      "helpIdentify": {
+        "title": "Helfen Sie mir herauszufinden, was ich brauche"
       }
     },
     "footer": {
@@ -474,7 +481,17 @@
     "generate": "Meine Risk Map erstellen",
     "removeMarket": "{{market}} entfernen",
     "aboutMarket": "Über {{market}}",
-    "situationHint": "Ein privates Anliegen? CompliHub360 ist vorerst für Unternehmen gebaut — eine Beratungsstelle vor Ort ist der bessere erste Schritt."
+    "situationHint": "Ein privates Anliegen? CompliHub360 ist vorerst für Unternehmen gebaut — eine Beratungsstelle vor Ort ist der bessere erste Schritt.",
+    "suggest": {
+      "reasons": {
+        "market": "Sie verkaufen nach {{markets}}",
+        "physical": "Sie verkaufen physische Produkte",
+        "multiMarket": "Sie verkaufen physische Produkte in mehr als einem Land",
+        "online": "Sie verkaufen online oder bieten digitale Produkte an",
+        "consumersOnline": "Sie verkaufen über Ihre eigene Website an Verbraucher",
+        "starting": "Ihr Unternehmen wird noch aufgebaut"
+      }
+    }
   },
   "marketsDrawer": {
     "header": "Märkte",
@@ -1332,7 +1349,7 @@
         ]
       },
       {
-        "title": "Umwelt-Compliance",
+        "title": "Umwelt- & Chemikalien-Compliance",
         "desc": "Register für Geräte und Batterien, Rücknahme am Lebensende, und was Sie über Stoffe offenlegen müssen.",
         "intro": "Umweltpflichten jenseits der Verpackung: nationale Register für Elektrogeräte und Batterien, Rücknahme am Lebensende, und die Informationspflichten für Stoffe in den Erzeugnissen, die Sie verkaufen.",
         "cover": [

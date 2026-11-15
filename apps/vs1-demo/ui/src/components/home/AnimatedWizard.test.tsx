@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { AnimatedWizard, buildProfile, selectionFromProfile } from './AnimatedWizard';
+import { AnimatedWizard, buildProfile, selectionFromProfile, suggestedAreas } from './AnimatedWizard';
 import type { SearchProfile } from '../wizard/WizardContext';
 
 // ─── Wizard Runde 1 · Ablauf (Canvas-Wahl 14.11.2026: 1B · 2A · 3A · 4A · 5B) ─
@@ -245,6 +245,36 @@ describe('AnimatedWizard · v1a', () => {
       eprProducts: ['other'],
       packaging: ['shipping'],
     });
+  });
+
+  it('S12: "Help me identify" stands alone and opens the suggestions', () => {
+    const { onComplete } = setup({ initialMarkets: ['DE'] });
+    nextTimes(1);
+    fireEvent.click(card('offPhysical'));
+    nextTimes(4); // Customers+Channels → Establishment → Stock → Domains
+    fireEvent.click(card('vatTax'));
+    fireEvent.click(card('helpIdentify'));
+    expect(card('helpIdentify')).toHaveAttribute('aria-pressed', 'true');
+    expect(card('vatTax')).toHaveAttribute('aria-pressed', 'false');
+    nextTimes(1);
+    expect(heading('suggest')).toBeInTheDocument();
+    // Vorschlaege mit Grund — und keiner ist vorausgewaehlt.
+    expect(screen.getAllByText('wizard.suggest.reasons.physical')).toHaveLength(2);
+    expect(card('eprPackaging')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.queryByText('wizard.cards.legalAdvisory.title')).not.toBeInTheDocument();
+    fireEvent.click(card('productCompliance'));
+    nextTimes(1);
+    fireEvent.click(generate());
+    const profile = onComplete.mock.calls[0][0] as SearchProfile;
+    expect(profile.categories).toEqual(['product-compliance']);
+  });
+
+  it('S12: suggestions follow fixed rules, each tied to an answer', () => {
+    expect(suggestedAreas(new Set(), [])).toEqual([]);
+    expect(suggestedAreas(new Set(['off:physical']), ['Germany', 'Italy']).map((x) => x.id))
+      .toEqual(['Tax & VAT', 'EPR & Packaging', 'Product Compliance', 'Logistics & Customs']);
+    expect(suggestedAreas(new Set(['ch:own-site', 'cu:consumers', 'sit:starting']), []).map((x) => x.id))
+      .toEqual(['Data & Privacy', 'Marketing Compliance', 'Corporate & Structure']);
   });
 
   it('drops dependent answers when the condition goes away', () => {
