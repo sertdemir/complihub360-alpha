@@ -334,7 +334,7 @@ export function MarketsIndexPage() {
                 <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
                   {t('compliance.howItWorks.hubCta.lead', {
                     ...COVERAGE_COUNTS,
-                    defaultValue: 'The assessment narrows the {{areas}} areas down to your business, your markets and your product — in under five minutes.',
+                    defaultValue: 'The assessment narrows the {{areas}} areas down to your business, your markets and your product — in about six minutes.',
                   })}
                 </p>
               </div>
@@ -582,7 +582,7 @@ export function MarketPage() {
                 <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
                   {t('markets.country.ctaBody', {
                     defaultValue:
-                      'The assessment narrows this market to your business, your product and your areas — in under five minutes.',
+                      'The assessment narrows this market to your business, your product and your areas — in about six minutes.',
                   })}
                 </p>
               </div>

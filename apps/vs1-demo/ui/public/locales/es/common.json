@@ -324,7 +324,7 @@
       },
       "hubCta": {
         "title": "¿Listo para ver qué le aplica?",
-        "lead": "El assessment acota las nueve áreas a su empresa, sus mercados y su producto — en menos de cinco minutos.",
+        "lead": "El assessment acota las nueve áreas a su empresa, sus mercados y su producto — en unos seis minutos.",
         "btn": "Iniciar un assessment"
       }
     },
@@ -714,7 +714,7 @@
       "relatedTitle": "Áreas que van de la mano con esta",
       "relatedLead": "Comparten desencadenantes con el área que está leyendo — el mismo hecho de su negocio también las activa.",
       "ctaTitle": "¿Listo para ver qué le aplica?",
-      "ctaBody": "La evaluación acota esta área a su negocio, sus mercados y su producto — en menos de cinco minutos.",
+      "ctaBody": "La evaluación acota esta área a su negocio, sus mercados y su producto — en unos seis minutos.",
       "metrics": {
         "obligations": "Obligaciones en este ámbito",
         "obligationsNote": "{{count}} con una fuente específica para este mercado",
@@ -1085,7 +1085,7 @@
     },
     "cta": {
       "title": "O empiece por su propia situación.",
-      "lead": "Cuatro preguntas, unos cinco minutos, sin necesidad de cuenta."
+      "lead": "Cuatro preguntas, unos seis minutos, sin necesidad de cuenta."
     }
   },
   "aiGov": {
@@ -1146,7 +1146,7 @@
     "dimEyebrow": "Gobernanza",
     "dimCounter": "Dimensión {{num}} de {{total}}",
     "featEyebrow": "En uso",
-    "ctaBody": "Las mismas reglas, la misma IA: la evaluación acota en menos de cinco minutos lo que se le aplica, con la fuente de cada afirmación."
+    "ctaBody": "Las mismas reglas, la misma IA: la evaluación acota en unos seis minutos lo que se le aplica, con la fuente de cada afirmación."
   },
   "header": {
     "nav": {
@@ -1329,7 +1329,7 @@
     },
     "cta": {
       "title": "Empiece por donde tenga sentido.",
-      "lead": "Cuatro preguntas, unos cinco minutos, sin necesidad de cuenta."
+      "lead": "Cuatro preguntas, unos seis minutos, sin necesidad de cuenta."
     },
     "seeAll": "Ver cómo funciona cada paso"
   },
@@ -1388,7 +1388,7 @@
       "leadDays_one": "{{count}} día de antelación",
       "leadDays_other": "{{count}} días de antelación",
       "exposureNote": "Sanción individual más alta en este mercado: {{max}} sobre {{duty}}. Los límites declarados suman {{total}}: un techo si todo saliera mal a la vez, no una previsión.",
-      "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en menos de cinco minutos.",
+      "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en unos seis minutos.",
       "allAreas": "Todas las áreas",
       "facts": {
         "duties": "Obligaciones en este mercado",
@@ -1521,7 +1521,7 @@
         {
           "title": "La evaluación",
           "desc": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen. Sin cuenta, sin llamada comercial, sin obligación de continuar.",
-          "price": "0 € · en menos de 5 minutos"
+          "price": "0 € · unos 6 minutos"
         },
         {
           "title": "Su Risk Map",
@@ -1550,7 +1550,7 @@
     },
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
-      "lead": "Cuatro preguntas, unos cinco minutos, sin necesidad de cuenta."
+      "lead": "Cuatro preguntas, unos seis minutos, sin necesidad de cuenta."
     },
     "vignette": {
       "confirmed": "Cita confirmada",

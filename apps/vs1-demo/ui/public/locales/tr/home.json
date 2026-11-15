@@ -37,8 +37,8 @@
       "gold": "gereken",
       "post": " uyum işleri."
     },
-    "subtitleDesktop": "CompliHub360, Avrupa pazarlarındaki operasyonlarınız için geçerli kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize yaklaşık beş dakika. Hesap gerekmez.",
-    "subtitleMobile": "CompliHub360, Avrupa pazarlarındaki kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize altı dakika. Hesap gerekmez.",
+    "subtitleDesktop": "CompliHub360, Avrupa pazarlarındaki operasyonlarınız için geçerli kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize yaklaşık altı dakika. Hesap gerekmez.",
+    "subtitleMobile": "CompliHub360, Avrupa pazarlarındaki kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize yaklaşık altı dakika. Hesap gerekmez.",
     "cta": {
       "start": "İhtiyaçlarımı değerlendir",
       "showMap": "Örnek bir Risk Map görün",
@@ -49,7 +49,7 @@
       "Kredi kartı gerekmez",
       "Sonuçlar tarayıcınızda"
     ],
-    "visualCaption": "Yaklaşık beş dakika · 4 soru · Hesap gerekmez",
+    "visualCaption": "Yaklaşık altı dakika · 4 soru · Hesap gerekmez",
     "preview": {
       "context": "Sınır ötesi lansman — DE → UK + NL",
       "steps": [
@@ -75,7 +75,7 @@
       "placeholder": "Durumunuzu kendi kelimelerinizle anlatın…",
       "answer": "Bir uyum sorusu sorun",
       "guided": "İhtiyaçlarımı değerlendir",
-      "trust": "Ücretsiz · anonim · yaklaşık beş dakika"
+      "trust": "Ücretsiz · anonim · yaklaşık altı dakika"
     }
   },
   "heroWorld": {
@@ -971,7 +971,7 @@
     "steps": [
       {
         "title": "Değerlendirmenizi başlatın",
-        "desc": "Dört soru. Yaklaşık beş dakika. Hesap gerekmez."
+        "desc": "Dört soru. Yaklaşık altı dakika. Hesap gerekmez."
       },
       {
         "title": "Risk Map'inizi görün",

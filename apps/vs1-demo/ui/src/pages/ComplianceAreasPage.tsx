@@ -151,7 +151,7 @@ export function ComplianceAreasPage() {
             <p className="mt-5 max-w-[56ch] text-body-lg leading-relaxed text-fg-secondary">
               {t(
                 'compliance.heroBody',
-                'Each compliance area is a gateway to your specific assessment. Identify your topic, understand your risks in under five minutes, then see your matched specialists.',
+                'Each compliance area is a gateway to your specific assessment. Identify your topic, understand your risks in about six minutes, then see your matched specialists.',
               )}
             </p>
           </Reveal>
@@ -237,7 +237,7 @@ export function ComplianceAreasPage() {
                   <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
                     {t('compliance.howItWorks.hubCta.lead', {
                       ...COVERAGE_COUNTS,
-                      defaultValue: 'The assessment narrows the {{areas}} areas down to your business, your markets and your product — in under five minutes.',
+                      defaultValue: 'The assessment narrows the {{areas}} areas down to your business, your markets and your product — in about six minutes.',
                     })}
                   </p>
                 </div>

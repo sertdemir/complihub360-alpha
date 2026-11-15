@@ -37,8 +37,8 @@
       "gold": "no debería",
       "post": " hacer usted solo."
     },
-    "subtitleDesktop": "CompliHub360 mapea las normas que aplican a sus operaciones en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Unos cinco minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
-    "subtitleMobile": "CompliHub360 mapea las normas en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
+    "subtitleDesktop": "CompliHub360 mapea las normas que aplican a sus operaciones en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Unos seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
+    "subtitleMobile": "CompliHub360 mapea las normas en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Unos seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
     "cta": {
       "start": "Evaluar mis necesidades",
       "showMap": "Ver una Risk Map de ejemplo",
@@ -49,7 +49,7 @@
       "Sin tarjeta de crédito",
       "Resultados en su navegador"
     ],
-    "visualCaption": "Unos cinco minutos · 4 preguntas · Sin necesidad de cuenta",
+    "visualCaption": "Unos seis minutos · 4 preguntas · Sin necesidad de cuenta",
     "preview": {
       "context": "Lanzamiento transfronterizo — DE → UK + NL",
       "steps": [
@@ -75,7 +75,7 @@
       "placeholder": "Describa su situación con sus propias palabras…",
       "answer": "Hacer una pregunta de compliance",
       "guided": "Evaluar mis necesidades",
-      "trust": "Gratis · anónimo · unos cinco minutos"
+      "trust": "Gratis · anónimo · unos seis minutos"
     }
   },
   "heroWorld": {
@@ -971,7 +971,7 @@
     "steps": [
       {
         "title": "Inicie su evaluación",
-        "desc": "Cuatro preguntas. Unos cinco minutos. Sin necesidad de cuenta."
+        "desc": "Cuatro preguntas. Unos seis minutos. Sin necesidad de cuenta."
       },
       {
         "title": "Vea su Risk Map",

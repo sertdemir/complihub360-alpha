@@ -324,7 +324,7 @@
       },
       "hubCta": {
         "title": "Sizin için ne geçerli, görmeye hazır mısınız?",
-        "lead": "Değerlendirme, dokuz alanı işletmenize, pazarlarınıza ve ürününüze göre daraltır — beş dakikadan kısa sürede.",
+        "lead": "Değerlendirme, dokuz alanı işletmenize, pazarlarınıza ve ürününüze göre daraltır — yaklaşık altı dakikada.",
         "btn": "Bir değerlendirme başlatın"
       }
     },
@@ -714,7 +714,7 @@
       "relatedTitle": "Bununla birlikte gelen alanlar",
       "relatedLead": "Okuduğunuz alanla aynı tetikleyicileri paylaşıyorlar — işinize dair aynı olgu bunları da devreye sokuyor.",
       "ctaTitle": "Size neyin uygulandığını görmeye hazır mısınız?",
-      "ctaBody": "Değerlendirme bu alanı işinize, pazarlarınıza ve ürününüze indirger — beş dakikadan kısa sürede.",
+      "ctaBody": "Değerlendirme bu alanı işinize, pazarlarınıza ve ürününüze indirger — yaklaşık altı dakikada.",
       "metrics": {
         "obligations": "Bu alandaki yükümlülükler",
         "obligationsNote": "{{count}} tanesi bu pazara özgü bir kaynakla",
@@ -1085,7 +1085,7 @@
     },
     "cta": {
       "title": "Ya da kendi durumunuzla başlayın.",
-      "lead": "Dört soru, yaklaşık beş dakika, hesap gerekmez."
+      "lead": "Dört soru, yaklaşık altı dakika, hesap gerekmez."
     }
   },
   "aiGov": {
@@ -1146,7 +1146,7 @@
     "dimEyebrow": "Yönetişim",
     "dimCounter": "{{total}} boyuttan {{num}}.",
     "featEyebrow": "Kullanımda",
-    "ctaBody": "Aynı kurallar, aynı yapay zekâ: değerlendirme beş dakikadan kısa sürede sizin için geçerli olanı daraltır — her ifade kaynağıyla."
+    "ctaBody": "Aynı kurallar, aynı yapay zekâ: değerlendirme yaklaşık altı dakikada sizin için geçerli olanı daraltır — her ifade kaynağıyla."
   },
   "header": {
     "nav": {
@@ -1329,7 +1329,7 @@
     },
     "cta": {
       "title": "Nereden mantıklıysa oradan başlayın.",
-      "lead": "Dört soru, yaklaşık beş dakika, hesap gerekmez."
+      "lead": "Dört soru, yaklaşık altı dakika, hesap gerekmez."
     },
     "seeAll": "Her adımın nasıl işlediğini görün"
   },
@@ -1388,7 +1388,7 @@
       "leadDays_one": "{{count}} gün hazırlık süresi",
       "leadDays_other": "{{count}} gün hazırlık süresi",
       "exposureNote": "Bu pazardaki en yüksek tekil ceza: {{duty}} için {{max}}. Belirtilen üst sınırların toplamı {{total}} — her şey aynı anda ters gitseydi diye bir tavan, tahmin değil.",
-      "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — beş dakikadan kısa sürede.",
+      "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — yaklaşık altı dakikada.",
       "allAreas": "Tüm alanlar",
       "facts": {
         "duties": "Bu pazardaki yükümlülükler",
@@ -1521,7 +1521,7 @@
         {
           "title": "Değerlendirme",
           "desc": "Pazarlarınız, iş modeliniz ve hacminiz hakkında dört soru. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok.",
-          "price": "0 € · 5 dakikadan kısa"
+          "price": "0 € · yaklaşık 6 dakika"
         },
         {
           "title": "Risk Map'iniz",
@@ -1550,7 +1550,7 @@
     },
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
-      "lead": "Dört soru, yaklaşık beş dakika, hesap gerekmez."
+      "lead": "Dört soru, yaklaşık altı dakika, hesap gerekmez."
     },
     "vignette": {
       "confirmed": "Randevu onaylandı",

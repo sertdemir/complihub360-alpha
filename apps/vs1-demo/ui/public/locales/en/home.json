@@ -37,8 +37,8 @@
       "gold": "shouldn't",
       "post": " be doing alone."
     },
-    "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. About five minutes to your first risk map. No account required.",
-    "subtitleMobile": "CompliHub360 maps the rules across European markets, then connects you to a verified specialist when something needs hands. Six minutes to your first risk map. No account required.",
+    "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. About six minutes to your first risk map. No account required.",
+    "subtitleMobile": "CompliHub360 maps the rules across European markets, then connects you to a verified specialist when something needs hands. About six minutes to your first risk map. No account required.",
     "cta": {
       "start": "Assess My Needs",
       "showMap": "See an example risk map",
@@ -49,7 +49,7 @@
       "No credit card",
       "Results in your browser"
     ],
-    "visualCaption": "About five minutes · 4 questions · No account required",
+    "visualCaption": "About six minutes · 4 questions · No account required",
     "preview": {
       "context": "Cross-border launch — DE → UK + NL",
       "steps": [
@@ -75,7 +75,7 @@
       "placeholder": "Describe your situation in your own words…",
       "answer": "Ask a Compliance Question",
       "guided": "Assess My Needs",
-      "trust": "Free · anonymous · about five minutes"
+      "trust": "Free · anonymous · about six minutes"
     }
   },
   "heroWorld": {
@@ -975,7 +975,7 @@
     "steps": [
       {
         "title": "Start your assessment",
-        "desc": "Four questions. About five minutes. No account needed."
+        "desc": "Four questions. About six minutes. No account needed."
       },
       {
         "title": "See your risk map",

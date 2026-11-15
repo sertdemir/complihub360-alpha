@@ -259,7 +259,7 @@
     "heroOverline": "Compliance Areas",
     "heroTitlePre": "Find Your Regulatory Challenge.",
     "heroTitleGold": "Start Here.",
-    "heroBody": "Each compliance area is a gateway to your specific assessment. Identify your topic, understand your risks in under five minutes, then see your matched specialists.",
+    "heroBody": "Each compliance area is a gateway to your specific assessment. Identify your topic, understand your risks in about six minutes, then see your matched specialists.",
     "whoAffected": "Who is affected",
     "startAssessment": "Start {{title}} Assessment",
     "riskPanel": {
@@ -327,7 +327,7 @@
       },
       "hubCta": {
         "title": "Ready to see what applies to you?",
-        "lead": "The assessment narrows the {{areas}} areas down to your business, your markets and your product — in under five minutes.",
+        "lead": "The assessment narrows the {{areas}} areas down to your business, your markets and your product — in about six minutes.",
         "btn": "Start an assessment"
       }
     },
@@ -717,7 +717,7 @@
       "relatedTitle": "Areas that travel with this one",
       "relatedLead": "These share triggers with the area you are reading — the same fact about your business pulls them in too.",
       "ctaTitle": "Ready to see what applies to you?",
-      "ctaBody": "The assessment narrows this area to your business, your markets and your product — in under five minutes.",
+      "ctaBody": "The assessment narrows this area to your business, your markets and your product — in about six minutes.",
       "metrics": {
         "obligations": "Duties in this area",
         "obligationsNote": "{{count}} with a source specific to this market",
@@ -1088,7 +1088,7 @@
     },
     "cta": {
       "title": "Or start with your own situation.",
-      "lead": "Four questions, about five minutes, no account needed."
+      "lead": "Four questions, about six minutes, no account needed."
     }
   },
   "aiGov": {
@@ -1151,7 +1151,7 @@
     "dimEyebrow": "Governance",
     "dimCounter": "Dimension {{num}} of {{total}}",
     "featEyebrow": "In use",
-    "ctaBody": "The same rules, the same AI: the assessment narrows down what applies to you in under five minutes — every statement with its source."
+    "ctaBody": "The same rules, the same AI: the assessment narrows down what applies to you in about six minutes — every statement with its source."
   },
   "header": {
     "nav": {
@@ -1334,7 +1334,7 @@
     },
     "cta": {
       "title": "Start wherever makes sense.",
-      "lead": "Four questions, about five minutes, no account needed."
+      "lead": "Four questions, about six minutes, no account needed."
     },
     "seeAll": "See how each step works",
     "ctaAsk": "Ask a Question",
@@ -1395,7 +1395,7 @@
       "leadDays_one": "{{count}} day lead time",
       "leadDays_other": "{{count}} days lead time",
       "exposureNote": "Highest single penalty in this market: {{max}} on {{duty}}. The stated upper bounds add up to {{total}} — a ceiling if everything went wrong at once, not a forecast.",
-      "ctaBody": "The assessment narrows this market to your business, your product and your areas — in under five minutes.",
+      "ctaBody": "The assessment narrows this market to your business, your product and your areas — in about six minutes.",
       "allAreas": "All areas",
       "facts": {
         "duties": "Duties in this market",
@@ -1567,7 +1567,7 @@
         {
           "title": "The assessment",
           "desc": "Four questions about your markets, your business model and your volume. No account, no sales call, no obligation to continue.",
-          "price": "€0 · under 5 minutes"
+          "price": "€0 · about 6 minutes"
         },
         {
           "title": "Your risk map",
@@ -1598,7 +1598,7 @@
     },
     "cta": {
       "title": "Start where it makes sense for you.",
-      "lead": "Four questions, about five minutes, no account needed."
+      "lead": "Four questions, about six minutes, no account needed."
     },
     "vignette": {
       "confirmed": "Appointment confirmed",

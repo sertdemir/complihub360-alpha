@@ -324,7 +324,7 @@
       },
       "hubCta": {
         "title": "Bereit zu sehen, was für Sie gilt?",
-        "lead": "Das Assessment grenzt die neun Bereiche auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in unter fünf Minuten.",
+        "lead": "Das Assessment grenzt die neun Bereiche auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in etwa sechs Minuten.",
         "btn": "Ein Assessment starten"
       }
     },
@@ -714,7 +714,7 @@
       "relatedTitle": "Bereiche, die damit einhergehen",
       "relatedLead": "Diese teilen Auslöser mit dem Bereich, den Sie gerade lesen — derselbe Umstand in Ihrem Unternehmen zieht sie mit.",
       "ctaTitle": "Bereit zu sehen, was für Sie gilt?",
-      "ctaBody": "Das Assessment grenzt diesen Bereich auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in unter fünf Minuten.",
+      "ctaBody": "Das Assessment grenzt diesen Bereich auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in etwa sechs Minuten.",
       "metrics": {
         "obligations": "Pflichten in diesem Bereich",
         "obligationsNote": "{{count}} davon mit einer Quelle speziell für diesen Markt",
@@ -1085,7 +1085,7 @@
     },
     "cta": {
       "title": "Oder fangen Sie mit Ihrer eigenen Lage an.",
-      "lead": "Vier Fragen, etwa fünf Minuten, kein Konto nötig."
+      "lead": "Vier Fragen, etwa sechs Minuten, kein Konto nötig."
     }
   },
   "aiGov": {
@@ -1146,7 +1146,7 @@
     "dimEyebrow": "Governance",
     "dimCounter": "Dimension {{num}} von {{total}}",
     "featEyebrow": "Im Einsatz",
-    "ctaBody": "Dieselben Regeln, dieselbe KI: Das Assessment grenzt in unter fünf Minuten ein, was für Sie gilt — jede Aussage mit Quelle."
+    "ctaBody": "Dieselben Regeln, dieselbe KI: Das Assessment grenzt in etwa sechs Minuten ein, was für Sie gilt — jede Aussage mit Quelle."
   },
   "header": {
     "nav": {
@@ -1329,7 +1329,7 @@
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
-      "lead": "Vier Fragen, etwa fünf Minuten, kein Konto nötig."
+      "lead": "Vier Fragen, etwa sechs Minuten, kein Konto nötig."
     },
     "seeAll": "Ansehen, wie jeder Schritt funktioniert"
   },
@@ -1388,7 +1388,7 @@
       "leadDays_one": "{{count}} Tag Vorlauf",
       "leadDays_other": "{{count}} Tage Vorlauf",
       "exposureNote": "Höchstes Einzelbußgeld in diesem Markt: {{max}} auf {{duty}}. Die benannten Obergrenzen summieren sich auf {{total}} — ein Deckel, falls alles gleichzeitig schiefginge, keine Prognose.",
-      "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in unter fünf Minuten.",
+      "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in etwa sechs Minuten.",
       "allAreas": "Alle Bereiche",
       "facts": {
         "duties": "Pflichten in diesem Markt",
@@ -1521,7 +1521,7 @@
         {
           "title": "Die Einschätzung",
           "desc": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen.",
-          "price": "0 € · unter 5 Minuten"
+          "price": "0 € · etwa 6 Minuten"
         },
         {
           "title": "Ihre Risk Map",
@@ -1550,7 +1550,7 @@
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
-      "lead": "Vier Fragen, etwa fünf Minuten, kein Konto nötig."
+      "lead": "Vier Fragen, etwa sechs Minuten, kein Konto nötig."
     },
     "vignette": {
       "confirmed": "Termin bestätigt",
