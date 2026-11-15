@@ -51,8 +51,8 @@ import { track } from '../../lib/analytics';
 export type Card = { id: string; key: string; icon?: LucideIcon; title?: string };
 
 export type StepKey =
-  | 'situation' | 'operations' | 'offering'
-  | 'markets' | 'establishment' | 'stock'
+  | 'situation' | 'reason' | 'operations' | 'offering' | 'customers' | 'channels'
+  | 'markets' | 'establishment' | 'planned' | 'stock'
   | 'domains' | 'eprProducts' | 'packaging';
 
 export type StepDef = {
@@ -161,6 +161,55 @@ const OFFERING: StepDef = {
   footerKey: 'next',
   exclusive: ['off:deciding', 'off:not-sure'],
 };
+// Runde 1 nach dem freigegebenen Fragen-Deck v1.0 (Canvas-Wahl 14.11.2026):
+// Anlass (S02), Kundschaft (S05) und Vertriebsweg (S06). S06 loest die alte
+// Operations-Frage ab — die bleibt als Definition fuer aeltere Sitzungen.
+const REASON: StepDef = {
+  rail: 0,
+  key: 'reason',
+  cards: [
+    { id: 'rsn:launch', key: 'rsnLaunch' },
+    { id: 'rsn:expansion', key: 'rsnExpansion' },
+    { id: 'rsn:check', key: 'rsnCheck' },
+    { id: 'rsn:ongoing', key: 'rsnOngoing' },
+    { id: 'rsn:provider', key: 'rsnProvider' },
+    { id: 'rsn:problem', key: 'rsnProblem' },
+    { id: 'rsn:not-sure', key: 'notSure' },
+  ],
+  picks: [],
+  footerKey: 'next',
+  exclusive: ['rsn:not-sure'],
+};
+const CUSTOMERS: StepDef = {
+  rail: 0,
+  key: 'customers',
+  cards: [
+    { id: 'cu:consumers', key: 'cuConsumers' },
+    { id: 'cu:businesses', key: 'cuBusinesses' },
+    { id: 'cu:both', key: 'cuBoth' },
+    { id: 'cu:deciding', key: 'offDeciding' },
+    { id: 'cu:not-sure', key: 'notSure' },
+  ],
+  picks: [],
+  footerKey: 'next',
+  single: true,
+};
+const CHANNELS: StepDef = {
+  rail: 0,
+  key: 'channels',
+  cards: [
+    { id: 'ch:own-site', key: 'chOwnSite' },
+    { id: 'ch:marketplaces', key: 'chMarketplaces' },
+    { id: 'ch:operating', key: 'chOperating' },
+    { id: 'ch:direct', key: 'chDirect' },
+    { id: 'ch:stores', key: 'chStores' },
+    { id: 'ch:deciding', key: 'offDeciding' },
+    { id: 'ch:not-sure', key: 'notSure' },
+  ],
+  picks: ['ch:own-site', 'ch:marketplaces'],
+  footerKey: 'next',
+  exclusive: ['ch:deciding', 'ch:not-sure'],
+};
 const EPR_PRODUCTS: StepDef = {
   rail: 2,
   key: 'eprProducts',
@@ -194,13 +243,16 @@ const PACKAGING: StepDef = {
 
 // Sitz (S03) und Lager (S08): die eigenen Maerkte zuerst (Wahl 3B), dann
 // "Others" mit allen uebrigen Laendern, dann die Antworten ohne Land.
-export type CountryStep = 'establishment' | 'stock';
-export const COUNTRY_PREFIX: Record<CountryStep, string> = { establishment: 'est:', stock: 'stock:' };
+// "planned" ist die Folgefrage zu "Not established yet" (S03, Wahl 4A).
+export type CountryStep = 'establishment' | 'planned' | 'stock';
+export const COUNTRY_PREFIX: Record<CountryStep, string> = { establishment: 'est:', planned: 'plan:', stock: 'stock:' };
+export const isCountryStep = (k: string): k is CountryStep => k in COUNTRY_PREFIX;
 const COUNTRY_TAIL: Record<CountryStep, Card[]> = {
   establishment: [
     { id: 'est:not-yet', key: 'estNotYet' },
     { id: 'est:not-sure', key: 'notSure' },
   ],
+  planned: [{ id: 'plan:deciding', key: 'offDeciding' }],
   stock: [
     { id: 'stock:none', key: 'stockNone' },
     { id: 'stock:not-sure', key: 'notSure' },
@@ -212,7 +264,7 @@ function countryStep(key: CountryStep, ownMarkets: string[]): StepDef {
     rail: 1,
     key,
     cards: [
-      ...ownMarkets.map((m) => ({ id: pre + m, key: key === 'establishment' ? 'estMarket' : 'stockMarket' })),
+      ...ownMarkets.map((m) => ({ id: pre + m, key: key === 'stock' ? 'stockMarket' : 'estMarket' })),
       { id: pre + 'Others', key: 'others' },
       ...COUNTRY_TAIL[key],
     ],
@@ -232,17 +284,24 @@ export function ownMarketsOf(selected: Set<string>, extraMarkets: string[]): str
 // Welche Schritte der interaktive Wizard zeigt — haengt von den Antworten ab.
 // Faellt eine Bedingung weg, fallen auch ihre Antworten aus dem Profil
 // (buildProfile), statt still mitzulaufen (Question Bank S17).
-export function flowFor(selected: Set<string>): StepKey[] {
+// Eine Seite traegt bis zu zwei verwandte Fragen (Wahl 1B).
+export function pagesFor(selected: Set<string>): StepKey[][] {
   return [
-    'situation', 'operations', 'offering',
-    'markets', 'establishment',
-    ...(selected.has('off:physical') ? (['stock'] as const) : []),
-    'domains',
-    ...(selected.has('EPR & Packaging') ? (['eprProducts', 'packaging'] as const) : []),
+    ['situation', 'reason'],
+    ['offering'],
+    ['customers', 'channels'],
+    ['markets'],
+    ['establishment', ...(selected.has('est:not-yet') ? (['planned'] as const) : [])],
+    ...(selected.has('off:physical') ? [['stock'] as StepKey[]] : []),
+    ['domains'],
+    ...(selected.has('EPR & Packaging') ? [['eprProducts'] as StepKey[], ['packaging'] as StepKey[]] : []),
   ];
 }
-// Die Demo auf der Startseite zeigt nur die drei Kernschritte.
-const DEMO_FLOW: StepKey[] = ['operations', 'markets', 'domains'];
+export function flowFor(selected: Set<string>): StepKey[] {
+  return pagesFor(selected).flat();
+}
+// Die Demo auf der Startseite zeigt nur drei Kernschritte.
+const DEMO_FLOW: StepKey[] = ['channels', 'markets', 'domains'];
 
 /** Die Karten eines Schritts. Sitz und Lager haengen an den eigenen Maerkten.
  *  Wizard und Antworten-Schublade teilen sich diese Definition. */
@@ -252,7 +311,10 @@ export function stepDefFor(k: StepKey, ownMarkets: string[]): StepDef {
     case 'operations': return OPERATIONS;
     case 'domains': return DOMAINS;
     case 'situation': return SITUATION;
+    case 'reason': return REASON;
     case 'offering': return OFFERING;
+    case 'customers': return CUSTOMERS;
+    case 'channels': return CHANNELS;
     case 'eprProducts': return EPR_PRODUCTS;
     case 'packaging': return PACKAGING;
     default: return countryStep(k, ownMarkets);
@@ -307,7 +369,7 @@ const BUSINESS_CODE: Record<string, BusinessType> = {
 };
 
 /** Laender, die in Sitz oder Lager ueber "Others" gewaehlt wurden (Namen). */
-export type CountryExtras = { establishment: string[]; stock: string[] };
+export type CountryExtras = { establishment: string[]; planned: string[]; stock: string[] };
 
 // C6 "Refine existing": a stored profile pre-selects the cards. Reverse of the
 // maps above — businessTypeNote carries the original card id when available.
@@ -334,17 +396,20 @@ export function selectionFromProfile(p: SearchProfile): {
     if (p.businessType && btToCard[p.businessType]) sel.add(btToCard[p.businessType]);
   }
 
-  const countryExtras: CountryExtras = { establishment: [], stock: [] };
+  const countryExtras: CountryExtras = { establishment: [], planned: [], stock: [] };
   const d = p.details;
   if (d) {
     if (d.situation) sel.add('sit:' + d.situation);
+    for (const v of d.reason ?? []) sel.add('rsn:' + v);
     for (const v of d.offering ?? []) sel.add('off:' + v);
+    if (d.customers) sel.add('cu:' + d.customers);
+    for (const v of d.channels ?? []) sel.add('ch:' + v);
     for (const v of d.eprProducts ?? []) sel.add('epr:' + v);
     for (const v of d.packaging ?? []) sel.add('pkg:' + v);
     const own = new Set(ownMarketsOf(sel, extra));
-    for (const key of ['establishment', 'stock'] as const) {
+    for (const key of ['establishment', 'planned', 'stock'] as const) {
       const pre = COUNTRY_PREFIX[key];
-      for (const v of d[key] ?? []) {
+      for (const v of (key === 'planned' ? d.plannedEstablishment : d[key]) ?? []) {
         if (COUNTRY_TAIL[key].some((c) => c.id === pre + v)) { sel.add(pre + v); continue; }
         const name = NAME_OF[v] ?? v;
         if (own.has(name)) sel.add(pre + name);
@@ -371,8 +436,12 @@ function detailsOf(selected: Set<string>, extraMarkets: string[], extras: Countr
   const situation = SITUATION.cards.find((c) => selected.has(c.id));
   return {
     situation: (situation?.id.slice(4) ?? '') as WizardDetails['situation'],
+    reason: strip(REASON),
     offering: strip(OFFERING),
+    customers: strip(CUSTOMERS)[0] ?? '',
+    channels: strip(CHANNELS),
     establishment: countries('establishment'),
+    plannedEstablishment: countries('planned'),
     stock: countries('stock'),
     eprProducts: flow.includes('eprProducts') ? strip(EPR_PRODUCTS) : [],
     packaging: flow.includes('packaging') ? strip(PACKAGING) : [],
@@ -388,12 +457,22 @@ export function buildProfile(selected: Set<string>, extraMarkets: string[], extr
   ];
   const categories = DOMAINS.cards.filter((c) => selected.has(c.id)).map((c) => CATEGORY_CODE[c.id]).filter(Boolean);
   const ops = OPERATIONS.cards.find((c) => selected.has(c.id));
+  // Geschaeftsart fuer die Engine. Mit einer Antwort auf den Vertriebsweg
+  // (S06) leitet sie sich daraus ab; aeltere Sitzungen behalten ihre
+  // Operations-Karte. Im Zweifel "other": lieber ungefiltert als falsch.
+  const has = (id: string) => selected.has(id);
+  const channelsAnswered = CHANNELS.cards.some((c) => has(c.id));
+  const derived: BusinessType =
+    has('ch:own-site') && has('off:physical') && !has('cu:businesses') ? 'ecommerce'
+      : has('ch:marketplaces') ? 'marketplace'
+      : has('ch:own-site') && has('off:digital') && !has('off:physical') ? 'saas'
+      : 'other';
   return {
     country: markets[0] ?? '',
     markets,
     categories,
-    businessType: ops ? BUSINESS_CODE[ops.id] ?? 'other' : '',
-    businessTypeNote: ops?.id ?? '',
+    businessType: channelsAnswered ? derived : ops ? BUSINESS_CODE[ops.id] ?? 'other' : '',
+    businessTypeNote: channelsAnswered ? '' : ops?.id ?? '',
     // Nicht mehr abgeleitet: "mehr als ein Markt = EU" machte aus US + TR eine
     // EU-Reichweite, und kein Verbraucher las das Feld (Wizard-Audit B8).
     marketScope: '',
@@ -551,7 +630,7 @@ export function AnimatedWizard({
   const [drawerFor, setDrawerFor] = useState<'markets' | CountryStep | null>(null);
   const [extraMarkets, setExtraMarkets] = useState<string[]>(() => prefill?.extraMarkets ?? []);
   const [countryExtras, setCountryExtras] = useState<CountryExtras>(
-    () => prefill?.countryExtras ?? { establishment: [], stock: [] },
+    () => prefill?.countryExtras ?? { establishment: [], planned: [], stock: [] },
   );
   const [infoCountry, setInfoCountry] = useState<string | null>(null);
   const [saveOpen, setSaveOpen] = useState(false);
@@ -559,8 +638,11 @@ export function AnimatedWizard({
   // uebersprungen, zurueck bleibt sie erreichbar.
   const skipMarkets = useRef(!!marketPrefill);
 
-  const flow = interactive ? flowFor(selected) : DEMO_FLOW;
+  const pages = interactive ? pagesFor(selected) : DEMO_FLOW.map((k) => [k]);
+  const flow = pages.flat();
   const isReview = stepKey === 'review';
+  const pageIndex = pages.findIndex((p) => p.includes(stepKey as StepKey));
+  const page = isReview ? [] : pages[pageIndex] ?? [stepKey as StepKey];
   const ownMarkets = ownMarketsOf(selected, extraMarkets);
   const stepOf = (k: StepKey): StepDef => stepDefFor(k, ownMarkets);
   const step = stepOf(isReview ? flow[flow.length - 1] : stepKey);
@@ -581,7 +663,7 @@ export function AnimatedWizard({
     });
   };
   const extrasFor = (k: StepKey) =>
-    k === 'markets' ? extraMarkets : k === 'establishment' || k === 'stock' ? countryExtras[k] : [];
+    k === 'markets' ? extraMarkets : isCountryStep(k) ? countryExtras[k] : [];
 
   // Interactive handlers (no-ops in auto-play mode). Einzelwahl ersetzt die
   // bisherige Antwort; eine exklusive Antwort (Not sure, None …) ersetzt alle
@@ -589,7 +671,7 @@ export function AnimatedWizard({
   const toggle = (def: StepDef, id: string) => {
     const next = toggleAnswer(def, selected, id);
     // Hat eine exklusive Antwort "Others" abgewaehlt, gehen dessen Laender mit.
-    if ((def.key === 'establishment' || def.key === 'stock') && !next.has(COUNTRY_PREFIX[def.key] + 'Others')) {
+    if (isCountryStep(def.key) && !next.has(COUNTRY_PREFIX[def.key] + 'Others')) {
       setCountryExtras((p) => ({ ...p, [def.key]: [] }));
     }
     setSelected(next);
@@ -600,15 +682,16 @@ export function AnimatedWizard({
   const needsMarket = interactive && !hasMarket && (stepKey === 'markets' || isReview);
   const completedRef = useRef(false);
   const go = (k: StepKey | 'review') => {
-    setStepKey(k);
+    // Immer die erste Frage der Seite: "Edit" kann auf die zweite zeigen.
+    setStepKey(k === 'review' ? k : pages.find((p) => p.includes(k))?.[0] ?? k);
     setActive(null);
   };
   const goNext = () => {
     if (needsMarket) return;
     if (!isReview) {
-      let i = flow.indexOf(stepKey) + 1;
-      if (flow[i] === 'markets' && skipMarkets.current) i += 1;
-      go(flow[i] ?? 'review');
+      let i = pageIndex + 1;
+      if (pages[i]?.[0] === 'markets' && skipMarkets.current) i += 1;
+      go(pages[i]?.[0] ?? 'review');
     } else {
       const profile = buildProfile(selected, extraMarkets, countryExtras);
       completedRef.current = true;
@@ -617,10 +700,10 @@ export function AnimatedWizard({
     }
   };
   const goBack = () => {
-    const i = isReview ? flow.length : flow.indexOf(stepKey);
-    if (i > 0) go(flow[i - 1]);
+    const i = isReview ? pages.length : pageIndex;
+    if (i > 0) go(pages[i - 1][0]);
   };
-  const atStart = !isReview && flow.indexOf(stepKey) === 0;
+  const atStart = !isReview && pageIndex === 0;
 
   // Messgrundlage (Wizard-Audit B14): Start, jeder Schritt, Abschluss, Abbruch.
   // Nur Schritt und Anzahlen — keine Antworten, keine Maerkte, keine Bereiche.
@@ -692,8 +775,16 @@ export function AnimatedWizard({
   }, [reduced, interactive]);
 
   const sp = spacious;
-  // Hero (compact) shows 6 cards; the spacious Figma layout shows the full set.
-  const cards = sp ? step.cards : step.cards.slice(0, 6);
+  // Fragetitel: linksbuendig und klein (Festlegung 14.11.2026) — auf einer
+  // Seite stehen bis zu zwei Fragen untereinander.
+  const heading = (title: string, subtitle: string) => (
+    <div className={sp ? 'text-left' : 'mt-5 text-left'}>
+      <h3 className="font-serif text-[24px] font-bold leading-tight text-fg">{title}</h3>
+      <p className={'leading-relaxed text-fg-secondary ' + (sp ? 'mt-1.5 text-body-sm' : 'mt-2 max-w-md text-body-2xs')}>
+        {subtitle}
+      </p>
+    </div>
+  );
 
   // Drawer market ids are single words, so the i18n key is just the lowercase id.
   const marketLabel = (id: string) => t(`marketsDrawer.markets.${id.toLowerCase()}.name`, { defaultValue: id });
@@ -703,7 +794,7 @@ export function AnimatedWizard({
     return card ? t(`wizard.cards.${card.key}.title`) : marketLabel(name);
   };
   const cardTitle = (c: Card) => {
-    const pre = c.id.startsWith('est:') ? 'est:' : c.id.startsWith('stock:') ? 'stock:' : '';
+    const pre = Object.values(COUNTRY_PREFIX).find((x) => c.id.startsWith(x)) ?? '';
     if (pre && (c.key === 'estMarket' || c.key === 'stockMarket')) return countryLabel(c.id.slice(pre.length));
     return t(`wizard.cards.${c.key}.title`);
   };
@@ -743,10 +834,15 @@ export function AnimatedWizard({
     ? [
         {
           label: t('wizard.review.business'),
-          value: [...segsOf('situation'), ...countrySegs('establishment', 'wizard.review.establishedIn', 'wizard.review.establishmentOpen')],
+          value: [
+            ...segsOf('situation'),
+            ...segsOf('reason'),
+            ...countrySegs('establishment', 'wizard.review.establishedIn', 'wizard.review.establishmentOpen'),
+            ...countrySegs('planned', 'wizard.review.plannedIn', 'wizard.review.establishmentOpen'),
+          ],
           edit: 'situation',
         },
-        { label: t('wizard.review.offering'), value: [...segsOf('offering'), ...segsOf('operations')], edit: 'offering' },
+        { label: t('wizard.review.offering'), value: [...segsOf('offering'), ...segsOf('customers'), ...segsOf('channels')], edit: 'offering' },
         {
           label: flow.includes('stock') ? t('wizard.review.marketsStock') : t('wizard.review.markets'),
           value: [...segsOf('markets'), ...countrySegs('stock', 'wizard.review.stockIn', 'wizard.review.stockOpen')],
@@ -763,7 +859,7 @@ export function AnimatedWizard({
       ]
     : [
         { label: t('wizard.review.markets'), value: segsOf('markets'), edit: 'markets' },
-        { label: t('wizard.review.operations'), value: segsOf('operations'), edit: 'operations' },
+        { label: t('wizard.review.offering'), value: segsOf('channels'), edit: 'channels' },
         { label: t('wizard.review.domains'), value: segsOf('domains'), edit: 'domains' },
       ];
 
@@ -838,140 +934,138 @@ export function AnimatedWizard({
         {/* In spacious mode, content sits in a centered 880px column; the body's
             extra height becomes whitespace above the footer. */}
         <div className={sp ? 'mx-auto w-full max-w-[880px]' : 'contents'}>
-          <div className={sp ? 'text-center' : 'mt-5 text-left'}>
-            <h3 className={'font-serif font-bold leading-tight text-fg ' + (sp ? 'text-[38px]' : 'text-[24px]')}>
-              {isReview ? t('wizard.review.title') : t(`wizard.steps.${step.key}.title`)}
-            </h3>
-            <p
-              className={
-                'leading-relaxed text-fg-secondary ' +
-                (sp ? 'mx-auto mt-3 max-w-xl text-body' : 'mt-2 max-w-md text-body-2xs')
-              }
-            >
-              {isReview
-                ? t('wizard.review.subtitle')
-                : t(`wizard.steps.${step.key}.subtitle`, {
-                    // Sitz (3B) nennt die eigenen Maerkte im Untertitel.
-                    markets: ownMarkets.map(countryLabel).join(', '),
-                  })}
-            </p>
-          </div>
-
-          {/* Review summary card (Step 4 · Figma 1660:162) */}
+          {/* Review summary card (Step 4 · Figma 1660:162). Titel und Karte teilen
+              sich eine Spalte, damit beide auf derselben Kante stehen. */}
           {isReview && (
-            <>
-              <div className="mx-auto mt-9 max-w-[640px] rounded-xl border-2 border-accent-400 bg-surface px-6">
+            <div className={sp ? 'mx-auto max-w-[640px]' : undefined}>
+              {heading(t('wizard.review.title'), t('wizard.review.subtitle'))}
+              <div className="mt-5 rounded-xl border-2 border-accent-400 bg-surface px-6">
                 {reviewRows.map((r) => (
                   <SummaryRow key={r.edit} label={r.label} value={r.value} onEdit={() => go(r.edit)} />
                 ))}
               </div>
-              <p className="mt-8 text-center text-body-sm text-fg-tertiary">
+              <p className="mt-8 text-left text-body-sm text-fg-tertiary">
                 {t('wizard.review.trust')}
               </p>
-            </>
+            </div>
           )}
 
-          {/* Card grid */}
-          {!isReview && (
-          <div className={'grid ' + (sp ? 'mt-9 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'mt-5 grid-cols-3 gap-3')}>
-            {cards.map((c) => {
-              const on = selected.has(c.id);
-              const others = isOthers(c.id);
-              const openDrawer = () => setDrawerFor(step.key === 'markets' ? 'markets' : (step.key as CountryStep));
-              const cardExtras = others ? extrasFor(step.key) : [];
-              return (
-                <div
-                  key={c.id}
-                  ref={setTarget(c.id)}
-                  onClick={interactive ? () => (others ? openDrawer() : toggle(step, c.id)) : undefined}
-                  role={interactive ? 'button' : undefined}
-                  // Tastatur und Fokusring waren korrekt, der ZUSTAND war unhoerbar: man
-                  // konnte auswaehlen, aber nicht erfahren, was ausgewaehlt ist (WCAG 4.1.2).
-                  // "Others" ist kein Schalter, sondern oeffnet den Markt-Drawer — dort
-                  // deshalb haspopup/expanded statt pressed.
-                  aria-pressed={interactive && !others ? on : undefined}
-                  aria-haspopup={interactive && others ? 'dialog' : undefined}
-                  aria-expanded={interactive && others ? drawerFor !== null : undefined}
-                  tabIndex={interactive ? 0 : undefined}
-                  onKeyDown={
-                    interactive
-                      ? (e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            if (others) openDrawer();
-                            else toggle(step, c.id);
-                          }
-                        }
-                      : undefined
-                  }
-                  className={
-                    'rounded-xl border transition-colors duration-200 ' +
-                    (sp ? 'p-[18px] ' : 'p-3.5 ') +
-                    (interactive ? 'cursor-pointer hover:border-stroke-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ' : '') +
-                    (on ? 'border-stroke-brand bg-brand-light/50 ring-1 ring-stroke-brand' : 'border-stroke bg-surface')
-                  }
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      {others && cardExtras.length > 0 ? (
-                        <div className="flex flex-wrap gap-1.5">
-                          {cardExtras.map((id) => (
-                            <Badge shape="pill" tone="brand" appearance="soft" size="md"
-                              key={id}
-                              className="font-medium"
-                            >
-                              {marketLabel(id)}
-                              <button
-                                type="button"
-                                aria-label={t('wizard.removeMarket', { market: marketLabel(id) })}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  applyExtra(step.key === 'markets' ? 'markets' : (step.key as CountryStep), cardExtras.filter((x) => x !== id));
-                                }}
-                                className="-mr-0.5 text-fg-brand/70 transition-colors hover:text-fg-brand"
-                              >
-                                <X size={12} />
-                              </button>
-                            </Badge>
-                          ))}
+          {/* Eine oder zwei Fragen je Seite (Wahl 1B), getrennt durch eine Linie. */}
+          {!isReview && page.map((k, qi) => {
+            const def = stepOf(k);
+            // Hero (compact) shows 6 cards; the spacious layout shows the full set.
+            const cards = sp ? def.cards : def.cards.slice(0, 6);
+            return (
+              <section key={k} className={qi > 0 ? 'mt-10 border-t border-stroke-subtle pt-9' : undefined}>
+                {heading(
+                  t(`wizard.steps.${def.key}.title`),
+                  // Sitz (3B) nennt die eigenen Maerkte im Untertitel.
+                  t(`wizard.steps.${def.key}.subtitle`, { markets: ownMarkets.map(countryLabel).join(', ') }),
+                )}
+              <div className={'grid ' + (sp ? 'mt-5 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'mt-5 grid-cols-3 gap-3')}>
+                {cards.map((c) => {
+                  const on = selected.has(c.id);
+                  const others = isOthers(c.id);
+                  const openDrawer = () => setDrawerFor(def.key === 'markets' ? 'markets' : (def.key as CountryStep));
+                  const cardExtras = others ? extrasFor(def.key) : [];
+                  return (
+                    <div
+                      key={c.id}
+                      ref={setTarget(c.id)}
+                      onClick={interactive ? () => (others ? openDrawer() : toggle(def, c.id)) : undefined}
+                      role={interactive ? 'button' : undefined}
+                      // Tastatur und Fokusring waren korrekt, der ZUSTAND war unhoerbar: man
+                      // konnte auswaehlen, aber nicht erfahren, was ausgewaehlt ist (WCAG 4.1.2).
+                      // "Others" ist kein Schalter, sondern oeffnet den Markt-Drawer — dort
+                      // deshalb haspopup/expanded statt pressed.
+                      aria-pressed={interactive && !others ? on : undefined}
+                      aria-haspopup={interactive && others ? 'dialog' : undefined}
+                      aria-expanded={interactive && others ? drawerFor !== null : undefined}
+                      tabIndex={interactive ? 0 : undefined}
+                      onKeyDown={
+                        interactive
+                          ? (e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                if (others) openDrawer();
+                                else toggle(def, c.id);
+                              }
+                            }
+                          : undefined
+                      }
+                      className={
+                        'rounded-xl border transition-colors duration-200 ' +
+                        (sp ? 'p-[18px] ' : 'p-3.5 ') +
+                        (interactive ? 'cursor-pointer hover:border-stroke-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ' : '') +
+                        (on ? 'border-stroke-brand bg-brand-light/50 ring-1 ring-stroke-brand' : 'border-stroke bg-surface')
+                      }
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          {others && cardExtras.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5">
+                              {cardExtras.map((id) => (
+                                <Badge shape="pill" tone="brand" appearance="soft" size="md"
+                                  key={id}
+                                  className="font-medium"
+                                >
+                                  {marketLabel(id)}
+                                  <button
+                                    type="button"
+                                    aria-label={t('wizard.removeMarket', { market: marketLabel(id) })}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      applyExtra(def.key === 'markets' ? 'markets' : (def.key as CountryStep), cardExtras.filter((x) => x !== id));
+                                    }}
+                                    className="-mr-0.5 text-fg-brand/70 transition-colors hover:text-fg-brand"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                          ) : c.icon ? (
+                            <c.icon size={sp ? 22 : 19} className="text-fg-brand" strokeWidth={1.75} />
+                          ) : (
+                            <span className={'block ' + (sp ? 'h-[22px]' : 'h-[19px]')} />
+                          )}
                         </div>
-                      ) : c.icon ? (
-                        <c.icon size={sp ? 22 : 19} className="text-fg-brand" strokeWidth={1.75} />
-                      ) : (
-                        <span className={'block ' + (sp ? 'h-[22px]' : 'h-[19px]')} />
+                        <span className="shrink-0">
+                          {on ? (
+                            <Check size={sp ? 18 : 15} strokeWidth={2.5} className="text-fg-brand" />
+                          ) : others ? null : interactive && COUNTRY_INFO[c.id] ? (
+                            <button
+                              type="button"
+                              aria-label={t('wizard.aboutMarket', { market: cardTitle(c) })}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setInfoCountry(c.id);
+                              }}
+                              className="-m-1 rounded-full p-1 text-fg-tertiary transition-colors hover:text-fg-brand"
+                            >
+                              <Info size={sp ? 16 : 13} />
+                            </button>
+                          ) : (
+                            <Info size={sp ? 16 : 13} className="text-fg-tertiary" />
+                          )}
+                        </span>
+                      </div>
+                      <p className={'font-semibold leading-tight text-fg ' + (sp ? 'mt-3 text-body' : 'mt-2.5 text-body-xs')}>
+                        {cardTitle(c)}
+                      </p>
+                      {/* Karten des Fragen-Decks haben (noch) keine Beschreibung. */}
+                      {i18n.exists(`home:wizard.cards.${c.key}.desc`) && (
+                        <p className={'leading-snug text-fg-secondary ' + (sp ? 'mt-1 text-body-sm' : 'mt-1 text-body-3xs')}>
+                          {t(`wizard.cards.${c.key}.desc`)}
+                        </p>
                       )}
                     </div>
-                    <span className="shrink-0">
-                      {on ? (
-                        <Check size={sp ? 18 : 15} strokeWidth={2.5} className="text-fg-brand" />
-                      ) : others ? null : interactive && COUNTRY_INFO[c.id] ? (
-                        <button
-                          type="button"
-                          aria-label={t('wizard.aboutMarket', { market: cardTitle(c) })}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setInfoCountry(c.id);
-                          }}
-                          className="-m-1 rounded-full p-1 text-fg-tertiary transition-colors hover:text-fg-brand"
-                        >
-                          <Info size={sp ? 16 : 13} />
-                        </button>
-                      ) : (
-                        <Info size={sp ? 16 : 13} className="text-fg-tertiary" />
-                      )}
-                    </span>
-                  </div>
-                  <p className={'font-semibold leading-tight text-fg ' + (sp ? 'mt-3 text-body' : 'mt-2.5 text-body-xs')}>
-                    {cardTitle(c)}
-                  </p>
-                  <p className={'leading-snug text-fg-secondary ' + (sp ? 'mt-1 text-body-sm' : 'mt-1 text-body-3xs')}>
-                    {t(`wizard.cards.${c.key}.desc`)}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-          )}
+                  );
+                })}
+              </div>
+              </section>
+            );
+          })}
 
           {/* Compact: route hint sits in the body; spacious moves it into the footer. */}
           {!sp && (

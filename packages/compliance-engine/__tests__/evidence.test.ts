@@ -108,6 +108,20 @@ describe('evidence · wizard details (D1)', () => {
     expect(evaluateEvidence('tax-vat-registration', f).state).toBe('likely');
   });
 
+  it('customers and channels set the facts the Operations card used to set', () => {
+    expect(facts({ customers: 'consumers', channels: ['own-site'] })).toMatchObject({ consumer_sales: true, online_sales: true });
+    expect(facts({ customers: 'both' })).toMatchObject({ consumer_sales: true, business_sales: true });
+    expect(facts({ channels: ['marketplaces'] }).online_sales).toBe(true);
+  });
+
+  it('never turns an unchosen customer group or channel into a No', () => {
+    const f = facts({ customers: 'businesses', channels: ['stores', 'direct'] });
+    expect(f.business_sales).toBe(true);
+    expect(f.consumer_sales).toBeUndefined();
+    expect(f.online_sales).toBeUndefined();
+    expect(facts({ customers: 'not-sure', channels: ['not-sure'] })).toEqual({ eu_market: true });
+  });
+
   it('ignores malformed details', () => {
     expect(factsFromAnswers({ markets: ['US'], details: 'x' })).toEqual({});
     expect(factsFromAnswers({ markets: ['US'], details: { offering: 'physical', eprProducts: [1, null] } })).toEqual({});

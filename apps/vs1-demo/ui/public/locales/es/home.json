@@ -206,6 +206,22 @@
       "packaging": {
         "title": "¿Qué actividades de envasado aplican?",
         "subtitle": "EPR y envases · pregunta 2 de 2. Selección múltiple."
+      },
+      "reason": {
+        "title": "¿Qué le trae hoy por aquí?",
+        "subtitle": "Selección múltiple."
+      },
+      "customers": {
+        "title": "¿A quién vende?",
+        "subtitle": "Elija una opción."
+      },
+      "channels": {
+        "title": "¿Cómo vende u ofrece su oferta?",
+        "subtitle": "Selección múltiple."
+      },
+      "planned": {
+        "title": "¿Dónde tiene previsto establecerla?",
+        "subtitle": "Elija los países que está considerando."
       }
     },
     "cards": {
@@ -386,6 +402,48 @@
       "pkgNone": {
         "title": "Sin envases",
         "desc": "No se envasa ni se envía nada"
+      },
+      "rsnLaunch": {
+        "title": "Lanzamiento de empresa, producto o servicio"
+      },
+      "rsnExpansion": {
+        "title": "Expansión"
+      },
+      "rsnCheck": {
+        "title": "Revisión de cumplimiento"
+      },
+      "rsnOngoing": {
+        "title": "Soporte continuo"
+      },
+      "rsnProvider": {
+        "title": "Cambiar o añadir un proveedor"
+      },
+      "rsnProblem": {
+        "title": "Problema, notificación o plazo"
+      },
+      "cuConsumers": {
+        "title": "Consumidores para uso personal"
+      },
+      "cuBusinesses": {
+        "title": "Empresas u organizaciones"
+      },
+      "cuBoth": {
+        "title": "Ambos"
+      },
+      "chOwnSite": {
+        "title": "Sitio web / app propios"
+      },
+      "chMarketplaces": {
+        "title": "Venta en marketplaces"
+      },
+      "chOperating": {
+        "title": "Operar un marketplace"
+      },
+      "chDirect": {
+        "title": "Venta directa / mayorista"
+      },
+      "chStores": {
+        "title": "Tiendas físicas"
       }
     },
     "footer": {
@@ -407,7 +465,8 @@
       "establishedIn": "establecida en",
       "establishmentOpen": "sede:",
       "stockIn": "existencias en",
-      "stockOpen": "existencias:"
+      "stockOpen": "existencias:",
+      "plannedIn": "prevista en"
     },
     "skipHint": "¿No está seguro? Elija lo que mejor encaje: puede cambiar cada respuesta antes de crear su mapa.",
     "needsMarket": "Elija al menos un mercado para continuar.",

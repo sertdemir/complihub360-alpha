@@ -687,7 +687,11 @@
       "establishment": "Ansässig in",
       "stock": "Lager",
       "eprProducts": "EPR · Produkte",
-      "packaging": "EPR · Verpackung"
+      "packaging": "EPR · Verpackung",
+      "reason": "Ihr Anlass",
+      "customers": "Sie verkaufen an",
+      "channels": "Vertriebsweg",
+      "planned": "Geplant in"
     },
     "otherCountry": "+ Weiteres Land …",
     "removes": {

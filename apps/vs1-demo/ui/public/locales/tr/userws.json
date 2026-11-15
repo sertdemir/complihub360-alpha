@@ -686,7 +686,11 @@
       "establishment": "Kuruluş yeri",
       "stock": "Stok",
       "eprProducts": "EPR · ürünler",
-      "packaging": "EPR · ambalaj"
+      "packaging": "EPR · ambalaj",
+      "reason": "Nedeniniz",
+      "customers": "Satış yaptığınız kesim",
+      "channels": "Satış kanalı",
+      "planned": "Planlanan yer"
     },
     "otherCountry": "+ Başka ülke…",
     "removes": {

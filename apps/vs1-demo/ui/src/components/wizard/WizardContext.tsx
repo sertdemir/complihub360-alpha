@@ -40,7 +40,15 @@ export type Urgency = "today" | "week" | "month" | "researching" | "";
 // "not-sure" ist eine eigene Antwort, nie ein stilles Nein.
 export interface WizardDetails {
     situation: "existing" | "starting" | "not-sure" | "";
+    /** Anlass (S02), Mehrfachwahl; fehlt bei Sitzungen vor Runde 1. */
+    reason?: string[];
     offering: string[];
+    /** Kundschaft (S05): consumers | businesses | both | deciding | not-sure. */
+    customers?: string;
+    /** Vertriebsweg (S06), Mehrfachwahl. */
+    channels?: string[];
+    /** Geplanter Sitz, wenn "not-yet": Laendercodes, dazu "deciding". */
+    plannedEstablishment?: string[];
     /** Laendercodes wie in markets, dazu "not-yet" | "not-sure". */
     establishment: string[];
     /** Laendercodes, dazu "none" | "not-sure"; leer, wenn nicht gefragt. */
