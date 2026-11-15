@@ -80,8 +80,8 @@ Rules — follow ALL of them:
 // Umsatzsteuer-Auszuegen fuellen.
 const DOMAIN_LABEL: Record<string, string> = {
     'tax-vat': 'Tax & VAT', 'product-packaging': 'EPR & Packaging', 'data-privacy': 'Data & Privacy',
-    'marketing-seo': 'Marketing Compliance', 'corporate-structure': 'Corporate & Structure',
-    'product-compliance': 'Product Compliance', 'logistics-customs': 'Logistics & Customs', 'legal-advisory': 'Legal Advisory', 'environment': 'Environmental Compliance',
+    'marketing-seo': 'Marketing Compliance', 'corporate-structure': 'Company Setup & Filings',
+    'product-compliance': 'Product Compliance', 'logistics-customs': 'Logistics & Customs', 'legal-advisory': 'Legal Support', 'environment': 'Environmental & Chemical Compliance',
 };
 function domainPrompt(slug: string): string {
     return `You are the CompliHub360 compliance assistant for the area "${DOMAIN_LABEL[slug] ?? slug}".

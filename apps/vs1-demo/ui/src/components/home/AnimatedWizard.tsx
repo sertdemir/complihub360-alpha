@@ -48,12 +48,12 @@ import { track } from '../../lib/analytics';
 
 // Copy lives in the 'home' namespace: wizard.cards.<key>.{title,desc},
 // wizard.steps.<key>.{title,subtitle}, wizard.rail.<key>, wizard.footer.<key>.
-export type Card = { id: string; key: string; icon?: LucideIcon; title?: string };
+export type Card = { id: string; key: string; icon?: LucideIcon; title?: string; /** i18n-Schluessel statt wizard.cards.<key>.desc */ descKey?: string };
 
 export type StepKey =
   | 'situation' | 'reason' | 'operations' | 'offering' | 'customers' | 'channels'
   | 'markets' | 'establishment' | 'planned' | 'stock'
-  | 'domains' | 'eprProducts' | 'packaging';
+  | 'domains' | 'suggest' | 'eprProducts' | 'packaging';
 
 export type StepDef = {
   rail: number;
@@ -284,6 +284,37 @@ export function ownMarketsOf(selected: Set<string>, extraMarkets: string[]): str
 // Welche Schritte der interaktive Wizard zeigt — haengt von den Antworten ab.
 // Faellt eine Bedingung weg, fallen auch ihre Antworten aus dem Profil
 // (buildProfile), statt still mitzulaufen (Question Bank S17).
+// S12: "Help me identify what I need" steht im Wizard neben den Bereichen und
+// schliesst sie aus. Die Karte gehoert nicht zu DOMAINS — die Antworten-
+// Schublade verlangt mindestens einen Bereich und bietet sie nicht an.
+export const HELP_IDENTIFY = 'help:identify';
+const DOMAINS_ASK: StepDef = {
+  ...DOMAINS,
+  cards: [...DOMAINS.cards, { id: HELP_IDENTIFY, key: 'helpIdentify' }],
+  exclusive: [HELP_IDENTIFY],
+};
+
+/** Bereiche, die zu den bisherigen Antworten passen koennen — feste Regeln,
+ *  keine AI, und nie eine Aussage, dass eine Pflicht gilt (Deck S12: "Suggest
+ *  topics from factual context and ask the user to confirm them; do not mark
+ *  obligations confirmed"). Jede Regel nennt die Antwort, aus der sie folgt.
+ *  Kein Vorschlag heisst nicht "trifft nicht zu" — dann zeigt der Schritt
+ *  alle Bereiche. */
+export function suggestedAreas(selected: Set<string>, ownMarkets: string[]): Array<{ id: string; reason: string }> {
+  const has = (id: string) => selected.has(id);
+  const out: Array<{ id: string; reason: string }> = [];
+  if (ownMarkets.length > 0) out.push({ id: 'Tax & VAT', reason: 'market' });
+  if (has('off:physical')) {
+    out.push({ id: 'EPR & Packaging', reason: 'physical' });
+    out.push({ id: 'Product Compliance', reason: 'physical' });
+    if (ownMarkets.length > 1) out.push({ id: 'Logistics & Customs', reason: 'multiMarket' });
+  }
+  if (has('ch:own-site') || has('off:digital')) out.push({ id: 'Data & Privacy', reason: 'online' });
+  if (has('ch:own-site') && (has('cu:consumers') || has('cu:both'))) out.push({ id: 'Marketing Compliance', reason: 'consumersOnline' });
+  if (has('sit:starting') || has('est:not-yet')) out.push({ id: 'Corporate & Structure', reason: 'starting' });
+  return out;
+}
+
 // Eine Seite traegt bis zu zwei verwandte Fragen (Wahl 1B).
 export function pagesFor(selected: Set<string>): StepKey[][] {
   return [
@@ -294,6 +325,8 @@ export function pagesFor(selected: Set<string>): StepKey[][] {
     ['establishment', ...(selected.has('est:not-yet') ? (['planned'] as const) : [])],
     ...(selected.has('off:physical') ? [['stock'] as StepKey[]] : []),
     ['domains'],
+    // S12 "Help me identify what I need": ein Vorschlagsschritt (siehe suggestedAreas).
+    ...(selected.has(HELP_IDENTIFY) ? [['suggest'] as StepKey[]] : []),
     ...(selected.has('EPR & Packaging') ? [['eprProducts'] as StepKey[], ['packaging'] as StepKey[]] : []),
   ];
 }
@@ -310,6 +343,7 @@ export function stepDefFor(k: StepKey, ownMarkets: string[]): StepDef {
     case 'markets': return MARKETS;
     case 'operations': return OPERATIONS;
     case 'domains': return DOMAINS;
+    case 'suggest': return { ...DOMAINS, key: 'suggest' };
     case 'situation': return SITUATION;
     case 'reason': return REASON;
     case 'offering': return OFFERING;
@@ -644,7 +678,18 @@ export function AnimatedWizard({
   const pageIndex = pages.findIndex((p) => p.includes(stepKey as StepKey));
   const page = isReview ? [] : pages[pageIndex] ?? [stepKey as StepKey];
   const ownMarkets = ownMarketsOf(selected, extraMarkets);
-  const stepOf = (k: StepKey): StepDef => stepDefFor(k, ownMarkets);
+  const stepOf = (k: StepKey): StepDef => {
+    if (interactive && k === 'domains') return DOMAINS_ASK;
+    if (k === 'suggest') {
+      // Vorgeschlagene Bereiche mit ihrem Grund; ohne Vorschlag alle Bereiche.
+      const sug = suggestedAreas(selected, ownMarkets);
+      const cards = sug.length
+        ? sug.map((x) => ({ ...DOMAINS.cards.find((c) => c.id === x.id)!, descKey: `wizard.suggest.reasons.${x.reason}` }))
+        : DOMAINS.cards;
+      return { ...DOMAINS, key: 'suggest', cards };
+    }
+    return stepDefFor(k, ownMarkets);
+  };
   const step = stepOf(isReview ? flow[flow.length - 1] : stepKey);
 
   // Commit the drawer's picks; the "Others" card of that step reflects them.
@@ -807,6 +852,7 @@ export function AnimatedWizard({
     return [
       ...def.cards
         .filter((c) => selected.has(c.id) && !isOthers(c.id))
+        .filter((c) => c.id !== HELP_IDENTIFY || !DOMAINS.cards.some((d) => selected.has(d.id)))
         .map((c) => (c.key === 'notSure' || c.key === 'sitNotSure'
           ? { text: t('wizard.review.notSure'), muted: true }
           : { text: cardTitle(c) })),
@@ -953,8 +999,9 @@ export function AnimatedWizard({
           {/* Eine oder zwei Fragen je Seite (Wahl 1B), getrennt durch eine Linie. */}
           {!isReview && page.map((k, qi) => {
             const def = stepOf(k);
-            // Hero (compact) shows 6 cards; the spacious layout shows the full set.
-            const cards = sp ? def.cards : def.cards.slice(0, 6);
+            // Die Demo im Hero (compact) zeigt 6 Karten. Wer selbst waehlt, sieht
+            // immer alle — sonst waere eine Antwort nicht erreichbar.
+            const cards = sp || interactive ? def.cards : def.cards.slice(0, 6);
             return (
               <section key={k} className={qi > 0 ? 'mt-10 border-t border-stroke-subtle pt-9' : undefined}>
                 {heading(
@@ -1054,9 +1101,9 @@ export function AnimatedWizard({
                         {cardTitle(c)}
                       </p>
                       {/* Karten des Fragen-Decks haben (noch) keine Beschreibung. */}
-                      {i18n.exists(`home:wizard.cards.${c.key}.desc`) && (
+                      {(c.descKey || i18n.exists(`home:wizard.cards.${c.key}.desc`)) && (
                         <p className={'leading-snug text-fg-secondary ' + (sp ? 'mt-1 text-body-sm' : 'mt-1 text-body-3xs')}>
-                          {t(`wizard.cards.${c.key}.desc`)}
+                          {t(c.descKey ?? `wizard.cards.${c.key}.desc`, { markets: ownMarkets.map(countryLabel).join(', ') })}
                         </p>
                       )}
                     </div>
