@@ -411,7 +411,7 @@ export function ComplianceAreaPage() {
                   <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
                     {t('compliance.area.ctaBody', {
                       defaultValue:
-                        'The assessment narrows this area to your business, your markets and your product — in under five minutes.',
+                        'The assessment narrows this area to your business, your markets and your product — in about six minutes.',
                     })}
                   </p>
                 </div>
