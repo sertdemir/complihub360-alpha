@@ -3,10 +3,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { AnimatedWizard, buildProfile, selectionFromProfile } from './AnimatedWizard';
 import type { SearchProfile } from '../wizard/WizardContext';
 
-// ─── Wizard v1a · Ablauf (Canvas-Wahl 1A · 2B · 3B · 4B · 5A · 6A · 7B · 8B) ─
-// Business (Situation → Operations → Angebot) → Markets (Maerkte → Sitz →
-// Lager, nur bei physischen Produkten) → Areas (Bereiche → EPR 1/2 → EPR 2/2,
-// nur mit EPR & Packaging) → Review.
+// ─── Wizard Runde 1 · Ablauf (Canvas-Wahl 14.11.2026: 1B · 2A · 3A · 4A · 5B) ─
+// Business (Situation + Anlass → Angebot → Kundschaft + Vertriebsweg) →
+// Markets (Maerkte → Sitz, mit Folgefrage bei "Not established yet" → Lager,
+// nur bei physischen Produkten) → Areas (Bereiche → EPR 1/2 → EPR 2/2, nur
+// mit EPR & Packaging) → Review. Bis zu zwei Fragen stehen auf einer Seite.
 
 // The drawers pull in focus traps and the whole markets catalogue; none of it
 // participates in the step logic under test.
@@ -20,7 +21,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       typeof opts?.defaultValue === 'string' ? (opts.defaultValue as string) : key,
-    i18n: { resolvedLanguage: 'en' },
+    i18n: { resolvedLanguage: 'en', exists: () => true },
   }),
 }));
 
@@ -46,7 +47,7 @@ describe('AnimatedWizard · initialMarkets', () => {
   it('starts with the situation and skips Markets going forward', () => {
     setup({ initialMarkets: ['DE'] });
     expect(heading('situation')).toBeInTheDocument();
-    nextTimes(3); // Situation → Operations → Offering → (Markets skipped)
+    nextTimes(3); // Situation+Reason → Offering → Customers+Channels → (Markets skipped)
     expect(heading('establishment')).toBeInTheDocument();
   });
 
@@ -95,18 +96,34 @@ describe('AnimatedWizard · audit fixes', () => {
     expect(onComplete).not.toHaveBeenCalled();
   });
 
-  it('B1: Operations takes exactly one business model', () => {
+  it('S06: the sales channel sets the business type for the engine', () => {
     const { onComplete } = setup({ initialMarkets: ['DE'] });
     nextTimes(1);
-    fireEvent.click(card('d2cEcommerce'));
-    fireEvent.click(card('marketplace'));
-    expect(card('d2cEcommerce')).toHaveAttribute('aria-pressed', 'false');
-    expect(card('marketplace')).toHaveAttribute('aria-pressed', 'true');
-    nextTimes(4);
+    fireEvent.click(card('offPhysical'));
+    nextTimes(1);
+    fireEvent.click(card('chOwnSite'));
+    nextTimes(4); // Establishment → Stock → Domains → Review
     fireEvent.click(generate());
     const profile = onComplete.mock.calls[0][0] as SearchProfile;
-    expect(profile.businessType).toBe('marketplace');
-    expect(profile.businessTypeNote).toBe('Marketplace');
+    expect(profile.businessType).toBe('ecommerce');
+    expect(profile.businessTypeNote).toBe('');
+    expect(profile.details?.channels).toEqual(['own-site']);
+  });
+
+  it('S06: selling on marketplaces is a seller, never an operator', () => {
+    const sel = new Set(['Germany', 'ch:marketplaces']);
+    expect(buildProfile(sel, [], { establishment: [], planned: [], stock: [] }).businessType).toBe('marketplace');
+    const op = new Set(['Germany', 'ch:operating']);
+    expect(buildProfile(op, [], { establishment: [], planned: [], stock: [] }).businessType).toBe('other');
+  });
+
+  it('S05: customers is a single choice', () => {
+    setup({ initialMarkets: ['DE'] });
+    nextTimes(2);
+    fireEvent.click(card('cuConsumers'));
+    fireEvent.click(card('cuBoth'));
+    expect(card('cuConsumers')).toHaveAttribute('aria-pressed', 'false');
+    expect(card('cuBoth')).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('B8 · F8: no invented EU scope, no invented "no existing Provider"', () => {
@@ -121,17 +138,47 @@ describe('AnimatedWizard · audit fixes', () => {
 });
 
 describe('AnimatedWizard · v1a', () => {
+  it('1B: two related questions share a page', () => {
+    setup();
+    expect(heading('situation')).toBeInTheDocument();
+    expect(heading('reason')).toBeInTheDocument();
+    nextTimes(2);
+    expect(heading('customers')).toBeInTheDocument();
+    expect(heading('channels')).toBeInTheDocument();
+  });
+
+  it('4A: "Not established yet" asks for the planned country on the same page', () => {
+    const { onComplete } = setup({ initialMarkets: ['DE'] });
+    nextTimes(3);
+    expect(screen.queryByRole('heading', { name: 'wizard.steps.planned.title' })).not.toBeInTheDocument();
+    fireEvent.click(card('estNotYet'));
+    expect(heading('establishment')).toBeInTheDocument();
+    expect(heading('planned')).toBeInTheDocument();
+    // Eigener Markt steht in beiden Fragen; die zweite Karte gehoert zur Folgefrage.
+    fireEvent.click(screen.getAllByText('wizard.cards.estMarket.desc')[1].closest('[role="button"]') as HTMLElement);
+    nextTimes(2);
+    fireEvent.click(generate());
+    const profile = onComplete.mock.calls[0][0] as SearchProfile;
+    expect(profile.details?.establishment).toEqual(['not-yet']);
+    expect(profile.details?.plannedEstablishment).toEqual(['DE']);
+  });
+
+  it('4A: the planned country goes away with "Not established yet"', () => {
+    const profile = buildProfile(new Set(['Germany', 'est:Germany', 'plan:Germany']), [], { establishment: [], planned: [], stock: [] });
+    expect(profile.details?.plannedEstablishment).toEqual([]);
+  });
+
   it('asks for stock only when physical products are sold', () => {
     setup({ initialMarkets: ['DE'] });
-    nextTimes(2);
+    nextTimes(1);
     expect(heading('offering')).toBeInTheDocument();
-    nextTimes(2); // Offering → Establishment → Domains
+    nextTimes(3); // Offering → Customers+Channels → Establishment → Domains
     expect(heading('domains')).toBeInTheDocument();
     // Zurueck fuehrt ueber den uebersprungenen Markt-Schritt.
-    for (let i = 0; i < 3; i++) fireEvent.click(screen.getByRole('button', { name: /wizard\.back/ }));
+    for (let i = 0; i < 4; i++) fireEvent.click(screen.getByRole('button', { name: /wizard\.back/ }));
     expect(heading('offering')).toBeInTheDocument();
     fireEvent.click(card('offPhysical'));
-    nextTimes(2);
+    nextTimes(3);
     expect(heading('stock')).toBeInTheDocument();
   });
 
@@ -147,7 +194,7 @@ describe('AnimatedWizard · v1a', () => {
 
   it('Not sure stands alone: it clears the other answers of the step, and back', () => {
     setup({ initialMarkets: ['DE'] });
-    nextTimes(2);
+    nextTimes(1);
     fireEvent.click(card('offPhysical'));
     fireEvent.click(card('offServices'));
     fireEvent.click(card('notSure'));
@@ -169,9 +216,9 @@ describe('AnimatedWizard · v1a', () => {
   it('stores the new answers in details — and only those that were asked', () => {
     const { onComplete } = setup({ initialMarkets: ['DE'] });
     fireEvent.click(card('sitExisting'));
-    nextTimes(2);
-    fireEvent.click(card('offPhysical'));
     nextTimes(1);
+    fireEvent.click(card('offPhysical'));
+    nextTimes(2);
     fireEvent.click(screen.getAllByText('wizard.cards.estMarket.desc')[0].closest('[role="button"]') as HTMLElement);
     nextTimes(1);
     fireEvent.click(card('notSure'));
@@ -188,8 +235,12 @@ describe('AnimatedWizard · v1a', () => {
     const profile = onComplete.mock.calls[0][0] as SearchProfile;
     expect(profile.details).toEqual({
       situation: 'existing',
+      reason: [],
       offering: ['physical'],
+      customers: '',
+      channels: [],
       establishment: ['DE'],
+      plannedEstablishment: [],
       stock: ['not-sure'],
       eprProducts: ['other'],
       packaging: ['shipping'],
@@ -200,7 +251,7 @@ describe('AnimatedWizard · v1a', () => {
     const profile = buildProfile(
       new Set(['Germany', 'stock:Germany', 'epr:other', 'pkg:none']),
       [],
-      { establishment: [], stock: [] },
+      { establishment: [], planned: [], stock: [] },
     );
     // Kein "Physical products", kein EPR-Bereich: Lager und EPR wurden nie gefragt.
     expect(profile.details?.stock).toEqual([]);
@@ -212,7 +263,7 @@ describe('AnimatedWizard · v1a', () => {
 describe('details · round trip', () => {
   it('a stored profile comes back as the same selection', () => {
     const sel = new Set(['Germany', 'Others', 'sit:starting', 'off:physical', 'est:Others', 'stock:Germany', 'EPR & Packaging', 'epr:not-sure', 'pkg:packaged']);
-    const extras = { establishment: ['France'], stock: [] };
+    const extras = { establishment: ['France'], planned: [], stock: [] };
     const profile = buildProfile(sel, ['Austria'], extras);
     expect(profile.details?.establishment).toEqual(['FR']);
     const back = selectionFromProfile(profile);

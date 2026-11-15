@@ -6,7 +6,7 @@ import { Button } from '../ui/Button';
 import { Banner } from '../ui/Banner';
 import {
   STEPS, selectionFromProfile, buildProfile, flowFor, stepDefFor, toggleAnswer, ownMarketsOf, isOthers,
-  COUNTRY_PREFIX, type StepKey, type StepDef, type CountryStep, type CountryExtras,
+  COUNTRY_PREFIX, isCountryStep, type StepKey, type StepDef, type CountryStep, type CountryExtras,
 } from '../home/AnimatedWizard';
 import { WizardDrawerLayer } from '../home/MarketsDrawer';
 import type { SearchProfile } from '../wizard/WizardContext';
@@ -40,11 +40,10 @@ import { FieldError } from '../ui/FieldError';
 // Erst-Wizard); gewaehlte bleiben als Chips abwaehlbar.
 
 const GROUPS: Array<{ rail: 'business' | 'markets' | 'domains'; steps: StepKey[] }> = [
-  { rail: 'business', steps: ['situation', 'operations', 'offering'] },
-  { rail: 'markets', steps: ['markets', 'establishment', 'stock'] },
+  { rail: 'business', steps: ['situation', 'reason', 'offering', 'customers', 'channels'] },
+  { rail: 'markets', steps: ['markets', 'establishment', 'planned', 'stock'] },
   { rail: 'domains', steps: ['domains', 'eprProducts', 'packaging'] },
 ];
-const isCountryStep = (k: StepKey): k is CountryStep => k === 'establishment' || k === 'stock';
 
 function sameSet(a: Set<string>, b: Set<string>): boolean {
   if (a.size !== b.size) return false;

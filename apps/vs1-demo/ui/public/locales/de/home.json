@@ -206,6 +206,22 @@
       "packaging": {
         "title": "Welche Verpackungstätigkeiten treffen zu?",
         "subtitle": "EPR & Verpackung · Frage 2 von 2. Mehrfachauswahl."
+      },
+      "reason": {
+        "title": "Was führt Sie heute zu uns?",
+        "subtitle": "Mehrfachauswahl."
+      },
+      "customers": {
+        "title": "An wen verkaufen Sie?",
+        "subtitle": "Wählen Sie eine Antwort."
+      },
+      "channels": {
+        "title": "Wie verkaufen Sie oder bieten Sie Ihr Angebot an?",
+        "subtitle": "Mehrfachauswahl."
+      },
+      "planned": {
+        "title": "Wo planen Sie die Gründung?",
+        "subtitle": "Wählen Sie die Länder, die infrage kommen."
       }
     },
     "cards": {
@@ -386,6 +402,48 @@
       "pkgNone": {
         "title": "Keine Verpackung",
         "desc": "Nichts wird verpackt oder versendet"
+      },
+      "rsnLaunch": {
+        "title": "Start eines Unternehmens, Produkts oder Services"
+      },
+      "rsnExpansion": {
+        "title": "Expansion"
+      },
+      "rsnCheck": {
+        "title": "Compliance-Check"
+      },
+      "rsnOngoing": {
+        "title": "Laufende Betreuung"
+      },
+      "rsnProvider": {
+        "title": "Anbieter wechseln oder ergänzen"
+      },
+      "rsnProblem": {
+        "title": "Problem, Bescheid oder Frist"
+      },
+      "cuConsumers": {
+        "title": "Verbraucher für den privaten Gebrauch"
+      },
+      "cuBusinesses": {
+        "title": "Unternehmen oder Organisationen"
+      },
+      "cuBoth": {
+        "title": "Beide"
+      },
+      "chOwnSite": {
+        "title": "Eigene Website / App"
+      },
+      "chMarketplaces": {
+        "title": "Verkauf über Marktplätze"
+      },
+      "chOperating": {
+        "title": "Betrieb eines Marktplatzes"
+      },
+      "chDirect": {
+        "title": "Direktvertrieb / Großhandel"
+      },
+      "chStores": {
+        "title": "Ladengeschäfte"
       }
     },
     "footer": {
@@ -407,7 +465,8 @@
       "establishedIn": "ansässig in",
       "establishmentOpen": "Sitz:",
       "stockIn": "Lager in",
-      "stockOpen": "Lager:"
+      "stockOpen": "Lager:",
+      "plannedIn": "geplant in"
     },
     "skipHint": "Unsicher? Wählen Sie, was am ehesten passt — jede Antwort lässt sich vor dem Erstellen noch ändern.",
     "needsMarket": "Wählen Sie mindestens einen Markt, um fortzufahren.",

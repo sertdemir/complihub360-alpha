@@ -180,6 +180,15 @@ function factsFromDetails(details: unknown, markets: string[]): Facts {
   if (offering.includes('physical')) facts.physical_goods = true;
   else if (offering.length > 0 && offering.every((o) => o === 'digital' || o === 'services')) facts.physical_goods = false;
 
+  // Kundschaft (S05) und Vertriebsweg (S06), Runde 1 (14.11.2026). Sie
+  // loesen die Operations-Karte ab und setzen dieselben Fakten wie sie —
+  // nur ein Ja. "Businesses" heisst nicht "keine Verbraucher" als Fakt, und
+  // ein nicht gewaehlter Vertriebsweg heisst nie "nicht online".
+  if (d.customers === 'consumers' || d.customers === 'both') facts.consumer_sales = true;
+  if (d.customers === 'businesses' || d.customers === 'both') facts.business_sales = true;
+  const channels = list(d.channels);
+  if (channels.includes('own-site') || channels.includes('marketplaces')) facts.online_sales = true;
+
   // EPR 1/2 (E01 + E02): nur angeklickte Karten zaehlen. Wer keine
   // Batterie-Karte waehlt, hat nicht "keine Batterien" gesagt.
   const epr = list(d.eprProducts);

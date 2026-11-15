@@ -692,7 +692,11 @@
       "establishment": "Established in",
       "stock": "Stock",
       "eprProducts": "EPR · products",
-      "packaging": "EPR · packaging"
+      "packaging": "EPR · packaging",
+      "reason": "What brings you here",
+      "customers": "You sell to",
+      "channels": "How you sell",
+      "planned": "Planned in"
     },
     "otherCountry": "+ Other country…",
     "removes": {
