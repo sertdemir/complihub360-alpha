@@ -47,11 +47,34 @@ Dazu braucht Halime einen eigenen Zugang durch die Wand:
 STAGING_SSH_HOST=vps ./scripts/beta-auth.sh add halime   # Mac, Passwort wird einmal ausgegeben
 ```
 
+## Zugangslink statt Anmeldefenster
+
+Der Browser von ChatGPT kann das Basic-Auth-Fenster der Wand nicht bedienen
+(Demet, 15.11.). Dafür gibt es einen persönlichen Zugangslink:
+
+```bash
+STAGING_SSH_HOST=vps ./scripts/beta-pass.sh add halime      # Mac; Link wird einmal ausgegeben
+STAGING_SSH_HOST=vps ./scripts/beta-pass.sh list
+STAGING_SSH_HOST=vps ./scripts/beta-pass.sh remove halime   # entzieht ihn sofort
+```
+
+- Der Link `https://beta.complihub360.com/__zugang/<token>` setzt ein Cookie
+  (HttpOnly, Secure, 30 Tage) und leitet auf `/de` weiter.
+- Ein eigener Traefik-Router nimmt Anfragen mit diesem Cookie ohne Basic Auth
+  an. `/api` bleibt beim API-Router, `noindex` gilt weiter.
+- Ein erneutes `add` erzeugt ein neues Token, das alte gilt dann nicht mehr.
+- Das Skript prüft auf der VPS: ohne Cookie 401, mit Cookie 200, mit falschem
+  Cookie 401, Link setzt Cookie und leitet weiter, `/api` liefert JSON. Bei
+  einem Fehler stellt es die vorige Compose-Datei wieder her.
+- Der Link ist ein Passwort: Passwort-Manager (`Beta Zugangslink · halime`),
+  nicht in den Chat. Das Token steht im Klartext nur in den Container-Labels
+  auf der VPS.
+
 ## Zuschnitt für Halime
 
 | Was | Wert |
 |---|---|
-| Wand | Zugang `halime` (eigener, damit sich Halimes Verkehr erkennen und mit `remove halime` sofort sperren lässt) |
+| Wand | Zugangslink `halime` (`beta-pass.sh`), für Menschen zusätzlich der Basic-Auth-Zugang `halime` |
 | Nutzer | `demet+halime-u01..u03@complihub360.com`, Passwort `Beta Halime · Nutzer` |
 | Provider | `demet+p21..p25@complihub360.com`, gemeinsames Passwort `Beta Test-Provider · gemeinsam`. `p01` bis `p20` bleiben bei der Mitgründerin. |
 | Admin | keiner |
@@ -61,8 +84,8 @@ Provider-Seite ein Mensch; die AI gibt sich nie als Fachperson aus
 (`KN-BRAND-001`). Halime bedient `p21` bis `p25` deshalb nur, solange auf der
 Beta ausschließlich interne Konten unterwegs sind, und schreibt als Provider
 nur an die eigenen Halime-Nutzer. **Bevor externe Tester eingeladen werden:**
-`beta-auth.sh remove halime` (ohne Wandzugang erreicht Halime die Beta nicht
-mehr) und Provider `p21` bis `p25` zurück an die Mitgründerin.
+`beta-pass.sh remove halime` und `beta-auth.sh remove halime` (ohne beides
+erreicht Halime die Beta nicht mehr) und Provider `p21` bis `p25` zurück an die Mitgründerin.
 
 ## Entfernen
 
