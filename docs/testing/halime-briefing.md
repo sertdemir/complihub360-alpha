@@ -46,15 +46,16 @@ vorkommt, notiere sie als **„Frage an einen Menschen"**, nicht als Fehler.
 ## 3 · Zugang
 
 - Adresse: `https://beta.complihub360.com`
-- Zuerst fragt der Browser nach einem Beta-Zugang (Benutzer `halime`). Das
-  Passwort gibt Demet ein (Übernahme-Modus) oder sie gibt es dir.
+- Zuerst öffnet Demet einmal deinen **Zugangslink** (Übernahme-Modus). Er
+  bringt dich durch die Beta-Sperre und gilt 30 Tage in diesem Browser. Siehst
+  du trotzdem ein Anmeldefenster des Browsers, brich ab und sag Demet Bescheid.
 - **Nutzerkonten:** `demet+halime-u01@complihub360.com`,
   `demet+halime-u02@complihub360.com`, `demet+halime-u03@complihub360.com`.
   Die Mailadressen sind schon bestätigt, du meldest dich unter „Anmelden" mit
   Adresse und Passwort an.
 - **Provider-Konten:** `demet+p21@complihub360.com` bis
   `demet+p25@complihub360.com`. Anmelden unter „Anmelden", Reiter „Anbieter" (englisch „Provider").
-- Passwörter gibt dir Demet. Schreib sie nie in den Bericht.
+- Passwörter und den Zugangslink gibt dir Demet. Schreib sie nie in den Bericht.
 
 ## 4 · Feste Regeln
 
