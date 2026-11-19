@@ -187,7 +187,7 @@ export function prioritiesCoveredBy(
 
 /** Engine-Pflichten → Tabellenzeilen. Nur Pflichten mit `severity` zaehlen;
  *  die uebrigen sind Knowledge-Treffer ohne Bewertung. */
-export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, locale: string): Obligation[] {
+export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, locale: string, phases?: Record<string, 'current' | 'planned' | 'both'>): Obligation[] {
   // Fruehere API-Staende lieferten den Platzhalter noch als `source`; die
   // Pruefung haengt deshalb am Scope, nicht daran, dass `source` leer ist.
   const keineNorm = t('common:compliance.area.fact.noNamedSource', { defaultValue: 'No named source yet' });
@@ -215,7 +215,11 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
       .join(' · '),
     sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
     sourceUrl: l.source_url ?? undefined,
-    market: l.markets && l.markets.length ? l.markets.join(' · ') : t('euWide'),
+    // Geplante Laender tragen den Zusatz "(planned)": die Pflicht betrifft dort
+    // eine geplante, keine heutige Taetigkeit (Core Wizard Handover v1.1).
+    market: l.markets && l.markets.length
+      ? l.markets.map((m) => (phases?.[m] === 'planned' ? `${m} (${t('plannedTag')})` : m)).join(' · ')
+      : t('euWide'),
     // Die Norm im Klartext, wenn es keine verlinkbare Fundstelle gibt —
     // sonst stuende unter dem Titel nur der Markt (Befund 2026-09-05).
     law: l.source_url ? undefined : l.source_scope === 'placeholder' ? keineNorm : (l.source ?? undefined),
@@ -393,7 +397,7 @@ export function ResultsRiskMap() {
   // `query` haelt fest, womit tatsaechlich gesucht wurde — der Umfang der
   // leeren Zustaende (welche Maerkte geprueft wurden) muss dieselbe Frage
   // beschreiben, nicht das lokale Profil, wenn eine Sitzung es ersetzt hat.
-  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; providersOutside: OutsideProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
+  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; providersOutside: OutsideProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; phases?: Record<string, 'current' | 'planned' | 'both'>; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
@@ -408,7 +412,7 @@ export function ResultsRiskMap() {
         // Ohne sie stand eine Pflicht, die der Gast als "confirmed" sah,
         // beim Wiederoeffnen wieder als "likely" da. Maerkte und Bereiche
         // kommen weiter aus den Spalten — die sind massgeblich.
-        if (s) { session = s; query = { ...(s.answers ?? {}), country: s.country ?? 'DE', markets: s.markets ?? [], categories: s.categories as SearchProfile['categories'] }; }
+        if (s) { session = s; query = { ...(s.answers ?? {}), country: s.country ?? '', markets: s.markets ?? [], categories: s.categories as SearchProfile['categories'] }; }
       } catch { /* handled below */ }
       // Keine Sitzung geladen → Fehlerzustand, nicht das zuletzt lokal
       // gespeicherte Profil. Das gehoerte zu einer anderen Auswertung und
@@ -420,7 +424,7 @@ export function ResultsRiskMap() {
     // Engine nicht gerechnet → riskMapFailed mit Referenz, nicht "keine
     // Pflichten" und auch keine Anbieter ohne die Pflichten dazu.
     const laws = lawsOf(res);
-    return { providers: res.providers, providersOutside: res.providers_outside ?? [], laws, coverage: res.coverage, session, query };
+    return { providers: res.providers, providersOutside: res.providers_outside ?? [], laws, coverage: res.coverage, phases: res.market_phase, session, query };
   }, { providers: [], providersOutside: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
   // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Bis 2026-09-22
   // stand hier beim Laden und bei einem API-Fehler eine Design-Fixture mit drei
@@ -546,7 +550,17 @@ export function ResultsRiskMap() {
   // Die Engine hat geantwortet — mit oder ohne Pflichten. Nur dann gibt es
   // eine Map, die man speichern kann, und eine Aussage "what applies to you".
   const hasResult = pageState === 'live' || pageState === 'none';
-  const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale) : [];
+  const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale, searchData.phases) : [];
+  // "Selling today: US · Planned: DE, FR" — nur, wenn es Geplantes gibt.
+  const phaseLine = (() => {
+    const ph = searchData.phases ?? {};
+    const planned = Object.keys(ph).filter((c) => ph[c] !== 'current');
+    if (!planned.length) return '';
+    const current = Object.keys(ph).filter((c) => ph[c] !== 'planned');
+    return current.length
+      ? t('header.phases', { current: current.join(', '), planned: planned.join(', ') })
+      : t('header.phasesPlannedOnly', { planned: planned.join(', ') });
+  })();
   const prioritiesCovered = (p: AnonProvider, settled: ReadonlySet<string>) => prioritiesCoveredBy(liveLaws, rows, p, settled);
   // F1: Stufe je Pflicht aus den Antworten. Aeltere Zustaende ('answer')
   // zaehlen als offen — sie sind ebenfalls noch keine Aussage.
@@ -982,6 +996,11 @@ export function ResultsRiskMap() {
                 ? t('header.subtitleChosen', { count: profile.categories?.length ?? 0, extra: extraAreas })
                 : t('header.subtitleProfile', { count: profile.categories?.length ?? 0 })}
             </p>
+          )}
+          {/* Heute und geplant getrennt, so wie gefragt (Handover v1.1). Ein
+              geplantes Land ersetzt kein heutiges und umgekehrt. */}
+          {phaseLine && (
+            <p className="mt-1 text-body-md leading-relaxed text-fg-secondary" data-testid="market-phases">{phaseLine}</p>
           )}
           {rows.length > 0 && evidenceCounts.likely + evidenceCounts.open > 0 && (
             <p className="mt-1 text-body-md leading-relaxed text-fg-secondary">

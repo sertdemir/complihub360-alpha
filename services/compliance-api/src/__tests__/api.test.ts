@@ -491,6 +491,51 @@ describe('auth gate', () => {
 });
 
 describe('POST /api/v1/search', () => {
+    // Core Wizard Handover v1.1 (18.11.2026): heutige und geplante Maerkte
+    // bleiben bis in die Risk Map getrennt.
+    it('US seller expanding to DE and FR: US is current, DE and FR are planned — not US-only', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({
+                country: 'US',
+                structured_answers: { markets: ['US'], domains: ['tax-vat'], details: { plannedMarkets: ['DE', 'FR'] } },
+            }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.market_phase).toEqual({ US: 'current', DE: 'planned', FR: 'planned' });
+        // Die Engine hat die geplanten Laender ausgewertet …
+        const assessed = new Set<string>(r.body.laws.flatMap((l: any) => l.markets));
+        expect(assessed.has('DE') || assessed.has('FR')).toBe(true);
+        // … und die Abdeckung fragt nach allen drei, statt US fuer DE/FR einzusetzen.
+        expect([...r.body.coverage.markets].sort()).toEqual(['DE', 'FR', 'US']);
+    });
+
+    it('undecided expansion stays unresolved: no planned country, and no invented one', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'US', structured_answers: { markets: ['US'], domains: ['tax-vat'], details: { plannedMarkets: ['undecided'] } } }),
+        });
+        expect(r.body.market_phase).toEqual({ US: 'current' });
+    });
+
+    it('no current market yet: the planned country is assessed as planned, never as current', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: [], domains: ['tax-vat'], details: { marketsStatus: 'not-yet', plannedMarkets: ['DE'] } } }),
+        });
+        expect(r.body.market_phase).toEqual({ DE: 'planned' });
+    });
+
+    it('no country at all: no laws — and no silent German fallback', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: '', structured_answers: { markets: [], domains: ['tax-vat'] } }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.laws).toEqual([]);
+        expect(r.body.market_phase).toEqual({});
+    });
+
     it('matches a wizard slug against an APPROVED service and anonymizes the result', async () => {
         seedProvider({ depth: 'independent' });
         const r = await api('/api/v1/search', {
@@ -684,7 +729,7 @@ describe('POST /api/v1/search', () => {
             expect(r.body).not.toHaveProperty('tutorials');
             expect(r.body).not.toHaveProperty('articles');
             expect(r.body).not.toHaveProperty('tips');
-            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'overview_summary', 'providers', 'providers_outside']);
+            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'market_phase', 'overview_summary', 'providers', 'providers_outside']);
             // Erfolg: kein Fehlersignal, keine Referenz im Koerper.
             expect(r.body.laws_status).toBe('ok');
         } finally {

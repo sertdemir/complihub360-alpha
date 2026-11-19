@@ -1,4 +1,4 @@
-import { isKnownCountry } from '@complihub/compliance-engine';
+import { isKnownCountry, marketPhases } from '@complihub/compliance-engine';
 
 // ─── Demo-Datensatz der Mock-API ─────────────────────────────────────────────
 // Zwei Abnehmer, ein Datensatz:
@@ -502,14 +502,20 @@ const titled = (p: (typeof PROVIDERS)[number], i: number) => {
 function search(body: unknown) {
   // runSearch schickt die Bereiche als `domains` (der Server erwartet das so);
   // `categories` bleibt als zweite Schreibweise stehen.
-  const req = (body ?? {}) as { domains?: unknown; categories?: unknown; country?: unknown; structured_answers?: { markets?: unknown } };
+  const req = (body ?? {}) as { domains?: unknown; categories?: unknown; country?: unknown; structured_answers?: { markets?: unknown; details?: unknown } };
   const asked = Array.isArray(req.domains) && req.domains.length ? req.domains
     : Array.isArray(req.categories) && req.categories.length ? req.categories
     : null;
   const requested = (asked as string[] | null) ?? DEFAULT_REQUEST;
-  const country = typeof req.country === 'string' && req.country ? req.country.toUpperCase() : 'DE';
-  const marketsAsked = Array.isArray(req.structured_answers?.markets) ? (req.structured_answers.markets as string[]).map((m) => String(m).toUpperCase()) : [];
-  const knownMarkets = [...new Set([country, ...marketsAsked])].filter((c) => isKnownCountry(c));
+  // Wie der Server: heutige und geplante Maerkte getrennt, kein stilles 'DE'.
+  const phases = marketPhases({ markets: req.structured_answers?.markets, country: req.country, details: req.structured_answers?.details });
+  const country = typeof req.country === 'string' && req.country ? req.country.toUpperCase() : '';
+  const knownMarkets = [...new Set([...phases.current, ...phases.planned])].filter((c) => isKnownCountry(c));
+  const market_phase: Record<string, 'current' | 'planned' | 'both'> = {};
+  for (const c of knownMarkets) {
+    const cur = phases.current.includes(c), pl = phases.planned.includes(c);
+    market_phase[c] = cur && pl ? 'both' : pl ? 'planned' : 'current';
+  }
   const providers = PROVIDERS.map((p, i) => {
     const covers = COVERS[p._key] ?? [];
     return {
@@ -530,8 +536,7 @@ function search(body: unknown) {
   // Wie der Server (index.ts, /search): ohne einen einzigen Markt mit
   // Laenderprofil keine Pflichten, statt still deutsche Gesetze zu zeigen. So
   // ist der Zustand marketUnavailable lokal erreichbar (Wizard: nur Brasilien).
-  const markets = Array.isArray(req.structured_answers?.markets) ? (req.structured_answers.markets as string[]) : [];
-  const anyKnown = [country, ...markets].some((c) => isKnownCountry(String(c).toUpperCase()));
+  const anyKnown = knownMarkets.length > 0;
   const covered: Record<string, string[]> = {};
   for (const m of knownMarkets) covered[m] = requested.filter((a) => PROVIDERS.some((p) => (COVERS[p._key] ?? []).includes(a) && (PROVIDER_DETAIL[p._key]?.markets ?? []).includes(m)));
   // Wie der Server: wer keinen der angefragten Bereiche abdeckt, steht nicht in
@@ -545,7 +550,7 @@ function search(body: unknown) {
   const outside = matching.length ? [] : providers
     .filter((p) => p.match_basis.country_covered)
     .map(({ match: _m, match_tier: _t, price_range: _pr, timeline_days: _td, ...rest }, j) => ({ ...rest, title: `Verified Provider ${LETTER(j)}`, letter: LETTER(j) }));
-  return { ok: true, providers: matching, providers_outside: outside, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
+  return { ok: true, providers: matching, providers_outside: outside, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered }, market_phase };
 }
 
 type MockDetail = {

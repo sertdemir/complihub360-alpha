@@ -18,7 +18,9 @@
     "titleNoneConfirmed": "Hier lohnt sich ein genauer Blick.",
     "evidenceCounts": "{{likely}} wahrscheinlich, {{open}} noch offen.",
     "evidenceOnlyLikely": "{{count}} wahrscheinlich.",
-    "evidenceOnlyOpen": "{{count}} noch offen."
+    "evidenceOnlyOpen": "{{count}} noch offen.",
+    "phases": "Heute: {{current}} · Geplant: {{planned}}",
+    "phasesPlannedOnly": "Geplant: {{planned}} · noch keine heutigen Märkte"
   },
   "stats": {
     "0": {
@@ -473,5 +475,6 @@
     "profileBody": "Sie kommen von Anbietern, die im selben Markt arbeiten, aber nicht in {{areas}}. Eine Buchung bieten wir von hier aus nicht an.",
     "profileBodyGeneric": "Sie kommen von Anbietern, die im selben Markt arbeiten, aber nicht in dem angefragten Bereich. Eine Buchung bieten wir von hier aus nicht an."
   },
-  "outsideTag": "Außerhalb Ihrer gewählten Bereiche"
+  "outsideTag": "Außerhalb Ihrer gewählten Bereiche",
+  "plannedTag": "geplant"
 }

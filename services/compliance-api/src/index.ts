@@ -7,7 +7,7 @@ import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
-import { generateRelevantSubdomains, factsFromAnswers, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
+import { generateRelevantSubdomains, factsFromAnswers, marketPhases, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
@@ -3403,11 +3403,27 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 let engineFailed = false;
                 // All requested markets the engine knows a profile for; unknown
                 // codes are dropped rather than killing the whole search.
-                const requestedMarkets: string[] = Array.isArray(requestData.structured_answers?.markets)
-                    ? requestData.structured_answers.markets
-                    : [];
-                const engineCountries = [...new Set([requestData.country || 'DE', ...requestedMarkets])]
+                //
+                // Heutige und geplante Maerkte bleiben getrennt (Core Wizard
+                // Handover v1.1): ein US-Haendler mit Plaenen fuer DE/FR bekommt
+                // US als heute und DE/FR als geplant — nicht nur US. Kein
+                // stilles 'DE' mehr, wenn gar kein Land genannt ist: dann gibt
+                // es keine Gesetze statt deutscher.
+                const phases = marketPhases({
+                    markets: requestData.structured_answers?.markets,
+                    country: requestData.country,
+                    details: requestData.structured_answers?.details,
+                });
+                const engineCountries = [...new Set([...phases.current, ...phases.planned])]
                     .filter((c): c is CountryCode => isKnownCountry(String(c)));
+                // Je ausgewertetem Land: heute, geplant oder beides. Die Risk Map
+                // zeigt damit, ob eine Pflicht eine heutige oder eine geplante
+                // Taetigkeit betrifft.
+                const marketPhase: Record<string, 'current' | 'planned' | 'both'> = {};
+                for (const c of engineCountries) {
+                    const cur = phases.current.includes(c), pl = phases.planned.includes(c);
+                    marketPhase[c] = cur && pl ? 'both' : pl ? 'planned' : 'current';
+                }
                 // Wizard domain slugs → engine domains (focus = user-selected;
                 // always included and sorted first — interest, not proof).
                 const requestedSlugs: string[] = requestData.structured_answers?.domains
@@ -3697,6 +3713,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // Bereich × Markt: deckt ein freigegebener Anbieter das ab?
                     // Nur Booleans je Zelle — kein Anbieter, keine Anzahl.
                     coverage: coverage.public,
+                    // Land → 'current' | 'planned' | 'both' (Handover v1.1).
+                    market_phase: marketPhase,
                     // Enriched obligations payload: severity + statute + penalty +
                     // cadence from the engine's editorial map. `state` mirrors the
                     // wizard: explicitly selected domains are 'confirmed', the

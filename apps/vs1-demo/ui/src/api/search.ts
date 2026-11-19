@@ -137,6 +137,9 @@ export interface SearchResult {
   /** Aeltere Antworten kennen sie nicht — dann gibt es keinen Befund
    *  "begrenzt", statt einen zu raten. */
   coverage?: SearchCoverage;
+  /** Je ausgewertetem Land: heutige oder geplante Taetigkeit (Handover v1.1).
+   *  Fehlt bei aelteren Antworten — dann gilt alles als heute. */
+  market_phase?: Record<string, 'current' | 'planned' | 'both'>;
   /** 'failed': die Engine hat nicht gerechnet — `laws` ist leer, weil nichts
    *  geprueft wurde, nicht weil nichts gilt. Fehlt das Feld (aeltere Antwort),
    *  gilt 'ok'. Gelesen wird es ueber `lawsOf`, nicht direkt. */
@@ -165,7 +168,8 @@ export async function runSearch(profile: Partial<SearchProfile> & { country?: st
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      country: profile.country || 'DE',
+      // Kein stilles 'DE': ohne Land gibt es keine Gesetze statt deutscher.
+      country: profile.country || '',
       domains: profile.categories || [],
       structured_answers: profile,
     }),

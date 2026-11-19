@@ -684,13 +684,16 @@
       "situation": "Su situación",
       "offering": "Usted vende",
       "establishment": "Establecida en",
-      "stock": "Existencias",
+      "stock": "Existencias actuales",
       "eprProducts": "EPR · productos",
       "packaging": "EPR · envases",
-      "reason": "Su motivo",
+      "reason": "Sus objetivos",
       "customers": "Vende a",
       "channels": "Canal de venta",
-      "planned": "Prevista en"
+      "planned": "Prevista en",
+      "check": "Revisión de cumplimiento para",
+      "expand": "Expansión prevista",
+      "plannedStock": "Existencias previstas"
     },
     "otherCountry": "+ Otro país…",
     "removes": {

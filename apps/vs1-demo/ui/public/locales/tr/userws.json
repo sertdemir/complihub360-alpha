@@ -684,13 +684,16 @@
       "situation": "Durumunuz",
       "offering": "Sattıklarınız",
       "establishment": "Kuruluş yeri",
-      "stock": "Stok",
+      "stock": "Mevcut stok",
       "eprProducts": "EPR · ürünler",
       "packaging": "EPR · ambalaj",
-      "reason": "Nedeniniz",
+      "reason": "Hedefleriniz",
       "customers": "Satış yaptığınız kesim",
       "channels": "Satış kanalı",
-      "planned": "Planlanan yer"
+      "planned": "Planlanan yer",
+      "check": "Uyumluluk kontrolü kapsamı",
+      "expand": "Planlanan genişleme",
+      "plannedStock": "Planlanan stok"
     },
     "otherCountry": "+ Başka ülke…",
     "removes": {

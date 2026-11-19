@@ -152,13 +152,34 @@ export function factsFromAnswers(answers: {
     default:
       break;
   }
-  const markets = [
-    ...(Array.isArray(answers.markets) ? answers.markets : []),
-    ...(typeof answers.country === 'string' && answers.country ? [answers.country] : []),
-  ].map(String);
+  // Heutige UND geplante Maerkte (Core Wizard Handover v1.1): ein geplantes
+  // Zielland wird mit ausgewertet, auch wenn heute nur anderswo verkauft wird.
+  const { current, planned } = marketPhases(answers);
+  const markets = [...current, ...planned];
   if (markets.some((m) => EU27.has(m.toUpperCase()))) facts.eu_market = true;
   Object.assign(facts, factsFromDetails(answers.details, markets));
   return facts;
+}
+
+/** Welche Laender die Antworten als heutigen und welche als geplanten Markt
+ *  nennen. Getrennt, damit kein geplantes Land als heutige Taetigkeit gilt und
+ *  kein heutiges ein geplantes ueberschreibt. Ein Land kann in beiden stehen.
+ *  Antworten ohne Land ("undecided", "not-planned") sind keine Laender. Der
+ *  Pruefumfang (CW08) zaehlt zu den heutigen Laendern. `country` ist nur dann
+ *  ein heutiger Markt, wenn es nicht aus den geplanten stammt. */
+export function marketPhases(answers: { markets?: unknown; country?: unknown; details?: unknown } | null | undefined): { current: string[]; planned: string[] } {
+  if (!answers) return { current: [], planned: [] };
+  const isCode = (v: string) => /^[A-Za-z]{2}$/.test(v);
+  const d = (answers.details && typeof answers.details === 'object' && !Array.isArray(answers.details) ? answers.details : {}) as Record<string, unknown>;
+  const planned = [...new Set(list(d.plannedMarkets).filter(isCode).map((x) => x.toUpperCase()))];
+  const scope = (d.checkScope && typeof d.checkScope === 'object' ? d.checkScope : {}) as Record<string, unknown>;
+  const stated = [
+    ...(Array.isArray(answers.markets) ? answers.markets.map(String) : []),
+    ...(scope.mode === 'countries' ? list(scope.countries) : []),
+  ].filter(isCode).map((x) => x.toUpperCase());
+  const country = typeof answers.country === 'string' && isCode(answers.country) ? answers.country.toUpperCase() : '';
+  const current = [...new Set([...stated, ...(country && !planned.includes(country) ? [country] : [])])];
+  return { current, planned };
 }
 
 const list = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
