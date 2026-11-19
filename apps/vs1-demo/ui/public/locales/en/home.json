@@ -511,7 +511,11 @@
       "helpValue": "Help identifying what else I may need",
       "unanswered": "Not answered",
       "notAssessedTitle": "Not assessed yet: {{countries}}",
-      "notAssessedText": "These countries stay in your request. Your Risk Map marks them as not covered — that is not a finding that nothing applies there."
+      "notAssessedText": "These countries stay in your request. Your Risk Map marks them as not covered — that is not a finding that nothing applies there.",
+      "checkNoMarkets": "current markets not known yet, so nothing is checked for today",
+      "checkOutside": "not part of this check: {{countries}}",
+      "storageTitle": "Storage locations are recorded, not assessed yet",
+      "storageText": "Your Risk Map names them as an open point. It makes no statement about storage there."
     },
     "skipHint": "Not sure? Choose what fits best — you can change every answer before you create your map.",
     "needsMarket": "Choose where you sell today — or say that you don’t sell yet.",

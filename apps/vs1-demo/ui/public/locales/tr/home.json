@@ -509,7 +509,11 @@
       "helpValue": "Başka neye ihtiyacım olabileceğini belirleme yardımı",
       "unanswered": "Yanıtlanmadı",
       "notAssessedTitle": "Henüz değerlendirilmeyen: {{countries}}",
-      "notAssessedText": "Bu ülkeler talebinizde kalır. Risk Map'iniz bunları kapsanmıyor olarak gösterir — bu, orada hiçbir şeyin geçerli olmadığı anlamına gelmez."
+      "notAssessedText": "Bu ülkeler talebinizde kalır. Risk Map'iniz bunları kapsanmıyor olarak gösterir — bu, orada hiçbir şeyin geçerli olmadığı anlamına gelmez.",
+      "checkNoMarkets": "mevcut pazarlar henüz bilinmiyor, bu nedenle bugün için hiçbir şey kontrol edilmiyor",
+      "checkOutside": "bu kontrolün parçası değil: {{countries}}",
+      "storageTitle": "Depolama yerleri kaydedildi, henüz değerlendirilmiyor",
+      "storageText": "Risk Map’iniz bunları açık nokta olarak gösterir. Oradaki depolama hakkında bir beyanda bulunmaz."
     },
     "skipHint": "Emin değil misiniz? En uygun olanı seçin — haritanızı oluşturmadan önce her yanıtı değiştirebilirsiniz.",
     "needsMarket": "Bugün nerede satış yaptığınızı seçin — ya da henüz satış yapmadığınızı belirtin.",

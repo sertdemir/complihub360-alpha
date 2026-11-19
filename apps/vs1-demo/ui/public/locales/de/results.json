@@ -27,6 +27,26 @@
       "plannedEstablishment": "Geplante Gründung: {{countries}}",
       "plannedMarkets": "Geplant: {{countries}}",
       "plannedUndecided": "Geplante Expansion: noch nicht entschieden, dafür ist deshalb nichts ausgewertet"
+    },
+    "scope": {
+      "checked": "Für heute geprüft: {{countries}}, wie von Ihnen gewählt.",
+      "outside": "Nicht Teil dieser Prüfung: {{countries}}.",
+      "allButUnknown": "Sie haben alle heutigen Märkte zur Prüfung gewählt. Bisher ist keiner bekannt, deshalb wird für heute nichts geprüft.",
+      "undecided": "Prüfumfang noch nicht entschieden: alle heutigen Märkte werden gezeigt.",
+      "undecidedUnknown": "Prüfumfang noch nicht entschieden, und es sind keine heutigen Märkte bekannt: für heute wird nichts geprüft.",
+      "all": "Für heute geprüft: alle Ihre heutigen Märkte ({{countries}})."
+    },
+    "storage": {
+      "label": "Lager –",
+      "today": "heute: {{countries}}",
+      "todayNone": "heute: keines",
+      "todayUnknown": "heute: nicht bekannt",
+      "planned": "geplant: {{countries}}",
+      "plannedNoOther": "geplant: keines in einem anderen Land",
+      "plannedUndecided": "geplant: noch nicht entschieden",
+      "plannedUnknown": "geplant: nicht bekannt",
+      "notAssessed": "Lagerorte sind erfasst, aber noch nicht ausgewertet; diese Risk Map trifft keine Aussage dazu.",
+      "open": "Dieser Punkt bleibt offen."
     }
   },
   "stats": {

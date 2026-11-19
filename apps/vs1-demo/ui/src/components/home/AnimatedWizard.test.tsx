@@ -292,6 +292,12 @@ describe('Handover v1.1 · acceptance', () => {
     expect(edited.details?.checkScope).toEqual({ mode: 'all-current', countries: [] });
     const specific = buildProfile(new Set(['United States', 'Germany', 'rsn:check', 'chk:Germany']), [], emptyExtras());
     expect(specific.details?.checkScope).toEqual({ mode: 'countries', countries: ['DE'] });
+    // CW-F02: der eingegrenzte Umfang fuehrt die Suche — nicht der erste heutige Markt.
+    expect(specific.markets).toEqual(['DE', 'US']);
+    expect(specific.country).toBe('DE');
+    const onlyUs = buildProfile(new Set(['United States', 'Germany', 'rsn:check', 'chk:United States']), [], emptyExtras());
+    expect(onlyUs.markets).toEqual(['DE', 'US']);
+    expect(onlyUs.country).toBe('US');
     // Ohne das Ziel ist der Pruefumfang nicht gefragt.
     expect(buildProfile(new Set(['United States', 'chk:all-current']), [], emptyExtras()).details?.checkScope).toBeUndefined();
   });

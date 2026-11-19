@@ -597,7 +597,10 @@ export function buildProfile(selected: Set<string>, extraMarkets: string[], extr
   return {
     // Ohne heutigen Markt das erste geplante Land — nie ein erfundenes.
     // Dann der Sitz, dann das geplante Gruendungsland (CW-F05).
-    country: markets[0] ?? (details?.plannedMarkets ?? []).find(isCode)
+    // Ein eingegrenzter Pruefumfang zuerst (CW-F02): sonst suchte die
+    // Anbieterliste in einem Land, das gar nicht geprueft wird.
+    country: (details?.checkScope?.mode === 'countries' ? details.checkScope.countries.find(isCode) : undefined)
+      ?? markets[0] ?? (details?.plannedMarkets ?? []).find(isCode)
       ?? (details?.establishment ?? []).find(isCode) ?? (details?.plannedEstablishment ?? []).find(isCode) ?? '',
     markets,
     categories,
@@ -959,9 +962,10 @@ export function AnimatedWizard({
   const openSuggestions = suggestedAreas(selected, allMarkets).filter((x) => !selected.has(x.id));
   // Laender, die erfasst, aber noch nicht ausgewertet werden (CW-F03): sie
   // bleiben in der Anfrage und stehen in der Uebersicht ausdruecklich da.
+  const reviewProfile = interactive && isReview ? buildProfile(selected, extraMarkets, countryExtras) : null;
   const notAssessed = (() => {
-    if (!interactive || !isReview) return [];
-    const p = buildProfile(selected, extraMarkets, countryExtras);
+    if (!reviewProfile) return [];
+    const p = reviewProfile;
     const d = p.details;
     const codes = [...p.markets, ...(d?.plannedMarkets ?? []), ...(d?.establishment ?? []), ...(d?.plannedEstablishment ?? [])]
       .filter(isCountryCode);
@@ -1010,6 +1014,26 @@ export function AnimatedWizard({
   // Sitz, heutige Maerkte, Pruefumfang, geplante Maerkte, Lager heute und
   // geplant, gewaehlte Bereiche und die Bitte um Hilfe.
   const row = (id: string, labelKey: string, value: Seg[], edit: StepKey) => ({ id, label: t(labelKey), value, edit });
+  // Pruefumfang (CW-F02): "alle heutigen" zeigt auf die bestaetigten heutigen
+  // Maerkte — sind keine bekannt, steht das da, statt eine leere Menge als
+  // vollstaendige Pruefung auszugeben. Ein eingegrenzter Umfang nennt, welche
+  // heutigen Maerkte er auslaesst.
+  const checkNote: Seg[] = (() => {
+    if (!flow.includes('check') || !reviewProfile) return [];
+    const lang = i18n.resolvedLanguage || 'en';
+    if (selected.has('chk:all-current')) {
+      return ownMarkets.length
+        ? [{ text: `(${ownMarkets.map(countryLabel).join(', ')})`, muted: true, glue: true }]
+        : [{ text: t('wizard.review.checkNoMarkets'), muted: true }];
+    }
+    const scope = reviewProfile.details?.checkScope;
+    if (scope?.mode !== 'countries') return [];
+    const outside = reviewProfile.markets.filter((m) => !scope.countries.includes(m));
+    return outside.length ? [{ text: t('wizard.review.checkOutside', { countries: outside.map((c) => countryName(c, lang)).join(', ') }), muted: true }] : [];
+  })();
+  // Lager (CW-F01): erfasst, aber von keiner Regel gedeckt — das sagt die
+  // Uebersicht, bevor die Risk Map entsteht.
+  const storageCountries = [...new Set([...(reviewProfile?.details?.stock ?? []), ...(reviewProfile?.details?.plannedStock ?? [])].filter((c) => /^[A-Z]{2}$/.test(c)))];
   const reviewRows: { id: string; label: string; value: Seg[]; edit: StepKey }[] = interactive
     ? [
         row('business', 'wizard.review.business', [...segsOf('situation'), ...segsOf('reason')], 'situation'),
@@ -1019,7 +1043,7 @@ export function AnimatedWizard({
           ...countrySegs('planned', 'wizard.review.plannedIn', 'wizard.review.establishmentOpen'),
         ], 'establishment'),
         row('markets', 'wizard.review.currentMarkets', segsOf('markets'), 'markets'),
-        ...(flow.includes('check') ? [row('check', 'wizard.review.checkScope', segsOf('check'), 'check')] : []),
+        ...(flow.includes('check') ? [row('check', 'wizard.review.checkScope', [...segsOf('check'), ...checkNote], 'check')] : []),
         ...(flow.includes('expand') ? [row('expand', 'wizard.review.plannedMarkets', segsOf('expand'), 'expand')] : []),
         ...(flow.includes('stock')
           ? [
@@ -1129,6 +1153,12 @@ export function AnimatedWizard({
                     {t('wizard.review.notAssessedTitle', { countries: notAssessed.map((c) => countryName(c, i18n.resolvedLanguage || 'en')).join(', ') })}
                   </p>
                   <p className="mt-0.5 text-body-sm text-fg-secondary">{t('wizard.review.notAssessedText')}</p>
+                </div>
+              )}
+              {storageCountries.length > 0 && (
+                <div className="mt-6 rounded-md bg-brand-light px-5 py-4" data-testid="storage-note">
+                  <p className="text-body-md font-semibold text-fg">{t('wizard.review.storageTitle')}</p>
+                  <p className="mt-0.5 text-body-sm text-fg-secondary">{t('wizard.review.storageText')}</p>
                 </div>
               )}
               <p className="mt-8 text-left text-body-sm text-fg-tertiary">

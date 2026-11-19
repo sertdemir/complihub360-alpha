@@ -537,6 +537,52 @@ describe('POST /api/v1/search', () => {
         expect(r.body.laws.length).toBeGreaterThan(0);
     });
 
+    // Feedback CW-F02 (19.11.2026): S09 "alle heutigen" gegen S10 "nur US".
+    it('the check scope narrows today: "only US" does not assess DE, France stays planned', async () => {
+        const run = (checkScope: unknown) => api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'US', structured_answers: { markets: ['US', 'DE'], domains: ['tax-vat'], details: { goals: ['check', 'expansion'], plannedMarkets: ['FR'], checkScope } } }),
+        });
+        const s09 = await run({ mode: 'all-current', countries: [] });
+        const s10 = await run({ mode: 'countries', countries: ['US'] });
+        expect(s09.body.market_phase).toEqual({ US: 'current', DE: 'current', FR: 'planned' });
+        expect(s10.body.market_phase).toEqual({ US: 'current', FR: 'planned' });
+        expect(s09.body.assessment.check).toEqual({ mode: 'all-current', countries: [], outside: [], current_markets_known: true });
+        expect(s10.body.assessment.check).toEqual({ mode: 'countries', countries: ['US'], outside: ['DE'], current_markets_known: true });
+        const markets = (r: any) => new Set<string>(r.body.laws.flatMap((l: any) => l.markets));
+        expect(markets(s09).has('DE')).toBe(true);
+        expect(markets(s10).has('DE')).toBe(false);
+        expect(markets(s10).has('FR')).toBe(true);
+        expect([...s10.body.coverage.markets].sort()).toEqual(['FR', 'US']);
+    });
+
+    it('"all current markets" with unknown markets is not a complete, empty check', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'FR', structured_answers: { markets: [], domains: ['tax-vat'], details: { marketsStatus: 'not-sure', plannedMarkets: ['FR'], checkScope: { mode: 'all-current', countries: [] } } } }),
+        });
+        expect(r.body.assessment.check).toEqual({ mode: 'all-current', countries: [], outside: [], current_markets_known: false });
+        expect(r.body.market_phase).toEqual({ FR: 'planned' });
+    });
+
+    // Feedback CW-F01: S06 geplantes Lager DE/FR · S07 kein anderes Land · S08 unentschieden.
+    it('planned storage keeps its own status and never becomes a market or an obligation', async () => {
+        const run = (plannedStock: string[]) => api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'US', structured_answers: { markets: ['US'], domains: ['tax-vat'], details: { offering: ['physical'], channels: ['marketplaces'], stock: ['US'], plannedStock } } }),
+        });
+        const [s06, s07, s08] = await Promise.all([run(['DE', 'FR']), run(['no-other']), run(['undecided'])]);
+        expect(s06.body.assessment.storage.planned).toEqual({ status: 'countries', countries: ['DE', 'FR'] });
+        expect(s06.body.assessment.storage.open_countries).toEqual({ current: ['US'], planned: ['DE', 'FR'] });
+        expect(s07.body.assessment.storage.planned).toEqual({ status: 'no-other', countries: [] });
+        expect(s08.body.assessment.storage.planned).toEqual({ status: 'undecided', countries: [] });
+        // Kein Lagerland wird Markt, und keine Pflicht entsteht allein aus ihm.
+        for (const r of [s06, s07, s08]) expect(r.body.market_phase).toEqual({ US: 'current' });
+        const ids = (r: any) => r.body.laws.map((l: any) => `${l.id}:${l.state}`).sort();
+        expect(ids(s06)).toEqual(ids(s07));
+        expect(ids(s07)).toEqual(ids(s08));
+    });
+
     it('no country at all: no laws — and no silent German fallback', async () => {
         const r = await api('/api/v1/search', {
             method: 'POST',
@@ -740,7 +786,7 @@ describe('POST /api/v1/search', () => {
             expect(r.body).not.toHaveProperty('tutorials');
             expect(r.body).not.toHaveProperty('articles');
             expect(r.body).not.toHaveProperty('tips');
-            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'market_phase', 'overview_summary', 'providers', 'providers_outside']);
+            expect(Object.keys(r.body).sort()).toEqual(['assessment', 'coverage', 'laws', 'laws_status', 'market_phase', 'overview_summary', 'providers', 'providers_outside']);
             // Erfolg: kein Fehlersignal, keine Referenz im Koerper.
             expect(r.body.laws_status).toBe('ok');
         } finally {

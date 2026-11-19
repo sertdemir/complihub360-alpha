@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateEvidence, factsFromAnswers, marketPhases, countryPhases, EVIDENCE_RULES } from '../evidence';
+import { evaluateEvidence, factsFromAnswers, marketPhases, countryPhases, checkScopeOf, storageOf, EVIDENCE_RULES } from '../evidence';
 import { DomainTemplateLibrary } from '../domain-schema';
 import { generateRelevantSubdomains } from '../generator';
 import { ComplianceDomain } from '../domain-schema';
@@ -57,21 +57,54 @@ describe('evidence · scope facts', () => {
 describe('evidence · current and planned markets (Core Wizard Handover v1.1)', () => {
   it('keeps current and planned apart', () => {
     expect(marketPhases({ country: 'US', markets: ['US'], details: { plannedMarkets: ['DE', 'FR'] } }))
-      .toEqual({ current: ['US'], planned: ['DE', 'FR'] });
+      .toEqual({ current: ['US'], planned: ['DE', 'FR'], outsideScope: [] });
   });
   it('a country may be both; statuses are not countries', () => {
     expect(marketPhases({ markets: ['DE'], details: { plannedMarkets: ['DE', 'undecided', 'not-planned'] } }))
-      .toEqual({ current: ['DE'], planned: ['DE'] });
+      .toEqual({ current: ['DE'], planned: ['DE'], outsideScope: [] });
   });
   it('the first planned country sent as `country` does not become a current market', () => {
     expect(marketPhases({ country: 'DE', markets: [], details: { plannedMarkets: ['DE', 'FR'] } }))
-      .toEqual({ current: [], planned: ['DE', 'FR'] });
+      .toEqual({ current: [], planned: ['DE', 'FR'], outsideScope: [] });
   });
-  it('a specific check scope counts as current; "all current" adds nothing; planned stays planned', () => {
-    expect(marketPhases({ markets: ['US'], details: { checkScope: { mode: 'countries', countries: ['UK'] }, plannedMarkets: ['FR'] } }))
-      .toEqual({ current: ['US', 'UK'], planned: ['FR'] });
-    expect(marketPhases({ markets: ['US'], details: { checkScope: { mode: 'all-current', countries: [] } } }))
-      .toEqual({ current: ['US'], planned: [] });
+  it('CW-F02: a specific check scope narrows today; "all current" and "not sure" do not; planned stays planned', () => {
+    // S09: alle heutigen Maerkte · S10: nur US.
+    const base = { markets: ['US', 'DE'], details: { plannedMarkets: ['FR'] } };
+    const s09 = { ...base, details: { ...base.details, checkScope: { mode: 'all-current', countries: [] } } };
+    const s10 = { ...base, details: { ...base.details, checkScope: { mode: 'countries', countries: ['US'] } } };
+    expect(marketPhases(s09)).toEqual({ current: ['US', 'DE'], planned: ['FR'], outsideScope: [] });
+    expect(marketPhases(s10)).toEqual({ current: ['US'], planned: ['FR'], outsideScope: ['DE'] });
+    expect(marketPhases({ ...base, details: { ...base.details, checkScope: { mode: 'unknown', countries: [] } } }).current).toEqual(['US', 'DE']);
+    // Ein Markt ausserhalb des Umfangs traegt keinen Fakt.
+    expect(factsFromAnswers({ markets: ['US', 'DE'], details: { checkScope: { mode: 'countries', countries: ['US'] } } }).eu_market).toBeUndefined();
+    expect(factsFromAnswers({ markets: ['US', 'DE'], details: { checkScope: { mode: 'all-current', countries: [] } } }).eu_market).toBe(true);
+  });
+  it('CW-F02: the seat is not silently added to a narrowed check', () => {
+    expect(countryPhases({ markets: ['US', 'DE'], details: { establishment: ['DE'], checkScope: { mode: 'countries', countries: ['US'] } } }))
+      .toEqual({ current: ['US'], planned: [], outsideScope: ['DE'] });
+    expect(countryPhases({ markets: ['US'], details: { establishment: ['FR'], checkScope: { mode: 'countries', countries: ['US'] } } }))
+      .toEqual({ current: ['US'], planned: [], outsideScope: ['FR'] });
+  });
+  it('CW-F02: the scope as asked — "all current" with unknown markets is not an empty, complete check', () => {
+    expect(checkScopeOf({ checkScope: { mode: 'countries', countries: ['us', 'US', 'x'] } })).toEqual({ mode: 'countries', countries: ['US'] });
+    expect(checkScopeOf({ checkScope: { mode: 'all-current', countries: [] } })).toEqual({ mode: 'all-current', countries: [] });
+    expect(checkScopeOf({ checkScope: { mode: 'unknown', countries: [] } }).mode).toBe('unknown');
+    expect(checkScopeOf({}).mode).toBe('none');
+    expect(checkScopeOf({ checkScope: { mode: 'countries', countries: [] } }).mode).toBe('none');
+  });
+  it('CW-F01: storage keeps its own status — undecided, unknown, "no other country" and "not asked" stay apart', () => {
+    expect(storageOf({ stock: ['US'], plannedStock: ['de', 'FR'] })).toEqual({ current: { status: 'countries', countries: ['US'] }, planned: { status: 'countries', countries: ['DE', 'FR'] } });
+    expect(storageOf({ stock: ['US'], plannedStock: ['no-other'] }).planned).toEqual({ status: 'no-other', countries: [] });
+    expect(storageOf({ stock: ['US'], plannedStock: ['undecided'] }).planned).toEqual({ status: 'undecided', countries: [] });
+    expect(storageOf({ stock: ['not-sure'], plannedStock: ['not-sure'] })).toEqual({ current: { status: 'unknown', countries: [] }, planned: { status: 'unknown', countries: [] } });
+    expect(storageOf({ stock: ['none'] })).toEqual({ current: { status: 'none', countries: [] }, planned: { status: 'not-asked', countries: [] } });
+    expect(storageOf({ stock: ['not-applicable'] }).current.status).toBe('not-applicable');
+    expect(storageOf(null).planned.status).toBe('not-asked');
+  });
+  it('CW-F01: a storage country is neither a market nor a fact', () => {
+    const a = { markets: ['US'], details: { stock: ['US'], plannedStock: ['DE', 'FR'] } };
+    expect(countryPhases(a)).toEqual({ current: ['US'], planned: [], outsideScope: [] });
+    expect(factsFromAnswers(a)).toEqual(factsFromAnswers({ markets: ['US'], details: { stock: ['US'], plannedStock: ['no-other'] } }));
   });
   it('planned EU markets reach the facts even when today is US-only', () => {
     expect(factsFromAnswers({ markets: ['US'] }).eu_market).toBeUndefined();
@@ -79,19 +112,19 @@ describe('evidence · current and planned markets (Core Wizard Handover v1.1)', 
   });
   it('CW-F05: a planned establishment country is assessed as planned — without inventing an expansion', () => {
     const founder = { country: 'DE', markets: [], details: { marketsStatus: 'not-yet', establishment: ['not-yet'], plannedEstablishment: ['DE'] } };
-    expect(marketPhases(founder)).toEqual({ current: [], planned: [] });
-    expect(countryPhases(founder)).toEqual({ current: [], planned: ['DE'] });
+    expect(marketPhases(founder)).toEqual({ current: [], planned: [], outsideScope: [] });
+    expect(countryPhases(founder)).toEqual({ current: [], planned: ['DE'], outsideScope: [] });
     // Der Sitz ist kein Verkaufsmarkt: kein eu_market-Fakt aus dem Gruendungsland.
     expect(factsFromAnswers(founder).eu_market).toBeUndefined();
   });
   it('CW-F05: an existing establishment without sales is assessed as current', () => {
-    expect(countryPhases({ country: 'FR', markets: [], details: { establishment: ['FR'] } })).toEqual({ current: ['FR'], planned: [] });
-    expect(countryPhases({ markets: ['US'], details: { establishment: ['US'], plannedMarkets: ['DE'] } })).toEqual({ current: ['US'], planned: ['DE'] });
+    expect(countryPhases({ country: 'FR', markets: [], details: { establishment: ['FR'] } })).toEqual({ current: ['FR'], planned: [], outsideScope: [] });
+    expect(countryPhases({ markets: ['US'], details: { establishment: ['US'], plannedMarkets: ['DE'] } })).toEqual({ current: ['US'], planned: ['DE'], outsideScope: [] });
   });
 
   it('nothing stated means nothing assessed — no default country', () => {
-    expect(marketPhases({})).toEqual({ current: [], planned: [] });
-    expect(marketPhases(null)).toEqual({ current: [], planned: [] });
+    expect(marketPhases({})).toEqual({ current: [], planned: [], outsideScope: [] });
+    expect(marketPhases(null)).toEqual({ current: [], planned: [], outsideScope: [] });
   });
 });
 

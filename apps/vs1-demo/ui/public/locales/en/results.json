@@ -27,6 +27,26 @@
       "plannedEstablishment": "Planned establishment: {{countries}}",
       "plannedMarkets": "Planned: {{countries}}",
       "plannedUndecided": "Planned expansion: not decided yet, so nothing is assessed for it"
+    },
+    "scope": {
+      "checked": "Checked for today: {{countries}}, as you asked.",
+      "outside": "Not part of this check: {{countries}}.",
+      "allButUnknown": "You asked us to check all current markets. None are known yet, so nothing is checked for today.",
+      "undecided": "Check scope not decided yet: all current markets are shown.",
+      "undecidedUnknown": "Check scope not decided yet, and no current markets are known: nothing is checked for today.",
+      "all": "Checked for today: all your current markets ({{countries}})."
+    },
+    "storage": {
+      "label": "Storage —",
+      "today": "today: {{countries}}",
+      "todayNone": "today: none",
+      "todayUnknown": "today: not known",
+      "planned": "planned: {{countries}}",
+      "plannedNoOther": "planned: none in another country",
+      "plannedUndecided": "planned: not decided yet",
+      "plannedUnknown": "planned: not known",
+      "notAssessed": "Storage locations are recorded but not assessed yet; this Risk Map makes no statement about them.",
+      "open": "This point stays open."
     }
   },
   "stats": {

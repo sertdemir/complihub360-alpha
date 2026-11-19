@@ -7,7 +7,7 @@ import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
-import { generateRelevantSubdomains, factsFromAnswers, countryPhases, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
+import { generateRelevantSubdomains, factsFromAnswers, countryPhases, assessmentOf, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
@@ -3411,11 +3411,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 // es keine Gesetze statt deutscher.
                 // Dazu Sitz und geplantes Gruendungsland (CW-F05): ein Gruender
                 // ohne Verkaeufe bekommt eine Auswertung fuer sein Gruendungsland.
-                const phases = countryPhases({
+                //
+                // Der Pruefumfang grenzt die heutigen Laender ein (CW-F02):
+                // "nur US" wertet DE nicht still mit aus. Lagerlaender sind
+                // weder Markt noch Fakt (CW-F01); sie stehen in `assessment`
+                // als offener Punkt.
+                const scopeInput = {
                     markets: requestData.structured_answers?.markets,
                     country: requestData.country,
                     details: requestData.structured_answers?.details,
-                });
+                };
+                const phases = countryPhases(scopeInput);
+                const assessment = assessmentOf(scopeInput);
                 const engineCountries = [...new Set([...phases.current, ...phases.planned])]
                     .filter((c): c is CountryCode => isKnownCountry(String(c)));
                 // Je ausgewertetem Land: heute, geplant oder beides. Die Risk Map
@@ -3717,6 +3724,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     coverage: coverage.public,
                     // Land → 'current' | 'planned' | 'both' (Handover v1.1).
                     market_phase: marketPhase,
+                    // Was geprueft wurde und was offen bleibt (CW-F01/F02):
+                    // Pruefumfang, Laender ausserhalb davon, Lager mit eigenem
+                    // Status. Nur Laendercodes und Statuswerte.
+                    assessment,
                     // Enriched obligations payload: severity + statute + penalty +
                     // cadence from the engine's editorial map. `state` mirrors the
                     // wizard: explicitly selected domains are 'confirmed', the

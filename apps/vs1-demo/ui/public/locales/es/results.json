@@ -27,6 +27,26 @@
       "plannedEstablishment": "Constitución prevista: {{countries}}",
       "plannedMarkets": "Previsto: {{countries}}",
       "plannedUndecided": "Expansión prevista: aún sin decidir, por lo que no se ha evaluado nada para ella"
+    },
+    "scope": {
+      "checked": "Revisado para hoy: {{countries}}, como usted indicó.",
+      "outside": "No forma parte de esta revisión: {{countries}}.",
+      "allButUnknown": "Usted pidió revisar todos los mercados actuales. Aún no se conoce ninguno, por lo que hoy no se revisa nada.",
+      "undecided": "Alcance de la revisión aún sin decidir: se muestran todos los mercados actuales.",
+      "undecidedUnknown": "Alcance de la revisión aún sin decidir y no se conocen mercados actuales: hoy no se revisa nada.",
+      "all": "Revisado para hoy: todos sus mercados actuales ({{countries}})."
+    },
+    "storage": {
+      "label": "Almacenamiento —",
+      "today": "hoy: {{countries}}",
+      "todayNone": "hoy: ninguno",
+      "todayUnknown": "hoy: no se sabe",
+      "planned": "previsto: {{countries}}",
+      "plannedNoOther": "previsto: ninguno en otro país",
+      "plannedUndecided": "previsto: aún sin decidir",
+      "plannedUnknown": "previsto: no se sabe",
+      "notAssessed": "Las ubicaciones de almacenamiento están registradas, pero aún no se evalúan; este Risk Map no afirma nada sobre ellas.",
+      "open": "Este punto queda abierto."
     }
   },
   "stats": {

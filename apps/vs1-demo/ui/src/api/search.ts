@@ -1,3 +1,4 @@
+import type { AssessmentRecord } from '@complihub/compliance-engine';
 import type { PenaltyCeiling } from '@complihub/compliance-engine';
 import { ApiError, apiFetch } from './client';
 import type { SearchProfile } from '../components/wizard/WizardContext';
@@ -140,6 +141,10 @@ export interface SearchResult {
   /** Je ausgewertetem Land: heutige oder geplante Taetigkeit (Handover v1.1).
    *  Fehlt bei aelteren Antworten — dann gilt alles als heute. */
   market_phase?: Record<string, 'current' | 'planned' | 'both'>;
+  /** Was geprueft wurde und was offen bleibt (Feedback CW-F01/F02): der
+   *  gefragte Pruefumfang, heutige Laender ausserhalb davon, Lager mit
+   *  eigenem Status. Fehlt bei aelteren Antworten. */
+  assessment?: AssessmentRecord;
   /** 'failed': die Engine hat nicht gerechnet — `laws` ist leer, weil nichts
    *  geprueft wurde, nicht weil nichts gilt. Fehlt das Feld (aeltere Antwort),
    *  gilt 'ok'. Gelesen wird es ueber `lawsOf`, nicht direkt. */
