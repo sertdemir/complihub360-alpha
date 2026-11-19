@@ -20,7 +20,9 @@
     "evidenceOnlyLikely": "{{count}} olası.",
     "evidenceOnlyOpen": "{{count}} henüz açık.",
     "phases": "Bugün: {{current}} · Planlanan: {{planned}}",
-    "phasesPlannedOnly": "Planlanan: {{planned}} · henüz mevcut pazar yok"
+    "phasesPlannedOnly": "Planlanan: {{planned}} · henüz mevcut pazar yok",
+    "phasesUndecided": "Bugün: {{current}} · Planlanan genişleme: henüz karar verilmedi, bu yüzden bunun için bir değerlendirme yapılmadı",
+    "phasesUndecidedOnly": "Planlanan genişleme: henüz karar verilmedi, bu yüzden bunun için bir değerlendirme yapılmadı"
   },
   "stats": {
     "0": {
