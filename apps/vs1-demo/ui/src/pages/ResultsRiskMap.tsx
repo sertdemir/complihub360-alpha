@@ -555,8 +555,14 @@ export function ResultsRiskMap() {
   const phaseLine = (() => {
     const ph = searchData.phases ?? {};
     const planned = Object.keys(ph).filter((c) => ph[c] !== 'current');
-    if (!planned.length) return '';
     const current = Object.keys(ph).filter((c) => ph[c] !== 'planned');
+    // "Noch nicht entschieden" bleibt sichtbar offen: fuer die Expansion ist
+    // nichts ausgewertet — das ist kein "keine Anforderungen" (Handover v1.1).
+    const asked = (searchData.query as { details?: { plannedMarkets?: string[] } } | null)?.details?.plannedMarkets ?? [];
+    if (!planned.length && asked.includes('undecided')) {
+      return current.length ? t('header.phasesUndecided', { current: current.join(', ') }) : t('header.phasesUndecidedOnly');
+    }
+    if (!planned.length) return '';
     return current.length
       ? t('header.phases', { current: current.join(', '), planned: planned.join(', ') })
       : t('header.phasesPlannedOnly', { planned: planned.join(', ') });

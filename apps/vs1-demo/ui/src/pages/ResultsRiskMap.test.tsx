@@ -796,6 +796,31 @@ describe('ResultsRiskMap header subtitle', () => {
     expect(await screen.findByText('header.subtitleProfile#1')).toBeInTheDocument();
   });
 
+  // Core Wizard Handover v1.1: heute und geplant bleiben auf der Risk Map getrennt.
+  it('names current and planned markets apart', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'], details: { plannedMarkets: ['DE', 'FR'] } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })],
+      market_phase: { US: 'current', DE: 'planned', FR: 'planned' } });
+    renderPage();
+    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.phases');
+  });
+
+  it('keeps an undecided expansion visibly unresolved — not "no requirements"', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'], details: { plannedMarkets: ['undecided'] } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })],
+      market_phase: { US: 'current' } });
+    renderPage();
+    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.phasesUndecided');
+  });
+
+  it('says nothing about phases when nothing is planned', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', markets: ['DE'], categories: ['tax-vat'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { DE: 'current' } });
+    renderPage();
+    await screen.findByText('header.subtitleProfile#1');
+    expect(screen.queryByTestId('market-phases')).not.toBeInTheDocument();
+  });
+
   it('names the areas the engine added on top of the chosen ones (Variante 1)', async () => {
     localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', categories: ['tax-vat'] }));
     runSearch.mockResolvedValue({ providers: [], laws: [

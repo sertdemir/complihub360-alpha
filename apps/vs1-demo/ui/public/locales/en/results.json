@@ -20,7 +20,9 @@
     "evidenceOnlyLikely": "{{count}} likely.",
     "evidenceOnlyOpen": "{{count}} still open.",
     "phases": "Selling today: {{current}} · Planned: {{planned}}",
-    "phasesPlannedOnly": "Planned: {{planned}} · no current markets yet"
+    "phasesPlannedOnly": "Planned: {{planned}} · no current markets yet",
+    "phasesUndecided": "Selling today: {{current}} · Planned expansion: not decided yet, so nothing is assessed for it",
+    "phasesUndecidedOnly": "Planned expansion: not decided yet, so nothing is assessed for it"
   },
   "stats": {
     "0": {

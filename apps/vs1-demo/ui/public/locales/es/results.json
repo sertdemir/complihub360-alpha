@@ -20,7 +20,9 @@
     "evidenceOnlyLikely": "{{count}} probables.",
     "evidenceOnlyOpen": "{{count}} aún abiertas.",
     "phases": "Hoy: {{current}} · Previsto: {{planned}}",
-    "phasesPlannedOnly": "Previsto: {{planned}} · aún sin mercados actuales"
+    "phasesPlannedOnly": "Previsto: {{planned}} · aún sin mercados actuales",
+    "phasesUndecided": "Hoy: {{current}} · Expansión prevista: aún sin decidir, por lo que no se ha evaluado nada para ella",
+    "phasesUndecidedOnly": "Expansión prevista: aún sin decidir, por lo que no se ha evaluado nada para ella"
   },
   "stats": {
     "0": {
