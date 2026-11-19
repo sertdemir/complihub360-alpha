@@ -18,7 +18,9 @@
     "titleNoneConfirmed": "Esto merece una revisión detallada.",
     "evidenceCounts": "{{likely}} probables, {{open}} aún abiertas.",
     "evidenceOnlyLikely": "{{count}} probables.",
-    "evidenceOnlyOpen": "{{count}} aún abiertas."
+    "evidenceOnlyOpen": "{{count}} aún abiertas.",
+    "phases": "Hoy: {{current}} · Previsto: {{planned}}",
+    "phasesPlannedOnly": "Previsto: {{planned}} · aún sin mercados actuales"
   },
   "stats": {
     "0": {
@@ -473,5 +475,6 @@
     "profileBody": "Llega a este perfil desde proveedores que trabajan en el mismo mercado, pero no en {{areas}}. Desde aquí no se ofrece la reserva.",
     "profileBodyGeneric": "Llega a este perfil desde proveedores que trabajan en el mismo mercado, pero no en el área solicitada. Desde aquí no se ofrece la reserva."
   },
-  "outsideTag": "Fuera de las áreas elegidas"
+  "outsideTag": "Fuera de las áreas elegidas",
+  "plannedTag": "previsto"
 }

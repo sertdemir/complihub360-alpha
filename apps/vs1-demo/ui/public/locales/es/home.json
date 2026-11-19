@@ -172,8 +172,8 @@
     "saveProgress": "Guardar progreso",
     "steps": {
       "markets": {
-        "title": "¿Dónde opera?",
-        "subtitle": "Selección múltiple. Contrastamos la normativa con los mercados en los que vende."
+        "title": "¿Dónde vende o presta servicios actualmente?",
+        "subtitle": "Solo la situación actual: los planes para nuevos mercados tienen su propia pregunta."
       },
       "operations": {
         "title": "¿Cómo son sus operaciones?",
@@ -185,7 +185,7 @@
       },
       "situation": {
         "title": "¿Qué describe mejor su situación?",
-        "subtitle": "Elija una opción. De ella dependen las preguntas siguientes."
+        "subtitle": "Elija una opción."
       },
       "offering": {
         "title": "¿Qué vende u ofrece?",
@@ -193,11 +193,11 @@
       },
       "establishment": {
         "title": "¿Dónde está establecida su empresa?",
-        "subtitle": "Vende en {{markets}}. ¿Está su empresa registrada en alguno de estos países?"
+        "subtitle": "Los países en los que su empresa está registrada o legalmente establecida."
       },
       "stock": {
-        "title": "¿Dónde tiene existencias?",
-        "subtitle": "Selección múltiple, incluidos almacenes de fulfillment y de marketplaces. Solo se pregunta porque vende productos físicos."
+        "title": "¿Dónde almacena actualmente sus productos?",
+        "subtitle": "Incluya las existencias en proveedores de logística y almacenes de marketplaces."
       },
       "eprProducts": {
         "title": "¿Qué productos vende o planea vender?",
@@ -208,7 +208,7 @@
         "subtitle": "EPR y envases · pregunta 2 de 2. Selección múltiple."
       },
       "reason": {
-        "title": "¿Qué le trae hoy por aquí?",
+        "title": "¿Con qué le gustaría recibir ayuda?",
         "subtitle": "Selección múltiple."
       },
       "customers": {
@@ -223,9 +223,17 @@
         "title": "¿Dónde tiene previsto establecerla?",
         "subtitle": "Elija los países que está considerando."
       },
-      "suggest": {
-        "title": "Temas que pueden encajar con sus respuestas",
-        "subtitle": "Sugerencias basadas en lo que nos ha indicado; no es una constatación de que se aplique una obligación. Elija lo que quiere ver en su Risk Map."
+      "check": {
+        "title": "¿Qué países quiere que revisemos?",
+        "subtitle": "Para la revisión de su cumplimiento actual."
+      },
+      "expand": {
+        "title": "¿A qué países tiene previsto expandirse?",
+        "subtitle": "Selección múltiple. Se mantienen separados de donde vende hoy."
+      },
+      "plannedStock": {
+        "title": "¿Dónde tiene previsto almacenar sus productos?",
+        "subtitle": "Incluya el almacenamiento en proveedores de logística."
       }
     },
     "cards": {
@@ -326,16 +334,13 @@
         "desc": "RAEE, baterías, sustancias"
       },
       "sitExisting": {
-        "title": "Empresa existente / autónomo",
-        "desc": "Ya vende o presta servicios"
+        "title": "Tengo una empresa existente o represento a una"
       },
       "sitStarting": {
-        "title": "Creando una empresa",
-        "desc": "Está planificando o poniéndola en marcha"
+        "title": "Tengo previsto crear una empresa"
       },
       "sitNotSure": {
-        "title": "No estoy seguro",
-        "desc": "Seguimos sin suponer ninguna de las dos"
+        "title": "No estoy seguro"
       },
       "offPhysical": {
         "title": "Productos físicos",
@@ -361,15 +366,14 @@
         "desc": "Uno de sus mercados"
       },
       "estNotYet": {
-        "title": "Aún no establecida",
+        "title": "Mi empresa aún no está establecida",
         "desc": "En proceso de creación"
       },
       "stockMarket": {
         "desc": "Vende aquí"
       },
       "stockNone": {
-        "title": "Sin existencias propias",
-        "desc": "Dropshipping o fabricación bajo pedido"
+        "title": "Actualmente no almaceno productos"
       },
       "eprElectronics": {
         "title": "Productos eléctricos o electrónicos",
@@ -407,23 +411,17 @@
         "title": "Sin envases",
         "desc": "No se envasa ni se envía nada"
       },
-      "rsnLaunch": {
-        "title": "Lanzamiento de empresa, producto o servicio"
-      },
       "rsnExpansion": {
-        "title": "Expansión"
+        "title": "Expandirme a nuevos mercados"
       },
       "rsnCheck": {
-        "title": "Revisión de cumplimiento"
+        "title": "Revisar mi cumplimiento actual"
       },
       "rsnOngoing": {
-        "title": "Soporte continuo"
+        "title": "Gestionar requisitos continuos"
       },
       "rsnProvider": {
-        "title": "Cambiar o añadir un proveedor"
-      },
-      "rsnProblem": {
-        "title": "Problema, notificación o plazo"
+        "title": "Cambiar un proveedor existente"
       },
       "cuConsumers": {
         "title": "Consumidores para uso personal"
@@ -450,7 +448,34 @@
         "title": "Tiendas físicas"
       },
       "helpIdentify": {
-        "title": "Ayúdeme a identificar lo que necesito"
+        "title": "No estoy seguro de lo que necesito"
+      },
+      "sitSelf": {
+        "title": "Trabajo por cuenta propia"
+      },
+      "rsnStarting": {
+        "title": "Crear una empresa"
+      },
+      "rsnOther": {
+        "title": "Otra cosa o no estoy seguro"
+      },
+      "mkNotYet": {
+        "title": "Todavía no vendo ni presto servicios"
+      },
+      "chkAll": {
+        "title": "Todos los países en los que vendo o presto servicios actualmente"
+      },
+      "expUndecided": {
+        "title": "Todavía no lo he decidido"
+      },
+      "expNotPlanned": {
+        "title": "No tengo previsto expandirme"
+      },
+      "stockNA": {
+        "title": "Esto no me aplica"
+      },
+      "pstockNoOther": {
+        "title": "No tengo previsto almacenar productos en otro país"
       }
     },
     "footer": {
@@ -473,24 +498,42 @@
       "establishmentOpen": "sede:",
       "stockIn": "existencias en",
       "stockOpen": "existencias:",
-      "plannedIn": "prevista en"
+      "plannedIn": "prevista en",
+      "establishment": "Establecida en",
+      "currentMarkets": "Mercados actuales",
+      "checkScope": "Revisión de cumplimiento para",
+      "plannedMarkets": "Expansión prevista",
+      "currentStock": "Existencias actuales",
+      "plannedStock": "Existencias previstas",
+      "help": "Solicitud de ayuda",
+      "helpValue": "Ayuda para identificar qué más puedo necesitar",
+      "unanswered": "Sin responder"
     },
     "skipHint": "¿No está seguro? Elija lo que mejor encaje: puede cambiar cada respuesta antes de crear su mapa.",
-    "needsMarket": "Elija al menos un mercado para continuar.",
+    "needsMarket": "Elija dónde vende hoy, o indique que todavía no vende.",
     "back": "Atrás",
     "generate": "Crear mi Risk Map",
     "removeMarket": "Quitar {{market}}",
     "aboutMarket": "Acerca de {{market}}",
     "situationHint": "¿Un asunto personal? Por ahora, CompliHub360 está pensado para empresas — un servicio de asesoramiento local es el mejor primer paso.",
     "suggest": {
+      "title": "Áreas que pueden encajar con sus respuestas",
+      "note": "Estas son las áreas que podemos identificar a partir de sus respuestas hasta ahora. Algunas necesidades pueden requerir una aclaración o la evaluación de un proveedor.",
+      "none": "No podemos identificar más áreas a partir de sus respuestas hasta ahora. Eso no significa que no se aplique nada más: la evaluación de un proveedor puede aclararlo.",
+      "add": "Añadir estas áreas a mi selección",
       "reasons": {
-        "market": "Vende en {{markets}}",
+        "market": "Vende en o prevé expandirse a {{markets}}",
         "physical": "Vende productos físicos",
         "multiMarket": "Vende productos físicos en más de un país",
         "online": "Vende en línea u ofrece productos digitales",
         "consumersOnline": "Vende a consumidores a través de su propio sitio web",
         "starting": "Su empresa aún se está constituyendo"
       }
+    },
+    "needsCountry": "Añada al menos un país —donde vende hoy o donde prevé expandirse— para que haya algo que evaluar.",
+    "expandConflict": {
+      "text": "Ha elegido «Expandirme a nuevos mercados» como objetivo. Si no prevé expandirse, puede quitar ese objetivo; los demás se mantienen.",
+      "action": "Quitar el objetivo de expansión"
     }
   },
   "marketsDrawer": {

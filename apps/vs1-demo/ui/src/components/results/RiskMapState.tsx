@@ -110,10 +110,12 @@ export function RiskMapTableSkeleton({ rows = 4 }: { rows?: number }) {
  *  checked" darf nichts nennen, was nicht geprueft wurde. "What we tried to
  *  assess" nennt dagegen die Anfrage, wie sie gestellt war. */
 export function scopeOf(
-  profile: { country?: string; markets?: string[]; categories?: string[] },
+  profile: { country?: string; markets?: string[]; categories?: string[]; details?: { plannedMarkets?: string[] } },
   mode: 'requested' | 'checked',
 ): { markets: string[]; areas: string[] } {
-  const requested = [...new Set([profile.country || 'DE', ...(profile.markets ?? [])].filter(Boolean))];
+  // Heutige und geplante Laender; kein stilles 'DE', wenn keines genannt ist.
+  const planned = (profile.details?.plannedMarkets ?? []).filter((m) => /^[A-Z]{2}$/.test(m));
+  const requested = [...new Set([profile.country ?? '', ...(profile.markets ?? []), ...planned].filter(Boolean))];
   return {
     markets: mode === 'checked' ? requested.filter((c) => isKnownCountry(c)) : requested,
     areas: [...new Set((profile.categories ?? []).filter(Boolean))],

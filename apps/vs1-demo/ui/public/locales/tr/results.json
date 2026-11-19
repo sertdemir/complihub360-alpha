@@ -18,7 +18,9 @@
     "titleNoneConfirmed": "Burada daha yakından bakmaya değer.",
     "evidenceCounts": "{{likely}} olası, {{open}} henüz açık.",
     "evidenceOnlyLikely": "{{count}} olası.",
-    "evidenceOnlyOpen": "{{count}} henüz açık."
+    "evidenceOnlyOpen": "{{count}} henüz açık.",
+    "phases": "Bugün: {{current}} · Planlanan: {{planned}}",
+    "phasesPlannedOnly": "Planlanan: {{planned}} · henüz mevcut pazar yok"
   },
   "stats": {
     "0": {
@@ -473,5 +475,6 @@
     "profileBody": "Bu profile aynı pazarda çalışan ancak {{areas}} alanında çalışmayan sağlayıcılardan ulaştınız. Buradan rezervasyon sunulmuyor.",
     "profileBodyGeneric": "Bu profile aynı pazarda çalışan ancak talep ettiğiniz alanda çalışmayan sağlayıcılardan ulaştınız. Buradan rezervasyon sunulmuyor."
   },
-  "outsideTag": "Seçtiğiniz alanların dışında"
+  "outsideTag": "Seçtiğiniz alanların dışında",
+  "plannedTag": "planlanan"
 }

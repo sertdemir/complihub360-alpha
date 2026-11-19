@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateEvidence, factsFromAnswers, EVIDENCE_RULES } from '../evidence';
+import { evaluateEvidence, factsFromAnswers, marketPhases, EVIDENCE_RULES } from '../evidence';
 import { DomainTemplateLibrary } from '../domain-schema';
 import { generateRelevantSubdomains } from '../generator';
 import { ComplianceDomain } from '../domain-schema';
@@ -54,6 +54,35 @@ describe('evidence · scope facts', () => {
 });
 
 // ─── D1 (24.10.2026): die Wizard-v1a-Antworten als Fakten ────────────────────
+describe('evidence · current and planned markets (Core Wizard Handover v1.1)', () => {
+  it('keeps current and planned apart', () => {
+    expect(marketPhases({ country: 'US', markets: ['US'], details: { plannedMarkets: ['DE', 'FR'] } }))
+      .toEqual({ current: ['US'], planned: ['DE', 'FR'] });
+  });
+  it('a country may be both; statuses are not countries', () => {
+    expect(marketPhases({ markets: ['DE'], details: { plannedMarkets: ['DE', 'undecided', 'not-planned'] } }))
+      .toEqual({ current: ['DE'], planned: ['DE'] });
+  });
+  it('the first planned country sent as `country` does not become a current market', () => {
+    expect(marketPhases({ country: 'DE', markets: [], details: { plannedMarkets: ['DE', 'FR'] } }))
+      .toEqual({ current: [], planned: ['DE', 'FR'] });
+  });
+  it('a specific check scope counts as current; "all current" adds nothing; planned stays planned', () => {
+    expect(marketPhases({ markets: ['US'], details: { checkScope: { mode: 'countries', countries: ['UK'] }, plannedMarkets: ['FR'] } }))
+      .toEqual({ current: ['US', 'UK'], planned: ['FR'] });
+    expect(marketPhases({ markets: ['US'], details: { checkScope: { mode: 'all-current', countries: [] } } }))
+      .toEqual({ current: ['US'], planned: [] });
+  });
+  it('planned EU markets reach the facts even when today is US-only', () => {
+    expect(factsFromAnswers({ markets: ['US'] }).eu_market).toBeUndefined();
+    expect(factsFromAnswers({ markets: ['US'], details: { plannedMarkets: ['DE'] } }).eu_market).toBe(true);
+  });
+  it('nothing stated means nothing assessed — no default country', () => {
+    expect(marketPhases({})).toEqual({ current: [], planned: [] });
+    expect(marketPhases(null)).toEqual({ current: [], planned: [] });
+  });
+});
+
 describe('evidence · wizard details (D1)', () => {
   const facts = (details: Record<string, unknown>, markets = ['DE']) => factsFromAnswers({ markets, details });
 

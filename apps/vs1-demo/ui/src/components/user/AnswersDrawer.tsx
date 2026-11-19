@@ -6,7 +6,7 @@ import { Button } from '../ui/Button';
 import { Banner } from '../ui/Banner';
 import {
   STEPS, selectionFromProfile, buildProfile, flowFor, stepDefFor, toggleAnswer, ownMarketsOf, isOthers,
-  COUNTRY_PREFIX, isCountryStep, type StepKey, type StepDef, type CountryStep, type CountryExtras,
+  COUNTRY_PREFIX, isCountryStep, isCountryCard, plannedMarketsOf, type StepKey, type StepDef, type CountryStep, type CountryExtras,
 } from '../home/AnimatedWizard';
 import { WizardDrawerLayer } from '../home/MarketsDrawer';
 import type { SearchProfile } from '../wizard/WizardContext';
@@ -41,7 +41,7 @@ import { FieldError } from '../ui/FieldError';
 
 const GROUPS: Array<{ rail: 'business' | 'markets' | 'domains'; steps: StepKey[] }> = [
   { rail: 'business', steps: ['situation', 'reason', 'offering', 'customers', 'channels'] },
-  { rail: 'markets', steps: ['markets', 'establishment', 'planned', 'stock'] },
+  { rail: 'markets', steps: ['markets', 'establishment', 'planned', 'check', 'expand', 'stock', 'plannedStock'] },
   { rail: 'domains', steps: ['domains', 'eprProducts', 'packaging'] },
 ];
 
@@ -105,13 +105,14 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
   const initialFlow = useMemo(() => flowFor(initial.selected), [initial]);
   const own = ownMarketsOf(selected, extra);
   const initialOwn = useMemo(() => ownMarketsOf(initial.selected, initial.extraMarkets), [initial]);
-  const defOf = (k: StepKey): StepDef => stepDefFor(k, own);
+  const planned = plannedMarketsOf(selected, countryExtras.expand);
+  const defOf = (k: StepKey): StepDef => stepDefFor(k, own, planned);
 
   /** Die gewaehlten Antworten eines Schritts, als Ids (Laender mit Praefix). */
   const picked = (k: StepKey, sel: Set<string>, ownMarkets: string[]) => {
     const ids = isCountryStep(k)
       ? [...sel].filter((id) => id.startsWith(COUNTRY_PREFIX[k]))
-      : stepDefFor(k, ownMarkets).cards.map((c) => c.id).filter((id) => sel.has(id));
+      : stepDefFor(k, ownMarkets, plannedMarketsOf(sel, countryExtras.expand)).cards.map((c) => c.id).filter((id) => sel.has(id));
     return new Set(ids);
   };
   const extrasOf = (k: StepKey, ex: string[], cx: CountryExtras) => (k === 'markets' ? ex : isCountryStep(k) ? cx[k] : []);
@@ -148,10 +149,10 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
     if (isCountryStep(k) && id.startsWith(COUNTRY_PREFIX[k])) {
       const rest = id.slice(COUNTRY_PREFIX[k].length);
       const tail = defOf(k).cards.find((c) => c.id === id);
-      if (tail && tail.key !== 'estMarket' && tail.key !== 'stockMarket') return th(`wizard.cards.${tail.key}.title`);
+      if (tail && !isCountryCard(tail)) return th(`wizard.cards.${tail.key}.title`);
       return countryLabel(rest);
     }
-    const c = stepDefFor(k, own).cards.find((x) => x.id === id) ?? stepDefFor(k, initialOwn).cards.find((x) => x.id === id);
+    const c = stepDefFor(k, own, planned).cards.find((x) => x.id === id) ?? stepDefFor(k, initialOwn, planned).cards.find((x) => x.id === id);
     return c ? th(`wizard.cards.${c.key}.title`) : id;
   };
   const isNotSure = (k: StepKey, id: string) => {
@@ -184,7 +185,7 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
       const n = new Set(prev);
       if (v.length) {
         n.add(COUNTRY_PREFIX[k] + 'Others');
-        for (const x of stepDefFor(k, own).exclusive ?? []) n.delete(x);
+        for (const x of stepDefFor(k, own, planned).exclusive ?? []) n.delete(x);
       } else n.delete(COUNTRY_PREFIX[k] + 'Others');
       return n;
     });
