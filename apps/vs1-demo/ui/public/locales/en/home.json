@@ -532,7 +532,7 @@
         "starting": "Your business is still being set up"
       }
     },
-    "needsCountry": "Add at least one country — where you sell today or plan to expand — so there is something to assess.",
+    "needsCountry": "Add at least one country — where you sell today, plan to expand, or where your business is or will be established — so there is something to assess.",
     "expandConflict": {
       "text": "You chose “Expanding into new markets” as a goal. If you are not planning to expand, you can remove that goal — your other goals stay.",
       "action": "Remove the expansion goal"

@@ -530,7 +530,7 @@
         "starting": "İşletmeniz hâlâ kuruluş aşamasında"
       }
     },
-    "needsCountry": "Değerlendirilecek bir şey olması için en az bir ülke ekleyin — bugün satış yaptığınız veya genişlemeyi planladığınız.",
+    "needsCountry": "Değerlendirilecek bir şey olması için en az bir ülke ekleyin — bugün satış yaptığınız, genişlemeyi planladığınız veya işletmenizin kurulu olduğu ya da kurulacağı ülke.",
     "expandConflict": {
       "text": "Hedef olarak “Yeni pazarlara genişlemek” seçtiniz. Genişlemeyi planlamıyorsanız bu hedefi kaldırabilirsiniz — diğer hedefleriniz kalır.",
       "action": "Genişleme hedefini kaldır"

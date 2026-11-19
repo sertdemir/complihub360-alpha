@@ -594,7 +594,9 @@ export function buildProfile(selected: Set<string>, extraMarkets: string[], extr
       : 'other';
   return {
     // Ohne heutigen Markt das erste geplante Land — nie ein erfundenes.
-    country: markets[0] ?? (details?.plannedMarkets ?? []).find(isCode) ?? '',
+    // Dann der Sitz, dann das geplante Gruendungsland (CW-F05).
+    country: markets[0] ?? (details?.plannedMarkets ?? []).find(isCode)
+      ?? (details?.establishment ?? []).find(isCode) ?? (details?.plannedEstablishment ?? []).find(isCode) ?? '',
     markets,
     categories,
     businessType: channelsAnswered ? derived : ops ? BUSINESS_CODE[ops.id] ?? 'other' : '',
@@ -694,6 +696,7 @@ export function AnimatedWizard({
   onComplete,
   initialProfile,
   initialMarkets,
+  initialStep,
 }: {
   className?: string;
   /** User-driven: click cards to select, Back/Next to move; no auto-play, no cursor. */
@@ -708,6 +711,10 @@ export function AnimatedWizard({
   onComplete?: (profile: SearchProfile) => void;
   /** C6 "Refine existing": pre-selects the cards and opens on the Review step. */
   initialProfile?: SearchProfile;
+  /** Oeffnet auf der Seite mit dieser Frage statt auf der Uebersicht — fuer
+      "Add answer" auf der Risk Map (Feedback CW-F06). Unbekannt oder nicht im
+      Ablauf: die Uebersicht. */
+  initialStep?: string;
   /** Market codes (DE, UK, …) already known from the entry point — a market
       page's CTA passes its own market, so the wizard pre-selects it and skips
       the Markets step going forward instead of asking the question the page
@@ -743,7 +750,9 @@ export function AnimatedWizard({
   // Der aktuelle Schritt als Schluessel, nicht als Index: welche Schritte es
   // gibt, haengt von den Antworten ab (Lager, EPR), ein Index wuerde springen.
   const [stepKey, setStepKey] = useState<StepKey | 'review'>(
-    prefill ? 'review' : interactive ? 'situation' : reduced ? 'domains' : DEMO_FLOW[0],
+    prefill
+      ? (pagesFor(prefill.selected).find((p) => p.includes(initialStep as StepKey))?.[0] ?? 'review')
+      : interactive ? 'situation' : reduced ? 'domains' : DEMO_FLOW[0],
   );
   const [selected, setSelected] = useState<Set<string>>(
     () =>
@@ -815,7 +824,11 @@ export function AnimatedWizard({
   // (Wizard-Audit B12).
   const marketsAnswered = ownMarkets.length > 0 || MARKET_STATUS.some((id) => selected.has(id));
   const needsMarket = interactive && !isReview && page.includes('markets') && !marketsAnswered;
-  const needsCountry = interactive && isReview && ownMarkets.length === 0 && plannedMarkets.length === 0;
+  // Ein Land genuegt, gleich in welcher Rolle: heutiger oder geplanter Markt,
+  // Sitz oder geplantes Gruendungsland — ein Gruender muss keine Expansion
+  // erfinden, um eine Risk Map zu bekommen (Feedback CW-F05).
+  const anyCountry = isReview && buildProfile(selected, extraMarkets, countryExtras).country !== '';
+  const needsCountry = interactive && isReview && !anyCountry;
   const blocked = needsMarket || needsCountry;
   const completedRef = useRef(false);
   const go = (k: StepKey | 'review') => {

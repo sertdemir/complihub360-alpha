@@ -19,7 +19,7 @@ import type { SearchProfile } from '../components/wizard/WizardContext';
 import { Button } from '../components/ui/Button';
 import { Banner } from '../components/ui/Banner';
 import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSnapshot';
-import { ObligationClusters, settledByWizard, type ClusterRow } from '../components/results/ObligationClusters';
+import { ObligationClusters, bestWizardQuestion, type ClusterRow } from '../components/results/ObligationClusters';
 import { OutsideFitProviders, type OutsideProvider } from '../components/results/OutsideFitProviders';
 import { AnswersDrawer } from '../components/user/AnswersDrawer';
 import { MatchBasis } from '../components/user/PartnerCard';
@@ -551,21 +551,32 @@ export function ResultsRiskMap() {
   // eine Map, die man speichern kann, und eine Aussage "what applies to you".
   const hasResult = pageState === 'live' || pageState === 'none';
   const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale, searchData.phases) : [];
-  // "Selling today: US · Planned: DE, FR" — nur, wenn es Geplantes gibt.
+  // Was ausgewertet wurde, nach Rolle getrennt — so wie gefragt (Handover
+  // v1.1, Feedback CW-F03/F05). "Nicht bekannt" ist nicht "noch keine
+  // Verkaeufe", und ein geplantes Gruendungsland ist kein geplanter Markt.
   const phaseLine = (() => {
-    const ph = searchData.phases ?? {};
-    const planned = Object.keys(ph).filter((c) => ph[c] !== 'current');
-    const current = Object.keys(ph).filter((c) => ph[c] !== 'planned');
-    // "Noch nicht entschieden" bleibt sichtbar offen: fuer die Expansion ist
-    // nichts ausgewertet — das ist kein "keine Anforderungen" (Handover v1.1).
-    const asked = (searchData.query as { details?: { plannedMarkets?: string[] } } | null)?.details?.plannedMarkets ?? [];
-    if (!planned.length && asked.includes('undecided')) {
-      return current.length ? t('header.phasesUndecided', { current: current.join(', ') }) : t('header.phasesUndecidedOnly');
-    }
-    if (!planned.length) return '';
-    return current.length
-      ? t('header.phases', { current: current.join(', '), planned: planned.join(', ') })
-      : t('header.phasesPlannedOnly', { planned: planned.join(', ') });
+    const q = searchData.query as { markets?: string[]; details?: { marketsStatus?: string; plannedMarkets?: string[]; establishment?: string[]; plannedEstablishment?: string[] } } | null;
+    const d = q?.details;
+    if (!d) return '';
+    const codes = (xs?: string[]) => (xs ?? []).filter((x) => /^[A-Z]{2}$/.test(x));
+    const current = codes(q?.markets);
+    const planned = codes(d.plannedMarkets);
+    const plannedEst = codes(d.plannedEstablishment);
+    const undecided = (d.plannedMarkets ?? []).includes('undecided');
+    // Ohne Plan und ohne offene Angabe sagt die Zeile nichts Neues.
+    if (!planned.length && !plannedEst.length && !undecided && current.length) return '';
+    const parts = [
+      current.length ? t('header.line.sellingToday', { countries: current.join(', ') })
+        : d.marketsStatus === 'not-yet' ? t('header.line.noSalesYet')
+        : d.marketsStatus === 'not-sure' ? t('header.line.marketsUnknown')
+        : '',
+      !current.length && codes(d.establishment).length ? t('header.line.establishedIn', { countries: codes(d.establishment).join(', ') }) : '',
+      plannedEst.length ? t('header.line.plannedEstablishment', { countries: plannedEst.join(', ') }) : '',
+      planned.length ? t('header.line.plannedMarkets', { countries: planned.join(', ') })
+        : undecided ? t('header.line.plannedUndecided')
+        : '',
+    ].filter(Boolean);
+    return parts.join(' · ');
   })();
   const prioritiesCovered = (p: AnonProvider, settled: ReadonlySet<string>) => prioritiesCoveredBy(liveLaws, rows, p, settled);
   // F1: Stufe je Pflicht aus den Antworten. Aeltere Zustaende ('answer')
@@ -635,7 +646,10 @@ export function ResultsRiskMap() {
   // 5B: Gezaehlt wird nur, was der Knopf auch erreicht. Seit 24.10.2026
   // kennt auch die Antworten-Schublade (gespeicherte Sitzung) alle
   // Wizard-v1a-Fragen — beide Wege erreichen dieselben Fragen.
-  const settles = settledByWizard(clusterRows, { fullWizard: true, profile: searchData.query });
+  // Welche eine Frage am meisten klaert — der Hinweis nennt sie, und der Knopf
+  // oeffnet genau sie statt der Uebersicht (Feedback CW-F06).
+  const bestQuestion = bestWizardQuestion(clusterRows, { fullWizard: true, profile: searchData.query });
+  const settles = bestQuestion.count;
 
   // Zurueck zur Marktwahl: mit gespeicherter Sitzung die Antworten-Schublade,
   // sonst der Wizard (wie "Edit answers" im Snapshot).
@@ -832,6 +846,7 @@ export function ResultsRiskMap() {
             onClose={() => setAnswersOpen(false)}
             sessionId={sessionId}
             sessionLabel={session.label || t('snapshot.fallbackTitle')}
+            focusStep={bestQuestion.step}
             profile={{
               country: session.country ?? '',
               markets: session.markets ?? [],
@@ -1054,12 +1069,17 @@ export function ResultsRiskMap() {
           <div className="mt-10 flex flex-col gap-4 rounded-md bg-brand-light px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-body-md font-semibold text-fg">{t('hint.title')}</p>
-              <p className="mt-0.5 text-body-sm text-fg-secondary">{t('hint.message', { count: settles })}</p>
+              <p className="mt-0.5 text-body-sm text-fg-secondary">
+                {t('hint.message', { count: settles })}
+                {bestQuestion.step && <> {t(`hint.question.${bestQuestion.step}`)}</>}
+              </p>
             </div>
             <Button
               size="md"
               className="shrink-0"
-              onClick={() => (canReviewAnswers ? setAnswersOpen(true) : navigate(`/${locale}/wizard?refine=1`))}
+              onClick={() => (canReviewAnswers
+                ? setAnswersOpen(true)
+                : navigate(`/${locale}/wizard?refine=1${bestQuestion.step ? `&step=${bestQuestion.step}` : ''}`))}
             >
               {t('hint.cta')}
             </Button>

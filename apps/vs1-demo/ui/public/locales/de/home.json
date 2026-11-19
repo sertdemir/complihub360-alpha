@@ -530,7 +530,7 @@
         "starting": "Ihr Unternehmen wird noch aufgebaut"
       }
     },
-    "needsCountry": "Ergänzen Sie mindestens ein Land — einen heutigen oder geplanten Markt —, damit es etwas auszuwerten gibt.",
+    "needsCountry": "Ergänzen Sie mindestens ein Land — einen heutigen oder geplanten Markt oder das Land, in dem Ihr Unternehmen ansässig ist oder gegründet werden soll —, damit es etwas auszuwerten gibt.",
     "expandConflict": {
       "text": "Sie haben „In neue Märkte expandieren“ als Ziel gewählt. Wenn Sie keine Expansion planen, können Sie dieses Ziel entfernen — Ihre anderen Ziele bleiben.",
       "action": "Expansionsziel entfernen"

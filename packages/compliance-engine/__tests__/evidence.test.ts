@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateEvidence, factsFromAnswers, marketPhases, EVIDENCE_RULES } from '../evidence';
+import { evaluateEvidence, factsFromAnswers, marketPhases, countryPhases, EVIDENCE_RULES } from '../evidence';
 import { DomainTemplateLibrary } from '../domain-schema';
 import { generateRelevantSubdomains } from '../generator';
 import { ComplianceDomain } from '../domain-schema';
@@ -77,6 +77,18 @@ describe('evidence · current and planned markets (Core Wizard Handover v1.1)', 
     expect(factsFromAnswers({ markets: ['US'] }).eu_market).toBeUndefined();
     expect(factsFromAnswers({ markets: ['US'], details: { plannedMarkets: ['DE'] } }).eu_market).toBe(true);
   });
+  it('CW-F05: a planned establishment country is assessed as planned — without inventing an expansion', () => {
+    const founder = { country: 'DE', markets: [], details: { marketsStatus: 'not-yet', establishment: ['not-yet'], plannedEstablishment: ['DE'] } };
+    expect(marketPhases(founder)).toEqual({ current: [], planned: [] });
+    expect(countryPhases(founder)).toEqual({ current: [], planned: ['DE'] });
+    // Der Sitz ist kein Verkaufsmarkt: kein eu_market-Fakt aus dem Gruendungsland.
+    expect(factsFromAnswers(founder).eu_market).toBeUndefined();
+  });
+  it('CW-F05: an existing establishment without sales is assessed as current', () => {
+    expect(countryPhases({ country: 'FR', markets: [], details: { establishment: ['FR'] } })).toEqual({ current: ['FR'], planned: [] });
+    expect(countryPhases({ markets: ['US'], details: { establishment: ['US'], plannedMarkets: ['DE'] } })).toEqual({ current: ['US'], planned: ['DE'] });
+  });
+
   it('nothing stated means nothing assessed — no default country', () => {
     expect(marketPhases({})).toEqual({ current: [], planned: [] });
     expect(marketPhases(null)).toEqual({ current: [], planned: [] });

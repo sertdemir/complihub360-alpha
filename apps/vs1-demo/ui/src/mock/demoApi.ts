@@ -1,4 +1,4 @@
-import { isKnownCountry, marketPhases } from '@complihub/compliance-engine';
+import { isKnownCountry, countryPhases } from '@complihub/compliance-engine';
 
 // ─── Demo-Datensatz der Mock-API ─────────────────────────────────────────────
 // Zwei Abnehmer, ein Datensatz:
@@ -508,7 +508,7 @@ function search(body: unknown) {
     : null;
   const requested = (asked as string[] | null) ?? DEFAULT_REQUEST;
   // Wie der Server: heutige und geplante Maerkte getrennt, kein stilles 'DE'.
-  const phases = marketPhases({ markets: req.structured_answers?.markets, country: req.country, details: req.structured_answers?.details });
+  const phases = countryPhases({ markets: req.structured_answers?.markets, country: req.country, details: req.structured_answers?.details });
   const country = typeof req.country === 'string' && req.country ? req.country.toUpperCase() : '';
   const knownMarkets = [...new Set([...phases.current, ...phases.planned])].filter((c) => isKnownCountry(c));
   const market_phase: Record<string, 'current' | 'planned' | 'both'> = {};

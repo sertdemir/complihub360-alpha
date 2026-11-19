@@ -178,8 +178,29 @@ export function marketPhases(answers: { markets?: unknown; country?: unknown; de
     ...(scope.mode === 'countries' ? list(scope.countries) : []),
   ].filter(isCode).map((x) => x.toUpperCase());
   const country = typeof answers.country === 'string' && isCode(answers.country) ? answers.country.toUpperCase() : '';
-  const current = [...new Set([...stated, ...(country && !planned.includes(country) ? [country] : [])])];
+  // `country` ist nur dann ein heutiger Markt, wenn es nicht aus einem Plan
+  // stammt (geplanter Markt, geplantes Gruendungsland) und CW04 nicht
+  // ausdruecklich "noch nicht" oder "nicht sicher" sagt.
+  const plannedEst = list(d.plannedEstablishment).filter(isCode).map((x) => x.toUpperCase());
+  const noSalesStated = d.marketsStatus === 'not-yet' || d.marketsStatus === 'not-sure';
+  const countryIsMarket = country && !planned.includes(country) && !plannedEst.includes(country) && !noSalesStated;
+  const current = [...new Set([...stated, ...(countryIsMarket ? [country] : [])])];
   return { current, planned };
+}
+
+/** Alle Laender, die ausgewertet werden: die Maerkte aus `marketPhases`, dazu
+ *  der Sitz (heute) und das geplante Gruendungsland (geplant). Ein Gruender
+ *  ohne Verkaeufe bekommt so eine Auswertung fuer sein Gruendungsland, ohne
+ *  eine Expansion erfinden zu muessen (Feedback CW-F05, 19.11.2026). Der Sitz
+ *  ist dabei kein Verkaufsmarkt: die Fakten (eu_market, established_in_market)
+ *  rechnen weiter nur mit `marketPhases`. */
+export function countryPhases(answers: { markets?: unknown; country?: unknown; details?: unknown } | null | undefined): { current: string[]; planned: string[] } {
+  const { current, planned } = marketPhases(answers);
+  const d = (answers?.details && typeof answers.details === 'object' && !Array.isArray(answers.details) ? answers.details : {}) as Record<string, unknown>;
+  const codes = (v: unknown) => list(v).filter((x) => /^[A-Za-z]{2}$/.test(x)).map((x) => x.toUpperCase());
+  const plannedAll = [...new Set([...planned, ...codes(d.plannedEstablishment)])];
+  const currentAll = [...new Set([...current, ...codes(d.establishment)])];
+  return { current: currentAll, planned: plannedAll };
 }
 
 const list = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);

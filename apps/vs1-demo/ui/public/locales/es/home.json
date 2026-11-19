@@ -530,7 +530,7 @@
         "starting": "Su empresa aún se está constituyendo"
       }
     },
-    "needsCountry": "Añada al menos un país —donde vende hoy o donde prevé expandirse— para que haya algo que evaluar.",
+    "needsCountry": "Añada al menos un país —donde vende hoy, donde prevé expandirse o donde su empresa está o estará establecida— para que haya algo que evaluar.",
     "expandConflict": {
       "text": "Ha elegido «Expandirme a nuevos mercados» como objetivo. Si no prevé expandirse, puede quitar ese objetivo; los demás se mantienen.",
       "action": "Quitar el objetivo de expansión"

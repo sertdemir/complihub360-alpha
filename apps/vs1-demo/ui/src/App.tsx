@@ -106,6 +106,7 @@ function WizardRoutes() {
             interactive
             initialProfile={initialProfile}
             initialMarkets={market ? market.split(',') : undefined}
+            initialStep={params.get('step') ?? undefined}
             onComplete={(profile) => navigate(`/${locale}/results`, { state: { searchProfile: profile } })}
             className="min-h-screen !rounded-none !border-0"
         />

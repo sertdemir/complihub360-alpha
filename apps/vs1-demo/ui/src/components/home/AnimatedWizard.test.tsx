@@ -85,6 +85,44 @@ describe('AnimatedWizard · pages', () => {
     expect(onComplete).not.toHaveBeenCalled();
   });
 
+  // Feedback CW-F05 (19.11.2026): Gruendung ist nicht Expansion.
+  it('a founder with only a planned establishment country reaches the Risk Map', () => {
+    const { onComplete } = setup();
+    fireEvent.click(card('sitStarting'));
+    nextTimes(2);
+    fireEvent.click(card('mkNotYet'));
+    fireEvent.click(card('estNotYet'));
+    expect(heading('planned')).toBeInTheDocument();
+    fireEvent.click(screen.getAllByText('wizard.cards.others.title')[2].closest('[role="button"]') as HTMLElement);
+    nextTimes(2);
+    // Ohne Land bleibt gesperrt — die Laenderliste ist hier gemockt.
+    expect(generate()).toBeDisabled();
+    const p = buildProfile(new Set(['mk:not-yet', 'est:not-yet', 'plan:Others']), [], { ...emptyExtras(), planned: ['Austria'] });
+    expect(p.country).toBe('AT');
+    expect(p.markets).toEqual([]);
+    expect(p.details?.plannedEstablishment).toEqual(['AT']);
+    expect(p.details?.plannedMarkets).toEqual([]);
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+
+  it('an existing establishment without sales carries the request', () => {
+    const p = buildProfile(new Set(['mk:not-yet', 'est:Others']), [], { ...emptyExtras(), establishment: ['France'] });
+    expect(p.country).toBe('FR');
+    expect(p.details?.marketsStatus).toBe('not-yet');
+  });
+
+  // Feedback CW-F06: "Add answer" oeffnet die Frage, nicht die Uebersicht.
+  it('opens on the page of the question "Add answer" points to', () => {
+    setup({ initialProfile: { markets: ['DE'], categories: ['tax-vat'], details: { situation: 'existing', offering: [], establishment: [], stock: [], eprProducts: [], packaging: [] } } as unknown as SearchProfile, initialStep: 'establishment' });
+    expect(heading('markets')).toBeInTheDocument();
+    expect(heading('establishment')).toBeInTheDocument();
+  });
+
+  it('an unknown step falls back to the review', () => {
+    setup({ initialProfile: { markets: ['DE'], categories: ['tax-vat'] } as SearchProfile, initialStep: 'nonsense' });
+    expect(generate()).toBeInTheDocument();
+  });
+
   it('a market page hands over its market preselected; the page is not skipped', () => {
     setup({ initialMarkets: ['DE'] });
     toFootprint();

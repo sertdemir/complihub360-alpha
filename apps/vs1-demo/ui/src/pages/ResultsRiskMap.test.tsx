@@ -802,7 +802,7 @@ describe('ResultsRiskMap header subtitle', () => {
     runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })],
       market_phase: { US: 'current', DE: 'planned', FR: 'planned' } });
     renderPage();
-    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.phases');
+    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.line.sellingToday · header.line.plannedMarkets');
   });
 
   it('keeps an undecided expansion visibly unresolved — not "no requirements"', async () => {
@@ -810,7 +810,25 @@ describe('ResultsRiskMap header subtitle', () => {
     runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })],
       market_phase: { US: 'current' } });
     renderPage();
-    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.phasesUndecided');
+    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.line.sellingToday · header.line.plannedUndecided');
+  });
+
+  // Feedback CW-F03: "nicht bekannt" ist nicht "noch keine Verkaeufe".
+  it('keeps unknown current markets apart from "no sales yet"', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', markets: [], categories: ['tax-vat'], details: { marketsStatus: 'not-sure', plannedMarkets: ['DE'] } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { DE: 'planned' } });
+    renderPage();
+    const line = await screen.findByTestId('market-phases');
+    expect(line).toHaveTextContent('header.line.marketsUnknown · header.line.plannedMarkets');
+    expect(line).not.toHaveTextContent('header.line.noSalesYet');
+  });
+
+  // Feedback CW-F05: ein geplantes Gruendungsland ist kein geplanter Markt.
+  it('names a planned establishment country as such', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', markets: [], categories: ['corporate-structure'], details: { marketsStatus: 'not-yet', establishment: ['not-yet'], plannedEstablishment: ['DE'], plannedMarkets: [] } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { DE: 'planned' } });
+    renderPage();
+    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.line.noSalesYet · header.line.plannedEstablishment');
   });
 
   it('says nothing about phases when nothing is planned', async () => {
