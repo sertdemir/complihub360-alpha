@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import type { PenaltyCeiling } from '@complihub/compliance-engine';
+import type { PenaltyCeiling, AssessmentRecord } from '@complihub/compliance-engine';
 import { describeCeiling, penaltyText } from '../lib/penaltyCeiling';
 import { cadenceLabel, obligationLabel } from '../lib/obligationText';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
@@ -397,7 +397,7 @@ export function ResultsRiskMap() {
   // `query` haelt fest, womit tatsaechlich gesucht wurde — der Umfang der
   // leeren Zustaende (welche Maerkte geprueft wurden) muss dieselbe Frage
   // beschreiben, nicht das lokale Profil, wenn eine Sitzung es ersetzt hat.
-  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; providersOutside: OutsideProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; phases?: Record<string, 'current' | 'planned' | 'both'>; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
+  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; providersOutside: OutsideProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; phases?: Record<string, 'current' | 'planned' | 'both'>; assessment?: AssessmentRecord; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
@@ -424,7 +424,7 @@ export function ResultsRiskMap() {
     // Engine nicht gerechnet → riskMapFailed mit Referenz, nicht "keine
     // Pflichten" und auch keine Anbieter ohne die Pflichten dazu.
     const laws = lawsOf(res);
-    return { providers: res.providers, providersOutside: res.providers_outside ?? [], laws, coverage: res.coverage, phases: res.market_phase, session, query };
+    return { providers: res.providers, providersOutside: res.providers_outside ?? [], laws, coverage: res.coverage, phases: res.market_phase, assessment: res.assessment, session, query };
   }, { providers: [], providersOutside: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
   // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Bis 2026-09-22
   // stand hier beim Laden und bei einem API-Fehler eine Design-Fixture mit drei
@@ -577,6 +577,37 @@ export function ResultsRiskMap() {
         : '',
     ].filter(Boolean);
     return parts.join(' · ');
+  })();
+  // Pruefumfang und Lager (Feedback CW-F01/F02), aus der Antwort des Servers:
+  // was fuer heute geprueft wurde, was der gewaehlte Umfang auslaesst, und
+  // was zum Lager erfasst, aber nicht ausgewertet ist.
+  const scopeLines = (() => {
+    const a = searchData.assessment;
+    if (!a) return { check: '', storage: '' };
+    const names = (xs: string[]) => xs.join(', ');
+    const check = a.check.mode === 'countries'
+      ? [t('header.scope.checked', { countries: names(a.check.countries) }), a.check.outside.length ? t('header.scope.outside', { countries: names(a.check.outside) }) : ''].filter(Boolean).join(' ')
+      : a.check.mode === 'all-current' && !a.check.current_markets_known ? t('header.scope.allButUnknown')
+      : a.check.mode === 'all-current' && a.assessed.current.length ? t('header.scope.all', { countries: names(a.assessed.current) })
+      : a.check.mode === 'unknown' ? t(a.check.current_markets_known ? 'header.scope.undecided' : 'header.scope.undecidedUnknown')
+      : '';
+    const st = a.storage;
+    const today = st.current.status === 'countries' ? t('header.storage.today', { countries: names(st.current.countries) })
+      : st.current.status === 'none' ? t('header.storage.todayNone')
+      : st.current.status === 'unknown' ? t('header.storage.todayUnknown')
+      : '';
+    const planned = st.planned.status === 'countries' ? t('header.storage.planned', { countries: names(st.planned.countries) })
+      : st.planned.status === 'no-other' ? t('header.storage.plannedNoOther')
+      : st.planned.status === 'undecided' ? t('header.storage.plannedUndecided')
+      : st.planned.status === 'unknown' ? t('header.storage.plannedUnknown')
+      : '';
+    const hasCountries = st.current.countries.length + st.planned.countries.length > 0;
+    const open = st.planned.status === 'undecided' || st.planned.status === 'unknown' || st.current.status === 'unknown';
+    const parts = [today, planned].filter(Boolean);
+    const storage = parts.length
+      ? `${t('header.storage.label')} ${parts.join(' · ')}. ${hasCountries ? t('header.storage.notAssessed') : open ? t('header.storage.open') : ''}`.trim()
+      : '';
+    return { check, storage };
   })();
   const prioritiesCovered = (p: AnonProvider, settled: ReadonlySet<string>) => prioritiesCoveredBy(liveLaws, rows, p, settled);
   // F1: Stufe je Pflicht aus den Antworten. Aeltere Zustaende ('answer')
@@ -1022,6 +1053,12 @@ export function ResultsRiskMap() {
               geplantes Land ersetzt kein heutiges und umgekehrt. */}
           {phaseLine && (
             <p className="mt-1 text-body-md leading-relaxed text-fg-secondary" data-testid="market-phases">{phaseLine}</p>
+          )}
+          {scopeLines.check && (
+            <p className="mt-1 text-body-md leading-relaxed text-fg-secondary" data-testid="check-scope">{scopeLines.check}</p>
+          )}
+          {scopeLines.storage && (
+            <p className="mt-1 text-body-md leading-relaxed text-fg-secondary" data-testid="storage-scope">{scopeLines.storage}</p>
           )}
           {rows.length > 0 && evidenceCounts.likely + evidenceCounts.open > 0 && (
             <p className="mt-1 text-body-md leading-relaxed text-fg-secondary">

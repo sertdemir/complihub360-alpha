@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
-import { isKnownCountry } from '@complihub/compliance-engine';
+import { isKnownCountry, countryPhases } from '@complihub/compliance-engine';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { Accordion, AccordionItem } from '../ui/Accordion';
 import { Button, outlineBrandClass } from '../ui/Button';
@@ -110,15 +110,16 @@ export function RiskMapTableSkeleton({ rows = 4 }: { rows?: number }) {
  *  checked" darf nichts nennen, was nicht geprueft wurde. "What we tried to
  *  assess" nennt dagegen die Anfrage, wie sie gestellt war. */
 export function scopeOf(
-  profile: { country?: string; markets?: string[]; categories?: string[]; details?: { plannedMarkets?: string[]; establishment?: string[]; plannedEstablishment?: string[] } },
+  profile: { country?: string; markets?: string[]; categories?: string[]; details?: unknown },
   mode: 'requested' | 'checked',
 ): { markets: string[]; areas: string[] } {
-  // Heutige und geplante Laender; kein stilles 'DE', wenn keines genannt ist.
-  // Auch Sitz und geplantes Gruendungsland: sie werden mit ausgewertet, und
-  // wo das nicht geht, muss das Land als "nicht geprueft" sichtbar bleiben.
-  const d = profile.details;
-  const planned = [...(d?.plannedMarkets ?? []), ...(d?.establishment ?? []), ...(d?.plannedEstablishment ?? [])].filter((m) => /^[A-Z]{2}$/.test(m));
-  const requested = [...new Set([profile.country ?? '', ...(profile.markets ?? []), ...planned].filter(Boolean))];
+  // Dieselbe Rechnung wie der Server (`countryPhases`): heutige und geplante
+  // Laender, Sitz und geplantes Gruendungsland; kein stilles 'DE', wenn keines
+  // genannt ist. Ein eingegrenzter Pruefumfang (CW-F02) laesst die uebrigen
+  // heutigen Laender aus — sie sind dann weder geprueft noch "nicht
+  // verfuegbar", sondern nicht gefragt.
+  const ph = countryPhases(profile);
+  const requested = [...new Set([...ph.current, ...ph.planned])];
   return {
     markets: mode === 'checked' ? requested.filter((c) => isKnownCountry(c)) : requested,
     areas: [...new Set((profile.categories ?? []).filter(Boolean))],

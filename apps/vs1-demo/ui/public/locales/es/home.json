@@ -509,7 +509,11 @@
       "helpValue": "Ayuda para identificar qué más puedo necesitar",
       "unanswered": "Sin responder",
       "notAssessedTitle": "Aún sin evaluar: {{countries}}",
-      "notAssessedText": "Estos países permanecen en su solicitud. Su Risk Map los marca como no cubiertos; eso no significa que allí no se aplique nada."
+      "notAssessedText": "Estos países permanecen en su solicitud. Su Risk Map los marca como no cubiertos; eso no significa que allí no se aplique nada.",
+      "checkNoMarkets": "aún no se conocen los mercados actuales, por lo que hoy no se revisa nada",
+      "checkOutside": "no forma parte de esta revisión: {{countries}}",
+      "storageTitle": "Las ubicaciones de almacenamiento están registradas, pero aún no se evalúan",
+      "storageText": "Su Risk Map las indica como punto abierto. No afirma nada sobre el almacenamiento allí."
     },
     "skipHint": "¿No está seguro? Elija lo que mejor encaje: puede cambiar cada respuesta antes de crear su mapa.",
     "needsMarket": "Elija dónde vende hoy, o indique que todavía no vende.",

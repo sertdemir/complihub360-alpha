@@ -1,4 +1,4 @@
-import { isKnownCountry, countryPhases } from '@complihub/compliance-engine';
+import { isKnownCountry, countryPhases, assessmentOf } from '@complihub/compliance-engine';
 
 // ─── Demo-Datensatz der Mock-API ─────────────────────────────────────────────
 // Zwei Abnehmer, ein Datensatz:
@@ -550,7 +550,7 @@ function search(body: unknown) {
   const outside = matching.length ? [] : providers
     .filter((p) => p.match_basis.country_covered)
     .map(({ match: _m, match_tier: _t, price_range: _pr, timeline_days: _td, ...rest }, j) => ({ ...rest, title: `Verified Provider ${LETTER(j)}`, letter: LETTER(j) }));
-  return { ok: true, providers: matching, providers_outside: outside, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered }, market_phase };
+  return { ok: true, providers: matching, providers_outside: outside, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered }, market_phase, assessment: assessmentOf({ markets: req.structured_answers?.markets, country: req.country, details: req.structured_answers?.details }) };
 }
 
 type MockDetail = {

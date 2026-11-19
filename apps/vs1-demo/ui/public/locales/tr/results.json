@@ -27,6 +27,26 @@
       "plannedEstablishment": "Planlanan kuruluş: {{countries}}",
       "plannedMarkets": "Planlanan: {{countries}}",
       "plannedUndecided": "Planlanan genişleme: henüz karar verilmedi, bu yüzden bunun için bir değerlendirme yapılmadı"
+    },
+    "scope": {
+      "checked": "Bugün için kontrol edildi: {{countries}}, seçtiğiniz gibi.",
+      "outside": "Bu kontrolün parçası değil: {{countries}}.",
+      "allButUnknown": "Tüm mevcut pazarların kontrol edilmesini istediniz. Henüz hiçbiri bilinmiyor, bu nedenle bugün için hiçbir şey kontrol edilmiyor.",
+      "undecided": "Kontrol kapsamı henüz kararlaştırılmadı: tüm mevcut pazarlar gösteriliyor.",
+      "undecidedUnknown": "Kontrol kapsamı henüz kararlaştırılmadı ve bilinen mevcut pazar yok: bugün için hiçbir şey kontrol edilmiyor.",
+      "all": "Bugün için kontrol edildi: tüm mevcut pazarlarınız ({{countries}})."
+    },
+    "storage": {
+      "label": "Depolama —",
+      "today": "bugün: {{countries}}",
+      "todayNone": "bugün: yok",
+      "todayUnknown": "bugün: bilinmiyor",
+      "planned": "planlanan: {{countries}}",
+      "plannedNoOther": "planlanan: başka bir ülkede yok",
+      "plannedUndecided": "planlanan: henüz kararlaştırılmadı",
+      "plannedUnknown": "planlanan: bilinmiyor",
+      "notAssessed": "Depolama yerleri kaydedildi, ancak henüz değerlendirilmiyor; bu Risk Map bunlar hakkında bir beyanda bulunmaz.",
+      "open": "Bu nokta açık kalır."
     }
   },
   "stats": {
