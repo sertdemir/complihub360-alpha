@@ -507,7 +507,9 @@
       "plannedStock": "Existencias previstas",
       "help": "Solicitud de ayuda",
       "helpValue": "Ayuda para identificar qué más puedo necesitar",
-      "unanswered": "Sin responder"
+      "unanswered": "Sin responder",
+      "notAssessedTitle": "Aún sin evaluar: {{countries}}",
+      "notAssessedText": "Estos países permanecen en su solicitud. Su Risk Map los marca como no cubiertos; eso no significa que allí no se aplique nada."
     },
     "skipHint": "¿No está seguro? Elija lo que mejor encaje: puede cambiar cada respuesta antes de crear su mapa.",
     "needsMarket": "Elija dónde vende hoy, o indique que todavía no vende.",
@@ -606,7 +608,9 @@
       "footNote": "Solo se usa para esta respuesta: sus mercados no cambian.",
       "header": "Países",
       "count": "{{selected}} seleccionados · {{total}} países"
-    }
+    },
+    "allOthers": "Todos los demás países",
+    "allOthersNote": "Aún no los evaluamos. Puede añadirlos igualmente: permanecen en su solicitud y su Risk Map los marca como no cubiertos."
   },
   "countryInfo": {
     "header": "Mercado",

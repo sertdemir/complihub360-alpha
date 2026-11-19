@@ -30,6 +30,8 @@ import { WizardDrawerLayer, COUNTRY_INFO } from './MarketsDrawer';
 import type { SearchProfile, WizardCategory, BusinessType, WizardDetails } from '../wizard/WizardContext';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { isCountryCode, countryName } from '../../lib/countries';
+import { isKnownCountry } from '@complihub/compliance-engine';
 import { track } from '../../lib/analytics';
 
 // ─── AnimatedWizard — auto-playing hero key-visual ───────────────────────────
@@ -935,7 +937,11 @@ export function AnimatedWizard({
   );
 
   // Drawer market ids are single words, so the i18n key is just the lowercase id.
-  const marketLabel = (id: string) => t(`marketsDrawer.markets.${id.toLowerCase()}.name`, { defaultValue: id });
+  // Benannte Listenlaender haben einen Eintrag in den Sprachdateien; alle
+  // uebrigen Staaten tragen ihre ISO-Kennung als Id (CW-F03).
+  const marketLabel = (id: string) => (isCountryCode(id)
+    ? countryName(id, i18n.resolvedLanguage || 'en')
+    : t(`marketsDrawer.markets.${id.toLowerCase()}.name`, { defaultValue: id }));
   /** Landesname fuer Karten-Id (Germany) oder Drawer-Id (Switzerland). */
   const countryLabel = (name: string) => {
     const card = MARKETS.cards.find((c) => c.id === name);
@@ -951,6 +957,16 @@ export function AnimatedWizard({
   const allMarkets = [...new Set([...ownMarkets, ...plannedMarkets])];
   const allMarketsLabel = allMarkets.map(countryLabel).join(', ');
   const openSuggestions = suggestedAreas(selected, allMarkets).filter((x) => !selected.has(x.id));
+  // Laender, die erfasst, aber noch nicht ausgewertet werden (CW-F03): sie
+  // bleiben in der Anfrage und stehen in der Uebersicht ausdruecklich da.
+  const notAssessed = (() => {
+    if (!interactive || !isReview) return [];
+    const p = buildProfile(selected, extraMarkets, countryExtras);
+    const d = p.details;
+    const codes = [...p.markets, ...(d?.plannedMarkets ?? []), ...(d?.establishment ?? []), ...(d?.plannedEstablishment ?? [])]
+      .filter(isCountryCode);
+    return [...new Set(codes)].filter((c) => !isKnownCountry(c));
+  })();
   const removeExpansionGoal = () => {
     const nextKey = pages[pageIndex + 1]?.[0] ?? 'review';
     setSelected((prev) => { const n = new Set(prev); n.delete('rsn:expansion'); return n; });
@@ -1107,6 +1123,14 @@ export function AnimatedWizard({
                   <SummaryRow key={r.id} label={r.label} value={r.value} onEdit={() => go(r.edit)} />
                 ))}
               </div>
+              {notAssessed.length > 0 && (
+                <div className="mt-6 rounded-md bg-brand-light px-5 py-4" data-testid="not-assessed">
+                  <p className="text-body-md font-semibold text-fg">
+                    {t('wizard.review.notAssessedTitle', { countries: notAssessed.map((c) => countryName(c, i18n.resolvedLanguage || 'en')).join(', ') })}
+                  </p>
+                  <p className="mt-0.5 text-body-sm text-fg-secondary">{t('wizard.review.notAssessedText')}</p>
+                </div>
+              )}
               <p className="mt-8 text-left text-body-sm text-fg-tertiary">
                 {t('wizard.review.trust')}
               </p>

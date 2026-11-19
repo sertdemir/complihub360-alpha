@@ -507,7 +507,9 @@
       "plannedStock": "Planlanan stok",
       "help": "Yardım talebi",
       "helpValue": "Başka neye ihtiyacım olabileceğini belirleme yardımı",
-      "unanswered": "Yanıtlanmadı"
+      "unanswered": "Yanıtlanmadı",
+      "notAssessedTitle": "Henüz değerlendirilmeyen: {{countries}}",
+      "notAssessedText": "Bu ülkeler talebinizde kalır. Risk Map'iniz bunları kapsanmıyor olarak gösterir — bu, orada hiçbir şeyin geçerli olmadığı anlamına gelmez."
     },
     "skipHint": "Emin değil misiniz? En uygun olanı seçin — haritanızı oluşturmadan önce her yanıtı değiştirebilirsiniz.",
     "needsMarket": "Bugün nerede satış yaptığınızı seçin — ya da henüz satış yapmadığınızı belirtin.",
@@ -606,7 +608,9 @@
       "footNote": "Yalnızca bu yanıt için kullanılır — pazarlarınız değişmez.",
       "header": "Ülkeler",
       "count": "{{selected}} seçildi · {{total}} ülke"
-    }
+    },
+    "allOthers": "Diğer tüm ülkeler",
+    "allOthersNote": "Bunları henüz değerlendirmiyoruz. Yine de ekleyebilirsiniz: talebinizde kalırlar ve Risk Map'iniz bunları kapsanmıyor olarak gösterir."
   },
   "countryInfo": {
     "header": "Pazar",

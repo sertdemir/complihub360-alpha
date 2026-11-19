@@ -9,6 +9,7 @@ import {
   COUNTRY_PREFIX, isCountryStep, isCountryCard, plannedMarketsOf, type StepKey, type StepDef, type CountryStep, type CountryExtras,
 } from '../home/AnimatedWizard';
 import { WizardDrawerLayer } from '../home/MarketsDrawer';
+import { isCountryCode, countryName } from '../../lib/countries';
 import type { SearchProfile } from '../wizard/WizardContext';
 import { updateSessionAnswers } from '../../api/sessions';
 import { FormErrorSummary, focusField, type FormError } from '../ui/FormErrorSummary';
@@ -64,7 +65,7 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
   focusStep?: StepKey | null;
 }) {
   const { t } = useTranslation('userws');
-  const { t: th } = useTranslation('home');
+  const { t: th, i18n } = useTranslation('home');
 
   // Ausgangsstand aus dem Profil — derselbe Weg, den der Wizard fuer
   // "Refine existing" nimmt, damit beide dieselben Karten treffen.
@@ -145,7 +146,8 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
   // Landesname fuer Karten-Id (Germany) oder Drawer-Id (Switzerland).
   const countryLabel = (name: string) => {
     const card = STEPS[0].cards.find((c) => c.id === name);
-    return card ? th(`wizard.cards.${card.key}.title`) : th(`marketsDrawer.markets.${name.toLowerCase()}.name`, { defaultValue: name });
+    if (card) return th(`wizard.cards.${card.key}.title`);
+    return isCountryCode(name) ? countryName(name, i18n.resolvedLanguage || 'en') : th(`marketsDrawer.markets.${name.toLowerCase()}.name`, { defaultValue: name });
   };
   const cardLabel = (k: StepKey, id: string) => {
     if (isCountryStep(k) && id.startsWith(COUNTRY_PREFIX[k])) {
