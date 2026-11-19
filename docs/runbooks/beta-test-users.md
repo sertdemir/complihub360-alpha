@@ -14,8 +14,17 @@ Die Test-Provider beschreibt [beta-test-providers.md](beta-test-providers.md).
 - Adresse `<lokal>+<label>-uNN@<domain>`, also z. B.
   `demet+halime-u01@complihub360.com`. Alle Mails landen im Postfach der
   Mitgründerin.
-- Mail **bereits bestätigt**, Login mit Passwort, keine Rolle. Die
-  Beta-Vereinbarung kommt beim ersten Login wie bei jedem neuen Konto.
+- Mail **bereits bestätigt**, keine Rolle. Die Beta-Vereinbarung kommt beim
+  ersten Login wie bei jedem neuen Konto.
+- **Anmeldung per Anmeldelink.** Nutzer melden sich in der Oberfläche nur per
+  Magic Link an (Reiter „Unternehmen“); das Passwort aus `--apply` nutzt die
+  Oberfläche nicht. Für einen Agenten im Browser: Der Agent fordert den Link
+  an, ein Mensch kopiert ihn aus dem Postfach und fügt ihn im Übernahme-Modus
+  in den Agenten-Browser ein. Das geht, weil der Link über `token_hash` in
+  jedem Browser funktioniert. Wer den Link selbst anklickt, meldet den
+  eigenen Browser an und verbraucht ihn.
+- Die vorab angelegten Konten bleiben trotzdem sinnvoll: Sie tragen die
+  Markierung, über die `--remove` sie wiederfindet.
 - Ein gemeinsames Passwort je Label, verdeckt abgefragt.
 - Markierung `app_metadata.test_label = <label>`. Darüber findet `--remove`
   die Konten wieder, nie über die Adresse allein.
@@ -75,7 +84,7 @@ STAGING_SSH_HOST=vps ./scripts/beta-pass.sh remove halime   # entzieht ihn sofor
 | Was | Wert |
 |---|---|
 | Wand | Zugangslink `halime` (`beta-pass.sh`), für Menschen zusätzlich der Basic-Auth-Zugang `halime` |
-| Nutzer | `demet+halime-u01..u03@complihub360.com`, Passwort `Beta Halime · Nutzer` |
+| Nutzer | `demet+halime-u01..u03@complihub360.com`, Anmeldung per Anmeldelink (Demet kopiert ihn aus dem Postfach) |
 | Provider | `demet+p21..p25@complihub360.com`, gemeinsames Passwort `Beta Test-Provider · gemeinsam`. `p01` bis `p20` bleiben bei der Mitgründerin. |
 | Admin | keiner |
 
