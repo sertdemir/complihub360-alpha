@@ -144,7 +144,15 @@ gehört weder ins Repo noch in den Vault.
 Geprobt am 10.10.2026 lokal (PG 16):
 - dump, verschlüsseln, entschlüsseln und einspielen laufen durch
 - ohne Schlüssel verweigert das Skript
-- **Offen:** eine Probe gegen das echte Beta-Projekt nach Schritt 6
+
+Geprobt am 24.10.2026 gegen das echte Beta-Projekt:
+- erste Sicherung vom VPS (`beta-20261024-2159.dump.age`, 2,2 MB, Cron `45 3 * * *`)
+- auf dem Mac entschlüsselt und in einen Wegwerf-Cluster eingespielt
+  (brew `postgresql@17`, ohne Docker; vollständiges `pg_restore` in eine leere
+  Datenbank, nicht der Weg über ein neues Supabase-Projekt aus Schritt 1–3)
+- 91 Tabellen mit Daten, 0 Fehler; Stichprobe `auth.users` / `providers` /
+  `scheduling` = 28 / 25 / 2, deckungsgleich mit der Live-Beta
+- danach alles gelöscht
 
 ## Gefunden beim Vorbereiten
 
