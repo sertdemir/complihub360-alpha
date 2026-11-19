@@ -51,17 +51,16 @@ vorkommt, notiere sie als **„Frage an einen Menschen"**, nicht als Fehler.
   du trotzdem ein Anmeldefenster des Browsers, brich ab und sag Demet Bescheid.
 - **Nutzerkonten:** `demet+halime-u01@complihub360.com`,
   `demet+halime-u02@complihub360.com`, `demet+halime-u03@complihub360.com`.
-  Nutzer melden sich **per Anmeldelink** an, nicht mit Passwort:
-  1. Unter „Anmelden", Reiter „Unternehmen", die Adresse eingeben und den Link
-     anfordern. Dann **anhalten** und Demet Bescheid geben.
-  2. Demet öffnet die Mail in ihrem Postfach, klickt den Link **nicht** an,
-     sondern kopiert die Link-Adresse.
-  3. Demet übernimmt deinen Browser, fügt die Adresse in die Adresszeile ein
-     und gibt die Steuerung zurück. Du bist angemeldet.
+  **So meldest du dich als Nutzer an (Testweg):** unter „Anmelden" den Reiter
+  **„Anbieter"** wählen und mit Adresse und Passwort anmelden. Die Seite
+  erkennt, dass es ein Nutzerkonto ist, und leitet in den Nutzerbereich
+  weiter. An der Seite ist dafür nichts geändert, der Weg steht jedem Konto
+  mit Passwort offen. Dass du dafür den Reiter „Anbieter" nimmst, ist **kein
+  Befund**.
 
-  Der Link gilt nur einmal und nur kurz. Ist er abgelaufen, einen neuen
-  anfordern. Die Beta-Vereinbarung für die Halime-Konten anzunehmen ist
-  ausdrücklich vorgesehen und braucht keine weitere Freigabe.
+  Den Anmeldelink (Reiter „Unternehmen") prüfen Menschen getrennt. Die
+  Beta-Vereinbarung für die Halime-Konten anzunehmen ist ausdrücklich
+  vorgesehen und braucht keine weitere Freigabe.
 - **Provider-Konten:** `demet+p21@complihub360.com` bis
   `demet+p25@complihub360.com`. Anmelden unter „Anmelden", Reiter „Anbieter" (englisch „Provider"),
   mit Adresse und Passwort.
@@ -118,7 +117,7 @@ Ein Lauf ist eine Sitzung. Nach jedem Lauf den Bericht abschließen.
    heißt „Sofort" (englisch „Immediate"), nie „Dringend" oder „Urgent".
    Kein Countdown.
 4. Provider als Gast: Treffer sichtbar, aber **ohne** Name, Logo oder Link.
-5. Jetzt anmelden mit `halime-u01`, per Anmeldelink (Abschnitt 3). Beim
+5. Jetzt anmelden mit `halime-u01`, über den Testweg (Abschnitt 3). Beim
    ersten Login kommt die
    **Beta-Vereinbarung**: ein Blatt mit neun Sätzen. Einmal ohne Haken
    weiter klicken (Hinweis ohne Vorwurf?), dann mit Haken.
@@ -135,7 +134,7 @@ Ein Lauf ist eine Sitzung. Nach jedem Lauf den Bericht abschließen.
 11. Die übrigen Bereiche öffnen: Bibliothek, Hinweise, Benachrichtigungen,
     gemerkte Provider, Anfragen, Kalender. Leere Zustände verständlich?
     Platzhalter oder Fantasietexte?
-12. Abmelden, wieder anmelden (neuer Anmeldelink): Die Vereinbarung darf **nicht** noch einmal
+12. Abmelden, wieder anmelden (Testweg): Die Vereinbarung darf **nicht** noch einmal
     kommen.
 
 ### Lauf 2 · Nutzer, Englisch (Konto `halime-u02`, Persona P2)
