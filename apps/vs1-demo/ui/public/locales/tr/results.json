@@ -19,10 +19,15 @@
     "evidenceCounts": "{{likely}} olası, {{open}} henüz açık.",
     "evidenceOnlyLikely": "{{count}} olası.",
     "evidenceOnlyOpen": "{{count}} henüz açık.",
-    "phases": "Bugün: {{current}} · Planlanan: {{planned}}",
-    "phasesPlannedOnly": "Planlanan: {{planned}} · henüz mevcut pazar yok",
-    "phasesUndecided": "Bugün: {{current}} · Planlanan genişleme: henüz karar verilmedi, bu yüzden bunun için bir değerlendirme yapılmadı",
-    "phasesUndecidedOnly": "Planlanan genişleme: henüz karar verilmedi, bu yüzden bunun için bir değerlendirme yapılmadı"
+    "line": {
+      "sellingToday": "Bugün: {{countries}}",
+      "noSalesYet": "Henüz satış yok",
+      "marketsUnknown": "Mevcut pazarlar: bilinmiyor",
+      "establishedIn": "Kuruluş yeri: {{countries}}",
+      "plannedEstablishment": "Planlanan kuruluş: {{countries}}",
+      "plannedMarkets": "Planlanan: {{countries}}",
+      "plannedUndecided": "Planlanan genişleme: henüz karar verilmedi, bu yüzden bunun için bir değerlendirme yapılmadı"
+    }
   },
   "stats": {
     "0": {
@@ -466,7 +471,13 @@
     "title": "Tek bir yanıt risk haritanızı netleştirir",
     "message_one": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
     "message_other": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
-    "cta": "Yanıt ekle"
+    "cta": "Yanıt ekle",
+    "question": {
+      "customers": "Soru: kime ve nasıl satış yaptığınız.",
+      "offering": "Soru: ne sattığınız veya sunduğunuz.",
+      "establishment": "Soru: işletmenizin nerede kurulu olduğu.",
+      "eprProducts": "Soru: hangi ürünleri sattığınız."
+    }
   },
   "outside": {
     "title": "{{market}} pazarında diğer alanlar için Verified Provider’lar",

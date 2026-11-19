@@ -19,10 +19,15 @@
     "evidenceCounts": "{{likely}} wahrscheinlich, {{open}} noch offen.",
     "evidenceOnlyLikely": "{{count}} wahrscheinlich.",
     "evidenceOnlyOpen": "{{count}} noch offen.",
-    "phases": "Heute: {{current}} · Geplant: {{planned}}",
-    "phasesPlannedOnly": "Geplant: {{planned}} · noch keine heutigen Märkte",
-    "phasesUndecided": "Heute: {{current}} · Geplante Expansion: noch nicht entschieden, dafür ist deshalb nichts ausgewertet",
-    "phasesUndecidedOnly": "Geplante Expansion: noch nicht entschieden, dafür ist deshalb nichts ausgewertet"
+    "line": {
+      "sellingToday": "Heute: {{countries}}",
+      "noSalesYet": "Noch keine Verkäufe",
+      "marketsUnknown": "Heutige Märkte: nicht bekannt",
+      "establishedIn": "Ansässig in: {{countries}}",
+      "plannedEstablishment": "Geplante Gründung: {{countries}}",
+      "plannedMarkets": "Geplant: {{countries}}",
+      "plannedUndecided": "Geplante Expansion: noch nicht entschieden, dafür ist deshalb nichts ausgewertet"
+    }
   },
   "stats": {
     "0": {
@@ -466,7 +471,13 @@
     "title": "Eine Angabe macht Ihre Risk Map genauer",
     "message_one": "Damit klärt sich {{count}} Pflicht, deren Relevanz noch offen ist. Dauert wenige Sekunden.",
     "message_other": "Damit klären sich {{count}} Pflichten, deren Relevanz noch offen ist. Dauert wenige Sekunden.",
-    "cta": "Angabe ergänzen"
+    "cta": "Angabe ergänzen",
+    "question": {
+      "customers": "Die Frage: an wen und wie Sie verkaufen.",
+      "offering": "Die Frage: was Sie verkaufen oder anbieten.",
+      "establishment": "Die Frage: wo Ihr Unternehmen ansässig ist.",
+      "eprProducts": "Die Frage: welche Produkte Sie verkaufen."
+    }
   },
   "outside": {
     "title": "Verified Provider in {{market}} für andere Bereiche",

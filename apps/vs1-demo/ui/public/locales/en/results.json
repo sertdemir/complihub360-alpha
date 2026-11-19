@@ -19,10 +19,15 @@
     "evidenceCounts": "{{likely}} likely, {{open}} still open.",
     "evidenceOnlyLikely": "{{count}} likely.",
     "evidenceOnlyOpen": "{{count}} still open.",
-    "phases": "Selling today: {{current}} · Planned: {{planned}}",
-    "phasesPlannedOnly": "Planned: {{planned}} · no current markets yet",
-    "phasesUndecided": "Selling today: {{current}} · Planned expansion: not decided yet, so nothing is assessed for it",
-    "phasesUndecidedOnly": "Planned expansion: not decided yet, so nothing is assessed for it"
+    "line": {
+      "sellingToday": "Selling today: {{countries}}",
+      "noSalesYet": "No current sales yet",
+      "marketsUnknown": "Current markets: not known",
+      "establishedIn": "Established in: {{countries}}",
+      "plannedEstablishment": "Planned establishment: {{countries}}",
+      "plannedMarkets": "Planned: {{countries}}",
+      "plannedUndecided": "Planned expansion: not decided yet, so nothing is assessed for it"
+    }
   },
   "stats": {
     "0": {
@@ -508,7 +513,13 @@
     "title": "One answer makes your risk map more precise",
     "message_one": "It settles {{count}} obligation whose relevance is still open. Takes a few seconds.",
     "message_other": "It settles {{count}} obligations whose relevance is still open. Takes a few seconds.",
-    "cta": "Add answer"
+    "cta": "Add answer",
+    "question": {
+      "customers": "The question: who you sell to and how.",
+      "offering": "The question: what you sell or provide.",
+      "establishment": "The question: where your business is established.",
+      "eprProducts": "The question: which products you sell."
+    }
   },
   "outside": {
     "title": "Verified Providers in {{market}} for other areas",

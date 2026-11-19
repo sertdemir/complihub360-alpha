@@ -187,21 +187,35 @@ type AnswerContext = {
   profile?: { categories?: string[]; details?: { establishment?: string[] } } | null;
 };
 
-function answerableQuestions({ fullWizard = false, profile }: AnswerContext): Array<Set<string>> {
-  const questions = [WIZARD_ANSWERABLE];
+/** Die Wizard-Frage, die einen Fakt klaert — damit "Add answer" genau sie oeffnet. */
+export type AnswerStep = 'customers' | 'offering' | 'establishment' | 'eprProducts';
+type Question = { facts: Set<string>; step: AnswerStep };
+
+function answerableQuestions({ fullWizard = false, profile }: AnswerContext): Question[] {
+  const questions: Question[] = [{ facts: WIZARD_ANSWERABLE, step: 'customers' }];
   if (!fullWizard) return questions;
   // Angebot (S04) fragt der Wizard immer.
-  questions.push(new Set(['physical_goods']));
+  questions.push({ facts: new Set(['physical_goods']), step: 'offering' });
   // Sitz (S03) nur, solange er offen ist: bei teilweiser Ueberdeckung bleibt
   // der Fakt nach der Antwort unbekannt, der Hinweis stuende fuer immer da.
-  if (!profile?.details?.establishment?.length) questions.push(new Set(['established_in_market']));
+  if (!profile?.details?.establishment?.length) questions.push({ facts: new Set(['established_in_market']), step: 'establishment' });
   // EPR 1/2 stellt der Wizard nur mit EPR & Packaging.
-  if (profile?.categories?.includes('product-packaging')) questions.push(new Set(['electronics', 'batteries']));
+  if (profile?.categories?.includes('product-packaging')) questions.push({ facts: new Set(['electronics', 'batteries']), step: 'eprProducts' });
   return questions;
 }
 
 /** Wie viele Pflichten die eine Antwort klaeren wuerde, die am meisten klaert. */
 export function settledByWizard(rows: ClusterRow[], ctx: AnswerContext = {}): number {
+  return bestWizardQuestion(rows, ctx).count;
+}
+
+/** Die eine Frage, deren Antwort am meisten klaert, und wie viele Pflichten sie klaert. */
+export function bestWizardQuestion(rows: ClusterRow[], ctx: AnswerContext = {}): { count: number; step: AnswerStep | null } {
   const pending = rows.filter((r) => r.evidence !== 'confirmed');
-  return Math.max(0, ...answerableQuestions(ctx).map((q) => pending.filter((r) => r.decides.some((k) => q.has(k))).length));
+  let best: { count: number; step: AnswerStep | null } = { count: 0, step: null };
+  for (const q of answerableQuestions(ctx)) {
+    const count = pending.filter((r) => r.decides.some((k) => q.facts.has(k))).length;
+    if (count > best.count) best = { count, step: q.step };
+  }
+  return best;
 }

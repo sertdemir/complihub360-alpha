@@ -7,7 +7,7 @@ import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
-import { generateRelevantSubdomains, factsFromAnswers, marketPhases, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
+import { generateRelevantSubdomains, factsFromAnswers, countryPhases, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
@@ -3409,7 +3409,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 // US als heute und DE/FR als geplant — nicht nur US. Kein
                 // stilles 'DE' mehr, wenn gar kein Land genannt ist: dann gibt
                 // es keine Gesetze statt deutscher.
-                const phases = marketPhases({
+                // Dazu Sitz und geplantes Gruendungsland (CW-F05): ein Gruender
+                // ohne Verkaeufe bekommt eine Auswertung fuer sein Gruendungsland.
+                const phases = countryPhases({
                     markets: requestData.structured_answers?.markets,
                     country: requestData.country,
                     details: requestData.structured_answers?.details,

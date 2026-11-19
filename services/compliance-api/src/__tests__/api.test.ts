@@ -526,6 +526,17 @@ describe('POST /api/v1/search', () => {
         expect(r.body.market_phase).toEqual({ DE: 'planned' });
     });
 
+    // Feedback CW-F05 (19.11.2026): ein Gruender ohne Verkaeufe.
+    it('a planned establishment country is assessed as planned, without an invented expansion', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: [], domains: ['corporate-structure'], details: { marketsStatus: 'not-yet', establishment: ['not-yet'], plannedEstablishment: ['DE'], plannedMarkets: [] } } }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.market_phase).toEqual({ DE: 'planned' });
+        expect(r.body.laws.length).toBeGreaterThan(0);
+    });
+
     it('no country at all: no laws — and no silent German fallback', async () => {
         const r = await api('/api/v1/search', {
             method: 'POST',

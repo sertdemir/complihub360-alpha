@@ -51,7 +51,7 @@ function sameSet(a: Set<string>, b: Set<string>): boolean {
   return true;
 }
 
-export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile, onSaved }: {
+export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile, onSaved, focusStep }: {
   open: boolean;
   onClose: () => void;
   sessionId: string;
@@ -60,6 +60,8 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
   profile: Partial<SearchProfile>;
   /** Nach erfolgreichem Speichern: der Aufrufer laedt die Ergebnisse neu. */
   onSaved: () => void;
+  /** Diese Frage ist beim Oeffnen aufgeklappt — fuer "Add answer" (CW-F06). */
+  focusStep?: StepKey | null;
 }) {
   const { t } = useTranslation('userws');
   const { t: th } = useTranslation('home');
@@ -95,11 +97,11 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
     setSelected(new Set(initial.selected));
     setExtra(initial.extraMarkets);
     setCountryExtras(initial.countryExtras);
-    setOpenStep(null);
+    setOpenStep(focusStep && flowFor(initial.selected).includes(focusStep) ? focusStep : null);
     setDrawerFor(null);
     setState('idle');
     setTried(false);
-  }, [open, initial]);
+  }, [open, initial, focusStep]);
 
   const flow = flowFor(selected);
   const initialFlow = useMemo(() => flowFor(initial.selected), [initial]);
