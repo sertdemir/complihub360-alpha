@@ -4,7 +4,8 @@
 # reused from /docker/complihub-api/.env):
 #
 #  1. Availability (state-change alerts, incl. recovery):
-#     ui        — https://staging.complihub360.com answers 401 (auth wall)
+#     ui        — https://staging.complihub360.com answers 2xx (the wall is off
+#                 since 30.08.2026; the beta keeps its wall, see beta_ui)
 #     api       — /health inside the api container says ok:true
 #     supabase  — REST answers 200 (credentials from complihub-backup/.env)
 #     containers— complihub-api-api-1 + complihub-web-1 + traefik running
@@ -61,7 +62,7 @@ fi
 declare -A NOW DETAIL
 
 CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://staging.complihub360.com/ || echo 000)
-[ "$CODE" = "401" ] && NOW[ui]=OK || { NOW[ui]=FAIL; DETAIL[ui]="HTTP $CODE (expected 401 auth wall)"; }
+case "$CODE" in 2??) NOW[ui]=OK ;; *) NOW[ui]=FAIL; DETAIL[ui]="HTTP $CODE (expected 2xx)" ;; esac
 
 HEALTH=$(docker exec complihub-api-api-1 wget -qO- -T 15 http://localhost:3005/health 2>/dev/null || true)
 echo "$HEALTH" | grep -q '"ok":true' && NOW[api]=OK || { NOW[api]=FAIL; DETAIL[api]="health: ${HEALTH:-no response}"; }

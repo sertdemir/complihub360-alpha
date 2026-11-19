@@ -85,10 +85,11 @@ Dazu läuft `alert-watchdog.sh` alle 5 Minuten. Er prüft `beta_ui` (401) und
 
 ## Gesehen beim Einrichten
 
-`alert-watchdog.sh` erwartet für **Staging** weiter `401`. Die Wand dort ist
-aber seit dem 30.08. abgenommen (`deploy-staging.yml`, verify). Er dürfte
-`ui` also dauerhaft als FAIL führen. Weil er nur bei Zustandswechseln mailt,
-fällt das nicht auf. Das ist nicht Teil dieses Schritts.
+`alert-watchdog.sh` erwartete für **Staging** lange weiter `401`, obwohl die
+Wand dort seit dem 30.08. ab ist. `ui` stand deshalb dauerhaft auf FAIL, und
+weil der Watchdog nur bei Zustandswechseln mailt, fiel das nicht auf.
+Behoben am 19.11.2026: Staging erwartet 2xx, die Beta weiter 401. Nach dem
+nächsten Kopieren auf die VPS kommt einmal eine Recovery-Mail für `ui`.
 
 **Hostinger-Router (14.10.2026):** Die Staging-API hat neben
 `staging.complihub360.com` einen zweiten Router für
