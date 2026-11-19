@@ -507,7 +507,9 @@
       "plannedStock": "Geplantes Lager",
       "help": "Bitte um Hilfe",
       "helpValue": "Hilfe dabei, was ich sonst noch brauche",
-      "unanswered": "Nicht beantwortet"
+      "unanswered": "Nicht beantwortet",
+      "notAssessedTitle": "Noch nicht ausgewertet: {{countries}}",
+      "notAssessedText": "Diese Länder bleiben in Ihrer Anfrage. Ihre Risk Map weist sie als nicht abgedeckt aus — das ist keine Feststellung, dass dort nichts gilt."
     },
     "skipHint": "Unsicher? Wählen Sie, was am ehesten passt — jede Antwort lässt sich vor dem Erstellen noch ändern.",
     "needsMarket": "Wählen Sie, wo Sie heute verkaufen — oder geben Sie an, dass Sie noch nicht verkaufen.",
@@ -606,7 +608,9 @@
       "footNote": "Gilt nur für diese Antwort — Ihre Märkte bleiben unverändert.",
       "header": "Länder",
       "count": "{{selected}} ausgewählt · {{total}} Länder"
-    }
+    },
+    "allOthers": "Alle weiteren Länder",
+    "allOthersNote": "Diese werten wir noch nicht aus. Sie können sie trotzdem hinzufügen: Sie bleiben in Ihrer Anfrage, und Ihre Risk Map weist sie als nicht abgedeckt aus."
   },
   "countryInfo": {
     "header": "Markt",

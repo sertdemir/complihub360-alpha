@@ -509,7 +509,9 @@
       "plannedStock": "Planned stock",
       "help": "Help request",
       "helpValue": "Help identifying what else I may need",
-      "unanswered": "Not answered"
+      "unanswered": "Not answered",
+      "notAssessedTitle": "Not assessed yet: {{countries}}",
+      "notAssessedText": "These countries stay in your request. Your Risk Map marks them as not covered — that is not a finding that nothing applies there."
     },
     "skipHint": "Not sure? Choose what fits best — you can change every answer before you create your map.",
     "needsMarket": "Choose where you sell today — or say that you don’t sell yet.",
@@ -608,7 +610,9 @@
       "footNote": "Used only for this answer — your markets stay as they are.",
       "header": "Countries",
       "count": "{{selected}} selected · {{total}} countries"
-    }
+    },
+    "allOthers": "All other countries",
+    "allOthersNote": "We don’t assess these yet. You can still add them: they stay in your request and your Risk Map marks them as not covered."
   },
   "countryInfo": {
     "header": "Market",

@@ -9,6 +9,7 @@ import { Button } from '../ui/Button';
 import { focusField } from '../ui/FormErrorSummary';
 import { FieldError, FIELD_ERROR_CLASS, errorAria } from '../ui/FieldError';
 import type { SearchProfile } from '../wizard/WizardContext';
+import { ISO_COUNTRIES, isCountryCode, countryName } from '../../lib/countries';
 
 // ─── Wizard drawers · Figma 1698:293 (Other Markets) + 1740:428 (Country) ────
 // Both open INSIDE the wizard container (absolute, not a viewport portal): a
@@ -72,6 +73,12 @@ function WizardDrawer({ open, onClose, label, children }: {
 const EUROPEAN_IDS = ['Switzerland', 'Austria', 'Belgium', 'Sweden', 'Denmark', 'Poland', 'Czechia', 'Romania'] as const;
 const EXPANDING_IDS = ['Norway', 'Ireland', 'Finland', 'Portugal'] as const;
 
+// Alle uebrigen Staaten (CW-F03): das Land des Nutzers ist waehlbar, auch wenn
+// es noch nicht ausgewertet wird. Als Id dient die ISO-Kennung. Was die Karten
+// und die benannten Listen oben schon fuehren, steht hier nicht noch einmal.
+const LISTED_CODES = new Set(['DE', 'UK', 'NL', 'FR', 'IT', 'ES', 'US', 'TR', 'CH', 'AT', 'BE', 'SE', 'DK', 'PL', 'CZ', 'RO', 'NO', 'IE', 'FI', 'PT']);
+const OTHER_CODES = ISO_COUNTRIES.filter((c) => !LISTED_CODES.has(c));
+
 type Market = { id: string; name: string; desc: string };
 
 // Wizard v1a: Sitz und Lager fragen nach LAENDERN, nicht nach weiteren
@@ -88,7 +95,8 @@ function MarketsContent({ value, onChange, onClose, primary = [], exclude = [], 
   exclude?: string[];
   variant?: 'markets' | 'countries';
 }) {
-  const { t } = useTranslation('home');
+  const { t, i18n } = useTranslation('home');
+  const locale = i18n.resolvedLanguage || 'en';
   const [local, setLocal] = useState<string[]>(value);
   const [query, setQuery] = useState('');
   useEffect(() => {
@@ -107,7 +115,11 @@ function MarketsContent({ value, onChange, onClose, primary = [], exclude = [], 
   const main = primary.filter((m) => keep(m.id)).filter(match);
   const eu = EUROPEAN_IDS.filter(keep).map(toMarket).filter(match);
   const ex = EXPANDING_IDS.filter(keep).map(toMarket).filter(match);
-  const total = primary.filter((m) => keep(m.id)).length + [...EUROPEAN_IDS, ...EXPANDING_IDS].filter(keep).length;
+  const others = OTHER_CODES.filter(keep)
+    .map((c): Market => ({ id: c, name: countryName(c, locale), desc: '' }))
+    .sort((a, b) => a.name.localeCompare(b.name, locale))
+    .filter(match);
+  const total = primary.filter((m) => keep(m.id)).length + [...EUROPEAN_IDS, ...EXPANDING_IDS].filter(keep).length + OTHER_CODES.filter(keep).length;
   const copy = variant === 'countries' ? 'marketsDrawer.countries' : 'marketsDrawer';
 
   const Row = (m: Market) => {
@@ -124,7 +136,7 @@ function MarketsContent({ value, onChange, onClose, primary = [], exclude = [], 
         </span>
         <span className="min-w-0">
           <span className="block text-body-sm font-semibold text-fg">{m.name}</span>
-          <span className="block text-body-2xs text-fg-secondary">{m.desc}</span>
+          {m.desc && <span className="block text-body-2xs text-fg-secondary">{m.desc}</span>}
         </span>
       </button>
     );
@@ -180,7 +192,15 @@ function MarketsContent({ value, onChange, onClose, primary = [], exclude = [], 
             <div className="mt-2">{ex.map(Row)}</div>
           </>
         )}
-        {main.length === 0 && eu.length === 0 && ex.length === 0 && (
+        {others.length > 0 && (
+          <>
+            <hr className="my-6 border-stroke-subtle" />
+            <p className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{t('marketsDrawer.allOthers')}</p>
+            <p className="mt-1 text-body-2xs text-fg-secondary">{t('marketsDrawer.allOthersNote')}</p>
+            <div className="mt-2">{others.map(Row)}</div>
+          </>
+        )}
+        {main.length === 0 && eu.length === 0 && ex.length === 0 && others.length === 0 && (
           <p className="py-8 text-center text-body-sm text-fg-tertiary">{t('marketsDrawer.noMatch', { query })}</p>
         )}
         <div className="h-6" />

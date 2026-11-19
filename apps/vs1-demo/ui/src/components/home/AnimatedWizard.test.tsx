@@ -123,6 +123,31 @@ describe('AnimatedWizard · pages', () => {
     expect(generate()).toBeInTheDocument();
   });
 
+  // Feedback CW-F03: jedes Land ist erfassbar, auch wenn es nicht ausgewertet wird.
+  it('keeps a country we cannot assess in the request, in every role', () => {
+    const sel = new Set(['Others', 'rsn:expansion', 'exp:Others', 'est:Others']);
+    const p = buildProfile(sel, ['CA'], { ...emptyExtras(), expand: ['MX'], establishment: ['BR'] });
+    expect(p.markets).toEqual(['CA']);
+    expect(p.details?.plannedMarkets).toEqual(['MX']);
+    expect(p.details?.establishment).toEqual(['BR']);
+    const again = selectionFromProfile(p);
+    expect(again.extraMarkets).toEqual(['CA']);
+    expect(again.countryExtras.expand).toEqual(['MX']);
+    expect(again.countryExtras.establishment).toEqual(['BR']);
+    expect(buildProfile(again.selected, again.extraMarkets, again.countryExtras).details).toEqual(p.details);
+  });
+
+  it('the review names the countries that are not assessed yet', () => {
+    setup({ initialProfile: { country: 'DE', markets: ['DE', 'CA'], categories: ['tax-vat'], details: { situation: 'existing', goals: ['expansion'], offering: [], establishment: [], plannedMarkets: ['MX'], stock: [], eprProducts: [], packaging: [] } } as unknown as SearchProfile });
+    expect(screen.getByTestId('not-assessed')).toHaveTextContent('wizard.review.notAssessedTitle');
+    expect(generate()).toBeEnabled();
+  });
+
+  it('says nothing when every country can be assessed', () => {
+    setup({ initialProfile: { country: 'DE', markets: ['DE', 'FR'], categories: ['tax-vat'] } as SearchProfile });
+    expect(screen.queryByTestId('not-assessed')).not.toBeInTheDocument();
+  });
+
   it('a market page hands over its market preselected; the page is not skipped', () => {
     setup({ initialMarkets: ['DE'] });
     toFootprint();
