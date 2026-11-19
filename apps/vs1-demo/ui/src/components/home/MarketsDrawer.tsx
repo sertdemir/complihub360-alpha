@@ -9,7 +9,7 @@ import { Button } from '../ui/Button';
 import { focusField } from '../ui/FormErrorSummary';
 import { FieldError, FIELD_ERROR_CLASS, errorAria } from '../ui/FieldError';
 import type { SearchProfile } from '../wizard/WizardContext';
-import { ISO_COUNTRIES, isCountryCode, countryName } from '../../lib/countries';
+import { ISO_COUNTRIES, countryName } from '../../lib/countries';
 
 // ─── Wizard drawers · Figma 1698:293 (Other Markets) + 1740:428 (Country) ────
 // Both open INSIDE the wizard container (absolute, not a viewport portal): a
