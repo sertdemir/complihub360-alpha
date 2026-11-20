@@ -7,7 +7,7 @@ import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
-import { generateRelevantSubdomains, factsFromAnswers, countryPhases, assessmentOf, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
+import { generateRelevantSubdomains, factsFromAnswers, answeredQuestions, countryPhases, assessmentOf, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
@@ -3451,6 +3451,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             // Ob eine Pflicht gilt, sagen die Antworten, nicht
                             // der Klick auf den Bereich (Wizard-Audit F1).
                             facts: factsFromAnswers(requestData.structured_answers),
+                            // Eine Zeile je Rechtsgrundlage und Phase (CW-F04):
+                            // jede Zeile traegt die Quelle, die Frist und die
+                            // Fakten IHRER Laender, nicht die des ersten Landes.
+                            perCountry: {
+                                phase: marketPhase,
+                                factsFor: (cs) => factsFromAnswers(requestData.structured_answers, cs),
+                                row: answeredQuestions(requestData.structured_answers?.details),
+                            },
                         });
                     }
                 } catch (engineErr) {
@@ -3734,6 +3742,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // score-ranked top-up domains are 'likely'.
                     laws: engineResults.map((r) => ({
                         id: r.id,
+                        // Eindeutig je Zeile; `id` ist die Vorlage und kommt
+                        // seit CW-F04 je Rechtsgrundlage und Phase einmal vor.
+                        key: r.key ?? r.id,
+                        phase: r.phase ?? null,
+                        // `<id>.<Land>`, wo die Pflicht in dem Land anders heisst.
+                        title_key: r.labelKey ?? null,
                         title: r.label,
                         description: r.description,
                         domain: r.domain,
@@ -3750,6 +3764,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         // paragraph string (EUR-Lex, work package B).
                         celex: r.celex ?? null,
                         source_url: r.sourceUrl ?? null,
+                        // Was der Link oeffnet, wenn es nicht `source` ist: der
+                        // EU-Rechtsakt hinter einer nationalen Fundstelle.
+                        source_url_label: r.sourceUrlLabel ?? null,
                         penalty: r.penalty ?? null,
                         // Der Schluessel, unter dem die UI `penalty` in der
                         // Sprache des Lesers zeigt (compliance.penaltyText.*).
