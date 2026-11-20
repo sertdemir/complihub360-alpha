@@ -429,7 +429,7 @@
     "was": "era {{title}}",
     "wasInRiskMap": "era {{title}} en su sesión «{{riskMap}}»"
   },
-  "dueLive": "Vigente",
+  "dueLive": "Sin fecha fija",
   "clusters": {
     "confirmed": {
       "title": "Le aplica",
@@ -484,7 +484,13 @@
       "intra_eu_volume": "cuánto envía a otros países de la UE",
       "substances": "qué sustancias contienen sus productos",
       "contract_scope": "qué contratos utiliza",
-      "cross_border_shipping": "si envía a otros países"
+      "cross_border_shipping": "si envía a otros países",
+      "packaging_none": "qué se considera envase en sus productos: usted indicó que no usa ninguno",
+      "establishment_assessment": "cómo trata la ley de este mercado su lugar de establecimiento",
+      "packaging_assessment": "qué función de envasado le asigna la ley de este mercado"
+    },
+    "factPlanned": {
+      "eu_market": "usted planea vender en la UE"
     }
   },
   "hint": {
@@ -509,5 +515,7 @@
     "profileBodyGeneric": "Llega a este perfil desde proveedores que trabajan en el mismo mercado, pero no en el área solicitada. Desde aquí no se ofrece la reserva."
   },
   "outsideTag": "Fuera de las áreas elegidas",
-  "plannedTag": "previsto"
+  "plannedTag": "previsto",
+  "duePlanned": "cuando empiece allí",
+  "euBasis": "Base de la UE: {{act}}"
 }

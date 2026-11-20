@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateEvidence, factsFromAnswers, marketPhases, countryPhases, checkScopeOf, storageOf, EVIDENCE_RULES } from '../evidence';
+import { evaluateEvidence, factsFromAnswers, marketPhases, countryPhases, checkScopeOf, storageOf, answeredQuestions, EVIDENCE_RULES } from '../evidence';
 import { DomainTemplateLibrary } from '../domain-schema';
 import { generateRelevantSubdomains } from '../generator';
 import { ComplianceDomain } from '../domain-schema';
@@ -199,5 +199,93 @@ describe('evidence · wizard details (D1)', () => {
   it('ignores malformed details', () => {
     expect(factsFromAnswers({ markets: ['US'], details: 'x' })).toEqual({});
     expect(factsFromAnswers({ markets: ['US'], details: { offering: 'physical', eprProducts: [1, null] } })).toEqual({});
+  });
+});
+
+// ─── Feedback CW-F04/F06 (19.11.2026): eine Zeile je Rechtsgrundlage und Phase ─
+describe('rows per legal source and phase (CW-F04)', () => {
+  const base = { offering: ['physical'], customers: 'consumers', channels: ['own-site'] };
+  const rows = (a: { country?: string; markets: string[]; details: Record<string, unknown> }, domains: ComplianceDomain[]) => {
+    const ph = countryPhases(a);
+    const phase: Record<string, 'current' | 'planned'> = {};
+    for (const c of [...ph.current, ...ph.planned]) phase[c] = ph.current.includes(c) ? 'current' : 'planned';
+    return generateRelevantSubdomains({
+      countries: Object.keys(phase) as never, focusDomains: domains, facts: factsFromAnswers(a),
+      perCountry: { phase, factsFor: (cs) => factsFromAnswers(a, cs), row: answeredQuestions(a.details) },
+    }).filter((r) => r.focus);
+  };
+  const of = (rs: ReturnType<typeof rows>, id: string) => rs.filter((r) => r.id === id);
+
+  it('a US-only seller gets US sales tax — not "VAT" with a link to the EU VAT Directive', () => {
+    const [vat, ...rest] = of(rows({ country: 'US', markets: ['US'], details: { ...base, establishment: ['US'] } }, [ComplianceDomain.TAX]), 'tax-vat-registration');
+    expect(rest).toEqual([]);
+    expect(vat.label).toBe('US Sales Tax (state level)');
+    expect(vat.labelKey).toBe('tax-vat-registration.US');
+    expect(vat.source).toBe('State economic-nexus rules (post-Wayfair)');
+    expect(vat.sourceUrl).toBeUndefined();
+    expect(vat.celex).toBeUndefined();
+    // CW-F06: der Sitz ist bekannt und wird nicht noch einmal erfragt.
+    expect(vat.evidence).toEqual({ state: 'likely', supports: ['online_sales'], decides: ['establishment_assessment'] });
+  });
+
+  it('UK and Italy: each country cites its own act; only the EU row links EUR-Lex and names what the link opens', () => {
+    const vat = of(rows({ country: 'UK', markets: ['UK', 'IT'], details: base }, [ComplianceDomain.TAX]), 'tax-vat-registration');
+    expect(vat.map((r) => [r.markets.join('+'), r.source, r.sourceUrl ? r.sourceUrlLabel : null])).toEqual([
+      ['UK', 'UK VATA 1994 §3', null],
+      ['IT', 'Testo unico IVA (D.Lgs. 10/2026), vorher DPR 633/1972 Art. 35', 'EU VAT Directive 2006/112/EC'],
+    ]);
+    // Sitz unbekannt: die Frage bleibt.
+    expect(vat[0].evidence.decides).toEqual(['establishment']);
+    expect(new Set(vat.map((r) => r.key)).size).toBe(2);
+  });
+
+  it('Türkiye → Germany, US, Italy: four rows, none cites another country, planned rows carry no deadline', () => {
+    const vat = of(rows({ country: 'TR', markets: ['TR'], details: { ...base, establishment: ['TR'], plannedMarkets: ['DE', 'US', 'IT'] } }, [ComplianceDomain.TAX]), 'tax-vat-registration');
+    expect(vat.map((r) => [r.markets.join('+'), r.phase, r.source, r.dueDays ?? null])).toEqual([
+      ['TR', 'current', 'KDV Kanunu No. 3065', 26],
+      ['DE', 'planned', 'UStG §18 / §18i (OSS)', null],
+      ['US', 'planned', 'State economic-nexus rules (post-Wayfair)', null],
+      ['IT', 'planned', 'Testo unico IVA (D.Lgs. 10/2026), vorher DPR 633/1972 Art. 35', null],
+    ]);
+  });
+
+  it('US today, Germany and France planned: the US row is not carried by a planned EU market', () => {
+    const all = rows({ country: 'US', markets: ['US'], details: { ...base, establishment: ['US'], plannedMarkets: ['DE', 'FR'] } }, [ComplianceDomain.PRODUCT]);
+    const safety = of(all, 'prod-safety');
+    expect(safety.map((r) => [r.markets.join('+'), r.phase, r.source, r.evidence.state, r.evidence.supports.includes('eu_market')])).toEqual([
+      ['US', 'current', 'CPSA / CPSC recall rules', 'likely', false],
+      ['DE+FR', 'planned', 'EU GPSR 2023/988', 'confirmed', true],
+    ]);
+    // In der US-Zeile entscheidet "verkauft in die EU" nichts.
+    expect(safety[0].evidence.decides).toEqual([]);
+    expect(safety[0].sourceUrl).toBeUndefined();
+    // Die EU-Verpackungsverordnung bekommt keine US-Zeile.
+    expect(of(all, 'prod-packaging-conformity').flatMap((r) => r.markets)).toEqual(['DE', 'FR']);
+  });
+
+  it('a non-EU country without an entry of its own does not inherit the EU act', () => {
+    const terms = of(rows({ country: 'US', markets: ['US'], details: base }, [ComplianceDomain.LEGAL]), 'legal-consumer-terms');
+    expect(terms).toHaveLength(1);
+    expect(terms[0].scope).toBe('placeholder');
+    expect(terms[0].source).toBeUndefined();
+    expect(terms[0].sourceUrl).toBeUndefined();
+  });
+
+  it('S18 (CW-F06): "No packaging" is an answer — not asked again, not an exemption', () => {
+    const s18 = { country: 'FR', markets: ['FR'], details: { ...base, establishment: ['FR'], packaging: ['none'] } };
+    const epr = of(rows(s18, [ComplianceDomain.PRODUCT]), 'prod-epr')[0];
+    expect(epr.evidence.state).toBe('open');
+    expect(epr.evidence.decides).toEqual(['packaging_none']);
+    // Eine andere Antwort beantwortet die Frage, bestaetigt aber nichts.
+    const packed = of(rows({ ...s18, details: { ...s18.details, packaging: ['packaged'] } }, [ComplianceDomain.PRODUCT]), 'prod-epr')[0];
+    expect(packed.evidence).toEqual({ state: 'likely', supports: ['physical_goods', 'consumer_sales'], decides: ['packaging_assessment'] });
+    // "Nicht sicher" ist keine Antwort.
+    expect(answeredQuestions({ packaging: ['not-sure'], establishment: ['not-sure'] }).answered.size).toBe(0);
+  });
+
+  it('without perCountry the collected row stays as it was (dashboard)', () => {
+    const old = generateRelevantSubdomains({ countries: ['DE', 'US'] as never, focusDomains: [ComplianceDomain.TAX] }).filter((r) => r.id === 'tax-vat-registration');
+    expect(old).toHaveLength(1);
+    expect(old[0].key).toBeUndefined();
   });
 });

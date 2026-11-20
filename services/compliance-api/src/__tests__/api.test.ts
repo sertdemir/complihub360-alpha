@@ -565,6 +565,26 @@ describe('POST /api/v1/search', () => {
         expect(r.body.market_phase).toEqual({ FR: 'planned' });
     });
 
+    // Feedback CW-F04: eine Zeile je Rechtsgrundlage und Phase.
+    it('each row carries the source, link and phase of its own countries', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'TR', structured_answers: { markets: ['TR'], domains: ['tax-vat'],
+                details: { offering: ['physical'], customers: 'consumers', channels: ['own-site'], establishment: ['TR'], plannedMarkets: ['DE', 'US', 'IT'] } } }),
+        });
+        const vat = (r.body.laws as any[]).filter((l) => l.id === 'tax-vat-registration');
+        expect(vat.map((l) => [l.markets.join('+'), l.phase, l.source, l.source_url ? l.source_url_label : null, l.due_days])).toEqual([
+            ['TR', 'current', 'KDV Kanunu No. 3065', null, 26],
+            ['DE', 'planned', 'UStG §18 / §18i (OSS)', 'EU VAT Directive 2006/112/EC', null],
+            ['US', 'planned', 'State economic-nexus rules (post-Wayfair)', null, null],
+            ['IT', 'planned', 'Testo unico IVA (D.Lgs. 10/2026), vorher DPR 633/1972 Art. 35', 'EU VAT Directive 2006/112/EC', null],
+        ]);
+        expect(vat[2]).toMatchObject({ title: 'US Sales Tax (state level)', title_key: 'tax-vat-registration.US' });
+        // Jede Zeile ist eindeutig, auch wenn die Vorlage sich wiederholt.
+        const keys = (r.body.laws as any[]).map((l) => l.key);
+        expect(new Set(keys).size).toBe(keys.length);
+    });
+
     // Feedback CW-F01: S06 geplantes Lager DE/FR · S07 kein anderes Land · S08 unentschieden.
     it('planned storage keeps its own status and never becomes a market or an obligation', async () => {
         const run = (plannedStock: string[]) => api('/api/v1/search', {
@@ -723,8 +743,10 @@ describe('POST /api/v1/search', () => {
         expect(byId['env-weee-registration']).toMatchObject({ state: 'confirmed', evidence: { supports: ['electronics'] } });
         expect(byId['env-batteries-epr']).toMatchObject({ state: 'confirmed' });
         expect(byId['corp-registration']).toMatchObject({ state: 'confirmed', evidence: { supports: ['established_in_market'] } });
-        // Die Verpackungs-Taetigkeit beantwortet die Rollenfrage nicht.
-        expect(byId['prod-epr']).toMatchObject({ state: 'likely', evidence: { decides: ['packaging_role'] } });
+        // Die Verpackungs-Taetigkeit erledigt die Rollenfrage nicht — aber die
+        // Zeile fragt nicht noch einmal, wer verpackt (CW-F06): offen ist die
+        // fachliche Einordnung, und so heisst der Punkt jetzt auch.
+        expect(byId['prod-epr']).toMatchObject({ state: 'likely', evidence: { decides: ['packaging_assessment'] } });
     });
 
     // 25.10.2026: businessType kommt als Geschaeftsmodell an (vorher nie —
