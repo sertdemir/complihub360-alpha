@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Check, Gauge, Globe, ScrollText } from 'lucide-r
 import { useReducedMotion } from 'framer-motion';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
+import { Photo, type PhotoSlug } from '../components/ui/Photo';
 import { RiskBadge } from '../components/ui/RiskBadge';
 import { Button } from '../components/ui/Button';
 import { SiteFooter } from '../components/home';
@@ -70,6 +71,14 @@ function CountUp({ to, run, format }: { to: number; run: boolean; format: (v: nu
   }, [run, to, reduced]);
   return <>{format(run || reduced ? v : 0)}</>;
 }
+
+// The triptych below the KPI card: each photo paired with the area its
+// subject belongs to (common:compliance.<area>.title).
+const MARKET_PHOTOS: { slug: PhotoSlug; area: string }[] = [
+  { slug: 'port-aerial', area: 'logistics-customs' },
+  { slug: 'warehouse-shelves', area: 'tax-vat' },
+  { slug: 'parcel-car', area: 'product-packaging' },
+];
 
 // ─── The floating KPI card (canvas "Märkte · Hero" · Variante A, 2026-08-28) ─
 // ONE white card pulled up over the Gradient's bottom edge — the hub hero's
@@ -184,6 +193,30 @@ export function MarketsIndexPage() {
         <Reveal delay={0.1} className="mx-auto">
           <MarketsKpiCard markets={markets} />
         </Reveal>
+      </Container>
+
+      {/* ── Three photos as three areas (canvas "Marketing-Fotos · Look B" ·
+          Märkte-B, 2026-10-24): what crosses a border — goods at the port, stock
+          in a warehouse abroad, the parcel itself — named by the compliance area
+          it touches. Below the KPI card rather than inside the hero, so the
+          hero keeps the shared desktop height. Captions reuse the area titles. */}
+      <Container size="xl" className="pt-14 desktop-s:pt-16">
+        <Stagger className="grid gap-6 sm:grid-cols-3">
+          {MARKET_PHOTOS.map(({ slug, area }) => (
+            <StaggerItem key={slug} className="flex flex-col gap-3">
+              <div className="relative aspect-[3/2] overflow-hidden rounded-xl">
+                <Photo
+                  slug={slug}
+                  sizes="(min-width: 640px) 33vw, 100vw"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
+              <p className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
+                {t(`compliance.${area}.title`)}
+              </p>
+            </StaggerItem>
+          ))}
+        </Stagger>
       </Container>
 
       {/* ── The eight markets (canvas "Märkte · Karten" · Variante A,
