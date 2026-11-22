@@ -435,7 +435,7 @@
     "was": "was {{title}}",
     "wasInRiskMap": "was {{title}} in your risk map “{{riskMap}}”"
   },
-  "dueLive": "Live",
+  "dueLive": "No fixed date",
   "matchStates": {
     "factExpertise": "Expertise",
     "factCoverage": "Coverage",
@@ -526,7 +526,13 @@
       "intra_eu_volume": "how much you ship to other EU countries",
       "substances": "which substances your products contain",
       "contract_scope": "which contracts you use",
-      "cross_border_shipping": "whether you ship across borders"
+      "cross_border_shipping": "whether you ship across borders",
+      "packaging_none": "what counts as packaging for your goods — you told us you use none",
+      "establishment_assessment": "how the law of this market treats your place of establishment",
+      "packaging_assessment": "which packaging role the law of this market assigns to you"
+    },
+    "factPlanned": {
+      "eu_market": "you plan to sell into the EU"
     }
   },
   "hint": {
@@ -565,5 +571,7 @@
     "saveFull": "Your selection holds up to 200 providers. Remove one under Saved Providers to add another."
   },
   "outsideTag": "Outside the areas you chose",
-  "plannedTag": "planned"
+  "plannedTag": "planned",
+  "duePlanned": "once you start there",
+  "euBasis": "EU basis: {{act}}"
 }

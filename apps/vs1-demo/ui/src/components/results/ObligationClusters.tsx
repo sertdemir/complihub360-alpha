@@ -34,6 +34,10 @@ export type ClusterRow = {
   decides: string[];
   /** Bereich nicht gewaehlt — die Engine hat ihn fuer die Maerkte aufgefuellt. */
   outside?: boolean;
+  /** Eindeutig je Zeile; derselbe Titel kann je Land einmal vorkommen. */
+  rowKey?: string;
+  /** Geplante Taetigkeit — die Begruendung sagt dann "Sie planen". */
+  phase?: 'current' | 'planned';
 };
 
 const ORDER: EvidenceState[] = ['confirmed', 'likely', 'open'];
@@ -42,6 +46,11 @@ function WhyPanel({ row, id }: { row: ClusterRow; id: string }) {
   const { t } = useTranslation('results');
   const join = (keys: string[], prefix: string) =>
     keys.map((k) => t(`${prefix}.${k}`, { defaultValue: k })).join(', ');
+  // Ein geplanter Markt ist kein heutiger Verkauf (CW-F04): wo ein Fakt vom
+  // Markt abhaengt, sagt die Begruendung "Sie planen".
+  const facts = (keys: string[]) => keys
+    .map((k) => (row.phase === 'planned' ? t(`why.factPlanned.${k}`, { defaultValue: t(`why.fact.${k}`, { defaultValue: k }) }) : t(`why.fact.${k}`, { defaultValue: k })))
+    .join(', ');
   return (
     <div id={id} className="mt-2 rounded-md bg-surface-secondary px-3.5 py-3 text-body-2xs leading-relaxed text-fg">
       {/* "You chose this area" stimmt nur fuer gewaehlte Bereiche. */}
@@ -50,7 +59,7 @@ function WhyPanel({ row, id }: { row: ClusterRow; id: string }) {
         <p>{row.outside ? t('why.nothingYet') : t('why.onlyArea')}</p>
       ) : (
         <p>
-          <span className="font-semibold">{t('why.supports')}</span> {join(row.supports, 'why.fact')}.
+          <span className="font-semibold">{t('why.supports')}</span> {facts(row.supports)}.
         </p>
       )}
       {row.decides.length > 0 && (
@@ -97,6 +106,8 @@ function Row({ row }: { row: ClusterRow }) {
               {row.sourceLabel} ↗
             </a>
           ) : row.noSource ? <span className="italic text-fg-tertiary">{row.law}</span> : row.law}
+          {/* Nationale Fundstelle als Text, der EU-Rechtsakt dahinter als Link. */}
+          {row.sourceUrl && row.law && <span className="ml-1.5 text-fg-secondary">· {row.law}</span>}
           {(row.sourceUrl || row.law) && row.penalty && <span className="hidden lg:inline"> · </span>}
           {row.penalty && <span className="mt-0.5 block text-fg-tertiary lg:mt-0 lg:inline">{row.penalty}</span>}
         </span>
@@ -150,7 +161,7 @@ function ClusterCard({ state, rows, defaultOpen }: { state: EvidenceState; rows:
               <span className="text-body-3xs text-fg-tertiary">{s.items.length}</span>
             </div>
           )}
-          {s.items.map((r) => <Row key={r.title} row={r} />)}
+          {s.items.map((r, i) => <Row key={r.rowKey ?? `${r.title}-${i}`} row={r} />)}
         </div>
       ))}
     </DisclosureCard>

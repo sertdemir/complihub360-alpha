@@ -20,7 +20,7 @@ import { isKnownCountry } from './country-profile.js';
 /** Die 27 EU-Mitgliedstaaten (ISO 3166-1). Bewusst nicht EU_MEMBER_STATES aus
  *  country-profile: das kennt nur die fuenf Laender mit Engine-Profil, ein
  *  Markt wie AT oder BE ist trotzdem ein EU-Markt. */
-const EU27 = new Set(['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE']);
+export const EU27 = new Set(['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE']);
 
 /** Was die Antworten ueber das Geschaeft aussagen koennen. */
 export type Fact =
@@ -45,7 +45,13 @@ export type DecidingQuestion =
   | 'intra_eu_volume'
   | 'substances'
   | 'contract_scope'
-  | 'cross_border_shipping';
+  | 'cross_border_shipping'
+  /** Der Nutzer hat "keine Verpackung" gesagt; ob das die Pflicht erledigt, ist offen. */
+  | 'packaging_none'
+  /** Sitz bzw. Verpackungs-Taetigkeit sind beantwortet; offen ist, was das
+   *  Recht des Marktes daraus macht. Keine Wizard-Frage. */
+  | 'establishment_assessment'
+  | 'packaging_assessment';
 
 /** Bekannt wahr (true), bekannt falsch (false), unbekannt (fehlt). */
 export type Facts = Partial<Record<Fact, boolean>>;
@@ -98,12 +104,44 @@ export const EVIDENCE_RULES: Record<string, Rule> = {
 /** Fakten, die nur den Geltungsbereich abgrenzen und allein nichts belegen. */
 const SCOPE_FACTS = new Set<Fact>(['eu_market']);
 
-export function evaluateEvidence(templateId: string, facts: Facts): Evidence {
+/** Was eine einzelne Zeile ueber sich weiss (Feedback CW-F04/F06):
+ *  `euRow`        false, wenn kein Land der Zeile in der EU liegt — dann ist
+ *                 "verkauft in die EU" dort keine offene Frage
+ *  `answered`     Fragen, die der Wizard schon beantwortet hat; sie werden
+ *                 nicht erneut als fehlend ausgewiesen
+ *  `packagingNone` der Nutzer hat "keine Verpackung" geantwortet */
+export interface RowContext {
+  euRow?: boolean;
+  answered?: ReadonlySet<DecidingQuestion>;
+  packagingNone?: boolean;
+}
+
+export function evaluateEvidence(templateId: string, facts: Facts, row: RowContext = {}): Evidence {
   const rule = EVIDENCE_RULES[templateId];
   if (!rule) return { state: 'open', supports: [], decides: [] };
   const supports = rule.requires.filter((f) => facts[f] === true);
   const missing = rule.requires.filter((f) => facts[f] !== true);
-  const decides: Array<Fact | DecidingQuestion> = [...missing, ...(rule.question ? [rule.question] : [])];
+  // Eine beantwortete Frage wird nicht noch einmal gestellt (CW-F06). Erledigt
+  // ist sie damit nicht — ob die Antwort die Pflicht traegt, bleibt eine
+  // fachliche Pruefung je Markt (D1, 24.10.2026). Die Zeile nennt deshalb
+  // genau das als offenen Punkt, statt die Wizard-Frage zu wiederholen, und
+  // bleibt "likely".
+  const question: DecidingQuestion | undefined = !rule.question ? undefined
+    : !row.answered?.has(rule.question) ? rule.question
+    : rule.question === 'establishment' ? 'establishment_assessment'
+    : rule.question === 'packaging_role' ? 'packaging_assessment'
+    : rule.question;
+  const decides: Array<Fact | DecidingQuestion> = [
+    // In einer Zeile ohne EU-Land entscheidet "verkauft in die EU" nichts.
+    ...missing.filter((f) => !(f === 'eu_market' && row.euRow === false)),
+    ...(question ? [question] : []),
+  ];
+  // "Keine Verpackung" ist eine Antwort, keine Befreiung: die Pflicht bleibt
+  // sichtbar, aber offen, und nennt genau diesen Punkt statt erneut zu
+  // fragen, wer verpackt (CW-F06, S18).
+  if (rule.question === 'packaging_role' && row.packagingNone) {
+    return { state: 'open', supports, decides: [...decides.filter((d) => d !== 'packaging_role' && d !== 'packaging_assessment'), 'packaging_none'] };
+  }
   // Ein bekannt falscher Fakt schliesst die Pflicht nicht aus der Karte aus —
   // ausblenden waere eine Rechtsaussage, die die Regel nicht treffen kann.
   // Sie bleibt "open", damit niemand sie fuer erledigt haelt.
@@ -116,6 +154,18 @@ export function evaluateEvidence(templateId: string, facts: Facts): Evidence {
   return { state: 'likely', supports, decides };
 }
 
+/** Welche entscheidenden Fragen die Antworten schon beantworten. "Nicht
+ *  sicher" ist keine Antwort. */
+export function answeredQuestions(details: unknown): { answered: Set<DecidingQuestion>; packagingNone: boolean } {
+  const d = (details && typeof details === 'object' && !Array.isArray(details) ? details : {}) as Record<string, unknown>;
+  const answered = new Set<DecidingQuestion>();
+  const est = list(d.establishment);
+  if (est.some((x) => /^[A-Za-z]{2}$/.test(x) || x === 'not-yet')) answered.add('establishment');
+  const pkg = list(d.packaging);
+  if (pkg.some((x) => x !== 'not-sure')) answered.add('packaging_role');
+  return { answered, packagingNone: pkg.includes('none') };
+}
+
 /** Fakten aus den Wizard-Antworten, so wie sie heute ankommen. Nur was die
  *  Karte woertlich sagt; alles andere bleibt unbekannt. Die Operations-Karten
  *  (AnimatedWizard) tragen ihre englische Kennung in `businessTypeNote`. */
@@ -124,7 +174,7 @@ export function factsFromAnswers(answers: {
   markets?: unknown;
   country?: unknown;
   details?: unknown;
-} | null | undefined): Facts {
+} | null | undefined, rowCountries?: string[]): Facts {
   const facts: Facts = {};
   if (!answers) return facts;
   const card = typeof answers.businessTypeNote === 'string' ? answers.businessTypeNote : '';
@@ -155,8 +205,11 @@ export function factsFromAnswers(answers: {
   }
   // Heutige UND geplante Maerkte (Core Wizard Handover v1.1): ein geplantes
   // Zielland wird mit ausgewertet, auch wenn heute nur anderswo verkauft wird.
+  // `rowCountries`: die Fakten fuer EINE Zeile (Feedback CW-F04). Dann zaehlen
+  // nur ihre Laender — ein geplanter EU-Markt belegt nichts fuer eine
+  // US-Zeile, und "sitzt im Markt" meint die Laender dieser Zeile.
   const { current, planned } = marketPhases(answers);
-  const markets = [...current, ...planned];
+  const markets = rowCountries ?? [...current, ...planned];
   if (markets.some((m) => EU27.has(m.toUpperCase()))) facts.eu_market = true;
   Object.assign(facts, factsFromDetails(answers.details, markets));
   return facts;

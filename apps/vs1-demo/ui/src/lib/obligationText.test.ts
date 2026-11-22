@@ -56,6 +56,34 @@ describe('Risk Map liest Titel und Kadenz in der Sprache des Lesers', () => {
     expect(vat.title).toBe(load('de', 'common').markets.obligations['tax-vat-registration']);
     expect(vat.title).not.toBe('VAT Registration & Filing');
     expect(vat.due).toBe('Jährlich');
-    expect(privacy.dueSub).toBe('Gilt jetzt');
+    // Bis 20.11.2026 "Gilt jetzt" / "Live": das las sich als laufende Pflicht
+    // des Nutzers, gemeint war "ohne festen Termin" (Feedback CW-F04).
+    expect(privacy.dueSub).toBe('Kein fester Termin');
+  });
+
+  // Feedback CW-F04: Titel, Quelle, Linkziel und Phase je Zeile.
+  it('nennt US Sales Tax beim Namen, beschriftet den EU-Link als EU-Grundlage und macht einen Plan nicht faellig', async () => {
+    const i18n = i18next.createInstance();
+    await i18n.init({
+      lng: 'de', ns: ['results', 'common'], defaultNS: 'results',
+      resources: { de: { results: load('de', 'results'), common: load('de', 'common') } },
+      interpolation: { escapeValue: false },
+    });
+    const law = (o: Partial<SearchLaw>): SearchLaw => ({ id: 'tax-vat-registration', title: 'VAT Registration & Filing', description: '', severity: 'high', markets: ['DE'], source: 's', due: 'Quarterly', state: 'likely', ...o });
+    const [us, de, uk] = liveObligations([
+      law({ key: 'tax-vat-registration@US:planned', phase: 'planned', markets: ['US'], title: 'US Sales Tax (state level)', title_key: 'tax-vat-registration.US', source: 'State economic-nexus rules (post-Wayfair)', due: 'Monthly' }),
+      law({ key: 'tax-vat-registration@DE:planned', phase: 'planned', markets: ['DE'], source: 'UStG §18 / §18i (OSS)', source_url: 'https://eur-lex.europa.eu/x', source_url_label: 'EU VAT Directive 2006/112/EC' }),
+      law({ key: 'tax-vat-registration@UK:current', phase: 'current', markets: ['UK'], source: 'UK VATA 1994 §3', due_days: 30 }),
+    ], i18n.t as never, 'de', 'de-DE', { US: 'planned', DE: 'planned', UK: 'current' });
+    expect(us.title).toBe('US-Sales-Tax (Bundesstaaten)');
+    expect([us.sourceUrl, us.law]).toEqual([undefined, 'State economic-nexus rules (post-Wayfair)']);
+    expect(us.dueSub).toBe('sobald Sie dort starten');
+    // Der Link oeffnet die EU-Richtlinie und heisst so; das UStG steht als Text daneben.
+    expect(de.sourceLabel).toBe('EU-Grundlage: EU VAT Directive 2006/112/EC');
+    expect(de.law).toBe('UStG §18 / §18i (OSS)');
+    expect(de.market).toContain('geplant');
+    // Heutige Taetigkeit behaelt ihre Frist; kein Link auf EU-Recht fuer UK.
+    expect([uk.sourceUrl, uk.law, uk.dueSub]).toEqual([undefined, 'UK VATA 1994 §3', '30 Tage']);
+    expect(new Set([us.rowKey, de.rowKey, uk.rowKey]).size).toBe(3);
   });
 });

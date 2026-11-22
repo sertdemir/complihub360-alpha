@@ -89,6 +89,16 @@ export interface SearchCoverage {
 // optional and fall back to the design fixture when severity is absent.
 export interface SearchLaw {
   id: string;
+  /** Eindeutig je Zeile. `id` ist die Vorlage und kommt seit CW-F04 je
+   *  Rechtsgrundlage und Phase einmal vor. Fehlt bei aelteren Antworten. */
+  key?: string;
+  /** Heutige oder geplante Taetigkeit der Laender dieser Zeile. */
+  phase?: 'current' | 'planned' | null;
+  /** `<id>.<Land>`, wo die Pflicht in dem Land anders heisst (US Sales Tax). */
+  title_key?: string | null;
+  /** Was `source_url` oeffnet, wenn es nicht `source` ist: der EU-Rechtsakt
+   *  hinter einer nationalen Fundstelle. */
+  source_url_label?: string | null;
   title: string;
   description: string;
   domain?: string;

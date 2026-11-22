@@ -429,7 +429,7 @@
     "was": "{{title}} idi",
     "wasInRiskMap": "„{{riskMap}}“ oturumunuzda {{title}} idi"
   },
-  "dueLive": "Yürürlükte",
+  "dueLive": "Sabit tarih yok",
   "clusters": {
     "confirmed": {
       "title": "Sizin için geçerli",
@@ -484,7 +484,13 @@
       "intra_eu_volume": "diğer AB ülkelerine ne kadar gönderim yaptığınız",
       "substances": "ürünlerinizin hangi maddeleri içerdiği",
       "contract_scope": "hangi sözleşmeleri kullandığınız",
-      "cross_border_shipping": "sınır ötesine gönderim yapıp yapmadığınız"
+      "cross_border_shipping": "sınır ötesine gönderim yapıp yapmadığınız",
+      "packaging_none": "mallarınızda neyin ambalaj sayıldığı; hiç ambalaj kullanmadığınızı belirttiniz",
+      "establishment_assessment": "bu pazarın hukukunun işletme yerinizi nasıl değerlendirdiği",
+      "packaging_assessment": "bu pazarın hukukunun size hangi ambalaj rolünü verdiği"
+    },
+    "factPlanned": {
+      "eu_market": "AB’ye satış yapmayı planlıyorsunuz"
     }
   },
   "hint": {
@@ -509,5 +515,7 @@
     "profileBodyGeneric": "Bu profile aynı pazarda çalışan ancak talep ettiğiniz alanda çalışmayan sağlayıcılardan ulaştınız. Buradan rezervasyon sunulmuyor."
   },
   "outsideTag": "Seçtiğiniz alanların dışında",
-  "plannedTag": "planlanan"
+  "plannedTag": "planlanan",
+  "duePlanned": "orada başladığınızda",
+  "euBasis": "AB dayanağı: {{act}}"
 }

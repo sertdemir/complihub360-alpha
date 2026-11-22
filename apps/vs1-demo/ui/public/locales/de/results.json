@@ -429,7 +429,7 @@
     "was": "war {{title}}",
     "wasInRiskMap": "war {{title}} in Ihrer Sitzung „{{riskMap}}“"
   },
-  "dueLive": "Gilt jetzt",
+  "dueLive": "Kein fester Termin",
   "clusters": {
     "confirmed": {
       "title": "Gilt für Sie",
@@ -484,7 +484,13 @@
       "intra_eu_volume": "wie viel Sie in andere EU-Länder liefern",
       "substances": "welche Stoffe Ihre Produkte enthalten",
       "contract_scope": "welche Verträge Sie nutzen",
-      "cross_border_shipping": "ob Sie über Grenzen versenden"
+      "cross_border_shipping": "ob Sie über Grenzen versenden",
+      "packaging_none": "was bei Ihren Waren als Verpackung gilt – Sie haben angegeben, keine zu verwenden",
+      "establishment_assessment": "wie das Recht dieses Marktes Ihren Sitz einordnet",
+      "packaging_assessment": "welche Verpackungsrolle Ihnen das Recht dieses Marktes zuweist"
+    },
+    "factPlanned": {
+      "eu_market": "Sie planen, in die EU zu verkaufen"
     }
   },
   "hint": {
@@ -509,5 +515,7 @@
     "profileBodyGeneric": "Sie kommen von Anbietern, die im selben Markt arbeiten, aber nicht in dem angefragten Bereich. Eine Buchung bieten wir von hier aus nicht an."
   },
   "outsideTag": "Außerhalb Ihrer gewählten Bereiche",
-  "plannedTag": "geplant"
+  "plannedTag": "geplant",
+  "duePlanned": "sobald Sie dort starten",
+  "euBasis": "EU-Grundlage: {{act}}"
 }

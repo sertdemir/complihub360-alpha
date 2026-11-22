@@ -83,6 +83,10 @@ type Obligation = {
   /** Engine-Template-ID ('tax-vat-registration', …). Nur auf Live-Zeilen —
    *  die Design-Fixture hat keine, ist also nicht abhakbar. */
   id?: string;
+  /** Eindeutig je Zeile (`id` wiederholt sich je Rechtsgrundlage und Phase). */
+  rowKey?: string;
+  /** Geplante Taetigkeit: keine Frist, und die Begruendung sagt "geplant". */
+  phase?: 'current' | 'planned';
   severity: Severity;
   title: string;
   detail: string;
@@ -200,7 +204,13 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     severity: l.severity as Severity,
     // Der Engine-Titel ist englisch; die Sprachdateien fuehren ihn fuer alle
     // Pflichten (markets.obligations.<id>, Waechter: obligationText.test.ts).
-    title: obligationLabel(t, l.id, l.title),
+    // Wo die Pflicht in einem Land anders heisst (CW-F04: in den USA gibt es
+    // keine Mehrwertsteuer), fuehrt die Engine einen eigenen Schluessel.
+    title: l.title_key
+      ? t(`common:markets.obligationsByMarket.${l.title_key}`, { defaultValue: l.title })
+      : obligationLabel(t, l.id, l.title),
+    rowKey: l.key ?? l.id,
+    phase: l.phase ?? undefined,
     // Rechtsgrundlage zuerst, Bußgeld danach. Das DNA-Addendum V2 verlangt,
     // dass Strafhöhen nicht der primäre Untertitel jeder Pflicht sind —
     // zugänglich bleiben sie, führend sind sie nicht mehr. Der Präfix war
@@ -210,10 +220,15 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     // etwas sie zusammenhielt: hier stand "up to EUR 30,000 per year",
     // waehrend die Obergrenze zu derselben Pflicht 7.500 EUR JE EINHEIT
     // lautete und keinen Deckel hat. Eine Quelle, ein Satz.
-    detail: [l.source_url ? null : l.source_scope === 'placeholder' ? keineNorm : l.source, bussgeldZeile(l, t, lang)]
+    detail: [l.source_url && !l.source_url_label ? null : l.source_scope === 'placeholder' ? keineNorm : l.source, bussgeldZeile(l, t, lang)]
       .filter(Boolean)
       .join(' · '),
-    sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
+    // Beschriftung und Linkziel gehoeren zusammen (CW-F04): oeffnet der Link
+    // den EU-Rechtsakt hinter einer nationalen Fundstelle, heisst er auch so,
+    // und die nationale Fundstelle steht als Text daneben.
+    sourceLabel: l.source_url
+      ? (l.source_url_label ? t('euBasis', { act: l.source_url_label, defaultValue: `EU basis: ${l.source_url_label}` }) : (l.source ?? l.celex ?? undefined))
+      : undefined,
     sourceUrl: l.source_url ?? undefined,
     // Geplante Laender tragen den Zusatz "(planned)": die Pflicht betrifft dort
     // eine geplante, keine heutige Taetigkeit (Core Wizard Handover v1.1).
@@ -222,7 +237,7 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
       : t('euWide'),
     // Die Norm im Klartext, wenn es keine verlinkbare Fundstelle gibt —
     // sonst stuende unter dem Titel nur der Markt (Befund 2026-09-05).
-    law: l.source_url ? undefined : l.source_scope === 'placeholder' ? keineNorm : (l.source ?? undefined),
+    law: l.source_url && !l.source_url_label ? undefined : l.source_scope === 'placeholder' ? keineNorm : (l.source ?? undefined),
     penalty: bussgeldZeile(l, t, lang) ?? undefined,
     // A duty that has not started yet must not read "Ongoing · Live" — that
     // would tell the user they are already in breach. Until its start date
@@ -235,7 +250,9 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     dueSub: withinHorizon(l.applies_from) != null
       ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
       : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
-      : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? t('dueLive', { defaultValue: 'Live' }) : '',
+      // Ein Plan ist nicht faellig (CW-F04): keine Tage, kein "gilt jetzt".
+      : l.phase === 'planned' ? t('duePlanned', { defaultValue: 'once you start there' })
+      : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? t('dueLive', { defaultValue: 'No fixed date' }) : '',
     dueDays: l.due_days ?? undefined,
     // Seit F1 (23.10.2026) beruht die Stufe auf den Antworten. Aeltere
     // Antworten ohne 'open' kennen nur confirmed/likely.
@@ -618,6 +635,7 @@ export function ResultsRiskMap() {
     title: o.title, severity: o.severity, market: o.market, due: o.due, dueSub: o.dueSub,
     sourceLabel: o.sourceLabel, sourceUrl: o.sourceUrl, law: o.law, noSource: o.noSource, penalty: o.penalty,
     radar: o.radar, evidence: evidenceOf(o), supports: o.supports ?? [], decides: o.decides ?? [],
+    rowKey: o.rowKey, phase: o.phase,
     outside: o.outside,
   }));
   // Variante 1 (25.10.2026): Die Engine fuellt auf mindestens vier Bereiche

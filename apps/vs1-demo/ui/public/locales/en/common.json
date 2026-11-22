@@ -1547,6 +1547,11 @@
         "us": "Federal + CA, TX, NY, FL",
         "tr": "National law"
       }
+    },
+    "obligationsByMarket": {
+      "tax-vat-registration": {
+        "US": "US Sales Tax (state level)"
+      }
     }
   },
   "pricing": {
