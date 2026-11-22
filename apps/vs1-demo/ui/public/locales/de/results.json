@@ -35,18 +35,6 @@
       "undecided": "Prüfumfang noch nicht entschieden: alle heutigen Märkte werden gezeigt.",
       "undecidedUnknown": "Prüfumfang noch nicht entschieden, und es sind keine heutigen Märkte bekannt: für heute wird nichts geprüft.",
       "all": "Für heute geprüft: alle Ihre heutigen Märkte ({{countries}})."
-    },
-    "storage": {
-      "label": "Lager –",
-      "today": "heute: {{countries}}",
-      "todayNone": "heute: keines",
-      "todayUnknown": "heute: nicht bekannt",
-      "planned": "geplant: {{countries}}",
-      "plannedNoOther": "geplant: keines in einem anderen Land",
-      "plannedUndecided": "geplant: noch nicht entschieden",
-      "plannedUnknown": "geplant: nicht bekannt",
-      "notAssessed": "Lagerorte sind erfasst, aber noch nicht ausgewertet; diese Risk Map trifft keine Aussage dazu.",
-      "open": "Dieser Punkt bleibt offen."
     }
   },
   "stats": {
@@ -517,5 +505,32 @@
   "outsideTag": "Außerhalb Ihrer gewählten Bereiche",
   "plannedTag": "geplant",
   "duePlanned": "sobald Sie dort starten",
-  "euBasis": "EU-Grundlage: {{act}}"
+  "euBasis": "EU-Grundlage: {{act}}",
+  "storage": {
+    "title": "Lagerorte",
+    "sub": "Wo Sie Waren lagern, wird getrennt davon erfasst, wo Sie verkaufen.",
+    "phase": {
+      "current": "heute aktiv",
+      "planned": "geplant"
+    },
+    "confirmation": {
+      "confirmed": "Standort steht fest",
+      "unconfirmed": "noch zu bestätigen",
+      "unstated": "Bestätigung nicht angegeben"
+    },
+    "notAMarket": "keiner Ihrer Verkaufsmärkte",
+    "noRule": "Für {{country}} ist noch keine Lagerprüfung hinterlegt. Diese Risk Map trifft deshalb keine Aussage zur Lagerung dort. Das ist keine Feststellung, dass dort nichts gilt.",
+    "assessed": "Die Lagerung hier ist Teil von: {{checks}}.",
+    "open": {
+      "current": "Noch offen: ob dort tatsächlich Waren lagern.",
+      "planned": "Noch offen: ob dieser Standort genutzt wird."
+    },
+    "note": {
+      "currentNone": "Heute: Sie halten keinen Bestand.",
+      "currentUnknown": "Heute: Wo Ihr Bestand liegt, ist noch nicht bekannt. Es wird kein Lagerort berücksichtigt.",
+      "plannedNoOther": "Geplant: keine Lagerung in einem anderen Land. Wir ergänzen keinen weiteren Standort.",
+      "plannedUndecided": "Geplant: noch nicht entschieden, kein Standort bekannt. Für kein Land wird etwas angenommen.",
+      "plannedUnknown": "Geplant: noch nicht bekannt. Für kein Land wird etwas angenommen."
+    }
+  }
 }

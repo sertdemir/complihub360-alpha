@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateEvidence, factsFromAnswers, marketPhases, countryPhases, checkScopeOf, storageOf, answeredQuestions, EVIDENCE_RULES } from '../evidence';
+import { evaluateEvidence, factsFromAnswers, marketPhases, countryPhases, checkScopeOf, storageOf, assessmentOf, answeredQuestions, STORAGE_RULES, EVIDENCE_RULES } from '../evidence';
 import { DomainTemplateLibrary } from '../domain-schema';
 import { generateRelevantSubdomains } from '../generator';
 import { ComplianceDomain } from '../domain-schema';
@@ -93,13 +93,39 @@ describe('evidence · current and planned markets (Core Wizard Handover v1.1)', 
     expect(checkScopeOf({ checkScope: { mode: 'countries', countries: [] } }).mode).toBe('none');
   });
   it('CW-F01: storage keeps its own status — undecided, unknown, "no other country" and "not asked" stay apart', () => {
-    expect(storageOf({ stock: ['US'], plannedStock: ['de', 'FR'] })).toEqual({ current: { status: 'countries', countries: ['US'] }, planned: { status: 'countries', countries: ['DE', 'FR'] } });
-    expect(storageOf({ stock: ['US'], plannedStock: ['no-other'] }).planned).toEqual({ status: 'no-other', countries: [] });
-    expect(storageOf({ stock: ['US'], plannedStock: ['undecided'] }).planned).toEqual({ status: 'undecided', countries: [] });
-    expect(storageOf({ stock: ['not-sure'], plannedStock: ['not-sure'] })).toEqual({ current: { status: 'unknown', countries: [] }, planned: { status: 'unknown', countries: [] } });
-    expect(storageOf({ stock: ['none'] })).toEqual({ current: { status: 'none', countries: [] }, planned: { status: 'not-asked', countries: [] } });
+    expect(storageOf({ stock: ['US'], plannedStock: ['de', 'FR'] })).toEqual({ current: { status: 'countries', countries: ['US'], confirmation: { US: 'unstated' } }, planned: { status: 'countries', countries: ['DE', 'FR'], confirmation: { DE: 'unstated', FR: 'unstated' } } });
+    expect(storageOf({ stock: ['US'], plannedStock: ['no-other'] }).planned).toEqual({ status: 'no-other', countries: [], confirmation: {} });
+    expect(storageOf({ stock: ['US'], plannedStock: ['undecided'] }).planned).toEqual({ status: 'undecided', countries: [], confirmation: {} });
+    expect(storageOf({ stock: ['not-sure'], plannedStock: ['not-sure'] })).toEqual({ current: { status: 'unknown', countries: [], confirmation: {} }, planned: { status: 'unknown', countries: [], confirmation: {} } });
+    expect(storageOf({ stock: ['none'] })).toEqual({ current: { status: 'none', countries: [], confirmation: {} }, planned: { status: 'not-asked', countries: [], confirmation: {} } });
     expect(storageOf({ stock: ['not-applicable'] }).current.status).toBe('not-applicable');
     expect(storageOf(null).planned.status).toBe('not-asked');
+  });
+  // Folgeauftrag Lagerung (20.11.2026): Bestaetigungsstand je Standort.
+  it('storage keeps a confirmation state per location; older sessions stay "unstated", never "confirmed"', () => {
+    const s = storageOf({ stock: ['US'], stockStatus: { US: 'confirmed' }, plannedStock: ['DE', 'NL'], plannedStockStatus: { DE: 'unconfirmed', NL: 'confirmed', FR: 'confirmed' } });
+    expect(s.current.confirmation).toEqual({ US: 'confirmed' });
+    // Ein Status fuer ein nicht gewaehltes Land (FR) zaehlt nicht.
+    expect(s.planned.confirmation).toEqual({ DE: 'unconfirmed', NL: 'confirmed' });
+    expect(storageOf({ plannedStock: ['DE'] }).planned.confirmation).toEqual({ DE: 'unstated' });
+  });
+  it('each storage location reaches the result with country, phase and confirmation — and is never a market', () => {
+    // Kontrolle 3: NL nur als Lagerland; Verkaeufe US, geplant DE/FR.
+    const a = { markets: ['US'], details: { plannedMarkets: ['DE', 'FR'], stock: ['US', 'NL'], stockStatus: { US: 'confirmed', NL: 'confirmed' }, plannedStock: ['DE'], plannedStockStatus: { DE: 'unconfirmed' } } };
+    const r = assessmentOf(a);
+    expect(r.assessed).toEqual({ current: ['US'], planned: ['DE', 'FR'] });
+    expect(r.storage.locations).toEqual([
+      { country: 'US', phase: 'current', confirmation: 'confirmed', also_market: true, assessed: false, reason: 'no_rule', checks: [] },
+      { country: 'NL', phase: 'current', confirmation: 'confirmed', also_market: false, assessed: false, reason: 'no_rule', checks: [] },
+      { country: 'DE', phase: 'planned', confirmation: 'unconfirmed', also_market: true, assessed: false, reason: 'no_rule', checks: [] },
+    ]);
+    // Auch ohne erhobene Verkaufsexpansion: das Lagerland bleibt, kein Markt entsteht.
+    const noExpansion = assessmentOf({ markets: ['US'], details: { stock: ['US'], plannedStock: ['NL'], plannedStockStatus: { NL: 'confirmed' } } });
+    expect(noExpansion.assessed).toEqual({ current: ['US'], planned: [] });
+    expect(noExpansion.storage.locations.map((l) => [l.country, l.phase, l.also_market])).toEqual([['US', 'current', true], ['NL', 'planned', false]]);
+  });
+  it('no storage rule is on file yet — the engine says so instead of inventing one', () => {
+    expect(STORAGE_RULES).toEqual({});
   });
   it('CW-F01: a storage country is neither a market nor a fact', () => {
     const a = { markets: ['US'], details: { stock: ['US'], plannedStock: ['DE', 'FR'] } };

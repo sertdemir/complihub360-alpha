@@ -35,18 +35,6 @@
       "undecided": "Kontrol kapsamı henüz kararlaştırılmadı: tüm mevcut pazarlar gösteriliyor.",
       "undecidedUnknown": "Kontrol kapsamı henüz kararlaştırılmadı ve bilinen mevcut pazar yok: bugün için hiçbir şey kontrol edilmiyor.",
       "all": "Bugün için kontrol edildi: tüm mevcut pazarlarınız ({{countries}})."
-    },
-    "storage": {
-      "label": "Depolama —",
-      "today": "bugün: {{countries}}",
-      "todayNone": "bugün: yok",
-      "todayUnknown": "bugün: bilinmiyor",
-      "planned": "planlanan: {{countries}}",
-      "plannedNoOther": "planlanan: başka bir ülkede yok",
-      "plannedUndecided": "planlanan: henüz kararlaştırılmadı",
-      "plannedUnknown": "planlanan: bilinmiyor",
-      "notAssessed": "Depolama yerleri kaydedildi, ancak henüz değerlendirilmiyor; bu Risk Map bunlar hakkında bir beyanda bulunmaz.",
-      "open": "Bu nokta açık kalır."
     }
   },
   "stats": {
@@ -517,5 +505,32 @@
   "outsideTag": "Seçtiğiniz alanların dışında",
   "plannedTag": "planlanan",
   "duePlanned": "orada başladığınızda",
-  "euBasis": "AB dayanağı: {{act}}"
+  "euBasis": "AB dayanağı: {{act}}",
+  "storage": {
+    "title": "Depolama yerleri",
+    "sub": "Mallarınızı nerede depoladığınız, nerede satış yaptığınızdan ayrı kaydedilir.",
+    "phase": {
+      "current": "bugün etkin",
+      "planned": "planlanan"
+    },
+    "confirmation": {
+      "confirmed": "yer kesinleşti",
+      "unconfirmed": "henüz doğrulanacak",
+      "unstated": "doğrulama belirtilmedi"
+    },
+    "notAMarket": "satış pazarlarınızdan biri değil",
+    "noRule": "{{country}} için henüz bir depolama kontrolümüz yok; bu nedenle bu Risk Map orada mal depolama hakkında bir beyanda bulunmaz. Bu, orada hiçbir şeyin geçerli olmadığı anlamına gelmez.",
+    "assessed": "Buradaki depolama şunların parçasıdır: {{checks}}.",
+    "open": {
+      "current": "Hâlâ açık: orada gerçekten mal depolanıp depolanmadığı.",
+      "planned": "Hâlâ açık: bu yerin kullanılıp kullanılmayacağı."
+    },
+    "note": {
+      "currentNone": "Bugün: stok tutmuyorsunuz.",
+      "currentUnknown": "Bugün: stokunuzun nerede tutulduğu henüz bilinmiyor; hiçbir depolama yeri dikkate alınmaz.",
+      "plannedNoOther": "Planlanan: başka bir ülkede depolama yok. Başka bir yer eklemiyoruz.",
+      "plannedUndecided": "Planlanan: henüz kararlaştırılmadı, bilinen bir yer yok. Hiçbir ülke için varsayım yapılmaz.",
+      "plannedUnknown": "Planlanan: henüz bilinmiyor. Hiçbir ülke için varsayım yapılmaz."
+    }
+  }
 }

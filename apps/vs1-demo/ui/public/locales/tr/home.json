@@ -476,6 +476,9 @@
       },
       "pstockNoOther": {
         "title": "Başka bir ülkede ürün depolamayı planlamıyorum"
+      },
+      "pstockUndecided": {
+        "title": "Henüz karar vermedim; aklımda bir yer yok"
       }
     },
     "footer": {
@@ -513,7 +516,8 @@
       "checkNoMarkets": "mevcut pazarlar henüz bilinmiyor, bu nedenle bugün için hiçbir şey kontrol edilmiyor",
       "checkOutside": "bu kontrolün parçası değil: {{countries}}",
       "storageTitle": "Depolama yerleri kaydedildi, henüz değerlendirilmiyor",
-      "storageText": "Risk Map’iniz bunları açık nokta olarak gösterir. Oradaki depolama hakkında bir beyanda bulunmaz."
+      "storageText": "Risk Map’iniz bunları açık nokta olarak gösterir. Oradaki depolama hakkında bir beyanda bulunmaz.",
+      "toConfirm": "(doğrulanacak)"
     },
     "skipHint": "Emin değil misiniz? En uygun olanı seçin — haritanızı oluşturmadan önce her yanıtı değiştirebilirsiniz.",
     "needsMarket": "Bugün nerede satış yaptığınızı seçin — ya da henüz satış yapmadığınızı belirtin.",
@@ -540,6 +544,15 @@
     "expandConflict": {
       "text": "Hedef olarak “Yeni pazarlara genişlemek” seçtiniz. Genişlemeyi planlamıyorsanız bu hedefi kaldırabilirsiniz — diğer hedefleriniz kalır.",
       "action": "Genişleme hedefini kaldır"
+    },
+    "storage": {
+      "stockTitle": "Her depolama yeri kesinleşti mi?",
+      "plannedStockTitle": "Planlanan her yer kesinleşti mi?",
+      "note": "Bir ülkeyi belirtmek orada depolamayı doğrulamaz. Yerin nerede kesinleştiğini bize bildirin; diğerleri henüz doğrulanacak olarak kalır.",
+      "settled": "kesinleşti",
+      "toConfirm": "henüz doğrulanacak",
+      "toggle": "Yer kesinleşti",
+      "toggleFor": "{{country}} içindeki yer kesinleşti"
     }
   },
   "marketsDrawer": {

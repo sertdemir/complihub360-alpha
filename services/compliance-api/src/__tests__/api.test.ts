@@ -565,6 +565,24 @@ describe('POST /api/v1/search', () => {
         expect(r.body.market_phase).toEqual({ FR: 'planned' });
     });
 
+    // Folgeauftrag Lagerung (20.11.2026), Kontrollen 2 und 3.
+    it('a named, unconfirmed storage country is kept; a storage-only country never becomes a market', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'US', structured_answers: { markets: ['US'], domains: ['tax-vat'], details: {
+                offering: ['physical'], customers: 'consumers', channels: ['marketplaces'], plannedMarkets: ['DE', 'FR'],
+                stock: ['US', 'NL'], stockStatus: { US: 'confirmed', NL: 'confirmed' }, plannedStock: ['DE'], plannedStockStatus: { DE: 'unconfirmed' } } } }),
+        });
+        expect(r.body.market_phase).toEqual({ US: 'current', DE: 'planned', FR: 'planned' });
+        expect(r.body.assessment.storage.locations.map((l: any) => [l.country, l.phase, l.confirmation, l.also_market, l.assessed, l.reason])).toEqual([
+            ['US', 'current', 'confirmed', true, false, 'no_rule'],
+            ['NL', 'current', 'confirmed', false, false, 'no_rule'],
+            ['DE', 'planned', 'unconfirmed', true, false, 'no_rule'],
+        ]);
+        // Kein Lagerland erzeugt eine Pflichtzeile, solange keine Regel hinterlegt ist.
+        expect((r.body.laws as any[]).some((l) => l.markets.includes('NL'))).toBe(false);
+    });
+
     // Feedback CW-F04: eine Zeile je Rechtsgrundlage und Phase.
     it('each row carries the source, link and phase of its own countries', async () => {
         const r = await api('/api/v1/search', {
@@ -592,10 +610,10 @@ describe('POST /api/v1/search', () => {
             body: JSON.stringify({ country: 'US', structured_answers: { markets: ['US'], domains: ['tax-vat'], details: { offering: ['physical'], channels: ['marketplaces'], stock: ['US'], plannedStock } } }),
         });
         const [s06, s07, s08] = await Promise.all([run(['DE', 'FR']), run(['no-other']), run(['undecided'])]);
-        expect(s06.body.assessment.storage.planned).toEqual({ status: 'countries', countries: ['DE', 'FR'] });
+        expect(s06.body.assessment.storage.planned).toEqual({ status: 'countries', countries: ['DE', 'FR'], confirmation: { DE: 'unstated', FR: 'unstated' } });
         expect(s06.body.assessment.storage.open_countries).toEqual({ current: ['US'], planned: ['DE', 'FR'] });
-        expect(s07.body.assessment.storage.planned).toEqual({ status: 'no-other', countries: [] });
-        expect(s08.body.assessment.storage.planned).toEqual({ status: 'undecided', countries: [] });
+        expect(s07.body.assessment.storage.planned).toEqual({ status: 'no-other', countries: [], confirmation: {} });
+        expect(s08.body.assessment.storage.planned).toEqual({ status: 'undecided', countries: [], confirmation: {} });
         // Kein Lagerland wird Markt, und keine Pflicht entsteht allein aus ihm.
         for (const r of [s06, s07, s08]) expect(r.body.market_phase).toEqual({ US: 'current' });
         const ids = (r: any) => r.body.laws.map((l: any) => `${l.id}:${l.state}`).sort();

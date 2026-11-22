@@ -476,6 +476,9 @@
       },
       "pstockNoOther": {
         "title": "No tengo previsto almacenar productos en otro país"
+      },
+      "pstockUndecided": {
+        "title": "Aún no lo he decidido: no tengo ninguna ubicación en mente"
       }
     },
     "footer": {
@@ -513,7 +516,8 @@
       "checkNoMarkets": "aún no se conocen los mercados actuales, por lo que hoy no se revisa nada",
       "checkOutside": "no forma parte de esta revisión: {{countries}}",
       "storageTitle": "Las ubicaciones de almacenamiento están registradas, pero aún no se evalúan",
-      "storageText": "Su Risk Map las indica como punto abierto. No afirma nada sobre el almacenamiento allí."
+      "storageText": "Su Risk Map las indica como punto abierto. No afirma nada sobre el almacenamiento allí.",
+      "toConfirm": "(por confirmar)"
     },
     "skipHint": "¿No está seguro? Elija lo que mejor encaje: puede cambiar cada respuesta antes de crear su mapa.",
     "needsMarket": "Elija dónde vende hoy, o indique que todavía no vende.",
@@ -540,6 +544,15 @@
     "expandConflict": {
       "text": "Ha elegido «Expandirme a nuevos mercados» como objetivo. Si no prevé expandirse, puede quitar ese objetivo; los demás se mantienen.",
       "action": "Quitar el objetivo de expansión"
+    },
+    "storage": {
+      "stockTitle": "¿Está decidida cada ubicación de almacenamiento?",
+      "plannedStockTitle": "¿Está decidida cada ubicación prevista?",
+      "note": "Indicar un país no confirma que almacene allí. Díganos dónde está decidida la ubicación; el resto queda marcado como pendiente de confirmar.",
+      "settled": "decidida",
+      "toConfirm": "pendiente de confirmar",
+      "toggle": "La ubicación está decidida",
+      "toggleFor": "La ubicación en {{country}} está decidida"
     }
   },
   "marketsDrawer": {
