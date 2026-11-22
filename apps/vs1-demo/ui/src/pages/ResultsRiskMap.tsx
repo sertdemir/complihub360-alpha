@@ -6,6 +6,7 @@ import type { PenaltyCeiling, AssessmentRecord } from '@complihub/compliance-eng
 import { describeCeiling, penaltyText } from '../lib/penaltyCeiling';
 import { cadenceLabel, obligationLabel } from '../lib/obligationText';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
+import { StorageLocations } from '../components/results/StorageLocations';
 import { lawsOf, runSearch, type AnonProvider, type SearchCoverage, type SearchLaw } from '../api/search';
 import { coverageGaps, isLimitedCoverage } from '../lib/matchState';
 import { LimitedCoverageCard, OneMatchGuest, ProviderStateHead } from '../components/results/ProviderStates';
@@ -600,7 +601,7 @@ export function ResultsRiskMap() {
   // was zum Lager erfasst, aber nicht ausgewertet ist.
   const scopeLines = (() => {
     const a = searchData.assessment;
-    if (!a) return { check: '', storage: '' };
+    if (!a) return { check: '' };
     const names = (xs: string[]) => xs.join(', ');
     const check = a.check.mode === 'countries'
       ? [t('header.scope.checked', { countries: names(a.check.countries) }), a.check.outside.length ? t('header.scope.outside', { countries: names(a.check.outside) }) : ''].filter(Boolean).join(' ')
@@ -608,23 +609,7 @@ export function ResultsRiskMap() {
       : a.check.mode === 'all-current' && a.assessed.current.length ? t('header.scope.all', { countries: names(a.assessed.current) })
       : a.check.mode === 'unknown' ? t(a.check.current_markets_known ? 'header.scope.undecided' : 'header.scope.undecidedUnknown')
       : '';
-    const st = a.storage;
-    const today = st.current.status === 'countries' ? t('header.storage.today', { countries: names(st.current.countries) })
-      : st.current.status === 'none' ? t('header.storage.todayNone')
-      : st.current.status === 'unknown' ? t('header.storage.todayUnknown')
-      : '';
-    const planned = st.planned.status === 'countries' ? t('header.storage.planned', { countries: names(st.planned.countries) })
-      : st.planned.status === 'no-other' ? t('header.storage.plannedNoOther')
-      : st.planned.status === 'undecided' ? t('header.storage.plannedUndecided')
-      : st.planned.status === 'unknown' ? t('header.storage.plannedUnknown')
-      : '';
-    const hasCountries = st.current.countries.length + st.planned.countries.length > 0;
-    const open = st.planned.status === 'undecided' || st.planned.status === 'unknown' || st.current.status === 'unknown';
-    const parts = [today, planned].filter(Boolean);
-    const storage = parts.length
-      ? `${t('header.storage.label')} ${parts.join(' · ')}. ${hasCountries ? t('header.storage.notAssessed') : open ? t('header.storage.open') : ''}`.trim()
-      : '';
-    return { check, storage };
+    return { check };
   })();
   const prioritiesCovered = (p: AnonProvider, settled: ReadonlySet<string>) => prioritiesCoveredBy(liveLaws, rows, p, settled);
   // F1: Stufe je Pflicht aus den Antworten. Aeltere Zustaende ('answer')
@@ -1075,9 +1060,6 @@ export function ResultsRiskMap() {
           {scopeLines.check && (
             <p className="mt-1 text-body-md leading-relaxed text-fg-secondary" data-testid="check-scope">{scopeLines.check}</p>
           )}
-          {scopeLines.storage && (
-            <p className="mt-1 text-body-md leading-relaxed text-fg-secondary" data-testid="storage-scope">{scopeLines.storage}</p>
-          )}
           {rows.length > 0 && evidenceCounts.likely + evidenceCounts.open > 0 && (
             <p className="mt-1 text-body-md leading-relaxed text-fg-secondary">
               {evidenceCounts.likely && evidenceCounts.open
@@ -1145,6 +1127,8 @@ export function ResultsRiskMap() {
             nach Beleg in drei auf- und zuklappbaren Cards. Die Stufe steht im
             Kartenkopf, nicht mehr als Spalte. */}
         <div className={`${partial.length > 0 || settles > 0 ? 'mt-5' : 'mt-12'}`}>
+          {/* Lagerorte stehen am Ergebnis, nicht nur im Kopf (Folgeauftrag Lagerung). */}
+          <StorageLocations storage={searchData.assessment?.storage} />
           <ObligationClusters rows={clusterRows} />
         </div>
 

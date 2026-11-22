@@ -29,6 +29,7 @@ import { Logo } from '../ui/Logo';
 import { WizardDrawerLayer, COUNTRY_INFO } from './MarketsDrawer';
 import type { SearchProfile, WizardCategory, BusinessType, WizardDetails } from '../wizard/WizardContext';
 import { Badge } from '../ui/Badge';
+import { Toggle } from '../ui/Toggle';
 import { Button } from '../ui/Button';
 import { isCountryCode, countryName } from '../../lib/countries';
 import { isKnownCountry } from '@complihub/compliance-engine';
@@ -291,10 +292,22 @@ const COUNTRY_TAIL: Record<CountryStep, Card[]> = {
   // "keine Expansion".
   plannedStock: [
     { id: 'pstock:no-other', key: 'pstockNoOther' },
-    { id: 'pstock:undecided', key: 'expUndecided' },
+    { id: 'pstock:undecided', key: 'pstockUndecided' },
     { id: 'pstock:not-sure', key: 'notSure' },
   ],
 };
+/** "Der Standort steht fest" je Lagerland (Folgeauftrag Lagerung). Als Id in
+ *  `selected`: `stockok:<Land>` bzw. `pstockok:<Land>`. Fehlt sie, ist das
+ *  Land benannt, aber noch zu bestaetigen. */
+export type StorageStep = 'stock' | 'plannedStock';
+export const STORAGE_OK: Record<StorageStep, string> = { stock: 'stockok:', plannedStock: 'pstockok:' };
+/** Die gewaehlten Lagerlaender einer Frage, als Karten- bzw. Drawer-Namen. */
+export function storageNamesOf(key: StorageStep, selected: Set<string>, extras: string[]): string[] {
+  const pre = COUNTRY_PREFIX[key];
+  const tails = new Set(COUNTRY_TAIL[key].map((c) => c.id));
+  const cards = [...selected].filter((id) => id.startsWith(pre) && !tails.has(id) && id !== pre + 'Others').map((id) => id.slice(pre.length));
+  return [...cards, ...(selected.has(pre + 'Others') ? extras : [])];
+}
 const COUNTRY_CARD_KEY: Record<CountryStep, string> = {
   establishment: 'estMarket', planned: 'estMarket', check: 'chkMarket', expand: '', stock: 'stockMarket', plannedStock: 'pstockMarket',
 };
@@ -517,6 +530,10 @@ export function selectionFromProfile(p: SearchProfile): {
     restore('expand', d.plannedMarkets ?? [], []);
     const planned = plannedMarketsOf(sel, countryExtras.expand);
     for (const key of ['establishment', 'planned', 'stock', 'plannedStock'] as const) restore(key, d[DETAIL_FIELD[key]] ?? [], planned);
+    // Bestaetigte Lagerorte. Sitzungen ohne das Feld behalten "nicht angegeben".
+    for (const [key, status] of [['stock', d.stockStatus], ['plannedStock', d.plannedStockStatus]] as const) {
+      for (const [code, v] of Object.entries(status ?? {})) if (v === 'confirmed') sel.add(STORAGE_OK[key] + (NAME_OF[code] ?? code));
+    }
     if (d.checkScope?.mode === 'all-current') sel.add('chk:all-current');
     else if (d.checkScope?.mode === 'unknown') sel.add('chk:not-sure');
     else restore('check', d.checkScope?.countries ?? [], planned);
@@ -543,6 +560,9 @@ function detailsOf(selected: Set<string>, extraMarkets: string[], extras: Countr
       ...(withTail ? COUNTRY_TAIL[key].filter((c) => selected.has(c.id)).map((c) => c.id.slice(pre.length)) : []),
     ];
   };
+  const storageStatus = (key: StorageStep) => Object.fromEntries(
+    storageNamesOf(key, selected, extras[key]).map((n) => [codeOf(n), selected.has(STORAGE_OK[key] + n) ? 'confirmed' as const : 'unconfirmed' as const]),
+  );
   const situation = SITUATION.cards.find((c) => selected.has(c.id));
   const status = MARKET_STATUS.find((id) => selected.has(id));
   return {
@@ -557,6 +577,7 @@ function detailsOf(selected: Set<string>, extraMarkets: string[], extras: Countr
     plannedMarkets: countries('expand'),
     stock: countries('stock'),
     plannedStock: countries('plannedStock'),
+    ...(flow.includes('stock') ? { stockStatus: storageStatus('stock'), plannedStockStatus: storageStatus('plannedStock') } : {}),
     // "All current" bleibt eine Verweisung: wer die heutigen Maerkte aendert,
     // aendert den Pruefumfang mit.
     ...(flow.includes('check')
@@ -1034,6 +1055,15 @@ export function AnimatedWizard({
   // Lager (CW-F01): erfasst, aber von keiner Regel gedeckt — das sagt die
   // Uebersicht, bevor die Risk Map entsteht.
   const storageCountries = [...new Set([...(reviewProfile?.details?.stock ?? []), ...(reviewProfile?.details?.plannedStock ?? [])].filter((c) => /^[A-Z]{2}$/.test(c)))];
+  // Lager: je Land der Bestaetigungsstand. Ein benanntes, unbestaetigtes Land
+  // steht sichtbar als "to confirm" da (Folgeauftrag Lagerung).
+  const storageSegs = (k: StorageStep): Seg[] => {
+    if (!flow.includes(k)) return [];
+    const names = new Set(storageNamesOf(k, selected, countryExtras[k]).map(countryLabel));
+    return segsOf(k).flatMap((seg) => (names.has(seg.text) && !selected.has(STORAGE_OK[k] + storageNamesOf(k, selected, countryExtras[k]).find((n) => countryLabel(n) === seg.text))
+      ? [seg, { text: t('wizard.review.toConfirm'), muted: true, glue: true }]
+      : [seg]));
+  };
   const reviewRows: { id: string; label: string; value: Seg[]; edit: StepKey }[] = interactive
     ? [
         row('business', 'wizard.review.business', [...segsOf('situation'), ...segsOf('reason')], 'situation'),
@@ -1047,8 +1077,8 @@ export function AnimatedWizard({
         ...(flow.includes('expand') ? [row('expand', 'wizard.review.plannedMarkets', segsOf('expand'), 'expand')] : []),
         ...(flow.includes('stock')
           ? [
-              row('stock', 'wizard.review.currentStock', segsOf('stock'), 'stock'),
-              row('plannedStock', 'wizard.review.plannedStock', segsOf('plannedStock'), 'plannedStock'),
+              row('stock', 'wizard.review.currentStock', storageSegs('stock'), 'stock'),
+              row('plannedStock', 'wizard.review.plannedStock', storageSegs('plannedStock'), 'plannedStock'),
             ]
           : []),
         row('domains', 'wizard.review.domains', segsOf('domains'), 'domains'),
@@ -1281,6 +1311,37 @@ export function AnimatedWizard({
                   );
                 })}
               </div>
+
+                {/* Lager: je benanntem Land, ob der Standort feststeht. Ein Land
+                    zu nennen bestaetigt weder eine Lagerung noch einen Plan
+                    (Folgeauftrag Lagerung, 20.11.2026). Keine eigene Seite. */}
+                {interactive && (def.key === 'stock' || def.key === 'plannedStock') && storageNamesOf(def.key, selected, countryExtras[def.key]).length > 0 && (
+                  <div className="mt-5 rounded-md bg-surface-secondary px-5 py-4" data-testid={`storage-confirm-${def.key}`}>
+                    <p className="text-body-md font-semibold text-fg">{t(`wizard.storage.${def.key}Title`)}</p>
+                    <p className="mt-0.5 text-body-sm text-fg-secondary">{t('wizard.storage.note')}</p>
+                    <ul className="mt-3 flex flex-col gap-2.5">
+                      {storageNamesOf(def.key, selected, countryExtras[def.key]).map((name) => {
+                        const okId = STORAGE_OK[def.key as StorageStep] + name;
+                        const ok = selected.has(okId);
+                        return (
+                          <li key={name} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                            <span className="text-body-sm font-medium text-fg">
+                              {countryLabel(name)}
+                              <span className="ml-2 font-normal text-fg-tertiary">{t(ok ? 'wizard.storage.settled' : 'wizard.storage.toConfirm')}</span>
+                            </span>
+                            <Toggle
+                              size="sm"
+                              checked={ok}
+                              onChange={() => setSelected((prev) => { const n = new Set(prev); if (n.has(okId)) n.delete(okId); else n.add(okId); return n; })}
+                              label={t('wizard.storage.toggle')}
+                              aria-label={t('wizard.storage.toggleFor', { country: countryLabel(name) })}
+                            />
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
 
                 {/* "I am not sure what I need": Vorschlaege mit Grund, nichts ist
                     vorausgewaehlt. Uebernehmen fuegt sie den gewaehlten Bereichen

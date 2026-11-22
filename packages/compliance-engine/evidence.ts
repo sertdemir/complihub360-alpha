@@ -258,7 +258,40 @@ export function checkScopeOf(details: unknown): { mode: 'all-current' | 'countri
 }
 
 export type StorageStatus = 'countries' | 'none' | 'not-applicable' | 'no-other' | 'undecided' | 'unknown' | 'not-asked';
-export interface StorageAnswer { status: StorageStatus; countries: string[] }
+export type StorageConfirmation = 'confirmed' | 'unconfirmed' | 'unstated';
+export interface StorageAnswer {
+  status: StorageStatus;
+  countries: string[];
+  /** Je Land: steht der Standort fest? 'unstated' = die Sitzung stammt aus
+   *  der Zeit vor der Frage — nie rueckwirkend "bestaetigt". */
+  confirmation: Record<string, StorageConfirmation>;
+}
+
+/** Ein Lagerort am Ergebnis (Folgeauftrag Lagerung, 20.11.2026): Land, Phase
+ *  und Bestaetigungsstand, getrennt von den Verkaufsmaerkten.
+ *
+ *  `assessed` ist heute immer false, `reason` immer 'no_rule': Die Engine
+ *  fuehrt keine fachlich gepruefte Regel, die ein Lagerland auswertet. Die
+ *  Stelle, an der eine solche Regel greift, ist `STORAGE_RULES` — solange sie
+ *  leer ist, sagt jede Flaeche fuer genau dieses Land, dass die Bewertung
+ *  fehlt, statt eine Pflicht zu behaupten oder "nichts zu tun" nahezulegen. */
+export interface StorageLocation {
+  country: string;
+  phase: 'current' | 'planned';
+  confirmation: StorageConfirmation;
+  /** Das Land ist auch heutiger oder geplanter Verkaufsmarkt. Nur Auskunft:
+   *  ein Lagerland wird nie zum Markt und ein Markt nie zum Lagerland. */
+  also_market: boolean;
+  assessed: boolean;
+  reason: 'no_rule' | 'rule';
+  /** Die Pruefungen, die eine hinterlegte Regel fuer diesen Ort nennt. */
+  checks: string[];
+}
+
+/** Fachlich gepruefte Lagerregeln je Land. LEER, bis jemand vom Fach sie
+ *  liefert und prueft (Frage an die Mitgruenderin, 22.11.2026). Ein Eintrag
+ *  nennt die Kennungen der Pruefungen, die Lagerung in dem Land ausloest. */
+export const STORAGE_RULES: Record<string, { current: string[]; planned: string[] }> = {};
 
 /** Lager heute (CW06) und geplantes Lager (CW07), je mit eigenem Status
  *  (Feedback CW-F01). "Nicht gefragt", "unentschieden", "nicht sicher" und
@@ -268,16 +301,21 @@ export interface StorageAnswer { status: StorageStatus; countries: string[] }
  *  ausgewiesen statt ausgewertet (Entscheidung des Nutzers, 19.11.2026). */
 export function storageOf(details: unknown): { current: StorageAnswer; planned: StorageAnswer } {
   const d = (details && typeof details === 'object' && !Array.isArray(details) ? details : {}) as Record<string, unknown>;
-  const read = (v: unknown, tokens: Record<string, StorageStatus>): StorageAnswer => {
+  const read = (v: unknown, status: unknown, tokens: Record<string, StorageStatus>): StorageAnswer => {
     const xs = list(v);
     const countries = [...new Set(xs.filter((x) => /^[A-Za-z]{2}$/.test(x)).map((x) => x.toUpperCase()))];
-    if (countries.length) return { status: 'countries', countries };
+    const stated = (status && typeof status === 'object' && !Array.isArray(status) ? status : {}) as Record<string, unknown>;
+    const confirmation = Object.fromEntries(countries.map((c) => {
+      const v = stated[c] ?? stated[c.toLowerCase()];
+      return [c, v === 'confirmed' ? 'confirmed' : v === 'unconfirmed' ? 'unconfirmed' : 'unstated'] as [string, StorageConfirmation];
+    }));
+    if (countries.length) return { status: 'countries', countries, confirmation };
     const token = xs.find((x) => x in tokens);
-    return { status: token ? tokens[token] : 'not-asked', countries: [] };
+    return { status: token ? tokens[token] : 'not-asked', countries: [], confirmation: {} };
   };
   return {
-    current: read(d.stock, { none: 'none', 'not-applicable': 'not-applicable', 'not-sure': 'unknown' }),
-    planned: read(d.plannedStock, { 'no-other': 'no-other', undecided: 'undecided', 'not-sure': 'unknown' }),
+    current: read(d.stock, d.stockStatus, { none: 'none', 'not-applicable': 'not-applicable', 'not-sure': 'unknown' }),
+    planned: read(d.plannedStock, d.plannedStockStatus, { 'no-other': 'no-other', undecided: 'undecided', 'not-sure': 'unknown' }),
   };
 }
 
@@ -317,7 +355,7 @@ export interface AssessmentRecord {
   assessed: { current: string[]; planned: string[] };
   not_assessed: string[];
   check: { mode: 'all-current' | 'countries' | 'unknown' | 'none'; countries: string[]; outside: string[]; current_markets_known: boolean };
-  storage: { current: StorageAnswer; planned: StorageAnswer; open_countries: { current: string[]; planned: string[] } };
+  storage: { current: StorageAnswer; planned: StorageAnswer; open_countries: { current: string[]; planned: string[] }; locations: StorageLocation[] };
 }
 
 export function assessmentOf(answers: { markets?: unknown; country?: unknown; details?: unknown } | null | undefined): AssessmentRecord {
@@ -331,7 +369,24 @@ export function assessmentOf(answers: { markets?: unknown; country?: unknown; de
     assessed: { current: phases.current.filter(isKnownCountry), planned: phases.planned.filter(isKnownCountry) },
     not_assessed: all.filter((c) => !isKnownCountry(c)),
     check: { ...check, outside: phases.outsideScope, current_markets_known: unfiltered.current.length > 0 },
-    storage: { ...storage, open_countries: { current: storage.current.countries, planned: storage.planned.countries } },
+    storage: {
+      ...storage,
+      open_countries: {
+        current: storage.current.countries.filter((c) => !STORAGE_RULES[c]),
+        planned: storage.planned.countries.filter((c) => !STORAGE_RULES[c]),
+      },
+      locations: (['current', 'planned'] as const).flatMap((phase) => storage[phase].countries.map((country): StorageLocation => {
+        const checks = STORAGE_RULES[country]?.[phase] ?? [];
+        return {
+          country, phase,
+          confirmation: storage[phase].confirmation[country] ?? 'unstated',
+          also_market: all.includes(country),
+          assessed: checks.length > 0,
+          reason: checks.length > 0 ? 'rule' : 'no_rule',
+          checks,
+        };
+      })),
+    },
   };
 }
 

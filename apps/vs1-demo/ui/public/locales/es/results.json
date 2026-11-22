@@ -35,18 +35,6 @@
       "undecided": "Alcance de la revisión aún sin decidir: se muestran todos los mercados actuales.",
       "undecidedUnknown": "Alcance de la revisión aún sin decidir y no se conocen mercados actuales: hoy no se revisa nada.",
       "all": "Revisado para hoy: todos sus mercados actuales ({{countries}})."
-    },
-    "storage": {
-      "label": "Almacenamiento —",
-      "today": "hoy: {{countries}}",
-      "todayNone": "hoy: ninguno",
-      "todayUnknown": "hoy: no se sabe",
-      "planned": "previsto: {{countries}}",
-      "plannedNoOther": "previsto: ninguno en otro país",
-      "plannedUndecided": "previsto: aún sin decidir",
-      "plannedUnknown": "previsto: no se sabe",
-      "notAssessed": "Las ubicaciones de almacenamiento están registradas, pero aún no se evalúan; este Risk Map no afirma nada sobre ellas.",
-      "open": "Este punto queda abierto."
     }
   },
   "stats": {
@@ -517,5 +505,32 @@
   "outsideTag": "Fuera de las áreas elegidas",
   "plannedTag": "previsto",
   "duePlanned": "cuando empiece allí",
-  "euBasis": "Base de la UE: {{act}}"
+  "euBasis": "Base de la UE: {{act}}",
+  "storage": {
+    "title": "Ubicaciones de almacenamiento",
+    "sub": "Dónde almacena mercancía se registra por separado de dónde vende.",
+    "phase": {
+      "current": "activa hoy",
+      "planned": "prevista"
+    },
+    "confirmation": {
+      "confirmed": "ubicación decidida",
+      "unconfirmed": "pendiente de confirmar",
+      "unstated": "confirmación no indicada"
+    },
+    "notAMarket": "no es uno de sus mercados de venta",
+    "noRule": "Aún no tenemos una revisión de almacenamiento para {{country}}, por lo que este Risk Map no afirma nada sobre almacenar mercancía allí. No es una conclusión de que allí no se aplique nada.",
+    "assessed": "El almacenamiento aquí forma parte de: {{checks}}.",
+    "open": {
+      "current": "Queda abierto: si realmente se almacena mercancía allí.",
+      "planned": "Queda abierto: si se usará esta ubicación."
+    },
+    "note": {
+      "currentNone": "Hoy: usted no mantiene existencias.",
+      "currentUnknown": "Hoy: aún no se sabe dónde están sus existencias, por lo que no se considera ninguna ubicación.",
+      "plannedNoOther": "Previsto: sin almacenamiento en otro país. No añadimos ninguna otra ubicación.",
+      "plannedUndecided": "Previsto: aún sin decidir, sin ubicación conocida. No se supone nada para ningún país.",
+      "plannedUnknown": "Previsto: aún no se sabe. No se supone nada para ningún país."
+    }
+  }
 }

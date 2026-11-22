@@ -478,6 +478,9 @@
       },
       "pstockNoOther": {
         "title": "I don’t plan to store products in another country"
+      },
+      "pstockUndecided": {
+        "title": "I haven’t decided yet — no location in mind"
       }
     },
     "footer": {
@@ -515,7 +518,8 @@
       "checkNoMarkets": "current markets not known yet, so nothing is checked for today",
       "checkOutside": "not part of this check: {{countries}}",
       "storageTitle": "Storage locations are recorded, not assessed yet",
-      "storageText": "Your Risk Map names them as an open point. It makes no statement about storage there."
+      "storageText": "Your Risk Map names them as an open point. It makes no statement about storage there.",
+      "toConfirm": "(to confirm)"
     },
     "skipHint": "Not sure? Choose what fits best — you can change every answer before you create your map.",
     "needsMarket": "Choose where you sell today — or say that you don’t sell yet.",
@@ -542,6 +546,15 @@
     "expandConflict": {
       "text": "You chose “Expanding into new markets” as a goal. If you are not planning to expand, you can remove that goal — your other goals stay.",
       "action": "Remove the expansion goal"
+    },
+    "storage": {
+      "stockTitle": "Is each storage location settled?",
+      "plannedStockTitle": "Is each planned location settled?",
+      "note": "Naming a country does not confirm storage there. Tell us where the location is settled; the rest stays marked as still to confirm.",
+      "settled": "settled",
+      "toConfirm": "still to confirm",
+      "toggle": "Location is settled",
+      "toggleFor": "Location in {{country}} is settled"
     }
   },
   "marketsDrawer": {

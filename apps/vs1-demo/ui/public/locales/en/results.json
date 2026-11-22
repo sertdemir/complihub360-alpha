@@ -35,18 +35,6 @@
       "undecided": "Check scope not decided yet: all current markets are shown.",
       "undecidedUnknown": "Check scope not decided yet, and no current markets are known: nothing is checked for today.",
       "all": "Checked for today: all your current markets ({{countries}})."
-    },
-    "storage": {
-      "label": "Storage —",
-      "today": "today: {{countries}}",
-      "todayNone": "today: none",
-      "todayUnknown": "today: not known",
-      "planned": "planned: {{countries}}",
-      "plannedNoOther": "planned: none in another country",
-      "plannedUndecided": "planned: not decided yet",
-      "plannedUnknown": "planned: not known",
-      "notAssessed": "Storage locations are recorded but not assessed yet; this Risk Map makes no statement about them.",
-      "open": "This point stays open."
     }
   },
   "stats": {
@@ -573,5 +561,32 @@
   "outsideTag": "Outside the areas you chose",
   "plannedTag": "planned",
   "duePlanned": "once you start there",
-  "euBasis": "EU basis: {{act}}"
+  "euBasis": "EU basis: {{act}}",
+  "storage": {
+    "title": "Storage locations",
+    "sub": "Where you store goods is recorded separately from where you sell.",
+    "phase": {
+      "current": "active today",
+      "planned": "planned"
+    },
+    "confirmation": {
+      "confirmed": "location settled",
+      "unconfirmed": "still to confirm",
+      "unstated": "confirmation not stated"
+    },
+    "notAMarket": "not one of your sales markets",
+    "noRule": "We hold no storage check for {{country}} yet, so this Risk Map makes no statement about storing goods there. That is not a finding that nothing applies.",
+    "assessed": "Storage here is part of: {{checks}}.",
+    "open": {
+      "current": "Still open: whether goods are actually stored there.",
+      "planned": "Still open: whether this location will be used."
+    },
+    "note": {
+      "currentNone": "Today: you hold no stock.",
+      "currentUnknown": "Today: where your stock is held is not known yet, so no storage location is considered.",
+      "plannedNoOther": "Planned: no storage in another country. We add no further location.",
+      "plannedUndecided": "Planned: not decided yet, no location known. Nothing is assumed for a country.",
+      "plannedUnknown": "Planned: not known yet. Nothing is assumed for a country."
+    }
+  }
 }

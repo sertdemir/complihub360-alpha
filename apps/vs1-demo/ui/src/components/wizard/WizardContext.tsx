@@ -61,6 +61,12 @@ export interface WizardDetails {
     stock: string[];
     /** CW07: Laendercodes, dazu "no-other" | "undecided" | "not-sure"; leer, wenn nicht gefragt. */
     plannedStock?: string[];
+    /** Bestaetigungsstand je Lagerland (Folgeauftrag Lagerung, 20.11.2026):
+     *  "confirmed" = der Standort steht fest, "unconfirmed" = benannt, aber
+     *  noch zu bestaetigen. Fehlt das Feld (aeltere Sitzungen), ist der Stand
+     *  nicht angegeben — nie rueckwirkend "bestaetigt". */
+    stockStatus?: Record<string, 'confirmed' | 'unconfirmed'>;
+    plannedStockStatus?: Record<string, 'confirmed' | 'unconfirmed'>;
     /** CW08; fehlt, wenn nicht gefragt. "all-current" verweist auf `markets`. */
     checkScope?: { mode: "all-current" | "countries" | "unknown" | ""; countries: string[] };
     /** "I am not sure what I need" — unabhaengig von den gewaehlten Bereichen. */

@@ -283,6 +283,27 @@ describe('Handover v1.1 · acceptance', () => {
     expect(profile.details?.checkScope).toEqual({ mode: 'all-current', countries: [] });
   });
 
+  // Folgeauftrag Lagerung (20.11.2026): Bestaetigungsstand je Lagerort.
+  it('storage: a named country is "unconfirmed" until its location is marked as settled — and survives the round trip', () => {
+    const sel = new Set(['United States', 'off:physical', 'stock:United States', 'stockok:United States', 'pstock:United States', 'pstock:Others']);
+    const extras = { ...emptyExtras(), plannedStock: ['NL'] };
+    const p = buildProfile(sel, [], extras);
+    expect(p.details?.stock).toEqual(['US']);
+    expect(p.details?.stockStatus).toEqual({ US: 'confirmed' });
+    expect(p.details?.plannedStock).toEqual(['US', 'NL']);
+    // Benannt, aber nicht bestaetigt: das Land bleibt erhalten.
+    expect(p.details?.plannedStockStatus).toEqual({ US: 'unconfirmed', NL: 'unconfirmed' });
+    // Ein Lagerland wird kein Markt.
+    expect(p.markets).toEqual(['US']);
+    const back = selectionFromProfile(p);
+    expect(buildProfile(back.selected, back.extraMarkets, back.countryExtras).details?.stockStatus).toEqual({ US: 'confirmed' });
+    expect(back.selected.has('pstockok:United States')).toBe(false);
+    // "Kein Standort bekannt" bleibt eine eigene Antwort ohne Laender.
+    const undecided = buildProfile(new Set(['United States', 'off:physical', 'stock:United States', 'pstock:undecided']), [], emptyExtras());
+    expect(undecided.details?.plannedStock).toEqual(['undecided']);
+    expect(undecided.details?.plannedStockStatus).toEqual({});
+  });
+
   it('explicit check scope: "all current" is a live reference; specific countries stay explicit', () => {
     const all = buildProfile(new Set(['United States', 'rsn:check', 'chk:all-current']), [], emptyExtras());
     expect(all.details?.checkScope).toEqual({ mode: 'all-current', countries: [] });
