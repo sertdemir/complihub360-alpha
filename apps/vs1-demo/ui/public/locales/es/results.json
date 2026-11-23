@@ -556,7 +556,8 @@
         "products": "qué grupos de productos vende",
         "packaging": "qué hace con los envases",
         "established_in_jurisdiction": "dónde está establecida su empresa",
-        "sells_in_jurisdiction": "si vende en este país"
+        "sells_in_jurisdiction": "si vende en este país",
+        "established_in_eu": "si su empresa está establecida en la UE"
       }
     }
   }
