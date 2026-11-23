@@ -130,7 +130,7 @@ export async function generateRiskMapPdf(opts: {
 
   // ── Title + scope ───────────────────────────────────────────────────────
   doc.setFont('times', 'bold').setFontSize(24).setTextColor(INK);
-  doc.text(L('pdf.title', 'Your compliance risk map.'), M, y);
+  doc.text(L('pdf.title', 'Your compliance Risk Map.'), M, y);
   y += 20;
   doc.setFont('helvetica', 'normal').setFontSize(9).setTextColor(MUTED);
   doc.text(pdfSafe(profileLine(opts.profile, t)), M, y);

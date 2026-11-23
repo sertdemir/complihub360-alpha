@@ -324,7 +324,7 @@ function HerkunftZeile({ o }: { o: AreaObligation }) {
             defaultValue: 'The statute names no amount, so the euro figure beside it has no counterpart in law.',
           })
         : t('compliance.area.ceiling.unprovenNote', {
-            defaultValue: 'The figure the risk map counts with is carried stock — we have not read it off the statute.',
+            defaultValue: 'The figure the Risk Map counts with is carried stock — we have not read it off the statute.',
           });
   return <p className="mt-2 max-w-[34ch] text-body-3xs leading-relaxed text-fg-tertiary">{text}</p>;
 }

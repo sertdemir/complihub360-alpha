@@ -463,7 +463,7 @@ function CeilingFact({ o }: { o: AreaObligation }) {
         value={t('compliance.area.ceiling.unproven', 'Not proven yet')}
         note={t('compliance.area.ceiling.unprovenNote', {
           defaultValue:
-            'The figure the risk map counts with is carried stock — we have not read it off the statute.',
+            'The figure the Risk Map counts with is carried stock — we have not read it off the statute.',
         })}
         muted
       />
