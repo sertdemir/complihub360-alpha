@@ -556,7 +556,8 @@
         "products": "welche Produktgruppen Sie verkaufen",
         "packaging": "was Sie mit Verpackung tun",
         "established_in_jurisdiction": "wo Ihr Unternehmen seinen Sitz hat",
-        "sells_in_jurisdiction": "ob Sie in diesem Land verkaufen"
+        "sells_in_jurisdiction": "ob Sie in diesem Land verkaufen",
+        "established_in_eu": "ob Ihr Unternehmen seinen Sitz in der EU hat"
       }
     }
   }

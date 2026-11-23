@@ -122,6 +122,32 @@ describe('storage rules · exceptions change the result', () => {
   });
 });
 
+describe('storage rules · "established outside the EU"', () => {
+  // Die erste deutsche Regel soll fuer Haendler mit Sitz ausserhalb der EU gelten.
+  const rule: StorageRule = { ...TEST_RULE, exceptions: [], applies_to: { phases: ['current', 'planned'], conditions: [{ fact: 'established_in_eu', is: 'no' }] } };
+  it('a seat outside the EU triggers, a seat inside does not', () => {
+    expect(evaluateStorageRule(rule, at('current'), answers({ establishment: ['US'] }))?.state).toBe('confirmed');
+    expect(evaluateStorageRule(rule, at('current'), answers({ establishment: ['TR', 'UK'] }))?.state).toBe('confirmed');
+    expect(evaluateStorageRule(rule, at('current'), answers({ establishment: ['FR'] }))).toBeNull();
+    // Ein Sitz in der EU und einer ausserhalb: in der EU ansaessig.
+    expect(evaluateStorageRule(rule, at('current'), answers({ establishment: ['US', 'NL'] }))).toBeNull();
+  });
+  it('no seat country known — "not sure", not asked or "not yet" — keeps the result open and names it', () => {
+    for (const establishment of [null, []]) {
+      const c = evaluateStorageRule(rule, at('current'), answers({ establishment }));
+      expect([c?.state, c?.open]).toEqual(['open', [{ kind: 'answer', key: 'established_in_eu' }]]);
+    }
+  });
+  it('reads the seat the wizard already asks for — no extra question', () => {
+    const run = (establishment: string[]) => assessmentOf({ country: 'US', markets: ['US'], details: { offering: ['physical'], customers: 'consumers', establishment, stock: ['DE'], stockStatus: { DE: 'confirmed' } } }, [rule])
+      .storage.locations[0].checks.map((c) => c.state);
+    expect(run(['US'])).toEqual(['confirmed']);
+    expect(run(['DE'])).toEqual([]);
+    expect(run(['not-yet'])).toEqual(['open']);
+    expect(run(['not-sure'])).toEqual(['open']);
+  });
+});
+
 // STO-A04: US-Unternehmen, Verkaeufe und Bestand USA, geplante Verkaeufe nur
 // Frankreich; Deutschland ausschliesslich Lagerland, bestaetigt. Nur die Phase
 // des deutschen Lagerorts wechselt.

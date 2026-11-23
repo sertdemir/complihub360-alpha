@@ -607,7 +607,8 @@
         "products": "which product groups you sell",
         "packaging": "what you do with packaging",
         "established_in_jurisdiction": "where your business is established",
-        "sells_in_jurisdiction": "whether you sell in this country"
+        "sells_in_jurisdiction": "whether you sell in this country",
+        "established_in_eu": "whether your business is established in the EU"
       }
     }
   }
