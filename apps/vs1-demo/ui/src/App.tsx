@@ -1,7 +1,7 @@
 import { SessionExpiryWatcher } from "./components/auth/SessionExpiryWatcher";
 import { LegacyPartnerRedirect } from "./components/routing/LegacyPartnerRedirect";
 import { lazy, useEffect } from "react";
-import { trackScrollDepth } from "./lib/analytics";
+import { trackPageview, trackScrollDepth } from "./lib/analytics";
 import { useSeo } from "./hooks/useSeo";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams, Navigate, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -177,6 +177,16 @@ function AppContent() {
     // Titel, Description, Canonical, hreflang und Open Graph — zentral statt je
     // Seite, damit eine neue Route ihren Kopf aus lib/publicRoutes.ts bekommt.
     useSeo();
+
+    // Page view per route change. We send it ourselves (index.html loads
+    // script.manual.js) so the address never carries an identifier, a query or
+    // a hash — see lib/analytics.ts. Deferred by a tick: a route that redirects
+    // at once (<Navigate replace />) is cleaned up before the timer fires and
+    // is not counted as a page.
+    useEffect(() => {
+        const timer = window.setTimeout(() => trackPageview(location.pathname), 0);
+        return () => window.clearTimeout(timer);
+    }, [location.pathname]);
 
     // Scroll depth per page view. Re-armed on every navigation so the milestones
     // are per page, not per session; a no-op unless Plausible is configured.

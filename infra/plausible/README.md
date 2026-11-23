@@ -31,6 +31,48 @@ Staging-Klicks unter die echten Zahlen. Gesetzt wird sie in `.env.staging`
 `deploy-beta.yml` nimmt den Host aus `PLAUSIBLE_HOST`. Ist die Variable leer,
 bleibt Plausible in der Beta aus.
 
+## Seitenaufrufe ohne Kennungen (seit 22.11.2026)
+
+`index.html` lädt `script.manual.js`, nicht `script.js`. Das Standard-Skript
+liest die Adresszeile selbst und meldet sie mit Kennung, Query und Hash. Am
+20.11. fiel auf, dass die Bestätigungsseite `/dashboard/booking/<Buchungs-ID>`
+so die Buchungs-ID in jeden Seitenaufruf schrieb. Über unsere Datenbank lässt
+sich eine Buchungs-ID einem Konto zuordnen.
+
+Die manuelle Variante meldet von sich aus nichts. Die App schickt jeden
+Seitenaufruf selbst (`trackPageview` in `src/lib/analytics.ts`, aufgerufen in
+`App.tsx` bei jedem Routenwechsel) und baut die Adresse dafür neu:
+
+| Was | Regel |
+|---|---|
+| Pfad mit Kennung | Das Kennungs-Segment entfällt: `/de/dashboard/booking/<id>` → `/de/dashboard/booking`, `/de/p/<ref>` → `/de/p`, `/de/p/<ref>/schedule` → `/de/p/schedule`, `/de/admin/providers/<key>` → `/de/admin/providers` |
+| Unbekannte Route | Ein Segment, das wie eine UUID oder ein langer Hex-Wert aussieht, entfällt ebenfalls |
+| Query | Nur `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`. Token aus Mail-Links, Sitzungs- und Thread-IDs bleiben im Browser |
+| Hash | entfällt |
+| Pfad ohne Sprache (`/`) | kein Seitenaufruf, er leitet nur weiter |
+
+Dieselbe Adresse hängt an jedem eigenen Event (`track`), auch an `Scroll Depth`.
+
+**Eine neue Route mit Kennung im Pfad gehört in `IDENTIFIER_ROUTES`.** Der Test
+`analytics.test.ts` hält fest, was den Browser verlassen darf.
+
+Zwei Folgen für die Auswertung:
+
+- Weiterleitungen mit `replace` zählen jetzt mit (Login nach dem Guard,
+  `/beta-agreement`). Das Standard-Skript sah sie nicht.
+- Ziele in Plausible stehen auf den gekürzten Pfaden: `/*/dashboard/booking`,
+  `/*/p`, `/*/p/schedule`.
+
+**Sperre als Netz:** In Plausible unter *Site Settings → Shields → Pages* bleibt
+`/*/dashboard/booking/*` gesperrt. Der gekürzte Pfad hat kein Segment hinter
+`booking` und fällt nicht darunter. Die Sperre fängt nur noch ab, was ein alter
+Stand im Browser-Cache oder ein späterer Fehler schicken würde.
+
+Geprüft ist das über die Tests und am 22.11.2026 im Browser gegen den lokalen
+Dev-Server (Aufrufe in `window.plausible.q` gelesen). Gegen die echte Instanz
+ist es nicht geprüft; dass `script.manual.js` ausgeliefert wird und `u`
+übernimmt, stammt aus dem Quelltext von Plausible (Tracker v3.0.1 und v3.2.0).
+
 ## Scrolltiefe
 
 `src/lib/analytics.ts` meldet `Scroll Depth` bei 25 / 50 / 75 / 90 %, einmal je
