@@ -48,12 +48,12 @@ const GoogleIcon = () => (
 );
 
 interface FormData {
-    name: string; email: string; password: string; consent: boolean;
+    name: string; email: string; password: string;
     companyName: string; industry: string; companySize: string; country: string; targetMarkets: string[];
     complianceAreas: string[]; intent: string;
 }
 const DEFAULT_DATA: FormData = {
-    name: "", email: "", password: "", consent: false,
+    name: "", email: "", password: "",
     companyName: "", industry: "", companySize: "", country: "", targetMarkets: [],
     complianceAreas: [], intent: "",
 };
@@ -216,7 +216,6 @@ export function RegisterPage() {
         if (!data.name.trim()) errs.push({ id: "reg-name", label: t("register.nameLabel"), message: t("common:contactSend.field.name") });
         if (!/.+@.+\..+/.test(data.email.trim())) errs.push({ id: "reg-email", label: t("register.emailLabel"), message: t("login.validation.invalidEmail") });
         if (data.password.length < 8) errs.push({ id: "reg-password", label: t("register.passwordLabel"), message: t("reset.errors.tooShort") });
-        if (!data.consent) errs.push({ id: "reg-consent", label: t("register.validation.consentLabel"), message: t("register.validation.consent") });
         return errs;
     };
     const errors = tried && step === 0 ? accountErrors() : [];
@@ -411,27 +410,20 @@ export function RegisterPage() {
                                     <Field id="reg-name" label={t("register.nameLabel")} value={data.name} onChange={(v) => patch({ name: v })} placeholder={t("register.namePlaceholder")} autoComplete="name" error={errFor("reg-name")} />
                                     <Field id="reg-email" label={t("register.emailLabel")} type="email" value={data.email} onChange={(v) => patch({ email: v })} placeholder="name@unternehmen.de" autoComplete="email" error={errFor("reg-email")} />
                                     <Field id="reg-password" label={t("register.passwordLabel")} type="password" value={data.password} onChange={(v) => { patch({ password: v }); setWeakPassword(false); }} placeholder={t("register.passwordPlaceholder")} minLength={8} autoComplete="new-password" error={errFor("reg-password")} />
-                                    <label htmlFor="reg-consent" className="mt-5 flex cursor-pointer items-start gap-3">
-                                        <input
-                                            id="reg-consent"
-                                            type="checkbox"
-                                            checked={data.consent}
-                                            onChange={(e) => patch({ consent: e.target.checked })}
-                                            className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand,#004D40)]"
-                                            {...errorAria("reg-consent", !!errFor("reg-consent"))}
+                                    {/* Keine Checkbox (Entscheidung 23.11.2026): sie speicherte nichts.
+                                        Zugestimmt wird einmal und nachweisbar, im Schritt nach dem
+                                        ersten Anmelden (BetaAgreementStepPage). Hier steht nur, dass
+                                        er kommt. */}
+                                    <p className="mt-5 text-body-2xs leading-relaxed text-fg-tertiary">
+                                        <Trans
+                                            t={t}
+                                            i18nKey="register.betaNote"
+                                            components={{
+                                                terms: <a href={`/${lang}/terms`} className="font-semibold text-brand" />,
+                                                privacy: <a href={`/${lang}/privacy`} className="font-semibold text-brand" />,
+                                            }}
                                         />
-                                        <span className="text-body-2xs leading-relaxed text-fg-tertiary">
-                                            <Trans
-                                                t={t}
-                                                i18nKey="register.consent"
-                                                components={{
-                                                    terms: <a href={`/${lang}/terms`} className="font-semibold text-brand" />,
-                                                    privacy: <a href={`/${lang}/privacy`} className="font-semibold text-brand" />,
-                                                }}
-                                            />
-                                        </span>
-                                    </label>
-                                    <FieldError id="reg-consent" message={errFor("reg-consent")} />
+                                    </p>
                                 </>
                             )}
 
