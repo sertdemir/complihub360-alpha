@@ -36,7 +36,7 @@ import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { handleProviderApplication } from "./providerApplication.js";
-import { handleAgreementsRoute } from "./agreements.js";
+import { betaAgreementState, handleAgreementsRoute } from "./agreements.js";
 import { handleSavedProvidersRoute } from "./savedProviders.js";
 import { handleSubscriptionGet, handleSubscriptionSelect, handleSubscriptionSchedule, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
@@ -1924,6 +1924,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         if (seen.kind === 'in_progress') {
                             fail(409, 'BOOKING_IN_PROGRESS', 'This booking is already being processed. Please wait a moment.'); return;
                         }
+                    }
+
+                    // Geschlossene Beta: keine Buchung ohne die geltende Beta-Vereinbarung
+                    // (Entscheidungen 15.10. und 23.11.2026). Die Oberflaeche fragt vor dem
+                    // Workspace und vor /results; diese Pruefung ist das Netz fuer alte
+                    // Tabs und fuer den Fall, dass das Gate dort offen ausfaellt. Sie steht
+                    // nach der Wiederholungs-Pruefung, damit eine schon angelegte Buchung
+                    // weiter zurueckkommt. Ein Lesefehler landet im catch unten: lieber
+                    // keine Buchung als eine ohne Blatt.
+                    const beta = await betaAgreementState(authUserId as string, lang);
+                    if (beta.required) {
+                        fail(409, 'AGREEMENT_REQUIRED', 'The beta agreement must be accepted before booking', { agreement: 'beta', current_version: beta.current_version }); return;
                     }
 
                     // Die Fassung, die der Nutzer gesehen hat, muss die gueltige sein.

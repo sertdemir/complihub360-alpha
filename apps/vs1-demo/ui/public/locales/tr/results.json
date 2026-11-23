@@ -258,7 +258,17 @@
       "retryNow": "Tekrar dene",
       "pickOtherSlot": "Başka saat seç",
       "reread": "Güncellenen koşulları oku",
-      "keepNote": "Mesajınız ve seçiminiz korunur."
+      "keepNote": "Mesajınız ve seçiminiz korunur.",
+      "agreement_required": {
+        "title": "Randevudan önce beta sözleşmesi eksik.",
+        "body": "Randevu oluşturulmadı ve bilgileriniz paylaşılmadı."
+      },
+      "readAgreement": "Beta sözleşmesini oku",
+      "list": {
+        "noBooking": "Rezervasyon oluşturulmadı",
+        "nothingShared": "Sağlayıcıyla hiçbir şey paylaşılmadı",
+        "kept": "Seçiminiz ve mesajınız korunur"
+      }
     },
     "slotsFailed": "Uygun saatler yüklenemedi. Bu, sağlayıcının müsaitliği hakkında bir şey söylemez.",
     "slotsRetry": "Tekrar dene"

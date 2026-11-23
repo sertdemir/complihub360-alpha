@@ -258,7 +258,17 @@
       "retryNow": "Intentar de nuevo",
       "pickOtherSlot": "Elegir otra franja",
       "reread": "Leer las condiciones actualizadas",
-      "keepNote": "Su mensaje y su selección se conservan."
+      "keepNote": "Su mensaje y su selección se conservan.",
+      "agreement_required": {
+        "title": "Antes de reservar falta el acuerdo de la beta.",
+        "body": "No se ha creado ninguna reserva y su información no se ha compartido."
+      },
+      "readAgreement": "Leer el acuerdo de la beta",
+      "list": {
+        "noBooking": "No se ha creado ninguna reserva",
+        "nothingShared": "No se ha compartido nada con el proveedor",
+        "kept": "Su selección y su mensaje se conservan"
+      }
     },
     "slotsFailed": "No hemos podido cargar los horarios disponibles. Esto no dice nada sobre la disponibilidad del proveedor.",
     "slotsRetry": "Intentar de nuevo"

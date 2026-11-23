@@ -258,7 +258,17 @@
       "retryNow": "Erneut versuchen",
       "pickOtherSlot": "Anderen Termin wählen",
       "reread": "Aktualisierte Bedingungen lesen",
-      "keepNote": "Ihre Nachricht und Ihre Auswahl bleiben erhalten."
+      "keepNote": "Ihre Nachricht und Ihre Auswahl bleiben erhalten.",
+      "agreement_required": {
+        "title": "Vor der Buchung fehlt noch die Beta-Vereinbarung.",
+        "body": "Es wurde keine Buchung angelegt, und Ihre Angaben wurden nicht weitergegeben."
+      },
+      "readAgreement": "Beta-Vereinbarung lesen",
+      "list": {
+        "noBooking": "Es wurde keine Buchung angelegt",
+        "nothingShared": "Mit dem Anbieter wurde nichts geteilt",
+        "kept": "Ihre Auswahl und Ihr Anliegen bleiben erhalten"
+      }
     },
     "slotsFailed": "Die freien Termine konnten nicht geladen werden. Über die Verfügbarkeit des Anbieters sagt das nichts.",
     "slotsRetry": "Erneut versuchen"

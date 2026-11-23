@@ -74,7 +74,8 @@
     "steps": {
       "login": "1 Sign-in",
       "agreement": "2 Beta agreement",
-      "workspace": "3 Your workspace"
+      "workspace": "3 Your workspace",
+      "riskMap": "3 Your Risk Map"
     },
     "eyebrow": "Closed beta",
     "title": "One sheet before we start.",
@@ -91,7 +92,22 @@
     "outdated": "The sheet has changed in the meantime. Here is the new version.",
     "failed": "Your consent could not be saved right now. This is not on you.",
     "retry": "Try again",
-    "saving": "Saving …"
+    "saving": "Saving …",
+    "ctaRiskMap": "Continue to your Risk Map",
+    "drawer": {
+      "title": "One sheet, then your appointment",
+      "noteLead": "Not booked yet.",
+      "note": "Your selection stays here. The slot is not reserved yet.",
+      "cta": "Agree and return to the booking",
+      "back": "Back to the appointment"
+    },
+    "declined": {
+      "title": "You are signed out. Your Risk Map stays visible on this device.",
+      "body": "Booking, saving and messages are available in the beta once you have accepted the beta agreement. You can do that at any time.",
+      "read": "Read the beta agreement",
+      "signIn": "Sign in again",
+      "close": "Close notice"
+    }
   },
   "account": {
     "title": "Account",

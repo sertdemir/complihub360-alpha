@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Check, Info } from 'lucide-react';
 import { Button, outlineBrandClass } from '../ui/Button';
 import type { BookingAcknowledgement, BookingFailure } from '../../api/bookings';
@@ -42,7 +42,7 @@ export function AcknowledgementList({ ack, className = '' }: { ack: BookingAckno
 // Neutraler Kasten, kein Rot: dem Nutzer ist nichts passiert. Keine Schuld
 // auf keiner Seite (DNA).
 
-export function BookingFailureCard({ failure, onOtherProvider, onRetry, onReread, onPickSlot }: {
+export function BookingFailureCard({ failure, onOtherProvider, onRetry, onReread, onPickSlot, onReadAgreement }: {
   failure: BookingFailure;
   /** Schliesst die Schublade und laesst die Liste stehen; fehlt er (eigene Seite), bleibt nur „erneut". */
   onOtherProvider?: () => void;
@@ -51,18 +51,27 @@ export function BookingFailureCard({ failure, onOtherProvider, onRetry, onReread
   onReread: () => void;
   /** Slot vergeben: Termine neu laden, Auswahl loeschen. */
   onPickSlot: () => void;
+  /** Beta-Vereinbarung fehlt (4A, 23.11.2026): das Blatt an Ort und Stelle
+   *  zeigen. Fehlt der Handler (eigene Seite), fuehrt der Knopf zum Schritt
+   *  und danach hierher zurueck. */
+  onReadAgreement?: () => void;
 }) {
   const { t, i18n } = useTranslation(['results', 'common']);
   const navigate = useNavigate();
+  const location = useLocation();
   const locale = i18n.resolvedLanguage || 'en';
   const k = failure.kind;
+  const readAgreement = onReadAgreement
+    ?? (() => navigate(`/${locale}/beta-agreement?redirect=${encodeURIComponent(location.pathname)}`));
   const reason = k === 'slot_taken' ? t('schedule.fail.slot_taken.title')
     : k === 'acknowledgement_outdated' ? t('schedule.fail.acknowledgement_outdated.title')
+    : k === 'agreement_required' ? t('schedule.fail.agreement_required.title')
     : k === 'not_completed' ? t('schedule.fail.reasonProvider')
     : k === 'in_progress' ? t('schedule.fail.in_progress.title')
     : null;
   const primary = k === 'slot_taken' ? { label: t('schedule.fail.pickOtherSlot'), onClick: onPickSlot }
     : k === 'acknowledgement_outdated' ? { label: t('schedule.fail.reread'), onClick: onReread }
+    : k === 'agreement_required' ? { label: t('schedule.fail.readAgreement'), onClick: readAgreement }
     : k === 'not_completed' && onOtherProvider ? { label: t('schedule.fail.otherProvider'), onClick: onOtherProvider }
     : { label: t('common:states.actions.tryAgain'), onClick: onRetry };
   return (
@@ -72,7 +81,10 @@ export function BookingFailureCard({ failure, onOtherProvider, onRetry, onReread
         {t('common:states.bookingFailed.heading')}
       </p>
       {reason && <p className="mt-1.5 text-body-3xs font-semibold leading-relaxed text-fg">{reason}</p>}
-      <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-secondary">{t('common:states.bookingFailed.message')}</p>
+      {/* Fehlt die Vereinbarung, hilft „erneut versuchen" nicht: nur der erste Satz. */}
+      <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-secondary">
+        {k === 'agreement_required' ? t('schedule.fail.agreement_required.body') : t('common:states.bookingFailed.message')}
+      </p>
       <ul className="mt-3 flex flex-col gap-1.5 rounded-lg bg-brand-light px-3.5 py-3">
         {(['noBooking', 'nothingShared', 'kept'] as const).map((x) => (
           <li key={x} className="flex items-center gap-2 text-body-3xs text-fg">

@@ -776,6 +776,12 @@ function createBooking(body: unknown) {
   if (typeof d.acknowledgement_version !== 'string' || !d.acknowledgement_version) {
     return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'acknowledgement_version required' };
   }
+  // Wie der Server (23.11.2026): keine Buchung ohne die geltende Beta-
+  // Vereinbarung. Nach `POST /api/v1/mock/agreements/reset` spielt der Mock
+  // damit den alten Tab durch, an dem das Gate vorbeiging.
+  if (BETA_ACCEPTED?.version !== BETA_VERSION) {
+    return { __status: 409, errorCode: 'AGREEMENT_REQUIRED', message: 'The beta agreement must be accepted before booking', agreement: 'beta', current_version: BETA_VERSION };
+  }
   if (d.acknowledgement_version !== ACK_VERSION) {
     return { __status: 409, errorCode: 'ACKNOWLEDGEMENT_OUTDATED', message: 'The booking acknowledgement has changed — please read it again', current_version: ACK_VERSION };
   }

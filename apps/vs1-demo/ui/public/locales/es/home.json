@@ -803,7 +803,9 @@
         "Avisos regulatorios — en preparación"
       ],
       "confirm": "Haga clic en el enlace para terminar de configurar su cuenta gratuita.",
-      "cta": "Crear cuenta gratuita"
+      "cta": "Crear cuenta gratuita",
+      "footNote": "Sin contraseña · Sin tarjeta de crédito.",
+      "betaNote": "Beta cerrada: tras el primer inicio de sesión le mostramos una hoja. Dice qué es esta prueba y qué no."
     },
     "workEmail": "Correo de trabajo",
     "emailPlaceholder": "usted@empresa.com",

@@ -264,7 +264,12 @@
         "noBooking": "No booking was created",
         "nothingShared": "Nothing was shared with the provider",
         "kept": "Your selection and message are kept"
-      }
+      },
+      "agreement_required": {
+        "title": "The beta agreement is still missing before you can book.",
+        "body": "No booking was created and your information was not shared."
+      },
+      "readAgreement": "Read the beta agreement"
     },
     "slotsFailed": "We couldn’t load the available times. This says nothing about the provider’s availability.",
     "slotsRetry": "Try again"
