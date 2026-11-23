@@ -1,4 +1,5 @@
 import { isKnownCountry } from './country-profile.js';
+import { STORAGE_RULES, evaluateStorageRule, type StorageCheck, type StorageRule, type StorageRuleAnswers } from './storage-rules.js';
 
 // ─── Evidence: worauf eine Pflicht in der Risk Map beruht (Wizard-Audit F1) ───
 // Bis 23.10.2026 hiess "confirmed": der Nutzer hat den Bereich angeklickt.
@@ -270,11 +271,13 @@ export interface StorageAnswer {
 /** Ein Lagerort am Ergebnis (Folgeauftrag Lagerung, 20.11.2026): Land, Phase
  *  und Bestaetigungsstand, getrennt von den Verkaufsmaerkten.
  *
- *  `assessed` ist heute immer false, `reason` immer 'no_rule': Die Engine
- *  fuehrt keine fachlich gepruefte Regel, die ein Lagerland auswertet. Die
- *  Stelle, an der eine solche Regel greift, ist `STORAGE_RULES` — solange sie
- *  leer ist, sagt jede Flaeche fuer genau dieses Land, dass die Bewertung
- *  fehlt, statt eine Pflicht zu behaupten oder "nichts zu tun" nahezulegen. */
+ *  `assessed` = fuer dieses Land und diese Phase gibt es eine FREIGEGEBENE
+ *  Lagerregel (storage-rules.ts). Das Register ist heute leer: `assessed`
+ *  ist dann false und `reason` 'no_rule', und jede Flaeche sagt fuer genau
+ *  dieses Land, dass die Bewertung fehlt, statt eine Pflicht zu behaupten
+ *  oder "nichts zu tun" nahezulegen. Mit Regel traegt `checks` ihr Ergebnis;
+ *  `checks` kann leer sein, wenn der Ausloeser nicht zutrifft oder eine
+ *  Ausnahme greift. */
 export interface StorageLocation {
   country: string;
   phase: 'current' | 'planned';
@@ -284,14 +287,10 @@ export interface StorageLocation {
   also_market: boolean;
   assessed: boolean;
   reason: 'no_rule' | 'rule';
-  /** Die Pruefungen, die eine hinterlegte Regel fuer diesen Ort nennt. */
-  checks: string[];
+  /** Die lagerbezogenen Checks aus den freigegebenen Regeln fuer diesen Ort. */
+  checks: StorageCheck[];
 }
 
-/** Fachlich gepruefte Lagerregeln je Land. LEER, bis jemand vom Fach sie
- *  liefert und prueft (Frage an die Mitgruenderin, 22.11.2026). Ein Eintrag
- *  nennt die Kennungen der Pruefungen, die Lagerung in dem Land ausloest. */
-export const STORAGE_RULES: Record<string, { current: string[]; planned: string[] }> = {};
 
 /** Lager heute (CW06) und geplantes Lager (CW07), je mit eigenem Status
  *  (Feedback CW-F01). "Nicht gefragt", "unentschieden", "nicht sicher" und
@@ -358,7 +357,11 @@ export interface AssessmentRecord {
   storage: { current: StorageAnswer; planned: StorageAnswer; open_countries: { current: string[]; planned: string[] }; locations: StorageLocation[] };
 }
 
-export function assessmentOf(answers: { markets?: unknown; country?: unknown; details?: unknown } | null | undefined): AssessmentRecord {
+export function assessmentOf(
+  answers: { markets?: unknown; country?: unknown; details?: unknown } | null | undefined,
+  /** Nur fuer Tests ersetzbar; im Betrieb das Register. */
+  rules: StorageRule[] = STORAGE_RULES,
+): AssessmentRecord {
   const phases = countryPhases(answers);
   const d = answers?.details;
   const check = checkScopeOf(d);
@@ -369,24 +372,42 @@ export function assessmentOf(answers: { markets?: unknown; country?: unknown; de
     assessed: { current: phases.current.filter(isKnownCountry), planned: phases.planned.filter(isKnownCountry) },
     not_assessed: all.filter((c) => !isKnownCountry(c)),
     check: { ...check, outside: phases.outsideScope, current_markets_known: unfiltered.current.length > 0 },
-    storage: {
-      ...storage,
-      open_countries: {
-        current: storage.current.countries.filter((c) => !STORAGE_RULES[c]),
-        planned: storage.planned.countries.filter((c) => !STORAGE_RULES[c]),
-      },
-      locations: (['current', 'planned'] as const).flatMap((phase) => storage[phase].countries.map((country): StorageLocation => {
-        const checks = STORAGE_RULES[country]?.[phase] ?? [];
-        return {
-          country, phase,
-          confirmation: storage[phase].confirmation[country] ?? 'unstated',
-          also_market: all.includes(country),
-          assessed: checks.length > 0,
-          reason: checks.length > 0 ? 'rule' : 'no_rule',
-          checks,
-        };
-      })),
-    },
+    storage: (() => {
+      const released = rules.filter((r) => r.review.status === 'released');
+      const covered = (country: string, phase: 'current' | 'planned') => released.some((r) => r.jurisdiction === country && r.applies_to.phases.includes(phase));
+      const dd = (d && typeof d === 'object' && !Array.isArray(d) ? d : {}) as Record<string, unknown>;
+      const est = list(dd.establishment);
+      const ruleAnswers: StorageRuleAnswers = {
+        offering: list(dd.offering),
+        customers: typeof dd.customers === 'string' ? dd.customers : '',
+        channels: list(dd.channels),
+        products: list(dd.eprProducts),
+        packaging: list(dd.packaging),
+        // "Nicht sicher" und "nicht gefragt" sind unbekannt; "noch keiner" ist eine Antwort.
+        establishment: est.length && !est.includes('not-sure') ? est.filter((x) => /^[A-Za-z]{2}$/.test(x)).map((x) => x.toUpperCase()) : null,
+        currentMarkets: unfiltered.current,
+        plannedMarkets: unfiltered.planned,
+        inputs: (dd.ruleInputs && typeof dd.ruleInputs === 'object' && !Array.isArray(dd.ruleInputs) ? dd.ruleInputs : {}) as Record<string, string>,
+      };
+      return {
+        ...storage,
+        open_countries: {
+          current: storage.current.countries.filter((c) => !covered(c, 'current')),
+          planned: storage.planned.countries.filter((c) => !covered(c, 'planned')),
+        },
+        locations: (['current', 'planned'] as const).flatMap((phase) => storage[phase].countries.map((country): StorageLocation => {
+          const location = { country, phase, confirmation: storage[phase].confirmation[country] ?? 'unstated' as const };
+          const assessed = covered(country, phase);
+          return {
+            ...location,
+            also_market: all.includes(country),
+            assessed,
+            reason: assessed ? 'rule' : 'no_rule',
+            checks: released.flatMap((r) => evaluateStorageRule(r, location, ruleAnswers) ?? []),
+          };
+        })),
+      };
+    })(),
   };
 }
 

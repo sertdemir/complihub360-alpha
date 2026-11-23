@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateEvidence, factsFromAnswers, marketPhases, countryPhases, checkScopeOf, storageOf, assessmentOf, answeredQuestions, STORAGE_RULES, EVIDENCE_RULES } from '../evidence';
+import { evaluateEvidence, factsFromAnswers, marketPhases, countryPhases, checkScopeOf, storageOf, assessmentOf, answeredQuestions, EVIDENCE_RULES } from '../evidence';
 import { DomainTemplateLibrary } from '../domain-schema';
 import { generateRelevantSubdomains } from '../generator';
 import { ComplianceDomain } from '../domain-schema';
@@ -123,9 +123,6 @@ describe('evidence · current and planned markets (Core Wizard Handover v1.1)', 
     const noExpansion = assessmentOf({ markets: ['US'], details: { stock: ['US'], plannedStock: ['NL'], plannedStockStatus: { NL: 'confirmed' } } });
     expect(noExpansion.assessed).toEqual({ current: ['US'], planned: [] });
     expect(noExpansion.storage.locations.map((l) => [l.country, l.phase, l.also_market])).toEqual([['US', 'current', true], ['NL', 'planned', false]]);
-  });
-  it('no storage rule is on file yet — the engine says so instead of inventing one', () => {
-    expect(STORAGE_RULES).toEqual({});
   });
   it('CW-F01: a storage country is neither a market nor a fact', () => {
     const a = { markets: ['US'], details: { stock: ['US'], plannedStock: ['DE', 'FR'] } };

@@ -520,7 +520,7 @@
     },
     "notAMarket": "no es uno de sus mercados de venta",
     "noRule": "Aún no tenemos una revisión de almacenamiento para {{country}}, por lo que este Risk Map no afirma nada sobre almacenar mercancía allí. No es una conclusión de que allí no se aplique nada.",
-    "assessed": "El almacenamiento aquí forma parte de: {{checks}}.",
+    "assessed": "El almacenamiento aquí se evalúa más abajo: {{checks}}.",
     "open": {
       "current": "Queda abierto: si realmente se almacena mercancía allí.",
       "planned": "Queda abierto: si se usará esta ubicación."
@@ -531,6 +531,23 @@
       "plannedNoOther": "Previsto: sin almacenamiento en otro país. No añadimos ninguna otra ubicación.",
       "plannedUndecided": "Previsto: aún sin decidir, sin ubicación conocida. No se supone nada para ningún país.",
       "plannedUnknown": "Previsto: aún no se sabe. No se supone nada para ningún país."
+    },
+    "assessedNone": "Nuestra revisión de almacenamiento para {{country}} no añade nada con sus respuestas. No es una conclusión de que allí no se aplique nada.",
+    "guidance": "La fuente es una explicación oficial, no el texto de la ley.",
+    "openItem": {
+      "location": {
+        "current": "si realmente se almacena mercancía allí",
+        "planned": "si se usará esta ubicación"
+      },
+      "answer": {
+        "offering": "qué vende u ofrece",
+        "customers": "quiénes son sus clientes",
+        "channels": "cómo vende",
+        "products": "qué grupos de productos vende",
+        "packaging": "qué hace con los envases",
+        "established_in_jurisdiction": "dónde está establecida su empresa",
+        "sells_in_jurisdiction": "si vende en este país"
+      }
     }
   }
 }
