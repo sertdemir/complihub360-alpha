@@ -13,7 +13,7 @@ als Fachperson aus (DNA, `KN-BRAND-001`).
 | Wer antwortet | Mensch im Produkt: die Mitgründerin |
 | Postfach | `demet+p01@complihub360.com` … `+p25@`. Alles landet in einem Postfach. |
 | Verteilung | gleichmäßig über 9 Bereiche × 8 Märkte |
-| Kennzeichnung | keine im Produkt. Der Hinweis steht in den Beta-Bedingungen. **Tester bekommen Zugang erst, wenn sie die Bedingungen gesehen haben.** |
+| Kennzeichnung | keine im Produkt. Der Hinweis steht in den Beta-Bedingungen: seit der Fassung `beta-2026-11` als Punkt 05 „Anbieter sind Testkonten“ (Migration `20261123000000`). Die Fassung `beta-2026-10` enthielt ihn nicht. **Tester bekommen Zugang erst, wenn sie die Bedingungen gesehen haben.** |
 | Wächter | scharf: Erinnerungen und Herabstufung wie bei echten Providern |
 
 ## Was das Skript anlegt
