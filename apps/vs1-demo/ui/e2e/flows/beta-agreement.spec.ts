@@ -2,7 +2,7 @@ import { test, expect, demoLogin, resetMock, blockForeignHosts } from './_demo';
 
 // ─── Beta-Vereinbarung (Canvas-Wahl 1A · 2A · 3A+3C · 4C, 22.10.2026) ────────
 // Ein Tester ohne Annahme landet nach dem Login im eigenen Schritt, liest die
-// neun Saetze, setzt den Haken und kommt dorthin, wohin er wollte. Danach
+// zehn Saetze, setzt den Haken und kommt dorthin, wohin er wollte. Danach
 // steht der Nachweis im Konto. Wer schon angenommen hat, sieht den Schritt
 // nicht. /terms zeigt das Blatt fuer jeden, auch ohne Konto.
 
@@ -11,11 +11,13 @@ test.beforeEach(async ({ page }) => {
   await resetMock(page);
 });
 
-test('Gast: /terms zeigt das Blatt in neun Saetzen, der Footer heisst Beta-Vereinbarung', async ({ page }) => {
+test('Gast: /terms zeigt das Blatt in zehn Saetzen, der Footer heisst Beta-Vereinbarung', async ({ page }) => {
   await page.goto('/de/terms', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Beta-Vereinbarung');
   await expect(page.getByRole('heading', { name: /^01 · Das ist ein Test\./ })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /^09 · Jederzeit raus\./ })).toBeVisible();
+  // Fassung beta-2026-11: Punkt 05 sagt, dass die Anbieter der Beta Testkonten sind.
+  await expect(page.getByRole('heading', { name: /^05 · Anbieter sind Testkonten\./ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^10 · Jederzeit raus\./ })).toBeVisible();
   await expect(page.getByText(/ohne anwaltliche Prüfung erstellt/).first()).toBeVisible();
   await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Beta-Vereinbarung' })).toHaveAttribute('href', '/de/terms');
 });
@@ -28,7 +30,8 @@ test('Nutzer ohne Annahme: Gate → Schritt → Haken → zurueck ans Ziel, Nach
   await page.goto('/de/dashboard/termine', { waitUntil: 'domcontentloaded' });
   await expect(page).toHaveURL(/\/de\/beta-agreement\?redirect=%2Fde%2Fdashboard%2Ftermine/);
   await expect(page.getByRole('heading', { name: 'Bevor es losgeht: ein Blatt' })).toBeVisible();
-  await expect(page.getByTestId('beta-points').getByRole('listitem')).toHaveCount(9);
+  await expect(page.getByTestId('beta-points').getByRole('listitem')).toHaveCount(10);
+  await expect(page.getByTestId('beta-points')).toContainText('Anbieter sind Testkonten.');
   // Das ganze Blatt steht im Kasten; kein Absprung zum Volltext (Festlegung 23.10.).
   await expect(page.getByTestId('beta-points')).toContainText('Jederzeit raus.');
   await expect(page.getByRole('link', { name: /Das ganze Blatt lesen/ })).toHaveCount(0);
@@ -46,7 +49,7 @@ test('Nutzer ohne Annahme: Gate → Schritt → Haken → zurueck ans Ziel, Nach
   // Nachweis im Konto: Fassung, Zeitpunkt, Sprache.
   await page.goto('/de/dashboard/account', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: 'Konto' })).toBeVisible();
-  await expect(page.getByText('beta-2026-10')).toBeVisible();
+  await expect(page.getByText('beta-2026-11')).toBeVisible();
   await expect(page.getByText('aktuell')).toBeVisible();
   await expect(page.getByText(/· Deutsch$/)).toBeVisible();
 
