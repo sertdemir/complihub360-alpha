@@ -520,7 +520,7 @@
     },
     "notAMarket": "keiner Ihrer Verkaufsmärkte",
     "noRule": "Für {{country}} ist noch keine Lagerprüfung hinterlegt. Diese Risk Map trifft deshalb keine Aussage zur Lagerung dort. Das ist keine Feststellung, dass dort nichts gilt.",
-    "assessed": "Die Lagerung hier ist Teil von: {{checks}}.",
+    "assessed": "Die Lagerung hier wird unten bewertet: {{checks}}.",
     "open": {
       "current": "Noch offen: ob dort tatsächlich Waren lagern.",
       "planned": "Noch offen: ob dieser Standort genutzt wird."
@@ -531,6 +531,23 @@
       "plannedNoOther": "Geplant: keine Lagerung in einem anderen Land. Wir ergänzen keinen weiteren Standort.",
       "plannedUndecided": "Geplant: noch nicht entschieden, kein Standort bekannt. Für kein Land wird etwas angenommen.",
       "plannedUnknown": "Geplant: noch nicht bekannt. Für kein Land wird etwas angenommen."
+    },
+    "assessedNone": "Unsere Lagerprüfung für {{country}} ergibt für Ihre Angaben keinen Check. Das ist keine Feststellung, dass dort nichts gilt.",
+    "guidance": "Die Quelle ist eine amtliche Erläuterung, nicht der Gesetzestext.",
+    "openItem": {
+      "location": {
+        "current": "ob dort tatsächlich Waren lagern",
+        "planned": "ob dieser Standort genutzt wird"
+      },
+      "answer": {
+        "offering": "was Sie verkaufen oder anbieten",
+        "customers": "wer Ihre Kunden sind",
+        "channels": "wie Sie verkaufen",
+        "products": "welche Produktgruppen Sie verkaufen",
+        "packaging": "was Sie mit Verpackung tun",
+        "established_in_jurisdiction": "wo Ihr Unternehmen seinen Sitz hat",
+        "sells_in_jurisdiction": "ob Sie in diesem Land verkaufen"
+      }
     }
   }
 }

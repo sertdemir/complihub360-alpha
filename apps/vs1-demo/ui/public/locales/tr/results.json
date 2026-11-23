@@ -520,7 +520,7 @@
     },
     "notAMarket": "satış pazarlarınızdan biri değil",
     "noRule": "{{country}} için henüz bir depolama kontrolümüz yok; bu nedenle bu Risk Map orada mal depolama hakkında bir beyanda bulunmaz. Bu, orada hiçbir şeyin geçerli olmadığı anlamına gelmez.",
-    "assessed": "Buradaki depolama şunların parçasıdır: {{checks}}.",
+    "assessed": "Buradaki depolama aşağıda değerlendirilir: {{checks}}.",
     "open": {
       "current": "Hâlâ açık: orada gerçekten mal depolanıp depolanmadığı.",
       "planned": "Hâlâ açık: bu yerin kullanılıp kullanılmayacağı."
@@ -531,6 +531,23 @@
       "plannedNoOther": "Planlanan: başka bir ülkede depolama yok. Başka bir yer eklemiyoruz.",
       "plannedUndecided": "Planlanan: henüz kararlaştırılmadı, bilinen bir yer yok. Hiçbir ülke için varsayım yapılmaz.",
       "plannedUnknown": "Planlanan: henüz bilinmiyor. Hiçbir ülke için varsayım yapılmaz."
+    },
+    "assessedNone": "{{country}} için depolama kontrolümüz yanıtlarınıza göre bir şey eklemiyor. Bu, orada hiçbir şeyin geçerli olmadığı anlamına gelmez.",
+    "guidance": "Kaynak resmî bir açıklamadır, kanun metni değildir.",
+    "openItem": {
+      "location": {
+        "current": "orada gerçekten mal depolanıp depolanmadığı",
+        "planned": "bu yerin kullanılıp kullanılmayacağı"
+      },
+      "answer": {
+        "offering": "ne sattığınız veya sunduğunuz",
+        "customers": "müşterilerinizin kim olduğu",
+        "channels": "nasıl satış yaptığınız",
+        "products": "hangi ürün gruplarını sattığınız",
+        "packaging": "ambalajla ne yaptığınız",
+        "established_in_jurisdiction": "işletmenizin nerede kurulu olduğu",
+        "sells_in_jurisdiction": "bu ülkede satış yapıp yapmadığınız"
+      }
     }
   }
 }

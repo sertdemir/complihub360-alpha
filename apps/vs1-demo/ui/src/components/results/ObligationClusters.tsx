@@ -38,6 +38,10 @@ export type ClusterRow = {
   rowKey?: string;
   /** Geplante Taetigkeit — die Begruendung sagt dann "Sie planen". */
   phase?: 'current' | 'planned';
+  /** Ein lagerbezogener Check aus einer freigegebenen Lagerregel. Seine
+   *  Begruendung kommt fertig aus der Regel: Erklaerung, was noch offen ist,
+   *  und die Ausnahme, die das Ergebnis bestimmt hat. */
+  storage?: { explanation: string; open: string[]; exception?: string; guidance?: boolean };
 };
 
 const ORDER: EvidenceState[] = ['confirmed', 'likely', 'open'];
@@ -51,6 +55,20 @@ function WhyPanel({ row, id }: { row: ClusterRow; id: string }) {
   const facts = (keys: string[]) => keys
     .map((k) => (row.phase === 'planned' ? t(`why.factPlanned.${k}`, { defaultValue: t(`why.fact.${k}`, { defaultValue: k }) }) : t(`why.fact.${k}`, { defaultValue: k })))
     .join(', ');
+  if (row.storage) {
+    return (
+      <div id={id} className="mt-2 rounded-md bg-surface-secondary px-3.5 py-3 text-body-2xs leading-relaxed text-fg" data-testid="storage-why">
+        <p>{row.storage.explanation}</p>
+        {row.storage.exception && <p className="mt-1">{row.storage.exception}</p>}
+        {row.storage.open.length > 0 && (
+          <p className="mt-1">
+            <span className="font-semibold">{t('why.decides')}</span> {row.storage.open.join('; ')}.
+          </p>
+        )}
+        {row.storage.guidance && <p className="mt-1 text-fg-secondary">{t('storage.guidance')}</p>}
+      </div>
+    );
+  }
   return (
     <div id={id} className="mt-2 rounded-md bg-surface-secondary px-3.5 py-3 text-body-2xs leading-relaxed text-fg">
       {/* "You chose this area" stimmt nur fuer gewaehlte Bereiche. */}

@@ -9,8 +9,9 @@ import { countryName } from '../../lib/countries';
 // dieses Land. Sie behauptet weder eine Pflicht noch, dass dort nichts gilt
 // (DNA: Unsicherheit benennen, keine Beduerfnisse erzeugen).
 //
-// Heute fuehrt die Engine KEINE Lagerregel (STORAGE_RULES ist leer). Der
-// Zweig `assessed` ist vorbereitet und zeigt dann die Pruefungen der Regel.
+// Heute fuehrt die Engine KEINE freigegebene Lagerregel (das Register in
+// storage-rules.ts ist leer). Mit Regel verweist die Zeile auf ihre Checks,
+// die als eigene Zeilen in den Gruppen darunter stehen.
 
 type Storage = AssessmentRecord['storage'];
 
@@ -44,9 +45,11 @@ export function StorageLocations({ storage }: { storage: Storage | undefined }) 
                 </span>
               </p>
               <p className="mt-0.5 text-body-sm text-fg-secondary">
-                {l.assessed
-                  ? t('storage.assessed', { checks: l.checks.join(', ') })
-                  : t('storage.noRule', { country: countryName(l.country, lang) })}
+                {!l.assessed
+                  ? t('storage.noRule', { country: countryName(l.country, lang) })
+                  : l.checks.length
+                    ? t('storage.assessed', { checks: l.checks.map((c) => c.title).join(', ') })
+                    : t('storage.assessedNone', { country: countryName(l.country, lang) })}
                 {l.confirmation !== 'confirmed' && <> {t(`storage.open.${l.phase}`)}</>}
               </p>
             </li>

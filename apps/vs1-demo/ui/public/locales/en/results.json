@@ -576,7 +576,7 @@
     },
     "notAMarket": "not one of your sales markets",
     "noRule": "We hold no storage check for {{country}} yet, so this Risk Map makes no statement about storing goods there. That is not a finding that nothing applies.",
-    "assessed": "Storage here is part of: {{checks}}.",
+    "assessed": "Storage here is assessed below: {{checks}}.",
     "open": {
       "current": "Still open: whether goods are actually stored there.",
       "planned": "Still open: whether this location will be used."
@@ -587,6 +587,23 @@
       "plannedNoOther": "Planned: no storage in another country. We add no further location.",
       "plannedUndecided": "Planned: not decided yet, no location known. Nothing is assumed for a country.",
       "plannedUnknown": "Planned: not known yet. Nothing is assumed for a country."
+    },
+    "assessedNone": "Our storage check for {{country}} adds nothing for your answers. That is not a finding that nothing applies.",
+    "guidance": "The source is official guidance, not the text of the law.",
+    "openItem": {
+      "location": {
+        "current": "whether goods are actually stored there",
+        "planned": "whether this location will be used"
+      },
+      "answer": {
+        "offering": "what you sell or provide",
+        "customers": "who your customers are",
+        "channels": "how you sell",
+        "products": "which product groups you sell",
+        "packaging": "what you do with packaging",
+        "established_in_jurisdiction": "where your business is established",
+        "sells_in_jurisdiction": "whether you sell in this country"
+      }
     }
   }
 }

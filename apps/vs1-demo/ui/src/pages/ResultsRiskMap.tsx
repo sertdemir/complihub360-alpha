@@ -627,6 +627,34 @@ export function ResultsRiskMap() {
   // auf. Die Unterzeile nennt diese Bereiche, statt nur die gewaehlten zu
   // zaehlen und fremde Pflichten still darunter zu mischen.
   const extraAreas = new Set(rows.filter((o) => o.outside && o.domain).map((o) => o.domain)).size;
+  // Lagerbezogene Checks aus freigegebenen Lagerregeln (Folgeauftrag Lagerung
+  // v1.3): eigene Zeilen in denselben Gruppen, mit Land, Phase und dem, was
+  // noch offen ist. Ohne freigegebene Regel entsteht hier keine Zeile — das
+  // Register der Engine ist heute leer.
+  const storageRows: ClusterRow[] = (searchData.assessment?.storage.locations ?? []).flatMap((l) => (l.checks ?? []).map((c): ClusterRow => ({
+    title: c.title,
+    severity: c.priority,
+    market: `${c.country} · ${t(`storage.phase.${c.phase}`)}`,
+    due: '—',
+    // Ein Plan ist nicht faellig, und ein Lagercheck fuehrt keine Frist.
+    dueSub: c.phase === 'planned' ? t('duePlanned', { defaultValue: 'once you start there' }) : '',
+    sourceLabel: `${c.source.authority} — ${c.source.provision}`,
+    sourceUrl: c.source.url,
+    evidence: c.state,
+    supports: [],
+    decides: [],
+    rowKey: `storage:${c.rule_id}@${c.country}:${c.phase}`,
+    phase: c.phase,
+    storage: {
+      explanation: c.explanation,
+      exception: c.exception?.text,
+      guidance: c.source.kind === 'official_guidance',
+      open: c.open.map((o) => (o.kind === 'location' ? t(`storage.openItem.location.${c.phase}`)
+        : o.kind === 'input' ? (o.text ?? o.key)
+        : t(`storage.openItem.answer.${o.key}`, { defaultValue: o.key }))),
+    },
+  })));
+  clusterRows.push(...storageRows);
   const evidenceCounts = {
     confirmed: clusterRows.filter((r) => r.evidence === 'confirmed').length,
     likely: clusterRows.filter((r) => r.evidence === 'likely').length,

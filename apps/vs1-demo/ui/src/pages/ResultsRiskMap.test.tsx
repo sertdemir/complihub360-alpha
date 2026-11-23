@@ -901,6 +901,40 @@ describe('ResultsRiskMap header subtitle', () => {
     expect(screen.getByTestId('storage-location')).toHaveTextContent('storage.confirmation.unstated');
   });
 
+  // Folgeauftrag Lagerung v1.3: ein Check aus einer freigegebenen Lagerregel
+  // steht als eigene Zeile in seiner Gruppe. Die Regel hier ist erfunden.
+  it('a storage check from a released rule is a row of its own, with country, phase and what is still open', async () => {
+    const check = (phase: string, state: string, open: unknown[]) => ({
+      rule_id: 'test-storage-check', rule_version: 1, country: 'DE', phase, confirmation: 'confirmed', state, area: 'tax-vat', priority: 'high',
+      title: 'TEST storage check', explanation: 'TEST explanation.', open,
+      source: { authority: 'TEST authority', title: 'TEST source', url: 'https://example.invalid/test', provision: 'TEST provision', kind: 'official_guidance' },
+    });
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true, state: 'open' })], market_phase: { US: 'current' },
+      assessment: storage({ status: 'countries', countries: ['DE'], confirmation: {} }, { status: 'countries', countries: ['DE'], confirmation: {} }, [
+        { ...loc('DE', 'current', 'confirmed', false), assessed: true, reason: 'rule', checks: [check('current', 'confirmed', [])] },
+        { ...loc('DE', 'planned', 'unconfirmed', false), assessed: true, reason: 'rule', checks: [check('planned', 'likely', [{ kind: 'location', key: 'location' }, { kind: 'input', key: 'input:storage_type', text: 'TEST question?' }])] },
+      ]) });
+    renderPage();
+    const applies = within(await screen.findByTestId('cluster-confirmed')).getByTestId('obligation-row');
+    expect(applies).toHaveTextContent('TEST storage check');
+    expect(applies).toHaveTextContent('DE · storage.phase.current');
+    expect(applies).toHaveTextContent('TEST authority — TEST provision');
+    expect(within(applies).getByRole('link')).toHaveAttribute('href', 'https://example.invalid/test');
+    const planned = within(screen.getByTestId('cluster-likely')).getByTestId('obligation-row');
+    expect(planned).toHaveTextContent('DE · storage.phase.planned');
+    // Ein Plan fuehrt keine Frist.
+    expect(planned).toHaveTextContent('once you start there');
+    fireEvent.click(within(planned).getByRole('button', { name: /why.toggle/ }));
+    const why = within(planned).getByTestId('storage-why');
+    expect(why).toHaveTextContent('TEST explanation.');
+    expect(why).toHaveTextContent('storage.openItem.location.planned; TEST question?');
+    expect(why).toHaveTextContent('storage.guidance');
+    // Der Block verweist auf den Check, statt "keine Pruefung hinterlegt" zu sagen.
+    expect(screen.getAllByTestId('storage-location')[0]).toHaveTextContent('storage.assessed');
+    expect(screen.getAllByTestId('storage-location')[0]).not.toHaveTextContent('storage.noRule');
+  });
+
   it('shows no storage block when storage was not asked', async () => {
     localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'] }));
     runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { US: 'current' },
