@@ -796,6 +796,162 @@ describe('ResultsRiskMap header subtitle', () => {
     expect(await screen.findByText('header.subtitleProfile#1')).toBeInTheDocument();
   });
 
+  // Core Wizard Handover v1.1: heute und geplant bleiben auf der Risk Map getrennt.
+  it('names current and planned markets apart', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'], details: { plannedMarkets: ['DE', 'FR'] } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })],
+      market_phase: { US: 'current', DE: 'planned', FR: 'planned' } });
+    renderPage();
+    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.line.sellingToday · header.line.plannedMarkets');
+  });
+
+  it('keeps an undecided expansion visibly unresolved — not "no requirements"', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'], details: { plannedMarkets: ['undecided'] } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })],
+      market_phase: { US: 'current' } });
+    renderPage();
+    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.line.sellingToday · header.line.plannedUndecided');
+  });
+
+  // Feedback CW-F03: "nicht bekannt" ist nicht "noch keine Verkaeufe".
+  it('keeps unknown current markets apart from "no sales yet"', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', markets: [], categories: ['tax-vat'], details: { marketsStatus: 'not-sure', plannedMarkets: ['DE'] } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { DE: 'planned' } });
+    renderPage();
+    const line = await screen.findByTestId('market-phases');
+    expect(line).toHaveTextContent('header.line.marketsUnknown · header.line.plannedMarkets');
+    expect(line).not.toHaveTextContent('header.line.noSalesYet');
+  });
+
+  // Feedback CW-F05: ein geplantes Gruendungsland ist kein geplanter Markt.
+  it('names a planned establishment country as such', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', markets: [], categories: ['corporate-structure'], details: { marketsStatus: 'not-yet', establishment: ['not-yet'], plannedEstablishment: ['DE'], plannedMarkets: [] } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { DE: 'planned' } });
+    renderPage();
+    expect(await screen.findByTestId('market-phases')).toHaveTextContent('header.line.noSalesYet · header.line.plannedEstablishment');
+  });
+
+  // Feedback CW-F02: der gewaehlte Pruefumfang steht auf der Map.
+  it('names the narrowed check and what it leaves out', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US', 'DE'], categories: ['tax-vat'], details: { plannedMarkets: ['FR'], checkScope: { mode: 'countries', countries: ['US'] } } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { US: 'current', FR: 'planned' },
+      assessment: { assessed: { current: ['US'], planned: ['FR'] }, not_assessed: [], check: { mode: 'countries', countries: ['US'], outside: ['DE'], current_markets_known: true },
+        storage: { current: { status: 'not-asked', countries: [] }, planned: { status: 'not-asked', countries: [] }, open_countries: { current: [], planned: [] } } } });
+    renderPage();
+    expect(await screen.findByTestId('check-scope')).toHaveTextContent('header.scope.checked header.scope.outside');
+  });
+
+  it('"all current markets" names the markets it resolved to', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US', 'DE'], categories: ['tax-vat'], details: { checkScope: { mode: 'all-current', countries: [] } } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { US: 'current', DE: 'current' },
+      assessment: { assessed: { current: ['US', 'DE'], planned: [] }, not_assessed: [], check: { mode: 'all-current', countries: [], outside: [], current_markets_known: true },
+        storage: { current: { status: 'not-asked', countries: [] }, planned: { status: 'not-asked', countries: [] }, open_countries: { current: [], planned: [] } } } });
+    renderPage();
+    expect(await screen.findByTestId('check-scope')).toHaveTextContent('header.scope.all');
+  });
+
+  it('"all current markets" with unknown markets is not shown as a finished check', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'FR', markets: [], categories: ['tax-vat'], details: { marketsStatus: 'not-sure', plannedMarkets: ['FR'], checkScope: { mode: 'all-current', countries: [] } } }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { FR: 'planned' },
+      assessment: { assessed: { current: [], planned: ['FR'] }, not_assessed: [], check: { mode: 'all-current', countries: [], outside: [], current_markets_known: false },
+        storage: { current: { status: 'not-asked', countries: [] }, planned: { status: 'not-asked', countries: [] }, open_countries: { current: [], planned: [] } } } });
+    renderPage();
+    expect(await screen.findByTestId('check-scope')).toHaveTextContent('header.scope.allButUnknown');
+  });
+
+  // Folgeauftrag Lagerung (20.11.2026): jeder Lagerort steht am Ergebnis, mit
+  // Land, Phase und Bestaetigungsstand — nicht nur in einer Kopfzeile.
+  const storage = (current: unknown, planned: unknown, locations: unknown[]) => ({
+    assessed: { current: ['US'], planned: [] }, not_assessed: [], check: { mode: 'none', countries: [], outside: [], current_markets_known: true },
+    storage: { current, planned, open_countries: { current: [], planned: [] }, locations },
+  });
+  const loc = (country: string, phase: string, confirmation: string, also_market: boolean) => ({ country, phase, confirmation, also_market, assessed: false, reason: 'no_rule', checks: [] });
+
+  it('lists each storage location with phase and confirmation, and says where no storage check is on file', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { US: 'current' },
+      assessment: storage({ status: 'countries', countries: ['US', 'NL'], confirmation: {} }, { status: 'countries', countries: ['DE'], confirmation: {} },
+        [loc('US', 'current', 'confirmed', true), loc('NL', 'current', 'confirmed', false), loc('DE', 'planned', 'unconfirmed', true)]) });
+    renderPage();
+    const rows = await screen.findAllByTestId('storage-location');
+    expect(rows).toHaveLength(3);
+    expect(rows[0]).toHaveTextContent('storage.phase.current · storage.confirmation.confirmed');
+    expect(rows[0]).not.toHaveTextContent('storage.notAMarket');
+    // Lagerland ohne Absatzmarkt: als solches benannt, nicht als Markt gefuehrt.
+    expect(rows[1]).toHaveTextContent('storage.notAMarket');
+    expect(rows[1]).toHaveTextContent('storage.noRule');
+    // Benannt, aber unbestaetigt: der offene Punkt steht an genau dieser Zeile.
+    expect(rows[2]).toHaveTextContent('storage.phase.planned · storage.confirmation.unconfirmed');
+    expect(rows[2]).toHaveTextContent('storage.open.planned');
+    expect(rows[0]).not.toHaveTextContent('storage.open.current');
+  });
+
+  it.each([
+    ['no-other', 'storage.note.plannedNoOther'],
+    ['undecided', 'storage.note.plannedUndecided'],
+    ['unknown', 'storage.note.plannedUnknown'],
+  ])('planned storage "%s" stays its own statement and adds no location', async (status, text) => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { US: 'current' },
+      assessment: storage({ status: 'countries', countries: ['US'], confirmation: {} }, { status, countries: [], confirmation: {} }, [loc('US', 'current', 'unstated', true)]) });
+    renderPage();
+    expect(await screen.findByTestId('storage-note-line')).toHaveTextContent(text);
+    expect(screen.getAllByTestId('storage-location')).toHaveLength(1);
+    // Aeltere Sitzung ohne Angabe: nie rueckwirkend "bestaetigt".
+    expect(screen.getByTestId('storage-location')).toHaveTextContent('storage.confirmation.unstated');
+  });
+
+  // Folgeauftrag Lagerung v1.3: ein Check aus einer freigegebenen Lagerregel
+  // steht als eigene Zeile in seiner Gruppe. Die Regel hier ist erfunden.
+  it('a storage check from a released rule is a row of its own, with country, phase and what is still open', async () => {
+    const check = (phase: string, state: string, open: unknown[]) => ({
+      rule_id: 'test-storage-check', rule_version: 1, country: 'DE', phase, confirmation: 'confirmed', state, area: 'tax-vat', priority: 'high',
+      title: 'TEST storage check', explanation: 'TEST explanation.', open,
+      source: { authority: 'TEST authority', title: 'TEST source', url: 'https://example.invalid/test', provision: 'TEST provision', kind: 'official_guidance' },
+    });
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true, state: 'open' })], market_phase: { US: 'current' },
+      assessment: storage({ status: 'countries', countries: ['DE'], confirmation: {} }, { status: 'countries', countries: ['DE'], confirmation: {} }, [
+        { ...loc('DE', 'current', 'confirmed', false), assessed: true, reason: 'rule', checks: [check('current', 'confirmed', [])] },
+        { ...loc('DE', 'planned', 'unconfirmed', false), assessed: true, reason: 'rule', checks: [check('planned', 'likely', [{ kind: 'location', key: 'location' }, { kind: 'input', key: 'input:storage_type', text: 'TEST question?' }])] },
+      ]) });
+    renderPage();
+    const applies = within(await screen.findByTestId('cluster-confirmed')).getByTestId('obligation-row');
+    expect(applies).toHaveTextContent('TEST storage check');
+    expect(applies).toHaveTextContent('DE · storage.phase.current');
+    expect(applies).toHaveTextContent('TEST authority — TEST provision');
+    expect(within(applies).getByRole('link')).toHaveAttribute('href', 'https://example.invalid/test');
+    const planned = within(screen.getByTestId('cluster-likely')).getByTestId('obligation-row');
+    expect(planned).toHaveTextContent('DE · storage.phase.planned');
+    // Ein Plan fuehrt keine Frist.
+    expect(planned).toHaveTextContent('once you start there');
+    fireEvent.click(within(planned).getByRole('button', { name: /why.toggle/ }));
+    const why = within(planned).getByTestId('storage-why');
+    expect(why).toHaveTextContent('TEST explanation.');
+    expect(why).toHaveTextContent('storage.openItem.location.planned; TEST question?');
+    expect(why).toHaveTextContent('storage.guidance');
+    // Der Block verweist auf den Check, statt "keine Pruefung hinterlegt" zu sagen.
+    expect(screen.getAllByTestId('storage-location')[0]).toHaveTextContent('storage.assessed');
+    expect(screen.getAllByTestId('storage-location')[0]).not.toHaveTextContent('storage.noRule');
+  });
+
+  it('shows no storage block when storage was not asked', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'US', markets: ['US'], categories: ['tax-vat'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { US: 'current' },
+      assessment: storage({ status: 'not-asked', countries: [], confirmation: {} }, { status: 'not-asked', countries: [], confirmation: {} }, []) });
+    renderPage();
+    await screen.findByText('header.subtitleProfile#1');
+    expect(screen.queryByTestId('storage-locations')).not.toBeInTheDocument();
+  });
+
+  it('says nothing about phases when nothing is planned', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', markets: ['DE'], categories: ['tax-vat'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10), domain: 'TAX', focus: true })], market_phase: { DE: 'current' } });
+    renderPage();
+    await screen.findByText('header.subtitleProfile#1');
+    expect(screen.queryByTestId('market-phases')).not.toBeInTheDocument();
+  });
+
   it('names the areas the engine added on top of the chosen ones (Variante 1)', async () => {
     localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', categories: ['tax-vat'] }));
     runSearch.mockResolvedValue({ providers: [], laws: [

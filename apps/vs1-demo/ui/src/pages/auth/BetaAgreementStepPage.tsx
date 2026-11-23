@@ -9,6 +9,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { acceptAgreement, fetchAgreement, type UserAgreement } from "../../api/agreements";
 import { ApiError } from "../../api/client";
 import { markBetaAccepted, resetAgreementGate } from "../../lib/agreementGate";
+import { markBetaDeclined } from "../../components/auth/ResultsBetaGate";
 
 // ─── Schritt nach dem ersten Login (Canvas-Wahl 2A, 22.10.2026) ─────────────
 // Dasselbe Shell wie die Anmeldung: links das Narrativ auf dem Gradient, rechts
@@ -57,6 +58,10 @@ export function BetaAgreementStepPage() {
 
     const redirect = new URLSearchParams(location.search).get("redirect");
     const target = redirect && redirect.startsWith("/") ? redirect : `/${lang}/dashboard`;
+    // 1A (23.11.2026): Wer ueber die Risk Map kommt (Konto aus der Schublade,
+    // Mail-Link zurueck nach /results), liest hier "Risk Map" statt "Workspace"
+    // — der Schritt sagt, wohin es danach wirklich geht.
+    const toRiskMap = /\/results\/?$/.test(target.split("?")[0]);
 
     const submit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -86,6 +91,13 @@ export function BetaAgreementStepPage() {
     const signOut = async () => {
         resetAgreementGate();
         await logout();
+        // 3B (23.11.2026): Wer von der Risk Map kam, behaelt sie als Gast und
+        // liest dort, was das Ablehnen heisst. Kein Rauswurf auf die Anmeldung.
+        if (toRiskMap) {
+            markBetaDeclined();
+            navigate(target, { replace: true });
+            return;
+        }
         navigate(`/${lang}/login`, { replace: true });
     };
 
@@ -118,7 +130,7 @@ export function BetaAgreementStepPage() {
                         <li aria-hidden>›</li>
                         <li className="text-brand" aria-current="step">{t("betaStep.steps.agreement")}</li>
                         <li aria-hidden>›</li>
-                        <li>{t("betaStep.steps.workspace")}</li>
+                        <li>{toRiskMap ? t("betaStep.steps.riskMap") : t("betaStep.steps.workspace")}</li>
                     </ol>
 
                     <h2 id="beta-step-title" className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("betaStep.cardTitle")}</h2>
@@ -167,7 +179,7 @@ export function BetaAgreementStepPage() {
                     {needCheck && <p id="beta-check-error" role="alert" className="mt-2 text-body-2xs text-fg-secondary">{t("betaStep.needCheck")}</p>}
 
                     <Button type="submit" variant="primary" size="lg" fullWidth className="mt-6" disabled={!agreement || saving} loading={saving} iconRight={<ArrowRight size={16} aria-hidden />}>
-                        {saving ? t("betaStep.saving") : t("betaStep.cta")}
+                        {saving ? t("betaStep.saving") : toRiskMap ? t("betaStep.ctaRiskMap") : t("betaStep.cta")}
                     </Button>
 
                     <p className="mt-5 text-center text-body-xs text-fg-secondary">

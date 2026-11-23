@@ -491,6 +491,146 @@ describe('auth gate', () => {
 });
 
 describe('POST /api/v1/search', () => {
+    // Core Wizard Handover v1.1 (18.11.2026): heutige und geplante Maerkte
+    // bleiben bis in die Risk Map getrennt.
+    it('US seller expanding to DE and FR: US is current, DE and FR are planned — not US-only', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({
+                country: 'US',
+                structured_answers: { markets: ['US'], domains: ['tax-vat'], details: { plannedMarkets: ['DE', 'FR'] } },
+            }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.market_phase).toEqual({ US: 'current', DE: 'planned', FR: 'planned' });
+        // Die Engine hat die geplanten Laender ausgewertet …
+        const assessed = new Set<string>(r.body.laws.flatMap((l: any) => l.markets));
+        expect(assessed.has('DE') || assessed.has('FR')).toBe(true);
+        // … und die Abdeckung fragt nach allen drei, statt US fuer DE/FR einzusetzen.
+        expect([...r.body.coverage.markets].sort()).toEqual(['DE', 'FR', 'US']);
+    });
+
+    it('undecided expansion stays unresolved: no planned country, and no invented one', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'US', structured_answers: { markets: ['US'], domains: ['tax-vat'], details: { plannedMarkets: ['undecided'] } } }),
+        });
+        expect(r.body.market_phase).toEqual({ US: 'current' });
+    });
+
+    it('no current market yet: the planned country is assessed as planned, never as current', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: [], domains: ['tax-vat'], details: { marketsStatus: 'not-yet', plannedMarkets: ['DE'] } } }),
+        });
+        expect(r.body.market_phase).toEqual({ DE: 'planned' });
+    });
+
+    // Feedback CW-F05 (19.11.2026): ein Gruender ohne Verkaeufe.
+    it('a planned establishment country is assessed as planned, without an invented expansion', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: [], domains: ['corporate-structure'], details: { marketsStatus: 'not-yet', establishment: ['not-yet'], plannedEstablishment: ['DE'], plannedMarkets: [] } } }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.market_phase).toEqual({ DE: 'planned' });
+        expect(r.body.laws.length).toBeGreaterThan(0);
+    });
+
+    // Feedback CW-F02 (19.11.2026): S09 "alle heutigen" gegen S10 "nur US".
+    it('the check scope narrows today: "only US" does not assess DE, France stays planned', async () => {
+        const run = (checkScope: unknown) => api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'US', structured_answers: { markets: ['US', 'DE'], domains: ['tax-vat'], details: { goals: ['check', 'expansion'], plannedMarkets: ['FR'], checkScope } } }),
+        });
+        const s09 = await run({ mode: 'all-current', countries: [] });
+        const s10 = await run({ mode: 'countries', countries: ['US'] });
+        expect(s09.body.market_phase).toEqual({ US: 'current', DE: 'current', FR: 'planned' });
+        expect(s10.body.market_phase).toEqual({ US: 'current', FR: 'planned' });
+        expect(s09.body.assessment.check).toEqual({ mode: 'all-current', countries: [], outside: [], current_markets_known: true });
+        expect(s10.body.assessment.check).toEqual({ mode: 'countries', countries: ['US'], outside: ['DE'], current_markets_known: true });
+        const markets = (r: any) => new Set<string>(r.body.laws.flatMap((l: any) => l.markets));
+        expect(markets(s09).has('DE')).toBe(true);
+        expect(markets(s10).has('DE')).toBe(false);
+        expect(markets(s10).has('FR')).toBe(true);
+        expect([...s10.body.coverage.markets].sort()).toEqual(['FR', 'US']);
+    });
+
+    it('"all current markets" with unknown markets is not a complete, empty check', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'FR', structured_answers: { markets: [], domains: ['tax-vat'], details: { marketsStatus: 'not-sure', plannedMarkets: ['FR'], checkScope: { mode: 'all-current', countries: [] } } } }),
+        });
+        expect(r.body.assessment.check).toEqual({ mode: 'all-current', countries: [], outside: [], current_markets_known: false });
+        expect(r.body.market_phase).toEqual({ FR: 'planned' });
+    });
+
+    // Folgeauftrag Lagerung (20.11.2026), Kontrollen 2 und 3.
+    it('a named, unconfirmed storage country is kept; a storage-only country never becomes a market', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'US', structured_answers: { markets: ['US'], domains: ['tax-vat'], details: {
+                offering: ['physical'], customers: 'consumers', channels: ['marketplaces'], plannedMarkets: ['DE', 'FR'],
+                stock: ['US', 'NL'], stockStatus: { US: 'confirmed', NL: 'confirmed' }, plannedStock: ['DE'], plannedStockStatus: { DE: 'unconfirmed' } } } }),
+        });
+        expect(r.body.market_phase).toEqual({ US: 'current', DE: 'planned', FR: 'planned' });
+        expect(r.body.assessment.storage.locations.map((l: any) => [l.country, l.phase, l.confirmation, l.also_market, l.assessed, l.reason])).toEqual([
+            ['US', 'current', 'confirmed', true, false, 'no_rule'],
+            ['NL', 'current', 'confirmed', false, false, 'no_rule'],
+            ['DE', 'planned', 'unconfirmed', true, false, 'no_rule'],
+        ]);
+        // Kein Lagerland erzeugt eine Pflichtzeile, solange keine Regel hinterlegt ist.
+        expect((r.body.laws as any[]).some((l) => l.markets.includes('NL'))).toBe(false);
+    });
+
+    // Feedback CW-F04: eine Zeile je Rechtsgrundlage und Phase.
+    it('each row carries the source, link and phase of its own countries', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'TR', structured_answers: { markets: ['TR'], domains: ['tax-vat'],
+                details: { offering: ['physical'], customers: 'consumers', channels: ['own-site'], establishment: ['TR'], plannedMarkets: ['DE', 'US', 'IT'] } } }),
+        });
+        const vat = (r.body.laws as any[]).filter((l) => l.id === 'tax-vat-registration');
+        expect(vat.map((l) => [l.markets.join('+'), l.phase, l.source, l.source_url ? l.source_url_label : null, l.due_days])).toEqual([
+            ['TR', 'current', 'KDV Kanunu No. 3065', null, 26],
+            ['DE', 'planned', 'UStG §18 / §18i (OSS)', 'EU VAT Directive 2006/112/EC', null],
+            ['US', 'planned', 'State economic-nexus rules (post-Wayfair)', null, null],
+            ['IT', 'planned', 'Testo unico IVA (D.Lgs. 10/2026), vorher DPR 633/1972 Art. 35', 'EU VAT Directive 2006/112/EC', null],
+        ]);
+        expect(vat[2]).toMatchObject({ title: 'US Sales Tax (state level)', title_key: 'tax-vat-registration.US' });
+        // Jede Zeile ist eindeutig, auch wenn die Vorlage sich wiederholt.
+        const keys = (r.body.laws as any[]).map((l) => l.key);
+        expect(new Set(keys).size).toBe(keys.length);
+    });
+
+    // Feedback CW-F01: S06 geplantes Lager DE/FR · S07 kein anderes Land · S08 unentschieden.
+    it('planned storage keeps its own status and never becomes a market or an obligation', async () => {
+        const run = (plannedStock: string[]) => api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'US', structured_answers: { markets: ['US'], domains: ['tax-vat'], details: { offering: ['physical'], channels: ['marketplaces'], stock: ['US'], plannedStock } } }),
+        });
+        const [s06, s07, s08] = await Promise.all([run(['DE', 'FR']), run(['no-other']), run(['undecided'])]);
+        expect(s06.body.assessment.storage.planned).toEqual({ status: 'countries', countries: ['DE', 'FR'], confirmation: { DE: 'unstated', FR: 'unstated' } });
+        expect(s06.body.assessment.storage.open_countries).toEqual({ current: ['US'], planned: ['DE', 'FR'] });
+        expect(s07.body.assessment.storage.planned).toEqual({ status: 'no-other', countries: [], confirmation: {} });
+        expect(s08.body.assessment.storage.planned).toEqual({ status: 'undecided', countries: [], confirmation: {} });
+        // Kein Lagerland wird Markt, und keine Pflicht entsteht allein aus ihm.
+        for (const r of [s06, s07, s08]) expect(r.body.market_phase).toEqual({ US: 'current' });
+        const ids = (r: any) => r.body.laws.map((l: any) => `${l.id}:${l.state}`).sort();
+        expect(ids(s06)).toEqual(ids(s07));
+        expect(ids(s07)).toEqual(ids(s08));
+    });
+
+    it('no country at all: no laws — and no silent German fallback', async () => {
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: '', structured_answers: { markets: [], domains: ['tax-vat'] } }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.laws).toEqual([]);
+        expect(r.body.market_phase).toEqual({});
+    });
+
     it('matches a wizard slug against an APPROVED service and anonymizes the result', async () => {
         seedProvider({ depth: 'independent' });
         const r = await api('/api/v1/search', {
@@ -621,8 +761,10 @@ describe('POST /api/v1/search', () => {
         expect(byId['env-weee-registration']).toMatchObject({ state: 'confirmed', evidence: { supports: ['electronics'] } });
         expect(byId['env-batteries-epr']).toMatchObject({ state: 'confirmed' });
         expect(byId['corp-registration']).toMatchObject({ state: 'confirmed', evidence: { supports: ['established_in_market'] } });
-        // Die Verpackungs-Taetigkeit beantwortet die Rollenfrage nicht.
-        expect(byId['prod-epr']).toMatchObject({ state: 'likely', evidence: { decides: ['packaging_role'] } });
+        // Die Verpackungs-Taetigkeit erledigt die Rollenfrage nicht — aber die
+        // Zeile fragt nicht noch einmal, wer verpackt (CW-F06): offen ist die
+        // fachliche Einordnung, und so heisst der Punkt jetzt auch.
+        expect(byId['prod-epr']).toMatchObject({ state: 'likely', evidence: { decides: ['packaging_assessment'] } });
     });
 
     // 25.10.2026: businessType kommt als Geschaeftsmodell an (vorher nie —
@@ -684,7 +826,7 @@ describe('POST /api/v1/search', () => {
             expect(r.body).not.toHaveProperty('tutorials');
             expect(r.body).not.toHaveProperty('articles');
             expect(r.body).not.toHaveProperty('tips');
-            expect(Object.keys(r.body).sort()).toEqual(['coverage', 'laws', 'laws_status', 'overview_summary', 'providers', 'providers_outside']);
+            expect(Object.keys(r.body).sort()).toEqual(['assessment', 'coverage', 'laws', 'laws_status', 'market_phase', 'overview_summary', 'providers', 'providers_outside']);
             // Erfolg: kein Fehlersignal, keine Referenz im Koerper.
             expect(r.body.laws_status).toBe('ok');
         } finally {
@@ -927,6 +1069,85 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         expect(db.provider_lead_ledger[0]).toMatchObject({ area_code: 'legal-advisory', standard_fee_cents: 0, final_fee_cents: 0, payment_status: 'n/a' });
         expect(db.provider_lead_ledger_payment_events ?? []).toHaveLength(0);
         expect(db.scheduling[0]).toMatchObject({ lead_charged: false, identity_revealed: true });
+    });
+
+    // Geschlossene Beta (Entscheidungen 15.10. und 23.11.2026): Die Oberflaeche
+    // fragt vor dem Workspace und vor /results nach der Beta-Vereinbarung. Der
+    // Server ist das Netz dahinter, fuer alte Tabs und fuer ein Gate, das bei
+    // einem Ausfall offen bleibt. Eine Buchung belastet den Anbieter und legt
+    // Namen offen; ohne Blatt darf sie nicht entstehen.
+    describe('Beta-Vereinbarung vor der Buchung', () => {
+        const accept = (version: string) => (db.user_agreement_acceptance ??= []).push(
+            { id: randomUUID(), user_id: USER_ID, agreement: 'beta', version, language: 'de', accepted_at: new Date().toISOString() });
+
+        it('ohne Annahme: 409 AGREEMENT_REQUIRED mit der geltenden Fassung, keine Buchung, keine Belastung', async () => {
+            const { session } = seedBookable();
+            seedBetaAgreement();
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(409);
+            expect(r.body).toMatchObject({ errorCode: 'AGREEMENT_REQUIRED', agreement: 'beta', current_version: 'beta-2026-10' });
+            expect(db.scheduling ?? []).toHaveLength(0);
+            expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+            expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+            // Nichts ueber den Anbieter verlaesst den Server.
+            expect(JSON.stringify(r.body)).not.toContain('Testkanzlei');
+        });
+
+        it('mit Annahme der geltenden Fassung geht die Buchung durch', async () => {
+            const { session } = seedBookable();
+            seedBetaAgreement();
+            accept('beta-2026-10');
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            expect(db.scheduling).toHaveLength(1);
+        });
+
+        it('eine alte Annahme reicht nicht, sobald eine neuere Fassung gilt', async () => {
+            const { session } = seedBookable();
+            seedBetaAgreement();
+            seedBetaAgreement({ version: 'beta-2026-11', effective_from: '2026-11-23' });
+            accept('beta-2026-10');
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(409);
+            expect(r.body).toMatchObject({ errorCode: 'AGREEMENT_REQUIRED', current_version: 'beta-2026-11' });
+            expect(db.scheduling ?? []).toHaveLength(0);
+        });
+
+        it('gilt keine Fassung (nach dem Launch), ist nichts erforderlich', async () => {
+            const { session } = seedBookable();
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+        });
+
+        it('laesst sich der Stand nicht lesen, gibt es keine Buchung (geschlossen statt offen)', async () => {
+            const { session } = seedBookable();
+            seedBetaAgreement();
+            Object.defineProperty(db, 'user_agreement_acceptance', { configurable: true, enumerable: true, get() { throw new Error('acceptance table unreachable'); } });
+            const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            try {
+                const r = await book(standardBody(session));
+                expect(r.status).toBe(500);
+                expect(db.scheduling ?? []).toHaveLength(0);
+                expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+                expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+            } finally {
+                spy.mockRestore();
+                delete (db as Record<string, unknown>).user_agreement_acceptance;
+            }
+        });
+
+        it('die Wiederholung einer schon angelegten Buchung kommt weiter zurueck', async () => {
+            const { session } = seedBookable();
+            const body = standardBody(session, { request_id: 'beta-replay-0001' });
+            const first = await book(body);
+            expect(first.status).toBe(201);
+            // Danach gilt eine Fassung, die der Nutzer nicht angenommen hat.
+            seedBetaAgreement();
+            const again = await book(body);
+            expect(again.status).toBe(201);
+            expect(again.body).toMatchObject({ replay: true });
+            expect(db.scheduling).toHaveLength(1);
+        });
     });
 
     it('Karte abgelehnt: keine Buchung, neutraler Satz, Anbieter gesperrt und informiert', async () => {

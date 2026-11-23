@@ -108,6 +108,26 @@ async function loadAgreements(): Promise<AgreementRow[]> {
 }
 
 /**
+ * Stand der Beta-Vereinbarung fuer einen Nutzer, fuer Handlungen mit Folgen
+ * (Buchung). `required` ist true, wenn eine Fassung gilt und der Nutzer sie
+ * nicht angenommen hat; gilt keine Fassung (nach dem Launch), ist nichts
+ * erforderlich.
+ *
+ * Ein Lesefehler wird NICHT geschluckt, er geht an den Aufrufer. Das Gate der
+ * Oberflaeche faellt bei einem Ausfall offen aus (agreementGate.ts: niemand
+ * soll ausgesperrt werden). Hier ist es umgekehrt: Eine Buchung belastet den
+ * Anbieter und legt Namen offen. Kann der Stand nicht gelesen werden, gibt es
+ * keine Buchung.
+ */
+export async function betaAgreementState(userId: string, lang: string): Promise<AgreementState> {
+    const [rows, acc] = await Promise.all([
+        loadAgreements(),
+        supabaseApi.select('user_agreement_acceptance', { user_id: userId }, { order: 'accepted_at.desc', limit: 100 }) as Promise<AcceptanceRow[]>,
+    ]);
+    return acceptanceState('beta', currentAgreement(rows, 'beta', lang), acc);
+}
+
+/**
  * Bedient die drei Vereinbarungs-Routen. Gibt true zurueck, wenn die URL hier
  * gehoert (dann ist geantwortet), sonst false. Auth ist zentral geprueft:
  * /me/* kommt nie ohne gueltiges JWT hier an; ein Server-Schluessel ohne

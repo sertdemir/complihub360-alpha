@@ -13,7 +13,7 @@ während laufender Incidents):**
 
 | Check | Bedingung „OK" |
 |---|---|
-| `ui` | https://staging.complihub360.com antwortet 401 (Auth-Wall) |
+| `ui` | https://staging.complihub360.com antwortet 2xx. Die Wand ist seit dem 30.08.2026 ab; bis 19.11.2026 erwartete der Check noch 401 und stand deshalb still auf FAIL. |
 | `api` | `/health` im API-Container liefert `"ok":true` |
 | `supabase` | REST antwortet 200 (Pause-/Ausfall-Erkennung) |
 | `containers` | api-, web- und traefik-Container laufen |

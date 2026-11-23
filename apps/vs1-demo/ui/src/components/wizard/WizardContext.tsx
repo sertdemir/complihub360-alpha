@@ -39,20 +39,38 @@ export type Urgency = "today" | "week" | "month" | "researching" | "";
 // welche Antwort welche Pflicht bestaetigt, entscheidet der Mensch vorher.
 // "not-sure" ist eine eigene Antwort, nie ein stilles Nein.
 export interface WizardDetails {
-    situation: "existing" | "starting" | "not-sure" | "";
-    /** Anlass (S02), Mehrfachwahl; fehlt bei Sitzungen vor Runde 1. */
+    situation: "existing" | "starting" | "self-employed" | "not-sure" | "";
+    /** Ziele (CW02), Mehrfachwahl; "other" darf neben bekannten Zielen stehen. */
+    goals?: string[];
+    /** Vorgaenger von `goals` (Deck S02) — nur noch in aelteren Sitzungen. */
     reason?: string[];
     offering: string[];
     /** Kundschaft (S05): consumers | businesses | both | deciding | not-sure. */
     customers?: string;
     /** Vertriebsweg (S06), Mehrfachwahl. */
     channels?: string[];
-    /** Geplanter Sitz, wenn "not-yet": Laendercodes, dazu "deciding". */
-    plannedEstablishment?: string[];
+    /** CW04 ohne Land: noch kein Verkauf oder unbekannt. Leer, wenn `markets` Laender traegt. */
+    marketsStatus?: "not-yet" | "not-sure" | "";
     /** Laendercodes wie in markets, dazu "not-yet" | "not-sure". */
     establishment: string[];
-    /** Laendercodes, dazu "none" | "not-sure"; leer, wenn nicht gefragt. */
+    /** Geplanter Sitz, wenn "not-yet": Laendercodes, dazu "deciding". */
+    plannedEstablishment?: string[];
+    /** CW05: Laendercodes, dazu "undecided" | "not-planned"; leer, wenn nicht gefragt. */
+    plannedMarkets?: string[];
+    /** CW06: Laendercodes, dazu "none" | "not-applicable" | "not-sure"; leer, wenn nicht gefragt. */
     stock: string[];
+    /** CW07: Laendercodes, dazu "no-other" | "undecided" | "not-sure"; leer, wenn nicht gefragt. */
+    plannedStock?: string[];
+    /** Bestaetigungsstand je Lagerland (Folgeauftrag Lagerung, 20.11.2026):
+     *  "confirmed" = der Standort steht fest, "unconfirmed" = benannt, aber
+     *  noch zu bestaetigen. Fehlt das Feld (aeltere Sitzungen), ist der Stand
+     *  nicht angegeben — nie rueckwirkend "bestaetigt". */
+    stockStatus?: Record<string, 'confirmed' | 'unconfirmed'>;
+    plannedStockStatus?: Record<string, 'confirmed' | 'unconfirmed'>;
+    /** CW08; fehlt, wenn nicht gefragt. "all-current" verweist auf `markets`. */
+    checkScope?: { mode: "all-current" | "countries" | "unknown" | ""; countries: string[] };
+    /** "I am not sure what I need" — unabhaengig von den gewaehlten Bereichen. */
+    helpIdentify?: boolean;
     eprProducts: string[];
     packaging: string[];
 }

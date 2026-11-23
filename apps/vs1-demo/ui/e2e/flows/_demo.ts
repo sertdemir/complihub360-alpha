@@ -39,27 +39,23 @@ export function recordWrites(page: Page) {
   return writes;
 }
 
-/** Der Wizard bis zur Risk Map (Runde 1: Business · Markets · Areas · Review) —
- *  ein Markt, ein Vertriebsweg, ein Bereich. Die uebrigen Fragen (Situation,
- *  Anlass, Angebot, Kundschaft, Sitz) bleiben unbeantwortet: Weiter geht ohne
- *  Antwort, und ohne physische Produkte und ohne EPR fallen Lager und
- *  EPR-Fragen weg. Bis zu zwei Fragen stehen auf einer Seite. */
+/** Der Wizard bis zur Risk Map (Kernablauf nach dem Handover v1.1:
+ *  Ausgangslage · Angebot · Heutiger Stand · Bereiche · Review) — ein
+ *  Vertriebsweg, ein heutiger Markt, ein Bereich. Ohne das Ziel "Expansion"
+ *  und ohne physische Produkte fallen Expansion, Lager und EPR-Fragen weg. */
 export async function runWizard(page: Page, picks = { market: /Germany/, channel: /Own website/, domain: /Tax & VAT/ }) {
   const next = () => page.getByRole('button', { name: /^Continue/ }).click();
   await page.goto('/en/wizard', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: 'Which best describes your situation?' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'What brings you here today?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'What would you like help with?' })).toBeVisible();
   await next();
   await expect(page.getByRole('heading', { name: 'What do you sell or provide?' })).toBeVisible();
-  await next();
-  await expect(page.getByRole('heading', { name: 'Who do you sell to?' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'How do you sell or provide your offering?' })).toBeVisible();
   await page.getByRole('button', { name: picks.channel }).first().click();
   await next();
-  await expect(page.getByRole('heading', { name: 'Where does your business operate?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Where do you currently sell or provide services?' })).toBeVisible();
   // Die Karte traegt den Info-Knopf („About Germany“) in sich — die Karte ist das erste Treffer-Element.
   await page.getByRole('button', { name: picks.market }).first().click();
-  await next();
   await expect(page.getByRole('heading', { name: 'Where is your business established?' })).toBeVisible();
   await next();
   await expect(page.getByRole('heading', { name: 'What do you need help with?' })).toBeVisible();

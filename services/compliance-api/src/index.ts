@@ -7,7 +7,7 @@ import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
-import { generateRelevantSubdomains, factsFromAnswers, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
+import { generateRelevantSubdomains, factsFromAnswers, answeredQuestions, countryPhases, assessmentOf, isKnownCountry, type CountryCode, type IndustryType, businessModelFromAnswers, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
@@ -36,7 +36,7 @@ import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { handleProviderApplication } from "./providerApplication.js";
-import { handleAgreementsRoute } from "./agreements.js";
+import { betaAgreementState, handleAgreementsRoute } from "./agreements.js";
 import { handleSavedProvidersRoute } from "./savedProviders.js";
 import { handleSubscriptionGet, handleSubscriptionSelect, handleSubscriptionSchedule, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
@@ -1926,6 +1926,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         }
                     }
 
+                    // Geschlossene Beta: keine Buchung ohne die geltende Beta-Vereinbarung
+                    // (Entscheidungen 15.10. und 23.11.2026). Die Oberflaeche fragt vor dem
+                    // Workspace und vor /results; diese Pruefung ist das Netz fuer alte
+                    // Tabs und fuer den Fall, dass das Gate dort offen ausfaellt. Sie steht
+                    // nach der Wiederholungs-Pruefung, damit eine schon angelegte Buchung
+                    // weiter zurueckkommt. Ein Lesefehler landet im catch unten: lieber
+                    // keine Buchung als eine ohne Blatt.
+                    const beta = await betaAgreementState(authUserId as string, lang);
+                    if (beta.required) {
+                        fail(409, 'AGREEMENT_REQUIRED', 'The beta agreement must be accepted before booking', { agreement: 'beta', current_version: beta.current_version }); return;
+                    }
+
                     // Die Fassung, die der Nutzer gesehen hat, muss die gueltige sein.
                     const ackRows = (await supabaseApi.select('booking_acknowledgements', {}, { limit: 100 })) as any[];
                     const ack = currentAcknowledgement(ackRows, lang);
@@ -3403,11 +3415,36 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 let engineFailed = false;
                 // All requested markets the engine knows a profile for; unknown
                 // codes are dropped rather than killing the whole search.
-                const requestedMarkets: string[] = Array.isArray(requestData.structured_answers?.markets)
-                    ? requestData.structured_answers.markets
-                    : [];
-                const engineCountries = [...new Set([requestData.country || 'DE', ...requestedMarkets])]
+                //
+                // Heutige und geplante Maerkte bleiben getrennt (Core Wizard
+                // Handover v1.1): ein US-Haendler mit Plaenen fuer DE/FR bekommt
+                // US als heute und DE/FR als geplant — nicht nur US. Kein
+                // stilles 'DE' mehr, wenn gar kein Land genannt ist: dann gibt
+                // es keine Gesetze statt deutscher.
+                // Dazu Sitz und geplantes Gruendungsland (CW-F05): ein Gruender
+                // ohne Verkaeufe bekommt eine Auswertung fuer sein Gruendungsland.
+                //
+                // Der Pruefumfang grenzt die heutigen Laender ein (CW-F02):
+                // "nur US" wertet DE nicht still mit aus. Lagerlaender sind
+                // weder Markt noch Fakt (CW-F01); sie stehen in `assessment`
+                // als offener Punkt.
+                const scopeInput = {
+                    markets: requestData.structured_answers?.markets,
+                    country: requestData.country,
+                    details: requestData.structured_answers?.details,
+                };
+                const phases = countryPhases(scopeInput);
+                const assessment = assessmentOf(scopeInput);
+                const engineCountries = [...new Set([...phases.current, ...phases.planned])]
                     .filter((c): c is CountryCode => isKnownCountry(String(c)));
+                // Je ausgewertetem Land: heute, geplant oder beides. Die Risk Map
+                // zeigt damit, ob eine Pflicht eine heutige oder eine geplante
+                // Taetigkeit betrifft.
+                const marketPhase: Record<string, 'current' | 'planned' | 'both'> = {};
+                for (const c of engineCountries) {
+                    const cur = phases.current.includes(c), pl = phases.planned.includes(c);
+                    marketPhase[c] = cur && pl ? 'both' : pl ? 'planned' : 'current';
+                }
                 // Wizard domain slugs → engine domains (focus = user-selected;
                 // always included and sorted first — interest, not proof).
                 const requestedSlugs: string[] = requestData.structured_answers?.domains
@@ -3426,6 +3463,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             // Ob eine Pflicht gilt, sagen die Antworten, nicht
                             // der Klick auf den Bereich (Wizard-Audit F1).
                             facts: factsFromAnswers(requestData.structured_answers),
+                            // Eine Zeile je Rechtsgrundlage und Phase (CW-F04):
+                            // jede Zeile traegt die Quelle, die Frist und die
+                            // Fakten IHRER Laender, nicht die des ersten Landes.
+                            perCountry: {
+                                phase: marketPhase,
+                                factsFor: (cs) => factsFromAnswers(requestData.structured_answers, cs),
+                                row: answeredQuestions(requestData.structured_answers?.details),
+                            },
                         });
                     }
                 } catch (engineErr) {
@@ -3697,12 +3742,24 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // Bereich × Markt: deckt ein freigegebener Anbieter das ab?
                     // Nur Booleans je Zelle — kein Anbieter, keine Anzahl.
                     coverage: coverage.public,
+                    // Land → 'current' | 'planned' | 'both' (Handover v1.1).
+                    market_phase: marketPhase,
+                    // Was geprueft wurde und was offen bleibt (CW-F01/F02):
+                    // Pruefumfang, Laender ausserhalb davon, Lager mit eigenem
+                    // Status. Nur Laendercodes und Statuswerte.
+                    assessment,
                     // Enriched obligations payload: severity + statute + penalty +
                     // cadence from the engine's editorial map. `state` mirrors the
                     // wizard: explicitly selected domains are 'confirmed', the
                     // score-ranked top-up domains are 'likely'.
                     laws: engineResults.map((r) => ({
                         id: r.id,
+                        // Eindeutig je Zeile; `id` ist die Vorlage und kommt
+                        // seit CW-F04 je Rechtsgrundlage und Phase einmal vor.
+                        key: r.key ?? r.id,
+                        phase: r.phase ?? null,
+                        // `<id>.<Land>`, wo die Pflicht in dem Land anders heisst.
+                        title_key: r.labelKey ?? null,
                         title: r.label,
                         description: r.description,
                         domain: r.domain,
@@ -3719,6 +3776,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         // paragraph string (EUR-Lex, work package B).
                         celex: r.celex ?? null,
                         source_url: r.sourceUrl ?? null,
+                        // Was der Link oeffnet, wenn es nicht `source` ist: der
+                        // EU-Rechtsakt hinter einer nationalen Fundstelle.
+                        source_url_label: r.sourceUrlLabel ?? null,
                         penalty: r.penalty ?? null,
                         // Der Schluessel, unter dem die UI `penalty` in der
                         // Sprache des Lesers zeigt (compliance.penaltyText.*).

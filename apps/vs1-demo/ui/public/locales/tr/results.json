@@ -18,7 +18,24 @@
     "titleNoneConfirmed": "Burada daha yakından bakmaya değer.",
     "evidenceCounts": "{{likely}} olası, {{open}} henüz açık.",
     "evidenceOnlyLikely": "{{count}} olası.",
-    "evidenceOnlyOpen": "{{count}} henüz açık."
+    "evidenceOnlyOpen": "{{count}} henüz açık.",
+    "line": {
+      "sellingToday": "Bugün: {{countries}}",
+      "noSalesYet": "Henüz satış yok",
+      "marketsUnknown": "Mevcut pazarlar: bilinmiyor",
+      "establishedIn": "Kuruluş yeri: {{countries}}",
+      "plannedEstablishment": "Planlanan kuruluş: {{countries}}",
+      "plannedMarkets": "Planlanan: {{countries}}",
+      "plannedUndecided": "Planlanan genişleme: henüz karar verilmedi, bu yüzden bunun için bir değerlendirme yapılmadı"
+    },
+    "scope": {
+      "checked": "Bugün için kontrol edildi: {{countries}}, seçtiğiniz gibi.",
+      "outside": "Bu kontrolün parçası değil: {{countries}}.",
+      "allButUnknown": "Tüm mevcut pazarların kontrol edilmesini istediniz. Henüz hiçbiri bilinmiyor, bu nedenle bugün için hiçbir şey kontrol edilmiyor.",
+      "undecided": "Kontrol kapsamı henüz kararlaştırılmadı: tüm mevcut pazarlar gösteriliyor.",
+      "undecidedUnknown": "Kontrol kapsamı henüz kararlaştırılmadı ve bilinen mevcut pazar yok: bugün için hiçbir şey kontrol edilmiyor.",
+      "all": "Bugün için kontrol edildi: tüm mevcut pazarlarınız ({{countries}})."
+    }
   },
   "stats": {
     "0": {
@@ -241,7 +258,17 @@
       "retryNow": "Tekrar dene",
       "pickOtherSlot": "Başka saat seç",
       "reread": "Güncellenen koşulları oku",
-      "keepNote": "Mesajınız ve seçiminiz korunur."
+      "keepNote": "Mesajınız ve seçiminiz korunur.",
+      "agreement_required": {
+        "title": "Randevudan önce beta sözleşmesi eksik.",
+        "body": "Randevu oluşturulmadı ve bilgileriniz paylaşılmadı."
+      },
+      "readAgreement": "Beta sözleşmesini oku",
+      "list": {
+        "noBooking": "Rezervasyon oluşturulmadı",
+        "nothingShared": "Sağlayıcıyla hiçbir şey paylaşılmadı",
+        "kept": "Seçiminiz ve mesajınız korunur"
+      }
     },
     "slotsFailed": "Uygun saatler yüklenemedi. Bu, sağlayıcının müsaitliği hakkında bir şey söylemez.",
     "slotsRetry": "Tekrar dene"
@@ -400,7 +427,7 @@
     "was": "{{title}} idi",
     "wasInRiskMap": "„{{riskMap}}“ oturumunuzda {{title}} idi"
   },
-  "dueLive": "Yürürlükte",
+  "dueLive": "Sabit tarih yok",
   "clusters": {
     "confirmed": {
       "title": "Sizin için geçerli",
@@ -455,14 +482,26 @@
       "intra_eu_volume": "diğer AB ülkelerine ne kadar gönderim yaptığınız",
       "substances": "ürünlerinizin hangi maddeleri içerdiği",
       "contract_scope": "hangi sözleşmeleri kullandığınız",
-      "cross_border_shipping": "sınır ötesine gönderim yapıp yapmadığınız"
+      "cross_border_shipping": "sınır ötesine gönderim yapıp yapmadığınız",
+      "packaging_none": "mallarınızda neyin ambalaj sayıldığı; hiç ambalaj kullanmadığınızı belirttiniz",
+      "establishment_assessment": "bu pazarın hukukunun işletme yerinizi nasıl değerlendirdiği",
+      "packaging_assessment": "bu pazarın hukukunun size hangi ambalaj rolünü verdiği"
+    },
+    "factPlanned": {
+      "eu_market": "AB’ye satış yapmayı planlıyorsunuz"
     }
   },
   "hint": {
     "title": "Tek bir yanıt risk haritanızı netleştirir",
     "message_one": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
     "message_other": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
-    "cta": "Yanıt ekle"
+    "cta": "Yanıt ekle",
+    "question": {
+      "customers": "Soru: kime ve nasıl satış yaptığınız.",
+      "offering": "Soru: ne sattığınız veya sunduğunuz.",
+      "establishment": "Soru: işletmenizin nerede kurulu olduğu.",
+      "eprProducts": "Soru: hangi ürünleri sattığınız."
+    }
   },
   "outside": {
     "title": "{{market}} pazarında diğer alanlar için Verified Provider’lar",
@@ -473,5 +512,52 @@
     "profileBody": "Bu profile aynı pazarda çalışan ancak {{areas}} alanında çalışmayan sağlayıcılardan ulaştınız. Buradan rezervasyon sunulmuyor.",
     "profileBodyGeneric": "Bu profile aynı pazarda çalışan ancak talep ettiğiniz alanda çalışmayan sağlayıcılardan ulaştınız. Buradan rezervasyon sunulmuyor."
   },
-  "outsideTag": "Seçtiğiniz alanların dışında"
+  "outsideTag": "Seçtiğiniz alanların dışında",
+  "plannedTag": "planlanan",
+  "duePlanned": "orada başladığınızda",
+  "euBasis": "AB dayanağı: {{act}}",
+  "storage": {
+    "title": "Depolama yerleri",
+    "sub": "Mallarınızı nerede depoladığınız, nerede satış yaptığınızdan ayrı kaydedilir.",
+    "phase": {
+      "current": "bugün etkin",
+      "planned": "planlanan"
+    },
+    "confirmation": {
+      "confirmed": "yer kesinleşti",
+      "unconfirmed": "henüz doğrulanacak",
+      "unstated": "doğrulama belirtilmedi"
+    },
+    "notAMarket": "satış pazarlarınızdan biri değil",
+    "noRule": "{{country}} için henüz bir depolama kontrolümüz yok; bu nedenle bu Risk Map orada mal depolama hakkında bir beyanda bulunmaz. Bu, orada hiçbir şeyin geçerli olmadığı anlamına gelmez.",
+    "assessed": "Buradaki depolama aşağıda değerlendirilir: {{checks}}.",
+    "open": {
+      "current": "Hâlâ açık: orada gerçekten mal depolanıp depolanmadığı.",
+      "planned": "Hâlâ açık: bu yerin kullanılıp kullanılmayacağı."
+    },
+    "note": {
+      "currentNone": "Bugün: stok tutmuyorsunuz.",
+      "currentUnknown": "Bugün: stokunuzun nerede tutulduğu henüz bilinmiyor; hiçbir depolama yeri dikkate alınmaz.",
+      "plannedNoOther": "Planlanan: başka bir ülkede depolama yok. Başka bir yer eklemiyoruz.",
+      "plannedUndecided": "Planlanan: henüz kararlaştırılmadı, bilinen bir yer yok. Hiçbir ülke için varsayım yapılmaz.",
+      "plannedUnknown": "Planlanan: henüz bilinmiyor. Hiçbir ülke için varsayım yapılmaz."
+    },
+    "assessedNone": "{{country}} için depolama kontrolümüz yanıtlarınıza göre bir şey eklemiyor. Bu, orada hiçbir şeyin geçerli olmadığı anlamına gelmez.",
+    "guidance": "Kaynak resmî bir açıklamadır, kanun metni değildir.",
+    "openItem": {
+      "location": {
+        "current": "orada gerçekten mal depolanıp depolanmadığı",
+        "planned": "bu yerin kullanılıp kullanılmayacağı"
+      },
+      "answer": {
+        "offering": "ne sattığınız veya sunduğunuz",
+        "customers": "müşterilerinizin kim olduğu",
+        "channels": "nasıl satış yaptığınız",
+        "products": "hangi ürün gruplarını sattığınız",
+        "packaging": "ambalajla ne yaptığınız",
+        "established_in_jurisdiction": "işletmenizin nerede kurulu olduğu",
+        "sells_in_jurisdiction": "bu ülkede satış yapıp yapmadığınız"
+      }
+    }
+  }
 }

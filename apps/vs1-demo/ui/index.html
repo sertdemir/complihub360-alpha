@@ -32,8 +32,12 @@
          compliance product. Loads ONLY when both vars are configured; Vite
          leaves the %VITE_…% literal in place when they are not, which the
          charAt check catches, so dev and test stay silent.
-         The queue stub must exist before the script so custom events fired
-         during startup are not lost. -->
+         The queue stub must exist before the script so events fired during
+         startup are not lost.
+         script.manual.js, not script.js: the standard script reads the address
+         bar itself and reports it with identifier, query and hash. The manual
+         variant reports nothing on its own; the app sends every page view with
+         a cleaned address (src/lib/analytics.ts, trackPageview). -->
     <script>
         window.plausible = window.plausible || function () {
             (window.plausible.q = window.plausible.q || []).push(arguments);
@@ -46,7 +50,7 @@
             var el = document.createElement('script');
             el.defer = true;
             el.setAttribute('data-domain', domain);
-            el.src = host.replace(/\/+$/, '') + '/js/script.js';
+            el.src = host.replace(/\/+$/, '') + '/js/script.manual.js';
             document.head.appendChild(el);
         })();
     </script>

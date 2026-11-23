@@ -1,3 +1,5 @@
+import { isKnownCountry } from './country-profile.js';
+import { STORAGE_RULES, evaluateStorageRule, type StorageCheck, type StorageRule, type StorageRuleAnswers } from './storage-rules.js';
 
 // ─── Evidence: worauf eine Pflicht in der Risk Map beruht (Wizard-Audit F1) ───
 // Bis 23.10.2026 hiess "confirmed": der Nutzer hat den Bereich angeklickt.
@@ -19,7 +21,7 @@
 /** Die 27 EU-Mitgliedstaaten (ISO 3166-1). Bewusst nicht EU_MEMBER_STATES aus
  *  country-profile: das kennt nur die fuenf Laender mit Engine-Profil, ein
  *  Markt wie AT oder BE ist trotzdem ein EU-Markt. */
-const EU27 = new Set(['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE']);
+export const EU27 = new Set(['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE']);
 
 /** Was die Antworten ueber das Geschaeft aussagen koennen. */
 export type Fact =
@@ -44,7 +46,13 @@ export type DecidingQuestion =
   | 'intra_eu_volume'
   | 'substances'
   | 'contract_scope'
-  | 'cross_border_shipping';
+  | 'cross_border_shipping'
+  /** Der Nutzer hat "keine Verpackung" gesagt; ob das die Pflicht erledigt, ist offen. */
+  | 'packaging_none'
+  /** Sitz bzw. Verpackungs-Taetigkeit sind beantwortet; offen ist, was das
+   *  Recht des Marktes daraus macht. Keine Wizard-Frage. */
+  | 'establishment_assessment'
+  | 'packaging_assessment';
 
 /** Bekannt wahr (true), bekannt falsch (false), unbekannt (fehlt). */
 export type Facts = Partial<Record<Fact, boolean>>;
@@ -97,12 +105,44 @@ export const EVIDENCE_RULES: Record<string, Rule> = {
 /** Fakten, die nur den Geltungsbereich abgrenzen und allein nichts belegen. */
 const SCOPE_FACTS = new Set<Fact>(['eu_market']);
 
-export function evaluateEvidence(templateId: string, facts: Facts): Evidence {
+/** Was eine einzelne Zeile ueber sich weiss (Feedback CW-F04/F06):
+ *  `euRow`        false, wenn kein Land der Zeile in der EU liegt — dann ist
+ *                 "verkauft in die EU" dort keine offene Frage
+ *  `answered`     Fragen, die der Wizard schon beantwortet hat; sie werden
+ *                 nicht erneut als fehlend ausgewiesen
+ *  `packagingNone` der Nutzer hat "keine Verpackung" geantwortet */
+export interface RowContext {
+  euRow?: boolean;
+  answered?: ReadonlySet<DecidingQuestion>;
+  packagingNone?: boolean;
+}
+
+export function evaluateEvidence(templateId: string, facts: Facts, row: RowContext = {}): Evidence {
   const rule = EVIDENCE_RULES[templateId];
   if (!rule) return { state: 'open', supports: [], decides: [] };
   const supports = rule.requires.filter((f) => facts[f] === true);
   const missing = rule.requires.filter((f) => facts[f] !== true);
-  const decides: Array<Fact | DecidingQuestion> = [...missing, ...(rule.question ? [rule.question] : [])];
+  // Eine beantwortete Frage wird nicht noch einmal gestellt (CW-F06). Erledigt
+  // ist sie damit nicht — ob die Antwort die Pflicht traegt, bleibt eine
+  // fachliche Pruefung je Markt (D1, 24.10.2026). Die Zeile nennt deshalb
+  // genau das als offenen Punkt, statt die Wizard-Frage zu wiederholen, und
+  // bleibt "likely".
+  const question: DecidingQuestion | undefined = !rule.question ? undefined
+    : !row.answered?.has(rule.question) ? rule.question
+    : rule.question === 'establishment' ? 'establishment_assessment'
+    : rule.question === 'packaging_role' ? 'packaging_assessment'
+    : rule.question;
+  const decides: Array<Fact | DecidingQuestion> = [
+    // In einer Zeile ohne EU-Land entscheidet "verkauft in die EU" nichts.
+    ...missing.filter((f) => !(f === 'eu_market' && row.euRow === false)),
+    ...(question ? [question] : []),
+  ];
+  // "Keine Verpackung" ist eine Antwort, keine Befreiung: die Pflicht bleibt
+  // sichtbar, aber offen, und nennt genau diesen Punkt statt erneut zu
+  // fragen, wer verpackt (CW-F06, S18).
+  if (rule.question === 'packaging_role' && row.packagingNone) {
+    return { state: 'open', supports, decides: [...decides.filter((d) => d !== 'packaging_role' && d !== 'packaging_assessment'), 'packaging_none'] };
+  }
   // Ein bekannt falscher Fakt schliesst die Pflicht nicht aus der Karte aus —
   // ausblenden waere eine Rechtsaussage, die die Regel nicht treffen kann.
   // Sie bleibt "open", damit niemand sie fuer erledigt haelt.
@@ -115,6 +155,18 @@ export function evaluateEvidence(templateId: string, facts: Facts): Evidence {
   return { state: 'likely', supports, decides };
 }
 
+/** Welche entscheidenden Fragen die Antworten schon beantworten. "Nicht
+ *  sicher" ist keine Antwort. */
+export function answeredQuestions(details: unknown): { answered: Set<DecidingQuestion>; packagingNone: boolean } {
+  const d = (details && typeof details === 'object' && !Array.isArray(details) ? details : {}) as Record<string, unknown>;
+  const answered = new Set<DecidingQuestion>();
+  const est = list(d.establishment);
+  if (est.some((x) => /^[A-Za-z]{2}$/.test(x) || x === 'not-yet')) answered.add('establishment');
+  const pkg = list(d.packaging);
+  if (pkg.some((x) => x !== 'not-sure')) answered.add('packaging_role');
+  return { answered, packagingNone: pkg.includes('none') };
+}
+
 /** Fakten aus den Wizard-Antworten, so wie sie heute ankommen. Nur was die
  *  Karte woertlich sagt; alles andere bleibt unbekannt. Die Operations-Karten
  *  (AnimatedWizard) tragen ihre englische Kennung in `businessTypeNote`. */
@@ -123,7 +175,7 @@ export function factsFromAnswers(answers: {
   markets?: unknown;
   country?: unknown;
   details?: unknown;
-} | null | undefined): Facts {
+} | null | undefined, rowCountries?: string[]): Facts {
   const facts: Facts = {};
   if (!answers) return facts;
   const card = typeof answers.businessTypeNote === 'string' ? answers.businessTypeNote : '';
@@ -152,13 +204,211 @@ export function factsFromAnswers(answers: {
     default:
       break;
   }
-  const markets = [
-    ...(Array.isArray(answers.markets) ? answers.markets : []),
-    ...(typeof answers.country === 'string' && answers.country ? [answers.country] : []),
-  ].map(String);
+  // Heutige UND geplante Maerkte (Core Wizard Handover v1.1): ein geplantes
+  // Zielland wird mit ausgewertet, auch wenn heute nur anderswo verkauft wird.
+  // `rowCountries`: die Fakten fuer EINE Zeile (Feedback CW-F04). Dann zaehlen
+  // nur ihre Laender — ein geplanter EU-Markt belegt nichts fuer eine
+  // US-Zeile, und "sitzt im Markt" meint die Laender dieser Zeile.
+  const { current, planned } = marketPhases(answers);
+  const markets = rowCountries ?? [...current, ...planned];
   if (markets.some((m) => EU27.has(m.toUpperCase()))) facts.eu_market = true;
   Object.assign(facts, factsFromDetails(answers.details, markets));
   return facts;
+}
+
+/** Welche Laender die Antworten als heutigen und welche als geplanten Markt
+ *  nennen. Getrennt, damit kein geplantes Land als heutige Taetigkeit gilt und
+ *  kein heutiges ein geplantes ueberschreibt. Ein Land kann in beiden stehen.
+ *  Antworten ohne Land ("undecided", "not-planned") sind keine Laender.
+ *  `country` ist nur dann ein heutiger Markt, wenn es nicht aus den geplanten
+ *  stammt.
+ *
+ *  Der Pruefumfang (CW08) GRENZT EIN (Feedback CW-F02, 19.11.2026): wer "nur
+ *  US" pruefen laesst, bekommt als heutige Laender nur US — die uebrigen
+ *  heutigen Maerkte stehen in `outsideScope` und werden nicht ausgewertet.
+ *  "Alle heutigen" und "nicht sicher" grenzen nichts ein. Geplante Maerkte
+ *  bleiben davon unberuehrt. */
+export function marketPhases(answers: { markets?: unknown; country?: unknown; details?: unknown } | null | undefined): { current: string[]; planned: string[]; outsideScope: string[] } {
+  if (!answers) return { current: [], planned: [], outsideScope: [] };
+  const isCode = (v: string) => /^[A-Za-z]{2}$/.test(v);
+  const d = (answers.details && typeof answers.details === 'object' && !Array.isArray(answers.details) ? answers.details : {}) as Record<string, unknown>;
+  const planned = [...new Set(list(d.plannedMarkets).filter(isCode).map((x) => x.toUpperCase()))];
+  const stated = (Array.isArray(answers.markets) ? answers.markets.map(String) : []).filter(isCode).map((x) => x.toUpperCase());
+  const country = typeof answers.country === 'string' && isCode(answers.country) ? answers.country.toUpperCase() : '';
+  // `country` ist nur dann ein heutiger Markt, wenn es nicht aus einem Plan
+  // stammt (geplanter Markt, geplantes Gruendungsland) und CW04 nicht
+  // ausdruecklich "noch nicht" oder "nicht sicher" sagt.
+  const plannedEst = list(d.plannedEstablishment).filter(isCode).map((x) => x.toUpperCase());
+  const noSalesStated = d.marketsStatus === 'not-yet' || d.marketsStatus === 'not-sure';
+  const countryIsMarket = country && !planned.includes(country) && !plannedEst.includes(country) && !noSalesStated;
+  const all = [...new Set([...stated, ...(countryIsMarket ? [country] : [])])];
+  const scope = checkScopeOf(d).countries;
+  if (!scope.length) return { current: all, planned, outsideScope: [] };
+  return { current: scope, planned, outsideScope: all.filter((c) => !scope.includes(c)) };
+}
+
+/** Der Pruefumfang, wie er gefragt wurde. `none`: die Frage kam nicht vor. */
+export function checkScopeOf(details: unknown): { mode: 'all-current' | 'countries' | 'unknown' | 'none'; countries: string[] } {
+  const d = (details && typeof details === 'object' && !Array.isArray(details) ? details : {}) as Record<string, unknown>;
+  const scope = (d.checkScope && typeof d.checkScope === 'object' ? d.checkScope : {}) as Record<string, unknown>;
+  const countries = scope.mode === 'countries'
+    ? [...new Set(list(scope.countries).filter((x) => /^[A-Za-z]{2}$/.test(x)).map((x) => x.toUpperCase()))]
+    : [];
+  if (countries.length) return { mode: 'countries', countries };
+  return { mode: scope.mode === 'all-current' ? 'all-current' : scope.mode === 'unknown' ? 'unknown' : 'none', countries: [] };
+}
+
+export type StorageStatus = 'countries' | 'none' | 'not-applicable' | 'no-other' | 'undecided' | 'unknown' | 'not-asked';
+export type StorageConfirmation = 'confirmed' | 'unconfirmed' | 'unstated';
+export interface StorageAnswer {
+  status: StorageStatus;
+  countries: string[];
+  /** Je Land: steht der Standort fest? 'unstated' = die Sitzung stammt aus
+   *  der Zeit vor der Frage — nie rueckwirkend "bestaetigt". */
+  confirmation: Record<string, StorageConfirmation>;
+}
+
+/** Ein Lagerort am Ergebnis (Folgeauftrag Lagerung, 20.11.2026): Land, Phase
+ *  und Bestaetigungsstand, getrennt von den Verkaufsmaerkten.
+ *
+ *  `assessed` = fuer dieses Land und diese Phase gibt es eine FREIGEGEBENE
+ *  Lagerregel (storage-rules.ts). Das Register ist heute leer: `assessed`
+ *  ist dann false und `reason` 'no_rule', und jede Flaeche sagt fuer genau
+ *  dieses Land, dass die Bewertung fehlt, statt eine Pflicht zu behaupten
+ *  oder "nichts zu tun" nahezulegen. Mit Regel traegt `checks` ihr Ergebnis;
+ *  `checks` kann leer sein, wenn der Ausloeser nicht zutrifft oder eine
+ *  Ausnahme greift. */
+export interface StorageLocation {
+  country: string;
+  phase: 'current' | 'planned';
+  confirmation: StorageConfirmation;
+  /** Das Land ist auch heutiger oder geplanter Verkaufsmarkt. Nur Auskunft:
+   *  ein Lagerland wird nie zum Markt und ein Markt nie zum Lagerland. */
+  also_market: boolean;
+  assessed: boolean;
+  reason: 'no_rule' | 'rule';
+  /** Die lagerbezogenen Checks aus den freigegebenen Regeln fuer diesen Ort. */
+  checks: StorageCheck[];
+}
+
+
+/** Lager heute (CW06) und geplantes Lager (CW07), je mit eigenem Status
+ *  (Feedback CW-F01). "Nicht gefragt", "unentschieden", "nicht sicher" und
+ *  "kein Lager in einem anderen Land" bleiben vier verschiedene Antworten.
+ *  Ein Lagerland ist kein Verkaufsmarkt und setzt keinen Fakt: Keine Regel
+ *  der Engine deckt heute ein Lagerland, deshalb wird es als offener Punkt
+ *  ausgewiesen statt ausgewertet (Entscheidung des Nutzers, 19.11.2026). */
+export function storageOf(details: unknown): { current: StorageAnswer; planned: StorageAnswer } {
+  const d = (details && typeof details === 'object' && !Array.isArray(details) ? details : {}) as Record<string, unknown>;
+  const read = (v: unknown, status: unknown, tokens: Record<string, StorageStatus>): StorageAnswer => {
+    const xs = list(v);
+    const countries = [...new Set(xs.filter((x) => /^[A-Za-z]{2}$/.test(x)).map((x) => x.toUpperCase()))];
+    const stated = (status && typeof status === 'object' && !Array.isArray(status) ? status : {}) as Record<string, unknown>;
+    const confirmation = Object.fromEntries(countries.map((c) => {
+      const v = stated[c] ?? stated[c.toLowerCase()];
+      return [c, v === 'confirmed' ? 'confirmed' : v === 'unconfirmed' ? 'unconfirmed' : 'unstated'] as [string, StorageConfirmation];
+    }));
+    if (countries.length) return { status: 'countries', countries, confirmation };
+    const token = xs.find((x) => x in tokens);
+    return { status: token ? tokens[token] : 'not-asked', countries: [], confirmation: {} };
+  };
+  return {
+    current: read(d.stock, d.stockStatus, { none: 'none', 'not-applicable': 'not-applicable', 'not-sure': 'unknown' }),
+    planned: read(d.plannedStock, d.plannedStockStatus, { 'no-other': 'no-other', undecided: 'undecided', 'not-sure': 'unknown' }),
+  };
+}
+
+/** Alle Laender, die ausgewertet werden: die Maerkte aus `marketPhases`, dazu
+ *  der Sitz (heute) und das geplante Gruendungsland (geplant). Ein Gruender
+ *  ohne Verkaeufe bekommt so eine Auswertung fuer sein Gruendungsland, ohne
+ *  eine Expansion erfinden zu muessen (Feedback CW-F05, 19.11.2026). Der Sitz
+ *  ist dabei kein Verkaufsmarkt: die Fakten (eu_market, established_in_market)
+ *  rechnen weiter nur mit `marketPhases`. */
+export function countryPhases(answers: { markets?: unknown; country?: unknown; details?: unknown } | null | undefined): { current: string[]; planned: string[]; outsideScope: string[] } {
+  const { current, planned, outsideScope } = marketPhases(answers);
+  const d = (answers?.details && typeof answers.details === 'object' && !Array.isArray(answers.details) ? answers.details : {}) as Record<string, unknown>;
+  const codes = (v: unknown) => list(v).filter((x) => /^[A-Za-z]{2}$/.test(x)).map((x) => x.toUpperCase());
+  const plannedAll = [...new Set([...planned, ...codes(d.plannedEstablishment)])];
+  // Ein eingegrenzter Pruefumfang gilt auch fuer den Sitz: er wird nicht
+  // still dazugenommen, sondern als "ausserhalb des Umfangs" genannt.
+  const narrowed = checkScopeOf(d).countries.length > 0;
+  const est = codes(d.establishment);
+  const currentAll = narrowed ? current : [...new Set([...current, ...est])];
+  const outsideAll = narrowed ? [...new Set([...outsideScope, ...est.filter((c) => !current.includes(c))])] : [];
+  return { current: currentAll, planned: plannedAll, outsideScope: outsideAll };
+}
+
+/** Was aus den Antworten geprueft wird und was offen bleibt — ein Datensatz
+ *  fuer API, Risk Map und Nachweis (Feedback CW-F01/F02: "Eingabe →
+ *  normalisierte Daten → Pruefentscheidung → sichtbares Ergebnis").
+ *
+ *  `assessed`        Laender mit Engine-Profil, je Rolle
+ *  `not_assessed`    genannt, aber ohne Engine-Profil
+ *  `check`           der gefragte Pruefumfang; `outside` = heutige Laender,
+ *                    die er ausschliesst; `current_markets_known` = false,
+ *                    wenn "alle heutigen" auf eine unbekannte Menge zeigt
+ *  `storage`         Lager heute und geplant mit eigenem Status;
+ *                    `open_countries` = Lagerlaender, die offen bleiben, weil
+ *                    keine Regel ein Lagerland deckt */
+export interface AssessmentRecord {
+  assessed: { current: string[]; planned: string[] };
+  not_assessed: string[];
+  check: { mode: 'all-current' | 'countries' | 'unknown' | 'none'; countries: string[]; outside: string[]; current_markets_known: boolean };
+  storage: { current: StorageAnswer; planned: StorageAnswer; open_countries: { current: string[]; planned: string[] }; locations: StorageLocation[] };
+}
+
+export function assessmentOf(
+  answers: { markets?: unknown; country?: unknown; details?: unknown } | null | undefined,
+  /** Nur fuer Tests ersetzbar; im Betrieb das Register. */
+  rules: StorageRule[] = STORAGE_RULES,
+): AssessmentRecord {
+  const phases = countryPhases(answers);
+  const d = answers?.details;
+  const check = checkScopeOf(d);
+  const storage = storageOf(d);
+  const all = [...new Set([...phases.current, ...phases.planned])];
+  const unfiltered = marketPhases({ ...answers, details: { ...(d && typeof d === 'object' ? d : {}), checkScope: undefined } });
+  return {
+    assessed: { current: phases.current.filter(isKnownCountry), planned: phases.planned.filter(isKnownCountry) },
+    not_assessed: all.filter((c) => !isKnownCountry(c)),
+    check: { ...check, outside: phases.outsideScope, current_markets_known: unfiltered.current.length > 0 },
+    storage: (() => {
+      const released = rules.filter((r) => r.review.status === 'released');
+      const covered = (country: string, phase: 'current' | 'planned') => released.some((r) => r.jurisdiction === country && r.applies_to.phases.includes(phase));
+      const dd = (d && typeof d === 'object' && !Array.isArray(d) ? d : {}) as Record<string, unknown>;
+      const est = list(dd.establishment);
+      const ruleAnswers: StorageRuleAnswers = {
+        offering: list(dd.offering),
+        customers: typeof dd.customers === 'string' ? dd.customers : '',
+        channels: list(dd.channels),
+        products: list(dd.eprProducts),
+        packaging: list(dd.packaging),
+        // "Nicht sicher" und "nicht gefragt" sind unbekannt; "noch keiner" ist eine Antwort.
+        establishment: est.length && !est.includes('not-sure') ? est.filter((x) => /^[A-Za-z]{2}$/.test(x)).map((x) => x.toUpperCase()) : null,
+        currentMarkets: unfiltered.current,
+        plannedMarkets: unfiltered.planned,
+        inputs: (dd.ruleInputs && typeof dd.ruleInputs === 'object' && !Array.isArray(dd.ruleInputs) ? dd.ruleInputs : {}) as Record<string, string>,
+      };
+      return {
+        ...storage,
+        open_countries: {
+          current: storage.current.countries.filter((c) => !covered(c, 'current')),
+          planned: storage.planned.countries.filter((c) => !covered(c, 'planned')),
+        },
+        locations: (['current', 'planned'] as const).flatMap((phase) => storage[phase].countries.map((country): StorageLocation => {
+          const location = { country, phase, confirmation: storage[phase].confirmation[country] ?? 'unstated' as const };
+          const assessed = covered(country, phase);
+          return {
+            ...location,
+            also_market: all.includes(country),
+            assessed,
+            reason: assessed ? 'rule' : 'no_rule',
+            checks: released.flatMap((r) => evaluateStorageRule(r, location, ruleAnswers) ?? []),
+          };
+        })),
+      };
+    })(),
+  };
 }
 
 const list = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);

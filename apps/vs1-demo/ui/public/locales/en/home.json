@@ -174,8 +174,8 @@
     "saveProgress": "Save progress",
     "steps": {
       "markets": {
-        "title": "Where does your business operate?",
-        "subtitle": "Include countries where you sell, store goods, have a company, or otherwise conduct business."
+        "title": "Where do you currently sell or provide services?",
+        "subtitle": "Today only — plans for new markets have their own question."
       },
       "operations": {
         "title": "What do your operations look like?",
@@ -187,7 +187,7 @@
       },
       "situation": {
         "title": "Which best describes your situation?",
-        "subtitle": "Choose one. It decides which questions follow."
+        "subtitle": "Choose one."
       },
       "offering": {
         "title": "What do you sell or provide?",
@@ -195,11 +195,11 @@
       },
       "establishment": {
         "title": "Where is your business established?",
-        "subtitle": "You sell to {{markets}}. Is your business registered in one of these countries?"
+        "subtitle": "The countries where your business is registered or legally established."
       },
       "stock": {
-        "title": "Where do you hold stock?",
-        "subtitle": "Multi-select, including fulfilment and marketplace warehouses. Asked only because you sell physical products."
+        "title": "Where do you currently store your products?",
+        "subtitle": "Include stock at fulfilment providers and marketplace warehouses."
       },
       "eprProducts": {
         "title": "Which products do you sell or plan to sell?",
@@ -210,7 +210,7 @@
         "subtitle": "EPR & Packaging · question 2 of 2. Multi-select."
       },
       "reason": {
-        "title": "What brings you here today?",
+        "title": "What would you like help with?",
         "subtitle": "Choose all that apply."
       },
       "customers": {
@@ -225,9 +225,17 @@
         "title": "Where do you plan to establish it?",
         "subtitle": "Choose the countries you are considering."
       },
-      "suggest": {
-        "title": "Topics that may fit your answers",
-        "subtitle": "Suggestions based on what you told us — not a finding that an obligation applies. Choose the ones you want on your Risk Map."
+      "check": {
+        "title": "Which countries would you like us to check?",
+        "subtitle": "For your current compliance check."
+      },
+      "expand": {
+        "title": "Which countries are you planning to expand into?",
+        "subtitle": "Choose all that apply. They stay separate from where you sell today."
+      },
+      "plannedStock": {
+        "title": "Where do you plan to store your products?",
+        "subtitle": "Include storage at fulfilment providers."
       }
     },
     "cards": {
@@ -328,16 +336,13 @@
         "desc": "WEEE, batteries, substances"
       },
       "sitExisting": {
-        "title": "Existing business / self-employed",
-        "desc": "You already sell or provide services"
+        "title": "I have an existing business or represent one"
       },
       "sitStarting": {
-        "title": "Starting a business",
-        "desc": "You are planning or setting up"
+        "title": "I’m planning to start a business"
       },
       "sitNotSure": {
-        "title": "Not sure",
-        "desc": "We continue without assuming either"
+        "title": "I’m not sure"
       },
       "offPhysical": {
         "title": "Physical products",
@@ -356,22 +361,21 @@
         "desc": "Not settled yet"
       },
       "notSure": {
-        "title": "Not sure",
+        "title": "I’m not sure",
         "desc": "No problem — you can change it on the review step"
       },
       "estMarket": {
         "desc": "One of your markets"
       },
       "estNotYet": {
-        "title": "Not established yet",
+        "title": "My business is not established yet",
         "desc": "Still being set up"
       },
       "stockMarket": {
         "desc": "You sell here"
       },
       "stockNone": {
-        "title": "No stock held",
-        "desc": "Drop shipping or made to order"
+        "title": "I don’t currently store products"
       },
       "eprElectronics": {
         "title": "Electrical or electronic products",
@@ -409,23 +413,17 @@
         "title": "No packaging",
         "desc": "Nothing is packed or shipped"
       },
-      "rsnLaunch": {
-        "title": "Business, product or service launch"
-      },
       "rsnExpansion": {
-        "title": "Expansion"
+        "title": "Expanding into new markets"
       },
       "rsnCheck": {
-        "title": "Compliance check"
+        "title": "Checking my current compliance"
       },
       "rsnOngoing": {
-        "title": "Ongoing support"
+        "title": "Managing ongoing requirements"
       },
       "rsnProvider": {
-        "title": "Changing or adding a Provider"
-      },
-      "rsnProblem": {
-        "title": "Problem, notice or deadline"
+        "title": "Changing an existing Provider"
       },
       "cuConsumers": {
         "title": "Consumers for personal use"
@@ -452,7 +450,37 @@
         "title": "Physical stores"
       },
       "helpIdentify": {
-        "title": "Help me identify what I need"
+        "title": "I am not sure what I need"
+      },
+      "sitSelf": {
+        "title": "I work for myself"
+      },
+      "rsnStarting": {
+        "title": "Starting a business"
+      },
+      "rsnOther": {
+        "title": "Something else or I’m not sure"
+      },
+      "mkNotYet": {
+        "title": "I don’t sell or provide services yet"
+      },
+      "chkAll": {
+        "title": "All the countries where I currently sell or provide services"
+      },
+      "expUndecided": {
+        "title": "I haven’t decided yet"
+      },
+      "expNotPlanned": {
+        "title": "I’m not planning to expand"
+      },
+      "stockNA": {
+        "title": "This doesn’t apply to me"
+      },
+      "pstockNoOther": {
+        "title": "I don’t plan to store products in another country"
+      },
+      "pstockUndecided": {
+        "title": "I haven’t decided yet — no location in mind"
       }
     },
     "footer": {
@@ -475,24 +503,58 @@
       "establishmentOpen": "established:",
       "stockIn": "stock in",
       "stockOpen": "stock:",
-      "plannedIn": "planned in"
+      "plannedIn": "planned in",
+      "establishment": "Established in",
+      "currentMarkets": "Current markets",
+      "checkScope": "Compliance check for",
+      "plannedMarkets": "Planned expansion",
+      "currentStock": "Current stock",
+      "plannedStock": "Planned stock",
+      "help": "Help request",
+      "helpValue": "Help identifying what else I may need",
+      "unanswered": "Not answered",
+      "notAssessedTitle": "Not assessed yet: {{countries}}",
+      "notAssessedText": "These countries stay in your request. Your Risk Map marks them as not covered — that is not a finding that nothing applies there.",
+      "checkNoMarkets": "current markets not known yet, so nothing is checked for today",
+      "checkOutside": "not part of this check: {{countries}}",
+      "storageTitle": "Storage locations are recorded, not assessed yet",
+      "storageText": "Your Risk Map names them as an open point. It makes no statement about storage there.",
+      "toConfirm": "(to confirm)"
     },
     "skipHint": "Not sure? Choose what fits best — you can change every answer before you create your map.",
-    "needsMarket": "Choose at least one market to continue.",
+    "needsMarket": "Choose where you sell today — or say that you don’t sell yet.",
     "back": "Back",
     "generate": "Create My Risk Map",
     "removeMarket": "Remove {{market}}",
     "aboutMarket": "About {{market}}",
     "situationHint": "A personal matter? CompliHub360 is built for businesses for now — a local advice centre is the better first step.",
     "suggest": {
+      "title": "Areas that may fit your answers",
+      "note": "These are the areas we can identify from your answers so far. Some needs may require clarification or a Provider’s assessment.",
+      "none": "We cannot identify further areas from your answers so far. That does not mean nothing else applies — a Provider’s assessment can clarify it.",
+      "add": "Add these areas to my selection",
       "reasons": {
-        "market": "You sell in {{markets}}",
+        "market": "You sell in or plan to expand into {{markets}}",
         "physical": "You sell physical products",
         "multiMarket": "You sell physical products in more than one country",
         "online": "You sell online or offer digital products",
         "consumersOnline": "You sell to consumers through your own website",
         "starting": "Your business is still being set up"
       }
+    },
+    "needsCountry": "Add at least one country — where you sell today, plan to expand, or where your business is or will be established — so there is something to assess.",
+    "expandConflict": {
+      "text": "You chose “Expanding into new markets” as a goal. If you are not planning to expand, you can remove that goal — your other goals stay.",
+      "action": "Remove the expansion goal"
+    },
+    "storage": {
+      "stockTitle": "Is each storage location settled?",
+      "plannedStockTitle": "Is each planned location settled?",
+      "note": "Naming a country does not confirm storage there. Tell us where the location is settled; the rest stays marked as still to confirm.",
+      "settled": "settled",
+      "toConfirm": "still to confirm",
+      "toggle": "Location is settled",
+      "toggleFor": "Location in {{country}} is settled"
     }
   },
   "marketsDrawer": {
@@ -565,7 +627,9 @@
       "footNote": "Used only for this answer — your markets stay as they are.",
       "header": "Countries",
       "count": "{{selected}} selected · {{total}} countries"
-    }
+    },
+    "allOthers": "All other countries",
+    "allOthersNote": "We don’t assess these yet. You can still add them: they stay in your request and your Risk Map marks them as not covered."
   },
   "countryInfo": {
     "header": "Market",
@@ -741,7 +805,9 @@
         "Regulatory alerts — in preparation"
       ],
       "confirm": "Click the link to finish setting up your free account.",
-      "cta": "Create free account"
+      "cta": "Create free account",
+      "footNote": "No password · No credit card.",
+      "betaNote": "Closed beta: after your first sign-in we show you one sheet. It says what this test is and what it is not."
     },
     "workEmail": "Work email",
     "emailPlaceholder": "you@company.com",

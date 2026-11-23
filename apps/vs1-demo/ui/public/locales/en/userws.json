@@ -689,13 +689,16 @@
       "situation": "Your situation",
       "offering": "You sell",
       "establishment": "Established in",
-      "stock": "Stock",
+      "stock": "Current stock",
       "eprProducts": "EPR · products",
       "packaging": "EPR · packaging",
-      "reason": "What brings you here",
+      "reason": "Your goals",
       "customers": "You sell to",
       "channels": "How you sell",
-      "planned": "Planned in"
+      "planned": "Planned in",
+      "check": "Compliance check for",
+      "expand": "Planned expansion",
+      "plannedStock": "Planned stock"
     },
     "otherCountry": "+ Other country…",
     "removes": {

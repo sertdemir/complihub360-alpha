@@ -29,6 +29,10 @@ import { Logo } from '../ui/Logo';
 import { WizardDrawerLayer, COUNTRY_INFO } from './MarketsDrawer';
 import type { SearchProfile, WizardCategory, BusinessType, WizardDetails } from '../wizard/WizardContext';
 import { Badge } from '../ui/Badge';
+import { Toggle } from '../ui/Toggle';
+import { Button } from '../ui/Button';
+import { isCountryCode, countryName } from '../../lib/countries';
+import { isKnownCountry } from '@complihub/compliance-engine';
 import { track } from '../../lib/analytics';
 
 // ─── AnimatedWizard — auto-playing hero key-visual ───────────────────────────
@@ -52,8 +56,8 @@ export type Card = { id: string; key: string; icon?: LucideIcon; title?: string;
 
 export type StepKey =
   | 'situation' | 'reason' | 'operations' | 'offering' | 'customers' | 'channels'
-  | 'markets' | 'establishment' | 'planned' | 'stock'
-  | 'domains' | 'suggest' | 'eprProducts' | 'packaging';
+  | 'markets' | 'establishment' | 'planned' | 'check' | 'expand' | 'stock' | 'plannedStock'
+  | 'domains' | 'eprProducts' | 'packaging';
 
 export type StepDef = {
   rail: number;
@@ -131,16 +135,20 @@ export const STEPS: StepDef[] = [
 ];
 const [MARKETS, OPERATIONS, DOMAINS] = STEPS;
 
-// Neue Fragen (Question Bank v1.0). Ids tragen ein Praefix, weil "Germany"
-// schon die Markt-Karte ist und Sitz/Lager dieselben Laender anbieten.
+// Kernfragen nach dem Core Wizard Handover v1.1 (18.11.2026, CW01–CW08):
+// was heute gilt und was geplant ist, bleibt getrennt — Maerkte, Lager und
+// der Pruefumfang je als eigene Antwort. Ids tragen ein Praefix, weil
+// "Germany" schon die Markt-Karte ist und mehrere Fragen dieselben Laender
+// anbieten.
 const SITUATION: StepDef = {
   rail: 0,
   key: 'situation',
-  // "Personal matter" (S01) bleibt aussen vor, bis der Umfang entschieden ist
-  // (D11) — der Hinweis in der Fusszeile nennt den besseren ersten Schritt.
+  // CW01: "I work for myself" ist eine eigene Antwort — wer selbststaendig
+  // arbeitet, muss dafuer kein eingetragenes Unternehmen haben.
   cards: [
-    { id: 'sit:existing', key: 'sitExisting' },
     { id: 'sit:starting', key: 'sitStarting' },
+    { id: 'sit:existing', key: 'sitExisting' },
+    { id: 'sit:self-employed', key: 'sitSelf' },
     { id: 'sit:not-sure', key: 'sitNotSure' },
   ],
   picks: [],
@@ -161,24 +169,21 @@ const OFFERING: StepDef = {
   footerKey: 'next',
   exclusive: ['off:deciding', 'off:not-sure'],
 };
-// Runde 1 nach dem freigegebenen Fragen-Deck v1.0 (Canvas-Wahl 14.11.2026):
-// Anlass (S02), Kundschaft (S05) und Vertriebsweg (S06). S06 loest die alte
-// Operations-Frage ab — die bleibt als Definition fuer aeltere Sitzungen.
+// CW02 Ziele. "Something else or I'm not sure" darf neben bekannten Zielen
+// stehen — deshalb keine exklusive Antwort.
 const REASON: StepDef = {
   rail: 0,
   key: 'reason',
   cards: [
-    { id: 'rsn:launch', key: 'rsnLaunch' },
+    { id: 'rsn:starting', key: 'rsnStarting' },
     { id: 'rsn:expansion', key: 'rsnExpansion' },
     { id: 'rsn:check', key: 'rsnCheck' },
     { id: 'rsn:ongoing', key: 'rsnOngoing' },
     { id: 'rsn:provider', key: 'rsnProvider' },
-    { id: 'rsn:problem', key: 'rsnProblem' },
-    { id: 'rsn:not-sure', key: 'notSure' },
+    { id: 'rsn:other', key: 'rsnOther' },
   ],
   picks: [],
   footerKey: 'next',
-  exclusive: ['rsn:not-sure'],
 };
 const CUSTOMERS: StepDef = {
   rail: 0,
@@ -241,11 +246,26 @@ const PACKAGING: StepDef = {
   exclusive: ['pkg:none', 'pkg:not-sure'],
 };
 
-// Sitz (S03) und Lager (S08): die eigenen Maerkte zuerst (Wahl 3B), dann
-// "Others" mit allen uebrigen Laendern, dann die Antworten ohne Land.
-// "planned" ist die Folgefrage zu "Not established yet" (S03, Wahl 4A).
-export type CountryStep = 'establishment' | 'planned' | 'stock';
-export const COUNTRY_PREFIX: Record<CountryStep, string> = { establishment: 'est:', planned: 'plan:', stock: 'stock:' };
+// CW04 Aktuelle Maerkte: die Laenderkarten wie bisher, dazu zwei Antworten
+// ohne Land. Sie gehoeren nicht zu MARKETS — sonst zaehlte "noch nicht" als
+// Markt (ownMarketsOf) und die Demo zeigte sie.
+export const MARKET_STATUS = ['mk:not-yet', 'mk:not-sure'];
+const MARKETS_ASK: StepDef = {
+  ...MARKETS,
+  cards: [...MARKETS.cards, { id: 'mk:not-yet', key: 'mkNotYet' }, { id: 'mk:not-sure', key: 'notSure' }],
+  exclusive: MARKET_STATUS,
+};
+
+// Fragen nach Laendern. Jede fuehrt die passenden Laender als Karten, dann
+// "Others" mit allen uebrigen, dann die Antworten ohne Land (exklusiv).
+//   establishment  CW03 Sitz            planned       Folgefrage "noch nicht gegruendet"
+//   check          CW08 Pruefumfang     expand        CW05 geplante Maerkte
+//   stock          CW06 Lager heute     plannedStock  CW07 geplantes Lager
+export type CountryStep = 'establishment' | 'planned' | 'check' | 'expand' | 'stock' | 'plannedStock';
+export const COUNTRY_PREFIX: Record<CountryStep, string> = {
+  establishment: 'est:', planned: 'plan:', check: 'chk:', expand: 'exp:', stock: 'stock:', plannedStock: 'pstock:',
+};
+export const COUNTRY_STEPS = Object.keys(COUNTRY_PREFIX) as CountryStep[];
 export const isCountryStep = (k: string): k is CountryStep => k in COUNTRY_PREFIX;
 const COUNTRY_TAIL: Record<CountryStep, Card[]> = {
   establishment: [
@@ -253,21 +273,58 @@ const COUNTRY_TAIL: Record<CountryStep, Card[]> = {
     { id: 'est:not-sure', key: 'notSure' },
   ],
   planned: [{ id: 'plan:deciding', key: 'offDeciding' }],
+  // "All current" ist eine lebende Verweisung auf CW04, kein Schnappschuss.
+  check: [
+    { id: 'chk:all-current', key: 'chkAll' },
+    { id: 'chk:not-sure', key: 'notSure' },
+  ],
+  expand: [
+    { id: 'exp:undecided', key: 'expUndecided' },
+    { id: 'exp:not-planned', key: 'expNotPlanned' },
+  ],
+  // Kein Lager, trifft nicht zu und unbekannt sind drei verschiedene Zustaende.
   stock: [
     { id: 'stock:none', key: 'stockNone' },
+    { id: 'stock:not-applicable', key: 'stockNA' },
     { id: 'stock:not-sure', key: 'notSure' },
   ],
+  // "Kein Lager in einem anderen Land" heisst weder "kein Lager" noch
+  // "keine Expansion".
+  plannedStock: [
+    { id: 'pstock:no-other', key: 'pstockNoOther' },
+    { id: 'pstock:undecided', key: 'pstockUndecided' },
+    { id: 'pstock:not-sure', key: 'notSure' },
+  ],
 };
-function countryStep(key: CountryStep, ownMarkets: string[]): StepDef {
+/** "Der Standort steht fest" je Lagerland (Folgeauftrag Lagerung). Als Id in
+ *  `selected`: `stockok:<Land>` bzw. `pstockok:<Land>`. Fehlt sie, ist das
+ *  Land benannt, aber noch zu bestaetigen. */
+export type StorageStep = 'stock' | 'plannedStock';
+export const STORAGE_OK: Record<StorageStep, string> = { stock: 'stockok:', plannedStock: 'pstockok:' };
+/** Die gewaehlten Lagerlaender einer Frage, als Karten- bzw. Drawer-Namen. */
+export function storageNamesOf(key: StorageStep, selected: Set<string>, extras: string[]): string[] {
   const pre = COUNTRY_PREFIX[key];
+  const tails = new Set(COUNTRY_TAIL[key].map((c) => c.id));
+  const cards = [...selected].filter((id) => id.startsWith(pre) && !tails.has(id) && id !== pre + 'Others').map((id) => id.slice(pre.length));
+  return [...cards, ...(selected.has(pre + 'Others') ? extras : [])];
+}
+const COUNTRY_CARD_KEY: Record<CountryStep, string> = {
+  establishment: 'estMarket', planned: 'estMarket', check: 'chkMarket', expand: '', stock: 'stockMarket', plannedStock: 'pstockMarket',
+};
+/** Eine Karte, die fuer ein Land steht (Titel = Landesname). */
+export const isCountryCard = (c: Card) => c.key.endsWith('Market');
+const uniq = (xs: string[]) => [...new Set(xs)];
+function countryStep(key: CountryStep, ownMarkets: string[], plannedMarkets: string[]): StepDef {
+  const pre = COUNTRY_PREFIX[key];
+  // Geplante Maerkte: alle Hauptlaender, auch die mit heutiger Aktivitaet
+  // (CW05). Geplantes Lager: heutige und geplante Maerkte. Sonst die heutigen.
+  const countries: Card[] = key === 'expand'
+    ? MARKETS.cards.filter((c) => !isOthers(c.id)).map((c) => ({ id: pre + c.id, key: c.key }))
+    : (key === 'plannedStock' ? uniq([...ownMarkets, ...plannedMarkets]) : ownMarkets).map((m) => ({ id: pre + m, key: COUNTRY_CARD_KEY[key] }));
   return {
     rail: 1,
     key,
-    cards: [
-      ...ownMarkets.map((m) => ({ id: pre + m, key: key === 'stock' ? 'stockMarket' : 'estMarket' })),
-      { id: pre + 'Others', key: 'others' },
-      ...COUNTRY_TAIL[key],
-    ],
+    cards: [...countries, { id: pre + 'Others', key: 'others' }, ...COUNTRY_TAIL[key]],
     picks: [],
     footerKey: 'next',
     exclusive: COUNTRY_TAIL[key].map((c) => c.id),
@@ -276,57 +333,65 @@ function countryStep(key: CountryStep, ownMarkets: string[]): StepDef {
 
 export const isOthers = (id: string) => id === 'Others' || id.endsWith(':Others');
 
-/** Die eigenen Maerkte als Karten-Ids (Namen), Karten und Drawer zusammen. */
+/** Die heutigen Maerkte als Karten-Ids (Namen), Karten und Drawer zusammen. */
 export function ownMarketsOf(selected: Set<string>, extraMarkets: string[]): string[] {
   return [...MARKETS.cards.filter((c) => !isOthers(c.id) && selected.has(c.id)).map((c) => c.id), ...extraMarkets];
 }
+/** Die geplanten Maerkte (CW05) als Namen — nur solange das Ziel "Expansion" gewaehlt ist. */
+export function plannedMarketsOf(selected: Set<string>, extraPlanned: string[]): string[] {
+  if (!selected.has('rsn:expansion')) return [];
+  return [
+    ...MARKETS.cards.filter((c) => !isOthers(c.id) && selected.has('exp:' + c.id)).map((c) => c.id),
+    ...(selected.has('exp:Others') ? extraPlanned : []),
+  ];
+}
 
-// Welche Schritte der interaktive Wizard zeigt — haengt von den Antworten ab.
-// Faellt eine Bedingung weg, fallen auch ihre Antworten aus dem Profil
-// (buildProfile), statt still mitzulaufen (Question Bank S17).
-// S12: "Help me identify what I need" steht im Wizard neben den Bereichen und
-// schliesst sie aus. Die Karte gehoert nicht zu DOMAINS — die Antworten-
-// Schublade verlangt mindestens einen Bereich und bietet sie nicht an.
+// "I am not sure what I need" (Handover v1.1): eine eigene Bitte um Hilfe,
+// keine Alternative zu den Bereichen — gewaehlte Bereiche bleiben stehen.
+// Die Karte gehoert nicht zu DOMAINS: die Antworten-Schublade bietet sie
+// nicht an.
 export const HELP_IDENTIFY = 'help:identify';
 const DOMAINS_ASK: StepDef = {
   ...DOMAINS,
   cards: [...DOMAINS.cards, { id: HELP_IDENTIFY, key: 'helpIdentify' }],
-  exclusive: [HELP_IDENTIFY],
 };
 
 /** Bereiche, die zu den bisherigen Antworten passen koennen — feste Regeln,
- *  keine AI, und nie eine Aussage, dass eine Pflicht gilt (Deck S12: "Suggest
- *  topics from factual context and ask the user to confirm them; do not mark
- *  obligations confirmed"). Jede Regel nennt die Antwort, aus der sie folgt.
- *  Kein Vorschlag heisst nicht "trifft nicht zu" — dann zeigt der Schritt
- *  alle Bereiche. */
-export function suggestedAreas(selected: Set<string>, ownMarkets: string[]): Array<{ id: string; reason: string }> {
+ *  keine AI, und nie eine Aussage, dass eine Pflicht gilt. Jede Regel nennt
+ *  die Antwort, aus der sie folgt. Kein Vorschlag heisst nicht "trifft nicht
+ *  zu". `markets` sind heutige und geplante Maerkte zusammen. */
+export function suggestedAreas(selected: Set<string>, markets: string[]): Array<{ id: string; reason: string }> {
   const has = (id: string) => selected.has(id);
   const out: Array<{ id: string; reason: string }> = [];
-  if (ownMarkets.length > 0) out.push({ id: 'Tax & VAT', reason: 'market' });
+  if (markets.length > 0) out.push({ id: 'Tax & VAT', reason: 'market' });
   if (has('off:physical')) {
     out.push({ id: 'EPR & Packaging', reason: 'physical' });
     out.push({ id: 'Product Compliance', reason: 'physical' });
-    if (ownMarkets.length > 1) out.push({ id: 'Logistics & Customs', reason: 'multiMarket' });
+    if (markets.length > 1) out.push({ id: 'Logistics & Customs', reason: 'multiMarket' });
   }
   if (has('ch:own-site') || has('off:digital')) out.push({ id: 'Data & Privacy', reason: 'online' });
   if (has('ch:own-site') && (has('cu:consumers') || has('cu:both'))) out.push({ id: 'Marketing Compliance', reason: 'consumersOnline' });
-  if (has('sit:starting') || has('est:not-yet')) out.push({ id: 'Corporate & Structure', reason: 'starting' });
+  if (has('sit:starting') || has('est:not-yet') || has('rsn:starting')) out.push({ id: 'Corporate & Structure', reason: 'starting' });
   return out;
 }
 
-// Eine Seite traegt bis zu zwei verwandte Fragen (Wahl 1B).
+// Welche Schritte der interaktive Wizard zeigt — haengt von den Antworten ab.
+// Faellt eine Bedingung weg, fallen auch ihre Antworten aus dem Profil
+// (buildProfile), statt still mitzulaufen. Gruppierung nach dem Handover:
+// Ausgangslage · Angebot · Heutiger Stand · Expansion · Lager · Bereiche.
 export function pagesFor(selected: Set<string>): StepKey[][] {
   return [
     ['situation', 'reason'],
-    ['offering'],
-    ['customers', 'channels'],
-    ['markets'],
-    ['establishment', ...(selected.has('est:not-yet') ? (['planned'] as const) : [])],
-    ...(selected.has('off:physical') ? [['stock'] as StepKey[]] : []),
+    ['offering', 'customers', 'channels'],
+    [
+      'markets', 'establishment',
+      ...(selected.has('est:not-yet') ? (['planned'] as const) : []),
+      ...(selected.has('rsn:check') ? (['check'] as const) : []),
+    ],
+    ...(selected.has('rsn:expansion') ? [['expand'] as StepKey[]] : []),
+    // Lager heute und geplant stehen zusammen, auch ohne Expansionsziel.
+    ...(selected.has('off:physical') ? [['stock', 'plannedStock'] as StepKey[]] : []),
     ['domains'],
-    // S12 "Help me identify what I need": ein Vorschlagsschritt (siehe suggestedAreas).
-    ...(selected.has(HELP_IDENTIFY) ? [['suggest'] as StepKey[]] : []),
     ...(selected.has('EPR & Packaging') ? [['eprProducts'] as StepKey[], ['packaging'] as StepKey[]] : []),
   ];
 }
@@ -336,14 +401,14 @@ export function flowFor(selected: Set<string>): StepKey[] {
 // Die Demo auf der Startseite zeigt nur drei Kernschritte.
 const DEMO_FLOW: StepKey[] = ['channels', 'markets', 'domains'];
 
-/** Die Karten eines Schritts. Sitz und Lager haengen an den eigenen Maerkten.
- *  Wizard und Antworten-Schublade teilen sich diese Definition. */
-export function stepDefFor(k: StepKey, ownMarkets: string[]): StepDef {
+/** Die Karten eines Schritts. Die Laenderfragen haengen an den heutigen und
+ *  geplanten Maerkten. Wizard und Antworten-Schublade teilen sich diese
+ *  Definition. */
+export function stepDefFor(k: StepKey, ownMarkets: string[], plannedMarkets: string[] = []): StepDef {
   switch (k) {
     case 'markets': return MARKETS;
     case 'operations': return OPERATIONS;
     case 'domains': return DOMAINS;
-    case 'suggest': return { ...DOMAINS, key: 'suggest' };
     case 'situation': return SITUATION;
     case 'reason': return REASON;
     case 'offering': return OFFERING;
@@ -351,7 +416,7 @@ export function stepDefFor(k: StepKey, ownMarkets: string[]): StepDef {
     case 'channels': return CHANNELS;
     case 'eprProducts': return EPR_PRODUCTS;
     case 'packaging': return PACKAGING;
-    default: return countryStep(k, ownMarkets);
+    default: return countryStep(k, ownMarkets, plannedMarkets);
   }
 }
 
@@ -402,8 +467,16 @@ const BUSINESS_CODE: Record<string, BusinessType> = {
   'SaaS / digital': 'saas', Hybrid: 'other', Other: 'other',
 };
 
-/** Laender, die in Sitz oder Lager ueber "Others" gewaehlt wurden (Namen). */
-export type CountryExtras = { establishment: string[]; planned: string[]; stock: string[] };
+/** Laender, die in einer Laenderfrage ueber "Others" gewaehlt wurden (Namen). */
+export type CountryExtras = Record<CountryStep, string[]>;
+export const emptyExtras = (): CountryExtras => ({ establishment: [], planned: [], check: [], expand: [], stock: [], plannedStock: [] });
+
+// Wo eine Laenderfrage in `details` steht.
+const DETAIL_FIELD = {
+  establishment: 'establishment', planned: 'plannedEstablishment', expand: 'plannedMarkets', stock: 'stock', plannedStock: 'plannedStock',
+} as const;
+// Ziele aus Sitzungen vor dem Handover v1.1 (Deck S02).
+const OLD_GOAL: Record<string, string> = { launch: 'starting', problem: 'other', 'not-sure': 'other' };
 
 // C6 "Refine existing": a stored profile pre-selects the cards. Reverse of the
 // maps above — businessTypeNote carries the original card id when available.
@@ -430,26 +503,40 @@ export function selectionFromProfile(p: SearchProfile): {
     if (p.businessType && btToCard[p.businessType]) sel.add(btToCard[p.businessType]);
   }
 
-  const countryExtras: CountryExtras = { establishment: [], planned: [], stock: [] };
+  const countryExtras = emptyExtras();
   const d = p.details;
   if (d) {
     if (d.situation) sel.add('sit:' + d.situation);
-    for (const v of d.reason ?? []) sel.add('rsn:' + v);
+    for (const v of d.goals ?? d.reason ?? []) sel.add('rsn:' + (OLD_GOAL[v] ?? v));
     for (const v of d.offering ?? []) sel.add('off:' + v);
     if (d.customers) sel.add('cu:' + d.customers);
     for (const v of d.channels ?? []) sel.add('ch:' + v);
     for (const v of d.eprProducts ?? []) sel.add('epr:' + v);
     for (const v of d.packaging ?? []) sel.add('pkg:' + v);
-    const own = new Set(ownMarketsOf(sel, extra));
-    for (const key of ['establishment', 'planned', 'stock'] as const) {
+    if (d.marketsStatus && !(p.markets ?? []).length) sel.add('mk:' + d.marketsStatus);
+    if (d.helpIdentify) sel.add(HELP_IDENTIFY);
+    const own = ownMarketsOf(sel, extra);
+    const restore = (key: CountryStep, values: string[], planned: string[]) => {
       const pre = COUNTRY_PREFIX[key];
-      for (const v of (key === 'planned' ? d.plannedEstablishment : d[key]) ?? []) {
+      const def = countryStep(key, own, planned);
+      for (const v of values) {
         if (COUNTRY_TAIL[key].some((c) => c.id === pre + v)) { sel.add(pre + v); continue; }
         const name = NAME_OF[v] ?? v;
-        if (own.has(name)) sel.add(pre + name);
+        if (def.cards.some((c) => c.id === pre + name)) sel.add(pre + name);
         else { sel.add(pre + 'Others'); countryExtras[key].push(name); }
       }
+    };
+    // Geplante Maerkte zuerst: das geplante Lager bietet sie als Karten an.
+    restore('expand', d.plannedMarkets ?? [], []);
+    const planned = plannedMarketsOf(sel, countryExtras.expand);
+    for (const key of ['establishment', 'planned', 'stock', 'plannedStock'] as const) restore(key, d[DETAIL_FIELD[key]] ?? [], planned);
+    // Bestaetigte Lagerorte. Sitzungen ohne das Feld behalten "nicht angegeben".
+    for (const [key, status] of [['stock', d.stockStatus], ['plannedStock', d.plannedStockStatus]] as const) {
+      for (const [code, v] of Object.entries(status ?? {})) if (v === 'confirmed') sel.add(STORAGE_OK[key] + (NAME_OF[code] ?? code));
     }
+    if (d.checkScope?.mode === 'all-current') sel.add('chk:all-current');
+    else if (d.checkScope?.mode === 'unknown') sel.add('chk:not-sure');
+    else restore('check', d.checkScope?.countries ?? [], planned);
   }
   return { selected: sel, extraMarkets: extra, countryExtras };
 }
@@ -458,29 +545,55 @@ function detailsOf(selected: Set<string>, extraMarkets: string[], extras: Countr
   const strip = (step: StepDef) => step.cards.filter((c) => selected.has(c.id)).map((c) => c.id.slice(c.id.indexOf(':') + 1));
   const flow = flowFor(selected);
   const own = ownMarketsOf(selected, extraMarkets);
-  const countries = (key: CountryStep) => {
+  const planned = plannedMarketsOf(selected, extras.expand);
+  // Laendercodes einer Laenderfrage, dann ihre Antwort ohne Land. Nicht
+  // gefragt heisst leer — nie "nein".
+  const countries = (key: CountryStep, withTail = true) => {
     if (!flow.includes(key)) return [];
     const pre = COUNTRY_PREFIX[key];
+    const tails = new Set(COUNTRY_TAIL[key].map((c) => c.id));
     return [
-      ...own.filter((m) => selected.has(pre + m)).map(codeOf),
+      ...countryStep(key, own, planned).cards
+        .filter((c) => !isOthers(c.id) && !tails.has(c.id) && selected.has(c.id))
+        .map((c) => codeOf(c.id.slice(pre.length))),
       ...(selected.has(pre + 'Others') ? extras[key].map(codeOf) : []),
-      ...strip({ ...SITUATION, cards: COUNTRY_TAIL[key] }),
+      ...(withTail ? COUNTRY_TAIL[key].filter((c) => selected.has(c.id)).map((c) => c.id.slice(pre.length)) : []),
     ];
   };
+  const storageStatus = (key: StorageStep) => Object.fromEntries(
+    storageNamesOf(key, selected, extras[key]).map((n) => [codeOf(n), selected.has(STORAGE_OK[key] + n) ? 'confirmed' as const : 'unconfirmed' as const]),
+  );
   const situation = SITUATION.cards.find((c) => selected.has(c.id));
+  const status = MARKET_STATUS.find((id) => selected.has(id));
   return {
     situation: (situation?.id.slice(4) ?? '') as WizardDetails['situation'],
-    reason: strip(REASON),
+    goals: strip(REASON),
     offering: strip(OFFERING),
     customers: strip(CUSTOMERS)[0] ?? '',
     channels: strip(CHANNELS),
+    marketsStatus: own.length ? '' : ((status?.slice(3) ?? '') as WizardDetails['marketsStatus']),
     establishment: countries('establishment'),
     plannedEstablishment: countries('planned'),
+    plannedMarkets: countries('expand'),
     stock: countries('stock'),
+    plannedStock: countries('plannedStock'),
+    ...(flow.includes('stock') ? { stockStatus: storageStatus('stock'), plannedStockStatus: storageStatus('plannedStock') } : {}),
+    // "All current" bleibt eine Verweisung: wer die heutigen Maerkte aendert,
+    // aendert den Pruefumfang mit.
+    ...(flow.includes('check')
+      ? {
+          checkScope: selected.has('chk:all-current') ? { mode: 'all-current' as const, countries: [] }
+            : selected.has('chk:not-sure') ? { mode: 'unknown' as const, countries: [] }
+            : { mode: (countries('check', false).length ? 'countries' : '') as 'countries' | '', countries: countries('check', false) },
+        }
+      : {}),
+    helpIdentify: selected.has(HELP_IDENTIFY),
     eprProducts: flow.includes('eprProducts') ? strip(EPR_PRODUCTS) : [],
     packaging: flow.includes('packaging') ? strip(PACKAGING) : [],
   };
 }
+
+const isCode = (v: string) => /^[A-Z]{2}$/.test(v);
 
 /** Ohne extras (AnswersDrawer) bleibt `details` aussen vor — der Aufrufer
     behaelt dann die gespeicherten Antworten der neuen Fragen. */
@@ -489,6 +602,7 @@ export function buildProfile(selected: Set<string>, extraMarkets: string[], extr
     ...MARKETS.cards.filter((c) => c.id !== 'Others' && selected.has(c.id)).map((c) => MARKET_CODE[c.id] ?? c.id),
     ...extraMarkets.map((m) => EXTRA_MARKET_CODE[m] ?? m),
   ];
+  const details = extras ? detailsOf(selected, extraMarkets, extras) : undefined;
   const categories = DOMAINS.cards.filter((c) => selected.has(c.id)).map((c) => CATEGORY_CODE[c.id]).filter(Boolean);
   const ops = OPERATIONS.cards.find((c) => selected.has(c.id));
   // Geschaeftsart fuer die Engine. Mit einer Antwort auf den Vertriebsweg
@@ -502,7 +616,13 @@ export function buildProfile(selected: Set<string>, extraMarkets: string[], extr
       : has('ch:own-site') && has('off:digital') && !has('off:physical') ? 'saas'
       : 'other';
   return {
-    country: markets[0] ?? '',
+    // Ohne heutigen Markt das erste geplante Land — nie ein erfundenes.
+    // Dann der Sitz, dann das geplante Gruendungsland (CW-F05).
+    // Ein eingegrenzter Pruefumfang zuerst (CW-F02): sonst suchte die
+    // Anbieterliste in einem Land, das gar nicht geprueft wird.
+    country: (details?.checkScope?.mode === 'countries' ? details.checkScope.countries.find(isCode) : undefined)
+      ?? markets[0] ?? (details?.plannedMarkets ?? []).find(isCode)
+      ?? (details?.establishment ?? []).find(isCode) ?? (details?.plannedEstablishment ?? []).find(isCode) ?? '',
     markets,
     categories,
     businessType: channelsAnswered ? derived : ops ? BUSINESS_CODE[ops.id] ?? 'other' : '',
@@ -517,7 +637,7 @@ export function buildProfile(selected: Set<string>, extraMarkets: string[], extr
     note: '',
     // Nicht gefragt heisst unbekannt, nicht "nein" (Wizard-Audit F8).
     existingProvider: null,
-    ...(extras ? { details: detailsOf(selected, extraMarkets, extras) } : {}),
+    ...(details ? { details } : {}),
   };
 }
 
@@ -538,7 +658,8 @@ function SummaryRow({ label, value, onEdit }: { label: string; value: Seg[]; onE
                   <span className={v.muted ? 'text-fg-tertiary' : undefined}>{v.text}</span>
                 </Fragment>
               ))
-            : '—'}
+            // Unbeantwortet steht in Klartext da — ein Strich laese sich als "nichts".
+            : <span className="text-fg-tertiary">{t('wizard.review.unanswered')}</span>}
         </p>
       </div>
       <button
@@ -601,6 +722,7 @@ export function AnimatedWizard({
   onComplete,
   initialProfile,
   initialMarkets,
+  initialStep,
 }: {
   className?: string;
   /** User-driven: click cards to select, Back/Next to move; no auto-play, no cursor. */
@@ -615,6 +737,10 @@ export function AnimatedWizard({
   onComplete?: (profile: SearchProfile) => void;
   /** C6 "Refine existing": pre-selects the cards and opens on the Review step. */
   initialProfile?: SearchProfile;
+  /** Oeffnet auf der Seite mit dieser Frage statt auf der Uebersicht — fuer
+      "Add answer" auf der Risk Map (Feedback CW-F06). Unbekannt oder nicht im
+      Ablauf: die Uebersicht. */
+  initialStep?: string;
   /** Market codes (DE, UK, …) already known from the entry point — a market
       page's CTA passes its own market, so the wizard pre-selects it and skips
       the Markets step going forward instead of asking the question the page
@@ -650,7 +776,9 @@ export function AnimatedWizard({
   // Der aktuelle Schritt als Schluessel, nicht als Index: welche Schritte es
   // gibt, haengt von den Antworten ab (Lager, EPR), ein Index wuerde springen.
   const [stepKey, setStepKey] = useState<StepKey | 'review'>(
-    prefill ? 'review' : interactive ? 'situation' : reduced ? 'domains' : DEMO_FLOW[0],
+    prefill
+      ? (pagesFor(prefill.selected).find((p) => p.includes(initialStep as StepKey))?.[0] ?? 'review')
+      : interactive ? 'situation' : reduced ? 'domains' : DEMO_FLOW[0],
   );
   const [selected, setSelected] = useState<Set<string>>(
     () =>
@@ -664,13 +792,13 @@ export function AnimatedWizard({
   const [drawerFor, setDrawerFor] = useState<'markets' | CountryStep | null>(null);
   const [extraMarkets, setExtraMarkets] = useState<string[]>(() => prefill?.extraMarkets ?? []);
   const [countryExtras, setCountryExtras] = useState<CountryExtras>(
-    () => prefill?.countryExtras ?? { establishment: [], planned: [], stock: [] },
+    () => prefill?.countryExtras ?? emptyExtras(),
   );
   const [infoCountry, setInfoCountry] = useState<string | null>(null);
   const [saveOpen, setSaveOpen] = useState(false);
-  // Die Marktseite hat die Markt-Frage schon beantwortet: vorwaerts wird sie
-  // uebersprungen, zurueck bleibt sie erreichbar.
-  const skipMarkets = useRef(!!marketPrefill);
+  // Eine Marktseite reicht ihren Markt vorausgewaehlt herein. Die Seite wird
+  // nicht mehr uebersprungen: sie traegt auch Sitz und Pruefumfang, und der
+  // Markt der Seite ist nicht zwingend ein heutiger Markt (Handover v1.1).
 
   const pages = interactive ? pagesFor(selected) : DEMO_FLOW.map((k) => [k]);
   const flow = pages.flat();
@@ -678,17 +806,11 @@ export function AnimatedWizard({
   const pageIndex = pages.findIndex((p) => p.includes(stepKey as StepKey));
   const page = isReview ? [] : pages[pageIndex] ?? [stepKey as StepKey];
   const ownMarkets = ownMarketsOf(selected, extraMarkets);
+  const plannedMarkets = plannedMarketsOf(selected, countryExtras.expand);
   const stepOf = (k: StepKey): StepDef => {
+    if (interactive && k === 'markets') return MARKETS_ASK;
     if (interactive && k === 'domains') return DOMAINS_ASK;
-    if (k === 'suggest') {
-      // Vorgeschlagene Bereiche mit ihrem Grund; ohne Vorschlag alle Bereiche.
-      const sug = suggestedAreas(selected, ownMarkets);
-      const cards = sug.length
-        ? sug.map((x) => ({ ...DOMAINS.cards.find((c) => c.id === x.id)!, descKey: `wizard.suggest.reasons.${x.reason}` }))
-        : DOMAINS.cards;
-      return { ...DOMAINS, key: 'suggest', cards };
-    }
-    return stepDefFor(k, ownMarkets);
+    return stepDefFor(k, ownMarkets, plannedMarkets);
   };
   const step = stepOf(isReview ? flow[flow.length - 1] : stepKey);
 
@@ -701,8 +823,8 @@ export function AnimatedWizard({
       const n = new Set(prev);
       if (v.length) {
         n.add(others);
-        // Ein Land schliesst "Not yet" / "None" / "Not sure" aus.
-        if (target !== 'markets') for (const x of stepOf(target).exclusive ?? []) n.delete(x);
+        // Ein Land schliesst die Antworten ohne Land aus ("Not yet", "None" …).
+        for (const x of stepOf(target).exclusive ?? []) n.delete(x);
       } else n.delete(others);
       return n;
     });
@@ -719,12 +841,21 @@ export function AnimatedWizard({
     if (isCountryStep(def.key) && !next.has(COUNTRY_PREFIX[def.key] + 'Others')) {
       setCountryExtras((p) => ({ ...p, [def.key]: [] }));
     }
+    if (def.key === 'markets' && !next.has('Others')) setExtraMarkets([]);
     setSelected(next);
   };
-  // Ohne Markt keine Auswertung: frueher wurde daraus still eine deutsche
-  // (Wizard-Audit B12). Weiter vom Markt-Schritt und Erstellen brauchen einen.
-  const hasMarket = ownMarkets.length > 0;
-  const needsMarket = interactive && !hasMarket && (stepKey === 'markets' || isReview);
+  // CW04 braucht eine Antwort: Laender oder "noch nicht" / "nicht sicher".
+  // Und ohne ein einziges Land — heute oder geplant — gibt es nichts
+  // auszuwerten: frueher wurde daraus still eine deutsche Risk Map
+  // (Wizard-Audit B12).
+  const marketsAnswered = ownMarkets.length > 0 || MARKET_STATUS.some((id) => selected.has(id));
+  const needsMarket = interactive && !isReview && page.includes('markets') && !marketsAnswered;
+  // Ein Land genuegt, gleich in welcher Rolle: heutiger oder geplanter Markt,
+  // Sitz oder geplantes Gruendungsland — ein Gruender muss keine Expansion
+  // erfinden, um eine Risk Map zu bekommen (Feedback CW-F05).
+  const anyCountry = isReview && buildProfile(selected, extraMarkets, countryExtras).country !== '';
+  const needsCountry = interactive && isReview && !anyCountry;
+  const blocked = needsMarket || needsCountry;
   const completedRef = useRef(false);
   const go = (k: StepKey | 'review') => {
     // Immer die erste Frage der Seite: "Edit" kann auf die zweite zeigen.
@@ -732,11 +863,9 @@ export function AnimatedWizard({
     setActive(null);
   };
   const goNext = () => {
-    if (needsMarket) return;
+    if (blocked) return;
     if (!isReview) {
-      let i = pageIndex + 1;
-      if (pages[i]?.[0] === 'markets' && skipMarkets.current) i += 1;
-      go(pages[i]?.[0] ?? 'review');
+      go(pages[pageIndex + 1]?.[0] ?? 'review');
     } else {
       const profile = buildProfile(selected, extraMarkets, countryExtras);
       completedRef.current = true;
@@ -832,7 +961,11 @@ export function AnimatedWizard({
   );
 
   // Drawer market ids are single words, so the i18n key is just the lowercase id.
-  const marketLabel = (id: string) => t(`marketsDrawer.markets.${id.toLowerCase()}.name`, { defaultValue: id });
+  // Benannte Listenlaender haben einen Eintrag in den Sprachdateien; alle
+  // uebrigen Staaten tragen ihre ISO-Kennung als Id (CW-F03).
+  const marketLabel = (id: string) => (isCountryCode(id)
+    ? countryName(id, i18n.resolvedLanguage || 'en')
+    : t(`marketsDrawer.markets.${id.toLowerCase()}.name`, { defaultValue: id }));
   /** Landesname fuer Karten-Id (Germany) oder Drawer-Id (Switzerland). */
   const countryLabel = (name: string) => {
     const card = MARKETS.cards.find((c) => c.id === name);
@@ -840,8 +973,30 @@ export function AnimatedWizard({
   };
   const cardTitle = (c: Card) => {
     const pre = Object.values(COUNTRY_PREFIX).find((x) => c.id.startsWith(x)) ?? '';
-    if (pre && (c.key === 'estMarket' || c.key === 'stockMarket')) return countryLabel(c.id.slice(pre.length));
+    if (pre && isCountryCard(c)) return countryLabel(c.id.slice(pre.length));
     return t(`wizard.cards.${c.key}.title`);
+  };
+
+  // Vorschlaege fuer "I am not sure what I need": nur, was noch nicht gewaehlt ist.
+  const allMarkets = [...new Set([...ownMarkets, ...plannedMarkets])];
+  const allMarketsLabel = allMarkets.map(countryLabel).join(', ');
+  const openSuggestions = suggestedAreas(selected, allMarkets).filter((x) => !selected.has(x.id));
+  // Laender, die erfasst, aber noch nicht ausgewertet werden (CW-F03): sie
+  // bleiben in der Anfrage und stehen in der Uebersicht ausdruecklich da.
+  const reviewProfile = interactive && isReview ? buildProfile(selected, extraMarkets, countryExtras) : null;
+  const notAssessed = (() => {
+    if (!reviewProfile) return [];
+    const p = reviewProfile;
+    const d = p.details;
+    const codes = [...p.markets, ...(d?.plannedMarkets ?? []), ...(d?.establishment ?? []), ...(d?.plannedEstablishment ?? [])]
+      .filter(isCountryCode);
+    return [...new Set(codes)].filter((c) => !isKnownCountry(c));
+  })();
+  const removeExpansionGoal = () => {
+    const nextKey = pages[pageIndex + 1]?.[0] ?? 'review';
+    setSelected((prev) => { const n = new Set(prev); n.delete('rsn:expansion'); return n; });
+    setStepKey(nextKey);
+    setActive(null);
   };
 
   // Review summary derived from the user's selections. "Not sure" steht als
@@ -852,7 +1007,7 @@ export function AnimatedWizard({
     return [
       ...def.cards
         .filter((c) => selected.has(c.id) && !isOthers(c.id))
-        .filter((c) => c.id !== HELP_IDENTIFY || !DOMAINS.cards.some((d) => selected.has(d.id)))
+        .filter((c) => c.id !== HELP_IDENTIFY)
         .map((c) => (c.key === 'notSure' || c.key === 'sitNotSure'
           ? { text: t('wizard.review.notSure'), muted: true }
           : { text: cardTitle(c) })),
@@ -876,45 +1031,77 @@ export function AnimatedWizard({
       ...(open ? [{ text: t(openKey) }, { text: t('wizard.review.notSure'), muted: true, glue: true }] : []),
     ];
   };
-  const reviewRows: { label: string; value: Seg[]; edit: StepKey }[] = interactive
+  // Die Uebersicht haelt getrennt, was das Handover v1.1 getrennt verlangt:
+  // Sitz, heutige Maerkte, Pruefumfang, geplante Maerkte, Lager heute und
+  // geplant, gewaehlte Bereiche und die Bitte um Hilfe.
+  const row = (id: string, labelKey: string, value: Seg[], edit: StepKey) => ({ id, label: t(labelKey), value, edit });
+  // Pruefumfang (CW-F02): "alle heutigen" zeigt auf die bestaetigten heutigen
+  // Maerkte — sind keine bekannt, steht das da, statt eine leere Menge als
+  // vollstaendige Pruefung auszugeben. Ein eingegrenzter Umfang nennt, welche
+  // heutigen Maerkte er auslaesst.
+  const checkNote: Seg[] = (() => {
+    if (!flow.includes('check') || !reviewProfile) return [];
+    const lang = i18n.resolvedLanguage || 'en';
+    if (selected.has('chk:all-current')) {
+      return ownMarkets.length
+        ? [{ text: `(${ownMarkets.map(countryLabel).join(', ')})`, muted: true, glue: true }]
+        : [{ text: t('wizard.review.checkNoMarkets'), muted: true }];
+    }
+    const scope = reviewProfile.details?.checkScope;
+    if (scope?.mode !== 'countries') return [];
+    const outside = reviewProfile.markets.filter((m) => !scope.countries.includes(m));
+    return outside.length ? [{ text: t('wizard.review.checkOutside', { countries: outside.map((c) => countryName(c, lang)).join(', ') }), muted: true }] : [];
+  })();
+  // Lager (CW-F01): erfasst, aber von keiner Regel gedeckt — das sagt die
+  // Uebersicht, bevor die Risk Map entsteht.
+  const storageCountries = [...new Set([...(reviewProfile?.details?.stock ?? []), ...(reviewProfile?.details?.plannedStock ?? [])].filter((c) => /^[A-Z]{2}$/.test(c)))];
+  // Lager: je Land der Bestaetigungsstand. Ein benanntes, unbestaetigtes Land
+  // steht sichtbar als "to confirm" da (Folgeauftrag Lagerung).
+  const storageSegs = (k: StorageStep): Seg[] => {
+    if (!flow.includes(k)) return [];
+    const names = new Set(storageNamesOf(k, selected, countryExtras[k]).map(countryLabel));
+    return segsOf(k).flatMap((seg) => (names.has(seg.text) && !selected.has(STORAGE_OK[k] + storageNamesOf(k, selected, countryExtras[k]).find((n) => countryLabel(n) === seg.text))
+      ? [seg, { text: t('wizard.review.toConfirm'), muted: true, glue: true }]
+      : [seg]));
+  };
+  const reviewRows: { id: string; label: string; value: Seg[]; edit: StepKey }[] = interactive
     ? [
-        {
-          label: t('wizard.review.business'),
-          value: [
-            ...segsOf('situation'),
-            ...segsOf('reason'),
-            ...countrySegs('establishment', 'wizard.review.establishedIn', 'wizard.review.establishmentOpen'),
-            ...countrySegs('planned', 'wizard.review.plannedIn', 'wizard.review.establishmentOpen'),
-          ],
-          edit: 'situation',
-        },
-        { label: t('wizard.review.offering'), value: [...segsOf('offering'), ...segsOf('customers'), ...segsOf('channels')], edit: 'offering' },
-        {
-          label: flow.includes('stock') ? t('wizard.review.marketsStock') : t('wizard.review.markets'),
-          value: [...segsOf('markets'), ...countrySegs('stock', 'wizard.review.stockIn', 'wizard.review.stockOpen')],
-          edit: 'markets',
-        },
-        { label: t('wizard.review.domains'), value: segsOf('domains'), edit: 'domains' },
+        row('business', 'wizard.review.business', [...segsOf('situation'), ...segsOf('reason')], 'situation'),
+        row('offering', 'wizard.review.offering', [...segsOf('offering'), ...segsOf('customers'), ...segsOf('channels')], 'offering'),
+        row('establishment', 'wizard.review.establishment', [
+          ...segsOf('establishment'),
+          ...countrySegs('planned', 'wizard.review.plannedIn', 'wizard.review.establishmentOpen'),
+        ], 'establishment'),
+        row('markets', 'wizard.review.currentMarkets', segsOf('markets'), 'markets'),
+        ...(flow.includes('check') ? [row('check', 'wizard.review.checkScope', [...segsOf('check'), ...checkNote], 'check')] : []),
+        ...(flow.includes('expand') ? [row('expand', 'wizard.review.plannedMarkets', segsOf('expand'), 'expand')] : []),
+        ...(flow.includes('stock')
+          ? [
+              row('stock', 'wizard.review.currentStock', storageSegs('stock'), 'stock'),
+              row('plannedStock', 'wizard.review.plannedStock', storageSegs('plannedStock'), 'plannedStock'),
+            ]
+          : []),
+        row('domains', 'wizard.review.domains', segsOf('domains'), 'domains'),
+        ...(selected.has(HELP_IDENTIFY) ? [row('help', 'wizard.review.help', [{ text: t('wizard.review.helpValue') }], 'domains')] : []),
         ...(flow.includes('eprProducts')
-          ? [{
-              label: t('wizard.review.epr'),
-              value: [...segsOf('eprProducts'), ...segsOf('packaging')],
-              edit: 'eprProducts' as StepKey,
-            }]
+          ? [row('epr', 'wizard.review.epr', [...segsOf('eprProducts'), ...segsOf('packaging')], 'eprProducts')]
           : []),
       ]
     : [
-        { label: t('wizard.review.markets'), value: segsOf('markets'), edit: 'markets' },
-        { label: t('wizard.review.offering'), value: segsOf('channels'), edit: 'channels' },
-        { label: t('wizard.review.domains'), value: segsOf('domains'), edit: 'domains' },
+        row('markets', 'wizard.review.markets', segsOf('markets'), 'markets'),
+        row('offering', 'wizard.review.offering', segsOf('channels'), 'channels'),
+        row('domains', 'wizard.review.domains', segsOf('domains'), 'domains'),
       ];
 
   // Laender-Drawer fuer Sitz und Lager: Hauptlaender, die keine eigene Karte
   // sind, oben; eigene Maerkte fallen aus der Liste.
+  const drawerShown = drawerFor && drawerFor !== 'markets'
+    ? stepOf(drawerFor).cards.filter((c) => !isOthers(c.id)).map((c) => c.id.slice(COUNTRY_PREFIX[drawerFor].length))
+    : [];
   const drawerPrimary =
     drawerFor && drawerFor !== 'markets'
       ? MARKETS.cards
-          .filter((c) => !isOthers(c.id) && !ownMarkets.includes(c.id))
+          .filter((c) => !isOthers(c.id) && !drawerShown.includes(c.id))
           .map((c) => ({ id: c.id, name: t(`wizard.cards.${c.key}.title`), desc: t(`wizard.cards.${c.key}.desc`) }))
       : undefined;
 
@@ -987,9 +1174,23 @@ export function AnimatedWizard({
               {heading(t('wizard.review.title'), t('wizard.review.subtitle'))}
               <div className="mt-5 rounded-xl border-2 border-accent-400 bg-surface px-6">
                 {reviewRows.map((r) => (
-                  <SummaryRow key={r.edit} label={r.label} value={r.value} onEdit={() => go(r.edit)} />
+                  <SummaryRow key={r.id} label={r.label} value={r.value} onEdit={() => go(r.edit)} />
                 ))}
               </div>
+              {notAssessed.length > 0 && (
+                <div className="mt-6 rounded-md bg-brand-light px-5 py-4" data-testid="not-assessed">
+                  <p className="text-body-md font-semibold text-fg">
+                    {t('wizard.review.notAssessedTitle', { countries: notAssessed.map((c) => countryName(c, i18n.resolvedLanguage || 'en')).join(', ') })}
+                  </p>
+                  <p className="mt-0.5 text-body-sm text-fg-secondary">{t('wizard.review.notAssessedText')}</p>
+                </div>
+              )}
+              {storageCountries.length > 0 && (
+                <div className="mt-6 rounded-md bg-brand-light px-5 py-4" data-testid="storage-note">
+                  <p className="text-body-md font-semibold text-fg">{t('wizard.review.storageTitle')}</p>
+                  <p className="mt-0.5 text-body-sm text-fg-secondary">{t('wizard.review.storageText')}</p>
+                </div>
+              )}
               <p className="mt-8 text-left text-body-sm text-fg-tertiary">
                 {t('wizard.review.trust')}
               </p>
@@ -1103,13 +1304,85 @@ export function AnimatedWizard({
                       {/* Karten des Fragen-Decks haben (noch) keine Beschreibung. */}
                       {(c.descKey || i18n.exists(`home:wizard.cards.${c.key}.desc`)) && (
                         <p className={'leading-snug text-fg-secondary ' + (sp ? 'mt-1 text-body-sm' : 'mt-1 text-body-3xs')}>
-                          {t(c.descKey ?? `wizard.cards.${c.key}.desc`, { markets: ownMarkets.map(countryLabel).join(', ') })}
+                          {t(c.descKey ?? `wizard.cards.${c.key}.desc`)}
                         </p>
                       )}
                     </div>
                   );
                 })}
               </div>
+
+                {/* Lager: je benanntem Land, ob der Standort feststeht. Ein Land
+                    zu nennen bestaetigt weder eine Lagerung noch einen Plan
+                    (Folgeauftrag Lagerung, 20.11.2026). Keine eigene Seite. */}
+                {interactive && (def.key === 'stock' || def.key === 'plannedStock') && storageNamesOf(def.key, selected, countryExtras[def.key]).length > 0 && (
+                  <div className="mt-5 rounded-md bg-surface-secondary px-5 py-4" data-testid={`storage-confirm-${def.key}`}>
+                    <p className="text-body-md font-semibold text-fg">{t(`wizard.storage.${def.key}Title`)}</p>
+                    <p className="mt-0.5 text-body-sm text-fg-secondary">{t('wizard.storage.note')}</p>
+                    <ul className="mt-3 flex flex-col gap-2.5">
+                      {storageNamesOf(def.key, selected, countryExtras[def.key]).map((name) => {
+                        const okId = STORAGE_OK[def.key as StorageStep] + name;
+                        const ok = selected.has(okId);
+                        return (
+                          <li key={name} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                            <span className="text-body-sm font-medium text-fg">
+                              {countryLabel(name)}
+                              <span className="ml-2 font-normal text-fg-tertiary">{t(ok ? 'wizard.storage.settled' : 'wizard.storage.toConfirm')}</span>
+                            </span>
+                            <Toggle
+                              size="sm"
+                              checked={ok}
+                              onChange={() => setSelected((prev) => { const n = new Set(prev); if (n.has(okId)) n.delete(okId); else n.add(okId); return n; })}
+                              label={t('wizard.storage.toggle')}
+                              aria-label={t('wizard.storage.toggleFor', { country: countryLabel(name) })}
+                            />
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+
+                {/* "I am not sure what I need": Vorschlaege mit Grund, nichts ist
+                    vorausgewaehlt. Uebernehmen fuegt sie den gewaehlten Bereichen
+                    hinzu und laesst die Bitte um Hilfe stehen (Handover v1.1). */}
+                {interactive && def.key === 'domains' && selected.has(HELP_IDENTIFY) && (
+                  <div className="mt-6 rounded-md bg-brand-light px-5 py-4" data-testid="area-suggestions">
+                    <p className="text-body-md font-semibold text-fg">{t('wizard.suggest.title')}</p>
+                    <p className="mt-0.5 text-body-sm text-fg-secondary">
+                      {t(openSuggestions.length ? 'wizard.suggest.note' : 'wizard.suggest.none')}
+                    </p>
+                    {openSuggestions.length > 0 && (
+                      <>
+                        <ul className="mt-3 flex flex-col gap-1.5">
+                          {openSuggestions.map((x) => (
+                            <li key={x.id} className="text-body-sm text-fg">
+                              <span className="font-semibold">{cardTitle(DOMAINS.cards.find((c) => c.id === x.id)!)}</span>
+                              <span className="text-fg-secondary"> — {t(`wizard.suggest.reasons.${x.reason}`, { markets: allMarketsLabel })}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <Button
+                          className="mt-4"
+                          onClick={() => setSelected((prev) => new Set([...prev, ...openSuggestions.map((x) => x.id)]))}
+                        >
+                          {t('wizard.suggest.add')}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* CW05: "nicht geplant" widerspricht dem Ziel "Expansion". Die
+                    Korrektur ist sichtbar und ausdruecklich — andere Ziele bleiben. */}
+                {interactive && def.key === 'expand' && selected.has('exp:not-planned') && (
+                  <div className="mt-6 flex flex-col gap-4 rounded-md bg-brand-light px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-body-sm text-fg">{t('wizard.expandConflict.text')}</p>
+                    <Button className="shrink-0" onClick={removeExpansionGoal}>
+                      {t('wizard.expandConflict.action')}
+                    </Button>
+                  </div>
+                )}
               </section>
             );
           })}
@@ -1130,14 +1403,14 @@ export function AnimatedWizard({
           (sp ? 'relative px-16 py-5' : 'px-7 py-3.5')
         }
       >
-        {sp && !isReview && !needsMarket && (
+        {sp && !isReview && !blocked && (
           <p className="pointer-events-none absolute left-1/2 hidden w-max max-w-[900px] -translate-x-1/2 px-4 text-center text-body-xs text-fg-tertiary lg:block">
             {/* S01: "Personal matter" ist keine Karte, solange der Umfang offen
                 ist (D11) — der Hinweis nennt den besseren ersten Schritt. */}
             {stepKey === 'situation' ? t('wizard.situationHint') : t('wizard.skipHint')}
           </p>
         )}
-        {needsMarket && (
+        {blocked && (
           <p
             id="wizard-needs-market"
             className={
@@ -1145,7 +1418,7 @@ export function AnimatedWizard({
               (sp ? 'pointer-events-none absolute left-1/2 -translate-x-1/2 px-4 text-body-xs' : 'order-1 mx-3 flex-1 text-body-3xs')
             }
           >
-            {t('wizard.needsMarket')}
+            {needsCountry ? t('wizard.needsCountry') : t('wizard.needsMarket')}
           </p>
         )}
         {interactive ? (
@@ -1164,8 +1437,8 @@ export function AnimatedWizard({
             <button
               type="button"
               onClick={goNext}
-              disabled={needsMarket}
-              aria-describedby={needsMarket ? 'wizard-needs-market' : undefined}
+              disabled={blocked}
+              aria-describedby={blocked ? 'wizard-needs-market' : undefined}
               className={
                 'order-2 inline-flex items-center gap-1.5 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40 ' +
                 (sp ? 'px-6 py-3 text-body-md' : 'px-5 py-2.5 text-body-xs') +
@@ -1226,7 +1499,7 @@ export function AnimatedWizard({
           value={drawerFor && drawerFor !== 'markets' ? countryExtras[drawerFor] : extraMarkets}
           onChange={(v) => drawerFor && applyExtra(drawerFor, v)}
           primary={drawerPrimary}
-          exclude={drawerFor && drawerFor !== 'markets' ? ownMarkets : undefined}
+          exclude={drawerFor && drawerFor !== 'markets' ? drawerShown : undefined}
           variant={drawerFor && drawerFor !== 'markets' ? 'countries' : 'markets'}
           infoCountry={infoCountry}
           onInfoClose={() => setInfoCountry(null)}

@@ -5,6 +5,7 @@ import { useRequestContext } from '../../lib/requestContext';
 import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
 import { AnonNotice, Monogram, OriginLine, RankBasis } from './PartnerCard';
 import { AcknowledgementList, BookingFailureCard } from './BookingAcknowledgement';
+import { BetaSheetBody, BetaSheetFooter, BetaSheetHeader, useBetaSheet } from './BetaSheet';
 import { SharingReviewDialog, useSharedRows, type SharingTopic } from './SharingReview';
 import { goToBookingConfirmed } from '../../lib/bookingConfirmed';
 import { Drawer } from '../ui/Drawer';
@@ -59,7 +60,10 @@ import type { AnonProvider } from '../../api/search';
 // eigene Seite.
 
 type Detail = { kind: 'loading' } | { kind: 'ready'; d: ProviderDetail } | { kind: 'missing' } | { kind: 'error' };
-type Step = 'profil' | 'termin';
+// 'blatt' (4A, 23.11.2026): das Netz hinter dem Gate — der Server hat die
+// Buchung abgelehnt, weil die Beta-Vereinbarung fehlt; das Blatt steht dann
+// hier in der Schublade, Termin und Anliegen bleiben im Zustand stehen.
+type Step = 'profil' | 'termin' | 'blatt';
 
 export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, sessionLabel, requestScope, opportunity, booking, onBooked, startAt = 'profil' }: {
   open: boolean;
@@ -95,6 +99,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
 }) {
   const { t, i18n } = useTranslation('results');
   const { t: tw } = useTranslation('userws');
+  const { t: tLegal } = useTranslation('legal');
   // 3 V3: Beschreibung in der Sprache des Nutzers statt der englischen Server-Zeile.
   const { beschreibung } = useRequestContext();
   const navigate = useNavigate();
@@ -102,6 +107,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
 
   const [detail, setDetail] = useState<Detail>({ kind: 'loading' });
   const [step, setStep] = useState<Step>('profil');
+  const sheet = useBetaSheet(locale, step === 'blatt');
   const [slots, setSlots] = useState<string[] | null>(null);
   // Ein Abruffehler ist keine Auskunft ueber den Anbieter: er bekommt einen
   // eigenen Zustand statt der leeren Liste ("keine freien Termine").
@@ -269,7 +275,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
     provider.completed_count ? `${provider.completed_count} ${t('detail.mandates')}` : null,
   ].filter(Boolean).join(' · ');
 
-  const title = step === 'profil' ? (booking?.name ?? provider.title) : t('schedule.title');
+  const title = step === 'profil' ? (booking?.name ?? provider.title) : step === 'blatt' ? tLegal('betaStep.drawer.title') : t('schedule.title');
   const eyebrow = t('detail.crumbProviders');
 
   return (
@@ -321,6 +327,8 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
             </button>
             <p className="mt-1.5 text-body-3xs text-fg-tertiary">{provider.title} · {t('schedule.sub')}</p>
           </div>
+        ) : step === 'blatt' ? (
+          <BetaSheetHeader onBack={() => setStep('termin')} />
         ) : undefined
       }
       footer={
@@ -350,6 +358,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
               onRetry={() => setFailure(null)}
               onReread={() => { setFailure(null); setAckKey((k) => k + 1); }}
               onPickSlot={() => { setFailure(null); setSelected(null); setSlotTried(false); setSlotsKey((k) => k + 1); }}
+              onReadAgreement={() => setStep('blatt')}
             />
           ) : (
             <>
@@ -382,9 +391,15 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
               <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{selected ? slotLine : t('schedule.pickSlotDrawer')}</p>
             </>
           )
+        ) : step === 'blatt' ? (
+          // Nach der Annahme zurueck in die Buchung: Termin und Anliegen stehen
+          // noch da, der Nutzer bucht mit einem Klick weiter.
+          <BetaSheetFooter sheet={sheet} onAccepted={() => { setFailure(null); setStep('termin'); }} />
         ) : undefined
       }
     >
+      {step === 'blatt' && <BetaSheetBody sheet={sheet} />}
+
       {step === 'profil' && (
         <Profil provider={provider} detail={detail} d={d} basisNode={basisNode} />
       )}

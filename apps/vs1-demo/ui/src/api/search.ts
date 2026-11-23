@@ -1,3 +1,4 @@
+import type { AssessmentRecord } from '@complihub/compliance-engine';
 import type { PenaltyCeiling } from '@complihub/compliance-engine';
 import { ApiError, apiFetch } from './client';
 import type { SearchProfile } from '../components/wizard/WizardContext';
@@ -88,6 +89,16 @@ export interface SearchCoverage {
 // optional and fall back to the design fixture when severity is absent.
 export interface SearchLaw {
   id: string;
+  /** Eindeutig je Zeile. `id` ist die Vorlage und kommt seit CW-F04 je
+   *  Rechtsgrundlage und Phase einmal vor. Fehlt bei aelteren Antworten. */
+  key?: string;
+  /** Heutige oder geplante Taetigkeit der Laender dieser Zeile. */
+  phase?: 'current' | 'planned' | null;
+  /** `<id>.<Land>`, wo die Pflicht in dem Land anders heisst (US Sales Tax). */
+  title_key?: string | null;
+  /** Was `source_url` oeffnet, wenn es nicht `source` ist: der EU-Rechtsakt
+   *  hinter einer nationalen Fundstelle. */
+  source_url_label?: string | null;
   title: string;
   description: string;
   domain?: string;
@@ -137,6 +148,13 @@ export interface SearchResult {
   /** Aeltere Antworten kennen sie nicht — dann gibt es keinen Befund
    *  "begrenzt", statt einen zu raten. */
   coverage?: SearchCoverage;
+  /** Je ausgewertetem Land: heutige oder geplante Taetigkeit (Handover v1.1).
+   *  Fehlt bei aelteren Antworten — dann gilt alles als heute. */
+  market_phase?: Record<string, 'current' | 'planned' | 'both'>;
+  /** Was geprueft wurde und was offen bleibt (Feedback CW-F01/F02): der
+   *  gefragte Pruefumfang, heutige Laender ausserhalb davon, Lager mit
+   *  eigenem Status. Fehlt bei aelteren Antworten. */
+  assessment?: AssessmentRecord;
   /** 'failed': die Engine hat nicht gerechnet — `laws` ist leer, weil nichts
    *  geprueft wurde, nicht weil nichts gilt. Fehlt das Feld (aeltere Antwort),
    *  gilt 'ok'. Gelesen wird es ueber `lawsOf`, nicht direkt. */
@@ -165,7 +183,8 @@ export async function runSearch(profile: Partial<SearchProfile> & { country?: st
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      country: profile.country || 'DE',
+      // Kein stilles 'DE': ohne Land gibt es keine Gesetze statt deutscher.
+      country: profile.country || '',
       domains: profile.categories || [],
       structured_answers: profile,
     }),

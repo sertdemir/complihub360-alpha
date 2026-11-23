@@ -18,7 +18,24 @@
     "titleNoneConfirmed": "Here's what's worth a closer look.",
     "evidenceCounts": "{{likely}} likely, {{open}} still open.",
     "evidenceOnlyLikely": "{{count}} likely.",
-    "evidenceOnlyOpen": "{{count}} still open."
+    "evidenceOnlyOpen": "{{count}} still open.",
+    "line": {
+      "sellingToday": "Selling today: {{countries}}",
+      "noSalesYet": "No current sales yet",
+      "marketsUnknown": "Current markets: not known",
+      "establishedIn": "Established in: {{countries}}",
+      "plannedEstablishment": "Planned establishment: {{countries}}",
+      "plannedMarkets": "Planned: {{countries}}",
+      "plannedUndecided": "Planned expansion: not decided yet, so nothing is assessed for it"
+    },
+    "scope": {
+      "checked": "Checked for today: {{countries}}, as you asked.",
+      "outside": "Not part of this check: {{countries}}.",
+      "allButUnknown": "You asked us to check all current markets. None are known yet, so nothing is checked for today.",
+      "undecided": "Check scope not decided yet: all current markets are shown.",
+      "undecidedUnknown": "Check scope not decided yet, and no current markets are known: nothing is checked for today.",
+      "all": "Checked for today: all your current markets ({{countries}})."
+    }
   },
   "stats": {
     "0": {
@@ -247,7 +264,12 @@
         "noBooking": "No booking was created",
         "nothingShared": "Nothing was shared with the provider",
         "kept": "Your selection and message are kept"
-      }
+      },
+      "agreement_required": {
+        "title": "The beta agreement is still missing before you can book.",
+        "body": "No booking was created and your information was not shared."
+      },
+      "readAgreement": "Read the beta agreement"
     },
     "slotsFailed": "We couldn’t load the available times. This says nothing about the provider’s availability.",
     "slotsRetry": "Try again"
@@ -406,7 +428,7 @@
     "was": "was {{title}}",
     "wasInRiskMap": "was {{title}} in your risk map “{{riskMap}}”"
   },
-  "dueLive": "Live",
+  "dueLive": "No fixed date",
   "matchStates": {
     "factExpertise": "Expertise",
     "factCoverage": "Coverage",
@@ -497,14 +519,26 @@
       "intra_eu_volume": "how much you ship to other EU countries",
       "substances": "which substances your products contain",
       "contract_scope": "which contracts you use",
-      "cross_border_shipping": "whether you ship across borders"
+      "cross_border_shipping": "whether you ship across borders",
+      "packaging_none": "what counts as packaging for your goods — you told us you use none",
+      "establishment_assessment": "how the law of this market treats your place of establishment",
+      "packaging_assessment": "which packaging role the law of this market assigns to you"
+    },
+    "factPlanned": {
+      "eu_market": "you plan to sell into the EU"
     }
   },
   "hint": {
     "title": "One answer makes your risk map more precise",
     "message_one": "It settles {{count}} obligation whose relevance is still open. Takes a few seconds.",
     "message_other": "It settles {{count}} obligations whose relevance is still open. Takes a few seconds.",
-    "cta": "Add answer"
+    "cta": "Add answer",
+    "question": {
+      "customers": "The question: who you sell to and how.",
+      "offering": "The question: what you sell or provide.",
+      "establishment": "The question: where your business is established.",
+      "eprProducts": "The question: which products you sell."
+    }
   },
   "outside": {
     "title": "Verified Providers in {{market}} for other areas",
@@ -529,5 +563,52 @@
     "saveFailed": "That didn’t work. Please try again.",
     "saveFull": "Your selection holds up to 200 providers. Remove one under Saved Providers to add another."
   },
-  "outsideTag": "Outside the areas you chose"
+  "outsideTag": "Outside the areas you chose",
+  "plannedTag": "planned",
+  "duePlanned": "once you start there",
+  "euBasis": "EU basis: {{act}}",
+  "storage": {
+    "title": "Storage locations",
+    "sub": "Where you store goods is recorded separately from where you sell.",
+    "phase": {
+      "current": "active today",
+      "planned": "planned"
+    },
+    "confirmation": {
+      "confirmed": "location settled",
+      "unconfirmed": "still to confirm",
+      "unstated": "confirmation not stated"
+    },
+    "notAMarket": "not one of your sales markets",
+    "noRule": "We hold no storage check for {{country}} yet, so this Risk Map makes no statement about storing goods there. That is not a finding that nothing applies.",
+    "assessed": "Storage here is assessed below: {{checks}}.",
+    "open": {
+      "current": "Still open: whether goods are actually stored there.",
+      "planned": "Still open: whether this location will be used."
+    },
+    "note": {
+      "currentNone": "Today: you hold no stock.",
+      "currentUnknown": "Today: where your stock is held is not known yet, so no storage location is considered.",
+      "plannedNoOther": "Planned: no storage in another country. We add no further location.",
+      "plannedUndecided": "Planned: not decided yet, no location known. Nothing is assumed for a country.",
+      "plannedUnknown": "Planned: not known yet. Nothing is assumed for a country."
+    },
+    "assessedNone": "Our storage check for {{country}} adds nothing for your answers. That is not a finding that nothing applies.",
+    "guidance": "The source is official guidance, not the text of the law.",
+    "openItem": {
+      "location": {
+        "current": "whether goods are actually stored there",
+        "planned": "whether this location will be used"
+      },
+      "answer": {
+        "offering": "what you sell or provide",
+        "customers": "who your customers are",
+        "channels": "how you sell",
+        "products": "which product groups you sell",
+        "packaging": "what you do with packaging",
+        "established_in_jurisdiction": "where your business is established",
+        "sells_in_jurisdiction": "whether you sell in this country"
+      }
+    }
+  }
 }

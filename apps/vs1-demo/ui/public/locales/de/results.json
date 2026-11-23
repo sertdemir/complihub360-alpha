@@ -18,7 +18,24 @@
     "titleNoneConfirmed": "Hier lohnt sich ein genauer Blick.",
     "evidenceCounts": "{{likely}} wahrscheinlich, {{open}} noch offen.",
     "evidenceOnlyLikely": "{{count}} wahrscheinlich.",
-    "evidenceOnlyOpen": "{{count}} noch offen."
+    "evidenceOnlyOpen": "{{count}} noch offen.",
+    "line": {
+      "sellingToday": "Heute: {{countries}}",
+      "noSalesYet": "Noch keine Verkäufe",
+      "marketsUnknown": "Heutige Märkte: nicht bekannt",
+      "establishedIn": "Ansässig in: {{countries}}",
+      "plannedEstablishment": "Geplante Gründung: {{countries}}",
+      "plannedMarkets": "Geplant: {{countries}}",
+      "plannedUndecided": "Geplante Expansion: noch nicht entschieden, dafür ist deshalb nichts ausgewertet"
+    },
+    "scope": {
+      "checked": "Für heute geprüft: {{countries}}, wie von Ihnen gewählt.",
+      "outside": "Nicht Teil dieser Prüfung: {{countries}}.",
+      "allButUnknown": "Sie haben alle heutigen Märkte zur Prüfung gewählt. Bisher ist keiner bekannt, deshalb wird für heute nichts geprüft.",
+      "undecided": "Prüfumfang noch nicht entschieden: alle heutigen Märkte werden gezeigt.",
+      "undecidedUnknown": "Prüfumfang noch nicht entschieden, und es sind keine heutigen Märkte bekannt: für heute wird nichts geprüft.",
+      "all": "Für heute geprüft: alle Ihre heutigen Märkte ({{countries}})."
+    }
   },
   "stats": {
     "0": {
@@ -241,7 +258,17 @@
       "retryNow": "Erneut versuchen",
       "pickOtherSlot": "Anderen Termin wählen",
       "reread": "Aktualisierte Bedingungen lesen",
-      "keepNote": "Ihre Nachricht und Ihre Auswahl bleiben erhalten."
+      "keepNote": "Ihre Nachricht und Ihre Auswahl bleiben erhalten.",
+      "agreement_required": {
+        "title": "Vor der Buchung fehlt noch die Beta-Vereinbarung.",
+        "body": "Es wurde keine Buchung angelegt, und Ihre Angaben wurden nicht weitergegeben."
+      },
+      "readAgreement": "Beta-Vereinbarung lesen",
+      "list": {
+        "noBooking": "Es wurde keine Buchung angelegt",
+        "nothingShared": "Mit dem Anbieter wurde nichts geteilt",
+        "kept": "Ihre Auswahl und Ihr Anliegen bleiben erhalten"
+      }
     },
     "slotsFailed": "Die freien Termine konnten nicht geladen werden. Über die Verfügbarkeit des Anbieters sagt das nichts.",
     "slotsRetry": "Erneut versuchen"
@@ -400,7 +427,7 @@
     "was": "war {{title}}",
     "wasInRiskMap": "war {{title}} in Ihrer Sitzung „{{riskMap}}“"
   },
-  "dueLive": "Gilt jetzt",
+  "dueLive": "Kein fester Termin",
   "clusters": {
     "confirmed": {
       "title": "Gilt für Sie",
@@ -455,14 +482,26 @@
       "intra_eu_volume": "wie viel Sie in andere EU-Länder liefern",
       "substances": "welche Stoffe Ihre Produkte enthalten",
       "contract_scope": "welche Verträge Sie nutzen",
-      "cross_border_shipping": "ob Sie über Grenzen versenden"
+      "cross_border_shipping": "ob Sie über Grenzen versenden",
+      "packaging_none": "was bei Ihren Waren als Verpackung gilt – Sie haben angegeben, keine zu verwenden",
+      "establishment_assessment": "wie das Recht dieses Marktes Ihren Sitz einordnet",
+      "packaging_assessment": "welche Verpackungsrolle Ihnen das Recht dieses Marktes zuweist"
+    },
+    "factPlanned": {
+      "eu_market": "Sie planen, in die EU zu verkaufen"
     }
   },
   "hint": {
     "title": "Eine Angabe macht Ihre Risk Map genauer",
     "message_one": "Damit klärt sich {{count}} Pflicht, deren Relevanz noch offen ist. Dauert wenige Sekunden.",
     "message_other": "Damit klären sich {{count}} Pflichten, deren Relevanz noch offen ist. Dauert wenige Sekunden.",
-    "cta": "Angabe ergänzen"
+    "cta": "Angabe ergänzen",
+    "question": {
+      "customers": "Die Frage: an wen und wie Sie verkaufen.",
+      "offering": "Die Frage: was Sie verkaufen oder anbieten.",
+      "establishment": "Die Frage: wo Ihr Unternehmen ansässig ist.",
+      "eprProducts": "Die Frage: welche Produkte Sie verkaufen."
+    }
   },
   "outside": {
     "title": "Verified Provider in {{market}} für andere Bereiche",
@@ -473,5 +512,52 @@
     "profileBody": "Sie kommen von Anbietern, die im selben Markt arbeiten, aber nicht in {{areas}}. Eine Buchung bieten wir von hier aus nicht an.",
     "profileBodyGeneric": "Sie kommen von Anbietern, die im selben Markt arbeiten, aber nicht in dem angefragten Bereich. Eine Buchung bieten wir von hier aus nicht an."
   },
-  "outsideTag": "Außerhalb Ihrer gewählten Bereiche"
+  "outsideTag": "Außerhalb Ihrer gewählten Bereiche",
+  "plannedTag": "geplant",
+  "duePlanned": "sobald Sie dort starten",
+  "euBasis": "EU-Grundlage: {{act}}",
+  "storage": {
+    "title": "Lagerorte",
+    "sub": "Wo Sie Waren lagern, wird getrennt davon erfasst, wo Sie verkaufen.",
+    "phase": {
+      "current": "heute aktiv",
+      "planned": "geplant"
+    },
+    "confirmation": {
+      "confirmed": "Standort steht fest",
+      "unconfirmed": "noch zu bestätigen",
+      "unstated": "Bestätigung nicht angegeben"
+    },
+    "notAMarket": "keiner Ihrer Verkaufsmärkte",
+    "noRule": "Für {{country}} ist noch keine Lagerprüfung hinterlegt. Diese Risk Map trifft deshalb keine Aussage zur Lagerung dort. Das ist keine Feststellung, dass dort nichts gilt.",
+    "assessed": "Die Lagerung hier wird unten bewertet: {{checks}}.",
+    "open": {
+      "current": "Noch offen: ob dort tatsächlich Waren lagern.",
+      "planned": "Noch offen: ob dieser Standort genutzt wird."
+    },
+    "note": {
+      "currentNone": "Heute: Sie halten keinen Bestand.",
+      "currentUnknown": "Heute: Wo Ihr Bestand liegt, ist noch nicht bekannt. Es wird kein Lagerort berücksichtigt.",
+      "plannedNoOther": "Geplant: keine Lagerung in einem anderen Land. Wir ergänzen keinen weiteren Standort.",
+      "plannedUndecided": "Geplant: noch nicht entschieden, kein Standort bekannt. Für kein Land wird etwas angenommen.",
+      "plannedUnknown": "Geplant: noch nicht bekannt. Für kein Land wird etwas angenommen."
+    },
+    "assessedNone": "Unsere Lagerprüfung für {{country}} ergibt für Ihre Angaben keinen Check. Das ist keine Feststellung, dass dort nichts gilt.",
+    "guidance": "Die Quelle ist eine amtliche Erläuterung, nicht der Gesetzestext.",
+    "openItem": {
+      "location": {
+        "current": "ob dort tatsächlich Waren lagern",
+        "planned": "ob dieser Standort genutzt wird"
+      },
+      "answer": {
+        "offering": "was Sie verkaufen oder anbieten",
+        "customers": "wer Ihre Kunden sind",
+        "channels": "wie Sie verkaufen",
+        "products": "welche Produktgruppen Sie verkaufen",
+        "packaging": "was Sie mit Verpackung tun",
+        "established_in_jurisdiction": "wo Ihr Unternehmen seinen Sitz hat",
+        "sells_in_jurisdiction": "ob Sie in diesem Land verkaufen"
+      }
+    }
+  }
 }

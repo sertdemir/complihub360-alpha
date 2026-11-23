@@ -1,7 +1,7 @@
 import { SessionExpiryWatcher } from "./components/auth/SessionExpiryWatcher";
 import { LegacyPartnerRedirect } from "./components/routing/LegacyPartnerRedirect";
 import { lazy, useEffect } from "react";
-import { trackScrollDepth } from "./lib/analytics";
+import { trackPageview, trackScrollDepth } from "./lib/analytics";
 import { useSeo } from "./hooks/useSeo";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams, Navigate, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -75,6 +75,7 @@ const EmailVerificationPage = lazy(() => import("./pages/auth/EmailVerificationP
 const AuthCallbackPage = lazy(() => import("./pages/auth/AuthCallbackPage").then((m) => ({ default: m.AuthCallbackPage })));
 const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage").then((m) => ({ default: m.ResetPasswordPage })));
 import { AuthGuard } from "./components/auth/AuthGuard";
+import { ResultsBetaGate } from "./components/auth/ResultsBetaGate";
 import { AnimatedWizard } from "./components/home/AnimatedWizard";
 import { WizardDrawerProvider } from "./components/user/WizardDrawer";
 
@@ -106,6 +107,7 @@ function WizardRoutes() {
             interactive
             initialProfile={initialProfile}
             initialMarkets={market ? market.split(',') : undefined}
+            initialStep={params.get('step') ?? undefined}
             onComplete={(profile) => navigate(`/${locale}/results`, { state: { searchProfile: profile } })}
             className="min-h-screen !rounded-none !border-0"
         />
@@ -177,6 +179,16 @@ function AppContent() {
     // Seite, damit eine neue Route ihren Kopf aus lib/publicRoutes.ts bekommt.
     useSeo();
 
+    // Page view per route change. We send it ourselves (index.html loads
+    // script.manual.js) so the address never carries an identifier, a query or
+    // a hash — see lib/analytics.ts. Deferred by a tick: a route that redirects
+    // at once (<Navigate replace />) is cleaned up before the timer fires and
+    // is not counted as a page.
+    useEffect(() => {
+        const timer = window.setTimeout(() => trackPageview(location.pathname), 0);
+        return () => window.clearTimeout(timer);
+    }, [location.pathname]);
+
     // Scroll depth per page view. Re-armed on every navigation so the milestones
     // are per page, not per session; a no-op unless Plausible is configured.
     useEffect(() => trackScrollDepth(location.pathname), [location.pathname]);
@@ -214,7 +226,8 @@ function AppContent() {
                     {/* Kontakt UND Support: beide Footer-Eintraege zeigen hierher,
                         die Seite sortiert nach Anliegen statt nach Abteilung. */}
                     <Route path="contact" element={<ContactPage />} />
-                    <Route path="results" element={<ResultsRiskMap />} />
+                    {/* Eingeloggt und ohne geltende Beta-Vereinbarung: erst der Schritt (1A, 23.11.2026). */}
+                    <Route path="results" element={<ResultsBetaGate><ResultsRiskMap /></ResultsBetaGate>} />
                     {/* Station 1A: prose-search answers page (no risk map, no gating). */}
                     <Route path="search" element={<SearchResultPage />} />
                     <Route path="wizard/*" element={<WizardRoutes />} />

@@ -685,13 +685,16 @@
       "situation": "Ihre Situation",
       "offering": "Sie verkaufen",
       "establishment": "Ansässig in",
-      "stock": "Lager",
+      "stock": "Lager heute",
       "eprProducts": "EPR · Produkte",
       "packaging": "EPR · Verpackung",
-      "reason": "Ihr Anlass",
+      "reason": "Ihre Ziele",
       "customers": "Sie verkaufen an",
       "channels": "Vertriebsweg",
-      "planned": "Geplant in"
+      "planned": "Geplant in",
+      "check": "Compliance-Prüfung für",
+      "expand": "Geplante Expansion",
+      "plannedStock": "Geplantes Lager"
     },
     "otherCountry": "+ Weiteres Land …",
     "removes": {

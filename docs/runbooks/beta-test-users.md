@@ -14,8 +14,22 @@ Die Test-Provider beschreibt [beta-test-providers.md](beta-test-providers.md).
 - Adresse `<lokal>+<label>-uNN@<domain>`, also z. B.
   `demet+halime-u01@complihub360.com`. Alle Mails landen im Postfach der
   Mitgründerin.
-- Mail **bereits bestätigt**, Login mit Passwort, keine Rolle. Die
-  Beta-Vereinbarung kommt beim ersten Login wie bei jedem neuen Konto.
+- Mail **bereits bestätigt**, keine Rolle. Die Beta-Vereinbarung kommt beim
+  ersten Login wie bei jedem neuen Konto.
+- **Anmeldung mit Passwort über den Reiter „Anbieter“.** Nutzer melden sich
+  in der Oberfläche per Magic Link an (Reiter „Unternehmen“). Der Reiter
+  „Anbieter“ ruft `signInWithPassword` auf und leitet auf
+  `/provider-dashboard`; der `AuthGuard` erkennt dort die Rolle `user` und
+  leitet in den Nutzerbereich weiter. Testkonten mit Passwort kommen so ohne
+  Postfach und ohne Browserwechsel hinein, auch nach dem Abmelden. Kein Code,
+  keine Konfiguration: Der Weg bestand schon und steht jedem Konto mit
+  Passwort offen, auch Nutzern, die sich mit Passwort registriert haben. Der
+  Anmeldelink im Reiter „Unternehmen“ bleibt unverändert.
+- Der Magic-Link-Weg für einen Agenten-Browser (Link kopieren, im
+  Übernahme-Modus einfügen) scheiterte am 19.11.: Der ChatGPT-Browser nahm
+  den eingefügten Link nicht an.
+- Die vorab angelegten Konten bleiben trotzdem sinnvoll: Sie tragen die
+  Markierung, über die `--remove` sie wiederfindet.
 - Ein gemeinsames Passwort je Label, verdeckt abgefragt.
 - Markierung `app_metadata.test_label = <label>`. Darüber findet `--remove`
   die Konten wieder, nie über die Adresse allein.
@@ -47,12 +61,35 @@ Dazu braucht Halime einen eigenen Zugang durch die Wand:
 STAGING_SSH_HOST=vps ./scripts/beta-auth.sh add halime   # Mac, Passwort wird einmal ausgegeben
 ```
 
+## Zugangslink statt Anmeldefenster
+
+Der Browser von ChatGPT kann das Basic-Auth-Fenster der Wand nicht bedienen
+(Demet, 15.11.). Dafür gibt es einen persönlichen Zugangslink:
+
+```bash
+STAGING_SSH_HOST=vps ./scripts/beta-pass.sh add halime      # Mac; Link wird einmal ausgegeben
+STAGING_SSH_HOST=vps ./scripts/beta-pass.sh list
+STAGING_SSH_HOST=vps ./scripts/beta-pass.sh remove halime   # entzieht ihn sofort
+```
+
+- Der Link `https://beta.complihub360.com/__zugang/<token>` setzt ein Cookie
+  (HttpOnly, Secure, 30 Tage) und leitet auf `/de` weiter.
+- Ein eigener Traefik-Router nimmt Anfragen mit diesem Cookie ohne Basic Auth
+  an. `/api` bleibt beim API-Router, `noindex` gilt weiter.
+- Ein erneutes `add` erzeugt ein neues Token, das alte gilt dann nicht mehr.
+- Das Skript prüft auf der VPS: ohne Cookie 401, mit Cookie 200, mit falschem
+  Cookie 401, Link setzt Cookie und leitet weiter, `/api` liefert JSON. Bei
+  einem Fehler stellt es die vorige Compose-Datei wieder her.
+- Der Link ist ein Passwort: Passwort-Manager (`Beta Zugangslink · halime`),
+  nicht in den Chat. Das Token steht im Klartext nur in den Container-Labels
+  auf der VPS.
+
 ## Zuschnitt für Halime
 
 | Was | Wert |
 |---|---|
-| Wand | Zugang `halime` (eigener, damit sich Halimes Verkehr erkennen und mit `remove halime` sofort sperren lässt) |
-| Nutzer | `demet+halime-u01..u03@complihub360.com`, Passwort `Beta Halime · Nutzer` |
+| Wand | Zugangslink `halime` (`beta-pass.sh`), für Menschen zusätzlich der Basic-Auth-Zugang `halime` |
+| Nutzer | `demet+halime-u01..u03@complihub360.com`, Anmeldung mit Passwort über den Reiter „Anbieter“ (`Beta Halime · Nutzer`) |
 | Provider | `demet+p21..p25@complihub360.com`, gemeinsames Passwort `Beta Test-Provider · gemeinsam`. `p01` bis `p20` bleiben bei der Mitgründerin. |
 | Admin | keiner |
 
@@ -61,8 +98,8 @@ Provider-Seite ein Mensch; die AI gibt sich nie als Fachperson aus
 (`KN-BRAND-001`). Halime bedient `p21` bis `p25` deshalb nur, solange auf der
 Beta ausschließlich interne Konten unterwegs sind, und schreibt als Provider
 nur an die eigenen Halime-Nutzer. **Bevor externe Tester eingeladen werden:**
-`beta-auth.sh remove halime` (ohne Wandzugang erreicht Halime die Beta nicht
-mehr) und Provider `p21` bis `p25` zurück an die Mitgründerin.
+`beta-pass.sh remove halime` und `beta-auth.sh remove halime` (ohne beides
+erreicht Halime die Beta nicht mehr) und Provider `p21` bis `p25` zurück an die Mitgründerin.
 
 ## Entfernen
 

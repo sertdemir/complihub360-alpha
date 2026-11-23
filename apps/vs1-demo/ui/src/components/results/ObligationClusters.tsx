@@ -34,6 +34,14 @@ export type ClusterRow = {
   decides: string[];
   /** Bereich nicht gewaehlt — die Engine hat ihn fuer die Maerkte aufgefuellt. */
   outside?: boolean;
+  /** Eindeutig je Zeile; derselbe Titel kann je Land einmal vorkommen. */
+  rowKey?: string;
+  /** Geplante Taetigkeit — die Begruendung sagt dann "Sie planen". */
+  phase?: 'current' | 'planned';
+  /** Ein lagerbezogener Check aus einer freigegebenen Lagerregel. Seine
+   *  Begruendung kommt fertig aus der Regel: Erklaerung, was noch offen ist,
+   *  und die Ausnahme, die das Ergebnis bestimmt hat. */
+  storage?: { explanation: string; open: string[]; exception?: string; guidance?: boolean };
 };
 
 const ORDER: EvidenceState[] = ['confirmed', 'likely', 'open'];
@@ -42,6 +50,25 @@ function WhyPanel({ row, id }: { row: ClusterRow; id: string }) {
   const { t } = useTranslation('results');
   const join = (keys: string[], prefix: string) =>
     keys.map((k) => t(`${prefix}.${k}`, { defaultValue: k })).join(', ');
+  // Ein geplanter Markt ist kein heutiger Verkauf (CW-F04): wo ein Fakt vom
+  // Markt abhaengt, sagt die Begruendung "Sie planen".
+  const facts = (keys: string[]) => keys
+    .map((k) => (row.phase === 'planned' ? t(`why.factPlanned.${k}`, { defaultValue: t(`why.fact.${k}`, { defaultValue: k }) }) : t(`why.fact.${k}`, { defaultValue: k })))
+    .join(', ');
+  if (row.storage) {
+    return (
+      <div id={id} className="mt-2 rounded-md bg-surface-secondary px-3.5 py-3 text-body-2xs leading-relaxed text-fg" data-testid="storage-why">
+        <p>{row.storage.explanation}</p>
+        {row.storage.exception && <p className="mt-1">{row.storage.exception}</p>}
+        {row.storage.open.length > 0 && (
+          <p className="mt-1">
+            <span className="font-semibold">{t('why.decides')}</span> {row.storage.open.join('; ')}.
+          </p>
+        )}
+        {row.storage.guidance && <p className="mt-1 text-fg-secondary">{t('storage.guidance')}</p>}
+      </div>
+    );
+  }
   return (
     <div id={id} className="mt-2 rounded-md bg-surface-secondary px-3.5 py-3 text-body-2xs leading-relaxed text-fg">
       {/* "You chose this area" stimmt nur fuer gewaehlte Bereiche. */}
@@ -50,7 +77,7 @@ function WhyPanel({ row, id }: { row: ClusterRow; id: string }) {
         <p>{row.outside ? t('why.nothingYet') : t('why.onlyArea')}</p>
       ) : (
         <p>
-          <span className="font-semibold">{t('why.supports')}</span> {join(row.supports, 'why.fact')}.
+          <span className="font-semibold">{t('why.supports')}</span> {facts(row.supports)}.
         </p>
       )}
       {row.decides.length > 0 && (
@@ -97,6 +124,8 @@ function Row({ row }: { row: ClusterRow }) {
               {row.sourceLabel} ↗
             </a>
           ) : row.noSource ? <span className="italic text-fg-tertiary">{row.law}</span> : row.law}
+          {/* Nationale Fundstelle als Text, der EU-Rechtsakt dahinter als Link. */}
+          {row.sourceUrl && row.law && <span className="ml-1.5 text-fg-secondary">· {row.law}</span>}
           {(row.sourceUrl || row.law) && row.penalty && <span className="hidden lg:inline"> · </span>}
           {row.penalty && <span className="mt-0.5 block text-fg-tertiary lg:mt-0 lg:inline">{row.penalty}</span>}
         </span>
@@ -150,7 +179,7 @@ function ClusterCard({ state, rows, defaultOpen }: { state: EvidenceState; rows:
               <span className="text-body-3xs text-fg-tertiary">{s.items.length}</span>
             </div>
           )}
-          {s.items.map((r) => <Row key={r.title} row={r} />)}
+          {s.items.map((r, i) => <Row key={r.rowKey ?? `${r.title}-${i}`} row={r} />)}
         </div>
       ))}
     </DisclosureCard>
@@ -187,21 +216,35 @@ type AnswerContext = {
   profile?: { categories?: string[]; details?: { establishment?: string[] } } | null;
 };
 
-function answerableQuestions({ fullWizard = false, profile }: AnswerContext): Array<Set<string>> {
-  const questions = [WIZARD_ANSWERABLE];
+/** Die Wizard-Frage, die einen Fakt klaert — damit "Add answer" genau sie oeffnet. */
+export type AnswerStep = 'customers' | 'offering' | 'establishment' | 'eprProducts';
+type Question = { facts: Set<string>; step: AnswerStep };
+
+function answerableQuestions({ fullWizard = false, profile }: AnswerContext): Question[] {
+  const questions: Question[] = [{ facts: WIZARD_ANSWERABLE, step: 'customers' }];
   if (!fullWizard) return questions;
   // Angebot (S04) fragt der Wizard immer.
-  questions.push(new Set(['physical_goods']));
+  questions.push({ facts: new Set(['physical_goods']), step: 'offering' });
   // Sitz (S03) nur, solange er offen ist: bei teilweiser Ueberdeckung bleibt
   // der Fakt nach der Antwort unbekannt, der Hinweis stuende fuer immer da.
-  if (!profile?.details?.establishment?.length) questions.push(new Set(['established_in_market']));
+  if (!profile?.details?.establishment?.length) questions.push({ facts: new Set(['established_in_market']), step: 'establishment' });
   // EPR 1/2 stellt der Wizard nur mit EPR & Packaging.
-  if (profile?.categories?.includes('product-packaging')) questions.push(new Set(['electronics', 'batteries']));
+  if (profile?.categories?.includes('product-packaging')) questions.push({ facts: new Set(['electronics', 'batteries']), step: 'eprProducts' });
   return questions;
 }
 
 /** Wie viele Pflichten die eine Antwort klaeren wuerde, die am meisten klaert. */
 export function settledByWizard(rows: ClusterRow[], ctx: AnswerContext = {}): number {
+  return bestWizardQuestion(rows, ctx).count;
+}
+
+/** Die eine Frage, deren Antwort am meisten klaert, und wie viele Pflichten sie klaert. */
+export function bestWizardQuestion(rows: ClusterRow[], ctx: AnswerContext = {}): { count: number; step: AnswerStep | null } {
   const pending = rows.filter((r) => r.evidence !== 'confirmed');
-  return Math.max(0, ...answerableQuestions(ctx).map((q) => pending.filter((r) => r.decides.some((k) => q.has(k))).length));
+  let best: { count: number; step: AnswerStep | null } = { count: 0, step: null };
+  for (const q of answerableQuestions(ctx)) {
+    const count = pending.filter((r) => r.decides.some((k) => q.facts.has(k))).length;
+    if (count > best.count) best = { count, step: q.step };
+  }
+  return best;
 }

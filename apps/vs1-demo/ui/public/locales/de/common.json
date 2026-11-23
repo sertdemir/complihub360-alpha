@@ -1501,6 +1501,11 @@
         "uk": {},
         "us": {}
       }
+    },
+    "obligationsByMarket": {
+      "tax-vat-registration": {
+        "US": "US-Sales-Tax (Bundesstaaten)"
+      }
     }
   },
   "pricing": {

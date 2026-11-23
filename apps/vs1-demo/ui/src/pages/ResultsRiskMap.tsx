@@ -2,10 +2,11 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import type { PenaltyCeiling } from '@complihub/compliance-engine';
+import type { PenaltyCeiling, AssessmentRecord } from '@complihub/compliance-engine';
 import { describeCeiling, penaltyText } from '../lib/penaltyCeiling';
 import { cadenceLabel, obligationLabel } from '../lib/obligationText';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
+import { StorageLocations } from '../components/results/StorageLocations';
 import { lawsOf, runSearch, type AnonProvider, type SearchCoverage, type SearchLaw } from '../api/search';
 import { coverageGaps, isLimitedCoverage } from '../lib/matchState';
 import { LimitedCoverageCard, OneMatchGuest, ProviderStateHead } from '../components/results/ProviderStates';
@@ -19,7 +20,7 @@ import type { SearchProfile } from '../components/wizard/WizardContext';
 import { Button } from '../components/ui/Button';
 import { Banner } from '../components/ui/Banner';
 import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSnapshot';
-import { ObligationClusters, settledByWizard, type ClusterRow } from '../components/results/ObligationClusters';
+import { ObligationClusters, bestWizardQuestion, type ClusterRow } from '../components/results/ObligationClusters';
 import { OutsideFitProviders, type OutsideProvider } from '../components/results/OutsideFitProviders';
 import { AnswersDrawer } from '../components/user/AnswersDrawer';
 import { MatchBasis } from '../components/user/PartnerCard';
@@ -83,6 +84,10 @@ type Obligation = {
   /** Engine-Template-ID ('tax-vat-registration', …). Nur auf Live-Zeilen —
    *  die Design-Fixture hat keine, ist also nicht abhakbar. */
   id?: string;
+  /** Eindeutig je Zeile (`id` wiederholt sich je Rechtsgrundlage und Phase). */
+  rowKey?: string;
+  /** Geplante Taetigkeit: keine Frist, und die Begruendung sagt "geplant". */
+  phase?: 'current' | 'planned';
   severity: Severity;
   title: string;
   detail: string;
@@ -187,7 +192,7 @@ export function prioritiesCoveredBy(
 
 /** Engine-Pflichten → Tabellenzeilen. Nur Pflichten mit `severity` zaehlen;
  *  die uebrigen sind Knowledge-Treffer ohne Bewertung. */
-export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, locale: string): Obligation[] {
+export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, locale: string, phases?: Record<string, 'current' | 'planned' | 'both'>): Obligation[] {
   // Fruehere API-Staende lieferten den Platzhalter noch als `source`; die
   // Pruefung haengt deshalb am Scope, nicht daran, dass `source` leer ist.
   const keineNorm = t('common:compliance.area.fact.noNamedSource', { defaultValue: 'No named source yet' });
@@ -200,7 +205,13 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     severity: l.severity as Severity,
     // Der Engine-Titel ist englisch; die Sprachdateien fuehren ihn fuer alle
     // Pflichten (markets.obligations.<id>, Waechter: obligationText.test.ts).
-    title: obligationLabel(t, l.id, l.title),
+    // Wo die Pflicht in einem Land anders heisst (CW-F04: in den USA gibt es
+    // keine Mehrwertsteuer), fuehrt die Engine einen eigenen Schluessel.
+    title: l.title_key
+      ? t(`common:markets.obligationsByMarket.${l.title_key}`, { defaultValue: l.title })
+      : obligationLabel(t, l.id, l.title),
+    rowKey: l.key ?? l.id,
+    phase: l.phase ?? undefined,
     // Rechtsgrundlage zuerst, Bußgeld danach. Das DNA-Addendum V2 verlangt,
     // dass Strafhöhen nicht der primäre Untertitel jeder Pflicht sind —
     // zugänglich bleiben sie, führend sind sie nicht mehr. Der Präfix war
@@ -210,15 +221,24 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     // etwas sie zusammenhielt: hier stand "up to EUR 30,000 per year",
     // waehrend die Obergrenze zu derselben Pflicht 7.500 EUR JE EINHEIT
     // lautete und keinen Deckel hat. Eine Quelle, ein Satz.
-    detail: [l.source_url ? null : l.source_scope === 'placeholder' ? keineNorm : l.source, bussgeldZeile(l, t, lang)]
+    detail: [l.source_url && !l.source_url_label ? null : l.source_scope === 'placeholder' ? keineNorm : l.source, bussgeldZeile(l, t, lang)]
       .filter(Boolean)
       .join(' · '),
-    sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
+    // Beschriftung und Linkziel gehoeren zusammen (CW-F04): oeffnet der Link
+    // den EU-Rechtsakt hinter einer nationalen Fundstelle, heisst er auch so,
+    // und die nationale Fundstelle steht als Text daneben.
+    sourceLabel: l.source_url
+      ? (l.source_url_label ? t('euBasis', { act: l.source_url_label, defaultValue: `EU basis: ${l.source_url_label}` }) : (l.source ?? l.celex ?? undefined))
+      : undefined,
     sourceUrl: l.source_url ?? undefined,
-    market: l.markets && l.markets.length ? l.markets.join(' · ') : t('euWide'),
+    // Geplante Laender tragen den Zusatz "(planned)": die Pflicht betrifft dort
+    // eine geplante, keine heutige Taetigkeit (Core Wizard Handover v1.1).
+    market: l.markets && l.markets.length
+      ? l.markets.map((m) => (phases?.[m] === 'planned' ? `${m} (${t('plannedTag')})` : m)).join(' · ')
+      : t('euWide'),
     // Die Norm im Klartext, wenn es keine verlinkbare Fundstelle gibt —
     // sonst stuende unter dem Titel nur der Markt (Befund 2026-09-05).
-    law: l.source_url ? undefined : l.source_scope === 'placeholder' ? keineNorm : (l.source ?? undefined),
+    law: l.source_url && !l.source_url_label ? undefined : l.source_scope === 'placeholder' ? keineNorm : (l.source ?? undefined),
     penalty: bussgeldZeile(l, t, lang) ?? undefined,
     // A duty that has not started yet must not read "Ongoing · Live" — that
     // would tell the user they are already in breach. Until its start date
@@ -231,7 +251,9 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     dueSub: withinHorizon(l.applies_from) != null
       ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
       : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
-      : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? t('dueLive', { defaultValue: 'Live' }) : '',
+      // Ein Plan ist nicht faellig (CW-F04): keine Tage, kein "gilt jetzt".
+      : l.phase === 'planned' ? t('duePlanned', { defaultValue: 'once you start there' })
+      : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? t('dueLive', { defaultValue: 'No fixed date' }) : '',
     dueDays: l.due_days ?? undefined,
     // Seit F1 (23.10.2026) beruht die Stufe auf den Antworten. Aeltere
     // Antworten ohne 'open' kennen nur confirmed/likely.
@@ -393,7 +415,7 @@ export function ResultsRiskMap() {
   // `query` haelt fest, womit tatsaechlich gesucht wurde — der Umfang der
   // leeren Zustaende (welche Maerkte geprueft wurden) muss dieselbe Frage
   // beschreiben, nicht das lokale Profil, wenn eine Sitzung es ersetzt hat.
-  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; providersOutside: OutsideProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
+  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; providersOutside: OutsideProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; phases?: Record<string, 'current' | 'planned' | 'both'>; assessment?: AssessmentRecord; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
@@ -408,7 +430,7 @@ export function ResultsRiskMap() {
         // Ohne sie stand eine Pflicht, die der Gast als "confirmed" sah,
         // beim Wiederoeffnen wieder als "likely" da. Maerkte und Bereiche
         // kommen weiter aus den Spalten — die sind massgeblich.
-        if (s) { session = s; query = { ...(s.answers ?? {}), country: s.country ?? 'DE', markets: s.markets ?? [], categories: s.categories as SearchProfile['categories'] }; }
+        if (s) { session = s; query = { ...(s.answers ?? {}), country: s.country ?? '', markets: s.markets ?? [], categories: s.categories as SearchProfile['categories'] }; }
       } catch { /* handled below */ }
       // Keine Sitzung geladen → Fehlerzustand, nicht das zuletzt lokal
       // gespeicherte Profil. Das gehoerte zu einer anderen Auswertung und
@@ -420,7 +442,7 @@ export function ResultsRiskMap() {
     // Engine nicht gerechnet → riskMapFailed mit Referenz, nicht "keine
     // Pflichten" und auch keine Anbieter ohne die Pflichten dazu.
     const laws = lawsOf(res);
-    return { providers: res.providers, providersOutside: res.providers_outside ?? [], laws, coverage: res.coverage, session, query };
+    return { providers: res.providers, providersOutside: res.providers_outside ?? [], laws, coverage: res.coverage, phases: res.market_phase, assessment: res.assessment, session, query };
   }, { providers: [], providersOutside: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
   // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Bis 2026-09-22
   // stand hier beim Laden und bei einem API-Fehler eine Design-Fixture mit drei
@@ -546,7 +568,49 @@ export function ResultsRiskMap() {
   // Die Engine hat geantwortet — mit oder ohne Pflichten. Nur dann gibt es
   // eine Map, die man speichern kann, und eine Aussage "what applies to you".
   const hasResult = pageState === 'live' || pageState === 'none';
-  const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale) : [];
+  const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale, searchData.phases) : [];
+  // Was ausgewertet wurde, nach Rolle getrennt — so wie gefragt (Handover
+  // v1.1, Feedback CW-F03/F05). "Nicht bekannt" ist nicht "noch keine
+  // Verkaeufe", und ein geplantes Gruendungsland ist kein geplanter Markt.
+  const phaseLine = (() => {
+    const q = searchData.query as { markets?: string[]; details?: { marketsStatus?: string; plannedMarkets?: string[]; establishment?: string[]; plannedEstablishment?: string[] } } | null;
+    const d = q?.details;
+    if (!d) return '';
+    const codes = (xs?: string[]) => (xs ?? []).filter((x) => /^[A-Z]{2}$/.test(x));
+    const current = codes(q?.markets);
+    const planned = codes(d.plannedMarkets);
+    const plannedEst = codes(d.plannedEstablishment);
+    const undecided = (d.plannedMarkets ?? []).includes('undecided');
+    // Ohne Plan und ohne offene Angabe sagt die Zeile nichts Neues.
+    if (!planned.length && !plannedEst.length && !undecided && current.length) return '';
+    const parts = [
+      current.length ? t('header.line.sellingToday', { countries: current.join(', ') })
+        : d.marketsStatus === 'not-yet' ? t('header.line.noSalesYet')
+        : d.marketsStatus === 'not-sure' ? t('header.line.marketsUnknown')
+        : '',
+      !current.length && codes(d.establishment).length ? t('header.line.establishedIn', { countries: codes(d.establishment).join(', ') }) : '',
+      plannedEst.length ? t('header.line.plannedEstablishment', { countries: plannedEst.join(', ') }) : '',
+      planned.length ? t('header.line.plannedMarkets', { countries: planned.join(', ') })
+        : undecided ? t('header.line.plannedUndecided')
+        : '',
+    ].filter(Boolean);
+    return parts.join(' · ');
+  })();
+  // Pruefumfang und Lager (Feedback CW-F01/F02), aus der Antwort des Servers:
+  // was fuer heute geprueft wurde, was der gewaehlte Umfang auslaesst, und
+  // was zum Lager erfasst, aber nicht ausgewertet ist.
+  const scopeLines = (() => {
+    const a = searchData.assessment;
+    if (!a) return { check: '' };
+    const names = (xs: string[]) => xs.join(', ');
+    const check = a.check.mode === 'countries'
+      ? [t('header.scope.checked', { countries: names(a.check.countries) }), a.check.outside.length ? t('header.scope.outside', { countries: names(a.check.outside) }) : ''].filter(Boolean).join(' ')
+      : a.check.mode === 'all-current' && !a.check.current_markets_known ? t('header.scope.allButUnknown')
+      : a.check.mode === 'all-current' && a.assessed.current.length ? t('header.scope.all', { countries: names(a.assessed.current) })
+      : a.check.mode === 'unknown' ? t(a.check.current_markets_known ? 'header.scope.undecided' : 'header.scope.undecidedUnknown')
+      : '';
+    return { check };
+  })();
   const prioritiesCovered = (p: AnonProvider, settled: ReadonlySet<string>) => prioritiesCoveredBy(liveLaws, rows, p, settled);
   // F1: Stufe je Pflicht aus den Antworten. Aeltere Zustaende ('answer')
   // zaehlen als offen — sie sind ebenfalls noch keine Aussage.
@@ -556,12 +620,41 @@ export function ResultsRiskMap() {
     title: o.title, severity: o.severity, market: o.market, due: o.due, dueSub: o.dueSub,
     sourceLabel: o.sourceLabel, sourceUrl: o.sourceUrl, law: o.law, noSource: o.noSource, penalty: o.penalty,
     radar: o.radar, evidence: evidenceOf(o), supports: o.supports ?? [], decides: o.decides ?? [],
+    rowKey: o.rowKey, phase: o.phase,
     outside: o.outside,
   }));
   // Variante 1 (25.10.2026): Die Engine fuellt auf mindestens vier Bereiche
   // auf. Die Unterzeile nennt diese Bereiche, statt nur die gewaehlten zu
   // zaehlen und fremde Pflichten still darunter zu mischen.
   const extraAreas = new Set(rows.filter((o) => o.outside && o.domain).map((o) => o.domain)).size;
+  // Lagerbezogene Checks aus freigegebenen Lagerregeln (Folgeauftrag Lagerung
+  // v1.3): eigene Zeilen in denselben Gruppen, mit Land, Phase und dem, was
+  // noch offen ist. Ohne freigegebene Regel entsteht hier keine Zeile — das
+  // Register der Engine ist heute leer.
+  const storageRows: ClusterRow[] = (searchData.assessment?.storage.locations ?? []).flatMap((l) => (l.checks ?? []).map((c): ClusterRow => ({
+    title: c.title,
+    severity: c.priority,
+    market: `${c.country} · ${t(`storage.phase.${c.phase}`)}`,
+    due: '—',
+    // Ein Plan ist nicht faellig, und ein Lagercheck fuehrt keine Frist.
+    dueSub: c.phase === 'planned' ? t('duePlanned', { defaultValue: 'once you start there' }) : '',
+    sourceLabel: `${c.source.authority} — ${c.source.provision}`,
+    sourceUrl: c.source.url,
+    evidence: c.state,
+    supports: [],
+    decides: [],
+    rowKey: `storage:${c.rule_id}@${c.country}:${c.phase}`,
+    phase: c.phase,
+    storage: {
+      explanation: c.explanation,
+      exception: c.exception?.text,
+      guidance: c.source.kind === 'official_guidance',
+      open: c.open.map((o) => (o.kind === 'location' ? t(`storage.openItem.location.${c.phase}`)
+        : o.kind === 'input' ? (o.text ?? o.key)
+        : t(`storage.openItem.answer.${o.key}`, { defaultValue: o.key }))),
+    },
+  })));
+  clusterRows.push(...storageRows);
   const evidenceCounts = {
     confirmed: clusterRows.filter((r) => r.evidence === 'confirmed').length,
     likely: clusterRows.filter((r) => r.evidence === 'likely').length,
@@ -615,7 +708,10 @@ export function ResultsRiskMap() {
   // 5B: Gezaehlt wird nur, was der Knopf auch erreicht. Seit 24.10.2026
   // kennt auch die Antworten-Schublade (gespeicherte Sitzung) alle
   // Wizard-v1a-Fragen — beide Wege erreichen dieselben Fragen.
-  const settles = settledByWizard(clusterRows, { fullWizard: true, profile: searchData.query });
+  // Welche eine Frage am meisten klaert — der Hinweis nennt sie, und der Knopf
+  // oeffnet genau sie statt der Uebersicht (Feedback CW-F06).
+  const bestQuestion = bestWizardQuestion(clusterRows, { fullWizard: true, profile: searchData.query });
+  const settles = bestQuestion.count;
 
   // Zurueck zur Marktwahl: mit gespeicherter Sitzung die Antworten-Schublade,
   // sonst der Wizard (wie "Edit answers" im Snapshot).
@@ -812,6 +908,7 @@ export function ResultsRiskMap() {
             onClose={() => setAnswersOpen(false)}
             sessionId={sessionId}
             sessionLabel={session.label || t('snapshot.fallbackTitle')}
+            focusStep={bestQuestion.step}
             profile={{
               country: session.country ?? '',
               markets: session.markets ?? [],
@@ -983,6 +1080,14 @@ export function ResultsRiskMap() {
                 : t('header.subtitleProfile', { count: profile.categories?.length ?? 0 })}
             </p>
           )}
+          {/* Heute und geplant getrennt, so wie gefragt (Handover v1.1). Ein
+              geplantes Land ersetzt kein heutiges und umgekehrt. */}
+          {phaseLine && (
+            <p className="mt-1 text-body-md leading-relaxed text-fg-secondary" data-testid="market-phases">{phaseLine}</p>
+          )}
+          {scopeLines.check && (
+            <p className="mt-1 text-body-md leading-relaxed text-fg-secondary" data-testid="check-scope">{scopeLines.check}</p>
+          )}
           {rows.length > 0 && evidenceCounts.likely + evidenceCounts.open > 0 && (
             <p className="mt-1 text-body-md leading-relaxed text-fg-secondary">
               {evidenceCounts.likely && evidenceCounts.open
@@ -1029,12 +1134,17 @@ export function ResultsRiskMap() {
           <div className="mt-10 flex flex-col gap-4 rounded-md bg-brand-light px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-body-md font-semibold text-fg">{t('hint.title')}</p>
-              <p className="mt-0.5 text-body-sm text-fg-secondary">{t('hint.message', { count: settles })}</p>
+              <p className="mt-0.5 text-body-sm text-fg-secondary">
+                {t('hint.message', { count: settles })}
+                {bestQuestion.step && <> {t(`hint.question.${bestQuestion.step}`)}</>}
+              </p>
             </div>
             <Button
               size="md"
               className="shrink-0"
-              onClick={() => (canReviewAnswers ? setAnswersOpen(true) : navigate(`/${locale}/wizard?refine=1`))}
+              onClick={() => (canReviewAnswers
+                ? setAnswersOpen(true)
+                : navigate(`/${locale}/wizard?refine=1${bestQuestion.step ? `&step=${bestQuestion.step}` : ''}`))}
             >
               {t('hint.cta')}
             </Button>
@@ -1045,6 +1155,8 @@ export function ResultsRiskMap() {
             nach Beleg in drei auf- und zuklappbaren Cards. Die Stufe steht im
             Kartenkopf, nicht mehr als Spalte. */}
         <div className={`${partial.length > 0 || settles > 0 ? 'mt-5' : 'mt-12'}`}>
+          {/* Lagerorte stehen am Ergebnis, nicht nur im Kopf (Folgeauftrag Lagerung). */}
+          <StorageLocations storage={searchData.assessment?.storage} />
           <ObligationClusters rows={clusterRows} />
         </div>
 

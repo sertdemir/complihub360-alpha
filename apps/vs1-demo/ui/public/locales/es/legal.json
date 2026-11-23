@@ -61,7 +61,7 @@
   },
   "beta": {
     "eyebrow": "Acuerdo de la beta",
-    "lede": "Usted prueba CompliHub360 antes del lanzamiento, por invitación. Estas nueve frases dicen qué significa eso y qué no.",
+    "lede": "Usted prueba CompliHub360 antes del lanzamiento, por invitación. Estas diez frases dicen qué significa eso y qué no.",
     "meta": "Versión {{version}} · redactado sin revisión de un abogado · operadora: véase el aviso legal",
     "contactHeading": "¿Preguntas sobre esta hoja?",
     "contact": "Escríbanos a <mail>{{email}}</mail>. Si cambiamos esta hoja, le pedimos de nuevo su conformidad.",
@@ -74,13 +74,14 @@
     "steps": {
       "login": "1 Inicio de sesión",
       "agreement": "2 Acuerdo de la beta",
-      "workspace": "3 Su espacio de trabajo"
+      "workspace": "3 Su espacio de trabajo",
+      "riskMap": "3 Su Risk Map"
     },
     "eyebrow": "Beta cerrada",
     "title": "Una hoja antes de empezar.",
-    "lead": "Nueve frases, una conformidad, revocable en cualquier momento.",
+    "lead": "Diez frases, una conformidad, revocable en cualquier momento.",
     "cardTitle": "Antes de empezar: una hoja",
-    "cardLead": "Está invitado como probador. Nueve frases dicen qué es esta prueba y qué no.",
+    "cardLead": "Está invitado como probador. Diez frases dicen qué es esta prueba y qué no.",
     "listLabel": "Acuerdo de la beta · versión {{version}}",
     "checkbox": "He leído el acuerdo de la beta (versión {{version}}) y estoy de acuerdo.",
     "cta": "Continuar a su espacio de trabajo",
@@ -91,7 +92,22 @@
     "outdated": "La hoja ha cambiado entretanto. Esta es la nueva versión.",
     "failed": "Su conformidad no se ha podido guardar ahora mismo. No es culpa suya.",
     "retry": "Intentarlo de nuevo",
-    "saving": "Guardando …"
+    "saving": "Guardando …",
+    "ctaRiskMap": "Continuar a su Risk Map",
+    "drawer": {
+      "title": "Una hoja más y después su cita",
+      "noteLead": "Todavía no está reservado.",
+      "note": "Su selección se queda aquí. La cita aún no está reservada.",
+      "cta": "De acuerdo, volver a la reserva",
+      "back": "Volver a la cita"
+    },
+    "declined": {
+      "title": "Ha cerrado la sesión. Su Risk Map sigue visible en este dispositivo.",
+      "body": "En la beta, reservar, guardar y enviar mensajes solo es posible cuando haya aceptado el acuerdo de la beta. Puede hacerlo en cualquier momento.",
+      "read": "Leer el acuerdo de la beta",
+      "signIn": "Volver a iniciar sesión",
+      "close": "Cerrar el aviso"
+    }
   },
   "account": {
     "title": "Cuenta",

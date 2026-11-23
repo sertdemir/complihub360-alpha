@@ -18,7 +18,24 @@
     "titleNoneConfirmed": "Esto merece una revisión detallada.",
     "evidenceCounts": "{{likely}} probables, {{open}} aún abiertas.",
     "evidenceOnlyLikely": "{{count}} probables.",
-    "evidenceOnlyOpen": "{{count}} aún abiertas."
+    "evidenceOnlyOpen": "{{count}} aún abiertas.",
+    "line": {
+      "sellingToday": "Hoy: {{countries}}",
+      "noSalesYet": "Aún sin ventas",
+      "marketsUnknown": "Mercados actuales: no se conocen",
+      "establishedIn": "Establecida en: {{countries}}",
+      "plannedEstablishment": "Constitución prevista: {{countries}}",
+      "plannedMarkets": "Previsto: {{countries}}",
+      "plannedUndecided": "Expansión prevista: aún sin decidir, por lo que no se ha evaluado nada para ella"
+    },
+    "scope": {
+      "checked": "Revisado para hoy: {{countries}}, como usted indicó.",
+      "outside": "No forma parte de esta revisión: {{countries}}.",
+      "allButUnknown": "Usted pidió revisar todos los mercados actuales. Aún no se conoce ninguno, por lo que hoy no se revisa nada.",
+      "undecided": "Alcance de la revisión aún sin decidir: se muestran todos los mercados actuales.",
+      "undecidedUnknown": "Alcance de la revisión aún sin decidir y no se conocen mercados actuales: hoy no se revisa nada.",
+      "all": "Revisado para hoy: todos sus mercados actuales ({{countries}})."
+    }
   },
   "stats": {
     "0": {
@@ -241,7 +258,17 @@
       "retryNow": "Intentar de nuevo",
       "pickOtherSlot": "Elegir otra franja",
       "reread": "Leer las condiciones actualizadas",
-      "keepNote": "Su mensaje y su selección se conservan."
+      "keepNote": "Su mensaje y su selección se conservan.",
+      "agreement_required": {
+        "title": "Antes de reservar falta el acuerdo de la beta.",
+        "body": "No se ha creado ninguna reserva y su información no se ha compartido."
+      },
+      "readAgreement": "Leer el acuerdo de la beta",
+      "list": {
+        "noBooking": "No se ha creado ninguna reserva",
+        "nothingShared": "No se ha compartido nada con el proveedor",
+        "kept": "Su selección y su mensaje se conservan"
+      }
     },
     "slotsFailed": "No hemos podido cargar los horarios disponibles. Esto no dice nada sobre la disponibilidad del proveedor.",
     "slotsRetry": "Intentar de nuevo"
@@ -400,7 +427,7 @@
     "was": "era {{title}}",
     "wasInRiskMap": "era {{title}} en su sesión «{{riskMap}}»"
   },
-  "dueLive": "Vigente",
+  "dueLive": "Sin fecha fija",
   "clusters": {
     "confirmed": {
       "title": "Le aplica",
@@ -455,14 +482,26 @@
       "intra_eu_volume": "cuánto envía a otros países de la UE",
       "substances": "qué sustancias contienen sus productos",
       "contract_scope": "qué contratos utiliza",
-      "cross_border_shipping": "si envía a otros países"
+      "cross_border_shipping": "si envía a otros países",
+      "packaging_none": "qué se considera envase en sus productos: usted indicó que no usa ninguno",
+      "establishment_assessment": "cómo trata la ley de este mercado su lugar de establecimiento",
+      "packaging_assessment": "qué función de envasado le asigna la ley de este mercado"
+    },
+    "factPlanned": {
+      "eu_market": "usted planea vender en la UE"
     }
   },
   "hint": {
     "title": "Una respuesta hace su mapa de riesgos más preciso",
     "message_one": "Aclara {{count}} obligación cuya relevancia aún está abierta. Solo unos segundos.",
     "message_other": "Aclara {{count}} obligaciones cuya relevancia aún está abierta. Solo unos segundos.",
-    "cta": "Añadir respuesta"
+    "cta": "Añadir respuesta",
+    "question": {
+      "customers": "La pregunta: a quién vende y cómo.",
+      "offering": "La pregunta: qué vende u ofrece.",
+      "establishment": "La pregunta: dónde está establecida su empresa.",
+      "eprProducts": "La pregunta: qué productos vende."
+    }
   },
   "outside": {
     "title": "Verified Providers en {{market}} para otras áreas",
@@ -473,5 +512,52 @@
     "profileBody": "Llega a este perfil desde proveedores que trabajan en el mismo mercado, pero no en {{areas}}. Desde aquí no se ofrece la reserva.",
     "profileBodyGeneric": "Llega a este perfil desde proveedores que trabajan en el mismo mercado, pero no en el área solicitada. Desde aquí no se ofrece la reserva."
   },
-  "outsideTag": "Fuera de las áreas elegidas"
+  "outsideTag": "Fuera de las áreas elegidas",
+  "plannedTag": "previsto",
+  "duePlanned": "cuando empiece allí",
+  "euBasis": "Base de la UE: {{act}}",
+  "storage": {
+    "title": "Ubicaciones de almacenamiento",
+    "sub": "Dónde almacena mercancía se registra por separado de dónde vende.",
+    "phase": {
+      "current": "activa hoy",
+      "planned": "prevista"
+    },
+    "confirmation": {
+      "confirmed": "ubicación decidida",
+      "unconfirmed": "pendiente de confirmar",
+      "unstated": "confirmación no indicada"
+    },
+    "notAMarket": "no es uno de sus mercados de venta",
+    "noRule": "Aún no tenemos una revisión de almacenamiento para {{country}}, por lo que este Risk Map no afirma nada sobre almacenar mercancía allí. No es una conclusión de que allí no se aplique nada.",
+    "assessed": "El almacenamiento aquí se evalúa más abajo: {{checks}}.",
+    "open": {
+      "current": "Queda abierto: si realmente se almacena mercancía allí.",
+      "planned": "Queda abierto: si se usará esta ubicación."
+    },
+    "note": {
+      "currentNone": "Hoy: usted no mantiene existencias.",
+      "currentUnknown": "Hoy: aún no se sabe dónde están sus existencias, por lo que no se considera ninguna ubicación.",
+      "plannedNoOther": "Previsto: sin almacenamiento en otro país. No añadimos ninguna otra ubicación.",
+      "plannedUndecided": "Previsto: aún sin decidir, sin ubicación conocida. No se supone nada para ningún país.",
+      "plannedUnknown": "Previsto: aún no se sabe. No se supone nada para ningún país."
+    },
+    "assessedNone": "Nuestra revisión de almacenamiento para {{country}} no añade nada con sus respuestas. No es una conclusión de que allí no se aplique nada.",
+    "guidance": "La fuente es una explicación oficial, no el texto de la ley.",
+    "openItem": {
+      "location": {
+        "current": "si realmente se almacena mercancía allí",
+        "planned": "si se usará esta ubicación"
+      },
+      "answer": {
+        "offering": "qué vende u ofrece",
+        "customers": "quiénes son sus clientes",
+        "channels": "cómo vende",
+        "products": "qué grupos de productos vende",
+        "packaging": "qué hace con los envases",
+        "established_in_jurisdiction": "dónde está establecida su empresa",
+        "sells_in_jurisdiction": "si vende en este país"
+      }
+    }
+  }
 }

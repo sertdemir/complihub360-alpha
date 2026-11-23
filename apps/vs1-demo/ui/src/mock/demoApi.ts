@@ -1,4 +1,4 @@
-import { isKnownCountry } from '@complihub/compliance-engine';
+import { isKnownCountry, countryPhases, assessmentOf } from '@complihub/compliance-engine';
 
 // ─── Demo-Datensatz der Mock-API ─────────────────────────────────────────────
 // Zwei Abnehmer, ein Datensatz:
@@ -502,14 +502,20 @@ const titled = (p: (typeof PROVIDERS)[number], i: number) => {
 function search(body: unknown) {
   // runSearch schickt die Bereiche als `domains` (der Server erwartet das so);
   // `categories` bleibt als zweite Schreibweise stehen.
-  const req = (body ?? {}) as { domains?: unknown; categories?: unknown; country?: unknown; structured_answers?: { markets?: unknown } };
+  const req = (body ?? {}) as { domains?: unknown; categories?: unknown; country?: unknown; structured_answers?: { markets?: unknown; details?: unknown } };
   const asked = Array.isArray(req.domains) && req.domains.length ? req.domains
     : Array.isArray(req.categories) && req.categories.length ? req.categories
     : null;
   const requested = (asked as string[] | null) ?? DEFAULT_REQUEST;
-  const country = typeof req.country === 'string' && req.country ? req.country.toUpperCase() : 'DE';
-  const marketsAsked = Array.isArray(req.structured_answers?.markets) ? (req.structured_answers.markets as string[]).map((m) => String(m).toUpperCase()) : [];
-  const knownMarkets = [...new Set([country, ...marketsAsked])].filter((c) => isKnownCountry(c));
+  // Wie der Server: heutige und geplante Maerkte getrennt, kein stilles 'DE'.
+  const phases = countryPhases({ markets: req.structured_answers?.markets, country: req.country, details: req.structured_answers?.details });
+  const country = typeof req.country === 'string' && req.country ? req.country.toUpperCase() : '';
+  const knownMarkets = [...new Set([...phases.current, ...phases.planned])].filter((c) => isKnownCountry(c));
+  const market_phase: Record<string, 'current' | 'planned' | 'both'> = {};
+  for (const c of knownMarkets) {
+    const cur = phases.current.includes(c), pl = phases.planned.includes(c);
+    market_phase[c] = cur && pl ? 'both' : pl ? 'planned' : 'current';
+  }
   const providers = PROVIDERS.map((p, i) => {
     const covers = COVERS[p._key] ?? [];
     return {
@@ -530,8 +536,7 @@ function search(body: unknown) {
   // Wie der Server (index.ts, /search): ohne einen einzigen Markt mit
   // Laenderprofil keine Pflichten, statt still deutsche Gesetze zu zeigen. So
   // ist der Zustand marketUnavailable lokal erreichbar (Wizard: nur Brasilien).
-  const markets = Array.isArray(req.structured_answers?.markets) ? (req.structured_answers.markets as string[]) : [];
-  const anyKnown = [country, ...markets].some((c) => isKnownCountry(String(c).toUpperCase()));
+  const anyKnown = knownMarkets.length > 0;
   const covered: Record<string, string[]> = {};
   for (const m of knownMarkets) covered[m] = requested.filter((a) => PROVIDERS.some((p) => (COVERS[p._key] ?? []).includes(a) && (PROVIDER_DETAIL[p._key]?.markets ?? []).includes(m)));
   // Wie der Server: wer keinen der angefragten Bereiche abdeckt, steht nicht in
@@ -545,7 +550,7 @@ function search(body: unknown) {
   const outside = matching.length ? [] : providers
     .filter((p) => p.match_basis.country_covered)
     .map(({ match: _m, match_tier: _t, price_range: _pr, timeline_days: _td, ...rest }, j) => ({ ...rest, title: `Verified Provider ${LETTER(j)}`, letter: LETTER(j) }));
-  return { ok: true, providers: matching, providers_outside: outside, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered } };
+  return { ok: true, providers: matching, providers_outside: outside, laws: anyKnown ? LAWS : [], coverage: { markets: knownMarkets, areas: requested, covered }, market_phase, assessment: assessmentOf({ markets: req.structured_answers?.markets, country: req.country, details: req.structured_answers?.details }) };
 }
 
 type MockDetail = {
@@ -702,35 +707,37 @@ function acknowledgement(lang: string) {
 // Wie der Server: Text versioniert je Sprache, Annahme je Nutzer. Der Demo-
 // Nutzer hat die Fassung angenommen (sonst sperrte der Schritt jede E2E-Fahrt
 // aus); `POST /api/v1/mock/agreements/reset` macht ihn zum Neuling.
-const BETA_VERSION = 'beta-2026-10';
+const BETA_VERSION = 'beta-2026-11';
 const BETA_POINTS: Record<string, { title: string; points: Array<{ lead: string; text: string }> }> = {
   de: { title: 'Beta-Vereinbarung', points: [
     { lead: 'Das ist ein Test.', text: 'Sie nutzen eine unfertige Version von CompliHub360, auf Einladung, für eine begrenzte Zeit. Was offen ist, sagen wir Ihnen, bevor Sie es brauchen.' },
     { lead: 'Es kostet nichts.', text: 'In der Beta wird nichts berechnet und nichts abgebucht. Zahlungsfunktionen laufen im Testmodus. Sollte sich das je ändern, bestätigen Sie vorher eine neue Fassung dieses Blatts.' },
     { lead: 'Es kann schiefgehen.', text: 'Ausfälle, Fehler und Datenverlust sind in einer Beta möglich. Wir übernehmen keine Gewähr für Verfügbarkeit oder Ergebnisse. Wenn etwas passiert ist, sagen wir es Ihnen, ohne dass Sie fragen müssen.' },
-    { lead: 'Keine Rechtsberatung.', text: 'Risk Map und Antworten sind Orientierung, kein Ersatz für eine Prüfung Ihres Falls. Verified Provider beraten in eigener beruflicher Verantwortung; CompliHub360 ist keine Kanzlei.' },
+    { lead: 'Keine Rechtsberatung.', text: 'Risk Map und Antworten sind Orientierung, kein Ersatz für eine Prüfung Ihres Falls. CompliHub360 ist keine Kanzlei.' },
+    { lead: 'Anbieter sind Testkonten.', text: 'In der Beta gibt es noch keine echten Anbieter. Alle Anbieter, die Sie sehen und buchen können, sind Testkonten mit erfundenen Namen. Auf Buchungen und Nachrichten antwortet ein Mensch aus unserem Team. Was Sie dort erfahren, ist keine Beratung zu Ihrem Fall.' },
     { lead: 'Ihre Daten.', text: 'Es gilt die Datenschutzerklärung. Laden Sie bitte nur Dokumente hoch, die Sie dafür verwenden dürfen, am besten keine echten Kundendaten.' },
     { lead: 'Ihr Feedback hilft.', text: 'Was Sie uns melden, dürfen wir nutzen, um das Produkt zu verbessern, ohne Vergütung und ohne Ihren Namen.' },
     { lead: 'Bitte nicht öffentlich.', text: 'Screenshots und Inhalte der Beta bleiben im Kreis der Tester, bis wir starten.' },
     { lead: 'Das Ende.', text: 'Die Beta endet mit Ankündigung. Ihr Konto und Ihre Daten löschen wir 30 Tage danach, außer Sie übernehmen das Konto in den Regelbetrieb. Dazu fragen wir Sie rechtzeitig.' },
-    { lead: 'Jederzeit raus.', text: 'Sie können das Konto jederzeit löschen oder uns schreiben. Ändern wir dieses Blatt, bitten wir Sie neu um Ihre Zustimmung. Dieses Blatt ist ohne anwaltliche Prüfung erstellt.' },
+    { lead: 'Jederzeit raus.', text: 'Sie können jederzeit aufhören. Schreiben Sie uns, dann löschen wir Ihr Konto. Ändern wir dieses Blatt, bitten wir Sie neu um Ihre Zustimmung. Dieses Blatt ist ohne anwaltliche Prüfung erstellt.' },
   ] },
   en: { title: 'Beta agreement', points: [
     { lead: 'This is a test.', text: 'You are using an unfinished version of CompliHub360, by invitation, for a limited time. Whatever is still open, we tell you before you need it.' },
     { lead: 'It costs nothing.', text: 'Nothing is charged or debited during the beta. Payment features run in test mode. Should that ever change, you confirm a new version of this sheet first.' },
     { lead: 'Things can go wrong.', text: 'Outages, bugs and data loss are possible in a beta. We give no warranty for availability or results. If something has happened, we tell you without you having to ask.' },
-    { lead: 'No legal advice.', text: 'The risk map and answers are orientation, not a substitute for a review of your case. Verified Providers advise under their own professional responsibility; CompliHub360 is not a law firm.' },
+    { lead: 'No legal advice.', text: 'The risk map and answers are orientation, not a substitute for a review of your case. CompliHub360 is not a law firm.' },
+    { lead: 'Providers are test accounts.', text: 'There are no real providers in the beta yet. Every provider you can see and book is a test account with an invented name. A person on our team answers bookings and messages. What you learn there is not advice on your case.' },
     { lead: 'Your data.', text: 'The privacy policy applies. Please upload only documents you are allowed to use for this, ideally no real client data.' },
     { lead: 'Your feedback helps.', text: 'What you report to us we may use to improve the product, without payment and without your name.' },
     { lead: 'Please keep it private.', text: 'Screenshots and content of the beta stay within the circle of testers until we launch.' },
     { lead: 'The end.', text: 'The beta ends with notice. We delete your account and data 30 days after that, unless you take the account into regular operation. We will ask you in good time.' },
-    { lead: 'Leave any time.', text: 'You can delete your account or write to us at any time. If we change this sheet, we ask for your consent again. This sheet was written without review by legal counsel.' },
+    { lead: 'Leave any time.', text: 'You can stop at any time. Write to us and we delete your account. If we change this sheet, we ask for your consent again. This sheet was written without review by legal counsel.' },
   ] },
 };
 let BETA_ACCEPTED: { version: string; language: string; accepted_at: string } | null = { version: BETA_VERSION, language: 'en', accepted_at: plus(-5 * 24 * H) };
 function betaAgreement(lang: string) {
   const l = BETA_POINTS[lang] ? lang : 'en';
-  return { ok: true, agreement: 'beta', version: BETA_VERSION, language: l, title: BETA_POINTS[l].title, points: BETA_POINTS[l].points, effective_from: '2026-10-22' };
+  return { ok: true, agreement: 'beta', version: BETA_VERSION, language: l, title: BETA_POINTS[l].title, points: BETA_POINTS[l].points, effective_from: '2026-11-23' };
 }
 function myAgreements() {
   const a = BETA_ACCEPTED;
@@ -768,6 +775,12 @@ function createBooking(body: unknown) {
   }
   if (typeof d.acknowledgement_version !== 'string' || !d.acknowledgement_version) {
     return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'acknowledgement_version required' };
+  }
+  // Wie der Server (23.11.2026): keine Buchung ohne die geltende Beta-
+  // Vereinbarung. Nach `POST /api/v1/mock/agreements/reset` spielt der Mock
+  // damit den alten Tab durch, an dem das Gate vorbeiging.
+  if (BETA_ACCEPTED?.version !== BETA_VERSION) {
+    return { __status: 409, errorCode: 'AGREEMENT_REQUIRED', message: 'The beta agreement must be accepted before booking', agreement: 'beta', current_version: BETA_VERSION };
   }
   if (d.acknowledgement_version !== ACK_VERSION) {
     return { __status: 409, errorCode: 'ACKNOWLEDGEMENT_OUTDATED', message: 'The booking acknowledgement has changed — please read it again', current_version: ACK_VERSION };

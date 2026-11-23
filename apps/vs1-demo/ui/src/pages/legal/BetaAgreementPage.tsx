@@ -7,7 +7,7 @@ import { fetchAgreement, type UserAgreement } from '../../api/agreements';
 import { LegalShell, Section } from './LegalPages';
 
 // ─── Beta-Vereinbarung unter /terms (Canvas-Wahl 1A + 3A, 22.10.2026) ────────
-// In der geschlossenen Beta ersetzt das Blatt in neun Saetzen die AGB-Seite;
+// In der geschlossenen Beta ersetzt das Blatt (zehn Saetze seit beta-2026-11) die AGB-Seite;
 // der Footer-Link heisst „Beta-Vereinbarung". Der Text kommt vom Server
 // (user_agreements), versioniert und in der Sprache des Besuchers; nichts
 // davon steht im Code. Die AGB-Entwurfsseite (TermsPage) bleibt fuer den
