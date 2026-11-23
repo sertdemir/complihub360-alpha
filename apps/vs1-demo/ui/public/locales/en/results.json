@@ -266,7 +266,8 @@
         "kept": "Your selection and message are kept"
       },
       "agreement_required": {
-        "title": "The beta agreement is still missing before you can book."
+        "title": "The beta agreement is still missing before you can book.",
+        "body": "No booking was created and your information was not shared."
       },
       "readAgreement": "Read the beta agreement"
     },

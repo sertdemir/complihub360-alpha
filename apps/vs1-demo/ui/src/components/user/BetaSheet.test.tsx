@@ -42,6 +42,9 @@ describe('BookingFailureCard · Beta-Vereinbarung fehlt', () => {
     render(<MemoryRouter><BookingFailureCard failure={failure} onRetry={noop} onReread={noop} onPickSlot={noop} onReadAgreement={onReadAgreement} /></MemoryRouter>);
     const karte = screen.getByRole('status');
     expect(karte).toHaveTextContent('schedule.fail.agreement_required.title');
+    // Erneut versuchen hilft hier nicht: der allgemeine Satz steht nicht da.
+    expect(karte).toHaveTextContent('schedule.fail.agreement_required.body');
+    expect(karte).not.toHaveTextContent('states.bookingFailed.message');
     expect(karte).toHaveTextContent('schedule.fail.list.noBooking');
     expect(karte).toHaveTextContent('schedule.fail.list.nothingShared');
     expect(karte).toHaveTextContent('schedule.fail.list.kept');

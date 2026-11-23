@@ -260,7 +260,8 @@
       "reread": "Aktualisierte Bedingungen lesen",
       "keepNote": "Ihre Nachricht und Ihre Auswahl bleiben erhalten.",
       "agreement_required": {
-        "title": "Vor der Buchung fehlt noch die Beta-Vereinbarung."
+        "title": "Vor der Buchung fehlt noch die Beta-Vereinbarung.",
+        "body": "Es wurde keine Buchung angelegt, und Ihre Angaben wurden nicht weitergegeben."
       },
       "readAgreement": "Beta-Vereinbarung lesen",
       "list": {

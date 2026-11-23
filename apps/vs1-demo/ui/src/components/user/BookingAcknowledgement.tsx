@@ -81,7 +81,10 @@ export function BookingFailureCard({ failure, onOtherProvider, onRetry, onReread
         {t('common:states.bookingFailed.heading')}
       </p>
       {reason && <p className="mt-1.5 text-body-3xs font-semibold leading-relaxed text-fg">{reason}</p>}
-      <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-secondary">{t('common:states.bookingFailed.message')}</p>
+      {/* Fehlt die Vereinbarung, hilft „erneut versuchen" nicht: nur der erste Satz. */}
+      <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-secondary">
+        {k === 'agreement_required' ? t('schedule.fail.agreement_required.body') : t('common:states.bookingFailed.message')}
+      </p>
       <ul className="mt-3 flex flex-col gap-1.5 rounded-lg bg-brand-light px-3.5 py-3">
         {(['noBooking', 'nothingShared', 'kept'] as const).map((x) => (
           <li key={x} className="flex items-center gap-2 text-body-3xs text-fg">

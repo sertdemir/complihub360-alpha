@@ -260,7 +260,8 @@
       "reread": "Güncellenen koşulları oku",
       "keepNote": "Mesajınız ve seçiminiz korunur.",
       "agreement_required": {
-        "title": "Randevudan önce beta sözleşmesi eksik."
+        "title": "Randevudan önce beta sözleşmesi eksik.",
+        "body": "Randevu oluşturulmadı ve bilgileriniz paylaşılmadı."
       },
       "readAgreement": "Beta sözleşmesini oku",
       "list": {

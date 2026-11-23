@@ -260,7 +260,8 @@
       "reread": "Leer las condiciones actualizadas",
       "keepNote": "Su mensaje y su selección se conservan.",
       "agreement_required": {
-        "title": "Antes de reservar falta el acuerdo de la beta."
+        "title": "Antes de reservar falta el acuerdo de la beta.",
+        "body": "No se ha creado ninguna reserva y su información no se ha compartido."
       },
       "readAgreement": "Leer el acuerdo de la beta",
       "list": {
