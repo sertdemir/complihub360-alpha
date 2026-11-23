@@ -725,7 +725,7 @@ const BETA_POINTS: Record<string, { title: string; points: Array<{ lead: string;
     { lead: 'This is a test.', text: 'You are using an unfinished version of CompliHub360, by invitation, for a limited time. Whatever is still open, we tell you before you need it.' },
     { lead: 'It costs nothing.', text: 'Nothing is charged or debited during the beta. Payment features run in test mode. Should that ever change, you confirm a new version of this sheet first.' },
     { lead: 'Things can go wrong.', text: 'Outages, bugs and data loss are possible in a beta. We give no warranty for availability or results. If something has happened, we tell you without you having to ask.' },
-    { lead: 'No legal advice.', text: 'The risk map and answers are orientation, not a substitute for a review of your case. CompliHub360 is not a law firm.' },
+    { lead: 'No legal advice.', text: 'The Risk Map and answers are orientation, not a substitute for a review of your case. CompliHub360 is not a law firm.' },
     { lead: 'Providers are test accounts.', text: 'There are no real providers in the beta yet. Every provider you can see and book is a test account with an invented name. A person on our team answers bookings and messages. What you learn there is not advice on your case.' },
     { lead: 'Your data.', text: 'The privacy policy applies. Please upload only documents you are allowed to use for this, ideally no real client data.' },
     { lead: 'Your feedback helps.', text: 'What you report to us we may use to improve the product, without payment and without your name.' },

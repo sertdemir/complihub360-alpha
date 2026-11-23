@@ -5,7 +5,7 @@
     "saveMap": "Save this map"
   },
   "header": {
-    "eyebrow": "Your risk map",
+    "eyebrow": "Your Risk Map",
     "title": "Here's what applies to you.",
     "subtitleProfile_one": "Based on your assessment. {{count}} area in scope.",
     "subtitleProfile_other": "Based on your assessment. {{count}} areas in scope.",
@@ -100,7 +100,7 @@
     "domainTaxVat": "Tax & VAT"
   },
   "pdf": {
-    "title": "Your compliance risk map.",
+    "title": "Your compliance Risk Map.",
     "generated": "Generated {{date}} · staging preview",
     "profile": {
       "anonymousScope": "Anonymous assessment · example scope",
@@ -140,9 +140,9 @@
     "errorBody": "Please try again in a moment.",
     "crumbProviders": "Providers",
     "backToArea": "Back to the area",
-    "backToRiskMap": "Back to the risk map",
+    "backToRiskMap": "Back to the Risk Map",
     "lageAreasArea": "Covers {{matched}} of {{total}} areas ({{area}})",
-    "lageAreasRiskMap": "Matches {{matched}} of {{total}} areas in your risk map “{{riskMap}}”",
+    "lageAreasRiskMap": "Matches {{matched}} of {{total}} areas in your Risk Map “{{riskMap}}”",
     "lageMarketsAll_one": "{{count}} market covered",
     "lageMarketsAll_other": "all {{count}} markets covered",
     "lageMarketsPartial_one": "{{covered}} of {{total}} market covered · not {{missing}}",
@@ -156,12 +156,12 @@
     "matrixTitle": "Your obligations and this provider's markets",
     "matrixCovered_one": "{{covered}} of {{total}} market",
     "matrixCovered_other": "{{covered}} of {{total}} markets",
-    "matrixRiskMap": "Risk map",
+    "matrixRiskMap": "Risk Map",
     "matrixNone": "Nothing is open in this context right now.",
     "matrixNotCovered": "This provider does not cover this market.",
     "matrixEuWide": "EU-wide",
     "matrixFoot": "Struck-through markets are not covered by this provider. The matrix shows markets, not areas of expertise — the dossier says which areas he covers.",
-    "matrixNoContext": "Open a provider from an area or a risk map and this shows which of your open obligations the provider can take on, in which market.",
+    "matrixNoContext": "Open a provider from an area or a Risk Map and this shows which of your open obligations the provider can take on, in which market.",
     "dossierTitle": "Dossier",
     "servicesTitle": "Services",
     "servicesCoarse": "The provider has not detailed his services yet — these are the areas of expertise from his application.",
@@ -223,7 +223,7 @@
     "toAppointments": "To your appointments",
     "pickSlotDrawer": "Pick a slot above.",
     "messageLabel": "What it is about",
-    "messageFromRiskMap": "This is about my risk map “{{riskMap}}”.",
+    "messageFromRiskMap": "This is about my Risk Map “{{riskMap}}”.",
     "duration": "30 min",
     "noSlots": "This provider has no free slots right now. Try again in a few days.",
     "failed": "The appointment could not be booked. Please try again in a moment.",
@@ -282,7 +282,7 @@
     "guidesTitle": "Where to read on",
     "guideRead": "Open",
     "bridgeTitle": "Want to see what applies to your business?",
-    "bridgeBody": "Your risk map is matched to your markets and your business model, and shows the Verified Providers who fit what you actually need.",
+    "bridgeBody": "Your Risk Map is matched to your markets and your business model, and shows the Verified Providers who fit what you actually need.",
     "bridgeCta": "Assess My Needs",
     "entries": {
       "markets": "Markets and what applies there",
@@ -322,7 +322,7 @@
     "groupFit": "Fits your request"
   },
   "snapshot": {
-    "fallbackTitle": "Your risk map",
+    "fallbackTitle": "Your Risk Map",
     "areas_one": "{{count}} area",
     "areas_other": "{{count}} areas",
     "exportPdf": "Export PDF",
@@ -350,9 +350,9 @@
       "later_one": "{{count}} obligation",
       "later_other": "{{count}} obligations"
     },
-    "historyTitle": "History of this risk map",
+    "historyTitle": "History of this Risk Map",
     "historyCurrent": "Current state",
-    "historyStart": "Risk map created",
+    "historyStart": "Risk Map created",
     "historyCreated": "Your answers as first given",
     "copyVariant": "Copy as a variant",
     "copyHint": "Creates a copy — try variants without losing the original.",
@@ -426,7 +426,7 @@
   },
   "reveal": {
     "was": "was {{title}}",
-    "wasInRiskMap": "was {{title}} in your risk map “{{riskMap}}”"
+    "wasInRiskMap": "was {{title}} in your Risk Map “{{riskMap}}”"
   },
   "dueLive": "No fixed date",
   "matchStates": {
@@ -529,7 +529,7 @@
     }
   },
   "hint": {
-    "title": "One answer makes your risk map more precise",
+    "title": "One answer makes your Risk Map more precise",
     "message_one": "It settles {{count}} obligation whose relevance is still open. Takes a few seconds.",
     "message_other": "It settles {{count}} obligations whose relevance is still open. Takes a few seconds.",
     "cta": "Add answer",

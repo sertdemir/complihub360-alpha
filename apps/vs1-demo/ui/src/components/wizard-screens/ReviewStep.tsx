@@ -34,7 +34,7 @@ export function ReviewStep() {
       current={3}
       stepLabel="Step 4 of 4"
       title="Your situation, summarized."
-      subtitle="Here's what we'll use. Edit anything you need, then generate your risk map."
+      subtitle="Here's what we'll use. Edit anything you need, then create your Risk Map."
       topbarRight={topbarRight}
       footerLeft={footerLeft}
       footerRight={
