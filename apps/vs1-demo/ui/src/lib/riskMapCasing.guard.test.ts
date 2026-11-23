@@ -5,7 +5,7 @@ import { join } from 'node:path';
 // ─── Waechter: "Risk Map" ist ein Plattformbegriff ───────────────────────────
 // Handover 1.0 §14: "Capitalize Risk Map, Verified Provider, and CompliHub360
 // when used as defined platform terms." Bis November 2026 stand "risk map" an
-// rund 70 Stellen der englischen Sprachdateien klein (PR #429, #455).
+// rund 70 Stellen der englischen Sprachdateien klein (PR #429, #454).
 //
 // Geprueft wird nur EN: DE schreibt "Risk Map" ohnehin gross, ES und TR
 // uebersetzen den Begriff ("mapa de riesgos", "risk haritasi").
