@@ -49,7 +49,7 @@
       "Sin tarjeta de crédito",
       "Resultados en su navegador"
     ],
-    "visualCaption": "Unos seis minutos · 4 preguntas · Sin necesidad de cuenta",
+    "visualCaption": "Unos seis minutos · Unas pocas preguntas · Sin necesidad de cuenta",
     "preview": {
       "context": "Lanzamiento transfronterizo — DE → UK + NL",
       "steps": [
@@ -1054,7 +1054,7 @@
     "steps": [
       {
         "title": "Inicie su evaluación",
-        "desc": "Cuatro preguntas. Unos seis minutos. Sin necesidad de cuenta."
+        "desc": "Unas pocas preguntas. Unos seis minutos. Sin necesidad de cuenta."
       },
       {
         "title": "Vea su Risk Map",

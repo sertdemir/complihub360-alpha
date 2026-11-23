@@ -49,7 +49,7 @@
       "Kredi kartı gerekmez",
       "Sonuçlar tarayıcınızda"
     ],
-    "visualCaption": "Yaklaşık altı dakika · 4 soru · Hesap gerekmez",
+    "visualCaption": "Yaklaşık altı dakika · Birkaç soru · Hesap gerekmez",
     "preview": {
       "context": "Sınır ötesi lansman — DE → UK + NL",
       "steps": [
@@ -1054,7 +1054,7 @@
     "steps": [
       {
         "title": "Değerlendirmenizi başlatın",
-        "desc": "Dört soru. Yaklaşık altı dakika. Hesap gerekmez."
+        "desc": "Birkaç soru. Yaklaşık altı dakika. Hesap gerekmez."
       },
       {
         "title": "Risk Map'inizi görün",

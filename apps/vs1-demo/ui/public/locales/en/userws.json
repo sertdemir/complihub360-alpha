@@ -63,7 +63,7 @@
     "titleNoName": "Welcome back.",
     "loading": "Loading your data …",
     "emptyTitle": "Nothing saved yet",
-    "emptyBody": "Answer four questions and you will see which obligations apply to your business — in which markets, and how urgent they are. The result stays here.",
+    "emptyBody": "Answer a few questions and you will see which obligations apply to your business — in which markets, and how urgent they are. The result stays here.",
     "emptyCta": "Start your Risk Map",
     "emptyHint": "About six minutes. You can stop at any point.",
     "alertTitle": "Needs attention: {{name}}",

@@ -49,7 +49,7 @@
       "No credit card",
       "Results in your browser"
     ],
-    "visualCaption": "About six minutes · 4 questions · No account required",
+    "visualCaption": "About six minutes · A few questions · No account required",
     "preview": {
       "context": "Cross-border launch — DE → UK + NL",
       "steps": [
@@ -1058,7 +1058,7 @@
     "steps": [
       {
         "title": "Start your assessment",
-        "desc": "Four questions. About six minutes. No account needed."
+        "desc": "A few questions. About six minutes. No account needed."
       },
       {
         "title": "See your risk map",

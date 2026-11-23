@@ -62,7 +62,7 @@
     "titleNoName": "Bienvenido de nuevo.",
     "loading": "Cargando sus datos …",
     "emptyTitle": "Todavía no hay nada guardado",
-    "emptyBody": "Responda cuatro preguntas y verá qué obligaciones se aplican a su empresa, en qué mercados y con qué urgencia. El resultado se conserva aquí.",
+    "emptyBody": "Responda unas pocas preguntas y verá qué obligaciones se aplican a su empresa, en qué mercados y con qué urgencia. El resultado se conserva aquí.",
     "emptyCta": "Iniciar el mapa de riesgos",
     "emptyHint": "Unos seis minutos. Puede detenerse cuando quiera.",
     "alertTitle": "Requiere atención: {{name}}",
@@ -144,7 +144,7 @@
       "legal-advisory": "Apoyo jurídico"
     },
     "emptyStep1Title": "Describir",
-    "emptyStep1Body": "Cuatro preguntas sobre país, mercados y gama.",
+    "emptyStep1Body": "Unas pocas preguntas sobre su empresa, sus mercados y sus áreas.",
     "emptyStep2Title": "Ver",
     "emptyStep2Body": "Sus obligaciones, ordenadas por urgencia.",
     "emptyStep3Title": "Actuar",

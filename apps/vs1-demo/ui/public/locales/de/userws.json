@@ -62,7 +62,7 @@
     "titleNoName": "Willkommen zurück.",
     "loading": "Ihre Daten werden geladen …",
     "emptyTitle": "Noch nichts gespeichert",
-    "emptyBody": "Beantworten Sie vier Fragen, und Sie sehen, welche Pflichten für Ihren Betrieb gelten — in welchen Märkten, mit welcher Dringlichkeit. Das Ergebnis bleibt hier erhalten.",
+    "emptyBody": "Beantworten Sie ein paar Fragen, und Sie sehen, welche Pflichten für Ihren Betrieb gelten — in welchen Märkten, mit welcher Dringlichkeit. Das Ergebnis bleibt hier erhalten.",
     "emptyCta": "Risk Map starten",
     "emptyHint": "Etwa sechs Minuten. Sie können jederzeit aufhören.",
     "alertTitle": "Braucht Aufmerksamkeit: {{name}}",
@@ -144,7 +144,7 @@
       "legal-advisory": "Rechtliche Unterstützung"
     },
     "emptyStep1Title": "Beschreiben",
-    "emptyStep1Body": "Vier Fragen zu Land, Märkten und Sortiment.",
+    "emptyStep1Body": "Ein paar Fragen zu Ihrem Unternehmen, Ihren Märkten und Bereichen.",
     "emptyStep2Title": "Sehen",
     "emptyStep2Body": "Ihre Pflichten, nach Dringlichkeit sortiert.",
     "emptyStep3Title": "Handeln",

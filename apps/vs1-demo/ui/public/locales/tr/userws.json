@@ -62,7 +62,7 @@
     "titleNoName": "Tekrar hoş geldiniz.",
     "loading": "Verileriniz yükleniyor …",
     "emptyTitle": "Henüz kayıtlı bir şey yok",
-    "emptyBody": "Dört soruyu yanıtlayın; işletmeniz için hangi yükümlülüklerin geçerli olduğunu, hangi pazarlarda ve ne kadar acil olduğunu görün. Sonuç burada saklanır.",
+    "emptyBody": "Birkaç soruyu yanıtlayın; işletmeniz için hangi yükümlülüklerin geçerli olduğunu, hangi pazarlarda ve ne kadar acil olduğunu görün. Sonuç burada saklanır.",
     "emptyCta": "Risk haritasını başlat",
     "emptyHint": "Yaklaşık altı dakika. İstediğiniz anda durabilirsiniz.",
     "alertTitle": "Dikkat gerekiyor: {{name}}",
@@ -144,7 +144,7 @@
       "legal-advisory": "Hukuki destek"
     },
     "emptyStep1Title": "Anlatın",
-    "emptyStep1Body": "Ülke, pazarlar ve ürün yelpazesi hakkında dört soru.",
+    "emptyStep1Body": "İşletmeniz, pazarlarınız ve alanlarınız hakkında birkaç soru.",
     "emptyStep2Title": "Görün",
     "emptyStep2Body": "Yükümlülükleriniz, aciliyete göre sıralı.",
     "emptyStep3Title": "Harekete geçin",
