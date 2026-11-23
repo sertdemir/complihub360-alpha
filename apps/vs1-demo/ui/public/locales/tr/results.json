@@ -556,7 +556,8 @@
         "products": "hangi ürün gruplarını sattığınız",
         "packaging": "ambalajla ne yaptığınız",
         "established_in_jurisdiction": "işletmenizin nerede kurulu olduğu",
-        "sells_in_jurisdiction": "bu ülkede satış yapıp yapmadığınız"
+        "sells_in_jurisdiction": "bu ülkede satış yapıp yapmadığınız",
+        "established_in_eu": "işletmenizin AB’de kurulu olup olmadığı"
       }
     }
   }
