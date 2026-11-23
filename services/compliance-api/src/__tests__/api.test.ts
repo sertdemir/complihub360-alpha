@@ -1071,6 +1071,85 @@ describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, AD
         expect(db.scheduling[0]).toMatchObject({ lead_charged: false, identity_revealed: true });
     });
 
+    // Geschlossene Beta (Entscheidungen 15.10. und 23.11.2026): Die Oberflaeche
+    // fragt vor dem Workspace und vor /results nach der Beta-Vereinbarung. Der
+    // Server ist das Netz dahinter, fuer alte Tabs und fuer ein Gate, das bei
+    // einem Ausfall offen bleibt. Eine Buchung belastet den Anbieter und legt
+    // Namen offen; ohne Blatt darf sie nicht entstehen.
+    describe('Beta-Vereinbarung vor der Buchung', () => {
+        const accept = (version: string) => (db.user_agreement_acceptance ??= []).push(
+            { id: randomUUID(), user_id: USER_ID, agreement: 'beta', version, language: 'de', accepted_at: new Date().toISOString() });
+
+        it('ohne Annahme: 409 AGREEMENT_REQUIRED mit der geltenden Fassung, keine Buchung, keine Belastung', async () => {
+            const { session } = seedBookable();
+            seedBetaAgreement();
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(409);
+            expect(r.body).toMatchObject({ errorCode: 'AGREEMENT_REQUIRED', agreement: 'beta', current_version: 'beta-2026-10' });
+            expect(db.scheduling ?? []).toHaveLength(0);
+            expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+            expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+            // Nichts ueber den Anbieter verlaesst den Server.
+            expect(JSON.stringify(r.body)).not.toContain('Testkanzlei');
+        });
+
+        it('mit Annahme der geltenden Fassung geht die Buchung durch', async () => {
+            const { session } = seedBookable();
+            seedBetaAgreement();
+            accept('beta-2026-10');
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+            expect(db.scheduling).toHaveLength(1);
+        });
+
+        it('eine alte Annahme reicht nicht, sobald eine neuere Fassung gilt', async () => {
+            const { session } = seedBookable();
+            seedBetaAgreement();
+            seedBetaAgreement({ version: 'beta-2026-11', effective_from: '2026-11-23' });
+            accept('beta-2026-10');
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(409);
+            expect(r.body).toMatchObject({ errorCode: 'AGREEMENT_REQUIRED', current_version: 'beta-2026-11' });
+            expect(db.scheduling ?? []).toHaveLength(0);
+        });
+
+        it('gilt keine Fassung (nach dem Launch), ist nichts erforderlich', async () => {
+            const { session } = seedBookable();
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(201);
+        });
+
+        it('laesst sich der Stand nicht lesen, gibt es keine Buchung (geschlossen statt offen)', async () => {
+            const { session } = seedBookable();
+            seedBetaAgreement();
+            Object.defineProperty(db, 'user_agreement_acceptance', { configurable: true, enumerable: true, get() { throw new Error('acceptance table unreachable'); } });
+            const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            try {
+                const r = await book(standardBody(session));
+                expect(r.status).toBe(500);
+                expect(db.scheduling ?? []).toHaveLength(0);
+                expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+                expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+            } finally {
+                spy.mockRestore();
+                delete (db as Record<string, unknown>).user_agreement_acceptance;
+            }
+        });
+
+        it('die Wiederholung einer schon angelegten Buchung kommt weiter zurueck', async () => {
+            const { session } = seedBookable();
+            const body = standardBody(session, { request_id: 'beta-replay-0001' });
+            const first = await book(body);
+            expect(first.status).toBe(201);
+            // Danach gilt eine Fassung, die der Nutzer nicht angenommen hat.
+            seedBetaAgreement();
+            const again = await book(body);
+            expect(again.status).toBe(201);
+            expect(again.body).toMatchObject({ replay: true });
+            expect(db.scheduling).toHaveLength(1);
+        });
+    });
+
     it('Karte abgelehnt: keine Buchung, neutraler Satz, Anbieter gesperrt und informiert', async () => {
         const { session } = seedBookable();
         stripeMock.createPaymentIntent.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', stripeRef: 'pi_fail', detail: 'generic_decline' });

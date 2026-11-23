@@ -74,7 +74,8 @@
     "steps": {
       "login": "1 Inicio de sesión",
       "agreement": "2 Acuerdo de la beta",
-      "workspace": "3 Su espacio de trabajo"
+      "workspace": "3 Su espacio de trabajo",
+      "riskMap": "3 Su Risk Map"
     },
     "eyebrow": "Beta cerrada",
     "title": "Una hoja antes de empezar.",
@@ -91,7 +92,22 @@
     "outdated": "La hoja ha cambiado entretanto. Esta es la nueva versión.",
     "failed": "Su conformidad no se ha podido guardar ahora mismo. No es culpa suya.",
     "retry": "Intentarlo de nuevo",
-    "saving": "Guardando …"
+    "saving": "Guardando …",
+    "ctaRiskMap": "Continuar a su Risk Map",
+    "drawer": {
+      "title": "Una hoja más y después su cita",
+      "noteLead": "Todavía no está reservado.",
+      "note": "Su selección se queda aquí. La cita aún no está reservada.",
+      "cta": "De acuerdo, volver a la reserva",
+      "back": "Volver a la cita"
+    },
+    "declined": {
+      "title": "Ha cerrado la sesión. Su Risk Map sigue visible en este dispositivo.",
+      "body": "En la beta, reservar, guardar y enviar mensajes solo es posible cuando haya aceptado el acuerdo de la beta. Puede hacerlo en cualquier momento.",
+      "read": "Leer el acuerdo de la beta",
+      "signIn": "Volver a iniciar sesión",
+      "close": "Cerrar el aviso"
+    }
   },
   "account": {
     "title": "Cuenta",

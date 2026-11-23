@@ -392,7 +392,10 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress', draft }
       </div>
 
       <div className="border-t border-stroke-subtle px-8 py-5">
-        <p className="text-body-xs text-fg-tertiary">{t('account.footNote')}</p>
+        {/* 5A (23.11.2026): Nach dem ersten Anmelden kommt in der Beta ein Blatt.
+            "Dauert 20 Sekunden" stimmt dann nicht mehr, und das Blatt soll niemanden
+            ueberraschen. Beta-Copy: zum Launch mit den uebrigen Beta-Texten raus. */}
+        <p className="text-body-xs text-fg-tertiary">{t(copyKey === 'freeAccount' ? 'account.freeAccount.footNote' : 'account.footNote')}</p>
         <Button
           size="lg"
           shape="soft"
@@ -437,6 +440,9 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress', draft }
         >
           {sent ? t('account.done') : t(`${base}.cta`)} <ArrowRight size={17} />
         </Button>
+        {copyKey === 'freeAccount' && !sent && (
+          <p className="mt-3 text-body-xs leading-relaxed text-fg-secondary">{t('account.freeAccount.betaNote')}</p>
+        )}
       </div>
     </>
   );
@@ -522,10 +528,13 @@ export function FreeAccountDrawer({ open, onClose }: { open: boolean; onClose: (
             aria-label={t('account.drawerLabel')}
             // Gleiche Form wie components/ui/Drawer (Canvas-Wahl 4C, 2026-09-05):
             // schwebendes helles Milchglas statt flacher Vollhoehen-Wand.
-            className="absolute right-4 top-1/2 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[520px] -translate-y-1/2 flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-white/70 bg-[var(--drawer-glass-bg)] shadow-[0_24px_60px_-24px_rgba(11,21,18,0.30),0_2px_6px_rgba(11,21,18,0.06)] backdrop-blur-[var(--drawer-glass-blur)] dark:border-white/10"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            className="absolute right-4 top-1/2 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[520px] flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-white/70 bg-[var(--drawer-glass-bg)] shadow-[0_24px_60px_-24px_rgba(11,21,18,0.30),0_2px_6px_rgba(11,21,18,0.06)] backdrop-blur-[var(--drawer-glass-blur)] dark:border-white/10"
+            // Die Mitte setzt Framer mit: sein Inline-transform ueberschreibt
+            // eine Tailwind-Klasse -translate-y-1/2, die Schublade hing dann
+            // mit der Oberkante auf halber Hoehe und lief unten aus dem Bild.
+            initial={{ x: '100%', y: '-50%' }}
+            animate={{ x: 0, y: '-50%' }}
+            exit={{ x: '100%', y: '-50%' }}
             transition={{ type: 'tween', ease: [0.32, 0.72, 0, 1], duration: 0.42 }}
           >
             <SaveProgressContent onClose={onClose} copyKey="freeAccount" />

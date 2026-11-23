@@ -803,7 +803,9 @@
         "Mevzuat bildirimleri — hazırlanıyor"
       ],
       "confirm": "Ücretsiz hesabınızın kurulumunu tamamlamak için bağlantıya tıklayın.",
-      "cta": "Ücretsiz hesap oluşturun"
+      "cta": "Ücretsiz hesap oluşturun",
+      "footNote": "Şifre yok · Kredi kartı yok.",
+      "betaNote": "Kapalı beta: İlk girişten sonra size bir sayfa gösteririz. Bu testin ne olduğunu ve ne olmadığını söyler."
     },
     "workEmail": "İş e-postası",
     "emailPlaceholder": "siz@sirketiniz.com",

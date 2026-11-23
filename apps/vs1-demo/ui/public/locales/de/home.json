@@ -803,7 +803,9 @@
         "Regulatorische Hinweise — in Vorbereitung"
       ],
       "confirm": "Klicken Sie auf den Link, um die Einrichtung Ihres kostenlosen Kontos abzuschließen.",
-      "cta": "Kostenloses Konto erstellen"
+      "cta": "Kostenloses Konto erstellen",
+      "footNote": "Kein Passwort · Keine Kreditkarte.",
+      "betaNote": "Geschlossene Beta: Nach dem ersten Anmelden zeigen wir Ihnen ein Blatt. Es sagt, was dieser Test ist und was nicht."
     },
     "workEmail": "Geschäftliche E-Mail",
     "emailPlaceholder": "sie@unternehmen.de",

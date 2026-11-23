@@ -74,7 +74,8 @@
     "steps": {
       "login": "1 Giriş",
       "agreement": "2 Beta sözleşmesi",
-      "workspace": "3 Çalışma alanınız"
+      "workspace": "3 Çalışma alanınız",
+      "riskMap": "3 Risk Map’iniz"
     },
     "eyebrow": "Kapalı beta",
     "title": "Başlamadan önce bir sayfa.",
@@ -91,7 +92,22 @@
     "outdated": "Sayfa bu arada değişti. İşte yeni sürüm.",
     "failed": "Onayınız şu anda kaydedilemedi. Bu sizden kaynaklanmıyor.",
     "retry": "Yeniden dene",
-    "saving": "Kaydediliyor …"
+    "saving": "Kaydediliyor …",
+    "ctaRiskMap": "Risk Map’e devam et",
+    "drawer": {
+      "title": "Bir sayfa daha, sonra randevunuz",
+      "noteLead": "Henüz rezerve edilmedi.",
+      "note": "Seçiminiz burada kalır. Randevu henüz ayrılmadı.",
+      "cta": "Kabul ediyorum, rezervasyona dön",
+      "back": "Randevuya dön"
+    },
+    "declined": {
+      "title": "Oturumunuz kapatıldı. Risk Map’iniz bu cihazda görünür kalır.",
+      "body": "Betada randevu alma, kaydetme ve mesajlaşma, beta sözleşmesini kabul ettiğinizde mümkündür. Bunu istediğiniz zaman yapabilirsiniz.",
+      "read": "Beta sözleşmesini oku",
+      "signIn": "Yeniden giriş yap",
+      "close": "Bildirimi kapat"
+    }
   },
   "account": {
     "title": "Hesap",

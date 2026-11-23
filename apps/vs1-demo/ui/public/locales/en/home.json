@@ -805,7 +805,9 @@
         "Regulatory alerts — in preparation"
       ],
       "confirm": "Click the link to finish setting up your free account.",
-      "cta": "Create free account"
+      "cta": "Create free account",
+      "footNote": "No password · No credit card.",
+      "betaNote": "Closed beta: after your first sign-in we show you one sheet. It says what this test is and what it is not."
     },
     "workEmail": "Work email",
     "emailPlaceholder": "you@company.com",

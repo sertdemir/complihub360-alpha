@@ -74,7 +74,8 @@
     "steps": {
       "login": "1 Anmeldung",
       "agreement": "2 Beta-Vereinbarung",
-      "workspace": "3 Ihr Workspace"
+      "workspace": "3 Ihr Workspace",
+      "riskMap": "3 Ihre Risk Map"
     },
     "eyebrow": "Geschlossene Beta",
     "title": "Ein Blatt, bevor es losgeht.",
@@ -91,7 +92,22 @@
     "outdated": "Das Blatt hat sich inzwischen geändert. Hier ist die neue Fassung.",
     "failed": "Die Zustimmung konnte gerade nicht gespeichert werden. Es liegt nicht an Ihnen.",
     "retry": "Noch einmal versuchen",
-    "saving": "Wird gespeichert …"
+    "saving": "Wird gespeichert …",
+    "ctaRiskMap": "Weiter zur Risk Map",
+    "drawer": {
+      "title": "Noch ein Blatt, dann Ihr Termin",
+      "noteLead": "Noch nicht gebucht.",
+      "note": "Ihre Auswahl bleibt hier stehen. Reserviert ist der Termin noch nicht.",
+      "cta": "Einverstanden, zurück zur Buchung",
+      "back": "Zurück zum Termin"
+    },
+    "declined": {
+      "title": "Sie sind abgemeldet. Ihre Risk Map bleibt auf diesem Gerät sichtbar.",
+      "body": "Buchen, Merken und Nachrichten gehen in der Beta erst, wenn Sie die Beta-Vereinbarung angenommen haben. Das können Sie jederzeit nachholen.",
+      "read": "Beta-Vereinbarung lesen",
+      "signIn": "Wieder anmelden",
+      "close": "Hinweis schließen"
+    }
   },
   "account": {
     "title": "Konto",

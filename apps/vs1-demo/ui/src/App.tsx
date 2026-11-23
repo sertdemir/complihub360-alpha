@@ -75,6 +75,7 @@ const EmailVerificationPage = lazy(() => import("./pages/auth/EmailVerificationP
 const AuthCallbackPage = lazy(() => import("./pages/auth/AuthCallbackPage").then((m) => ({ default: m.AuthCallbackPage })));
 const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage").then((m) => ({ default: m.ResetPasswordPage })));
 import { AuthGuard } from "./components/auth/AuthGuard";
+import { ResultsBetaGate } from "./components/auth/ResultsBetaGate";
 import { AnimatedWizard } from "./components/home/AnimatedWizard";
 import { WizardDrawerProvider } from "./components/user/WizardDrawer";
 
@@ -225,7 +226,8 @@ function AppContent() {
                     {/* Kontakt UND Support: beide Footer-Eintraege zeigen hierher,
                         die Seite sortiert nach Anliegen statt nach Abteilung. */}
                     <Route path="contact" element={<ContactPage />} />
-                    <Route path="results" element={<ResultsRiskMap />} />
+                    {/* Eingeloggt und ohne geltende Beta-Vereinbarung: erst der Schritt (1A, 23.11.2026). */}
+                    <Route path="results" element={<ResultsBetaGate><ResultsRiskMap /></ResultsBetaGate>} />
                     {/* Station 1A: prose-search answers page (no risk map, no gating). */}
                     <Route path="search" element={<SearchResultPage />} />
                     <Route path="wizard/*" element={<WizardRoutes />} />

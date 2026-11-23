@@ -55,6 +55,22 @@ describe('SaveProgressContent', () => {
     expect(screen.queryByText(/account\.saveProgress\.confirm/)).not.toBeInTheDocument();
     expect(screen.getByText(/account\.freeAccount\.confirm/)).toBeInTheDocument();
   });
+
+  // 5A (23.11.2026): In der geschlossenen Beta folgt auf das Konto ein Blatt.
+  // Die Konto-Schublade kuendigt es an, statt zu ueberraschen; "20 Sekunden"
+  // steht dort nicht mehr.
+  it('5A: die Konto-Schublade kuendigt das Blatt an und verspricht keine 20 Sekunden', () => {
+    render(<SaveProgressContent onClose={vi.fn()} copyKey="freeAccount" />);
+    expect(screen.getByText('account.freeAccount.betaNote')).toBeInTheDocument();
+    expect(screen.getByText('account.freeAccount.footNote')).toBeInTheDocument();
+    expect(screen.queryByText('account.footNote')).not.toBeInTheDocument();
+  });
+
+  it('5A: „Fortschritt sichern“ im Wizard bleibt, wie es war', () => {
+    render(<SaveProgressContent onClose={vi.fn()} draft={DRAFT} />);
+    expect(screen.getByText('account.footNote')).toBeInTheDocument();
+    expect(screen.queryByText('account.freeAccount.betaNote')).not.toBeInTheDocument();
+  });
 });
 
 // ─── Fusszeile je Variante (24.10.2026) ───────────────────────────────────────

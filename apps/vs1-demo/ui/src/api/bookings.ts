@@ -438,6 +438,10 @@ export type BookingFailure =
   /** B8: derselbe Versuch laeuft gerade (Doppelklick) — kurz warten, dann erneut. */
   | { kind: 'in_progress' }
   | { kind: 'acknowledgement_outdated'; currentVersion: string | null }
+  /** Geschlossene Beta: die geltende Beta-Vereinbarung ist nicht angenommen
+   *  (409 AGREEMENT_REQUIRED). Das Netz hinter dem Gate — alter Tab, Gate
+   *  ausgefallen. Nichts gebucht, nichts geteilt; der Weg fuehrt zum Blatt. */
+  | { kind: 'agreement_required'; currentVersion: string | null }
   | { kind: 'generic' };
 
 export function bookingFailureFrom(err: unknown): BookingFailure {
@@ -447,6 +451,7 @@ export function bookingFailureFrom(err: unknown): BookingFailure {
   if (code === 'SLOT_TAKEN') return { kind: 'slot_taken' };
   if (code === 'BOOKING_IN_PROGRESS') return { kind: 'in_progress' };
   if (code === 'ACKNOWLEDGEMENT_OUTDATED') return { kind: 'acknowledgement_outdated', currentVersion: typeof err.body.current_version === 'string' ? err.body.current_version : null };
+  if (code === 'AGREEMENT_REQUIRED') return { kind: 'agreement_required', currentVersion: typeof err.body.current_version === 'string' ? err.body.current_version : null };
   return { kind: 'generic' };
 }
 

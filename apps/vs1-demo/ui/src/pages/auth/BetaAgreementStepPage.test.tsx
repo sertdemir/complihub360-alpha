@@ -26,6 +26,7 @@ function mount(path = '/de/beta-agreement?redirect=/de/dashboard') {
       <Routes>
         <Route path="/:locale/beta-agreement" element={<BetaAgreementStepPage />} />
         <Route path="/:locale/dashboard" element={<p>DASHBOARD</p>} />
+        <Route path="/:locale/results" element={<p>RISK MAP</p>} />
         <Route path="/:locale/login" element={<p>LOGIN</p>} />
       </Routes>
     </MemoryRouter>,
@@ -82,6 +83,52 @@ describe('BetaAgreementStepPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /betaStep.cta/ }));
     expect(await screen.findByRole('alert')).toHaveTextContent('betaStep.failed');
     expect(screen.getByRole('checkbox')).toBeChecked();
+  });
+
+  // 1A + 3B (23.11.2026): Wer ueber die Risk Map kommt, liest "Risk Map" statt
+  // "Workspace" und behaelt seine Karte, wenn er ablehnt.
+  describe('Ziel Risk Map', () => {
+    const path = '/de/beta-agreement?redirect=%2Fde%2Fresults';
+
+    it('Schritt drei und der Knopf nennen die Risk Map', async () => {
+      mount(path);
+      await screen.findByText('Satz 1.');
+      expect(screen.getByText('betaStep.steps.riskMap')).toBeInTheDocument();
+      expect(screen.queryByText('betaStep.steps.workspace')).toBeNull();
+      expect(screen.getByRole('button', { name: /betaStep.ctaRiskMap/ })).toBeInTheDocument();
+    });
+
+    it('nach der Annahme zurueck zur Risk Map', async () => {
+      mount(path);
+      await screen.findByText('Satz 1.');
+      fireEvent.click(screen.getByRole('checkbox'));
+      fireEvent.click(screen.getByRole('button', { name: /betaStep.ctaRiskMap/ }));
+      expect(await screen.findByText('RISK MAP')).toBeInTheDocument();
+    });
+
+    it('„Lieber nicht“: abgemeldet zurueck zur Risk Map, der Hinweis ist vorgemerkt', async () => {
+      const logout = vi.fn().mockImplementation(async () => { useAuthStore.setState({ isLoggedIn: false, role: null }); });
+      useAuthStore.setState({ logout });
+      sessionStorage.clear();
+      mount(path);
+      await screen.findByText('Satz 1.');
+      fireEvent.click(screen.getByRole('button', { name: /betaStep.exit/ }));
+      expect(await screen.findByText('RISK MAP')).toBeInTheDocument();
+      expect(logout).toHaveBeenCalled();
+      expect(sessionStorage.getItem('ch360_beta_declined')).toBe('1');
+    });
+
+    it('anderes Ziel: „Lieber nicht“ fuehrt wie bisher zur Anmeldung, ohne Vormerkung', async () => {
+      const logout = vi.fn().mockImplementation(async () => { useAuthStore.setState({ isLoggedIn: false, role: null }); });
+      useAuthStore.setState({ logout });
+      sessionStorage.clear();
+      mount();
+      await screen.findByText('Satz 1.');
+      expect(screen.getByText('betaStep.steps.workspace')).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: /betaStep.exit/ }));
+      expect(await screen.findByText('LOGIN')).toBeInTheDocument();
+      expect(sessionStorage.getItem('ch360_beta_declined')).toBeNull();
+    });
   });
 
   it('ohne Login: zur Anmeldung, mit Rueckweg', async () => {
