@@ -55,7 +55,7 @@
   },
   "changeEmail": {
     "eyebrow": "SETTINGS",
-    "title": "Change contact e-mail",
+    "title": "Change contact email",
     "done": "Done",
     "cancel": "Cancel",
     "sendVerification": "Send verification",
@@ -73,25 +73,6 @@
       "heading": "We couldn’t send the verification link",
       "message": "Your contact address is unchanged. Please try again. If the problem continues, contact support."
     }
-  },
-  "addMarket": {
-    "eyebrow": "COVERAGE",
-    "title": "Add market",
-    "addButton": "Add market",
-    "addSelected": "Add {{code}}",
-    "footerNote": "New markets are re-verified before they rank — usually about 2 business days.",
-    "coverageToday": "Your coverage today: {{markets}}. Pick the market to expand into — demand figures are the last 30 days.",
-    "addedTitle": "{{code}} added",
-    "addedBody": " — verification pending (≈ 2 business days). You'll see it ranked once verified.",
-    "candidateNote": "{{requests}} open requests / 30d · {{partners}} providers",
-    "allCovered": "All listed markets are already covered.",
-    "errorFallback": "Adding the market failed.",
-    "countryNl": "Netherlands",
-    "countryCh": "Switzerland",
-    "countryFr": "France",
-    "countryIt": "Italy",
-    "countryEs": "Spain",
-    "countryPl": "Poland"
   },
   "invoiceDetail": {
     "eyebrow": "INVOICE",
@@ -183,7 +164,6 @@
     "portalNotConfigured": "Stripe is being connected — payment methods can be managed as soon as the Billing Portal is live.",
     "portalUnavailable": "The Billing Portal is currently unreachable — please try again later.",
     "kpiThisMonth": "THIS MONTH (RUNNING)",
-    "kpiThisMonthTrend": "14 confirms + 17 clicks",
     "kpiLastInvoice": "LAST INVOICE",
     "kpiPaymentFailed": "not collected",
     "kpiNextInvoice": "NEXT INVOICE",
@@ -226,7 +206,7 @@
       "no_payment_method": "No payment method on file. Add a card in the portal.",
       "incomplete_billing_info": "Billing details are incomplete. Complete them in the portal.",
       "inactive_subscription": "Your subscription is not active. Reactivate it to take bookings.",
-      "withdrawn_authorization": "The billing authorisation has been withdrawn. Accept the current version to continue.",
+      "withdrawn_authorization": "The billing authorization has been withdrawn. Accept the current version to continue.",
       "overdue_invoice": "An invoice is overdue. Pay it in the portal.",
       "account_paused": "Your account is paused. If you would like to know why or talk about it, write to us via Help & support.",
       "payment_failed": "The last lead charge did not go through. Have the same card checked again or add a different payment method — either lifts the pause once confirmed.",
@@ -275,32 +255,13 @@
   },
   "notifications": {
     "title": "Notifications",
-    "subtitle": "Everything we have sent you in one place: new requests, SLA reminders, plan and payment updates, review activity. Choose email or in-app delivery under Settings → Notifications.",
     "markAllRead": "Mark all read",
-    "preferences": "Preferences",
     "chipAll": "All",
     "chipUnread": "Unread",
-    "chipRequests": "Requests",
-    "chipSla": "SLA",
     "chipBilling": "Billing",
-    "chipReviews": "Reviews",
-    "chipSystem": "System",
     "emptyFilter": "Nothing here — try another filter.",
     "dayToday": "Today",
-    "dayYesterday": "Yesterday",
-    "itemNewRequest": "New request",
-    "itemSlaReminder": "SLA reminder",
-    "itemEngagementClosed": "Engagement closed",
-    "itemNewReview": "New 5-star review",
-    "timeMinAgo_one": "{{count}} min ago",
-    "timeMinAgo_other": "{{count}} min ago",
-    "timeHoursAgo_one": "{{count}}h ago",
-    "timeHoursAgo_other": "{{count}}h ago",
-    "descRq0234": "EPR setup for DE marketplace launch · €4.2M revenue · 91% match score · SLA 24h from now",
-    "descRq0233": "VAT review for DE+AT · €1.8M revenue · OSS expansion · 84% match score",
-    "descRq0232": "Reminder #1 (T+24h) sent · 14h 12m remaining before reroute · DPIA workshop for SaaS company",
-    "descEngagementClosed": "Client marked engagement complete · 5-star rating · €3,600 invoiced · performance score updated",
-    "actionOpenRq": "Open {{id}} →"
+    "dayYesterday": "Yesterday"
   },
   "performance": {
     "title": "Your <accent>performance</accent>.",
@@ -399,7 +360,7 @@
     "partnerBadge": "Provider",
     "verifying": "Verifying your link…",
     "invalidTitle": "Link no longer valid",
-    "invalidBody": "This magic link is invalid, expired (24h) or was already used — each link works exactly once. Please use the most recent e-mail, or contact the client through your dashboard.",
+    "invalidBody": "This magic link is invalid, expired (24h) or was already used — each link works exactly once. Please use the most recent email, or contact the client through your dashboard.",
     "confirmTitle": "Confirm this engagement",
     "confirmGold": "Confirm",
     "confirmButton": "Confirm engagement",
@@ -440,30 +401,6 @@
       "domain": "Area",
       "timeline": "Timeline"
     }
-  },
-  "requests": {
-    "title": "Requests",
-    "subtitle": "Every request routed to you. New requests arrive by email with a one-time link and stay highlighted here until you confirm. The default filter shows what is waiting for you.",
-    "outOfOffice": "Out of office",
-    "oooBannerTitle": "Out of office active",
-    "oooBannerBody": "New requests are paused and re-routed · your ranking is frozen while away · SLA timers resume on return.",
-    "oooEndEarly": "End early",
-    "newBannerTitle_one": "{{count}} new request since you last checked",
-    "newBannerTitle_other": "{{count}} new requests since you last checked",
-    "newBannerBody": "Magic-link emails sent · they'll appear here too",
-    "markAllSeen": "Mark all seen",
-    "filterAwaitingConfirmation": "Awaiting confirmation",
-    "filterAwaitingReply": "Awaiting reply",
-    "filterActive": "Active",
-    "statusAwaitingConfirm": "Awaiting confirm",
-    "statusAwaitingReply": "Awaiting reply",
-    "statusActive": "Active",
-    "actionOpenConfirm": "Open · confirm",
-    "actionReply": "Reply",
-    "actionView": "View",
-    "sortSla": "Sort: SLA urgency",
-    "emptyTitle": "No requests yet",
-    "companyAnonymized": "🔒 Anonymized request"
   },
   "settings": {
     "title": "Settings",
@@ -511,7 +448,7 @@
       "title": "Calendar",
       "body": "Connect your Google or Microsoft calendar. We only read when you are busy, no titles and no attendees, and add booked appointments. Without a connection, clients see your business hours.",
       "connect": "Connect calendar",
-      "nylasNote": "The connection runs through our service provider Nylas, data centre in London.",
+      "nylasNote": "The connection runs through our service provider Nylas, data center in London.",
       "connectedAs": "Connected to {{email}}",
       "connectedBody": "Clients only see times when you are free. Booked appointments appear in this calendar.",
       "disconnect": "Disconnect",
@@ -586,7 +523,7 @@
   },
   "termine": {
     "title": "Appointments & <accent>leads</accent>.",
-    "sub": "Booked intro calls. The dossier with identity and request is yours from the moment of booking. Every booking is a billed lead.",
+    "sub": "Booked consultations. The dossier with identity and request is yours from the moment of booking. Every booking is a billed lead.",
     "upcoming": "UPCOMING",
     "past": "PAST",
     "leadCharged": "Lead billed",
@@ -615,9 +552,9 @@
     "leadStandardFee": "Standard fee · allowance used",
     "leadNoFee": "No lead fee for this area",
     "leadPayment": {
-      "captured": "Charged · receipt by e-mail",
+      "captured": "Charged · receipt by email",
       "pending": "Charge pending",
-      "authorized": "Authorised",
+      "authorized": "Authorized",
       "failed": "Charge failed",
       "refunded": "Refunded",
       "na": "Not charged"
@@ -758,7 +695,7 @@
       "entityType": "Legal form",
       "registrationNumber": "Registration number",
       "registeredAddress": "Registered address",
-      "representative": "Authorised representative",
+      "representative": "Authorized representative",
       "representativeTitle": "Role",
       "insuranceProvider": "Insurance provider",
       "insuranceValidUntil": "Insurance valid until"
@@ -770,7 +707,7 @@
       "countryPlaceholder": "ISO-2, e.g. AT",
       "codePlaceholder": "Service code, e.g. tax-vat.returns",
       "namePlaceholder": "Service name",
-      "licenceHint": "For tax and legal advice the review requires a licence per country.",
+      "licenceHint": "For tax and legal advice the review requires a license per country.",
       "allowanceHint": "Allowance: your plan is not chosen yet. The number of main categories is checked against the plan when activating, not now.",
       "allowanceError": "Your plan covers fewer main categories than this would need.",
       "pricingModel": "Pricing model",
@@ -811,8 +748,8 @@
         "incorporation": "Commercial register extract",
         "vat_id": "VAT ID (registry check)",
         "insurance": "Professional liability insurance",
-        "representative_identity": "Authorised representative",
-        "professional_licence": "Professional licence"
+        "representative_identity": "Authorized representative",
+        "professional_licence": "Professional license"
       },
       "scopeAccount": "Account",
       "scopeDocument": "Document",
@@ -852,7 +789,7 @@
       "doc": {
         "provider_agreement": "Provider agreement",
         "privacy_notice": "Privacy notice for providers",
-        "billing_authorization": "Billing authorisation",
+        "billing_authorization": "Billing authorization",
         "commercial_terms": "Commercial terms"
       },
       "version": "Version {{version}} · {{language}}",
@@ -939,7 +876,7 @@
       "readyTitle": "Ready",
       "cta": "Submit application",
       "note": "After submitting, a person reviews your dossier. You can see the status at any time in the Verification Center; questions come by email and there.",
-      "licenceNote": "Licences per country can follow after submitting — the review team requests them per country if they are still missing.",
+      "licenceNote": "Licenses per country can follow after submitting — the review team requests them per country if they are still missing.",
       "done": "Submitted. A person will now review your dossier.",
       "notSubmittable": "An application in this status cannot be submitted.",
       "ready": {
@@ -959,7 +896,7 @@
         "entity_type": "Legal form",
         "registration_number": "Registration number",
         "registered_address": "Registered address",
-        "representative_name": "Authorised representative"
+        "representative_name": "Authorized representative"
       },
       "services": {
         "none": "At least one service",
@@ -969,13 +906,13 @@
         "incorporation": "Evidence: commercial register extract",
         "vat_id": "Evidence: VAT ID registry check",
         "insurance": "Evidence: professional liability insurance",
-        "representative_identity": "Evidence: authorised representative",
-        "professional_licence": "Evidence: professional licence"
+        "representative_identity": "Evidence: authorized representative",
+        "professional_licence": "Evidence: professional license"
       },
       "agreements": {
         "provider_agreement": "Agreement: provider agreement",
         "privacy_notice": "Agreement: privacy notice",
-        "billing_authorization": "Agreement: billing authorisation"
+        "billing_authorization": "Agreement: billing authorization"
       }
     },
     "edit": "Edit",
@@ -1174,7 +1111,7 @@
       "what": "What happened?",
       "pickEvent": "Please choose what happened.",
       "events": {
-        "licence_restricted": "Licence restricted or withdrawn",
+        "licence_restricted": "License restricted or withdrawn",
         "authority_lost": "Authority to represent lost",
         "insurance_lost": "Insurance lapsed",
         "security_incident": "Security incident affecting users",
@@ -1206,7 +1143,7 @@
     "hint": "Please keep this without {{kind}}: “{{match}}” in {{field}}. These texts stay anonymous until booking.",
     "hintGeneric": "Please keep these texts free of names, domains and registration numbers — they stay anonymous until booking.",
     "kind": {
-      "email": "an e-mail address",
+      "email": "an email address",
       "phone": "a phone number",
       "domain": "a web address",
       "handle": "a social handle",
@@ -1336,19 +1273,19 @@
     "goTo": "Open",
     "booking_created": {
       "title": "New booking",
-      "body": "A client booked an intro call for {{slot}}. The dossier is ready."
+      "body": "A client booked a consultation for {{slot}}. The dossier is ready."
     },
     "booking_cancelled": {
       "title": "Booking cancelled",
-      "body": "The client cancelled the intro call on {{slot}}."
+      "body": "The client cancelled the consultation on {{slot}}."
     },
     "booking_rescheduled": {
       "title": "Booking moved",
-      "body": "The client moved the intro call from {{from}} to {{slot}}."
+      "body": "The client moved the consultation from {{from}} to {{slot}}."
     },
     "appointment_reminder": {
       "title": "Appointment in {{offset}}",
-      "body": "Intro call on {{slot}}."
+      "body": "Consultation on {{slot}}."
     },
     "dispute_opened": {
       "title": "A client disagrees with your report",
