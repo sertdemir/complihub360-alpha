@@ -1,0 +1,112 @@
+# ─── Stufe A: Nutzer und Anbieter gegen die echte API ────────────────────────
+#
+# scripts/e2e/scenarios.mjs spielt mit zwei echten Testkonten (ein Nutzer, ein
+# Mitglied eines Test-Anbieters) und einem Gast die Kernwege gegen die API:
+# wer darf was, bleibt der Anbieter vor der Buchung anonym, und auf Staging
+# eine echte Buchung samt Absage.
+#
+#   smoke  liest nur. Nach jedem gruenen Staging-Deploy, taeglich auf der Beta.
+#   full   bucht und sagt ab. NUR Staging: jede Buchung belastet die Karte des
+#          Test-Anbieters im Stripe-TESTMODUS mit der Lead-Gebuehr (sie wird
+#          bei Absage nicht erstattet) und verschickt die Mails einer Buchung
+#          an dessen Kontaktadresse. Einmal am Tag und von Hand.
+#
+# Eingeschaltet wird der Lauf mit der Repository-Variable E2E_ENABLED=true,
+# sobald die Testkonten stehen (docs/runbooks/e2e-scenarios.md). Vorher sind
+# die Jobs uebersprungen, nicht gruen. Danach ist ein fehlendes Secret rot.
+#
+# Secrets (Settings → Secrets → Actions):
+#   STAGING_API_URL, STAGING_API_KEY, BETA_API_URL, BETA_API_KEY   (bestehen)
+#   E2E_STAGING_USER_EMAIL, E2E_STAGING_USER_PASSWORD
+#   E2E_STAGING_PROVIDER_EMAIL, E2E_STAGING_PROVIDER_PASSWORD
+#   E2E_BETA_USER_EMAIL, E2E_BETA_USER_PASSWORD
+#   E2E_BETA_PROVIDER_EMAIL, E2E_BETA_PROVIDER_PASSWORD
+# Variablen: BETA_SUPABASE_URL, BETA_SUPABASE_ANON_KEY (bestehen),
+#   E2E_BETA_PROVIDER_REF (public_ref des Test-Anbieters, optional).
+#
+# Der Lauf holt den Code von main und laeuft auf ubuntu-latest, nie auf dem
+# self-hosted Runner. `workflow_run` startet ihn im Kontext von main mit dem
+# Stand von main; ein Fork-PR kann ihn nicht ausloesen.
+
+name: E2E Scenarios
+
+on:
+  workflow_run:
+    workflows: ['Deploy Staging']
+    types: [completed]
+  schedule:
+    - cron: '41 3 * * *'
+  workflow_dispatch:
+    inputs:
+      level:
+        description: smoke liest nur · full bucht und sagt ab (nur Staging)
+        required: true
+        type: choice
+        options: [smoke, full]
+        default: smoke
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-scenarios
+  cancel-in-progress: false
+
+jobs:
+  staging:
+    name: Szenarien auf Staging
+    # Nach einem Deploy nur, wenn er gruen war. Ein roter Deploy hat seinen eigenen Alarm.
+    if: vars.E2E_ENABLED == 'true' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Szenarien
+        env:
+          API_URL: ${{ secrets.STAGING_API_URL }}
+          API_KEY: ${{ secrets.STAGING_API_KEY }}
+          # Oeffentliche Werte, dieselben wie im Staging-Build (deploy-staging.yml).
+          SUPABASE_URL: https://kqylqwogxbiwpnomkzsn.supabase.co
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxeWxxd29neGJpd3Bub21renNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NDI1MjgsImV4cCI6MjA5OTExODUyOH0.sReK_846Tx-fawVO71Ojy5zJ3uF7Y4xvxGH0Md45Ptk
+          E2E_USER_EMAIL: ${{ secrets.E2E_STAGING_USER_EMAIL }}
+          E2E_USER_PASSWORD: ${{ secrets.E2E_STAGING_USER_PASSWORD }}
+          E2E_PROVIDER_EMAIL: ${{ secrets.E2E_STAGING_PROVIDER_EMAIL }}
+          E2E_PROVIDER_PASSWORD: ${{ secrets.E2E_STAGING_PROVIDER_PASSWORD }}
+          # public_ref des Staging-Test-Anbieters (dahlmann-cpa); kein Geheimnis.
+          E2E_PROVIDER_REF: af3dcda86248
+          # Geplant: einmal am Tag die volle Runde. Nach einem Deploy: smoke.
+          E2E_LEVEL: ${{ github.event_name == 'schedule' && 'full' || github.event_name == 'workflow_dispatch' && inputs.level || 'smoke' }}
+          E2E_ALLOW_FULL: 'true'
+        run: node scripts/e2e/scenarios.mjs
+
+  beta:
+    name: Szenarien auf der Beta (nur lesend)
+    # Die Beta bekommt nie eine Buchung aus diesem Lauf, auch nicht von Hand.
+    if: vars.E2E_ENABLED == 'true' && github.event_name != 'workflow_run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Szenarien
+        env:
+          API_URL: ${{ secrets.BETA_API_URL }}
+          API_KEY: ${{ secrets.BETA_API_KEY }}
+          SUPABASE_URL: ${{ vars.BETA_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.BETA_SUPABASE_ANON_KEY }}
+          E2E_USER_EMAIL: ${{ secrets.E2E_BETA_USER_EMAIL }}
+          E2E_USER_PASSWORD: ${{ secrets.E2E_BETA_USER_PASSWORD }}
+          E2E_PROVIDER_EMAIL: ${{ secrets.E2E_BETA_PROVIDER_EMAIL }}
+          E2E_PROVIDER_PASSWORD: ${{ secrets.E2E_BETA_PROVIDER_PASSWORD }}
+          E2E_PROVIDER_REF: ${{ vars.E2E_BETA_PROVIDER_REF }}
+          E2E_LEVEL: smoke
+        run: node scripts/e2e/scenarios.mjs
