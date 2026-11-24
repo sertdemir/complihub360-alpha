@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutGrid, Users, Search, ScrollText, Gauge, KeyRound } from 'lucide-react';
+import { LayoutGrid, Users, Search, ScrollText, Gauge, KeyRound, Inbox } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
 import { Logo } from '../ui/Logo';
@@ -26,6 +26,7 @@ const NAV: { group: string; items: { to: string; label: string; icon: typeof Lay
   {
     group: 'Platform',
     items: [
+      { to: 'applications', label: 'Applications', icon: Inbox },
       { to: 'providers', label: 'Providers', icon: Users },
       { to: 'api-access', label: 'API access', icon: KeyRound },
     ],

@@ -1466,6 +1466,45 @@ export function resetMockState(): void {
   API_STATE.clients = init.API_STATE.clients;
   REVIEWED.clear();
   PROVIDER_REVIEWED.clear();
+  APPLICATIONS = null;
+}
+
+// ─── Bewerbungen und Einladung (providerInvites.ts) ──────────────────────────
+// Drei Bewerbungen in den drei Staenden. Der Mock-Link ist fest: `mock-invite`
+// fuer die eingeladene Bewerbung, `mock-expired` fuer eine abgelaufene.
+type MockApplication = Record<string, unknown> & { id: string; status: string };
+function mockApplications(): MockApplication[] {
+  return [
+    { id: 'a0000000-0000-4000-8000-000000000001', reference: 'c7f2a1d0-5b6e-4f3a-9c1d-2e8b7a6f5d41', created_at: plus(-5 * H), locale: 'en', first_name: 'Elise', contact_name: 'Elise Marlow', email: 'elise@alderquay.example', firm: 'Alder Quay VAT Services LLC', website: 'https://alderquay.example', credentials: 'Enrolled Agent (US), VAT adviser for EU distance sales since 2014', areas: ['tax-vat'], markets: ['DE', 'FR', 'NL'], message: 'We support US sellers with EU VAT registrations and OSS filings.', status: 'received', invited_at: null, invite_expires_at: null, invite_expired: false, invite_send_count: 0, redeemed_at: null, provider_key: null },
+    { id: 'a0000000-0000-4000-8000-000000000002', reference: '1d9e4b72-3a5c-4e8f-b6d2-7c0a9f8e1b35', created_at: plus(-52 * H), locale: 'de', first_name: 'Jonas', contact_name: 'Jonas Reuter', email: 'j.reuter@reuter-zoll.example', firm: 'Reuter Zollberatung GmbH', website: 'https://reuter-zoll.example', credentials: 'Zugelassener Wirtschaftsbeteiligter (AEO-C), Zollberater', areas: ['logistics-customs'], markets: ['DE', 'AT'], message: null, status: 'invited', invited_at: plus(-20 * H), invite_expires_at: plus(13 * 24 * H), invite_expired: false, invite_send_count: 1, redeemed_at: null, provider_key: null },
+    { id: 'a0000000-0000-4000-8000-000000000003', reference: '8b3c6f10-9d2e-4a7b-8f5c-4e1d0a9b7c62', created_at: plus(-9 * 24 * H), locale: 'en', first_name: 'Marta', contact_name: 'Marta Kowalczyk', email: 'marta@kowalczyk-epr.example', firm: 'Kowalczyk EPR Advisory', website: null, credentials: 'Authorised representative for packaging (DE, FR), 9 years', areas: ['product-packaging', 'environment'], markets: ['DE', 'FR', 'PL'], message: null, status: 'onboarding', invited_at: plus(-7 * 24 * H), invite_expires_at: plus(7 * 24 * H), invite_expired: false, invite_send_count: 1, redeemed_at: plus(-6 * 24 * H), provider_key: 'dahlmann-cpa' },
+  ];
+}
+let APPLICATIONS: MockApplication[] | null = null;
+const applications = () => (APPLICATIONS ??= mockApplications());
+function applicationList() {
+  const rows = applications();
+  const n = (st: string) => rows.filter((r) => r.status === st).length;
+  return { ok: true, applications: rows, counts: { total: rows.length, received: n('received'), invited: n('invited'), onboarding: n('onboarding') } };
+}
+function applicationInvite(id: string) {
+  const row = applications().find((r) => r.id === id);
+  if (!row) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Application not found' };
+  if (row.status === 'onboarding') return { __status: 409, errorCode: 'ALREADY_ONBOARDING', message: 'This invitation was already used; the provider has an account' };
+  Object.assign(row, { status: 'invited', invited_at: plus(0), invite_expires_at: plus(14 * 24 * H), invite_expired: false, invite_send_count: Number(row.invite_send_count ?? 0) + 1 });
+  return { ok: true, application: row };
+}
+function inviteRead(token: string | null) {
+  if (token === 'mock-expired') return { __status: 410, errorCode: 'INVITE_EXPIRED', message: 'This invitation has expired' };
+  if (token === 'mock-used') return { __status: 409, errorCode: 'INVITE_USED', message: 'This invitation was already used' };
+  if (token !== 'mock-invite') return { __status: 404, errorCode: 'INVITE_INVALID', message: 'This invitation link is not valid' };
+  return { ok: true, invite: { first_name: 'Elise', firm: 'Alder Quay VAT Services LLC', email: 'elise@alderquay.example', expires_at: plus(13 * 24 * H) } };
+}
+function inviteAccept(body: Record<string, unknown>) {
+  const read = inviteRead(typeof body.token === 'string' ? body.token : null);
+  if ('__status' in read) return read;
+  if (typeof body.password !== 'string' || body.password.length < 8) return { __status: 400, errorCode: 'VALIDATION_ERROR', field: 'password', message: 'password: at least 8 characters' };
+  return { ok: true, provider_key: PARTNER_KEY, email: 'elise@alderquay.example' };
 }
 
 export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
@@ -1479,6 +1518,10 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'me' && p[1] === 'saved-providers' && !p[2] && method === 'GET') return savedList();
   if (p[0] === 'me' && p[1] === 'saved-providers' && p[2] && method === 'PUT') return saveProvider(p[2], body);
   if (p[0] === 'me' && p[1] === 'saved-providers' && p[2] && method === 'DELETE') return forgetProvider(p[2]);
+  if (p[0] === 'admin' && p[1] === 'provider-applications' && !p[2] && method === 'GET') return role === 'admin' ? applicationList() : { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin only' };
+  if (p[0] === 'admin' && p[1] === 'provider-applications' && p[2] && p[3] === 'invite' && method === 'POST') return role === 'admin' ? applicationInvite(p[2]) : { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin only' };
+  if (p[0] === 'provider-invite' && !p[1] && method === 'GET') return inviteRead(query.get('token'));
+  if (p[0] === 'provider-invite' && p[1] === 'accept' && method === 'POST') return inviteAccept(body);
   if (method === 'GET') {
     // Kalender-Status (nylasAuth.ts) — vor dem allgemeinen GET-Rueckfall unten.
     if (p[0] === 'provider' && p[2] === 'calendar' && p.length === 3) return calendarStatus();

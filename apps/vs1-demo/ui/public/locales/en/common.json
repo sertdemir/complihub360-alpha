@@ -1786,12 +1786,12 @@
         "desc": "We review every application by hand: credentials, website, coverage. You get a confirmation of receipt, then a reasoned reply."
       },
       "access": {
-        "title": "Your personal access link",
-        "desc": "If it is a fit, you receive a magic link by email — no password, the link takes you straight to your provider workspace."
+        "title": "Your invitation link",
+        "desc": "If your application moves forward, you receive an invitation link by email. With it you set up your account and reach your provider workspace."
       },
       "listing": {
         "title": "Onboarding and listing",
-        "desc": "On first open you complete your profile in a few steps. Once the required fields are in, you are listed for matching requests."
+        "desc": "You complete your company profile and upload the documents we need. Verification begins once you submit them; after it, you are listed for matching requests."
       }
     },
     "facts": {
@@ -1811,7 +1811,8 @@
     "formTitle": "Your application",
     "formLead": "The minimum we need to start the review. Everything else we clarify in conversation.",
     "firm": "Firm / company",
-    "contact": "Contact person",
+    "firstName": "First name",
+    "lastName": "Last name",
     "email": "Email",
     "emailPh": "you@firm.com",
     "website": "Website (optional)",
@@ -1993,7 +1994,8 @@
       "credentials": "Please enter your licence or qualification.",
       "areas": "Please choose at least one area.",
       "markets": "Please choose at least one market.",
-      "website": "Please check the website address."
+      "website": "Please check the website address.",
+      "first_name": "Please enter your first name, letters only."
     }
   },
   "states": {

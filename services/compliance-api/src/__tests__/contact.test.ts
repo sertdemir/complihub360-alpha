@@ -44,7 +44,7 @@ describe('checkContact', () => {
     it('Bewerbung: nur bekannte Bereiche, Maerkte als ISO-Code, Nachricht optional', () => {
         const c = checkContact(APP);
         expect(c.ok && 'request' in c && c.request.application).toEqual({
-            firm: 'Muster Steuerberatung', website: 'https://kanzlei.example', credentials: 'Steuerberater (DE)', areas: ['tax-vat'], markets: ['DE', 'AT'],
+            firstName: null, firm: 'Muster Steuerberatung', website: 'https://kanzlei.example', credentials: 'Steuerberater (DE)', areas: ['tax-vat'], markets: ['DE', 'AT'],
         });
         expect(checkContact({ ...APP, areas: ['nope'] })).toMatchObject({ ok: false, field: 'areas' });
         expect(checkContact({ ...APP, credentials: '' })).toMatchObject({ ok: false, field: 'credentials' });
@@ -164,5 +164,52 @@ describe('renderInboxMail', () => {
     it('kein Zeilenumbruch im Betreff', () => {
         const r = (checkContact({ ...MSG, name: 'A\nB' }) as any).request;
         expect(renderInboxMail(r, 'i@x.de', 'r').subject).not.toMatch(/\n/);
+    });
+});
+
+describe('Bewerbung: Vorname und Ablage (P01, 24.11.2026)', () => {
+    it('spricht die Kontaktperson mit dem Vornamen an', () => {
+        const c = checkContact({ ...APP, first_name: 'Elise' });
+        if (!c.ok || !('request' in c)) throw new Error('unexpected');
+        expect(renderAckMail(c.request, 'hallo@complihub360.test', 'ref').text.startsWith('Hi Elise,\nthank you for applying')).toBe(true);
+        const de = checkContact({ ...APP, locale: 'de', first_name: 'Élise-Marie' });
+        if (!de.ok || !('request' in de)) throw new Error('unexpected');
+        expect(renderAckMail(de.request, 'hallo@complihub360.test', 'ref').text.startsWith('Guten Tag Élise-Marie,')).toBe(true);
+    });
+
+    it('bleibt ohne Vornamen neutral, und die anderen Wege nennen nie einen Namen', () => {
+        const c = checkContact(APP);
+        if (!c.ok || !('request' in c)) throw new Error('unexpected');
+        expect(renderAckMail(c.request, 'hallo@complihub360.test', 'ref').text.startsWith('Hello,')).toBe(true);
+        const m = checkContact({ ...MSG, first_name: 'Jana' });
+        if (!m.ok || !('request' in m)) throw new Error('unexpected');
+        expect(renderAckMail(m.request, 'hallo@complihub360.test', 'ref').text).not.toContain('Jana');
+    });
+
+    it('nimmt als Vornamen nur Buchstaben: kein Link, kein Satz in fremde Postfaecher', () => {
+        for (const bad of ['http://evil.example', 'Elise. Click here', 'Elise 123', 'a/b', 'Elise,', 'x'.repeat(41)]) {
+            expect(checkContact({ ...APP, first_name: bad })).toMatchObject({ ok: false, field: 'first_name' });
+        }
+        for (const good of ['Elise', 'Jean-Luc', "D'Arcy", 'María José', 'Çağla']) {
+            expect(checkContact({ ...APP, first_name: good }).ok).toBe(true);
+        }
+    });
+
+    it('legt die Bewerbung ab, die Nachrichten der Kontaktseite nicht', async () => {
+        const stored: string[] = [];
+        const { d, logged } = deps({ storeApplication: async (r) => { stored.push(r.application!.firm); } });
+        await handleContact({ ...APP, first_name: 'Elise' }, d, 'ref-1');
+        await handleContact(MSG, d, 'ref-2');
+        expect(stored).toEqual(['Muster Steuerberatung']);
+        expect(logged.find(([t]) => t === 'contact_sent')![1]).toMatchObject({ stored: true });
+    });
+
+    it('sagt im Protokoll, wenn die Ablage scheitert; die Bewerbung ist trotzdem im Postfach', async () => {
+        const { d, sent, logged } = deps({ storeApplication: async () => { throw new Error('db down'); } });
+        const out = await handleContact(APP, d, 'ref-1');
+        expect(out.status).toBe(200);
+        expect(sent).toHaveLength(2);
+        expect(logged.map(([t]) => t)).toContain('application_store_failed');
+        expect(logged.find(([t]) => t === 'contact_sent')![1]).toMatchObject({ stored: false });
     });
 });

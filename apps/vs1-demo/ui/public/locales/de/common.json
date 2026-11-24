@@ -1737,12 +1737,12 @@
         "desc": "Wir prüfen jede Bewerbung von Hand: Zulassung, Website, Abdeckung. Sie erhalten eine Eingangsbestätigung, danach eine begründete Rückmeldung."
       },
       "access": {
-        "title": "Ihr persönlicher Zugangslink",
-        "desc": "Passt es, bekommen Sie einen Magic-Link per E-Mail — kein Passwort, der Link führt direkt in Ihren Anbieter-Bereich."
+        "title": "Ihr Einladungslink",
+        "desc": "Geht Ihre Bewerbung weiter, bekommen Sie einen Einladungslink per E-Mail. Damit richten Sie Ihr Konto ein und gelangen in Ihren Anbieter-Bereich."
       },
       "listing": {
         "title": "Onboarding und Listung",
-        "desc": "Beim ersten Öffnen vervollständigen Sie Ihr Profil in wenigen Schritten. Sobald die Pflichtangaben stehen, sind Sie für passende Anfragen gelistet."
+        "desc": "Sie vervollständigen Ihr Unternehmensprofil und laden die benötigten Nachweise hoch. Mit dem Einreichen beginnt die Verifizierung; danach sind Sie für passende Anfragen gelistet."
       }
     },
     "facts": {
@@ -1762,7 +1762,8 @@
     "formTitle": "Ihre Bewerbung",
     "formLead": "Das Minimum, mit dem die Prüfung starten kann. Alles Weitere klären wir im Gespräch.",
     "firm": "Kanzlei / Firma",
-    "contact": "Ansprechperson",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
     "email": "E-Mail",
     "emailPh": "sie@kanzlei.de",
     "website": "Website (optional)",
@@ -1944,7 +1945,8 @@
       "credentials": "Bitte nennen Sie Ihre Zulassung oder Qualifikation.",
       "areas": "Bitte wählen Sie mindestens einen Bereich.",
       "markets": "Bitte wählen Sie mindestens einen Markt.",
-      "website": "Bitte prüfen Sie die Website-Adresse."
+      "website": "Bitte prüfen Sie die Website-Adresse.",
+      "first_name": "Bitte geben Sie Ihren Vornamen an, nur Buchstaben."
     }
   },
   "states": {

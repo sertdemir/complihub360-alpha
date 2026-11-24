@@ -17,6 +17,8 @@ export interface ContactPayload {
   name: string;
   email: string;
   message?: string;
+  /** Nur Bewerbung: Vorname fuer die Anrede. */
+  first_name?: string;
   firm?: string;
   website?: string;
   credentials?: string;

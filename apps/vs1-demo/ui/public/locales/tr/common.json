@@ -1737,12 +1737,12 @@
         "desc": "Her başvuruyu elle inceliyoruz: yetki belgesi, web sitesi, kapsam. Önce alındı onayı, ardından gerekçeli bir yanıt alırsınız."
       },
       "access": {
-        "title": "Kişisel erişim bağlantınız",
-        "desc": "Uygunsa e-postayla bir magic link alırsınız — şifre yok, bağlantı sizi doğrudan sağlayıcı alanınıza götürür."
+        "title": "Davet bağlantınız",
+        "desc": "Başvurunuz ilerlerse e-postayla bir davet bağlantısı alırsınız. Bununla hesabınızı oluşturur ve sağlayıcı alanınıza ulaşırsınız."
       },
       "listing": {
         "title": "Onboarding ve listelenme",
-        "desc": "İlk açılışta profilinizi birkaç adımda tamamlarsınız. Zorunlu alanlar dolduğunda uygun talepler için listelenirsiniz."
+        "desc": "Şirket profilinizi tamamlar ve gereken belgeleri yüklersiniz. Doğrulama, bunları gönderdiğinizde başlar; ardından uygun talepler için listelenirsiniz."
       }
     },
     "facts": {
@@ -1762,7 +1762,8 @@
     "formTitle": "Başvurunuz",
     "formLead": "İncelemeyi başlatmak için gereken asgari bilgiler. Gerisini görüşmede netleştiririz.",
     "firm": "Büro / şirket",
-    "contact": "İlgili kişi",
+    "firstName": "Ad",
+    "lastName": "Soyad",
     "email": "E-posta",
     "emailPh": "siz@buro.com",
     "website": "Web sitesi (isteğe bağlı)",
@@ -1944,7 +1945,8 @@
       "credentials": "Lütfen ruhsatınızı veya yeterliliğinizi belirtin.",
       "areas": "Lütfen en az bir alan seçin.",
       "markets": "Lütfen en az bir pazar seçin.",
-      "website": "Lütfen web sitesi adresini kontrol edin."
+      "website": "Lütfen web sitesi adresini kontrol edin.",
+      "first_name": "Lütfen adınızı yalnızca harflerle girin."
     }
   },
   "states": {
