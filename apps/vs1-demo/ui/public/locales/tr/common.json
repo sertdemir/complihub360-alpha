@@ -1085,7 +1085,7 @@
     },
     "cta": {
       "title": "Ya da kendi durumunuzla başlayın.",
-      "lead": "Dört soru, yaklaşık altı dakika, hesap gerekmez."
+      "lead": "Birkaç soru, yaklaşık altı dakika, hesap gerekmez."
     }
   },
   "aiGov": {
@@ -1329,7 +1329,7 @@
     },
     "cta": {
       "title": "Nereden mantıklıysa oradan başlayın.",
-      "lead": "Dört soru, yaklaşık altı dakika, hesap gerekmez."
+      "lead": "Birkaç soru, yaklaşık altı dakika, hesap gerekmez."
     },
     "seeAll": "Her adımın nasıl işlediğini görün"
   },
@@ -1525,7 +1525,7 @@
       "items": [
         {
           "title": "Değerlendirme",
-          "desc": "Pazarlarınız, iş modeliniz ve hacminiz hakkında dört soru. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok.",
+          "desc": "İşletmeniz, pazarlarınız ve destek almak istediğiniz alanlar hakkında birkaç soru. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok.",
           "price": "0 € · yaklaşık 6 dakika"
         },
         {
@@ -1555,7 +1555,7 @@
     },
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
-      "lead": "Dört soru, yaklaşık altı dakika, hesap gerekmez."
+      "lead": "Birkaç soru, yaklaşık altı dakika, hesap gerekmez."
     },
     "vignette": {
       "confirmed": "Randevu onaylandı",
@@ -1583,7 +1583,7 @@
       "items": [
         {
           "q": "Değerlendirme gerçekten ücretsiz mi?",
-          "a": "Evet — dört soru, risk haritası ve uzman karşılaştırması hiçbir ücret gerektirmez ve hesap istemez. Ücretli olan danışmanlığın kendisidir; doğrudan uzmana, önceden yayımladığı tahmine göre ödenir."
+          "a": "Evet — değerlendirme ve risk haritası ücretsizdir ve hesap istemez; sağlayıcıları karşılaştırmak için ücretsiz bir hesap yeterlidir. Ücretli olan danışmanlığın kendisidir; doğrudan sağlayıcıya, önceden yayımladığı tahmine göre ödenir."
         },
         {
           "q": "Hesap açmam gerekiyor mu?",
@@ -1778,7 +1778,7 @@
     "questionsLink": "Sağlayıcı iletişimi",
     "sent": {
       "title": "Başvurunuz ulaştı.",
-      "body": "{{email}} adresine bir onay yolda. Bilgilerinizi elle inceliyor ve 3 iş günü içinde size dönüyoruz.",
+      "body": "{{email}} adresine bir onay yolda. Başvurunuzu bir kişi okur ve 3 iş günü içinde size döner. Uygunsa, belgelerinizi yükleyeceğiniz onboarding için kişisel bağlantınızı alırsınız.",
       "progress": "devam ediyor · 3 iş günü içinde geri bildirim",
       "home": "Ana sayfaya dön"
     }

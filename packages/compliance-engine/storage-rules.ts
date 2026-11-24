@@ -25,9 +25,14 @@
 // Der Standort allein begruendet nie eine Pflicht: ohne `applies_when` bleibt
 // auch bestaetigte aktive Lagerung "likely".
 //
+// `review.reviewer` traegt eine eindeutige Pruefer-ID, keinen Namen; der Name
+// wird intern festgehalten (Festlegung der Mitgruenderin, 23.11.2026).
+//
 // DAS REGISTER IST LEER. Es gibt keine fachlich gepruefte Lagerregel; wer eine
 // eintraegt, braucht die Freigabe einer benannten pruefenden Person
 // (`review`), und `validateStorageRule` haelt das fest.
+
+import { EU27 } from './eu.js';
 
 /** Was eine Bedingung abfragen kann — nur, was der Wizard erhebt, plus
  *  Zusatzangaben, die eine Regel selbst verlangt (`input:<key>`). */
@@ -38,6 +43,7 @@ export type ConditionFact =
   | 'products'                 // electronics | batteries-inside | batteries-separate
   | 'packaging'                // Taetigkeiten laut Wizard, none
   | 'established_in_jurisdiction'   // yes | no
+  | 'established_in_eu'        // yes | no — aus dem Sitzland, das der Wizard ohnehin erhebt
   | 'sells_in_jurisdiction'    // current | planned | no
   | `input:${string}`;         // Zusatzangabe aus `required_inputs`
 
@@ -198,6 +204,10 @@ function test(c: Condition, rule: StorageRule, a: StorageRuleAnswers): Tri {
       case 'products': return a.products.length ? a.products : null;
       case 'packaging': return a.packaging.length && !a.packaging.every((x) => x === 'not-sure') ? a.packaging : null;
       case 'established_in_jurisdiction': return a.establishment === null ? null : [a.establishment.includes(j) ? 'yes' : 'no'];
+      // "Sitz ausserhalb der EU" (erste deutsche Regel: amtliche Anleitung fuer
+      // Onlinehaendler mit Sitz ausserhalb der EU). Wer noch keinen Sitz hat,
+      // sitzt nicht "ausserhalb": ohne Sitzland bleibt die Angabe unbekannt.
+      case 'established_in_eu': return !a.establishment?.length ? null : [a.establishment.some((c) => EU27.has(c)) ? 'yes' : 'no'];
       case 'sells_in_jurisdiction': return [a.currentMarkets.includes(j) ? 'current' : a.plannedMarkets.includes(j) ? 'planned' : 'no'];
       default: return null;
     }

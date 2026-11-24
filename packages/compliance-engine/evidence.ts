@@ -1,4 +1,5 @@
 import { isKnownCountry } from './country-profile.js';
+import { EU27 } from './eu.js';
 import { STORAGE_RULES, evaluateStorageRule, type StorageCheck, type StorageRule, type StorageRuleAnswers } from './storage-rules.js';
 
 // ─── Evidence: worauf eine Pflicht in der Risk Map beruht (Wizard-Audit F1) ───
@@ -21,7 +22,7 @@ import { STORAGE_RULES, evaluateStorageRule, type StorageCheck, type StorageRule
 /** Die 27 EU-Mitgliedstaaten (ISO 3166-1). Bewusst nicht EU_MEMBER_STATES aus
  *  country-profile: das kennt nur die fuenf Laender mit Engine-Profil, ein
  *  Markt wie AT oder BE ist trotzdem ein EU-Markt. */
-export const EU27 = new Set(['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE']);
+export { EU27 };
 
 /** Was die Antworten ueber das Geschaeft aussagen koennen. */
 export type Fact =

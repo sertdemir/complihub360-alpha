@@ -1085,7 +1085,7 @@
     },
     "cta": {
       "title": "O empiece por su propia situación.",
-      "lead": "Cuatro preguntas, unos seis minutos, sin necesidad de cuenta."
+      "lead": "Unas pocas preguntas, unos seis minutos, sin necesidad de cuenta."
     }
   },
   "aiGov": {
@@ -1329,7 +1329,7 @@
     },
     "cta": {
       "title": "Empiece por donde tenga sentido.",
-      "lead": "Cuatro preguntas, unos seis minutos, sin necesidad de cuenta."
+      "lead": "Unas pocas preguntas, unos seis minutos, sin necesidad de cuenta."
     },
     "seeAll": "Ver cómo funciona cada paso"
   },
@@ -1525,7 +1525,7 @@
       "items": [
         {
           "title": "La evaluación",
-          "desc": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen. Sin cuenta, sin llamada comercial, sin obligación de continuar.",
+          "desc": "Unas pocas preguntas sobre su empresa, sus mercados y las áreas en las que necesita apoyo. Sin cuenta, sin llamada comercial, sin obligación de continuar.",
           "price": "0 € · unos 6 minutos"
         },
         {
@@ -1555,7 +1555,7 @@
     },
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
-      "lead": "Cuatro preguntas, unos seis minutos, sin necesidad de cuenta."
+      "lead": "Unas pocas preguntas, unos seis minutos, sin necesidad de cuenta."
     },
     "vignette": {
       "confirmed": "Cita confirmada",
@@ -1583,7 +1583,7 @@
       "items": [
         {
           "q": "¿La evaluación es realmente gratuita?",
-          "a": "Sí: las cuatro preguntas, el mapa de riesgos y la comparación de especialistas no cuestan nada y no requieren cuenta. Lo que se paga es el asesoramiento en sí, directamente al especialista, según la estimación que publica de antemano."
+          "a": "Sí: la evaluación y el mapa de riesgos no cuestan nada y no requieren cuenta; para comparar proveedores basta una cuenta gratuita. Lo que se paga es el asesoramiento en sí, directamente al proveedor, según la estimación que publica de antemano."
         },
         {
           "q": "¿Necesito una cuenta?",
@@ -1778,7 +1778,7 @@
     "questionsLink": "Contacto para proveedores",
     "sent": {
       "title": "Su solicitud ha llegado.",
-      "body": "Hay una confirmación en camino a {{email}}. Revisamos sus datos a mano y le respondemos en un plazo de 3 días hábiles.",
+      "body": "Hay una confirmación en camino a {{email}}. Una persona lee su solicitud y le responde en un plazo de 3 días hábiles. Si encaja, recibirá su enlace personal al onboarding, donde sube sus justificantes.",
       "progress": "en curso · respuesta en 3 días hábiles",
       "home": "Ir a la página de inicio"
     }

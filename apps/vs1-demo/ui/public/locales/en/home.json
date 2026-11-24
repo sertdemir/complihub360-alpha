@@ -37,19 +37,19 @@
       "gold": "shouldn't",
       "post": " be doing alone."
     },
-    "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. About six minutes to your first risk map. No account required.",
-    "subtitleMobile": "CompliHub360 maps the rules across European markets, then connects you to a verified specialist when something needs hands. About six minutes to your first risk map. No account required.",
+    "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. About six minutes to your first Risk Map. No account required.",
+    "subtitleMobile": "CompliHub360 maps the rules across European markets, then connects you to a verified specialist when something needs hands. About six minutes to your first Risk Map. No account required.",
     "cta": {
       "start": "Assess My Needs",
-      "showMap": "See an example risk map",
-      "closeMap": "Close risk map"
+      "showMap": "See an example Risk Map",
+      "closeMap": "Close Risk Map"
     },
     "trust": [
       "Anonymous",
       "No credit card",
       "Results in your browser"
     ],
-    "visualCaption": "About six minutes · 4 questions · No account required",
+    "visualCaption": "About six minutes · A few questions · No account required",
     "preview": {
       "context": "Cross-border launch — DE → UK + NL",
       "steps": [
@@ -561,12 +561,12 @@
     "header": "Markets",
     "title": "Other markets",
     "count": "{{selected}} selected · {{total}} markets",
-    "desc": "We don't assess these markets yet. Add the ones you operate in: your risk map marks them as not covered yet, and you can request coverage there.",
+    "desc": "We don't assess these markets yet. Add the ones you operate in: your Risk Map marks them as not covered yet, and you can request coverage there.",
     "searchPlaceholder": "Search by name or country code",
     "european": "European markets",
     "expanding": "More markets",
     "noMatch": "No markets match “{{query}}”.",
-    "footNote": "Selections add to your risk map. Edit anytime in Step 4.",
+    "footNote": "Selections add to your Risk Map. Edit anytime in Step 4.",
     "add_one": "Add {{count}} Market",
     "add_other": "Add {{count}} Markets",
     "done": "Done",
@@ -786,7 +786,7 @@
     "saveProgress": {
       "eyebrow": "Free account",
       "title": "Save your progress",
-      "desc": "Keep your risk map and match with Verified Providers — free, no credit card. Alerts for when the rules change are in preparation. We'll email you a magic link, so there's no password to remember.",
+      "desc": "Keep your Risk Map and match with Verified Providers — free, no credit card. Alerts for when the rules change are in preparation. We'll email you a magic link, so there's no password to remember.",
       "benefits": [
         "Your saved risk-map dossier",
         "Verified-Provider matching",
@@ -798,7 +798,7 @@
     "freeAccount": {
       "eyebrow": "Free account",
       "title": "Your map and your matches, free",
-      "desc": "Keep your risk map and match with Verified Providers in your markets. Free, no credit card. Regulatory alerts are in preparation and arrive in your account when they ship. We'll email you a magic link, so there's no password.",
+      "desc": "Keep your Risk Map and match with Verified Providers in your markets. Free, no credit card. Regulatory alerts are in preparation and arrive in your account when they ship. We'll email you a magic link, so there's no password.",
       "benefits": [
         "Your saved risk-map dossier",
         "Verified-Provider matching",
@@ -823,7 +823,7 @@
   },
   "riskMapPreview": {
     "guestNote": "Guest map · kept for 30 min — save it to keep it",
-    "eyebrow": "Your risk map",
+    "eyebrow": "Your Risk Map",
     "title": "Here's what applies to you.",
     "stats": [
       {
@@ -1058,10 +1058,10 @@
     "steps": [
       {
         "title": "Start your assessment",
-        "desc": "Four questions. About six minutes. No account needed."
+        "desc": "A few questions. About six minutes. No account needed."
       },
       {
-        "title": "See your risk map",
+        "title": "See your Risk Map",
         "desc": "Anonymous preview, structured, source-cited."
       },
       {

@@ -64,8 +64,8 @@
       "card1Problem": "Information on advertising restrictions, EPR, and tax laws is fragmented across unstructured government sites.",
       "card1Solution": "The Markets and Compliance Areas pages hold the duties we check against, each with its statute. Guides and tutorials follow once they are worth reading.",
       "card2Title": "Loss of Continuity",
-      "card2Problem": "Tracking provider requests, saved risk maps, and legal updates is chaotic without a unified system.",
-      "card2Solution": "The Dashboard Control Center lets you save risk maps, track engagement statuses in real-time, and monitor tasks.",
+      "card2Problem": "Tracking provider requests, saved Risk Maps, and legal updates is chaotic without a unified system.",
+      "card2Solution": "The Dashboard Control Center lets you save Risk Maps, track engagement statuses in real-time, and monitor tasks.",
       "card3Title": "Reporting Friction",
       "card3Problem": "Summarizing regulatory exposure for stakeholders is manual, time-consuming work.",
       "card3Solution": "One-click PDF export: Risk Snapshot, Action Plan, and Source Index — ready for internal circulation.",
@@ -83,7 +83,7 @@
       "item3": "Source Index",
       "stat1Label": "Engagement lifecycle visibility",
       "stat2Label": "PDF report export",
-      "stat3Label": "Saved risk maps",
+      "stat3Label": "Saved Risk Maps",
       "railSub": "One control centre instead of email threads"
     },
     "counsel": {
@@ -843,7 +843,7 @@
       "checkFoot": "If one applies, this area carries duties for you — the assessment narrows them to your case.",
       "ceiling": {
         "unproven": "Not proven yet",
-        "unprovenNote": "The figure the risk map counts with is carried stock — we have not read it off the statute.",
+        "unprovenNote": "The figure the Risk Map counts with is carried stock — we have not read it off the statute.",
         "perUnit": "{{amount}} per {{per}}",
         "proportional": "{{percent}}% {{of}}",
         "turnover": "{{percent}}% of annual worldwide turnover",
@@ -1088,7 +1088,7 @@
     },
     "cta": {
       "title": "Or start with your own situation.",
-      "lead": "Four questions, about six minutes, no account needed."
+      "lead": "A few questions, about six minutes, no account needed."
     }
   },
   "aiGov": {
@@ -1334,7 +1334,7 @@
     },
     "cta": {
       "title": "Start wherever makes sense.",
-      "lead": "Four questions, about six minutes, no account needed."
+      "lead": "A few questions, about six minutes, no account needed."
     },
     "seeAll": "See how each step works",
     "ctaAsk": "Ask a Question",
@@ -1564,18 +1564,18 @@
       "gold": "nothing",
       "post": "."
     },
-    "lead": "The assessment, the risk map and the matching are free. We are paid by the specialists, and only when a booking actually happens.",
+    "lead": "The assessment, the Risk Map and the matching are free. We are paid by the specialists, and only when a booking actually happens.",
     "free": {
       "kicker": "What is free",
       "title": "Everything up to the booking.",
       "items": [
         {
           "title": "The assessment",
-          "desc": "Four questions about your markets, your business model and your volume. No account, no sales call, no obligation to continue.",
+          "desc": "A few questions about your business, your markets and the areas you need support in. No account, no sales call, no obligation to continue.",
           "price": "€0 · about 6 minutes"
         },
         {
-          "title": "Your risk map",
+          "title": "Your Risk Map",
           "desc": "The duties that apply to your operation, each with its legal basis and its deadline. A free account opens the full map.",
           "price": "€0 · with legal bases"
         },
@@ -1603,7 +1603,7 @@
     },
     "cta": {
       "title": "Start where it makes sense for you.",
-      "lead": "Four questions, about six minutes, no account needed."
+      "lead": "A few questions, about six minutes, no account needed."
     },
     "vignette": {
       "confirmed": "Appointment confirmed",
@@ -1631,7 +1631,7 @@
       "items": [
         {
           "q": "Is the assessment really free?",
-          "a": "Yes — the four questions, the risk map and the specialist comparison cost nothing and need no account. What costs money is the advice itself, paid directly to the specialist at the estimate they publish up front."
+          "a": "Yes — the assessment and the Risk Map cost nothing and need no account; comparing providers needs a free account. What costs money is the advice itself, paid directly to the provider at the estimate they publish up front."
         },
         {
           "q": "Do I need an account?",
@@ -1712,11 +1712,11 @@
   "seo": {
     "home": {
       "title": "CompliHub360 · Understand and act on compliance",
-      "description": "The rules for your markets on one risk map, with the source behind every obligation — and the way to vetted specialists. Free, no account."
+      "description": "The rules for your markets on one Risk Map, with the source behind every obligation — and the way to vetted specialists. Free, no account."
     },
     "howItWorks": {
       "title": "How it works · CompliHub360",
-      "description": "From a question to a risk map to the right professional. Five steps, no sales call, no obligation."
+      "description": "From a question to a Risk Map to the right professional. Five steps, no sales call, no obligation."
     },
     "compliance": {
       "title": "Compliance areas · CompliHub360",
@@ -1728,7 +1728,7 @@
     },
     "pricing": {
       "title": "Pricing · CompliHub360",
-      "description": "The assessment, the risk map and the matching cost you nothing. Specialists pay, and only once an appointment is confirmed."
+      "description": "The assessment, the Risk Map and the matching cost you nothing. Specialists pay, and only once an appointment is confirmed."
     },
     "resources": {
       "title": "Resources · CompliHub360",
@@ -1740,7 +1740,7 @@
     },
     "platform": {
       "title": "The platform · CompliHub360",
-      "description": "How your business context becomes a structured risk map: the privacy gate, source-bound analysis and the matching behind it."
+      "description": "How your business context becomes a structured Risk Map: the privacy gate, source-bound analysis and the matching behind it."
     },
     "solutions": {
       "title": "By role · CompliHub360",
@@ -1827,7 +1827,7 @@
     "questionsLink": "Contact for providers",
     "sent": {
       "title": "Your application has arrived.",
-      "body": "A confirmation is on its way to {{email}}. We review your details by hand and get back to you within 3 business days.",
+      "body": "A confirmation is on its way to {{email}}. A person reads your application and gets back to you within 3 business days. If it fits, you receive your personal link to the onboarding, where you upload your proofs.",
       "progress": "in progress · feedback within 3 business days",
       "home": "Back to the homepage"
     }

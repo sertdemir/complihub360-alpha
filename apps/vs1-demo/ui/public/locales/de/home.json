@@ -49,7 +49,7 @@
       "Keine Kreditkarte",
       "Ergebnisse in Ihrem Browser"
     ],
-    "visualCaption": "Etwa sechs Minuten · 4 Fragen · Kein Konto erforderlich",
+    "visualCaption": "Etwa sechs Minuten · Ein paar Fragen · Kein Konto erforderlich",
     "preview": {
       "context": "Cross-Border-Launch — DE → UK + NL",
       "steps": [
@@ -1054,7 +1054,7 @@
     "steps": [
       {
         "title": "Assessment starten",
-        "desc": "Vier Fragen. Etwa sechs Minuten. Kein Konto nötig."
+        "desc": "Ein paar Fragen. Etwa sechs Minuten. Kein Konto nötig."
       },
       {
         "title": "Risk Map ansehen",

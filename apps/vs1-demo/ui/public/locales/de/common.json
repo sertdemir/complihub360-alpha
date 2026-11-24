@@ -1085,7 +1085,7 @@
     },
     "cta": {
       "title": "Oder fangen Sie mit Ihrer eigenen Lage an.",
-      "lead": "Vier Fragen, etwa sechs Minuten, kein Konto nötig."
+      "lead": "Ein paar Fragen, etwa sechs Minuten, kein Konto nötig."
     }
   },
   "aiGov": {
@@ -1329,7 +1329,7 @@
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
-      "lead": "Vier Fragen, etwa sechs Minuten, kein Konto nötig."
+      "lead": "Ein paar Fragen, etwa sechs Minuten, kein Konto nötig."
     },
     "seeAll": "Ansehen, wie jeder Schritt funktioniert"
   },
@@ -1525,7 +1525,7 @@
       "items": [
         {
           "title": "Die Einschätzung",
-          "desc": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen.",
+          "desc": "Ein paar Fragen zu Ihrem Unternehmen, Ihren Märkten und den Bereichen, in denen Sie Unterstützung brauchen. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen.",
           "price": "0 € · etwa 6 Minuten"
         },
         {
@@ -1555,7 +1555,7 @@
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
-      "lead": "Vier Fragen, etwa sechs Minuten, kein Konto nötig."
+      "lead": "Ein paar Fragen, etwa sechs Minuten, kein Konto nötig."
     },
     "vignette": {
       "confirmed": "Termin bestätigt",
@@ -1583,7 +1583,7 @@
       "items": [
         {
           "q": "Ist die Einschätzung wirklich kostenlos?",
-          "a": "Ja — die vier Fragen, die Risk Map und der Vergleich der Fachleute kosten nichts und brauchen kein Konto. Bezahlt wird erst die Beratung selbst, direkt bei der Fachperson, zu deren vorab veröffentlichter Schätzung."
+          "a": "Ja — das Assessment und die Risk Map kosten nichts und brauchen kein Konto; für den Vergleich der Anbieter genügt ein kostenloses Konto. Bezahlt wird erst die Beratung selbst, direkt beim Anbieter, zu dessen vorab veröffentlichter Schätzung."
         },
         {
           "q": "Brauche ich ein Konto?",
@@ -1778,7 +1778,7 @@
     "questionsLink": "Zum Kontakt für Anbieter",
     "sent": {
       "title": "Ihre Bewerbung ist angekommen.",
-      "body": "Eine Bestätigung ist an {{email}} unterwegs. Wir prüfen Ihre Angaben von Hand und melden uns innerhalb von 3 Werktagen.",
+      "body": "Eine Bestätigung ist an {{email}} unterwegs. Ein Mensch liest Ihre Bewerbung und meldet sich innerhalb von 3 Werktagen. Passt sie, erhalten Sie Ihren persönlichen Link zum Onboarding, wo Sie Ihre Nachweise hochladen.",
       "progress": "läuft · Rückmeldung in 3 Werktagen",
       "home": "Zur Startseite"
     }
