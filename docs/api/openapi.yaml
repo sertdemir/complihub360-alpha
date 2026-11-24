@@ -22,6 +22,35 @@ paths:
                     type: string
                     example: ok
 
+  /admin/readiness:
+    get:
+      summary: Anbindungen pruefen (Datenbank, Stripe, Mail, Kalender, LLM)
+      description: >-
+        Fragt jede Anbindung mit ihrem hinterlegten Schluessel einmal lesend an
+        (dependencyCheck.ts). Nur mit dem Server-Schluessel (Header `x-api-key`)
+        oder als Admin. Die Antwort nennt je Anbindung einen Zustand und nie ein
+        Geheimnis. Das Ergebnis wird fuenf Minuten gehalten; `?fresh=1` fragt neu.
+      parameters:
+        - in: query
+          name: fresh
+          schema: { type: string, enum: ['1'] }
+          description: Zwischenspeicher umgehen
+      responses:
+        '200':
+          description: Alle Anbindungen antworten; nichts Verlangtes fehlt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DependencyReport' }
+        '503':
+          description: Mindestens eine Anbindung ist abgewiesen, unerreichbar oder fehlt, obwohl verlangt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DependencyReport' }
+        '401':
+          description: Ohne Anmeldung
+        '403':
+          description: Angemeldet, aber weder Server-Schluessel noch Admin
+
   /search:
     post:
       summary: Search and Wizard endpoint
@@ -480,7 +509,7 @@ paths:
                 language: { type: string, maxLength: 2 }
       responses:
         '201': { description: "`{ agreement, version, language, accepted_at }`" }
-        '200': { description: Schon angenommen (`replay: true`) }
+        '200': { description: "Schon angenommen (`replay: true`)" }
         '400': { description: "`version` fehlt (`VALIDATION_ERROR`)" }
         '401': { description: Kein Nutzer-Login }
         '404': { description: Unbekannte Vereinbarung (`AGREEMENT_UNKNOWN`) }
@@ -2249,6 +2278,32 @@ components:
       schema:
         type: string
   schemas:
+    DependencyReport:
+      type: object
+      required: [ok, checkedAt, cached, required, unknownRequired, checks]
+      properties:
+        ok: { type: boolean }
+        checkedAt: { type: string, format: date-time }
+        cached: { type: boolean, description: Ergebnis aus dem Zwischenspeicher }
+        required:
+          type: array
+          items: { type: string }
+          description: Anbindungen, die laut READINESS_REQUIRED nicht fehlen duerfen; die Datenbank immer
+        unknownRequired:
+          type: array
+          items: { type: string }
+          description: Namen in READINESS_REQUIRED, die es nicht gibt; nicht leer heisst nicht ok
+        checks:
+          type: array
+          items:
+            type: object
+            required: [name, state, ms]
+            properties:
+              name: { type: string, enum: [database, stripe, mail, calendar, calendar_grants, llm] }
+              state: { type: string, enum: [ok, not_configured, rejected, unreachable, error] }
+              ms: { type: integer, description: Dauer des Aufrufs in Millisekunden }
+              status: { type: integer, description: HTTP-Status der Gegenseite }
+              note: { type: string, description: 'Fester Hinweis, z. B. mode_test, send_only_key, grants_3_invalid_1, grants_not_loaded' }
     PerformanceCounted:
       type: object
       description: Eine Zahl mit ihrer Basis; `rate` nur, wenn die Stichprobe reicht (Spec A §17).

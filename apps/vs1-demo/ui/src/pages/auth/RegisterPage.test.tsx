@@ -38,12 +38,14 @@ describe('RegisterPage · Schritt 1 (V2)', () => {
 
     const summary = screen.getByRole('alert');
     expect(summary).toHaveTextContent('common:states.formErrorSummary.heading');
-    for (const msg of ['common:contactSend.field.name', 'login.validation.invalidEmail', 'reset.errors.tooShort', 'register.validation.consent']) {
+    for (const msg of ['common:contactSend.field.name', 'login.validation.invalidEmail', 'reset.errors.tooShort']) {
       expect(summary).toHaveTextContent(msg);
     }
     expect(screen.getByLabelText('register.nameLabel')).toHaveFocus();
     expect(screen.getByLabelText('register.passwordLabel')).toHaveAttribute('aria-describedby', 'reg-password-error');
-    expect(screen.getByRole('checkbox')).toHaveAttribute('aria-invalid', 'true');
+    // Keine Checkbox mehr: zugestimmt wird im Schritt nach dem ersten Anmelden.
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(screen.getByText(/register\.betaNote/)).toBeInTheDocument();
     // Noch in Schritt 1.
     expect(screen.getByText('register.stepTitles.account')).toBeInTheDocument();
   });
@@ -56,7 +58,6 @@ describe('RegisterPage · Schritt 1 (V2)', () => {
     fireEvent.change(screen.getByLabelText('register.emailLabel'), { target: { value: 'anna@firma.de' } });
     expect(screen.getByRole('alert')).not.toHaveTextContent('common:contactSend.field.name');
     fireEvent.change(screen.getByLabelText('register.passwordLabel'), { target: { value: 'langes-passwort' } });
-    fireEvent.click(screen.getByRole('checkbox'));
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /register\.next/ }));
