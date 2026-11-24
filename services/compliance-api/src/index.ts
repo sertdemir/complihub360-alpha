@@ -13,6 +13,7 @@ import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, 
 import { supabaseApi } from "./supabase.js";
 import { checkSupabaseJwt } from "./supabaseJwt.js";
 import { schemaStatus, startSchemaCheck } from "./schemaCheck.js";
+import { dependencyReport, startDependencyMonitor } from "./dependencyCheck.js";
 import { sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleDomain } from "./domain.js";
@@ -3888,6 +3889,25 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Cockpit build failed', correlationId }));
             }
         }
+    } else if (req.method === 'GET' && (req.url === '/api/v1/admin/readiness' || req.url === '/api/v1/admin/readiness?fresh=1')) {
+        // Anbindungen mit ihren Schluesseln lesend pruefen (dependencyCheck.ts).
+        // Nur Server-Key oder Admin: die Antwort nennt, was konfiguriert ist.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authViaApiKey && !authIsAdmin) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'The readiness report is admin-only', correlationId }));
+        } else {
+            try {
+                const report = await dependencyReport(connectedCalendarGrants, { fresh: req.url.endsWith('?fresh=1') });
+                // 503 statt 200, damit ein Lauf von aussen ohne JSON-Kenntnis rot wird.
+                res.writeHead(report.ok ? 200 : 503, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ...report, correlationId }));
+            } catch (err) {
+                structuredLog('error', 'Readiness report failed', { correlationId, errorCode: 'ERR_DEPENDENCY_CHECK', severity: 'error', route: req.url, detail: String(err).slice(0, 200) });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Readiness report failed', correlationId }));
+            }
+        }
     } else if (req.method === 'POST' && req.url === '/api/v1/admin/watchers/tick') {
         // Force one SLA-watcher tick now (Beta verification) — server-to-server
         // key only. Runs the same pass the scheduler runs every WATCHERS_TICK_MS.
@@ -3933,6 +3953,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     }
 });
 
+/** Die Kalenderfreigaben, an denen Buchungen haengen (eine je verbundenem Anbieter). */
+async function connectedCalendarGrants(): Promise<string[]> {
+    const rows = (await supabaseApi.selectWhere('providers', { select: 'nylas_grant_id', nylas_grant_id: 'not.is.null' }, { order: 'provider_key.asc', limit: 1000 })) as Array<{ nylas_grant_id?: unknown }>;
+    return rows.map((r) => r.nylas_grant_id).filter((g): g is string => typeof g === 'string' && g.length > 0);
+}
+
 const PORT = process.env.PORT || 3005;
 server.listen(PORT, () => {
     console.log(`Compliance API running on port ${PORT}`);
@@ -3941,4 +3967,6 @@ server.listen(PORT, () => {
     // sending mail or mutating state until explicitly switched live.
     startSlaWatchers();
     startSchemaCheck();
+    // Stuendlich: antworten Stripe, Resend, Nylas, das LLM und Supabase noch?
+    startDependencyMonitor(connectedCalendarGrants);
 });

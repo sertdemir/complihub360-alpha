@@ -17,6 +17,7 @@ während laufender Incidents):**
 | `api` | `/health` im API-Container liefert `"ok":true` |
 | `supabase` | REST antwortet 200 (Pause-/Ausfall-Erkennung) |
 | `containers` | api-, web- und traefik-Container laufen |
+| `deps` / `beta_deps` | `GET /api/v1/admin/readiness` im API-Container sagt `ok:true`: Supabase, Stripe, Resend, Nylas und das LLM antworten mit ihren Schlüsseln (seit 24.11.2026, `system-check.md`) |
 
 **API-Error-Digest:** neue `"level":"error"`-Zeilen im API-Container-Log
 seit dem letzten Scan → max. **1 Digest-Mail pro Stunde** (erste 10 Zeilen

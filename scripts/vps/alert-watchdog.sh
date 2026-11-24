@@ -9,6 +9,10 @@
 #     api       — /health inside the api container says ok:true
 #     supabase  — REST answers 200 (credentials from complihub-backup/.env)
 #     containers— complihub-api-api-1 + complihub-web-1 + traefik running
+#     deps      — GET /api/v1/admin/readiness inside the api container says
+#                 ok:true: Supabase, Stripe, Resend, Nylas and the LLM still
+#                 answer with their configured keys (dependencyCheck.ts,
+#                 docs/runbooks/system-check.md). beta_deps: the same on beta.
 #     A mail is sent ONLY on transition (OK→FAIL or FAIL→OK) — no spam while
 #     a known incident is ongoing.
 #
@@ -77,11 +81,25 @@ MISSING=$(for c in complihub-api-api-1 complihub-web-1 traefik-traefik-1; do
 done)
 [ -z "$MISSING" ] && NOW[containers]=OK || { NOW[containers]=FAIL; DETAIL[containers]="not running: $MISSING"; }
 
+# Anbindungen (Systemcheck 24.11.2026): die API fragt jede Gegenseite lesend
+# mit ihrem Schluessel an; hier zaehlt nur ihr Bericht. Gefragt wird IM
+# Container (node ist dort ohnehin da, der Server-Schluessel steht in dessen
+# Umgebung und verlaesst sie nicht). Die API haelt das Ergebnis fuenf Minuten,
+# die Gegenseiten sehen also hoechstens einen Aufruf je Tick.
+DEPS_JS='fetch("http://localhost:3005/api/v1/admin/readiness",{headers:{"x-api-key":process.env.API_KEY||""},signal:AbortSignal.timeout(40000)}).then(async r=>{const j=await r.json().catch(()=>null);if(!j||!Array.isArray(j.checks)){console.log("FAIL HTTP "+r.status+" without a report");return}const req=j.required||[];const bad=j.checks.filter(c=>c.state!=="ok"&&!(c.state==="not_configured"&&!req.includes(c.name==="calendar_grants"?"calendar":c.name))).map(c=>c.name+":"+c.state+(c.note?" ("+c.note+")":""));if((j.unknownRequired||[]).length)bad.push("READINESS_REQUIRED unknown: "+j.unknownRequired.join(","));console.log(j.ok===true&&!bad.length?"OK":"FAIL "+(bad.join(", ")||"ok=false"))}).catch(()=>console.log("FAIL no answer"))'
+deps_of() { # $1 container, $2 key in NOW/DETAIL
+  local out
+  out=$(docker exec "$1" node -e "$DEPS_JS" 2>/dev/null | tail -1)
+  if [ "$out" = "OK" ]; then NOW[$2]=OK; else NOW[$2]=FAIL; DETAIL[$2]="${out:-FAIL no answer from container}"; fi
+}
+deps_of complihub-api-api-1 deps
+
 # Beta (Beta-Plan Di 20.10.): nur, wenn setup-beta.sh sie eingerichtet hat.
 # Geschlossen heisst 401 — ein 200 waere ein offener Zugang und ein Alarm.
-KEYS="ui api supabase containers"
+KEYS="ui api supabase containers deps"
 if [ -d /docker/complihub-beta ]; then
-  KEYS="$KEYS beta_ui beta_api"
+  KEYS="$KEYS beta_ui beta_api beta_deps"
+  deps_of complihub-beta-api-api-1 beta_deps
   BCODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://beta.complihub360.com/ || echo 000)
   [ "$BCODE" = "401" ] && NOW[beta_ui]=OK || { NOW[beta_ui]=FAIL; DETAIL[beta_ui]="HTTP $BCODE (expected 401 — beta must stay closed)"; }
   BHEALTH=$(docker exec complihub-beta-api-api-1 wget -qO- -T 15 http://localhost:3005/health 2>/dev/null || true)
@@ -102,13 +120,23 @@ for k in $KEYS; do
     fi
   fi
 done
-: > "$STATE"; for k in $KEYS; do echo "$k=${NOW[$k]}" >> "$STATE"; done
+save_state() { : > "$STATE"; for k in $KEYS; do echo "$k=${NOW[$k]}" >> "$STATE"; done; }
 
 if [ -n "$CHANGES" ]; then
-  BODY="Staging availability change at $(ts):\n$CHANGES\n\nCurrent state: ui=${NOW[ui]} api=${NOW[api]} supabase=${NOW[supabase]} containers=${NOW[containers]}${NOW[beta_ui]:+ beta_ui=${NOW[beta_ui]} beta_api=${NOW[beta_api]}}\nRunbook: docs/runbooks/staging-backup-restore.md"
+  BODY="Staging availability change at $(ts):\n$CHANGES\n\nCurrent state: ui=${NOW[ui]} api=${NOW[api]} supabase=${NOW[supabase]} containers=${NOW[containers]} deps=${NOW[deps]}${NOW[beta_ui]:+ beta_ui=${NOW[beta_ui]} beta_api=${NOW[beta_api]} beta_deps=${NOW[beta_deps]}}\nRunbooks: docs/runbooks/staging-backup-restore.md, docs/runbooks/system-check.md"
   if printf '%b' "$CHANGES" | grep -q DOWN; then SUBJ="[CompliHub staging] ALERT: service down"; else SUBJ="[CompliHub staging] recovered"; fi
-  send_mail "$SUBJ" "$(printf '%b' "$BODY")" >> "$LOG" 2>&1
-  echo "$(ts) TRANSITION $(printf '%b' "$CHANGES" | tr '\n' ';')" >> "$LOG"
+  # Der Zustand wird erst gemerkt, wenn die Mail draussen ist. Vorher galt ein
+  # Wechsel als gemeldet, auch wenn Resend ihn abgelehnt hatte — und genau
+  # dann (deps: mail:rejected) erfuhr niemand davon. So versucht es der
+  # naechste Tick erneut; system-check.yml meldet denselben Befund ueber GitHub.
+  if send_mail "$SUBJ" "$(printf '%b' "$BODY")" >> "$LOG" 2>&1; then
+    save_state
+    echo "$(ts) TRANSITION $(printf '%b' "$CHANGES" | tr '\n' ';')" >> "$LOG"
+  else
+    echo "$(ts) TRANSITION NOT MAILED — retry next tick: $(printf '%b' "$CHANGES" | tr '\n' ';')" >> "$LOG"
+  fi
+else
+  save_state
 fi
 
 # ── 2. API error-log digest (≤1 mail/hour) ───────────────────────────────────
@@ -129,5 +157,5 @@ if [ -n "$ERRS" ]; then
   fi
 fi
 
-echo "$(ts) tick ui=${NOW[ui]} api=${NOW[api]} supabase=${NOW[supabase]} containers=${NOW[containers]}" >> "$LOG"
+echo "$(ts) tick ui=${NOW[ui]} api=${NOW[api]} supabase=${NOW[supabase]} containers=${NOW[containers]} deps=${NOW[deps]}${NOW[beta_deps]:+ beta_deps=${NOW[beta_deps]}}" >> "$LOG"
 tail -1000 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"
