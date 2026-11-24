@@ -146,6 +146,12 @@ type AckStrings = {
 };
 
 // Copy abgenommen 10.10.2026 (Canvas „Kontakt und Bewerbung senden", Board E V1).
+// `next.application` neu am 24.11.2026 (Provider-Beta-Test P01, Weg A): Die
+// Mail versprach eine Pruefung von Zulassung, Website und Abdeckung, obwohl an
+// dieser Stelle nur die Angaben des Formulars vorliegen, und sagte nicht, dass
+// das Onboarding mit dem Upload der Nachweise erst nach einer Einladung kommt.
+// Der Ablauf selbst bleibt zweistufig (keine Selbstregistrierung, v2 §10/D7).
+// Die Fassungen de, es und tr sind nicht von Muttersprachlern freigegeben.
 // Ansprache wie in allen Produkt-Mails: DE Sie, ES usted, TR siz.
 const ACK: Record<Locale, AckStrings> = {
     en: {
@@ -161,7 +167,7 @@ const ACK: Record<Locale, AckStrings> = {
             quick: 'A person reads and sorts it on the same business day. You get a substantive reply by the next business day. If it takes longer, we send you an interim note.',
             partner: 'A person reads it on the same business day. You get a reply within 3 business days.',
             privacy: 'We answer your request within the deadline under Art. 12 GDPR.',
-            application: 'We review every application by hand — credentials, website, coverage. You get a reasoned reply within 3 business days.',
+            application: 'This was the first step. A person reads your application and looks at what you told us: firm, website, areas, markets and your note on credentials. We cannot verify documents at this point, because none have been uploaded yet. You get a reasoned reply within 3 business days. If your application fits, that reply contains your personal link to the onboarding. There you complete your company details and upload your proofs, and only then does the verification begin.',
         },
         reply: 'If you want to add something, simply reply to this email.',
     },
@@ -178,7 +184,7 @@ const ACK: Record<Locale, AckStrings> = {
             quick: 'Ein Mensch liest und sortiert sie am selben Werktag. Eine fachliche Antwort erhalten Sie bis zum nächsten Werktag. Dauert es länger, schicken wir Ihnen eine Zwischennachricht.',
             partner: 'Ein Mensch liest sie am selben Werktag. Eine Antwort erhalten Sie innerhalb von 3 Werktagen.',
             privacy: 'Wir beantworten Ihr Anliegen innerhalb der Frist nach Art. 12 DSGVO.',
-            application: 'Wir prüfen jede Bewerbung von Hand — Zulassung, Website, Abdeckung. Eine begründete Rückmeldung erhalten Sie innerhalb von 3 Werktagen.',
+            application: 'Das war der erste Schritt. Ein Mensch liest Ihre Bewerbung und sieht sich an, was Sie uns mitgeteilt haben: Firma, Website, Bereiche, Märkte und Ihre Angaben zur Qualifikation. Nachweise können wir an dieser Stelle noch nicht prüfen, weil noch keine hochgeladen sind. Eine begründete Rückmeldung erhalten Sie innerhalb von 3 Werktagen. Passt Ihre Bewerbung, enthält sie Ihren persönlichen Link zum Onboarding. Dort ergänzen Sie Ihre Unternehmensdaten und laden Ihre Nachweise hoch, und erst dann beginnt die Verifizierung.',
         },
         reply: 'Möchten Sie etwas ergänzen, antworten Sie einfach auf diese E-Mail.',
     },
@@ -195,7 +201,7 @@ const ACK: Record<Locale, AckStrings> = {
             quick: 'Una persona lo lee y lo clasifica el mismo día hábil. Recibirá una respuesta de fondo a más tardar el siguiente día hábil. Si tardamos más, le enviaremos un mensaje intermedio.',
             partner: 'Una persona lo lee el mismo día hábil. Recibirá una respuesta en un plazo de 3 días hábiles.',
             privacy: 'Respondemos a su solicitud dentro del plazo del art. 12 del RGPD.',
-            application: 'Revisamos cada solicitud a mano: titulación, sitio web, cobertura. Recibirá una respuesta motivada en un plazo de 3 días hábiles.',
+            application: 'Este ha sido el primer paso. Una persona lee su solicitud y revisa lo que nos ha indicado: empresa, sitio web, áreas, mercados y su nota sobre la titulación. En este punto aún no podemos verificar documentos, porque todavía no se ha subido ninguno. Recibirá una respuesta motivada en un plazo de 3 días hábiles. Si su solicitud encaja, esa respuesta incluye su enlace personal al onboarding. Allí completa los datos de su empresa y sube sus justificantes, y solo entonces comienza la verificación.',
         },
         reply: 'Si desea añadir algo, simplemente responda a este correo.',
     },
@@ -212,7 +218,7 @@ const ACK: Record<Locale, AckStrings> = {
             quick: 'Mesajınızı aynı iş günü içinde bir kişi okur ve sınıflandırır. En geç bir sonraki iş günü içerikli bir yanıt alırsınız. Daha uzun sürerse size bir ara bilgi göndeririz.',
             partner: 'Mesajınızı aynı iş günü içinde bir kişi okur. 3 iş günü içinde yanıt alırsınız.',
             privacy: 'Talebinizi GDPR madde 12’de öngörülen süre içinde yanıtlarız.',
-            application: 'Her başvuruyu tek tek elle inceliyoruz: yetki belgesi, web sitesi, kapsam. 3 iş günü içinde gerekçeli bir geri bildirim alırsınız.',
+            application: 'Bu ilk adımdı. Başvurunuzu bir kişi okur ve bize bildirdiklerinize bakar: firma, web sitesi, alanlar, pazarlar ve yetkinliğinize ilişkin notunuz. Bu aşamada belgeleri doğrulayamıyoruz, çünkü henüz hiçbiri yüklenmedi. 3 iş günü içinde gerekçeli bir geri bildirim alırsınız. Başvurunuz uygunsa bu yanıt, onboarding için kişisel bağlantınızı içerir. Orada şirket bilgilerinizi tamamlar ve belgelerinizi yüklersiniz; doğrulama ancak o zaman başlar.',
         },
         reply: 'Eklemek istediğiniz bir şey varsa bu e-postayı yanıtlamanız yeterli.',
     },
