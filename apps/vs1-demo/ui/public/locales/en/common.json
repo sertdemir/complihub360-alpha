@@ -84,7 +84,7 @@
       "stat1Label": "Engagement lifecycle visibility",
       "stat2Label": "PDF report export",
       "stat3Label": "Saved Risk Maps",
-      "railSub": "One control centre instead of email threads"
+      "railSub": "One control center instead of email threads"
     },
     "counsel": {
       "overline": "For In-House Counsel",
@@ -94,7 +94,7 @@
       "benefit1Title": "Source-bound output",
       "benefit1Desc": "Every summary, risk label and tip links to the official source it rests on. Where we hold no source, we say so instead of filling the gap.",
       "benefit2Title": "Privacy-First Architecture",
-      "benefit2Desc": "Documents pass through a local redaction pipeline. E-mail addresses, phone numbers and known identifier patterns are masked before any AI processing. Pattern rules do not catch every name — the Trust Center says what they cover.",
+      "benefit2Desc": "Documents pass through a local redaction pipeline. Email addresses, phone numbers and known identifier patterns are masked before any AI processing. Pattern rules do not catch every name — the Trust Center says what they cover.",
       "benefit3Title": "Structured Engagement Dossiers",
       "benefit3Desc": "Replace vague emails with structured compliance dossiers sent to verified local counsel — accelerating the mandate process.",
       "privacyGateTitle": "The Privacy-First AI Gate",
@@ -147,7 +147,7 @@
       "titlePre": "Mandates that arrive ",
       "titleGold": "already sorted",
       "titlePost": ".",
-      "lead": "No cold contact, no reconstruction. What reaches you is an anonymised dossier with the market, the context and the risk profile — and the question of whether you take it on.",
+      "lead": "No cold contact, no reconstruction. What reaches you is an anonymized dossier with the market, the context and the risk profile — and the question of whether you take it on.",
       "facts": {
         "confirm": {
           "value": "24h",
@@ -194,10 +194,10 @@
     "step": {
       "dossier": {
         "title": "Structured dossier",
-        "desc": "A pre-qualified case arrives — anonymised, with its market and risk profile."
+        "desc": "A pre-qualified case arrives — anonymized, with its market and risk profile."
       },
       "mail": {
-        "title": "Magic link e-mail",
+        "title": "Magic link email",
         "desc": "Secure, time-bound access, straight to your inbox."
       },
       "view": {
@@ -243,7 +243,7 @@
     "intakeStep": {
       "apply": {
         "title": "Application",
-        "desc": "You describe your practice areas, markets and admission to practise."
+        "desc": "You describe your practice areas, markets and admission to practice."
       },
       "vetting": {
         "title": "Vetting",
@@ -932,7 +932,7 @@
         "FR": "10–40% surcharge + late-payment interest",
         "IT": "120% for an omitted return, 70% for an inaccurate one",
         "ES": "50–150% of the tax due + surcharges",
-        "NL": "default or offence penalty up to 100%",
+        "NL": "default or offense penalty up to 100%",
         "US": "5%/month of unpaid tax, max 25%",
         "default": "late surcharges + interest"
       },
@@ -1109,7 +1109,7 @@
     "featTitle": "Active AI Features on CompliHub360",
     "featDesc": "How we leverage AI today, wrapped in our strict governance framework.",
     "featPrivacyTitle": "Privacy Redaction Pipeline",
-    "featPrivacyDesc": "Before any business context reaches an AI model, fixed pattern rules mask e-mail addresses, phone numbers and other identifiers. They don’t catch every name, so please leave personal details out of free text.",
+    "featPrivacyDesc": "Before any business context reaches an AI model, fixed pattern rules mask email addresses, phone numbers and other identifiers. They don’t catch every name, so please leave personal details out of free text.",
     "featIntentTitle": "Intent Analysis Engine",
     "featIntentDesc": "Transforms unstructured client input into a structured risk profile. The AI is restricted to analyzing compliance context and cannot make binding legal decisions on its own.",
     "featGateTitle": "Triple AI Gate Validator",
@@ -1124,7 +1124,7 @@
         "When the legal position is clear, it says so and explains why.",
         "When it is uncertain, it says that too instead of guessing, and points you to qualified confirmation.",
         "It never uses fear or urgency to move you towards a booking, and never invents an obligation.",
-        "It hands over to a person the moment professional judgement matters."
+        "It hands over to a person the moment professional judgment matters."
       ],
       "principle": "Technology should be the shortest path to the right human — not a barrier between them."
     },
@@ -1140,7 +1140,7 @@
         },
         "gates": {
           "label": "Gates before every AI action",
-          "note": "sanitisation, consent, domain"
+          "note": "sanitization, consent, domain"
         },
         "pii": {
           "label": "PII in the model",
@@ -1696,7 +1696,7 @@
         "Ask before assuming.",
         "Professional first. Human always.",
         "We do not create needs. We identify them.",
-        "Same respect. Personalised depth.",
+        "Same respect. Personalized depth.",
         "Experience is how trust is delivered."
       ]
     },
@@ -1816,7 +1816,7 @@
     "email": "Email",
     "emailPh": "you@firm.com",
     "website": "Website (optional)",
-    "credentials": "Licence / qualification",
+    "credentials": "License / qualification",
     "credentialsPh": "e.g. tax advisor (DE), attorney, ISO auditor",
     "areas": "Your areas",
     "markets": "Your markets",
@@ -1894,7 +1894,7 @@
       "lane": "Your topic",
       "name": "Name",
       "namePlaceholder": "Your name",
-      "email": "E-mail",
+      "email": "Email",
       "emailPlaceholder": "name@company.com",
       "message": "What is it about?",
       "messagePlaceholder": "The more specific, the faster the answer.",
@@ -1991,7 +1991,7 @@
       "email": "Please check the email address.",
       "message": "Please tell us briefly what it is about.",
       "firm": "Please enter your firm.",
-      "credentials": "Please enter your licence or qualification.",
+      "credentials": "Please enter your license or qualification.",
       "areas": "Please choose at least one area.",
       "markets": "Please choose at least one market.",
       "website": "Please check the website address.",

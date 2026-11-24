@@ -271,7 +271,7 @@ async function decideCoverage(req: IncomingMessage, res: ServerResponse, correla
         if (licence.state !== 'reviewed') {
             json(res, 422, {
                 errorCode: 'LICENCE_REQUIRED',
-                message: 'A tax or legal service needs a reviewed licence for this country before the cell can be approved.',
+                message: 'A tax or legal service needs a reviewed license for this country before the cell can be approved.',
                 area: areaCodeOf(service.service_code), country: cell.country_code, correlationId,
             });
             return;

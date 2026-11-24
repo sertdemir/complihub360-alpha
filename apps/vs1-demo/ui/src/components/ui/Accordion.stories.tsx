@@ -38,7 +38,7 @@ const FAQ = [
   {
     value: 'q2',
     q: 'Is my company data shared before I accept a match?',
-    a: 'No. Providers only see an anonymised dossier until you explicitly accept a match. Your identity and documents stay private until you decide to engage.',
+    a: 'No. Providers only see an anonymized dossier until you explicitly accept a match. Your identity and documents stay private until you decide to engage.',
   },
   {
     value: 'q3',

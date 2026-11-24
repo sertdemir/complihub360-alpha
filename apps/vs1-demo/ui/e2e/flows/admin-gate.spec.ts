@@ -15,7 +15,7 @@ test('Queue → Pruefung: das Gate nennt die fehlenden Bedingungen und sperrt di
   await expect(page.getByRole('heading', { name: 'Activation gate' })).toBeVisible();
   const main = page.locator('main');
   await expect(main).toContainText(/7 of 9 conditions/);
-  await expect(main).toContainText('Billing authorisation accepted');
+  await expect(main).toContainText('Billing authorization accepted');
   await expect(main).toContainText('This does not block activation');
   await expect(page.getByRole('button', { name: 'Activate as limited' })).toBeDisabled();
   await expect(page.getByRole('heading', { name: 'Approvals per service and country' })).toBeVisible();

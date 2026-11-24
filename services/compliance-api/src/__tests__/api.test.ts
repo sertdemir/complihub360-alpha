@@ -3949,7 +3949,7 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
             expect(r.status).toBe(422);
             expect(r.body).toMatchObject({
                 errorCode: 'LICENCE_REQUIRED',
-                message: 'A tax or legal service needs a reviewed licence for this country before the cell can be approved.',
+                message: 'A tax or legal service needs a reviewed license for this country before the cell can be approved.',
                 area: 'tax-vat', country: 'DE',
             });
             expect(typeof r.body.correlationId).toBe('string');
