@@ -143,23 +143,28 @@ type AckStrings = {
     lanes: Record<ContactLane, string>;
     next: { quick: string; partner: string; privacy: string; application: string };
     reply: string;
+    replyApplication: string;
 };
 
 // Copy abgenommen 10.10.2026 (Canvas „Kontakt und Bewerbung senden", Board E V1).
-// `next.application` neu am 24.11.2026 (Provider-Beta-Test P01, Weg A): Die
-// Mail versprach eine Pruefung von Zulassung, Website und Abdeckung, obwohl an
-// dieser Stelle nur die Angaben des Formulars vorliegen, und sagte nicht, dass
-// das Onboarding mit dem Upload der Nachweise erst nach einer Einladung kommt.
-// Der Ablauf selbst bleibt zweistufig (keine Selbstregistrierung, v2 §10/D7).
+// Bewerbung (`*Application`) neu am 24.11.2026, Provider-Beta-Test P01, Weg A,
+// in der Fassung der Mitgruenderin vom Nachtest: Die Mail bestaetigt den
+// Eingang, sagt, dass das Team die ANGABEN sichtet und sich binnen drei
+// Werktagen meldet, und dass Unternehmensprofil und Unterlagen erst ueber
+// einen Einladungslink kommen. Der Satz "Nachweise koennen wir noch nicht
+// pruefen, weil keine hochgeladen sind" ist wieder gestrichen: das Formular
+// bietet keinen Upload, der Satz las sich wie ein Versaeumnis des Bewerbers.
+// "Einladungslink", nicht "persoenlicher Link": der Link traegt heute ein
+// gemeinsames Token (PROVIDER_INTAKE_TOKEN), er ist nicht je Bewerber eigen.
+// Der Ablauf bleibt zweistufig (keine Selbstregistrierung, v2 §10/D7).
 // Die Fassungen de, es und tr sind nicht von Muttersprachlern freigegeben.
-// Ansprache wie in allen Produkt-Mails: DE Sie, ES usted, TR siz.
 const ACK: Record<Locale, AckStrings> = {
     en: {
         subject: 'We have received your message',
-        subjectApplication: 'We have received your application',
+        subjectApplication: 'We’ve received your CompliHub360 provider application',
         hello: 'Hello,',
         intro: 'thank you — your message has reached us.',
-        introApplication: 'thank you — your application has reached us.',
+        introApplication: 'thank you for applying to become a CompliHub360 provider.',
         topic: 'Topic',
         reference: 'Reference',
         lanes: { support: 'Help with the assessment', sales: 'Pricing and plans', partner: 'Getting listed as a provider', privacy: 'Privacy and security', application: 'Provider application' },
@@ -167,16 +172,17 @@ const ACK: Record<Locale, AckStrings> = {
             quick: 'A person reads and sorts it on the same business day. You get a substantive reply by the next business day. If it takes longer, we send you an interim note.',
             partner: 'A person reads it on the same business day. You get a reply within 3 business days.',
             privacy: 'We answer your request within the deadline under Art. 12 GDPR.',
-            application: 'This was the first step. A person reads your application and looks at what you told us: firm, website, areas, markets and your note on credentials. We cannot verify documents at this point, because none have been uploaded yet. You get a reasoned reply within 3 business days. If your application fits, that reply contains your personal link to the onboarding. There you complete your company details and upload your proofs, and only then does the verification begin.',
+            application: 'Our team will review the information you shared and email you within three business days with an update on your application.\n\nIf your application moves forward, we’ll send you an invitation link to complete your company profile and upload the documents needed for verification. We’ll begin verification once you’ve submitted those details and documents.\n\nFor now, you can wait for our next email.',
         },
         reply: 'If you want to add something, simply reply to this email.',
+        replyApplication: 'If you have a question about your application, you can reply to this message.',
     },
     de: {
         subject: 'Ihre Nachricht ist bei uns angekommen',
-        subjectApplication: 'Ihre Bewerbung ist bei uns angekommen',
+        subjectApplication: 'Ihre Bewerbung als CompliHub360-Anbieter ist angekommen',
         hello: 'Guten Tag,',
         intro: 'vielen Dank — Ihre Nachricht ist bei uns angekommen.',
-        introApplication: 'vielen Dank — Ihre Bewerbung ist bei uns angekommen.',
+        introApplication: 'vielen Dank für Ihre Bewerbung als Anbieter bei CompliHub360.',
         topic: 'Anliegen',
         reference: 'Referenz',
         lanes: { support: 'Hilfe beim Assessment', sales: 'Preise und Tarife', partner: 'Als Anbieter gelistet werden', privacy: 'Datenschutz und Sicherheit', application: 'Anbieter-Bewerbung' },
@@ -184,16 +190,17 @@ const ACK: Record<Locale, AckStrings> = {
             quick: 'Ein Mensch liest und sortiert sie am selben Werktag. Eine fachliche Antwort erhalten Sie bis zum nächsten Werktag. Dauert es länger, schicken wir Ihnen eine Zwischennachricht.',
             partner: 'Ein Mensch liest sie am selben Werktag. Eine Antwort erhalten Sie innerhalb von 3 Werktagen.',
             privacy: 'Wir beantworten Ihr Anliegen innerhalb der Frist nach Art. 12 DSGVO.',
-            application: 'Das war der erste Schritt. Ein Mensch liest Ihre Bewerbung und sieht sich an, was Sie uns mitgeteilt haben: Firma, Website, Bereiche, Märkte und Ihre Angaben zur Qualifikation. Nachweise können wir an dieser Stelle noch nicht prüfen, weil noch keine hochgeladen sind. Eine begründete Rückmeldung erhalten Sie innerhalb von 3 Werktagen. Passt Ihre Bewerbung, enthält sie Ihren persönlichen Link zum Onboarding. Dort ergänzen Sie Ihre Unternehmensdaten und laden Ihre Nachweise hoch, und erst dann beginnt die Verifizierung.',
+            application: 'Unser Team sieht sich die Angaben an, die Sie uns geschickt haben, und meldet sich innerhalb von drei Werktagen per E-Mail mit dem Stand Ihrer Bewerbung.\n\nGeht Ihre Bewerbung weiter, erhalten Sie von uns einen Einladungslink. Darüber vervollständigen Sie Ihr Unternehmensprofil und laden die Unterlagen hoch, die wir für die Verifizierung brauchen. Die Verifizierung beginnt, sobald diese Angaben und Unterlagen eingereicht sind.\n\nBis zu unserer nächsten E-Mail müssen Sie nichts weiter tun.',
         },
         reply: 'Möchten Sie etwas ergänzen, antworten Sie einfach auf diese E-Mail.',
+        replyApplication: 'Haben Sie eine Frage zu Ihrer Bewerbung, antworten Sie einfach auf diese Nachricht.',
     },
     es: {
         subject: 'Hemos recibido su mensaje',
-        subjectApplication: 'Hemos recibido su solicitud',
+        subjectApplication: 'Hemos recibido su solicitud como proveedor de CompliHub360',
         hello: 'Hola:',
         intro: 'gracias, su mensaje nos ha llegado.',
-        introApplication: 'gracias, su solicitud nos ha llegado.',
+        introApplication: 'gracias por solicitar ser proveedor de CompliHub360.',
         topic: 'Asunto',
         reference: 'Referencia',
         lanes: { support: 'Ayuda con la evaluación', sales: 'Precios y planes', partner: 'Aparecer como proveedor', privacy: 'Privacidad y seguridad', application: 'Solicitud de proveedor' },
@@ -201,16 +208,17 @@ const ACK: Record<Locale, AckStrings> = {
             quick: 'Una persona lo lee y lo clasifica el mismo día hábil. Recibirá una respuesta de fondo a más tardar el siguiente día hábil. Si tardamos más, le enviaremos un mensaje intermedio.',
             partner: 'Una persona lo lee el mismo día hábil. Recibirá una respuesta en un plazo de 3 días hábiles.',
             privacy: 'Respondemos a su solicitud dentro del plazo del art. 12 del RGPD.',
-            application: 'Este ha sido el primer paso. Una persona lee su solicitud y revisa lo que nos ha indicado: empresa, sitio web, áreas, mercados y su nota sobre la titulación. En este punto aún no podemos verificar documentos, porque todavía no se ha subido ninguno. Recibirá una respuesta motivada en un plazo de 3 días hábiles. Si su solicitud encaja, esa respuesta incluye su enlace personal al onboarding. Allí completa los datos de su empresa y sube sus justificantes, y solo entonces comienza la verificación.',
+            application: 'Nuestro equipo revisará la información que nos ha enviado y le escribirá en un plazo de tres días hábiles con el estado de su solicitud.\n\nSi su solicitud sigue adelante, le enviaremos un enlace de invitación para completar el perfil de su empresa y subir los documentos necesarios para la verificación. La verificación comienza cuando haya enviado esos datos y documentos.\n\nPor ahora, puede esperar a nuestro próximo correo.',
         },
         reply: 'Si desea añadir algo, simplemente responda a este correo.',
+        replyApplication: 'Si tiene alguna pregunta sobre su solicitud, puede responder a este mensaje.',
     },
     tr: {
         subject: 'Mesajınız bize ulaştı',
-        subjectApplication: 'Başvurunuz bize ulaştı',
+        subjectApplication: 'CompliHub360 sağlayıcı başvurunuz bize ulaştı',
         hello: 'Merhaba,',
         intro: 'teşekkür ederiz, mesajınız bize ulaştı.',
-        introApplication: 'teşekkür ederiz, başvurunuz bize ulaştı.',
+        introApplication: 'CompliHub360 sağlayıcısı olmak için başvurduğunuz için teşekkür ederiz.',
         topic: 'Konu',
         reference: 'Referans',
         lanes: { support: 'Değerlendirmede yardım', sales: 'Fiyatlar ve planlar', partner: 'Sağlayıcı olarak listelenmek', privacy: 'Gizlilik ve güvenlik', application: 'Sağlayıcı başvurusu' },
@@ -218,9 +226,10 @@ const ACK: Record<Locale, AckStrings> = {
             quick: 'Mesajınızı aynı iş günü içinde bir kişi okur ve sınıflandırır. En geç bir sonraki iş günü içerikli bir yanıt alırsınız. Daha uzun sürerse size bir ara bilgi göndeririz.',
             partner: 'Mesajınızı aynı iş günü içinde bir kişi okur. 3 iş günü içinde yanıt alırsınız.',
             privacy: 'Talebinizi GDPR madde 12’de öngörülen süre içinde yanıtlarız.',
-            application: 'Bu ilk adımdı. Başvurunuzu bir kişi okur ve bize bildirdiklerinize bakar: firma, web sitesi, alanlar, pazarlar ve yetkinliğinize ilişkin notunuz. Bu aşamada belgeleri doğrulayamıyoruz, çünkü henüz hiçbiri yüklenmedi. 3 iş günü içinde gerekçeli bir geri bildirim alırsınız. Başvurunuz uygunsa bu yanıt, onboarding için kişisel bağlantınızı içerir. Orada şirket bilgilerinizi tamamlar ve belgelerinizi yüklersiniz; doğrulama ancak o zaman başlar.',
+            application: 'Ekibimiz paylaştığınız bilgileri inceleyecek ve üç iş günü içinde başvurunuzun durumu hakkında size e-posta gönderecek.\n\nBaşvurunuz ilerlerse, şirket profilinizi tamamlamanız ve doğrulama için gereken belgeleri yüklemeniz için size bir davet bağlantısı göndeririz. Doğrulama, bu bilgileri ve belgeleri gönderdiğinizde başlar.\n\nŞimdilik bir sonraki e-postamızı bekleyebilirsiniz.',
         },
         reply: 'Eklemek istediğiniz bir şey varsa bu e-postayı yanıtlamanız yeterli.',
+        replyApplication: 'Başvurunuzla ilgili bir sorunuz varsa bu mesajı yanıtlayabilirsiniz.',
     },
 };
 
@@ -242,7 +251,7 @@ export function renderAckMail(r: ContactRequest, inbox: string, reference: strin
         '',
         next,
         '',
-        t.reply,
+        app ? t.replyApplication : t.reply,
         '',
         'CompliHub360',
     ].join('\n');

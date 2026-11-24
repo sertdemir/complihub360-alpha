@@ -1778,7 +1778,7 @@
     "questionsLink": "Sağlayıcı iletişimi",
     "sent": {
       "title": "Başvurunuz ulaştı.",
-      "body": "{{email}} adresine bir onay yolda. Başvurunuzu bir kişi okur ve 3 iş günü içinde size döner. Uygunsa, belgelerinizi yükleyeceğiniz onboarding için kişisel bağlantınızı alırsınız.",
+      "body": "{{email}} adresine bir onay yolda. Ekibimiz paylaştığınız bilgileri inceler ve üç iş günü içinde size e-posta gönderir. Başvurunuz ilerlerse, şirket profilinizi tamamlamanız ve belgelerinizi yüklemeniz için bir davet bağlantısı alırsınız.",
       "progress": "devam ediyor · 3 iş günü içinde geri bildirim",
       "home": "Ana sayfaya dön"
     }

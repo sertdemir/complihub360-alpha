@@ -1827,7 +1827,7 @@
     "questionsLink": "Contact for providers",
     "sent": {
       "title": "Your application has arrived.",
-      "body": "A confirmation is on its way to {{email}}. A person reads your application and gets back to you within 3 business days. If it fits, you receive your personal link to the onboarding, where you upload your proofs.",
+      "body": "A confirmation is on its way to {{email}}. Our team reviews the information you shared and emails you within three business days. If your application moves forward, you receive an invitation link to complete your company profile and upload your documents.",
       "progress": "in progress · feedback within 3 business days",
       "home": "Back to the homepage"
     }
