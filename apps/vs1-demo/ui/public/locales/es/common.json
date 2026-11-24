@@ -1778,7 +1778,7 @@
     "questionsLink": "Contacto para proveedores",
     "sent": {
       "title": "Su solicitud ha llegado.",
-      "body": "Hay una confirmación en camino a {{email}}. Una persona lee su solicitud y le responde en un plazo de 3 días hábiles. Si encaja, recibirá su enlace personal al onboarding, donde sube sus justificantes.",
+      "body": "Hay una confirmación en camino a {{email}}. Nuestro equipo revisa la información que nos ha enviado y le escribe en un plazo de tres días hábiles. Si su solicitud sigue adelante, recibirá un enlace de invitación para completar el perfil de su empresa y subir sus documentos.",
       "progress": "en curso · respuesta en 3 días hábiles",
       "home": "Ir a la página de inicio"
     }
