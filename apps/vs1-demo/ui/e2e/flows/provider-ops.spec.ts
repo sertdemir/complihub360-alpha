@@ -55,7 +55,7 @@ test('Bewerbung: die Abrechnungsermaechtigung zeigt die neue Fassung und nimmt s
   await expect(chapter).toContainText(/New version 2026-10 is available/);
   await chapter.getByRole('button', { name: 'Read and accept' }).click();
   const dialog = page.getByRole('dialog').last();
-  await expect(dialog.getByRole('heading', { name: /Accept Billing authorisation/ })).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: /Accept Billing authorization/ })).toBeVisible();
   const text = dialog.getByTestId('mandate-text');
   await expect(text).toContainText('1. What this is about');
   await expect(text).toContainText('9. Changes');
