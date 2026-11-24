@@ -84,6 +84,17 @@ describe('handleContact', () => {
         expect(ack('partner')).toContain('within 3 business days');
         expect(ack('privacy')).toContain('Art. 12 GDPR');
         expect(renderAckMail((checkContact(APP) as any).request, 'i@x.de', 'r').subject).toBe('We have received your application');
+        // P01 (24.11.2026): Die Bestaetigung sagt, was jetzt geprueft wird und was
+        // erst nach der Einladung kommt — in jeder Sprache.
+        for (const locale of ['en', 'de', 'es', 'tr'] as const) {
+            const text = renderAckMail({ ...(checkContact(APP) as any).request, locale }, 'i@x.de', 'r').text;
+            expect(text).toMatch(/onboarding/i);
+            expect(text).toMatch(/\b3\b/);
+        }
+        const en = renderAckMail((checkContact(APP) as any).request, 'i@x.de', 'r').text;
+        expect(en).toContain('We cannot verify documents at this point');
+        expect(en).toContain('only then does the verification begin');
+        expect(en).not.toContain('credentials, website, coverage');
     });
 
     it('Bewerbung: strukturierte Felder in der Mail ans Postfach', async () => {

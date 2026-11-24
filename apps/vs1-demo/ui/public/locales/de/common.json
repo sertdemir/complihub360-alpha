@@ -1778,7 +1778,7 @@
     "questionsLink": "Zum Kontakt für Anbieter",
     "sent": {
       "title": "Ihre Bewerbung ist angekommen.",
-      "body": "Eine Bestätigung ist an {{email}} unterwegs. Wir prüfen Ihre Angaben von Hand und melden uns innerhalb von 3 Werktagen.",
+      "body": "Eine Bestätigung ist an {{email}} unterwegs. Ein Mensch liest Ihre Bewerbung und meldet sich innerhalb von 3 Werktagen. Passt sie, erhalten Sie Ihren persönlichen Link zum Onboarding, wo Sie Ihre Nachweise hochladen.",
       "progress": "läuft · Rückmeldung in 3 Werktagen",
       "home": "Zur Startseite"
     }
