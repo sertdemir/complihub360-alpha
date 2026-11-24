@@ -16,6 +16,16 @@ import { SLUG_TO_ENGINE } from './dashboard.js';
 // Missbrauch: Die Bestaetigung geht an eine Adresse, die jeder eintippen
 // kann. Sie wiederholt deshalb weder Name noch Nachricht — sonst waere das
 // Formular ein Weg, beliebigen Text an fremde Postfaecher zu schicken.
+//
+// Eine Ausnahme seit 24.11.2026 (Entscheidung der Mitgruenderin, P01): die
+// Bestaetigung der BEWERBUNG spricht die Kontaktperson mit dem Vornamen an.
+// Der Vorname ist dafuer ein eigenes, enges Feld (FIRST_NAME): nur Buchstaben,
+// Leerzeichen, Bindestrich und Apostroph, hoechstens 40 Zeichen. Damit laesst
+// sich weder ein Link noch ein Satz in fremde Postfaecher tragen.
+//
+// Ebenfalls seit 24.11.2026: die Bewerbung wird zusaetzlich gespeichert
+// (provider_applications), damit sie im Admin-Bereich erscheint und von dort
+// eingeladen werden kann. Die vier Wege der Kontaktseite bleiben beim Postfach.
 
 export const CONTACT_LANES = ['support', 'sales', 'partner', 'privacy', 'application'] as const;
 export type ContactLane = (typeof CONTACT_LANES)[number];
@@ -24,7 +34,10 @@ const LOCALES: readonly Locale[] = ['en', 'de', 'es', 'tr'];
 
 const EMAIL = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[^\s@<>()",;:]{2,}$/;
 const MARKET = /^[A-Z]{2}$/;
-const MAX = { name: 120, email: 254, message: 5000, firm: 160, website: 300, credentials: 500, list: 40 } as const;
+/** Vorname fuer die Anrede: Buchstaben (auch mit Akzent), dazwischen Leerzeichen,
+ *  Bindestrich oder Apostroph. Keine Ziffern, keine Punkte, keine Schraegstriche. */
+export const FIRST_NAME = /^\p{L}[\p{L}\p{M}]*(?:[ '’-]\p{L}[\p{L}\p{M}]*)*$/u;
+const MAX = { name: 120, email: 254, message: 5000, firm: 160, website: 300, credentials: 500, list: 40, firstName: 40 } as const;
 
 export type ContactInput = Record<string, unknown>;
 
@@ -35,7 +48,7 @@ export type ContactRequest = {
     email: string;
     message: string;
     /** Nur bei lane 'application'. */
-    application?: { firm: string; website: string | null; credentials: string; areas: string[]; markets: string[] };
+    application?: { firm: string; website: string | null; credentials: string; areas: string[]; markets: string[]; firstName: string | null };
 };
 
 export type ContactCheck =
@@ -80,6 +93,12 @@ export function checkContact(input: ContactInput): ContactCheck {
         return { ok: true, request: { lane, locale, name, email, message } };
     }
 
+    // Optional, damit eine aeltere Seite weiter senden kann; dann bleibt die
+    // Anrede neutral. Ist er da, muss er das enge Muster erfuellen.
+    const firstRaw = line(input.first_name, MAX.firstName);
+    if (firstRaw && (firstRaw.length > MAX.firstName || !FIRST_NAME.test(firstRaw))) {
+        return { ok: false, field: 'first_name', message: 'first name: letters only (max 40)' };
+    }
     const firm = line(input.firm, MAX.firm);
     if (!firm || firm.length > MAX.firm) return { ok: false, field: 'firm', message: 'firm required (max 160)' };
     const credentials = block(input.credentials, MAX.credentials);
@@ -97,7 +116,7 @@ export function checkContact(input: ContactInput): ContactCheck {
 
     return {
         ok: true,
-        request: { lane, locale, name, email, message, application: { firm, website: websiteRaw || null, credentials, areas, markets } },
+        request: { lane, locale, name, email, message, application: { firm, website: websiteRaw || null, credentials, areas, markets, firstName: firstRaw || null } },
     };
 }
 
@@ -120,6 +139,7 @@ export function renderInboxMail(r: ContactRequest, inbox: string, reference: str
     const lines = [
         `Anliegen: ${INBOX_LABEL[r.lane]}`,
         `Von: ${r.name} <${r.email}>`,
+        ...(r.application?.firstName ? [`Vorname: ${r.application.firstName}`] : []),
         `Sprache: ${r.locale}`,
         `Referenz: ${reference}`,
     ];
@@ -136,6 +156,8 @@ type AckStrings = {
     subject: string;
     subjectApplication: string;
     hello: string;
+    /** Anrede mit Vornamen, nur fuer die Bewerbung. `{name}` wird ersetzt. */
+    helloName: string;
     intro: string;
     introApplication: string;
     topic: string;
@@ -163,6 +185,7 @@ const ACK: Record<Locale, AckStrings> = {
         subject: 'We have received your message',
         subjectApplication: 'We’ve received your CompliHub360 provider application',
         hello: 'Hello,',
+        helloName: 'Hi {name},',
         intro: 'thank you — your message has reached us.',
         introApplication: 'thank you for applying to become a CompliHub360 provider.',
         topic: 'Topic',
@@ -181,6 +204,7 @@ const ACK: Record<Locale, AckStrings> = {
         subject: 'Ihre Nachricht ist bei uns angekommen',
         subjectApplication: 'Ihre Bewerbung als CompliHub360-Anbieter ist angekommen',
         hello: 'Guten Tag,',
+        helloName: 'Guten Tag {name},',
         intro: 'vielen Dank — Ihre Nachricht ist bei uns angekommen.',
         introApplication: 'vielen Dank für Ihre Bewerbung als Anbieter bei CompliHub360.',
         topic: 'Anliegen',
@@ -199,6 +223,7 @@ const ACK: Record<Locale, AckStrings> = {
         subject: 'Hemos recibido su mensaje',
         subjectApplication: 'Hemos recibido su solicitud como proveedor de CompliHub360',
         hello: 'Hola:',
+        helloName: 'Hola, {name}:',
         intro: 'gracias, su mensaje nos ha llegado.',
         introApplication: 'gracias por solicitar ser proveedor de CompliHub360.',
         topic: 'Asunto',
@@ -217,6 +242,7 @@ const ACK: Record<Locale, AckStrings> = {
         subject: 'Mesajınız bize ulaştı',
         subjectApplication: 'CompliHub360 sağlayıcı başvurunuz bize ulaştı',
         hello: 'Merhaba,',
+        helloName: 'Merhaba {name},',
         intro: 'teşekkür ederiz, mesajınız bize ulaştı.',
         introApplication: 'CompliHub360 sağlayıcısı olmak için başvurduğunuz için teşekkür ederiz.',
         topic: 'Konu',
@@ -233,8 +259,9 @@ const ACK: Record<Locale, AckStrings> = {
     },
 };
 
-/** Eingangsbestaetigung an den Absender. Absichtlich ohne Name und ohne
- *  Nachricht (siehe oben); Antworten landen im Postfach. */
+/** Eingangsbestaetigung an den Absender. Absichtlich ohne Nachricht und ohne
+ *  den freien Namen (siehe oben); die Bewerbung nennt den geprueften Vornamen.
+ *  Antworten landen im Postfach. */
 export function renderAckMail(r: ContactRequest, inbox: string, reference: string): OutgoingMail {
     const t = ACK[r.locale];
     const app = r.lane === 'application';
@@ -242,8 +269,9 @@ export function renderAckMail(r: ContactRequest, inbox: string, reference: strin
         : r.lane === 'partner' ? t.next.partner
         : r.lane === 'privacy' ? t.next.privacy
         : t.next.quick;
+    const first = r.application?.firstName ?? null;
     const text = [
-        t.hello,
+        app && first ? t.helloName.replace('{name}', first) : t.hello,
         app ? t.introApplication : t.intro,
         '',
         `${t.topic}: ${t.lanes[r.lane]}`,
@@ -266,6 +294,9 @@ export type ContactDeps = {
     mailFrom: string;
     send: ((mail: OutgoingMail, from: string) => Promise<SendResult>) | null;
     log: (type: string, payload: Record<string, unknown>) => Promise<void>;
+    /** Legt die Bewerbung fuer den Admin-Bereich ab. Fehlt sie (Tests, alte
+     *  Aufrufer), bleibt es beim Postfach. */
+    storeApplication?: (r: ContactRequest, reference: string) => Promise<void>;
 };
 
 export type ContactOutcome = { status: number; body: Record<string, unknown> };
@@ -315,13 +346,28 @@ export async function handleContact(input: ContactInput, deps: ContactDeps, refe
         return { status: 502, body: { errorCode: 'CONTACT_SEND_FAILED', message: 'The message could not be delivered' } };
     }
 
+    // Die Bewerbung steht jetzt im Postfach. Scheitert das Ablegen, ist sie
+    // deshalb nicht verloren, fehlt aber im Admin-Bereich: das steht im
+    // Protokoll und in der Antwort, statt still zu fehlen.
+    let stored: boolean | null = null;
+    if (r.application && deps.storeApplication) {
+        try {
+            await deps.storeApplication(r, reference);
+            stored = true;
+        } catch {
+            stored = false;
+            structuredLog('error', 'Application not stored', { correlationId: reference, route: '/api/v1/contact', severity: 'error', errorCode: 'ERR_APPLICATION_STORE' });
+            await deps.log('application_store_failed', { locale: r.locale }).catch(() => {});
+        }
+    }
+
     let acknowledged = false;
     try {
         acknowledged = (await deps.send(renderAckMail(r, deps.inbox, reference), deps.mailFrom)).ok;
     } catch {
         acknowledged = false;
     }
-    await deps.log('contact_sent', { lane: r.lane, locale: r.locale, acknowledged }).catch(() => {});
+    await deps.log('contact_sent', { lane: r.lane, locale: r.locale, acknowledged, ...(stored === null ? {} : { stored }) }).catch(() => {});
     return { status: 200, body: { ok: true, acknowledged } };
 }
 

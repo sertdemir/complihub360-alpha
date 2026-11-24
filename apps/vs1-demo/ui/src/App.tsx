@@ -53,6 +53,8 @@ const ApplicationPage = lazy(() => import("./pages/provider/ApplicationPage").th
 const VerificationPage = lazy(() => import("./pages/provider/VerificationPage").then((m) => ({ default: m.VerificationPage })));
 const AdminProvidersPage = lazy(() => import("./pages/admin/AdminProvidersPage").then((m) => ({ default: m.AdminProvidersPage })));
 const AdminProviderReviewPage = lazy(() => import("./pages/admin/AdminProviderReviewPage").then((m) => ({ default: m.AdminProviderReviewPage })));
+const AdminApplicationsPage = lazy(() => import("./pages/admin/AdminApplicationsPage").then((m) => ({ default: m.AdminApplicationsPage })));
+const ProviderInvitePage = lazy(() => import("./pages/onboarding/ProviderInvitePage").then((m) => ({ default: m.ProviderInvitePage })));
 const AdminApiAccessPage = lazy(() => import("./pages/admin/AdminApiAccessPage").then((m) => ({ default: m.AdminApiAccessPage })));
 const UserHomePage = lazy(() => import("./pages/user/UserHomePage").then((m) => ({ default: m.UserHomePage })));
 const SessionsPage = lazy(() => import("./pages/user/SessionsPage").then((m) => ({ default: m.SessionsPage })));
@@ -300,6 +302,7 @@ function AppContent() {
                         {/* Phase 2: Pruef-Queue + Reviewer-Pruefung */}
                         <Route path="admin/providers" element={<AdminProvidersPage />} />
                         <Route path="admin/providers/:key" element={<AdminProviderReviewPage />} />
+                        <Route path="admin/applications" element={<AdminApplicationsPage />} />
                         <Route path="admin/api-access" element={<AdminApiAccessPage />} />
                         <Route path="admin/security" element={<AdminComingSoonPage />} />
                         <Route path="admin/privacy" element={<AdminComingSoonPage />} />
@@ -312,6 +315,7 @@ function AppContent() {
                     {/* v2 (D7): providers onboard via the token-gated intake link —
                         the old self-registration wizard is retired. */}
                     <Route path="provider-intake" element={<ProviderIntakePage />} />
+                    <Route path="provider-invite" element={<ProviderInvitePage />} />
                     <Route path="partner-onboarding" element={<LegacyPartnerRedirect from="partner-onboarding" to="provider-intake" />} />
                     <Route path="register" element={<RegisterPage />} />
                     {/* Oeffentliche Partner-Bewerbung — fuehrt in die manuelle

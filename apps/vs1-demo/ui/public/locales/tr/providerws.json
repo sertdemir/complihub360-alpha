@@ -1459,5 +1459,66 @@
     "calls": "Son çağrılar",
     "noCalls": "Henüz çağrı yok.",
     "callsNote": "Bugün: {{count}} çağrı · {{limited}} × 429 · {{failed}} × 5xx. Günlük 90 gün tutulur; içerik ve anahtar içermez."
+  },
+  "invite": {
+    "eyebrow": "Sağlayıcı onboarding",
+    "titlePre": "",
+    "titleGold": "Onboarding",
+    "titlePost": " davetiniz.",
+    "steps": {
+      "account": {
+        "title": "Hesabınızı oluşturun",
+        "desc": "Bir şifre seçin. Hesabınız başvurunuzdaki e-posta adresini kullanır."
+      },
+      "profile": {
+        "title": "Şirket profili ve belgeler",
+        "desc": "Şirket bilgilerinizi tamamlayın, hangi belgelerin gerektiğini görün ve yükleyin."
+      },
+      "verification": {
+        "title": "Doğrulama",
+        "desc": "Doğrulama, bilgilerinizi ve belgelerinizi gönderdiğinizde başlar. Bunları elle inceleriz."
+      }
+    },
+    "notVerified": "Davet edilmiş olmak, şirketinizin doğrulandığı anlamına gelmez. Şirketiniz ancak bu incelemeden sonra doğrulanmış olarak gösterilir.",
+    "hello": "Hoş geldiniz",
+    "helloName": "Merhaba {{name}}",
+    "lead": "Onboarding sürecine devam etmek için {{firm}} hesabını oluşturun.",
+    "email": "E-posta",
+    "emailHint": "Bu, başvurunuzdaki adrestir. Onunla oturum açarsınız.",
+    "password": "Şifre",
+    "passwordHint": "En az {{min}} karakter.",
+    "passwordShort": "Lütfen en az {{min}} karakterli bir şifre seçin.",
+    "passwordWeak": "Bu şifre tahmin edilmesi çok kolay olduğu için reddedildi. Lütfen başka bir şifre seçin.",
+    "show": "Göster",
+    "hide": "Gizle",
+    "submit": "Hesabı oluştur",
+    "sending": "Oluşturuluyor…",
+    "validUntil": "Bu davet {{date}} tarihine kadar geçerlidir.",
+    "loading": "Davetiniz kontrol ediliyor…",
+    "signIn": "Oturum aç",
+    "contact": "Bize ulaşın",
+    "failure": {
+      "exists": "Bu e-posta adresiyle zaten bir hesap var, bu yüzden burada yeni bir hesap oluşturamıyoruz. Lütfen davet e-postanızı yanıtlayın; başvurunuzu o hesaba bağlarız.",
+      "failed": "Hesap oluşturulamadı. Hiçbir şey kaybolmadı; lütfen tekrar deneyin. Sorun sürerse davet e-postanızı yanıtlayın.",
+      "signin": "Hesabınız oluşturuldu, ancak oturum açma şu anda başarısız oldu. Lütfen e-posta adresiniz ve seçtiğiniz şifreyle oturum açın."
+    },
+    "problem": {
+      "invalid": {
+        "title": "Bu davet bağlantısı geçerli değil",
+        "body": "Bağlantı eksik olabilir veya daha yeni bir davet onun yerini almış olabilir. Lütfen son e-postamızdaki bağlantıyı kullanın veya bize ulaşın."
+      },
+      "expired": {
+        "title": "Bu davetin süresi doldu",
+        "body": "Davet bağlantıları 14 gün geçerlidir. Davet e-postanızı yanıtlayın veya bize ulaşın; size yenisini göndeririz."
+      },
+      "used": {
+        "title": "Bu davet zaten kullanıldı",
+        "body": "Bu bağlantıyla bir hesap oluşturuldu. Başvurunuzdaki e-posta adresiyle oturum açabilirsiniz."
+      },
+      "unreachable": {
+        "title": "Davetinizi kontrol edemedik",
+        "body": "Bağlantı kontrol edilmedi, bu yüzden hiçbir şey değişmedi. Lütfen sayfayı birazdan yeniden yükleyin."
+      }
+    }
   }
 }

@@ -1737,12 +1737,12 @@
         "desc": "Revisamos cada solicitud a mano: habilitación, web, cobertura. Recibirá una confirmación de recepción y después una respuesta motivada."
       },
       "access": {
-        "title": "Su enlace de acceso personal",
-        "desc": "Si encaja, recibirá un magic link por correo: sin contraseña, el enlace le lleva directo a su área de proveedor."
+        "title": "Su enlace de invitación",
+        "desc": "Si su solicitud avanza, recibirá un enlace de invitación por correo. Con él crea su cuenta y accede a su área de proveedor."
       },
       "listing": {
         "title": "Onboarding y listado",
-        "desc": "Al abrirla por primera vez completa su perfil en pocos pasos. Con los campos obligatorios listos, queda listado para solicitudes afines."
+        "desc": "Completa el perfil de su empresa y sube los documentos necesarios. La verificación comienza cuando los envía; después queda listado para solicitudes afines."
       }
     },
     "facts": {
@@ -1762,7 +1762,8 @@
     "formTitle": "Su solicitud",
     "formLead": "Lo mínimo para iniciar la revisión. El resto lo aclaramos en conversación.",
     "firm": "Despacho / empresa",
-    "contact": "Persona de contacto",
+    "firstName": "Nombre",
+    "lastName": "Apellidos",
     "email": "Correo electrónico",
     "emailPh": "usted@despacho.es",
     "website": "Sitio web (opcional)",
@@ -1944,7 +1945,8 @@
       "credentials": "Indique su habilitación o cualificación, por favor.",
       "areas": "Elija al menos un ámbito, por favor.",
       "markets": "Elija al menos un mercado, por favor.",
-      "website": "Revise la dirección del sitio web, por favor."
+      "website": "Revise la dirección del sitio web, por favor.",
+      "first_name": "Indique su nombre, solo letras, por favor."
     }
   },
   "states": {

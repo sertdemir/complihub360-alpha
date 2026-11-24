@@ -37,6 +37,8 @@ const FIELD =
 const LABEL = 'block text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary';
 
 const OUTLOOK = ['review', 'access', 'listing'] as const;
+// Dasselbe enge Muster wie der Server (contact.ts, FIRST_NAME).
+const FIRST_NAME_RE = /^\p{L}[\p{L}\p{M}]*(?:[ '’-]\p{L}[\p{L}\p{M}]*)*$/u;
 
 export function PartnerApplyPage() {
     const navigate = useNavigate();
@@ -44,6 +46,9 @@ export function PartnerApplyPage() {
     const lang = i18n.resolvedLanguage || 'en';
 
     const [firm, setFirm] = useState('');
+    // Vor- und Nachname getrennt (P01, 24.11.2026): die Bestaetigung und die
+    // Einladung sprechen die Person mit dem Vornamen an.
+    const [firstName, setFirstName] = useState('');
     const [contact, setContact] = useState('');
     const [email, setEmail] = useState('');
     const [website, setWebsite] = useState('');
@@ -66,7 +71,8 @@ export function PartnerApplyPage() {
     const errorsOf = (): FormError[] => {
         const errs: FormError[] = [];
         if (!firm.trim()) errs.push({ id: 'pa-firm', label: t('partnerApply.firm'), message: t('contactSend.field.firm') });
-        if (!contact.trim()) errs.push({ id: 'pa-contact', label: t('partnerApply.contact'), message: t('contactSend.field.name') });
+        if (!FIRST_NAME_RE.test(firstName.trim()) || firstName.trim().length > 40) errs.push({ id: 'pa-first', label: t('partnerApply.firstName'), message: t('contactSend.field.first_name') });
+        if (!contact.trim()) errs.push({ id: 'pa-contact', label: t('partnerApply.lastName'), message: t('contactSend.field.name') });
         if (!EMAIL_RE.test(email.trim())) errs.push({ id: 'pa-email', label: t('partnerApply.email'), message: t('contactSend.field.email') });
         if (!credentials.trim()) errs.push({ id: 'pa-cred', label: t('partnerApply.credentials'), message: t('contactSend.field.credentials') });
         if (!areas.length) errs.push({ id: 'pa-areas', label: t('partnerApply.areas'), message: t('contactSend.field.areas') });
@@ -87,7 +93,7 @@ export function PartnerApplyPage() {
         setFieldError(null);
         try {
             const r = await sendContact({
-                lane: 'application', locale: lang, name: contact.trim(), email: email.trim(), firm: firm.trim(),
+                lane: 'application', locale: lang, name: `${firstName.trim()} ${contact.trim()}`, first_name: firstName.trim(), email: email.trim(), firm: firm.trim(),
                 website: website.trim(), credentials: credentials.trim(), areas, markets, message, hp,
             });
             setAcknowledged(r.acknowledged);
@@ -193,15 +199,20 @@ export function PartnerApplyPage() {
                             <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{t('partnerApply.formLead')}</p>
 
 
-                            <div className="mt-2 flex flex-col gap-0 sm:flex-row sm:gap-4">
+                            <div className="mt-2">
+                                <label htmlFor="pa-firm" className={'mt-4 ' + LABEL}>{t('partnerApply.firm')}</label>
+                                <input id="pa-firm" value={firm} onChange={(e) => setFirm(e.target.value)} autoComplete="organization" className={fieldClass('pa-firm')} {...aria('pa-firm')} />
+                                <FieldError e={errFor('pa-firm')} />
+                            </div>
+                            <div className="flex flex-col gap-0 sm:flex-row sm:gap-4">
                                 <div className="flex-1">
-                                    <label htmlFor="pa-firm" className={'mt-4 ' + LABEL}>{t('partnerApply.firm')}</label>
-                                    <input id="pa-firm" value={firm} onChange={(e) => setFirm(e.target.value)} className={fieldClass('pa-firm')} {...aria('pa-firm')} />
-                                    <FieldError e={errFor('pa-firm')} />
+                                    <label htmlFor="pa-first" className={'mt-4 ' + LABEL}>{t('partnerApply.firstName')}</label>
+                                    <input id="pa-first" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoComplete="given-name" maxLength={40} className={fieldClass('pa-first')} {...aria('pa-first')} />
+                                    <FieldError e={errFor('pa-first')} />
                                 </div>
                                 <div className="flex-1">
-                                    <label htmlFor="pa-contact" className={'mt-4 ' + LABEL}>{t('partnerApply.contact')}</label>
-                                    <input id="pa-contact" value={contact} onChange={(e) => setContact(e.target.value)} className={fieldClass('pa-contact')} {...aria('pa-contact')} />
+                                    <label htmlFor="pa-contact" className={'mt-4 ' + LABEL}>{t('partnerApply.lastName')}</label>
+                                    <input id="pa-contact" value={contact} onChange={(e) => setContact(e.target.value)} autoComplete="family-name" className={fieldClass('pa-contact')} {...aria('pa-contact')} />
                                     <FieldError e={errFor('pa-contact')} />
                                 </div>
                             </div>

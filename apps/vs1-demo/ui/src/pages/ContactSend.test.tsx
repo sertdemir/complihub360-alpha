@@ -125,7 +125,8 @@ describe('Partner-Bewerbung', () => {
   const apply = () => render(<MemoryRouter><PartnerApplyPage /></MemoryRouter>);
   function fillApply() {
     fireEvent.change(screen.getByLabelText('partnerApply.firm'), { target: { value: 'Muster Steuerberatung' } });
-    fireEvent.change(screen.getByLabelText('partnerApply.contact'), { target: { value: 'Max Muster' } });
+    fireEvent.change(screen.getByLabelText('partnerApply.firstName'), { target: { value: 'Max' } });
+    fireEvent.change(screen.getByLabelText('partnerApply.lastName'), { target: { value: 'Muster' } });
     fireEvent.change(screen.getByLabelText('partnerApply.email'), { target: { value: 'max@kanzlei.de' } });
     fireEvent.change(screen.getByLabelText('partnerApply.credentials'), { target: { value: 'Steuerberater (DE)' } });
     fireEvent.click(screen.getByRole('button', { name: 'register.domains.taxVat' }));

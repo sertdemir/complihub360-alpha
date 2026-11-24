@@ -1459,5 +1459,66 @@
     "calls": "Últimas llamadas",
     "noCalls": "Todavía no hay llamadas.",
     "callsNote": "Hoy: {{count}} llamadas · {{limited}} × 429 · {{failed}} × 5xx. El registro conserva 90 días, sin contenidos y sin claves."
+  },
+  "invite": {
+    "eyebrow": "Onboarding de proveedores",
+    "titlePre": "Su invitación al ",
+    "titleGold": "onboarding",
+    "titlePost": ".",
+    "steps": {
+      "account": {
+        "title": "Cree su cuenta",
+        "desc": "Elija una contraseña. Su cuenta usa la dirección de correo de su solicitud."
+      },
+      "profile": {
+        "title": "Perfil de empresa y documentos",
+        "desc": "Complete los datos de su empresa, vea qué documentos se necesitan y súbalos."
+      },
+      "verification": {
+        "title": "Verificación",
+        "desc": "La verificación comienza cuando envía sus datos y documentos. Los revisamos a mano."
+      }
+    },
+    "notVerified": "Estar invitado no significa que su empresa ya esté verificada. Figura como verificada solo después de esa revisión.",
+    "hello": "Bienvenido",
+    "helloName": "Hola, {{name}}",
+    "lead": "Cree la cuenta de {{firm}} para continuar con el onboarding.",
+    "email": "Correo electrónico",
+    "emailHint": "Es la dirección de su solicitud. Con ella inicia sesión.",
+    "password": "Contraseña",
+    "passwordHint": "Al menos {{min}} caracteres.",
+    "passwordShort": "Elija una contraseña de al menos {{min}} caracteres, por favor.",
+    "passwordWeak": "Esta contraseña se rechazó por ser demasiado fácil de adivinar. Elija otra, por favor.",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "submit": "Crear cuenta",
+    "sending": "Creando…",
+    "validUntil": "Esta invitación es válida hasta el {{date}}.",
+    "loading": "Comprobando su invitación…",
+    "signIn": "Iniciar sesión",
+    "contact": "Contactar",
+    "failure": {
+      "exists": "Ya existe una cuenta con esta dirección de correo, por lo que no podemos crear una nueva aquí. Responda a su correo de invitación y vincularemos su solicitud con esa cuenta.",
+      "failed": "No se pudo crear la cuenta. No se ha perdido nada; inténtelo de nuevo. Si sigue fallando, responda a su correo de invitación.",
+      "signin": "Su cuenta está creada, pero el inicio de sesión no ha funcionado ahora. Inicie sesión con su dirección de correo y la contraseña elegida."
+    },
+    "problem": {
+      "invalid": {
+        "title": "Este enlace de invitación no es válido",
+        "body": "Puede que el enlace esté incompleto o que una invitación más reciente lo haya sustituido. Use el enlace de nuestro último correo o contáctenos."
+      },
+      "expired": {
+        "title": "Esta invitación ha caducado",
+        "body": "Los enlaces de invitación son válidos durante 14 días. Responda a su correo de invitación o contáctenos y le enviaremos uno nuevo."
+      },
+      "used": {
+        "title": "Esta invitación ya se ha utilizado",
+        "body": "Con este enlace se creó una cuenta. Puede iniciar sesión con la dirección de correo de su solicitud."
+      },
+      "unreachable": {
+        "title": "No pudimos comprobar su invitación",
+        "body": "El enlace no se comprobó, así que nada ha cambiado. Vuelva a cargar la página en un momento."
+      }
+    }
   }
 }

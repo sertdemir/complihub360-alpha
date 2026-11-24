@@ -21,6 +21,7 @@ import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, focusDomainsFor } from "./dashboard.js";
 import { checkMarketRequest, mergeMarketRequest } from "./marketRequests.js";
 import { handleContact, resendSender, contactRateLimited } from "./contact.js";
+import { handleProviderInvites, applicationRowOf, supabaseUserCreator, INVITE_PUBLIC_ROUTES } from "./providerInvites.js";
 import { hostedAuthConfigured, signState, verifyState, authUrl, exchangeCode, revokeGrant, settingsUrl } from "./nylasAuth.js";
 import { notify, notifyProviderMembers, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
@@ -321,6 +322,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         ['GET', /^\/api\/v1\/provider\/magic\//],          // single-use token IS the credential
         ['POST', /^\/api\/v1\/provider\/confirm$/],
         ['POST', /^\/api\/v1\/provider\/confirm-email$/],
+        ...INVITE_PUBLIC_ROUTES,                           // Einladung: der Link ist der Ausweis
     ];
     const isPublicRoute = PUBLIC_ROUTES.some(([m, rx]) => req.method === m && rx.test(req.url || ''));
 
@@ -506,6 +508,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     const forwardedIp = typeof req.headers['x-forwarded-for'] === 'string'
         ? (req.headers['x-forwarded-for'] as string).split(',')[0].trim() : (req.socket.remoteAddress || 'unknown');
     if (await handleProviderApplication(req, res, correlationId, caller, forwardedIp)) return;
+    // Bewerbung sichten, einladen, einloesen (providerInvites.ts).
+    if (/^\/api\/v1\/(?:admin\/provider-applications|provider-invite)(?:[/?]|$)/.test(req.url || '')) {
+        if (await handleProviderInvites(req, res, correlationId, caller, {
+            db: supabaseApi,
+            send: resendSender(process.env.RESEND_API_KEY),
+            mailFrom: process.env.MAIL_FROM || 'CompliHub360 <onboarding@resend.dev>',
+            inbox: process.env.CONTACT_INBOX?.trim() || null,
+            appUrl: process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com',
+            createUser: supabaseUserCreator(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY),
+            now: () => new Date(),
+        }, forwardedIp)) return;
+    }
     // Phase 7 (ADR-0010): Enterprise-API — Antrag und Schluessel des Anbieters
     // (hinter dem Ownership-Guard), Entscheidung des Teams (Admin-Gate).
     {
@@ -2835,7 +2849,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         }
     } else if (req.method === 'POST' && req.url === '/api/v1/contact') {
         // Kontaktseite und /provider-apply (contact.ts). Ein Postfach, die
-        // Nachricht geht dorthin und nicht in die Datenbank.
+        // Nachricht geht dorthin und nicht in die Datenbank. Ausnahme seit
+        // 24.11.2026: die Bewerbung wird zusaetzlich abgelegt (Admin-Bereich).
         res.setHeader('x-correlation-id', correlationId);
         if (contactRateLimited(ip)) {
             res.writeHead(429, { 'Content-Type': 'application/json' });
@@ -2867,6 +2882,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 mailFrom: process.env.MAIL_FROM || 'CompliHub360 <onboarding@resend.dev>',
                 send: resendSender(process.env.RESEND_API_KEY),
                 log: async (type, payload) => { await supabaseApi.insert('event_log', { type, payload: { ...payload, correlationId } }); },
+                storeApplication: async (r, reference) => { await supabaseApi.insert('provider_applications', applicationRowOf(r, reference)); },
             }, correlationId);
             res.writeHead(outcome.status, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ...outcome.body, correlationId }));

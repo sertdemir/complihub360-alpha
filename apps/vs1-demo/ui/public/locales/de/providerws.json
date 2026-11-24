@@ -1459,5 +1459,66 @@
     "calls": "Letzte Aufrufe",
     "noCalls": "Noch keine Aufrufe.",
     "callsNote": "Heute: {{count}} Aufrufe · {{limited}} × 429 · {{failed}} × 5xx. Das Protokoll hält 90 Tage, ohne Inhalte und ohne Schlüssel."
+  },
+  "invite": {
+    "eyebrow": "Anbieter-Onboarding",
+    "titlePre": "Ihre Einladung zum ",
+    "titleGold": "Onboarding",
+    "titlePost": ".",
+    "steps": {
+      "account": {
+        "title": "Konto einrichten",
+        "desc": "Wählen Sie ein Passwort. Ihr Konto nutzt die E-Mail-Adresse aus Ihrer Bewerbung."
+      },
+      "profile": {
+        "title": "Unternehmensprofil und Nachweise",
+        "desc": "Vervollständigen Sie Ihre Unternehmensdaten, sehen Sie, welche Nachweise benötigt werden, und laden Sie sie hoch."
+      },
+      "verification": {
+        "title": "Verifizierung",
+        "desc": "Die Verifizierung beginnt, sobald Sie Angaben und Nachweise einreichen. Wir prüfen sie von Hand."
+      }
+    },
+    "notVerified": "Eingeladen heißt noch nicht verifiziert. Als verifiziert wird Ihr Unternehmen erst nach dieser Prüfung geführt.",
+    "hello": "Willkommen",
+    "helloName": "Guten Tag {{name}}",
+    "lead": "Richten Sie das Konto für {{firm}} ein, um mit dem Onboarding fortzufahren.",
+    "email": "E-Mail",
+    "emailHint": "Das ist die Adresse aus Ihrer Bewerbung. Mit ihr melden Sie sich an.",
+    "password": "Passwort",
+    "passwordHint": "Mindestens {{min}} Zeichen.",
+    "passwordShort": "Bitte wählen Sie ein Passwort mit mindestens {{min}} Zeichen.",
+    "passwordWeak": "Dieses Passwort wurde als zu leicht zu erraten abgelehnt. Bitte wählen Sie ein anderes.",
+    "show": "Anzeigen",
+    "hide": "Verbergen",
+    "submit": "Konto einrichten",
+    "sending": "Wird eingerichtet…",
+    "validUntil": "Diese Einladung gilt bis {{date}}.",
+    "loading": "Ihre Einladung wird geprüft…",
+    "signIn": "Anmelden",
+    "contact": "Kontakt aufnehmen",
+    "failure": {
+      "exists": "Zu dieser E-Mail-Adresse gibt es bereits ein Konto, deshalb können wir hier kein neues anlegen. Bitte antworten Sie auf Ihre Einladungsmail, wir verknüpfen Ihre Bewerbung mit diesem Konto.",
+      "failed": "Das Konto konnte nicht eingerichtet werden. Es ist nichts verloren gegangen; bitte versuchen Sie es erneut. Bleibt es dabei, antworten Sie auf Ihre Einladungsmail.",
+      "signin": "Ihr Konto ist eingerichtet, die Anmeldung hat aber gerade nicht geklappt. Bitte melden Sie sich mit Ihrer E-Mail-Adresse und dem gewählten Passwort an."
+    },
+    "problem": {
+      "invalid": {
+        "title": "Dieser Einladungslink ist nicht gültig",
+        "body": "Der Link ist vielleicht unvollständig, oder eine neuere Einladung hat ihn ersetzt. Bitte nutzen Sie den Link aus unserer letzten E-Mail oder nehmen Sie Kontakt auf."
+      },
+      "expired": {
+        "title": "Diese Einladung ist abgelaufen",
+        "body": "Einladungslinks gelten 14 Tage. Antworten Sie auf Ihre Einladungsmail oder nehmen Sie Kontakt auf, dann senden wir Ihnen einen neuen."
+      },
+      "used": {
+        "title": "Diese Einladung wurde bereits verwendet",
+        "body": "Mit diesem Link wurde ein Konto eingerichtet. Sie können sich mit der E-Mail-Adresse aus Ihrer Bewerbung anmelden."
+      },
+      "unreachable": {
+        "title": "Wir konnten Ihre Einladung nicht prüfen",
+        "body": "Der Link wurde nicht geprüft, es hat sich nichts geändert. Bitte laden Sie die Seite gleich noch einmal."
+      }
+    }
   }
 }
