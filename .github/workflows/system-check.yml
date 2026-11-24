@@ -1,0 +1,144 @@
+# ─── Systemcheck von aussen: antworten die Anbindungen noch? ─────────────────
+#
+# Die API prueft stuendlich selbst, ob Supabase, Stripe, Resend, Nylas und das
+# LLM mit den hinterlegten Schluesseln antworten (dependencyCheck.ts), und
+# schreibt beim Kippen eine error-Zeile, die der Watchdog auf dem VPS mailt.
+# Dieser Lauf ist der zweite Weg: er fragt GET /api/v1/admin/readiness von
+# aussen und wird rot, wenn etwas nicht stimmt oder die API gar nicht
+# antwortet. Einen roten geplanten Lauf meldet GitHub per Mail an die Person,
+# die die cron-Zeile zuletzt geaendert hat. Dieser Weg haengt nicht an Resend:
+# kippt der Mail-Schluessel, kann der Watchdog nicht mailen, dieser Lauf schon.
+#
+# Geplante Laeufe kommen in diesem Repository stark verspaetet (gemessen am
+# 24.11.2026: stuendlich gestellt, alle 6 bis 12 Stunden gelaufen). Deshalb
+# zweimal am Tag und kein Ersatz fuer den Watchdog, nur ein Netz darunter.
+#
+# Wie watcher-tick.yml: kein checkout, kein Repository-Code, nur curl auf
+# ubuntu-latest. Secrets (Settings → Secrets → Actions), dieselben wie dort:
+#   STAGING_API_URL / STAGING_API_KEY, BETA_API_URL / BETA_API_KEY
+# Fehlen sie, ist der Lauf rot: ein geloeschtes oder umbenanntes Secret darf
+# die Pruefung nicht still abschalten.
+#
+# Die Ausgabe nennt je Anbindung Name, Zustand und einen festen Hinweis. Die
+# Antwort der API enthaelt keine Schluessel und keine Antwortkoerper.
+
+name: System Check
+
+on:
+  schedule:
+    - cron: '23 5,17 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: system-check
+  cancel-in-progress: false
+
+jobs:
+  staging:
+    name: Anbindungen auf Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET /api/v1/admin/readiness
+        env:
+          API_URL: ${{ secrets.STAGING_API_URL }}
+          API_KEY: ${{ secrets.STAGING_API_KEY }}
+          TARGET: Staging
+        run: |
+          set -uo pipefail
+          if [ -z "${API_URL:-}" ] || [ -z "${API_KEY:-}" ]; then
+            echo "::error::${TARGET}: API_URL oder API_KEY fehlt in den Secrets — es wurde nichts geprueft"
+            exit 1
+          fi
+          body=$(mktemp)
+          code=$(curl -sS --max-time 60 -o "$body" -w '%{http_code}' \
+            "${API_URL%/}/api/v1/admin/readiness?fresh=1" -H "x-api-key: ${API_KEY}") || {
+            echo "::error::${TARGET}-API war nicht erreichbar"
+            exit 1
+          }
+          case "$code" in
+            401|403) echo "::error::${TARGET}: abgewiesen ($code) — der API_KEY passt nicht, oder eine Wand steht vor /api"; exit 1 ;;
+            404)     echo "::error::${TARGET}: die Route fehlt (404) — dort laeuft ein Stand vor dem Systemcheck"; exit 1 ;;
+          esac
+          # Je Anbindung eine Zeile: Name, Zustand, Hinweis, Dauer.
+          jq -r '.checks[]? | "\(.name)\t\(.state)\t\(.note // "-")\t\(.ms) ms"' "$body" 2>/dev/null || true
+          # Ein Bericht ist nur, was wie einer aussieht. Eine 200 mit HTML (falsche
+          # URL, Wand, Ersatzseite) ist kein "alles gut".
+          if ! jq -e '(.ok | type) == "boolean" and (.checks | type) == "array" and (.checks | length) >= 6' "$body" >/dev/null 2>&1; then
+            echo "::error::${TARGET}: Status $code, aber die Antwort ist kein Bericht der API"
+            exit 1
+          fi
+          case "$code" in
+            200)
+              if jq -e '.ok == true' "$body" >/dev/null 2>&1; then
+                echo "✓ ${TARGET}: alle Anbindungen antworten"
+              else
+                echo "::error::${TARGET}: Status 200, aber der Bericht sagt ok=false"
+                exit 1
+              fi
+              ;;
+            503)
+              failing=$(jq -r '[.checks[]? | select(.state != "ok" and .state != "not_configured") | "\(.name) (\(.state))"] | join(", ")' "$body" 2>/dev/null || true)
+              missing=$(jq -r '. as $r | [.checks[]? | select(.state == "not_configured") | .name | select(. as $n | ($r.required // []) | index($n))] | join(", ")' "$body" 2>/dev/null || true)
+              unknown=$(jq -r '(.unknownRequired // []) | join(", ")' "$body" 2>/dev/null || true)
+              echo "::error::${TARGET}: gestoert: ${failing:-nichts}. Verlangt, aber nicht konfiguriert: ${missing:-nichts}. Unbekannt in READINESS_REQUIRED: ${unknown:-nichts}."
+              exit 1
+              ;;
+            *)       echo "::error::${TARGET}: unerwarteter Status $code"; exit 1 ;;
+          esac
+
+  beta:
+    name: Anbindungen auf der Beta
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET /api/v1/admin/readiness
+        env:
+          API_URL: ${{ secrets.BETA_API_URL }}
+          API_KEY: ${{ secrets.BETA_API_KEY }}
+          TARGET: Beta
+        run: |
+          set -uo pipefail
+          if [ -z "${API_URL:-}" ] || [ -z "${API_KEY:-}" ]; then
+            echo "::error::${TARGET}: API_URL oder API_KEY fehlt in den Secrets — es wurde nichts geprueft"
+            exit 1
+          fi
+          body=$(mktemp)
+          code=$(curl -sS --max-time 60 -o "$body" -w '%{http_code}' \
+            "${API_URL%/}/api/v1/admin/readiness?fresh=1" -H "x-api-key: ${API_KEY}") || {
+            echo "::error::${TARGET}-API war nicht erreichbar"
+            exit 1
+          }
+          case "$code" in
+            401|403) echo "::error::${TARGET}: abgewiesen ($code) — der API_KEY passt nicht, oder eine Wand steht vor /api"; exit 1 ;;
+            404)     echo "::error::${TARGET}: die Route fehlt (404) — dort laeuft ein Stand vor dem Systemcheck"; exit 1 ;;
+          esac
+          # Je Anbindung eine Zeile: Name, Zustand, Hinweis, Dauer.
+          jq -r '.checks[]? | "\(.name)\t\(.state)\t\(.note // "-")\t\(.ms) ms"' "$body" 2>/dev/null || true
+          # Ein Bericht ist nur, was wie einer aussieht. Eine 200 mit HTML (falsche
+          # URL, Wand, Ersatzseite) ist kein "alles gut".
+          if ! jq -e '(.ok | type) == "boolean" and (.checks | type) == "array" and (.checks | length) >= 6' "$body" >/dev/null 2>&1; then
+            echo "::error::${TARGET}: Status $code, aber die Antwort ist kein Bericht der API"
+            exit 1
+          fi
+          case "$code" in
+            200)
+              if jq -e '.ok == true' "$body" >/dev/null 2>&1; then
+                echo "✓ ${TARGET}: alle Anbindungen antworten"
+              else
+                echo "::error::${TARGET}: Status 200, aber der Bericht sagt ok=false"
+                exit 1
+              fi
+              ;;
+            503)
+              failing=$(jq -r '[.checks[]? | select(.state != "ok" and .state != "not_configured") | "\(.name) (\(.state))"] | join(", ")' "$body" 2>/dev/null || true)
+              missing=$(jq -r '. as $r | [.checks[]? | select(.state == "not_configured") | .name | select(. as $n | ($r.required // []) | index($n))] | join(", ")' "$body" 2>/dev/null || true)
+              unknown=$(jq -r '(.unknownRequired // []) | join(", ")' "$body" 2>/dev/null || true)
+              echo "::error::${TARGET}: gestoert: ${failing:-nichts}. Verlangt, aber nicht konfiguriert: ${missing:-nichts}. Unbekannt in READINESS_REQUIRED: ${unknown:-nichts}."
+              exit 1
+              ;;
+            *)       echo "::error::${TARGET}: unerwarteter Status $code"; exit 1 ;;
+          esac

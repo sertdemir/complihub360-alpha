@@ -2910,6 +2910,45 @@ describe('POST /api/v1/admin/watchers/tick', () => {
     });
 });
 
+// Systemcheck 24.11.2026: die Route, ueber die ein Mensch oder ein Lauf von
+// aussen fragt, ob die Anbindungen noch antworten. Die Pruefungen selbst haelt
+// dependencyCheck.test.ts; hier zaehlt, wer fragen darf und was der Status sagt.
+describe('GET /api/v1/admin/readiness', () => {
+    // Die "Datenbank" ist im Test der lokale JWKS-Server: er antwortet auf alles mit 200.
+    beforeEach(() => { process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key'; });
+    afterEach(() => { delete process.env.SUPABASE_SERVICE_ROLE_KEY; delete process.env.READINESS_REQUIRED; });
+
+    it('bleibt fuer Gaeste und fuer angemeldete Nutzer zu', async () => {
+        expect((await api('/api/v1/admin/readiness', { auth: 'none' })).status).toBe(401);
+        const user = await api('/api/v1/admin/readiness', { auth: 'jwt' });
+        expect(user.status).toBe(403);
+        expect(user.body.checks).toBeUndefined();
+    });
+
+    it('mit Server-Key: 200, je Anbindung ein Zustand, kein Geheimnis', async () => {
+        const r = await api('/api/v1/admin/readiness?fresh=1');
+        expect(r.status).toBe(200);
+        expect(r.body.ok).toBe(true);
+        expect(r.body.checks.map((c: any) => c.name)).toEqual(['database', 'stripe', 'mail', 'calendar', 'calendar_grants', 'llm']);
+        expect(r.body.checks.find((c: any) => c.name === 'database').state).toBe('ok');
+        expect(r.body.checks.find((c: any) => c.name === 'mail').state).toBe('not_configured');
+        expect(JSON.stringify(r.body)).not.toContain('test-service-key');
+    });
+
+    it('fehlt etwas Verlangtes, antwortet die Route mit 503 und nennt es', async () => {
+        process.env.READINESS_REQUIRED = 'mail';
+        const r = await api('/api/v1/admin/readiness?fresh=1');
+        expect(r.status).toBe(503);
+        expect(r.body.ok).toBe(false);
+        expect(r.body.required).toEqual(['database', 'mail']);
+    });
+
+    it('ohne ?fresh=1 kommt die zweite Antwort aus dem Zwischenspeicher', async () => {
+        await api('/api/v1/admin/readiness?fresh=1');
+        expect((await api('/api/v1/admin/readiness')).body.cached).toBe(true);
+    });
+});
+
 describe('Zurueckziehen und Erinnern gehoeren dem Ersteller', () => {
     const seedEngagement = (over: Record<string, any> = {}) => {
         const row = { id: randomUUID(), user_id: USER_ID, provider_key: 'test-kanzlei', country: 'DE', category: 'vat', status: 'created', created_at: new Date().toISOString(), ...over };
