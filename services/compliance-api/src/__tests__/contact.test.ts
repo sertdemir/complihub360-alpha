@@ -83,18 +83,25 @@ describe('handleContact', () => {
         expect(ack('support')).toContain('next business day');
         expect(ack('partner')).toContain('within 3 business days');
         expect(ack('privacy')).toContain('Art. 12 GDPR');
-        expect(renderAckMail((checkContact(APP) as any).request, 'i@x.de', 'r').subject).toBe('We have received your application');
-        // P01 (24.11.2026): Die Bestaetigung sagt, was jetzt geprueft wird und was
-        // erst nach der Einladung kommt — in jeder Sprache.
-        for (const locale of ['en', 'de', 'es', 'tr'] as const) {
-            const text = renderAckMail({ ...(checkContact(APP) as any).request, locale }, 'i@x.de', 'r').text;
-            expect(text).toMatch(/onboarding/i);
-            expect(text).toMatch(/\b3\b/);
-        }
-        const en = renderAckMail((checkContact(APP) as any).request, 'i@x.de', 'r').text;
-        expect(en).toContain('We cannot verify documents at this point');
-        expect(en).toContain('only then does the verification begin');
+        expect(renderAckMail((checkContact(APP) as any).request, 'i@x.de', 'r').subject).toBe('We’ve received your CompliHub360 provider application');
+        // P01 (24.11.2026): Die Bestaetigung sagt, dass das Team die Angaben
+        // sichtet, wann die Rueckmeldung kommt und dass Unterlagen erst ueber
+        // die Einladung kommen — in jeder Sprache, ohne dem Bewerber ein
+        // Versaeumnis nahezulegen.
+        const mail = (locale: string) => renderAckMail({ ...(checkContact(APP) as any).request, locale }, 'i@x.de', 'r').text;
+        const en = mail('en');
+        expect(en).toContain('email you within three business days');
+        expect(en).toContain('an invitation link to complete your company profile and upload the documents');
+        expect(en).toContain('For now, you can wait for our next email.');
+        expect(en).toContain('If you have a question about your application, you can reply to this message.');
+        expect(en).not.toContain('We cannot verify documents');
+        expect(en).not.toContain('personal link');
         expect(en).not.toContain('credentials, website, coverage');
+        expect(mail('de')).toContain('Einladungslink');
+        expect(mail('es')).toContain('enlace de invitación');
+        expect(mail('tr')).toContain('davet bağlantısı');
+        // Die uebrigen Wege behalten ihren Antwortsatz.
+        expect(renderAckMail({ ...(checkContact(APP) as any).request, lane: 'support', application: undefined }, 'i@x.de', 'r').text).toContain('simply reply to this email');
     });
 
     it('Bewerbung: strukturierte Felder in der Mail ans Postfach', async () => {
