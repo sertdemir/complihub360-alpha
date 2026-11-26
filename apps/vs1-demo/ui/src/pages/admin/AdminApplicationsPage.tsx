@@ -146,7 +146,7 @@ export function AdminApplicationsPage() {
                                   <Fact label="Email" value={a.email} />
                                   <Fact label="Website" value={a.website} />
                                   <Fact label="Form language" value={a.locale.toUpperCase()} />
-                                  <Fact label="Licence / qualification" value={a.credentials} wide />
+                                  <Fact label="License / qualification" value={a.credentials} wide />
                                   <Fact label="Message" value={a.message} wide />
                                   <Fact label="Areas" value={a.areas.join(', ')} />
                                   <Fact label="Markets" value={a.markets.join(', ')} />

@@ -429,7 +429,7 @@
         "title": "Consumers for personal use"
       },
       "cuBusinesses": {
-        "title": "Businesses or organisations"
+        "title": "Businesses or organizations"
       },
       "cuBoth": {
         "title": "Both"
@@ -527,7 +527,7 @@
     "generate": "Create My Risk Map",
     "removeMarket": "Remove {{market}}",
     "aboutMarket": "About {{market}}",
-    "situationHint": "A personal matter? CompliHub360 is built for businesses for now — a local advice centre is the better first step.",
+    "situationHint": "A personal matter? CompliHub360 is built for businesses for now — a local advice center is the better first step.",
     "suggest": {
       "title": "Areas that may fit your answers",
       "note": "These are the areas we can identify from your answers so far. Some needs may require clarification or a Provider’s assessment.",
@@ -699,7 +699,7 @@
           "EPR registration & unique IDs (IDU)",
           "AGEC ecomodulation contributions",
           "WEEE & battery schemes",
-          "Triman & sorting-info labelling",
+          "Triman & sorting-info labeling",
           "Repairability / durability index"
         ],
         "matters": [
@@ -711,12 +711,12 @@
       "italy": {
         "name": "Italy",
         "regime": "EU-VAT · OSS · CONAI · REACH",
-        "intro": "Italy applies EU VAT with OSS and mandatory e-invoicing (SdI) for many flows. Packaging EPR runs through CONAI with environmental-labelling obligations, while REACH applies to chemical content in goods.",
+        "intro": "Italy applies EU VAT with OSS and mandatory e-invoicing (SdI) for many flows. Packaging EPR runs through CONAI with environmental-labeling obligations, while REACH applies to chemical content in goods.",
         "cover": [
           "EU-VAT registration · OSS returns",
           "SdI e-invoicing where required",
           "CONAI packaging contributions",
-          "Environmental labelling (CONAI)",
+          "Environmental labeling (CONAI)",
           "WEEE & battery registration",
           "REACH substance obligations"
         ],

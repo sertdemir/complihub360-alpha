@@ -39,12 +39,12 @@ const CELL: Record<CellState, { tone: BadgeTone; icon: typeof CheckCircle2; colo
   suspended: { tone: 'neutral', icon: Clock, color: 'text-fg-tertiary', label: 'Suspended' },
   expired: { tone: 'neutral', icon: Clock, color: 'text-fg-tertiary', label: 'Expired' },
 };
-const EVIDENCE_LABEL: Record<string, string> = { incorporation: 'Commercial register extract', vat_id: 'VAT ID (VIES)', insurance: 'Professional liability insurance', representative_identity: 'Authorised representative', professional_licence: 'Professional licence' };
+const EVIDENCE_LABEL: Record<string, string> = { incorporation: 'Commercial register extract', vat_id: 'VAT ID (VIES)', insurance: 'Professional liability insurance', representative_identity: 'Authorized representative', professional_licence: 'Professional license' };
 const RESULT: Record<ReviewEvidence['result'], { label: string; tone: BadgeTone }> = { received: { label: 'Received', tone: 'info' }, reviewed: { label: 'Verified', tone: 'success' }, independently_verified: { label: 'Registry-verified', tone: 'success' }, rejected: { label: 'Rejected', tone: 'error' }, expired: { label: 'Expired', tone: 'error' } };
 const GATE_LABEL: Record<string, string> = {
   'evidence.incorporation': 'Register extract verified', 'evidence.vat_id': 'VAT ID confirmed (VIES)', 'evidence.insurance': 'Insurance verified', 'evidence.representative_identity': 'Representative verified',
-  'coverage.none_approved': '≥ 1 cell approved', 'agreements.provider_agreement': 'Provider agreement accepted', 'agreements.privacy_notice': 'Privacy notice accepted', 'agreements.billing_authorization': 'Billing authorisation accepted',
-  'billing.not_ready': 'not ready', 'billing.no_payment_method': 'no payment method', 'billing.incomplete_billing_info': 'billing details incomplete', 'billing.inactive_subscription': 'no active subscription', 'billing.withdrawn_authorization': 'authorisation withdrawn', 'billing.overdue_invoice': 'overdue invoice', 'billing.account_paused': 'account paused',
+  'coverage.none_approved': '≥ 1 cell approved', 'agreements.provider_agreement': 'Provider agreement accepted', 'agreements.privacy_notice': 'Privacy notice accepted', 'agreements.billing_authorization': 'Billing authorization accepted',
+  'billing.not_ready': 'not ready', 'billing.no_payment_method': 'no payment method', 'billing.incomplete_billing_info': 'billing details incomplete', 'billing.inactive_subscription': 'no active subscription', 'billing.withdrawn_authorization': 'authorization withdrawn', 'billing.overdue_invoice': 'overdue invoice', 'billing.account_paused': 'account paused',
   'plan.category_allowance': 'Plan category allowance', 'lifecycle.terminated': 'Account closed',
 };
 // Ohne 'billing.not_ready': Zahlungsbereitschaft sperrt die gebuehrenpflichtige
@@ -60,24 +60,24 @@ function fmt(iso: string | null | undefined, locale: string, time = false): stri
 
 /** Aktionen einer Zelle. In regulierten Bereichen ohne gepruefte Zulassung
  *  (R1, Entscheidung b) kein Approve und kein Limit — der Server antwortet
- *  dort 422 LICENCE_REQUIRED —, sondern "Request licence" als Hauptaktion. */
+ *  dort 422 LICENCE_REQUIRED —, sondern "Request license" als Hauptaktion. */
 export function cellActions(st: CellState, licence?: CellLicence): Array<[string, CellAction, 'success' | 'ghost']> {
   const base: Array<[string, CellAction, 'success' | 'ghost']> = st === 'pending' || st === 'requested' ? [['Approve', 'approve', 'success'], ['Limit', 'limit', 'ghost'], ['Reject', 'reject', 'ghost'], ['Request', 'request_info', 'ghost']]
     : st === 'approved' ? [['Limit', 'limit', 'ghost'], ['Pause', 'pause', 'ghost']] : st === 'limited' ? [['Approve', 'approve', 'success'], ['Pause', 'pause', 'ghost']] : [['Reopen', 'reopen', 'ghost']];
   if (!licence?.required || licence.state === 'reviewed' || st === 'rejected' || st === 'suspended' || st === 'expired') return base;
-  return [['Request licence', 'request_info', 'success'], ...base.filter(([, a]) => a !== 'approve' && a !== 'limit' && a !== 'request_info')];
+  return [['Request license', 'request_info', 'success'], ...base.filter(([, a]) => a !== 'approve' && a !== 'limit' && a !== 'request_info')];
 }
 
 /** Zulassungsstand einer Zelle (Entscheidung b). Admin-Copy bleibt Englisch. */
 export function LicenceLine({ licence, country, locale }: { licence: CellLicence; country: string; locale: string }) {
-  if (!licence.required) return <p className="mt-1 text-[12px] text-fg-tertiary">No licence needed</p>;
+  if (!licence.required) return <p className="mt-1 text-[12px] text-fg-tertiary">No license needed</p>;
   if (licence.state === 'reviewed') {
-    return <p className="mt-1 flex items-center gap-1.5 text-[12px] font-semibold text-fg-brand"><ShieldCheck size={13} aria-hidden />Licence reviewed{licence.expires_at ? ` · until ${fmt(licence.expires_at, locale)}` : ''}</p>;
+    return <p className="mt-1 flex items-center gap-1.5 text-[12px] font-semibold text-fg-brand"><ShieldCheck size={13} aria-hidden />License reviewed{licence.expires_at ? ` · until ${fmt(licence.expires_at, locale)}` : ''}</p>;
   }
   return (
     <p className="mt-1 flex items-center gap-1.5 text-[12px] font-semibold text-warning-800 dark:text-amber-300">
       <Info size={13} aria-hidden />
-      {licence.state === 'expired' ? `Licence expired${licence.expires_at ? ` · ${fmt(licence.expires_at, locale)}` : ''}` : `No reviewed licence for ${country}`}
+      {licence.state === 'expired' ? `License expired${licence.expires_at ? ` · ${fmt(licence.expires_at, locale)}` : ''}` : `No reviewed license for ${country}`}
     </p>
   );
 }
@@ -348,7 +348,7 @@ function ReasonDialog({ dialog, onClose, onSubmit }: { dialog: { kind: 'cell'; c
           </label>
         )}
         <label className="block text-[12px] text-fg-tertiary">{needsReason ? 'Reason — the provider reads this' : 'Note (optional)'}
-          <Textarea inputSize="sm" rows={4} value={reason} onChange={(e) => setReason(e.target.value)} className="mt-1" placeholder={dialog.kind === 'request' ? 'e.g. Please provide the tax-advisory licence for Austria (chamber certificate or register extract).' : ''} />
+          <Textarea inputSize="sm" rows={4} value={reason} onChange={(e) => setReason(e.target.value)} className="mt-1" placeholder={dialog.kind === 'request' ? 'e.g. Please provide the tax-advisory license for Austria (chamber certificate or register extract).' : ''} />
         </label>
         <p className="text-[12px] text-fg-tertiary">Plain, actionable, no deadline threats. The provider sees exactly this text in the Verification Center and by email.</p>
       </div>

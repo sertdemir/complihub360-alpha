@@ -15,27 +15,27 @@ describe('cellActions', () => {
   it('offers Approve with a reviewed licence', () => {
     expect(labels(cellActions('pending', { required: true, state: 'reviewed', expires_at: '2027-03-31' }))).toEqual(['Approve', 'Limit', 'Reject', 'Request']);
   });
-  it('replaces Approve and Limit with "Request licence" when the licence is missing or expired', () => {
+  it('replaces Approve and Limit with "Request license" when the licence is missing or expired', () => {
     for (const state of ['missing', 'expired'] as const) {
       const xs = labels(cellActions('pending', { required: true, state, expires_at: null }));
-      expect(xs[0]).toBe('Request licence');
+      expect(xs[0]).toBe('Request license');
       expect(xs).not.toContain('Approve');
       expect(xs).not.toContain('Limit');
       expect(xs).toContain('Reject');
     }
   });
   it('keeps Pause on an approved cell whose licence has lapsed', () => {
-    expect(labels(cellActions('approved', { required: true, state: 'expired', expires_at: '2026-01-31' }))).toEqual(['Request licence', 'Pause']);
+    expect(labels(cellActions('approved', { required: true, state: 'expired', expires_at: '2026-01-31' }))).toEqual(['Request license', 'Pause']);
   });
 });
 
 describe('LicenceLine', () => {
   it('names the country when the licence is missing', () => {
     render(<LicenceLine licence={{ required: true, state: 'missing', expires_at: null }} country="AT" locale="en" />);
-    expect(screen.getByText('No reviewed licence for AT')).toBeInTheDocument();
+    expect(screen.getByText('No reviewed license for AT')).toBeInTheDocument();
   });
   it('says when no licence is needed', () => {
     render(<LicenceLine licence={{ required: false, state: 'not_required', expires_at: null }} country="DE" locale="en" />);
-    expect(screen.getByText('No licence needed')).toBeInTheDocument();
+    expect(screen.getByText('No license needed')).toBeInTheDocument();
   });
 });
