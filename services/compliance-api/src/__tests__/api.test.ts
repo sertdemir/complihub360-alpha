@@ -2949,6 +2949,60 @@ describe('GET /api/v1/admin/readiness', () => {
     });
 });
 
+// Stufe A (24.11.2026): der Szenario-Laeufer, der spaeter mit zwei echten
+// Konten gegen Staging laeuft, hier gegen die echten Routen dieses Servers.
+// Bricht eine Route ihre Form, faellt es hier auf und nicht erst auf Staging.
+describe('Stufe A: Szenarien zwischen Nutzer und Anbieter (scripts/e2e/scenarios.mjs)', () => {
+    const tokens = () => ({ user: USER_JWT, provider: signJwt({ sub: MEMBER_ID, email: 'member@complihub.test' }) });
+    const run = async (level: 'smoke' | 'full') => {
+        // @ts-expect-error — reines ESM-Skript ohne Typen, absichtlich ausserhalb des Workspaces
+        const { runScenarios } = await import('../../../../scripts/e2e/scenarios.mjs');
+        const lines: string[] = [];
+        const out = await runScenarios({ apiUrl: BASE, level, tokens: tokens(), apiKey: API_KEY, providerRef: refOf('test-kanzlei'), log: (l: string) => lines.push(l) });
+        return { out, lines };
+    };
+    beforeEach(() => { process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key'; });
+    afterEach(() => { delete process.env.SUPABASE_SERVICE_ROLE_KEY; });
+
+    it('smoke: liest nur, alles bestanden, nichts geschrieben', async () => {
+        seedBookable();
+        seedBetaAgreement();
+        const { out, lines } = await run('smoke');
+        expect(lines.filter((l) => l.includes('✗'))).toEqual([]);
+        expect(out).toMatchObject({ ok: true, failed: 0, skipped: 0 });
+        expect(db.scheduling ?? []).toHaveLength(0);
+        expect(db.user_agreement_acceptance ?? []).toHaveLength(0);
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+    });
+
+    it('full: Annahme, Buchung, Wiederholung, vergebener Termin, Absage, und am Ende steht nichts Bestaetigtes', async () => {
+        seedBookable();
+        seedBetaAgreement();
+        const { out, lines } = await run('full');
+        expect(lines.filter((l) => l.includes('✗'))).toEqual([]);
+        expect(out).toMatchObject({ ok: true, failed: 0, skipped: 0 });
+        // Genau eine Buchung, genau eine Belastung, und sie ist abgesagt.
+        expect(db.scheduling).toHaveLength(1);
+        expect(db.scheduling[0].status).toBe('cancelled');
+        expect(stripeMock.createPaymentIntent).toHaveBeenCalledTimes(1);
+        expect(db.user_agreement_acceptance).toHaveLength(1);
+        // Was der Laeufer hinterlaesst, ist als Test gekennzeichnet.
+        expect(String(db.scheduling[0].message)).toMatch(/^\[E2E-Test\]/);
+    });
+
+    it('full: ist der Anbieter nicht buchbar, scheitert der Lauf sichtbar und bucht nichts', async () => {
+        seedBookable({ bookable: false });
+        seedBetaAgreement();
+        const { out, lines } = await run('full');
+        expect(out.ok).toBe(false);
+        expect(lines.some((l) => l.includes('✗') && l.includes('PROVIDER_NOT_BOOKABLE'))).toBe(true);
+        expect(db.scheduling ?? []).toHaveLength(0);
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+        // Was an der Buchung haengt, ist uebersprungen und nicht als bestanden gezaehlt.
+        expect(out.skipped).toBeGreaterThan(0);
+    });
+});
+
 describe('Zurueckziehen und Erinnern gehoeren dem Ersteller', () => {
     const seedEngagement = (over: Record<string, any> = {}) => {
         const row = { id: randomUUID(), user_id: USER_ID, provider_key: 'test-kanzlei', country: 'DE', category: 'vat', status: 'created', created_at: new Date().toISOString(), ...over };
