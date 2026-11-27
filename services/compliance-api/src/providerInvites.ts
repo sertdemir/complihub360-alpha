@@ -12,6 +12,8 @@ import type { Caller } from './providerAuth.js';
 //   received    Die Bewerbung ist da. Ein Mensch sichtet sie im Admin-Bereich.
 //   invited     "Zum Onboarding einladen": das System verschickt einen Link,
 //               der nur zu dieser Bewerbung gehoert. Der Zeitpunkt steht dran.
+//   declined    Abgelehnt, mit Grund per Mail (27.11.2026). Nicht endgueltig:
+//               eine abgelehnte Bewerbung kann spaeter eingeladen werden.
 //   onboarding  Der Link wurde eingeloest: es gibt ein Konto und einen
 //               Anbieter im Entwurf. Ab hier laeuft der bestehende Weg
 //               (Application, Nachweise, Einreichen, Pruefung).
@@ -24,6 +26,7 @@ import type { Caller } from './providerAuth.js';
 //
 //   GET  /api/v1/admin/provider-applications             Liste (Admin)
 //   POST /api/v1/admin/provider-applications/:id/invite  einladen (Admin)
+//   POST /api/v1/admin/provider-applications/:id/decline ablehnen { reason } (Admin)
 //   GET  /api/v1/provider-invite?token=…                 Link pruefen (offen)
 //   POST /api/v1/provider-invite/accept                  Konto einrichten (offen)
 //
@@ -50,7 +53,7 @@ export interface ApplicationRow {
     areas: string[];
     markets: string[];
     message: string | null;
-    status: 'received' | 'invited' | 'onboarding';
+    status: 'received' | 'invited' | 'onboarding' | 'declined';
     invited_at: string | null;
     invited_by: string | null;
     invite_token_hash: string | null;
@@ -59,6 +62,9 @@ export interface ApplicationRow {
     redeemed_at: string | null;
     provider_key: string | null;
     user_id: string | null;
+    declined_at?: string | null;
+    declined_by?: string | null;
+    decline_reason?: string | null;
 }
 
 /** Die Zeile, die aus einer Bewerbung der Kontaktroute wird. */
@@ -110,6 +116,8 @@ export function adminView(row: ApplicationRow, now: Date) {
         invite_send_count: row.invite_send_count ?? 0,
         redeemed_at: row.redeemed_at,
         provider_key: row.provider_key,
+        declined_at: row.declined_at ?? null,
+        decline_reason: row.decline_reason ?? null,
     };
 }
 
@@ -265,6 +273,7 @@ export async function listApplications(deps: InviteDeps): Promise<Outcome> {
                 received: views.filter((v) => v.status === 'received').length,
                 invited: views.filter((v) => v.status === 'invited').length,
                 onboarding: views.filter((v) => v.status === 'onboarding').length,
+                declined: views.filter((v) => v.status === 'declined').length,
             },
         },
     };
@@ -300,10 +309,119 @@ export async function inviteApplication(deps: InviteDeps, id: string, invitedBy:
         await deps.db.insert('event_log', { type: 'provider_invite_failed', payload: { applicationId: id, status: sent.status } }).catch(() => {});
         return { status: 502, body: { errorCode: 'INVITE_SEND_FAILED', message: 'The invitation could not be sent; nothing was changed' } };
     }
-    const patch = { status: 'invited', invited_at: now.toISOString(), invited_by: invitedBy, invite_send_count: (row.invite_send_count ?? 0) + 1 };
+    // Eine fruehere Ablehnung ist damit ueberholt; der Vorgang steht im event_log.
+    const patch = { status: 'invited', invited_at: now.toISOString(), invited_by: invitedBy, invite_send_count: (row.invite_send_count ?? 0) + 1, declined_at: null, declined_by: null, decline_reason: null };
     await deps.db.update('provider_applications', { id }, patch);
-    await deps.db.insert('event_log', { type: 'provider_invited', payload: { applicationId: id, by: invitedBy, resend: row.status === 'invited' } }).catch(() => {});
+    await deps.db.insert('event_log', { type: 'provider_invited', payload: { applicationId: id, by: invitedBy, resend: row.status === 'invited', afterDecline: row.status === 'declined' } }).catch(() => {});
     return { status: 200, body: { ok: true, application: adminView({ ...row, ...patch, invite_expires_at: expires.toISOString() } as ApplicationRow, now) } };
+}
+
+// ─── Ablehnen ────────────────────────────────────────────────────────────────
+// /provider-apply verspricht eine begruendete Antwort. Eine Ablehnung ist
+// deshalb immer eine Mail mit Grund: erst die Mail, dann der Stand. Geht sie
+// nicht hinaus, bleibt die Bewerbung, wie sie war. Die Mail draengt nicht,
+// wertet nicht und laesst den Weg zu einem Menschen offen (Antwort genuegt).
+// Entwurf vom 27.11.2026, nicht abgenommen; de, es und tr nicht von
+// Muttersprachlern freigegeben.
+
+export const DECLINE_REASON_MIN = 20;
+export const DECLINE_REASON_MAX = 1200;
+
+type DeclineStrings = { subject: string; hello: string; helloName: string; intro: string; outcome: string; reasonLabel: string; reply: string };
+
+const DECLINE: Record<Locale, DeclineStrings> = {
+    en: {
+        subject: 'An update on your CompliHub360 provider application',
+        hello: 'Hello,',
+        helloName: 'Hi {name},',
+        intro: 'thank you for applying with {firm} and for the time you put into your application.',
+        outcome: 'We have reviewed it and will not invite you to onboarding at this point.',
+        reasonLabel: 'Our reason',
+        reply: 'If something has changed or you think we have missed something, you can reply to this message. A person reads it.',
+    },
+    de: {
+        subject: 'Neuigkeiten zu Ihrer Bewerbung als CompliHub360-Anbieter',
+        hello: 'Guten Tag,',
+        helloName: 'Guten Tag {name},',
+        intro: 'vielen Dank für Ihre Bewerbung mit {firm} und für die Zeit, die Sie sich dafür genommen haben.',
+        outcome: 'Wir haben sie geprüft und laden Sie derzeit nicht zum Onboarding ein.',
+        reasonLabel: 'Unser Grund',
+        reply: 'Hat sich etwas geändert oder haben wir aus Ihrer Sicht etwas übersehen, können Sie auf diese Nachricht antworten. Ein Mensch liest sie.',
+    },
+    es: {
+        subject: 'Novedades sobre su solicitud como proveedor de CompliHub360',
+        hello: 'Hola:',
+        helloName: 'Hola, {name}:',
+        intro: 'gracias por su solicitud con {firm} y por el tiempo que le ha dedicado.',
+        outcome: 'La hemos revisado y por ahora no le invitaremos al onboarding.',
+        reasonLabel: 'Nuestro motivo',
+        reply: 'Si algo ha cambiado o cree que hemos pasado algo por alto, puede responder a este mensaje. Lo lee una persona.',
+    },
+    tr: {
+        subject: 'CompliHub360 sağlayıcı başvurunuzla ilgili güncelleme',
+        hello: 'Merhaba,',
+        helloName: 'Merhaba {name},',
+        intro: '{firm} ile yaptığınız başvuru ve ayırdığınız zaman için teşekkür ederiz.',
+        outcome: 'Başvurunuzu inceledik ve şu aşamada sizi onboarding sürecine davet etmeyeceğiz.',
+        reasonLabel: 'Gerekçemiz',
+        reply: 'Bir şey değiştiyse veya gözden kaçırdığımız bir nokta olduğunu düşünüyorsanız bu mesajı yanıtlayabilirsiniz. Mesajınızı bir kişi okur.',
+    },
+};
+
+export function renderDeclineMail(row: Pick<ApplicationRow, 'locale' | 'first_name' | 'firm' | 'email'>, reason: string, replyTo: string | null): OutgoingMail {
+    const t = DECLINE[row.locale] ?? DECLINE.en;
+    const text = [
+        row.first_name ? t.helloName.replace('{name}', row.first_name) : t.hello,
+        t.intro.replace('{firm}', row.firm),
+        '',
+        t.outcome,
+        '',
+        `${t.reasonLabel}:`,
+        reason,
+        '',
+        t.reply,
+        '',
+        'CompliHub360',
+    ].join('\n');
+    return { to: row.email, subject: t.subject, text, ...(replyTo ? { replyTo } : {}) };
+}
+
+/* eslint-disable-next-line no-control-regex */
+const CTRL = /[\u0000-\u0008\u000b-\u001f\u007f]/g;
+
+export async function declineApplication(deps: InviteDeps, id: string, declinedBy: string | null, input: Record<string, unknown>): Promise<Outcome> {
+    if (!UUID_RX.test(id)) return { status: 400, body: { errorCode: 'VALIDATION_ERROR', message: 'Unknown application id' } };
+    const reason = typeof input.reason === 'string' ? input.reason.replace(/\r\n?/g, '\n').replace(CTRL, '').trim() : '';
+    if (reason.length < DECLINE_REASON_MIN || reason.length > DECLINE_REASON_MAX) {
+        return { status: 400, body: { errorCode: 'VALIDATION_ERROR', field: 'reason', message: `reason: ${DECLINE_REASON_MIN} to ${DECLINE_REASON_MAX} characters; the applicant reads it` } };
+    }
+    const row = ((await deps.db.select('provider_applications', { id }, { limit: 1 })) as ApplicationRow[])[0];
+    if (!row) return { status: 404, body: { errorCode: 'NOT_FOUND', message: 'Application not found' } };
+    if (row.status === 'onboarding') {
+        return { status: 409, body: { errorCode: 'ALREADY_ONBOARDING', message: 'The provider has an account; this is decided in the review queue' } };
+    }
+    if (row.status === 'declined') {
+        return { status: 409, body: { errorCode: 'ALREADY_DECLINED', message: 'This application was already declined' } };
+    }
+    if (!deps.send) return { status: 503, body: { errorCode: 'MAIL_UNAVAILABLE', message: 'Mail delivery is not configured; nothing was sent or changed' } };
+
+    let sent: SendResult;
+    try {
+        sent = await deps.send(renderDeclineMail(row, reason, deps.inbox), deps.mailFrom);
+    } catch {
+        sent = { ok: false, status: 0 };
+    }
+    if (!sent.ok) {
+        await deps.db.insert('event_log', { type: 'provider_decline_failed', payload: { applicationId: id, status: sent.status } }).catch(() => {});
+        return { status: 502, body: { errorCode: 'DECLINE_SEND_FAILED', message: 'The message could not be sent; nothing was changed' } };
+    }
+    const now = deps.now();
+    // Ein offener Einladungslink gilt nach der Ablehnung nicht mehr.
+    const patch = { status: 'declined' as const, declined_at: now.toISOString(), declined_by: declinedBy, decline_reason: reason, invite_token_hash: null, invite_expires_at: null };
+    await deps.db.update('provider_applications', { id }, patch);
+    // Das Protokoll traegt den Vorgang, nicht den Text.
+    await deps.db.insert('event_log', { type: 'provider_application_declined', payload: { applicationId: id, by: declinedBy, wasInvited: row.status === 'invited' } }).catch(() => {});
+    return { status: 200, body: { ok: true, application: adminView({ ...row, ...patch }, now) } };
 }
 
 // ─── Der Link ────────────────────────────────────────────────────────────────
@@ -414,6 +532,7 @@ function readBody(req: IncomingMessage): Promise<Record<string, unknown>> {
 }
 
 const ADMIN_LIST = /^\/api\/v1\/admin\/provider-applications(?:\?.*)?$/;
+const ADMIN_DECLINE = /^\/api\/v1\/admin\/provider-applications\/([^/?]+)\/decline$/;
 const ADMIN_INVITE = /^\/api\/v1\/admin\/provider-applications\/([^/?]+)\/invite$/;
 const PUBLIC_READ = /^\/api\/v1\/provider-invite(?:\?.*)?$/;
 const PUBLIC_ACCEPT = /^\/api\/v1\/provider-invite\/accept$/;
@@ -444,7 +563,8 @@ export async function handleProviderInvites(req: IncomingMessage, res: ServerRes
     const url = req.url || '';
     const method = req.method || 'GET';
     const invite = ADMIN_INVITE.exec(url);
-    const isAdminRoute = ADMIN_LIST.test(url) || !!invite;
+    const decline = ADMIN_DECLINE.exec(url);
+    const isAdminRoute = ADMIN_LIST.test(url) || !!invite || !!decline;
     const isPublic = PUBLIC_READ.test(url) || PUBLIC_ACCEPT.test(url);
     if (!isAdminRoute && !isPublic) return false;
     res.setHeader('x-correlation-id', correlationId);
@@ -454,6 +574,7 @@ export async function handleProviderInvites(req: IncomingMessage, res: ServerRes
             if (!caller.isAdmin && !caller.viaApiKey) return done({ status: 403, body: { errorCode: 'FORBIDDEN', message: 'Admin only' } });
             if (ADMIN_LIST.test(url) && method === 'GET') return done(await listApplications(deps));
             if (invite && method === 'POST') return done(await inviteApplication(deps, invite[1], caller.userId));
+            if (decline && method === 'POST') return done(await declineApplication(deps, decline[1], caller.userId, await readBody(req)));
             return done({ status: 405, body: { errorCode: 'METHOD_NOT_ALLOWED', message: 'Not supported on this route' } });
         }
         if (inviteRateLimited(ip)) return done({ status: 429, body: { errorCode: 'RATE_LIMIT_EXCEEDED', message: 'Too many attempts, please try again later' } });

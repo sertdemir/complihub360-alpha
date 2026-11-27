@@ -1,14 +1,15 @@
 -- ─── Anbieter-Bewerbungen ────────────────────────────────────────────────────
 --
--- Gehoert zu 20261125000000_provider_applications.sql. Geprueft wird:
+-- Gehoert zu 20261125000000_provider_applications.sql und
+-- 20261127000000_provider_application_decline.sql. Geprueft wird:
 --
 --   1. anon und authenticated sehen keine Zeile (RLS ohne Policy).
---   2. Der Stand kennt nur die drei Werte.
+--   2. Der Stand kennt nur seine vier Werte; 'declined' gehoert dazu.
 --   3. Ein Einladungs-Hash gehoert zu genau einer Bewerbung.
 --   4. Geloeschtes Konto und geloeschter Anbieter: die Bewerbung bleibt.
 
 begin;
-select plan(6);
+select plan(7);
 
 insert into public.provider_applications (id, reference, contact_name, email, firm, credentials, invite_token_hash)
   values ('00000000-0000-0000-0000-0000000000c1', 'ref-1', 'Test Person', 'bewerbung@example.com', 'Test Firm', 'Tax adviser', 'hash-1');
@@ -22,6 +23,8 @@ reset role;
 
 select throws_ok($$ update public.provider_applications set status = 'verified' where id = '00000000-0000-0000-0000-0000000000c1' $$,
   '23514', null, 'der Stand kennt kein verified: das entscheidet die Pruefung, nicht die Einladung');
+select lives_ok($$ update public.provider_applications set status = 'declined', declined_at = now(), decline_reason = 'Kein Markt' where id = '00000000-0000-0000-0000-0000000000c1' $$,
+  'eine Bewerbung kann abgelehnt werden, mit Grund');
 select throws_ok($$ insert into public.provider_applications (reference, contact_name, email, firm, credentials, invite_token_hash) values ('ref-2', 'Zwei', 'zwei@example.com', 'Zwei', 'x', 'hash-1') $$,
   '23505', null, 'ein Einladungs-Hash gehoert zu genau einer Bewerbung');
 

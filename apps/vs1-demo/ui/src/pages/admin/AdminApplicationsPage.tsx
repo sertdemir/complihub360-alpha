@@ -11,7 +11,8 @@ import { Banner } from '../../components/ui/Banner';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ApiError } from '../../api/client';
-import { fetchApplications, inviteApplication, type ApplicationList, type ApplicationStatus, type ProviderApplication } from '../../api/providerInvites';
+import { Textarea } from '../../components/ui/Textarea';
+import { DECLINE_REASON_MAX, DECLINE_REASON_MIN, declineApplication, fetchApplications, inviteApplication, type ApplicationList, type ApplicationStatus, type ProviderApplication } from '../../api/providerInvites';
 
 // ─── Admin · Bewerbungen (P01, Entscheidung der Mitgruenderin 24.11.2026) ────
 // Jede Bewerbung von /provider-apply mit allen Angaben des Formulars. Die
@@ -19,14 +20,19 @@ import { fetchApplications, inviteApplication, type ApplicationList, type Applic
 // mit dem Link dieser Bewerbung, der Zeitpunkt steht danach in der Zeile.
 // "Invited" ist nicht "verified": die Pruefung laeuft danach in der Review
 // Queue. Wie die anderen Admin-Seiten bleibt die Oberflaeche englisch.
+//
+// Ablehnen (27.11.2026): "Decline" oeffnet das Begruendungsfeld in der Zeile.
+// Der Grund steht in der Mail an die Bewerberin; ohne Grund geht nichts
+// hinaus. Abgelehnt ist nicht endgueltig, "Invite to onboarding" bleibt.
 
 const STATUS: Record<ApplicationStatus, { label: string; tone: BadgeTone }> = {
   received: { label: 'New', tone: 'warning' },
   invited: { label: 'Invited to onboarding', tone: 'info' },
   onboarding: { label: 'Account set up', tone: 'success' },
+  declined: { label: 'Declined', tone: 'neutral' },
 };
 const FILTERS: Array<{ key: 'all' | ApplicationStatus; label: string }> = [
-  { key: 'received', label: 'New' }, { key: 'invited', label: 'Invited' }, { key: 'onboarding', label: 'Account set up' }, { key: 'all', label: 'All' },
+  { key: 'received', label: 'New' }, { key: 'invited', label: 'Invited' }, { key: 'onboarding', label: 'Account set up' }, { key: 'declined', label: 'Declined' }, { key: 'all', label: 'All' },
 ];
 
 const stamp = (iso: string | null, locale: string) => {
@@ -41,7 +47,9 @@ function failureText(err: unknown): string {
   if (code === 'MAIL_UNAVAILABLE') return 'Mail delivery is not configured here. No invitation was sent.';
   if (code === 'INVITE_SEND_FAILED') return 'The invitation could not be sent. Nothing was changed; you can try again.';
   if (code === 'ALREADY_ONBOARDING') return 'This invitation was already used. The provider has an account.';
-  return 'The invitation did not go through. Nothing was changed.';
+  if (code === 'DECLINE_SEND_FAILED') return 'The message could not be sent. Nothing was changed; you can try again.';
+  if (code === 'ALREADY_DECLINED') return 'This application was already declined.';
+  return 'The message did not go through. Nothing was changed.';
 }
 
 export function AdminApplicationsPage() {
@@ -53,23 +61,50 @@ export function AdminApplicationsPage() {
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
+  const [declining, setDeclining] = useState<string | null>(null);
+  const [reason, setReason] = useState('');
+  const [reasonTried, setReasonTried] = useState(false);
   const load = () => fetchApplications().then(setList).catch(() => setError('Applications could not be loaded. The API answers 403 without an admin login.'));
   useEffect(() => { void load(); }, []);
 
   const rows = useMemo(() => (list?.applications ?? []).filter((a) => filter === 'all' || a.status === filter), [list, filter]);
   const count = (k: 'all' | ApplicationStatus) => (list?.applications ?? []).filter((a) => k === 'all' || a.status === k).length;
 
+  const put = (next: ProviderApplication) => setList((cur) => {
+    if (!cur) return cur;
+    const applications = cur.applications.map((x) => (x.id === next.id ? next : x));
+    const n = (s: ApplicationStatus) => applications.filter((x) => x.status === s).length;
+    return { applications, counts: { total: applications.length, received: n('received'), invited: n('invited'), onboarding: n('onboarding'), declined: n('declined') } };
+  });
+
+  const startDecline = (a: ProviderApplication) => { setDeclining(a.id); setOpen(a.id); setReason(''); setReasonTried(false); setNotice(null); };
+  const reasonLength = reason.trim().length;
+  const reasonError = reasonTried && (reasonLength < DECLINE_REASON_MIN || reasonLength > DECLINE_REASON_MAX)
+    ? `Please give a reason of ${DECLINE_REASON_MIN} to ${DECLINE_REASON_MAX} characters. The applicant reads it.` : null;
+
+  const decline = async (a: ProviderApplication) => {
+    setReasonTried(true);
+    if (reasonLength < DECLINE_REASON_MIN || reasonLength > DECLINE_REASON_MAX) { document.getElementById('decline-reason')?.focus(); return; }
+    setBusy(a.id);
+    setNotice(null);
+    try {
+      const next = await declineApplication(a.id, reason.trim());
+      put(next);
+      setDeclining(null);
+      setNotice({ ok: true, text: `${next.firm}: declined. The message with your reason went to ${next.email} on ${stamp(next.declined_at, locale)}.` });
+    } catch (err) {
+      setNotice({ ok: false, text: `${a.firm}: ${failureText(err)}` });
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const invite = async (a: ProviderApplication) => {
     setBusy(a.id);
     setNotice(null);
     try {
       const next = await inviteApplication(a.id);
-      setList((cur) => {
-        if (!cur) return cur;
-        const applications = cur.applications.map((x) => (x.id === next.id ? next : x));
-        const n = (s: ApplicationStatus) => applications.filter((x) => x.status === s).length;
-        return { applications, counts: { total: applications.length, received: n('received'), invited: n('invited'), onboarding: n('onboarding') } };
-      });
+      put(next);
       setNotice({ ok: true, text: `Invitation sent to ${next.email} on ${stamp(next.invited_at, locale)}. The link is valid until ${day(next.invite_expires_at, locale)}.` });
     } catch (err) {
       setNotice({ ok: false, text: `${a.firm}: ${failureText(err)}` });
@@ -121,7 +156,9 @@ export function AdminApplicationsPage() {
                             <td className="px-4 py-3 text-fg-secondary">{stamp(a.created_at, locale)}</td>
                             <td className="px-4 py-3"><Badge tone={st.tone} size="sm">{st.label}</Badge></td>
                             <td className="px-4 py-3 text-fg-secondary">
-                              {a.invited_at ? (
+                              {a.status === 'declined' ? (
+                                <span data-declined-at>Declined {stamp(a.declined_at, locale)}</span>
+                              ) : a.invited_at ? (
                                 <>
                                   <span data-invited-at>Sent {stamp(a.invited_at, locale)}</span>
                                   <span className={'block text-[12px] ' + (a.invite_expired ? 'font-semibold text-warning-800 dark:text-amber-200' : 'text-fg-tertiary')}>
@@ -132,8 +169,12 @@ export function AdminApplicationsPage() {
                               ) : 'Not sent'}
                             </td>
                             <td className="px-4 py-3 text-right">
-                              {a.status === 'received' && <Button size="sm" variant="primary" loading={busy === a.id} onClick={() => void invite(a)}><Send size={14} />Invite to onboarding</Button>}
-                              {a.status === 'invited' && <Button size="sm" variant="secondary" loading={busy === a.id} onClick={() => void invite(a)}>Send again</Button>}
+                              <span className="inline-flex flex-wrap justify-end gap-2">
+                                {(a.status === 'received' || a.status === 'invited') && declining !== a.id && <Button size="sm" variant="ghost" onClick={() => startDecline(a)}>Decline</Button>}
+                                {a.status === 'received' && <Button size="sm" variant="primary" loading={busy === a.id && declining !== a.id} onClick={() => void invite(a)}><Send size={14} />Invite to onboarding</Button>}
+                                {a.status === 'invited' && <Button size="sm" variant="secondary" loading={busy === a.id && declining !== a.id} onClick={() => void invite(a)}>Send again</Button>}
+                                {a.status === 'declined' && <Button size="sm" variant="secondary" loading={busy === a.id} onClick={() => void invite(a)}>Invite to onboarding</Button>}
+                              </span>
                               {a.status === 'onboarding' && a.provider_key && <Link to={`/${locale}/admin/providers/${a.provider_key}`}><Button size="sm" variant="secondary">Open dossier</Button></Link>}
                             </td>
                           </tr>
@@ -152,7 +193,32 @@ export function AdminApplicationsPage() {
                                   <Fact label="Markets" value={a.markets.join(', ')} />
                                   <Fact label="Reference" value={a.reference} />
                                 </dl>
-                                {a.status === 'invited' && <p className="mt-3 text-[12px] text-fg-tertiary">Sending again creates a new link. The earlier link stops working.</p>}
+                                {a.status === 'declined' && (
+                                  <div className="mt-4 border-t border-stroke-subtle pt-4">
+                                    <Fact label="Reason sent to the applicant" value={a.decline_reason} wide />
+                                    <p className="mt-2 text-[12px] text-fg-tertiary">Declined is not final. Inviting later sends a fresh link.</p>
+                                  </div>
+                                )}
+                                {a.status === 'invited' && declining !== a.id && <p className="mt-3 text-[12px] text-fg-tertiary">Sending again creates a new link. The earlier link stops working.</p>}
+                                {declining === a.id && (
+                                  <form className="mt-4 border-t border-stroke-subtle pt-4" data-decline-form onSubmit={(e) => { e.preventDefault(); void decline(a); }} noValidate>
+                                    <label htmlFor="decline-reason" className="text-[13px] font-semibold text-fg">Reason for declining</label>
+                                    <p id="decline-reason-hint" className="mt-0.5 text-[12px] text-fg-tertiary">
+                                      This text goes into the message to {a.contact_name}, word for word. Write it in the form language ({a.locale.toUpperCase()}), plainly and without judging the firm.
+                                      {a.status === 'invited' ? ' The open invitation link stops working.' : ''}
+                                    </p>
+                                    <Textarea id="decline-reason" value={reason} onChange={(e) => setReason(e.target.value)} rows={4} maxLength={DECLINE_REASON_MAX} className="mt-2"
+                                      aria-invalid={reasonError ? true : undefined} aria-describedby={reasonError ? 'decline-reason-error' : 'decline-reason-hint'} />
+                                    {reasonError && <p id="decline-reason-error" className="mt-1.5 text-[12px] text-error-700 dark:text-red-300">{reasonError}</p>}
+                                    <div className="mt-3 flex items-center justify-between gap-3">
+                                      <span className="text-[12px] text-fg-tertiary">{reasonLength} / {DECLINE_REASON_MAX}</span>
+                                      <span className="flex gap-2">
+                                        <Button type="button" size="sm" variant="ghost" onClick={() => setDeclining(null)}>Cancel</Button>
+                                        <Button type="submit" size="sm" variant="secondary" loading={busy === a.id}>Decline and send message</Button>
+                                      </span>
+                                    </div>
+                                  </form>
+                                )}
                               </td>
                             </tr>
                           )}
