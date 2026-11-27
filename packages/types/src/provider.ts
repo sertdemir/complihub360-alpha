@@ -774,6 +774,12 @@ export interface SlotsResponse {
     ok: true;
     public_ref: string;
     slots: string[];
+    /**
+     * true nur, wenn der verbundene Kalender des Anbieters geantwortet hat und
+     * seine Belegung von `slots` abgezogen ist. false heisst: kein Kalender
+     * verbunden ODER der Kalender hat nicht geantwortet — die Slots sind dann
+     * die Geschaeftszeiten minus Buchungen.
+     */
     calendar_checked: boolean;
     booking_open: boolean;
     reason: 'ooo' | 'paused' | null;

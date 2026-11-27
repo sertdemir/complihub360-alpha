@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { subtractBusy, nylasConfigured, calendarRefFor, type BusyWindow } from '../nylas.js';
 
 // Die Slot-Filterung ist die Stelle, an der eine Kalenderanbindung praktisch
@@ -90,5 +90,85 @@ describe('calendarRefFor', () => {
     it('verträgt fehlende Zeilen', () => {
         expect(calendarRefFor(null, booking)).toBeNull();
         expect(calendarRefFor(provider, undefined)).toBeNull();
+    });
+});
+
+// "Keine Antwort" und "nichts belegt" sind zwei Auskuenfte. Bis 2026-11 gab
+// fetchBusy in beiden Faellen [] zurueck, und die Slot-Route meldete einen
+// Kalender als geprueft, der gar nicht geantwortet hatte.
+describe('fetchBusy', () => {
+    // Der Key wird beim Laden des Moduls gelesen, deshalb je Test frisch laden.
+    const load = async (key = 'nyk_test') => {
+        vi.resetModules();
+        if (key) process.env.NYLAS_API_KEY = key; else delete process.env.NYLAS_API_KEY;
+        return import('../nylas.js');
+    };
+    const answer = (status: number, body: unknown) =>
+        vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })));
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+        delete process.env.NYLAS_API_KEY;
+        vi.resetModules();
+    });
+
+    it('liefert die belegten Fenster, wenn der Kalender antwortet', async () => {
+        const { fetchBusy } = await load();
+        answer(200, { data: [{ email: 'k@x.de', object: 'free_busy', time_slots: [{ start_time: 100, end_time: 200, status: 'busy' }] }] });
+        expect(await fetchBusy('g1', 'k@x.de', 0, 1000)).toEqual([{ start: 100, end: 200 }]);
+        const [url, init] = (globalThis.fetch as any).mock.calls[0];
+        expect(String(url)).toContain('/v3/grants/g1/calendars/free-busy');
+        expect(JSON.parse(init.body)).toEqual({ start_time: 0, end_time: 1000, emails: ['k@x.de'] });
+    });
+
+    it('liefert [] für einen Kalender, der antwortet und nichts belegt hat', async () => {
+        const { fetchBusy } = await load();
+        answer(200, { data: [{ email: 'k@x.de', object: 'free_busy', time_slots: [] }] });
+        expect(await fetchBusy('g1', 'k@x.de', 0, 1000)).toEqual([]);
+    });
+
+    it('liefert null, wenn Nylas ablehnt (abgelaufener Grant)', async () => {
+        const { fetchBusy } = await load();
+        answer(401, { error: { type: 'unauthorized' } });
+        expect(await fetchBusy('g1', 'k@x.de', 0, 1000)).toBeNull();
+    });
+
+    it('liefert null, wenn Nylas nicht erreichbar ist', async () => {
+        const { fetchBusy } = await load();
+        vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('ECONNRESET'); }));
+        expect(await fetchBusy('g1', 'k@x.de', 0, 1000)).toBeNull();
+    });
+
+    it('liefert null bei einer Fehlerzeile für die angefragte Adresse', async () => {
+        const { fetchBusy } = await load();
+        answer(200, { data: [{ email: 'k@x.de', object: 'error', error: 'Unable to resolve e-mail address' }] });
+        expect(await fetchBusy('g1', 'k@x.de', 0, 1000)).toBeNull();
+    });
+
+    it('liefert null, wenn eine von mehreren Zeilen ein Fehler ist — halb geprüft ist nicht geprüft', async () => {
+        const { fetchBusy } = await load();
+        answer(200, { data: [
+            { email: 'a@x.de', object: 'free_busy', time_slots: [{ start_time: 100, end_time: 200 }] },
+            { email: 'b@x.de', object: 'error', error: 'nope' },
+        ] });
+        expect(await fetchBusy('g1', 'a@x.de', 0, 1000)).toBeNull();
+    });
+
+    it('liefert null bei einer Antwort ohne Zeilen oder in unbekannter Form', async () => {
+        const { fetchBusy } = await load();
+        answer(200, { data: [] });
+        expect(await fetchBusy('g1', 'k@x.de', 0, 1000)).toBeNull();
+        answer(200, { request_id: 'r1' });
+        expect(await fetchBusy('g1', 'k@x.de', 0, 1000)).toBeNull();
+        answer(200, { data: [{ email: 'k@x.de', object: 'free_busy' }] });
+        expect(await fetchBusy('g1', 'k@x.de', 0, 1000)).toBeNull();
+    });
+
+    it('liefert null ohne Key und ruft Nylas dann gar nicht an', async () => {
+        const { fetchBusy } = await load('');
+        const spy = vi.fn();
+        vi.stubGlobal('fetch', spy);
+        expect(await fetchBusy('g1', 'k@x.de', 0, 1000)).toBeNull();
+        expect(spy).not.toHaveBeenCalled();
     });
 });

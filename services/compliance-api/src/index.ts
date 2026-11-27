@@ -1178,6 +1178,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             // Belegung — der Generator oben liefert nur noch die Kandidaten.
             // Faellt Nylas aus, bleiben die Kandidaten stehen: lieber ein Slot
             // zu viel (der Anbieter sagt ab) als eine leere Buchungsseite.
+            // `calendar_checked` sagt dann aber die Wahrheit: true nur, wenn
+            // der Kalender geantwortet hat. Dem Anbieter sagen wir "Mandanten
+            // sehen nur Zeiten, an denen Sie frei sind" — gilt das gerade
+            // nicht, steht es als Fehler im Log statt als Zusicherung im JSON.
             let out = slots;
             let calendarChecked = false;
             const grant = (prov as any).nylas_grant_id as string | undefined;
@@ -1185,8 +1189,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const from = Math.floor(Date.now() / 1000);
                 const to = from + 21 * 24 * 3600;
                 const busy = await fetchBusy(grant, ((prov as any).nylas_calendar_id as string) || '', from, to);
-                out = subtractBusy(slots, busy);
-                calendarChecked = true;
+                if (busy) {
+                    out = subtractBusy(slots, busy);
+                    calendarChecked = true;
+                } else {
+                    structuredLog('error', 'Calendar busy lookup failed — slots shown without the provider calendar', { correlationId, errorCode: 'ERR_CALENDAR_BUSY', severity: 'error', route: '/api/v1/p/:ref/slots', providerKey } as any);
+                }
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, public_ref: ref, slots: out, calendar_checked: calendarChecked, booking_open: true, reason: null, correlationId }));

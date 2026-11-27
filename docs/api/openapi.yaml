@@ -1684,7 +1684,7 @@ paths:
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
       responses:
-        '200': { description: "`{ public_ref, slots[], calendar_checked, booking_open, reason }` — Phase 6: Slots aus den Verfuegbarkeitsfenstern des Anbieters in seiner Zeitzone (30 Minuten), minus Buchungen und Kalender-Belegung; bei Abwesenheit oder Buchungspause leer mit `reason: ooo|paused`" }
+        '200': { description: "`{ public_ref, slots[], calendar_checked, booking_open, reason }` — Phase 6: Slots aus den Verfuegbarkeitsfenstern des Anbieters in seiner Zeitzone (30 Minuten), minus Buchungen und Kalender-Belegung; bei Abwesenheit oder Buchungspause leer mit `reason: ooo|paused`. `calendar_checked` ist nur dann true, wenn der verbundene Kalender geantwortet hat; ohne Kalender oder ohne Antwort ist es false, und die Slots sind die Fenster minus Buchungen (Log `ERR_CALENDAR_BUSY`)" }
         '404': { description: Unbekannter Ref }
 
   /p/{ref}/reviews:
