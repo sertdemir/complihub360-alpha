@@ -1475,9 +1475,9 @@ export function resetMockState(): void {
 type MockApplication = Record<string, unknown> & { id: string; status: string };
 function mockApplications(): MockApplication[] {
   return [
-    { id: 'a0000000-0000-4000-8000-000000000001', reference: 'c7f2a1d0-5b6e-4f3a-9c1d-2e8b7a6f5d41', created_at: plus(-5 * H), locale: 'en', first_name: 'Elise', contact_name: 'Elise Marlow', email: 'elise@alderquay.example', firm: 'Alder Quay VAT Services LLC', website: 'https://alderquay.example', credentials: 'Enrolled Agent (US), VAT adviser for EU distance sales since 2014', areas: ['tax-vat'], markets: ['DE', 'FR', 'NL'], message: 'We support US sellers with EU VAT registrations and OSS filings.', status: 'received', invited_at: null, invite_expires_at: null, invite_expired: false, invite_send_count: 0, redeemed_at: null, provider_key: null },
-    { id: 'a0000000-0000-4000-8000-000000000002', reference: '1d9e4b72-3a5c-4e8f-b6d2-7c0a9f8e1b35', created_at: plus(-52 * H), locale: 'de', first_name: 'Jonas', contact_name: 'Jonas Reuter', email: 'j.reuter@reuter-zoll.example', firm: 'Reuter Zollberatung GmbH', website: 'https://reuter-zoll.example', credentials: 'Zugelassener Wirtschaftsbeteiligter (AEO-C), Zollberater', areas: ['logistics-customs'], markets: ['DE', 'AT'], message: null, status: 'invited', invited_at: plus(-20 * H), invite_expires_at: plus(13 * 24 * H), invite_expired: false, invite_send_count: 1, redeemed_at: null, provider_key: null },
-    { id: 'a0000000-0000-4000-8000-000000000003', reference: '8b3c6f10-9d2e-4a7b-8f5c-4e1d0a9b7c62', created_at: plus(-9 * 24 * H), locale: 'en', first_name: 'Marta', contact_name: 'Marta Kowalczyk', email: 'marta@kowalczyk-epr.example', firm: 'Kowalczyk EPR Advisory', website: null, credentials: 'Authorized representative for packaging (DE, FR), 9 years', areas: ['product-packaging', 'environment'], markets: ['DE', 'FR', 'PL'], message: null, status: 'onboarding', invited_at: plus(-7 * 24 * H), invite_expires_at: plus(7 * 24 * H), invite_expired: false, invite_send_count: 1, redeemed_at: plus(-6 * 24 * H), provider_key: 'dahlmann-cpa' },
+    { id: 'a0000000-0000-4000-8000-000000000001', reference: 'c7f2a1d0-5b6e-4f3a-9c1d-2e8b7a6f5d41', created_at: plus(-5 * H), locale: 'en', first_name: 'Elise', contact_name: 'Elise Marlow', email: 'elise@alderquay.example', firm: 'Alder Quay VAT Services LLC', website: 'https://alderquay.example', credentials: 'Enrolled Agent (US), VAT adviser for EU distance sales since 2014', areas: ['tax-vat'], markets: ['DE', 'FR', 'NL'], message: 'We support US sellers with EU VAT registrations and OSS filings.', status: 'received', invited_at: null, invite_expires_at: null, invite_expired: false, invite_send_count: 0, redeemed_at: null, provider_key: null, declined_at: null, decline_reason: null },
+    { id: 'a0000000-0000-4000-8000-000000000002', reference: '1d9e4b72-3a5c-4e8f-b6d2-7c0a9f8e1b35', created_at: plus(-52 * H), locale: 'de', first_name: 'Jonas', contact_name: 'Jonas Reuter', email: 'j.reuter@reuter-zoll.example', firm: 'Reuter Zollberatung GmbH', website: 'https://reuter-zoll.example', credentials: 'Zugelassener Wirtschaftsbeteiligter (AEO-C), Zollberater', areas: ['logistics-customs'], markets: ['DE', 'AT'], message: null, status: 'invited', invited_at: plus(-20 * H), invite_expires_at: plus(13 * 24 * H), invite_expired: false, invite_send_count: 1, redeemed_at: null, provider_key: null, declined_at: null, decline_reason: null },
+    { id: 'a0000000-0000-4000-8000-000000000003', reference: '8b3c6f10-9d2e-4a7b-8f5c-4e1d0a9b7c62', created_at: plus(-9 * 24 * H), locale: 'en', first_name: 'Marta', contact_name: 'Marta Kowalczyk', email: 'marta@kowalczyk-epr.example', firm: 'Kowalczyk EPR Advisory', website: null, credentials: 'Authorized representative for packaging (DE, FR), 9 years', areas: ['product-packaging', 'environment'], markets: ['DE', 'FR', 'PL'], message: null, status: 'onboarding', invited_at: plus(-7 * 24 * H), invite_expires_at: plus(7 * 24 * H), invite_expired: false, invite_send_count: 1, redeemed_at: plus(-6 * 24 * H), provider_key: 'dahlmann-cpa', declined_at: null, decline_reason: null },
   ];
 }
 let APPLICATIONS: MockApplication[] | null = null;
@@ -1485,13 +1485,23 @@ const applications = () => (APPLICATIONS ??= mockApplications());
 function applicationList() {
   const rows = applications();
   const n = (st: string) => rows.filter((r) => r.status === st).length;
-  return { ok: true, applications: rows, counts: { total: rows.length, received: n('received'), invited: n('invited'), onboarding: n('onboarding') } };
+  return { ok: true, applications: rows, counts: { total: rows.length, received: n('received'), invited: n('invited'), onboarding: n('onboarding'), declined: n('declined') } };
 }
 function applicationInvite(id: string) {
   const row = applications().find((r) => r.id === id);
   if (!row) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Application not found' };
   if (row.status === 'onboarding') return { __status: 409, errorCode: 'ALREADY_ONBOARDING', message: 'This invitation was already used; the provider has an account' };
-  Object.assign(row, { status: 'invited', invited_at: plus(0), invite_expires_at: plus(14 * 24 * H), invite_expired: false, invite_send_count: Number(row.invite_send_count ?? 0) + 1 });
+  Object.assign(row, { declined_at: null, decline_reason: null, status: 'invited', invited_at: plus(0), invite_expires_at: plus(14 * 24 * H), invite_expired: false, invite_send_count: Number(row.invite_send_count ?? 0) + 1 });
+  return { ok: true, application: row };
+}
+function applicationDecline(id: string, body: Record<string, unknown>) {
+  const row = applications().find((r) => r.id === id);
+  if (!row) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Application not found' };
+  if (row.status === 'onboarding') return { __status: 409, errorCode: 'ALREADY_ONBOARDING', message: 'The provider has an account' };
+  if (row.status === 'declined') return { __status: 409, errorCode: 'ALREADY_DECLINED', message: 'This application was already declined' };
+  const reason = typeof body.reason === 'string' ? body.reason.trim() : '';
+  if (reason.length < 20) return { __status: 400, errorCode: 'VALIDATION_ERROR', field: 'reason', message: 'reason: 20 to 1200 characters' };
+  Object.assign(row, { status: 'declined', declined_at: plus(0), decline_reason: reason });
   return { ok: true, application: row };
 }
 function inviteRead(token: string | null) {
@@ -1520,6 +1530,7 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'me' && p[1] === 'saved-providers' && p[2] && method === 'DELETE') return forgetProvider(p[2]);
   if (p[0] === 'admin' && p[1] === 'provider-applications' && !p[2] && method === 'GET') return role === 'admin' ? applicationList() : { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin only' };
   if (p[0] === 'admin' && p[1] === 'provider-applications' && p[2] && p[3] === 'invite' && method === 'POST') return role === 'admin' ? applicationInvite(p[2]) : { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin only' };
+  if (p[0] === 'admin' && p[1] === 'provider-applications' && p[2] && p[3] === 'decline' && method === 'POST') return role === 'admin' ? applicationDecline(p[2], body) : { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin only' };
   if (p[0] === 'provider-invite' && !p[1] && method === 'GET') return inviteRead(query.get('token'));
   if (p[0] === 'provider-invite' && p[1] === 'accept' && method === 'POST') return inviteAccept(body);
   if (method === 'GET') {

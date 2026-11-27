@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('../supabase.js', () => ({ supabaseApi: {} }));
 
 import {
-    acceptInvite, adminView, applicationRowOf, hashToken, inviteApplication, inviteRateLimited, listApplications, readInvite,
+    acceptInvite, adminView, applicationRowOf, declineApplication, renderDeclineMail, DECLINE_REASON_MIN, hashToken, inviteApplication, inviteRateLimited, listApplications, readInvite,
     renderInviteMail, resetInviteLimit, INVITE_DAYS, INVITE_LIMIT, type ApplicationRow, type InviteDeps,
 } from '../providerInvites.js';
 import { checkContact, type OutgoingMail } from '../contact.js';
@@ -66,7 +66,7 @@ describe('Admin-Liste', () => {
         const w = world([row({ status: 'invited', invite_token_hash: 'abc', invited_at: NOW.toISOString(), invite_expires_at: '2026-12-09T10:00:00Z', invite_send_count: 1 })]);
         const out = await listApplications(w.deps);
         const list = out.body.applications as Array<Record<string, unknown>>;
-        expect(out.body.counts).toEqual({ total: 1, received: 0, invited: 1, onboarding: 0 });
+        expect(out.body.counts).toEqual({ total: 1, received: 0, invited: 1, onboarding: 0, declined: 0 });
         expect(list[0]).toMatchObject({ firm: 'Alder Quay VAT Services LLC', first_name: 'Elise', email: 'elise@firm.example', credentials: 'Chartered tax adviser', invited_at: NOW.toISOString(), invite_expired: false });
         expect(JSON.stringify(out.body)).not.toContain('invite_token_hash');
     });
@@ -137,6 +137,77 @@ describe('Einladen', () => {
         const w = world();
         expect((await inviteApplication(w.deps, 'nope', null)).status).toBe(400);
         expect((await inviteApplication(w.deps, '99999999-2222-3333-4444-555555555555', null)).status).toBe(404);
+    });
+});
+
+describe('Ablehnen', () => {
+    const REASON = 'We currently onboard providers for EU markets only, and your coverage is US state sales tax.';
+
+    it('verschickt die Mail mit dem Grund und haelt Zeitpunkt und Text fest', async () => {
+        const w = world();
+        const out = await declineApplication(w.deps, ID, 'admin-1', { reason: `  ${REASON}  ` });
+        expect(out.status).toBe(200);
+        expect(w.sent).toHaveLength(1);
+        expect(w.sent[0].to).toBe('elise@firm.example');
+        expect(w.sent[0].text.startsWith('Hi Elise,')).toBe(true);
+        expect(w.sent[0].text).toContain(REASON);
+        expect(w.app()).toMatchObject({ status: 'declined', declined_at: NOW.toISOString(), declined_by: 'admin-1', decline_reason: REASON });
+        expect((out.body.application as Record<string, unknown>).decline_reason).toBe(REASON);
+        // Das Protokoll traegt den Vorgang, nicht den Text.
+        expect(JSON.stringify(w.tables.event_log)).not.toContain('EU markets');
+    });
+
+    it('die Mail wertet nicht, draengt nicht und laesst die Antwort an einen Menschen offen', () => {
+        const mail = renderDeclineMail(row(), REASON, 'hallo@complihub360.test');
+        expect(mail.text).toContain('A person reads it.');
+        expect(mail.text).toContain('at this point');
+        expect(mail.text).not.toMatch(/unfortunately|regret|rejected|not qualified|final|never/i);
+        expect(mail.replyTo).toBe('hallo@complihub360.test');
+        expect(renderDeclineMail(row({ first_name: null, locale: 'de' }), REASON, null).text.startsWith('Guten Tag,')).toBe(true);
+    });
+
+    it('verlangt einen Grund, den die Bewerberin lesen kann', async () => {
+        const w = world();
+        for (const reason of [undefined, '', 'No.', 'x'.repeat(DECLINE_REASON_MIN - 1), 'x'.repeat(1201)]) {
+            expect(await declineApplication(w.deps, ID, null, { reason })).toMatchObject({ status: 400, body: { field: 'reason' } });
+        }
+        expect(w.sent).toHaveLength(0);
+        expect(w.app().status).toBe('received');
+    });
+
+    it('aendert nichts, wenn die Mail nicht hinausgeht oder kein Versand eingerichtet ist', async () => {
+        const failing = world([row()], { send: vi.fn(async () => ({ ok: false, status: 500 })) });
+        expect((await declineApplication(failing.deps, ID, null, { reason: REASON })).status).toBe(502);
+        expect(failing.app()).toMatchObject({ status: 'received' });
+        expect(failing.app().decline_reason).toBeUndefined();
+        const none = world([row()], { send: null });
+        expect((await declineApplication(none.deps, ID, null, { reason: REASON })).status).toBe(503);
+        expect(none.app().status).toBe('received');
+    });
+
+    it('macht einen offenen Einladungslink ungueltig', async () => {
+        const w = world();
+        await inviteApplication(w.deps, ID, null);
+        const token = w.tokenOf();
+        expect((await declineApplication(w.deps, ID, null, { reason: REASON })).status).toBe(200);
+        expect((await readInvite(w.deps, token)).status).toBe(404);
+        expect((await acceptInvite(w.deps, { token, password: 'correct horse' })).status).toBe(404);
+    });
+
+    it('lehnt weder ein bestehendes Konto noch eine schon abgelehnte Bewerbung ab', async () => {
+        const a = world([row({ status: 'onboarding' })]);
+        expect(await declineApplication(a.deps, ID, null, { reason: REASON })).toMatchObject({ status: 409, body: { errorCode: 'ALREADY_ONBOARDING' } });
+        const b = world([row({ status: 'declined' })]);
+        expect(await declineApplication(b.deps, ID, null, { reason: REASON })).toMatchObject({ status: 409, body: { errorCode: 'ALREADY_DECLINED' } });
+        expect(a.sent.length + b.sent.length).toBe(0);
+    });
+
+    it('ist nicht endgueltig: eine abgelehnte Bewerbung kann eingeladen werden', async () => {
+        const w = world();
+        await declineApplication(w.deps, ID, 'admin-1', { reason: REASON });
+        expect((await inviteApplication(w.deps, ID, 'admin-1')).status).toBe(200);
+        expect(w.app()).toMatchObject({ status: 'invited', declined_at: null, decline_reason: null });
+        expect((await readInvite(w.deps, w.tokenOf())).status).toBe(200);
     });
 });
 

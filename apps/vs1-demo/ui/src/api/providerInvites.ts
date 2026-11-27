@@ -4,11 +4,12 @@ import { apiFetch } from './client';
 // Gegenstueck zu services/compliance-api/src/providerInvites.ts.
 //   Admin:  GET  /api/v1/admin/provider-applications
 //           POST /api/v1/admin/provider-applications/:id/invite
+//           POST /api/v1/admin/provider-applications/:id/decline
 //   Offen:  GET  /api/v1/provider-invite?token=…
 //           POST /api/v1/provider-invite/accept
 // Bei den offenen Routen ist der Link der Ausweis.
 
-export type ApplicationStatus = 'received' | 'invited' | 'onboarding';
+export type ApplicationStatus = 'received' | 'invited' | 'onboarding' | 'declined';
 
 export interface ProviderApplication {
   id: string;
@@ -31,11 +32,14 @@ export interface ProviderApplication {
   invite_send_count: number;
   redeemed_at: string | null;
   provider_key: string | null;
+  declined_at: string | null;
+  /** Der Grund, wie er in der Mail stand. */
+  decline_reason: string | null;
 }
 
 export interface ApplicationList {
   applications: ProviderApplication[];
-  counts: { total: number; received: number; invited: number; onboarding: number };
+  counts: { total: number; received: number; invited: number; onboarding: number; declined: number };
 }
 
 export async function fetchApplications(): Promise<ApplicationList> {
@@ -44,6 +48,15 @@ export async function fetchApplications(): Promise<ApplicationList> {
 
 export async function inviteApplication(id: string): Promise<ProviderApplication> {
   const r = await apiFetch<{ application: ProviderApplication }>(`/api/v1/admin/provider-applications/${id}/invite`, { method: 'POST', body: '{}' });
+  return r.application;
+}
+
+export const DECLINE_REASON_MIN = 20;
+export const DECLINE_REASON_MAX = 1200;
+
+/** Lehnt ab und verschickt die Mail mit dem Grund. Der Grund steht in der Mail. */
+export async function declineApplication(id: string, reason: string): Promise<ProviderApplication> {
+  const r = await apiFetch<{ application: ProviderApplication }>(`/api/v1/admin/provider-applications/${id}/decline`, { method: 'POST', body: JSON.stringify({ reason }) });
   return r.application;
 }
 
