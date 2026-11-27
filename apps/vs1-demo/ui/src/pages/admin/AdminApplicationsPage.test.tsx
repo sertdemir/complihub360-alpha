@@ -10,12 +10,13 @@ import { ApiError } from '../../api/client';
 // danach den Zeitpunkt. Geht die Einladung nicht hinaus, bleibt die Zeile,
 // wie sie war, und die Seite sagt es.
 
-const api = vi.hoisted(() => ({ fetchApplications: vi.fn(), inviteApplication: vi.fn() }));
+const api = vi.hoisted(() => ({ fetchApplications: vi.fn(), inviteApplication: vi.fn(), declineApplication: vi.fn() }));
 vi.mock('../../components/admin/AdminShell', () => ({ AdminShell: ({ children }: { children: ReactNode }) => <>{children}</> }));
 vi.mock('../../api/providerInvites', async (orig) => ({
   ...(await orig<typeof import('../../api/providerInvites')>()),
   fetchApplications: () => api.fetchApplications(),
   inviteApplication: (id: string) => api.inviteApplication(id),
+  declineApplication: (id: string, reason: string) => api.declineApplication(id, reason),
 }));
 vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (k: string) => k, i18n: { resolvedLanguage: 'en' } }) }));
 
@@ -24,16 +25,16 @@ import { AdminApplicationsPage } from './AdminApplicationsPage';
 const app = (over: Partial<ProviderApplication> = {}): ProviderApplication => ({
   id: 'a1', reference: 'ref-1', created_at: '2026-11-24T09:00:00Z', locale: 'en', first_name: 'Elise', contact_name: 'Elise Marlow', email: 'elise@alderquay.example',
   firm: 'Alder Quay VAT Services LLC', website: 'https://alderquay.example', credentials: 'Enrolled Agent (US)', areas: ['tax-vat'], markets: ['DE', 'FR'],
-  message: 'We support US sellers.', status: 'received', invited_at: null, invite_expires_at: null, invite_expired: false, invite_send_count: 0, redeemed_at: null, provider_key: null, ...over,
+  message: 'We support US sellers.', status: 'received', invited_at: null, invite_expires_at: null, invite_expired: false, invite_send_count: 0, redeemed_at: null, provider_key: null, declined_at: null, decline_reason: null, ...over,
 });
 const list = (rows: ProviderApplication[]): ApplicationList => ({
   applications: rows,
-  counts: { total: rows.length, received: rows.filter((r) => r.status === 'received').length, invited: rows.filter((r) => r.status === 'invited').length, onboarding: rows.filter((r) => r.status === 'onboarding').length },
+  counts: { total: rows.length, received: rows.filter((r) => r.status === 'received').length, invited: rows.filter((r) => r.status === 'invited').length, onboarding: rows.filter((r) => r.status === 'onboarding').length, declined: rows.filter((r) => r.status === 'declined').length },
 });
 const show = () => render(<MemoryRouter><AdminApplicationsPage /></MemoryRouter>);
 
 describe('Admin · Bewerbungen', () => {
-  beforeEach(() => { api.fetchApplications.mockReset(); api.inviteApplication.mockReset(); });
+  beforeEach(() => { api.fetchApplications.mockReset(); api.inviteApplication.mockReset(); api.declineApplication.mockReset(); });
 
   it('zeigt die Bewerbung mit allen Angaben des Formulars', async () => {
     api.fetchApplications.mockResolvedValue(list([app()]));
@@ -81,6 +82,60 @@ describe('Admin · Bewerbungen', () => {
     expect(screen.getByRole('link', { name: 'Open dossier' })).toHaveAttribute('href', '/en/admin/providers/done-ltd');
     // "Verified" vergibt diese Seite nie.
     expect(screen.queryByText(/verified$/i)).toBeNull();
+  });
+
+  const REASON = 'We currently onboard providers for EU markets only.';
+
+  it('lehnt nur mit Grund ab und sagt, dass der Text in die Mail geht', async () => {
+    api.fetchApplications.mockResolvedValue(list([app()]));
+    show();
+    fireEvent.click(await screen.findByRole('button', { name: 'Decline' }));
+    expect(screen.getByText(/goes into the message to Elise Marlow, word for word/)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Reason for declining'), { target: { value: 'Too short' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Decline and send message' }));
+    expect(screen.getByText(/Please give a reason of 20 to 1200 characters/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Reason for declining')).toHaveAttribute('aria-invalid', 'true');
+    expect(api.declineApplication).not.toHaveBeenCalled();
+  });
+
+  it('lehnt ab, nennt den Zeitpunkt und zeigt den gesendeten Grund', async () => {
+    api.fetchApplications.mockResolvedValue(list([app()]));
+    api.declineApplication.mockResolvedValue(app({ status: 'declined', declined_at: '2026-11-27T09:00:00Z', decline_reason: REASON }));
+    show();
+    fireEvent.click(await screen.findByRole('button', { name: 'Decline' }));
+    fireEvent.change(screen.getByLabelText('Reason for declining'), { target: { value: `  ${REASON} ` } });
+    fireEvent.click(screen.getByRole('button', { name: 'Decline and send message' }));
+    await waitFor(() => expect(api.declineApplication).toHaveBeenCalledWith('a1', REASON));
+    expect(await screen.findByText(/declined\. The message with your reason went to elise@alderquay\.example/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^Declined · 1$/ }));
+    const row = document.querySelector('[data-status="declined"]') as HTMLElement;
+    expect(within(row).getByText(/^Declined \d/)).toBeInTheDocument();
+    // Abgelehnt ist nicht endgueltig.
+    expect(within(row).getByRole('button', { name: 'Invite to onboarding' })).toBeInTheDocument();
+    // Die Zeile ist vom Ablehnen noch offen: der gesendete Grund steht da.
+    expect(screen.getByText('Reason sent to the applicant')).toBeInTheDocument();
+    expect(screen.getByText(REASON)).toBeInTheDocument();
+  });
+
+  it('laesst Zeile und Text stehen, wenn die Mail nicht hinausgeht; Abbrechen sendet nichts', async () => {
+    api.fetchApplications.mockResolvedValue(list([app()]));
+    api.declineApplication.mockRejectedValue(new ApiError('x', 502, 'c', undefined, { errorCode: 'DECLINE_SEND_FAILED' }));
+    show();
+    fireEvent.click(await screen.findByRole('button', { name: 'Decline' }));
+    fireEvent.change(screen.getByLabelText('Reason for declining'), { target: { value: REASON } });
+    fireEvent.click(screen.getByRole('button', { name: 'Decline and send message' }));
+    expect(await screen.findByText(/could not be sent\. Nothing was changed/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Reason for declining')).toHaveValue(REASON);
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByLabelText('Reason for declining')).toBeNull();
+    expect(screen.getByRole('button', { name: /Invite to onboarding/ })).toBeInTheDocument();
+  });
+
+  it('bietet fuer ein bestehendes Konto kein Ablehnen an', async () => {
+    api.fetchApplications.mockResolvedValue(list([app({ status: 'onboarding', provider_key: 'done-ltd', invited_at: '2026-11-10T10:00:00Z', redeemed_at: '2026-11-11T10:00:00Z' })]));
+    show();
+    fireEvent.click(await screen.findByRole('button', { name: /^All · 1$/ }));
+    expect(screen.queryByRole('button', { name: 'Decline' })).toBeNull();
   });
 
   it('zeigt bei einem Ladefehler keine Beispielzeilen', async () => {
