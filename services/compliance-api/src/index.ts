@@ -299,8 +299,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     let authCompany: string | null = null;
     // True only for the server-to-server API key — gates admin-only routes.
     let authViaApiKey = false;
-    // True when the verified JWT carries the app-level admin role (app_metadata
-    // wins over user_metadata, mirroring the frontend's roleFromUser()).
+    // True when the verified JWT carries the app-level admin role in
+    // app_metadata. NUR app_metadata: user_metadata schreibt der Nutzer selbst
+    // (supabase.auth.updateUser), eine Rolle von dort waere selbst verliehen.
     let authIsAdmin = false;
 
     // Public routes (audit P1 #4): guest-usable by DESIGN — the funnel runs
@@ -353,10 +354,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     if (typeof payload.sub === 'string') authUserId = payload.sub;
                     if (typeof payload.email === 'string') authEmail = payload.email;
                     if (payload.user_metadata && typeof payload.user_metadata.company_name === 'string') authCompany = payload.user_metadata.company_name;
-                    // App-level role lives in app_metadata.role (authoritative),
-                    // user_metadata.role as fallback — same precedence as the FE.
-                    const appRole = (payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined)
-                        ?? (payload.user_metadata && typeof payload.user_metadata.role === 'string' ? payload.user_metadata.role : undefined);
+                    // Die Rolle steht in app_metadata.role und nur dort. Bis
+                    // 2026-11-28 galt user_metadata.role als Rueckfall — damit
+                    // konnte sich jedes angemeldete Konto selbst zum Admin
+                    // machen. user_metadata ist Profil, keine Berechtigung.
+                    const appRole = payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined;
                     if (appRole === 'admin') authIsAdmin = true;
                 } else {
                     rejected = !notExpired ? 'expired' : !active ? 'not_yet_valid' : 'role';

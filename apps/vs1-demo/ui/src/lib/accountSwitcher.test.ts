@@ -30,6 +30,12 @@ describe('gemerkte Konten', () => {
     expect(list[1].role).toBe('partner');
   });
 
+  it('liest die Rolle nur aus app_metadata — user_metadata schreibt der Nutzer selbst', () => {
+    const s = mem();
+    rememberSession({ access_token: 'at', refresh_token: 'rt', user: { id: 'selbsternannt', app_metadata: {}, user_metadata: { role: 'admin' } } }, s);
+    expect(loadAccounts(s)[0].role).toBe('user');
+  });
+
   it('vergisst ein Konto', () => {
     const s = mem();
     rememberSession(sess('a'), s);
