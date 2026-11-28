@@ -88,7 +88,8 @@
     "ask": {
       "placeholder": "Beschreiben Sie Ihr Anliegen",
       "send": "Senden",
-      "note": "In der Beta führt Ihre Frage zum passenden Bereich und in die Erhebung — noch nicht zu einer direkten Antwort."
+      "note": "In der Beta führt Ihre Frage zum passenden Bereich und in die Erhebung — noch nicht zu einer direkten Antwort.",
+      "lead": "Oder stellen Sie eine Frage in Ihren eigenen Worten."
     },
     "promises": [
       {
@@ -104,7 +105,8 @@
         "desc": "Verbinden, zusammenarbeiten, erledigen."
       },
       {
-        "title": "Always on your side"
+        "title": "Always on your side",
+        "desc": "Kluge Technik für Tempo — und echte Menschen, wenn Sie sie brauchen."
       }
     ],
     "proofs": [
@@ -1068,7 +1070,11 @@
         "title": "Strukturierte Übergaben erhalten",
         "desc": "Der Anbieter antwortet per Magic-Link in 24–48h. Kein Discovery-Call."
       }
-    ]
+    ],
+    "subtitle": "Ihre besten Matches beruhen auf passender Expertise, Marktabdeckung, Servicequalität, Antwortzeit, Verfügbarkeit und Passung. Die Namen der Anbieter bleiben beim ersten Vergleich verborgen, damit Sie auf das Wesentliche achten können — nicht auf Bekanntheit.",
+    "exampleLabel": "Beispiel-Matches · anonymisiert",
+    "identityLabel": "Die Identität wird sichtbar, nachdem Sie gewählt haben.",
+    "supporting": "Wählen Sie einen oder mehrere Anbieter. Namen und vollständige Profile werden sichtbar, wenn Sie Termine buchen."
   },
   "twoReflexes": {
     "eyebrow": "Warum diese Lücke bestehen bleibt",
@@ -1113,7 +1119,9 @@
         "title": "Unabhängige Fachleute",
         "desc": "Verified Provider erbringen ihre Leistungen unabhängig und in eigener fachlicher Verantwortung."
       }
-    ]
+    ],
+    "row1Lead": "Die meisten Übersichten sagen, was in den Regeln steht. Die Risk Map zeigt, was für Ihr Geschäft auf dem Spiel steht — nach Priorität geordnet, die Quelle immer dabei.",
+    "row2Lead": "Verzeichnisse listen alle. Wir prüfen jeden Verified Provider anhand dokumentierter Nachweise, bevor er gematcht werden kann."
   },
   "domains": {
     "eyebrow": "Was wir wissen",
@@ -1188,7 +1196,8 @@
           "AV- / Sub-AV-Verträge",
           "Mechanismen für internationale Übermittlungen",
           "Auskunfts- & Löschprozesse",
-          "Fristen für Meldungen von Verletzungen"
+          "Fristen für Meldungen von Verletzungen",
+          "Bewertung und Meldung von Datenschutzverletzungen"
         ],
         "matters": [
           "Sie verarbeiten personenbezogene Daten von EU-/UK-Ansässigen",
@@ -1228,7 +1237,8 @@
           "Opt-in-Regeln für E-Mail / SMS",
           "Dark-Pattern-Audits",
           "Kennzeichnung von Influencer- & Werbeinhalten",
-          "Abmelde- & Sperrlistenprozesse"
+          "Abmelde- & Sperrlistenprozesse",
+          "Abmelde- und Sperrlistenprozesse"
         ],
         "matters": [
           "Sie schalten bezahlte Akquise in der EU",
@@ -1264,7 +1274,10 @@
           "Aktualisierungen wirtschaftlich Berechtigter",
           "Dokumentation konzerninterner Verträge",
           "Anforderungen an lokale Vertretung",
-          "Nachverfolgung von Meldefristen"
+          "Nachverfolgung von Meldefristen",
+          "Niederlassungen, Tochtergesellschaften und Konzernstrukturen",
+          "Umstrukturierung und Schließung",
+          "Laufende Fristen und Pflege der Gesellschaft"
         ],
         "matters": [
           "Sie betreiben eine lokale Gesellschaft oder Niederlassung",
@@ -1300,7 +1313,9 @@
           "Technische Dokumentation und ihre Aufbewahrung",
           "In der EU niedergelassene verantwortliche Person",
           "Meldung von Vorfällen und Rückrufe",
-          "UKCA-Kennzeichnung für Großbritannien"
+          "UKCA-Kennzeichnung für Großbritannien",
+          "Verantwortliche Person, Bevollmächtigter oder lokaler Vertreter",
+          "Vorfallmeldungen, Korrekturmaßnahmen und Rückrufe"
         ],
         "matters": [
           "Sie bringen erstmals ein physisches Produkt auf den EU-Markt",
@@ -1340,7 +1355,12 @@
           "Intrastat-Meldung ab Überschreiten der Schwelle",
           "Incoterms und wo die Haftung liegt",
           "Einfuhrumsatzsteuer und Aufschub",
-          "GB ↔ EU-Warenverkehr nach dem Brexit"
+          "GB ↔ EU-Warenverkehr nach dem Brexit",
+          "Ein- und Ausfuhrgenehmigungen",
+          "Incoterms und Lieferverantwortung",
+          "Intrastat-Meldungen",
+          "Lagerung, Fulfillment und 3PL-Dienstleistungen",
+          "Unterstützung für bestimmte Routen"
         ],
         "matters": [
           "Sie versenden erstmals über eine Zollgrenze",
@@ -1384,7 +1404,11 @@
           "Widerruf, Rückgabe und Gewährleistung",
           "Haftung und ihre Grenzen",
           "Streitfälle über Grenzen hinweg",
-          "Welches Recht tatsächlich gilt"
+          "Welches Recht tatsächlich gilt",
+          "Geistiges Eigentum und Marken",
+          "Streitigkeiten",
+          "Anwendbares Recht und Gerichtsstand",
+          "Lokale Rechtsgutachten und regulatorische Beratung"
         ],
         "matters": [
           "Sie schließen erstmals einen Vertragstyp ab, den Sie nicht kennen",
@@ -1433,7 +1457,8 @@
         ]
       }
     ],
-    "learnMore": "Mehr erfahren"
+    "learnMore": "Mehr erfahren",
+    "euWide": "EU-weit"
   },
   "howItActs": {
     "eyebrow": "Ein Mandat von innen",
@@ -1443,21 +1468,32 @@
       "post": " Match und Lösung passiert."
     },
     "cards": [
-      {},
       {
-        "title": "Antwort, mit laufender Uhr."
+        "title": "Den Preis sehen, bevor Sie sich festlegen",
+        "desc": "Eine erwartete Preisspanne steht da, bevor Sie wählen. Nach dem Termin bestätigt der Anbieter den endgültigen Umfang und die Schätzung. Keine fachliche Arbeit beginnt, bevor Sie zustimmen."
       },
       {
-        "title": "Ein Verlauf, der Ihnen gehört."
+        "title": "Antwort, mit laufender Uhr.",
+        "desc": "Verpasst ein Anbieter die vereinbarte Antwortzeit, sagen wir es Ihnen und können Ihnen ein anderes Match zeigen. Mit einem neuen Anbieter wird nichts geteilt, bevor Sie ihn wählen und buchen."
+      },
+      {
+        "title": "Ein Verlauf, der Ihnen gehört.",
+        "desc": "Jeder Schritt steht in einem privaten Verlauf — Anfrage, Antwort, vereinbarter Umfang, Ergebnisse. Er gehört Ihnen."
       }
     ],
     "panel1": {
       "scope": "Umfang",
       "scopeValue": "OSS-Quartalsmeldungen · DE + NL + FR",
-      "approval": "Freigabe"
+      "approval": "Freigabe",
+      "estCost": "Erwartete Preisspanne",
+      "estValue": "2.400–3.800 €",
+      "timeline": "Geschätzte Bearbeitungsdauer",
+      "timelineValue": "Im Schnitt 10–15 Werktage, nachdem alle nötigen Angaben und Unterlagen vorliegen",
+      "approvalValue": "Nötig, bevor die fachliche Arbeit beginnt"
     },
     "panel2": {
-      "label": "SLA für die Erstantwort"
+      "label": "SLA für die Erstantwort",
+      "note": "Wird sie verpasst, sagen wir es Ihnen und können Ihnen ein anderes Match zeigen."
     },
     "panel3": {
       "timeline": [
@@ -1466,7 +1502,8 @@
           "label": "Anfrage gesendet"
         },
         {
-          "date": "25. Apr"
+          "date": "25. Apr",
+          "label": "Bestätigung des Anbieters"
         },
         {
           "date": "28. Apr",
@@ -1475,10 +1512,19 @@
         {
           "date": "02. Mai",
           "label": "Umfang vereinbart"
+        },
+        {
+          "date": "06. Mai",
+          "label": "Arbeit und Unterlagen"
+        },
+        {
+          "date": "12. Mai",
+          "label": "Abschluss"
         }
       ],
       "export": "Geplante Exporte"
-    }
+    },
+    "subtitle": "Wählen Sie einen Termin und buchen Sie ihn. Die Identität des Anbieters wird sichtbar, und die Angaben, die Sie freigeben, werden geteilt. Preis, Zeitplan, Umfang, Kommunikation und Fortschritt bleiben während des gesamten Mandats sichtbar."
   },
   "brandCode": {
     "eyebrow": "Wie wir kommunizieren",
@@ -1562,7 +1608,8 @@
     "learn": {
       "meta": "Webinar · 24 Min.",
       "video": "Grenzüberschreitende USt für D2C",
-      "title": "Lernen Sie von Profis."
+      "title": "Lernen Sie von Profis.",
+      "desc": "Praxisleitfäden, Webinare und Tutorials von qualifizierten Fachleuten."
     },
     "mock": {
       "vatItaly": "USt-Registrierung · Italien",
@@ -1591,6 +1638,12 @@
       "libOssSource": "CompliHub360 Live · 90 Min.",
       "libItVat": "USt-Registrierung in Italien: Schritt für Schritt",
       "libItVatSource": "CompliHub360 Redaktion · 8 Min."
+    },
+    "tile1": {
+      "start": "Neues Assessment starten",
+      "resume": "Dort weitermachen, wo Sie aufgehört haben",
+      "active": "Laufende Termine und Mandate",
+      "saved": "Gespeicherte Risk Maps"
     }
   },
   "faq": {
@@ -1776,7 +1829,9 @@
         "links": {
           "howItWorks": "So funktioniert es",
           "forWhom": "Für wen",
-          "startAssessment": "Assessment starten"
+          "startAssessment": "Assessment starten",
+          "askQuestion": "Frage stellen",
+          "signIn": "Anmelden"
         }
       },
       "areas": {
@@ -1801,6 +1856,14 @@
           "contact": "Kontakt",
           "support": "Support"
         }
+      },
+      "providers": {
+        "title": "Für Anbieter",
+        "links": {
+          "join": "Unserem Anbieter-Netzwerk beitreten",
+          "matching": "So funktioniert das Anbieter-Matching",
+          "providerSignIn": "Anmeldung für Anbieter"
+        }
       }
     },
     "markets": {
@@ -1815,7 +1878,9 @@
       "imprint": "Impressum",
       "cookies": "Cookie-Richtlinie",
       "subProcessors": "Unterauftragsverarbeiter"
-    }
+    },
+    "coverageNote": "Ob ein Service verfügbar ist, hängt vom Land, von der Compliance-Anforderung und von der Abdeckung in unserem Netzwerk geprüfter Anbieter ab.",
+    "coverageLink": "Märkte und Abdeckung ansehen"
   },
   "trustBand": {
     "eyebrow": "Warum CompliHub360 beides zusammenbringt",

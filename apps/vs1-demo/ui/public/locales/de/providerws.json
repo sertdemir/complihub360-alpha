@@ -50,7 +50,8 @@
     "cancel": "Abbrechen",
     "confirm": "Bestätigen",
     "typePrefix": "Geben Sie ",
-    "typeSuffix": " ein, um zu bestätigen:"
+    "typeSuffix": " ein, um zu bestätigen:",
+    "keywordHint": "Geben Sie oben {{keyword}} ein, um fortzufahren."
   },
   "changeEmail": {
     "eyebrow": "EINSTELLUNGEN",
@@ -150,7 +151,8 @@
       "network": "Keine Verbindung. An Ihrem Konto hat sich nichts geändert — bitte versuchen Sie es erneut.",
       "rateLimit": "Zu viele Nachrichten in kurzer Zeit. Bitte warten Sie einen Moment."
     },
-    "scope": "Nicht Teil des Supports: Ihre Honorarverhandlungen mit Mandanten und fachliche Beratung — Sie sind die Fachperson, wir die Plattform. Fragen zu einer Lead-Gebühr, einem Band oder einer Gutschrift gehören sehr wohl hierher, unter Abrechnung."
+    "scope": "Nicht Teil des Supports: Ihre Honorarverhandlungen mit Mandanten und fachliche Beratung — Sie sind die Fachperson, wir die Plattform. Fragen zu einer Lead-Gebühr, einem Band oder einer Gutschrift gehören sehr wohl hierher, unter Abrechnung.",
+    "messageTooShort": "Bitte beschreiben Sie in mindestens 10 Zeichen, was passiert ist."
   },
   "billing": {
     "title": "Abrechnung",
@@ -351,7 +353,8 @@
       "cancelled": "abgesagt"
     },
     "trendsNote": "Monatsverlauf ab Growth; Bereich und Land ebenso. Essential zeigt die Fakten oben ohne Verlauf; CSV-Export ab Global. Dieselben Fakten in jedem Tarif.",
-    "bySelf": "durch Sie"
+    "bySelf": "durch Sie",
+    "appealTooShort": "Bitte begründen Sie Ihren Einspruch in mindestens 10 Zeichen."
   },
   "magicAction": {
     "partnerBadge": "Anbieter",
@@ -381,7 +384,23 @@
     "doneTitle": "Erledigt ✓",
     "dossierUnlocked": "🔓 Dossier freigeschaltet",
     "contactInDashboard": "Die Kontaktdaten des Anfragenden erscheinen im Thread Ihres Anbieter-Dashboards.",
-    "closeNote": "Sie können dieses Fenster schließen oder Ihr Anbieter-Dashboard öffnen."
+    "closeNote": "Sie können dieses Fenster schließen oder Ihr Anbieter-Dashboard öffnen.",
+    "fields": {
+      "country": "Land",
+      "markets": "Märkte",
+      "categories": "Bereiche",
+      "businessType": "Unternehmensart",
+      "businessTypeNote": "Angaben zum Unternehmen",
+      "marketScope": "Marktumfang",
+      "riskSignals": "Risikosignale",
+      "revenueBand": "Umsatzklasse",
+      "intent": "Anliegen",
+      "urgency": "Dringlichkeit",
+      "note": "Notiz",
+      "existingProvider": "Bisheriger Anbieter",
+      "domain": "Bereich",
+      "timeline": "Zeitrahmen"
+    }
   },
   "settings": {
     "title": "Einstellungen",
@@ -595,14 +614,15 @@
         "reason": "Die Buchung wurde storniert, bevor die Kontaktdaten freigegeben waren.",
         "context": "Nicht freigegeben."
       }
-    }
+    },
+    "attChoiceRequired": "Bitte wählen Sie, wie der Termin gelaufen ist."
   },
   "intake": {
     "inviteOnlyTitle": "Anbieter-Intake nur mit Einladung.",
     "inviteOnlyBody": "CompliHub360-Anbieter werden direkt von unserem Team angeworben und über einen persönlichen Intake-Link aufgenommen. Es gibt keine öffentliche Selbstregistrierung — jeder Anbieter durchläuft vor der Freischaltung eine manuelle Prüfung gegen unsere Richtlinien und Statuten.",
-    "inviteOnlyContact": "Du berätst Unternehmen zu Compliance und möchtest Anbieter werden? Melde dich: partners@complihub360.com",
+    "inviteOnlyContact": "Sie beraten Unternehmen zu Compliance und möchten Anbieter werden? Schreiben Sie uns: partners@complihub360.com",
     "title": "Anbieter-Intake",
-    "sub": "Reiche dein Kanzlei-Paket ein — wir prüfen es manuell und schalten deinen Workspace nach dem Vetting frei.",
+    "sub": "Reichen Sie Ihr Kanzlei-Paket ein — wir prüfen es manuell und schalten Ihren Workspace nach der Prüfung frei.",
     "secFirm": "Kanzlei & Abdeckung",
     "name": "Kanzleiname *",
     "website": "Website",
@@ -616,13 +636,19 @@
     "statutes": "Ich bestätige, dass unsere Kanzlei die CompliHub360-Anbieterrichtlinien und -Statuten erfüllt, und stimme der manuellen Prüfung der eingereichten Angaben zu.",
     "submit": "Paket zur Prüfung einreichen",
     "sending": "Wird eingereicht…",
-    "vettingNote": "Nach der Prüfung erhältst du deinen Workspace-Zugang — in der Regel innerhalb von 3 Werktagen.",
+    "vettingNote": "Nach der Prüfung erhalten Sie Ihren Workspace-Zugang — in der Regel innerhalb von 3 Werktagen.",
     "doneTitle": "Paket eingegangen — in Prüfung.",
-    "doneBody": "Danke! Unser Team prüft deine Angaben jetzt gegen die Anbieterrichtlinien. Du hörst von uns — in der Regel innerhalb von 3 Werktagen. Dein Workspace bleibt bis zur Freischaltung inaktiv.",
+    "doneBody": "Danke! Unser Team prüft Ihre Angaben jetzt gegen die Anbieterrichtlinien. Sie hören von uns — in der Regel innerhalb von 3 Werktagen. Ihr Workspace bleibt bis zur Freischaltung inaktiv.",
     "doneNote": "Fragen? partners@complihub360.com",
     "errorTitle": "Einreichen fehlgeschlagen",
-    "errorBody": "Das Paket konnte nicht übermittelt werden. Prüfe deinen Intake-Link oder versuche es erneut — oder kontaktiere partners@complihub360.com.",
-    "titleNote": "Vor der Buchung sehen Nutzer Sie als „Verified Provider A/B/C“ mit Ihren freigegebenen Bereichen und Ihrer Region — diesen Titel bildet CompliHub360, Sie müssen ihn nicht schreiben."
+    "errorBody": "Das Paket konnte nicht übermittelt werden. Prüfen Sie Ihren Intake-Link oder versuchen Sie es erneut — oder schreiben Sie an partners@complihub360.com.",
+    "titleNote": "Vor der Buchung sehen Nutzer Sie als „Verified Provider A/B/C“ mit Ihren freigegebenen Bereichen und Ihrer Region — diesen Titel bildet CompliHub360, Sie müssen ihn nicht schreiben.",
+    "nameShort": "Kanzleiname",
+    "statutesShort": "Anbieterrichtlinien und Statuten",
+    "errors": {
+      "name": "Bitte geben Sie den Namen Ihrer Kanzlei ein (mindestens 2 Zeichen).",
+      "statutes": "Bitte bestätigen Sie die Anbieterrichtlinien und Statuten, um Ihr Paket einzureichen."
+    }
   },
   "application": {
     "title": "Bewerbung",
@@ -748,7 +774,8 @@
       "registryUnavailable": "Das Register ist gerade nicht erreichbar. Das Prüfteam entscheidet am Dokument.",
       "reviewerHint": "Wird vom Prüfteam am Registerauszug geprüft — kein Upload nötig.",
       "licenceHint": "Vor dem Aktivieren nötig, nicht vor dem Einreichen.",
-      "uploadedOn": "hochgeladen {{date}}"
+      "uploadedOn": "hochgeladen {{date}}",
+      "vatTooShort": "Bitte geben Sie Ihre vollständige USt-IdNr. ein, zum Beispiel DE123456789."
     },
     "agreements": {
       "intro": "Jede Annahme wird mit Fassung, Sprache, Name und Funktion festgehalten. Eine neue Fassung ersetzt die alte, löscht sie aber nicht — der Stand zum Zeitpunkt einer Buchung bleibt belegbar.",
@@ -857,7 +884,8 @@
         "services": "{{services}} Leistungen in {{countries}} Ländern",
         "evidence": "Registerauszug, Versicherung, USt-IdNr.",
         "agreements": "{{done}} von {{total}} Annahmen"
-      }
+      },
+      "lockedHint": "Einreichen ist möglich, sobald alles unter „Fehlt noch“ erledigt ist. Wählen Sie einen Punkt, um dorthin zu springen."
     },
     "missing": {
       "account": {
@@ -957,12 +985,18 @@
       "approvedFrom": "freigegeben, ab {{date}}",
       "plannedFrom": "geplant ab {{date}}",
       "plannedShort": "Änderung geplant",
-      "withdrawFields": "Zurückziehen: {{fields}}"
+      "withdrawFields": "Zurückziehen: {{fields}}",
+      "numberInvalid": "Bitte geben Sie eine Zahl ab 0 ein oder lassen Sie das Feld leer."
     },
     "errors": {
       "serviceExists": "Diese Leistung steht bereits in Ihrer Liste.",
       "serviceCodeFixed": "Die Kategorie einer Leistung lässt sich nicht ändern. Beenden Sie diese Leistung und legen Sie stattdessen eine neue an.",
-      "serviceRetired": "Diese Leistung ist beendet und kann nicht mehr bearbeitet werden."
+      "serviceRetired": "Diese Leistung ist beendet und kann nicht mehr bearbeitet werden.",
+      "serviceCode": "Bitte geben Sie einen Leistungscode ein, zum Beispiel tax-vat.returns.",
+      "serviceCodeUnknown": "Dieser Leistungscode steht nicht in unserer Liste. Bitte prüfen Sie die Schreibweise, zum Beispiel tax-vat.returns.",
+      "countryCode": "Bitte geben Sie einen zweistelligen Ländercode ein, zum Beispiel AT.",
+      "countryListed": "{{country}} steht für diese Leistung schon in der Liste. Bitte geben Sie ein anderes Land ein.",
+      "agreementName": "Bitte geben Sie zur Annahme Ihren Namen ein."
     },
     "saveFailed": {
       "heading": "Wir konnten Ihre Änderungen nicht speichern",
@@ -1101,7 +1135,8 @@
       "sendFailed": {
         "heading": "Wir konnten die Änderung nicht melden",
         "message": "Ihre Angaben sind noch da. Bitte versuchen Sie es erneut. Wenn das Problem bleibt, wenden Sie sich an den Support."
-      }
+      },
+      "dateInvalid": "Bitte wählen Sie das Datum, an dem es geschah — heute oder früher."
     }
   },
   "identity": {
@@ -1218,7 +1253,8 @@
       "errAllowance": "Dieser Tarif trägt {{allowance}} Hauptkategorien, für Ihr Konto sind {{used}} freigegeben.",
       "errAlready": "Es ist bereits etwas vorgemerkt. Nehmen Sie das zuerst zurück.",
       "errSame": "Das ist bereits Ihr laufender Tarif.",
-      "errFailed": "Das hat gerade nicht geklappt. Bitte noch einmal versuchen."
+      "errFailed": "Das hat gerade nicht geklappt. Bitte noch einmal versuchen.",
+      "pickTargetRequired": "Bitte wählen Sie den Plan, zu dem Sie wechseln möchten."
     }
   },
   "partnerNotif": {
@@ -1458,7 +1494,14 @@
     "eventsNote": "Ereignisse werden abgeholt, nicht zugestellt; wir halten sie 90 Tage vor.",
     "calls": "Letzte Aufrufe",
     "noCalls": "Noch keine Aufrufe.",
-    "callsNote": "Heute: {{count}} Aufrufe · {{limited}} × 429 · {{failed}} × 5xx. Das Protokoll hält 90 Tage, ohne Inhalte und ohne Schlüssel."
+    "callsNote": "Heute: {{count}} Aufrufe · {{limited}} × 429 · {{failed}} × 5xx. Das Protokoll hält 90 Tage, ohne Inhalte und ohne Schlüssel.",
+    "errors": {
+      "name": "Bitte geben Sie einen Namen für die Integration ein.",
+      "useCase": "Bitte beschreiben Sie, wofür Sie die Integration brauchen.",
+      "scopes": "Bitte wählen Sie mindestens einen Datenbereich.",
+      "termsLabel": "API- und Integrationsbedingungen",
+      "terms": "Bitte akzeptieren Sie die API- und Integrationsbedingungen, um die Anfrage zu senden."
+    }
   },
   "invite": {
     "eyebrow": "Anbieter-Onboarding",

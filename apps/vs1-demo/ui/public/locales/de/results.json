@@ -268,7 +268,8 @@
         "noBooking": "Es wurde keine Buchung angelegt",
         "nothingShared": "Mit dem Anbieter wurde nichts geteilt",
         "kept": "Ihre Auswahl und Ihr Anliegen bleiben erhalten"
-      }
+      },
+      "reasonProvider": "Das liegt nicht an Ihnen: Auf Seiten des Anbieters fehlt gerade eine Voraussetzung. Der Anbieter ist informiert."
     },
     "slotsFailed": "Die freien Termine konnten nicht geladen werden. Über die Verfügbarkeit des Anbieters sagt das nichts.",
     "slotsRetry": "Erneut versuchen"
@@ -560,5 +561,55 @@
         "established_in_eu": "ob Ihr Unternehmen seinen Sitz in der EU hat"
       }
     }
+  },
+  "matchStates": {
+    "factExpertise": "Expertise",
+    "factCoverage": "Abdeckung",
+    "factPrice": "Erwartete Preisspanne",
+    "factAvailability": "Verfügbarkeit",
+    "priceFrom": "ab {{price}}",
+    "priceUpTo": "bis {{price}}",
+    "nextSlot": "Nächster freier Termin: {{when}}",
+    "guestCaption": "Mit einem kostenlosen Konto. Name und Kontakt erscheinen nach der Buchung.",
+    "matrixLabel": "Abdeckung nach Bereich und Markt",
+    "legendCovered": "ein geprüftes Match deckt es ab",
+    "legendGap": "noch kein Match"
+  },
+  "sharing": {
+    "fields": {
+      "company_name": "Firmenname",
+      "email": "E-Mail-Adresse",
+      "message": "Ihre Nachricht",
+      "topic": "Thema Ihrer Anfrage"
+    },
+    "notProvided": "Nicht angegeben",
+    "noMessage": "Keine Nachricht",
+    "sharedTitle": "Mit dem Anbieter geteilt",
+    "notOthers": "Mit keinem anderen Anbieter geteilt.",
+    "confirmRequired": "Bitte bestätigen Sie, dass Sie mit dieser Buchung fortfahren möchten.",
+    "termsTitle": "Buchungsbedingungen (Fassung {{version}})",
+    "topicUnspecified": "Bereich und Märkte dieser Anfrage"
+  },
+  "delayed": {
+    "yourAnswers": "Ihre Antworten",
+    "saved": "Gespeichert"
+  },
+  "providerCoverage": {
+    "notifyLabel": "Per E-Mail benachrichtigen, sobald ein geprüfter Anbieter das abdeckt",
+    "notifyHelp": "Wir schreiben Ihnen an {{email}}. Nur zu dieser Anfrage."
+  },
+  "card": {
+    "book": "Termin buchen",
+    "markets": "Märkte",
+    "priorities": "Abgedeckte Prioritäten",
+    "timeline": "Geschätzte Bearbeitungsdauer",
+    "completed": "Abgeschlossene Mandate",
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage",
+    "daysRange": "{{min}}–{{max}} Tage",
+    "addToSelection": "Zur Auswahl hinzufügen",
+    "inSelection": "In Ihrer Auswahl",
+    "saveFailed": "Das hat nicht geklappt. Bitte versuchen Sie es erneut.",
+    "saveFull": "Ihre Auswahl fasst bis zu 200 Anbieter. Entfernen Sie einen unter „Gespeicherte Anbieter“, um einen weiteren hinzuzufügen."
   }
 }

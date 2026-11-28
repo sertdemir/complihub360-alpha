@@ -53,7 +53,8 @@
       "stat1Label": "Schritte zum Risikoprofil",
       "stat2Label": "Max. Bestätigungszeit",
       "stat3Label": "Max. Antwortfenster",
-      "railSub": "Tempo und Klarheit statt Rechtsgutachten"
+      "railSub": "Tempo und Klarheit statt Rechtsgutachten",
+      "pain3Desc": "Das Assessment erfasst Ihren Kontext in vier Schritten, kartiert die Risiken, die in Ihren Märkten gelten, und verbindet Sie mit Verified Providern, die innerhalb von 24 Stunden bestätigen und innerhalb von 48 Stunden antworten."
     },
     "operations": {
       "overline": "Für Operations Teams",
@@ -316,7 +317,8 @@
         "body": "4–5 präzise Fragen übersetzen Ihre Situation in ein strukturiertes Suchprofil."
       },
       "match": {
-        "title": "Matchen"
+        "title": "Matchen",
+        "body": "Verified Provider werden nach Passung, geprüfter Expertise und Servicequalität gereiht — nie danach, was sie bezahlen."
       },
       "engage": {
         "title": "Anfragen",
@@ -1045,7 +1047,8 @@
         "DE": "unwirksame Klauseln; Prozessrisiko",
         "default": "nicht durchsetzbare Klauseln; Streitrisiko"
       }
-    }
+    },
+    "heroBody": "Jeder Compliance-Bereich führt zu Ihrem eigenen Assessment. Benennen Sie Ihr Thema, verstehen Sie Ihre Risiken in etwa sechs Minuten und sehen Sie dann die passenden Fachleute."
   },
   "resources": {
     "meta": {
@@ -1146,7 +1149,9 @@
     "dimEyebrow": "Governance",
     "dimCounter": "Dimension {{num}} von {{total}}",
     "featEyebrow": "Im Einsatz",
-    "ctaBody": "Dieselben Regeln, dieselbe KI: Das Assessment grenzt in etwa sechs Minuten ein, was für Sie gilt — jede Aussage mit Quelle."
+    "ctaBody": "Dieselben Regeln, dieselbe KI: Das Assessment grenzt in etwa sechs Minuten ein, was für Sie gilt — jede Aussage mit Quelle.",
+    "dimEthicsDesc": "Unsere KI-Funktionen achten die menschliche Selbstbestimmung. Sie sind dafür gebaut, Fachleute zu unterstützen, nicht sie zu ersetzen.",
+    "featPrivacyDesc": "Bevor Geschäftskontext ein KI-Modell erreicht, maskieren feste Musterregeln E-Mail-Adressen, Telefonnummern und andere Kennungen. Sie erkennen nicht jeden Namen — lassen Sie persönliche Angaben deshalb bitte aus dem Freitext heraus."
   },
   "header": {
     "nav": {
@@ -1331,7 +1336,9 @@
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
       "lead": "Ein paar Fragen, etwa sechs Minuten, kein Konto nötig."
     },
-    "seeAll": "Ansehen, wie jeder Schritt funktioniert"
+    "seeAll": "Ansehen, wie jeder Schritt funktioniert",
+    "ctaAsk": "Frage stellen",
+    "ctaAssess": "Bedarf ermitteln"
   },
   "markets": {
     "meta": {
@@ -1496,10 +1503,49 @@
       "title": "Wo wir stehen — und wo es hingeht",
       "items": {
         "eu": {
-          "name": "Europäische Union"
+          "name": "Europäische Union",
+          "focus": [
+            "DSGVO",
+            "EPR & Verpackung (PPWR)",
+            "EU-weite Umsatzsteuer",
+            "Produktsicherheit (GPSR)"
+          ]
         },
-        "uk": {},
-        "us": {}
+        "uk": {
+          "name": "Vereinigtes Königreich",
+          "focus": [
+            "UK GDPR",
+            "HMRC-Umsatzsteuer",
+            "Verpackungs-EPR (PackUK)",
+            "Produktsicherheit"
+          ]
+        },
+        "us": {
+          "name": "Vereinigte Staaten",
+          "focus": [
+            "Sales Tax der Bundesstaaten",
+            "CCPA/CPRA & Datenschutz der Bundesstaaten",
+            "FTC-Werberegeln",
+            "Zolltarifierung"
+          ]
+        },
+        "tr": {
+          "name": "Türkei",
+          "focus": [
+            "KDV (Umsatzsteuer)",
+            "KVKK-Datenschutz",
+            "Einwilligung im E-Commerce (ETK)",
+            "Zoll & EORI"
+          ]
+        }
+      },
+      "lead": "Jeder Eintrag nennt das Recht, aus dem er stammt: national, wo wir es führen, auf EU-Ebene, wo das das geltende Recht ist.",
+      "note": "{{markets}} Märkte heute: {{marketList}}. Wo wir noch keinen nationalen Text führen, sagt es die Marktseite.",
+      "scope": {
+        "eu": "Deutschland · Frankreich · Italien · Spanien · Niederlande + EU-Recht",
+        "uk": "Nationales Recht",
+        "us": "Bundesrecht + CA, TX, NY, FL",
+        "tr": "Nationales Recht"
       }
     },
     "obligationsByMarket": {
@@ -1551,7 +1597,9 @@
       "body": "Plätze sind nicht verkäuflich. Ein bezahlter Platz würde das Match für beide Seiten wertlos machen: Sie träfen den, der am meisten gezahlt hat, und die Fachperson träfe jemanden, dessen Fall sie nicht bedienen kann. Die Eignung ist das einzige Kriterium."
     },
     "specialist": {
-      "kicker": "Was die Fachperson kostet"
+      "kicker": "Was die Fachperson kostet",
+      "title": "Ihr Honorar — besprochen, bevor Sie sich festlegen.",
+      "body": "Die Beratung selbst ist nicht kostenlos, und wir tun nicht so, als wäre sie es. Jeder Verified Provider legt sein Honorar selbst fest; Umfang und Preis besprechen Sie im Termin, bevor Sie sich auf etwas festlegen."
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
@@ -1598,7 +1646,8 @@
           "a": "Nein. Plätze sind nicht verkäuflich — ein bezahlter Platz würde das Match für beide Seiten wertlos machen. Die Eignung ist das einzige Kriterium."
         },
         {
-          "q": "Was kostet die Beratung bei der Fachperson?"
+          "q": "Was kostet die Beratung bei der Fachperson?",
+          "a": "Das Honorar legt die Fachperson fest. Umfang und Preis besprechen Sie im Termin, bevor Sie sich auf etwas festlegen."
         },
         {
           "q": "Sieht die Fachperson meine Daten vor der Buchung?",
