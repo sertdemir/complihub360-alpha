@@ -26,7 +26,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 // verifiziert. Ohne gueltigen Link gibt es kein Formular, sondern den Grund.
 
 const FIELD =
-    'mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35';
+    'mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-stroke-focus/35';
 const LABEL = 'block text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary';
 const STEPS = ['account', 'profile', 'verification'] as const;
 const PASSWORD_MIN = 8;

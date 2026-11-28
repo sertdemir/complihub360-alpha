@@ -143,7 +143,7 @@ export function Combobox({
           'flex w-full items-center gap-2 border bg-surface transition-colors',
           TRIGGER_SIZE[inputSize],
           'border-stroke',
-          open && 'border-stroke-focus ring-2 ring-inset ring-primary-500/35 dark:ring-emerald-500/40',
+          open && 'border-stroke-focus ring-2 ring-inset ring-stroke-focus/35',
           disabled && 'cursor-not-allowed bg-neutral-100 opacity-60 dark:bg-white/[0.04]',
         )}
       >

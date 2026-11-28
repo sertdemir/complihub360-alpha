@@ -38,7 +38,7 @@ const readLater = (): string | null => { try { return localStorage.getItem(LATER
 const writeLater = (v: string) => { try { localStorage.setItem(LATER_KEY, v); } catch { /* privates Fenster: dann eben beim naechsten Laden wieder */ } };
 
 const FIELD =
-    "mt-2 w-full rounded-lg border border-stroke-input bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35";
+    "mt-2 w-full rounded-lg border border-stroke-input bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-stroke-focus/35";
 const LABEL = "block text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary";
 
 export function SetPasswordPrompt() {

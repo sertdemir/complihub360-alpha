@@ -173,8 +173,8 @@ export function DatePicker({
         className={cn(
           'flex w-full items-center gap-2 border bg-surface text-left transition-colors focus:outline-none',
           TRIGGER_SIZE[inputSize],
-          'border-stroke focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35 dark:focus:ring-emerald-500/40',
-          open && 'border-stroke-focus ring-2 ring-inset ring-primary-500/35 dark:ring-emerald-500/40',
+          'border-stroke focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-stroke-focus/35',
+          open && 'border-stroke-focus ring-2 ring-inset ring-stroke-focus/35',
           disabled && 'cursor-not-allowed bg-neutral-100 opacity-60 dark:bg-white/[0.04]',
         )}
       >
@@ -200,7 +200,7 @@ export function DatePicker({
               type="button"
               aria-label="Previous month"
               onClick={() => setViewMonth((m) => addMonths(m, -1))}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-fg-secondary transition-colors hover:bg-brand-light focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500/35 dark:focus:ring-emerald-500/40"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-fg-secondary transition-colors hover:bg-brand-light focus:outline-none focus:ring-2 focus:ring-inset focus:ring-stroke-focus/35"
             >
               <ChevronLeft size={18} />
             </button>
@@ -211,7 +211,7 @@ export function DatePicker({
               type="button"
               aria-label="Next month"
               onClick={() => setViewMonth((m) => addMonths(m, 1))}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-fg-secondary transition-colors hover:bg-brand-light focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500/35 dark:focus:ring-emerald-500/40"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-fg-secondary transition-colors hover:bg-brand-light focus:outline-none focus:ring-2 focus:ring-inset focus:ring-stroke-focus/35"
             >
               <ChevronRight size={18} />
             </button>

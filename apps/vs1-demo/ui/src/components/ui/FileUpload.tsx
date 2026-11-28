@@ -159,7 +159,7 @@ export function FileUpload({
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         className={cn(
-          'flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/40',
+          'flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-stroke-focus/40',
           dragActive ? 'border-stroke-brand bg-brand-light' : 'border-stroke bg-surface',
           disabled
             ? 'cursor-not-allowed opacity-60'

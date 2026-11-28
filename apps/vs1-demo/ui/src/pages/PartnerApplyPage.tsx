@@ -33,7 +33,7 @@ import { EMAIL_RE, failureOf, invalidFieldOf, sendContact, type SendFailure } fr
 // 01 bekommt den Haken. Figma: Screens-Datei, 3638:62.
 
 const FIELD =
-    'mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35';
+    'mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-stroke-focus/35';
 const LABEL = 'block text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary';
 
 const OUTLOOK = ['review', 'access', 'listing'] as const;

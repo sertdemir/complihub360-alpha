@@ -34,7 +34,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           variant === 'filled' ? 'bg-surface-secondary' : 'bg-surface',
           error
             ? 'border-error-500 bg-error-bg focus:ring-2 focus:ring-inset focus:ring-error-500/40 dark:bg-red-500/10'
-            : 'border-stroke focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35 dark:focus:ring-emerald-500/40',
+            : 'border-stroke focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-stroke-focus/35',
           disabled && 'cursor-not-allowed bg-neutral-100 opacity-60 dark:bg-white/[0.04]',
         )}
         {...props}

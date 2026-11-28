@@ -57,7 +57,7 @@ const goldComponents = {
 };
 
 const FIELD =
-    "mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35";
+    "mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-stroke-focus/35";
 const LABEL = "block text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary";
 const CTA =
     "mt-5 flex w-full items-center justify-center gap-2 rounded-cta btn-action-edge bg-action px-5 py-3.5 text-body-md font-semibold text-fg-on-action transition-transform duration-200 hover:-translate-y-0.5";

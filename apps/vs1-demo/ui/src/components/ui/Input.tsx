@@ -34,7 +34,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           variant === 'filled' ? 'bg-surface-secondary' : 'bg-surface',
           error
             ? 'border-error-500 bg-error-bg focus-within:ring-2 focus-within:ring-inset focus-within:ring-error-500/40 dark:bg-red-500/10'
-            : 'border-stroke focus-within:border-stroke-focus focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500/35 dark:focus-within:ring-emerald-500/40',
+            : 'border-stroke focus-within:border-stroke-focus focus-within:ring-2 focus-within:ring-inset focus-within:ring-stroke-focus/35',
           disabled && 'cursor-not-allowed bg-neutral-100 opacity-60 dark:bg-white/[0.04]',
           className,
         )}
