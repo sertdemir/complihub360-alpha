@@ -131,9 +131,9 @@
       "PRODUCT": "Produkt",
       "MARKETING": "Marketing",
       "DATA": "Daten",
-      "CORPORATE": "Unternehmen",
+      "CORPORATE": "Unternehmensgründung",
       "LOGISTICS": "Logistik",
-      "LEGAL": "Recht",
+      "LEGAL": "Rechtliche Unterstützung",
       "ONGOING_MONITORING": "Monitoring",
       "tax-vat": "Steuern & USt",
       "product-packaging": "EPR & Verpackung",
@@ -149,7 +149,7 @@
     "emptyStep2Title": "Sehen",
     "emptyStep2Body": "Ihre Pflichten, nach Dringlichkeit sortiert.",
     "emptyStep3Title": "Handeln",
-    "emptyStep3Body": "Abhaken — oder Fachleute dazuholen.",
+    "emptyStep3Body": "Abhaken — oder einen Anbieter dazuholen.",
     "dutiesHigh_one": "{{count}} hoch",
     "dutiesHigh_other": "{{count}} hoch",
     "today": "Heute",
@@ -414,7 +414,7 @@
     "emptyTitle": "Noch keine Pflichten aus {{area}}",
     "emptyBody": "Ein Assessment mit diesem Bereich erstellt eine Risk Map — ihre Pflichten je Markt stehen hier als Querschnitt.",
     "emptyHint": "Etwa sechs Minuten · Bereich ist vorausgewählt",
-    "emptyCta": "Prüfung für diesen Bereich starten",
+    "emptyCta": "Assessment für diesen Bereich starten",
     "emptyArchived_one": "{{count}} archivierte Risk Map deckt diesen Bereich ab",
     "emptyArchived_other": "{{count}} archivierte Risk Maps decken diesen Bereich ab",
     "emptyArchivedLink": "Archivierte Risk Maps ansehen",
@@ -520,7 +520,7 @@
   "assistant": {
     "title": "USt-Assistent",
     "beta": "Beta",
-    "intro": "Ich bin der KI-Assistent von CompliHub360. Fragen Sie mich zu USt-Regeln, Schwellenwerten und Fristen in Ihren Märkten (DE, UK, NL, FR, IT, ES, US, TR, AT). Ich antworte aus der geprüften Wissensbasis und sage es, wenn ich mir nicht sicher bin.",
+    "intro": "Ich bin der KI-Assistent von CompliHub360. Fragen Sie mich zu USt-Regeln, Schwellenwerten und Fristen in Ihren Märkten (DE, UK, NL, FR, IT, ES, US, TR, AT). Ich antworte aus der Wissensbasis und sage es, wenn ich mir nicht sicher bin.",
     "placeholder": "z. B. Ab wann muss ich mich in Italien registrieren?",
     "send": "Senden",
     "open": "Assistent öffnen",
@@ -538,7 +538,7 @@
   },
   "termine": {
     "title": "Ihre <accent>Termine</accent>.",
-    "sub": "Gebuchte Erstgespräche mit Ihren Spezialisten — Identität und Kontakt sind seit der Buchung sichtbar.",
+    "sub": "Gebuchte Termine mit Ihren Anbietern — Identität und Kontaktdaten sind seit der Buchung sichtbar.",
     "upcoming": "KOMMEND",
     "past": "VERGANGEN",
     "reschedule": "Verschieben",
@@ -617,7 +617,7 @@
       "disputeFailed": "Der Widerspruch konnte nicht gesendet werden. Bitte versuchen Sie es erneut oder sprechen Sie mit uns.",
       "rebookedFrom": "Neuer Termin zu einer früheren Buchung"
     },
-    "icsSummary": "CompliHub360 Erstgespräch — {{provider}}"
+    "icsSummary": "Termin mit {{provider}} · CompliHub360"
   },
   "review": {
     "eyebrow": "BEWERTUNG",
@@ -632,7 +632,7 @@
       "value": "Preis-Leistung"
     },
     "bodyLabel": "Ihre Erfahrung (optional)",
-    "bodyPh": "Wie lief das Erstgespräch?",
+    "bodyPh": "Wie lief der Termin?",
     "note": "Verifizierte Bewertungen stammen nur aus echten Terminen und erscheinen anonymisiert auf dem Anbieter-Profil. Ihr Name bleibt privat.",
     "close": "Schließen",
     "sendFailed": {
@@ -671,7 +671,7 @@
     "failed": "Der Termin konnte nicht verschoben werden. Bitte versuchen Sie es erneut."
   },
   "wizardDrawer": {
-    "eyebrow": "Neue Suche",
+    "eyebrow": "Neues Assessment",
     "title": "Passende Anbieter finden"
   },
   "answersDrawer": {

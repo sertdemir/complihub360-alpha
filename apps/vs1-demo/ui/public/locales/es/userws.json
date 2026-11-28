@@ -131,9 +131,9 @@
       "PRODUCT": "Producto",
       "MARKETING": "Marketing",
       "DATA": "Datos",
-      "CORPORATE": "Sociedad",
+      "CORPORATE": "Constitución de empresas",
       "LOGISTICS": "Logística",
-      "LEGAL": "Jurídico",
+      "LEGAL": "Apoyo jurídico",
       "ONGOING_MONITORING": "Seguimiento",
       "tax-vat": "Fiscal e IVA",
       "product-packaging": "RAP y envases",
@@ -149,7 +149,7 @@
     "emptyStep2Title": "Ver",
     "emptyStep2Body": "Sus obligaciones, ordenadas por urgencia.",
     "emptyStep3Title": "Actuar",
-    "emptyStep3Body": "Marcarlas — o recurrir a un especialista.",
+    "emptyStep3Body": "Márquelas como hechas, o recurra a un proveedor.",
     "dutiesHigh_one": "{{count}} alto",
     "dutiesHigh_other": "{{count}} altas",
     "today": "Hoy",
@@ -520,7 +520,7 @@
   "assistant": {
     "title": "Asistente de IVA",
     "beta": "Beta",
-    "intro": "Soy el asistente de IA de CompliHub360. Pregúnteme sobre normas de IVA, umbrales y plazos en sus mercados (DE, UK, NL, FR, IT, ES, US, TR, AT). Respondo desde la base de conocimiento verificada y lo digo cuando no estoy seguro.",
+    "intro": "Soy el asistente de IA de CompliHub360. Pregúnteme sobre normas de IVA, umbrales y plazos en sus mercados (DE, UK, NL, FR, IT, ES, US, TR, AT). Respondo desde la base de conocimiento y lo digo cuando no estoy seguro.",
     "placeholder": "p. ej. ¿Cuándo debo registrarme a efectos de IVA en Italia?",
     "send": "Enviar",
     "open": "Abrir asistente",
@@ -538,7 +538,7 @@
   },
   "termine": {
     "title": "Sus <accent>citas</accent>.",
-    "sub": "Llamadas iniciales reservadas con sus especialistas — identidad y contacto visibles desde la reserva.",
+    "sub": "Citas reservadas con sus proveedores: su identidad y sus datos de contacto son visibles desde la reserva.",
     "upcoming": "PRÓXIMAS",
     "past": "PASADAS",
     "reschedule": "Reprogramar",
@@ -632,7 +632,7 @@
       "value": "Relación calidad-precio"
     },
     "bodyLabel": "Su experiencia (opcional)",
-    "bodyPh": "¿Cómo fue la primera llamada?",
+    "bodyPh": "¿Cómo fue la cita?",
     "note": "Las valoraciones verificadas provienen solo de citas reales y aparecen anonimizadas en el perfil del proveedor. Su nombre permanece privado.",
     "close": "Cerrar",
     "sendFailed": {
@@ -671,7 +671,7 @@
     "failed": "No se pudo mover la cita. Inténtelo de nuevo."
   },
   "wizardDrawer": {
-    "eyebrow": "Nueva búsqueda",
+    "eyebrow": "Nueva evaluación",
     "title": "Buscar proveedores adecuados"
   },
   "answersDrawer": {

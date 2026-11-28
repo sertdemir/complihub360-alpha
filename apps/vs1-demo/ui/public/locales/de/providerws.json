@@ -523,7 +523,7 @@
   },
   "termine": {
     "title": "Termine & <accent>Leads</accent>.",
-    "sub": "Gebuchte Erstgespräche. Das Dossier mit Identität und Anliegen gehört Ihnen ab der Buchung. Jede Buchung ist ein abgerechneter Lead.",
+    "sub": "Gebuchte Termine. Das Dossier mit Identität und Anliegen gehört Ihnen ab der Buchung. Jede Buchung ist ein abgerechneter Lead.",
     "upcoming": "KOMMEND",
     "past": "VERGANGEN",
     "leadCharged": "Lead berechnet",
@@ -1273,19 +1273,19 @@
     "goTo": "Öffnen",
     "booking_created": {
       "title": "Neue Buchung",
-      "body": "Ein Mandant hat ein Erstgespräch am {{slot}} gebucht. Das Dossier liegt bereit."
+      "body": "Ein Mandant hat einen Termin am {{slot}} gebucht. Das Dossier liegt bereit."
     },
     "booking_cancelled": {
       "title": "Buchung abgesagt",
-      "body": "Der Mandant hat das Erstgespräch am {{slot}} abgesagt."
+      "body": "Der Mandant hat den Termin am {{slot}} abgesagt."
     },
     "booking_rescheduled": {
       "title": "Buchung verschoben",
-      "body": "Der Mandant hat das Erstgespräch vom {{from}} auf {{slot}} verschoben."
+      "body": "Der Mandant hat den Termin vom {{from}} auf {{slot}} verschoben."
     },
     "appointment_reminder": {
       "title": "Termin in {{offset}}",
-      "body": "Erstgespräch am {{slot}}."
+      "body": "Termin am {{slot}}."
     },
     "dispute_opened": {
       "title": "Ein Mandant widerspricht Ihrer Meldung",
