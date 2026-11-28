@@ -523,7 +523,7 @@
   },
   "termine": {
     "title": "Randevular ve <accent>lead'ler</accent>.",
-    "sub": "Planlanmış ilk görüşmeler. Kimlik ve talep bilgilerini içeren dosya rezervasyondan itibaren sizindir. Her rezervasyon faturalanmış bir lead’dir.",
+    "sub": "Planlanan görüşmeler. Kimlik ve talep bilgilerini içeren dosya, randevu anından itibaren sizindir. Her randevu faturalandırılan bir lead'dir.",
     "upcoming": "YAKLAŞAN",
     "past": "GEÇMİŞ",
     "leadCharged": "Lead faturalandı",
@@ -1338,19 +1338,19 @@
     "goTo": "Aç",
     "booking_created": {
       "title": "Yeni randevu",
-      "body": "Bir müşteri {{slot}} için ön görüşme randevusu aldı. Dosya hazır."
+      "body": "Bir müşteri {{slot}} için görüşme planladı. Dosya hazır."
     },
     "booking_cancelled": {
       "title": "Randevu iptal edildi",
-      "body": "Müşteri {{slot}} tarihindeki ön görüşmeyi iptal etti."
+      "body": "Müşteri {{slot}} tarihindeki görüşmeyi iptal etti."
     },
     "booking_rescheduled": {
       "title": "Randevu ertelendi",
-      "body": "Müşteri ön görüşmeyi {{from}} tarihinden {{slot}} tarihine aldı."
+      "body": "Müşteri görüşmeyi {{from}} tarihinden {{slot}} tarihine taşıdı."
     },
     "appointment_reminder": {
       "title": "{{offset}} sonra randevu",
-      "body": "Ön görüşme: {{slot}}."
+      "body": "{{slot}} tarihinde görüşme."
     },
     "dispute_opened": {
       "title": "Bir müşteri bildiriminize itiraz ediyor",

@@ -1190,44 +1190,44 @@
     "meta": {
       "title": "Nasıl çalışır · CompliHub360"
     },
-    "eyebrow": "Nasıl çalışır",
+    "eyebrow": "CompliHub360 nasıl çalışır",
     "title": {
-      "pre": "Bir sorudan, ",
-      "gold": "harekete",
-      "post": " geçebilecek birine."
+      "pre": "İlk sorunuzdan ",
+      "gold": "gerçek adıma",
+      "post": " uzanan daha net bir yol."
     },
-    "lead": "Beş adım. Her birinin ardından durabilirsiniz — çoğu kişi öyle yapıyor ve bu gayet iyi bir sonuç.",
+    "lead": "Yolun tamamını ya da yalnızca ihtiyacınız olan desteği kullanın. Sonra ne olacağına siz karar verirsiniz.",
     "heroListTitle": "Beş adım",
     "stages": [
       {
-        "kicker": "Anlayın",
+        "kicker": "Sorun",
         "title": "Kendi kelimelerinizle sorun.",
         "body": "Durumunuzu bir iş arkadaşınıza anlatır gibi anlatın. Serbest yazılmış sorulara doğrudan yanıtlar betada henüz yok; örnek, nereye gittiğimizi gösteriyor. O zamana kadar sorunuz sizi doğru alana ve değerlendirmeye götürür. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok.",
-        "short": "Sorunuzu kendi kelimelerinizle sorun; betada sizi doğru alana ve değerlendirmeye götürür. Hesap gerekmez."
+        "short": "Sorunuzu kendi kelimelerinizle sorun. Beta sürümünde sizi doğru alana ve değerlendirmeye yönlendirir, henüz doğrudan bir yanıt vermez. Hesap gerekmez."
       },
       {
         "kicker": "Değerlendirin",
         "title": "Size gerçekte neyin geçerli olduğunu görün.",
         "body": "Bize pazarlarınızı, iş modelinizi ve destek almak istediğiniz alanları anlatın. Risk Map'iniz, işletmeniz için geçerli yükümlülükleri her birini önceliğiyle ve varsa resmi kaynağı ve süresiyle gösterir. Bunlar bir sohbet botundan değil, kendi uyum motorumuzdan gelir.",
-        "short": "Wizard dört şey sorar ve Risk Map’inizi oluşturur — her yükümlülük yasal dayanağı ve süresiyle."
+        "short": "Bize pazarlarınızı, iş modelinizi ve destek almak istediğiniz alanları anlatın. Sonucu Risk Map'inizde düzenleriz."
       },
       {
         "kicker": "Karar verin",
         "title": "Neye dışarıdan destek gerektiğine karar verin.",
         "body": "Önceliklerinizi, sürelerinizi ve kaynaklarınızı; hangi konuları kurum içinde, hangilerini profesyonel destekle halledebileceğinizi görün. Her şeyi zaten karşıladığınız ortaya çıkarsa bunu söyleriz — o durumda size satacak bir şeyimiz yoktur.",
-        "short": "Risk Map, kendi başınıza halledebileceklerinizi bir uzman gerektirenlerden ayırır."
+        "short": "Önceliklerinizi, son tarihlerinizi, kaynaklarınızı ve hangi konuları kendi içinizde ya da profesyonel destekle halledebileceğinizi görün."
       },
       {
         "kicker": "Eşleştirin",
-        "title": "İsimden önce uygunluk.",
-        "body": "Eşleşen uzmanları önce kimlikleri olmadan görürsünüz: kapsam, doğrulanmış yetkinlikler, yanıt süresi, pazarlarınıza uygunluk. Uygunluğu antetli kâğıttan önce değerlendirmek bilinçli bir tercihtir — tanıdık bir isim, doğru uygunluğun kanıtı değildir. Sıralama hiçbir zaman satılık değildir.",
-        "short": "Uzmanlar önce kimliksiz: kapsam, doğrulanmış nitelikler, yanıt süresi."
+        "title": "Önce uygunluğa göre karşılaştırın.",
+        "body": "Ücretsiz bir hesapla en iyi sağlayıcı eşleşmelerinizi kimlikleri olmadan görürsünüz: kapsanan alanlar ve pazarlar, doğrulanmış kanıtlar, yanıt süresi ve fiyat aralığı. Bir isim görmeden önce uygunluğu siz değerlendirirsiniz — tanıdık bir isim doğru uygunluğun kanıtı değildir. Sıralama asla satılık değildir.",
+        "short": "En iyi anonim sağlayıcı eşleşmelerinizi gerçek uygunluğa göre karşılaştırın."
       },
       {
         "kicker": "Harekete geçin",
         "title": "Danışmanlık randevusu alın.",
         "body": "Bir sağlayıcı seçin ve takviminden bir saat belirleyin. Randevu almadan önce neyin paylaşılacağını tam olarak görürsünüz. Sağlayıcının kimliği randevu anında açılır ve yalnızca talebinizin işlenmesi için gereken bilgiler paylaşılır. Sonrasında randevuyu değerlendirebilirsiniz; yükümlülükleriniz süreleriyle birlikte Risk Map'inizde kalır.",
-        "short": "Randevu seçin — dosyanız sizinle gelir, işinizi altıncı kez anlatmazsınız."
+        "short": "Bir görüşme seçin ve randevu alın. Sağlayıcının kimliği görünür olur ve yalnızca talebinizin işlenmesi için gereken bilgiler paylaşılır."
       }
     ],
     "demos": {
@@ -1270,12 +1270,12 @@
           {
             "level": "medium",
             "title": "İzleme pikselleri için DKED",
-            "meta": "AB genelinde · Son tarih —"
+            "meta": "AB genelinde · Sabit tarih yok"
           },
           {
             "level": "high",
             "title": "Çerez bandı + onay kayıtları",
-            "meta": "AB genelinde · Son tarih Sürekli"
+            "meta": "AB genelinde · Süregelen"
           }
         ]
       },
@@ -1326,7 +1326,7 @@
     "privacy": {
       "kicker": "Verilerinize ne olur",
       "title": "Verileriniz sizde kalır.",
-      "body": "Bir hesap açmaya karar verene kadar anonim kalırsınız — değerlendirme ne isim, ne şirket, ne de e-posta adresi ister. Bir uzman bilgilerinizi ancak rezervasyon yaptığınızda görür ve dosyanız talimatınız olmadan asla paylaşılmaz."
+      "body": "Hesap açmaya karar verene kadar anonim kalırsınız — değerlendirme ne isim, ne şirket, ne de e-posta adresi ister. Bir sağlayıcı bilgilerinizi ancak randevu aldıktan sonra görür ve yalnızca talebinizin işlenmesi için gereken bilgiler paylaşılır."
     },
     "closing": {
       "eyebrow": "Küçük yazı yok",

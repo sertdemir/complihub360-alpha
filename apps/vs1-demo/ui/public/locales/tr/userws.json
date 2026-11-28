@@ -131,9 +131,9 @@
       "PRODUCT": "Ürün",
       "MARKETING": "Pazarlama",
       "DATA": "Veri",
-      "CORPORATE": "Şirket",
+      "CORPORATE": "Şirket kuruluşu",
       "LOGISTICS": "Lojistik",
-      "LEGAL": "Hukuk",
+      "LEGAL": "Hukuki destek",
       "ONGOING_MONITORING": "İzleme",
       "tax-vat": "Vergi & KDV",
       "product-packaging": "EPR & ambalaj",
@@ -149,7 +149,7 @@
     "emptyStep2Title": "Görün",
     "emptyStep2Body": "Yükümlülükleriniz, aciliyete göre sıralı.",
     "emptyStep3Title": "Harekete geçin",
-    "emptyStep3Body": "İşaretleyin — ya da bir uzman katın.",
+    "emptyStep3Body": "Tamamlandı olarak işaretleyin — ya da bir sağlayıcıdan destek alın.",
     "dutiesHigh_one": "{{count}} yüksek",
     "dutiesHigh_other": "{{count}} yüksek",
     "today": "Bugün",
@@ -520,7 +520,7 @@
   "assistant": {
     "title": "KDV Asistanı",
     "beta": "Beta",
-    "intro": "CompliHub360'ın yapay zeka asistanıyım. Pazarlarınızdaki (DE, UK, NL, FR, IT, ES, US, TR, AT) KDV kuralları, eşikler ve son tarihler hakkında bana soru sorabilirsiniz. Doğrulanmış bilgi tabanından yanıtlıyorum ve emin olmadığımda bunu söylüyorum.",
+    "intro": "CompliHub360'ın yapay zekâ asistanıyım. Pazarlarınızdaki (DE, UK, NL, FR, IT, ES, US, TR, AT) KDV kuralları, eşikler ve son tarihler hakkında bana soru sorabilirsiniz. Bilgi tabanından yanıtlıyorum ve emin olmadığımda bunu söylüyorum.",
     "placeholder": "örn. İtalya’da ne zaman KDV kaydı yaptırmam gerekir?",
     "send": "Gönder",
     "open": "Asistanı aç",
@@ -538,7 +538,7 @@
   },
   "termine": {
     "title": "<accent>Randevularınız</accent>.",
-    "sub": "Uzmanlarınızla planlanmış ilk görüşmeler — kimlik ve iletişim, rezervasyondan itibaren görünür.",
+    "sub": "Sağlayıcılarınızla planlanan görüşmeler — kimlikleri ve iletişim bilgileri randevudan bu yana görünür.",
     "upcoming": "YAKLAŞAN",
     "past": "GEÇMİŞ",
     "reschedule": "Ertele",
@@ -632,7 +632,7 @@
       "value": "Fiyat-performans"
     },
     "bodyLabel": "Deneyiminiz (isteğe bağlı)",
-    "bodyPh": "İlk görüşme nasıl geçti?",
+    "bodyPh": "Görüşme nasıl geçti?",
     "note": "Doğrulanmış değerlendirmeler yalnızca gerçek randevulardan gelir ve sağlayıcı profilinde anonim görünür. Adınız gizli kalır.",
     "close": "Kapat",
     "sendFailed": {
@@ -671,7 +671,7 @@
     "failed": "Randevu taşınamadı. Lütfen tekrar deneyin."
   },
   "wizardDrawer": {
-    "eyebrow": "Yeni arama",
+    "eyebrow": "Yeni değerlendirme",
     "title": "Uygun sağlayıcıları bul"
   },
   "answersDrawer": {

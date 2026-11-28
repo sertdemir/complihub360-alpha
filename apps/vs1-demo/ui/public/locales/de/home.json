@@ -11,11 +11,11 @@
     },
     "state": {
       "confirmed": "Bestätigt",
-      "likely": "Wahrscheinlich",
+      "likely": "Gilt wahrscheinlich",
       "action": "2 Fragen beantworten"
     },
     "table": {
-      "priority": "Schweregrad",
+      "priority": "Priorität",
       "obligation": "Pflicht",
       "market": "Markt",
       "due": "Fällig",
@@ -25,8 +25,8 @@
   },
   "drawer": {
     "close": "Schließen",
-    "whatWeCover": "Was wir abdecken",
-    "whenThisMatters": "Wann das relevant ist",
+    "whatWeCover": "Verfügbare Unterstützung",
+    "whenThisMatters": "Das brauchen Sie, wenn",
     "continues": "Wird im 6-Minuten-Assessment fortgesetzt.",
     "seeIfApplies": "Prüfen Sie, ob das auf Sie zutrifft"
   },
@@ -83,26 +83,26 @@
       "line2": "Wissen Sie, was zu tun ist.",
       "line1": "Verstehen Sie, was für Ihr Unternehmen gilt."
     },
-    "lead": "Ihre Pflichten in {{markets}} Märkten, jede mit Quelle. Die richtigen Fachleute, wenn Sie sie brauchen.",
+    "lead": "Erzählen Sie uns, wo und wie Sie tätig sind. Wir helfen Ihnen zu verstehen, was gilt, zu entscheiden, was als Nächstes zu tun ist, und geprüfte Fachleute zu finden, die zu Ihrem Bedarf passen.",
     "ctaRiskMap": "Bedarf ermitteln",
     "ask": {
-      "placeholder": "Beschreiben Sie Ihr Anliegen",
-      "send": "Senden",
-      "note": "In der Beta führt Ihre Frage zum passenden Bereich und in die Erhebung — noch nicht zu einer direkten Antwort.",
+      "placeholder": "Wobei brauchen Sie Hilfe?",
+      "send": "CompliHub360 fragen",
+      "note": "In der Beta führt Ihre Frage zum passenden Bereich und ins Assessment — noch nicht zu einer direkten Antwort.",
       "lead": "Oder stellen Sie eine Frage in Ihren eigenen Worten."
     },
     "promises": [
       {
-        "title": "Pflichten kennen",
-        "desc": "Sehen Sie klar, was für Ihren Betrieb gilt."
+        "title": "Verstehen, was gilt",
+        "desc": "Sehen Sie, welche Anforderungen Ihr Unternehmen betreffen können."
       },
       {
-        "title": "Die richtigen Fachleute",
-        "desc": "Wir matchen Sie mit Verified Providern, die zu Ihrem Fall passen."
+        "title": "Die richtigen Fachleute finden",
+        "desc": "Werden Sie mit geprüften Anbietern gematcht, die zu Ihrem Bedarf passen."
       },
       {
-        "title": "Ins Handeln kommen",
-        "desc": "Verbinden, zusammenarbeiten, erledigen."
+        "title": "Mit Zuversicht weitermachen",
+        "desc": "Verbinden Sie sich mit dem passenden Anbieter und steuern Sie die Arbeit an einem Ort."
       },
       {
         "title": "Always on your side",
@@ -112,53 +112,53 @@
     "proofs": [
       {
         "title": "360°-Abdeckung",
-        "desc": "Über Länder, Themen und Regularien."
+        "desc": "Über Länder, Compliance-Bereiche und Unternehmensleistungen hinweg."
       },
       {
-        "title": "Experten-Netzwerk",
-        "desc": "Fachleute, geprüft anhand von Nachweisen je Leistung und Markt."
+        "title": "Netzwerk geprüfter Anbieter",
+        "desc": "Fachleute, geprüft auf Expertise, Servicequalität und Verlässlichkeit."
       },
       {
-        "title": "Smarte Technologie",
-        "desc": "KI-Führung mit menschlicher Expertise."
+        "title": "Technik und menschliche Expertise",
+        "desc": "Kluge Orientierung, gestützt von erfahrenen Fachleuten."
       },
       {
-        "title": "Human First",
-        "desc": "Echte Menschen. Echter Support."
+        "title": "Menschliche Unterstützung",
+        "desc": "Echte Menschen, wenn es darauf ankommt."
       },
       {
         "title": "Ihre Daten, geschützt",
-        "desc": "Anonyme Erhebung. Kennungen werden maskiert, bevor eine KI Ihren Text sieht."
+        "desc": "Starke Sicherheit und Datenschutz von Grund auf."
       }
     ]
   },
   "problemRecognition": {
-    "eyebrow": "Warum das schwer ist",
+    "eyebrow": "Warum sich Compliance kompliziert anfühlt",
     "title": {
-      "pre": "Eine ",
-      "gold": "klare",
-      "post": " Antwort zu bekommen, ist der schwierige Teil."
+      "pre": "Compliance ist komplex. Die richtige Antwort zu finden, ",
+      "gold": "sollte es nicht sein",
+      "post": "."
     },
-    "lead": "Die meisten, mit denen wir sprechen, haben es bereits versucht. Das Problem ist selten der Aufwand — es ist, dass die Antworten nicht zusammenpassen und sich nicht erkennen lässt, welche zu Ihrer Lage gehört.",
+    "lead": "Vielleicht haben Sie online gesucht, mit verschiedenen Anbietern gesprochen und unterschiedliche Antworten bekommen. Die eigentliche Herausforderung ist zu wissen, was für Ihr Unternehmen gilt und was als Nächstes zu tun ist.",
     "items": [
       {
-        "title": "Zwei Berater, zwei Antworten.",
-        "desc": "Stellen Sie dieselbe Frage zweimal, bekommen Sie zwei vertretbare Antworten. Ohne die Quelle dahinter lässt sich nicht sagen, welche für Sie gilt."
+        "title": "Verschiedene Antworten können alle richtig klingen.",
+        "desc": ""
       },
       {
-        "title": "Mehr verkauft als nötig.",
-        "desc": "Der Anreiz belohnt meist den größten Umfang. Wenige werden dafür bezahlt, Ihnen zu sagen, dass eine Aufgabe klein ist — oder längst erledigt."
+        "title": "Es ist oft schwer zu erkennen, was Sie wirklich brauchen.",
+        "desc": ""
       },
       {
-        "title": "Wochen, die im Scoping verschwinden.",
-        "desc": "Bevor die eigentliche Arbeit beginnt, haben Sie Ihr Geschäft fünfmal erklärt und Angebote verglichen, die Verschiedenes messen."
+        "title": "Die richtige Hilfe zu finden, kostet Zeit.",
+        "desc": ""
       },
       {
-        "title": "Keine Vergleichsbasis.",
-        "desc": "Jedes Angebot ist anders aufgebaut. Sie zu vergleichen heißt zu raten, was jeweils weggelassen wurde."
+        "title": "Anbieter lassen sich schwer vergleichen.",
+        "desc": ""
       }
     ],
-    "note": "Nichts davon heißt, dass Sie ein Problem haben. Es heißt, dass Sie noch kein klares Bild haben — und das lässt sich lösen."
+    "note": "Das Problem ist nicht, dass Sie es nicht versucht hätten. Sie brauchen einfach einen klaren Blick darauf, was gilt, was zuerst zählt und wo Sie die richtige Unterstützung finden."
   },
   "heroWizard": {
     "mobileAlt": "CompliHub360 Compliance-Assistent — Schritt „Bereiche“ (mobil)"
@@ -166,8 +166,8 @@
   "wizard": {
     "rail": {
       "markets": "Märkte",
-      "operations": "Tätigkeit",
-      "domains": "Bereiche",
+      "operations": "Geschäftsmodell",
+      "domains": "Unterstützungsbereiche",
       "review": "Übersicht",
       "business": "Unternehmen"
     },
@@ -276,23 +276,23 @@
         "desc": "Länderliste öffnen →"
       },
       "d2cEcommerce": {
-        "title": "D2C-E-Commerce",
+        "title": "Online-Verkauf an Verbraucher (D2C)",
         "desc": "Online-Direktvertrieb an Endkunden"
       },
       "b2bWholesale": {
-        "title": "B2B / Großhandel",
+        "title": "Verkauf an Unternehmen (B2B oder Großhandel)",
         "desc": "Verkauf an Unternehmen oder Distributoren"
       },
       "marketplace": {
-        "title": "Marktplatz",
+        "title": "Marktplatzbetreiber",
         "desc": "Sie verbinden Käufer + Verkäufer"
       },
       "saasDigital": {
-        "title": "SaaS / digital",
+        "title": "Software oder digitale Dienste",
         "desc": "Software, kein physischer Versand"
       },
       "hybrid": {
-        "title": "Hybrid",
+        "title": "Mehrere Kanäle",
         "desc": "Mischung aus B2B- und B2C-Kanälen"
       },
       "other": {
@@ -488,12 +488,12 @@
     },
     "review": {
       "title": "Ihre Situation, zusammengefasst.",
-      "subtitle": "Das legen wir zugrunde. Passen Sie bei Bedarf alles an und erstellen Sie dann Ihre Risk Map.",
+      "subtitle": "Prüfen Sie Ihre Antworten. Ändern Sie, was nötig ist, bevor Ihre Risk Map erstellt wird.",
       "markets": "Märkte",
       "operations": "Tätigkeit",
-      "domains": "Compliance-Bereiche",
+      "domains": "Unterstützungsbereiche",
       "edit": "Bearbeiten",
-      "trust": "Anonym · Kein Konto nötig, um Ihre Risk Map zu sehen · Verarbeitung in ~4 Sekunden",
+      "trust": "Anonym · Kein Konto nötig · Ihre Risk Map ist in Sekunden fertig",
       "business": "Ihr Unternehmen",
       "offering": "Sie verkaufen",
       "marketsStock": "Märkte · Lager",
@@ -896,29 +896,29 @@
     ]
   },
   "riskMap": {
-    "eyebrow": "So sieht eine Risk Map aus · anonymisiertes Beispiel",
+    "eyebrow": "Eine Beispiel-Risk-Map ansehen",
     "title": {
-      "pre": "Das ",
-      "gold": "gilt",
-      "post": " für Sie."
+      "pre": "Sehen Sie, was ",
+      "gold": "gelten kann",
+      "post": " — und was zuerst zu tun ist."
     },
     "subtitle": "Basierend auf Deutschland · Vereinigtes Königreich · Niederlande. D2C-E-Commerce, €2M—€5M Umsatz. USt · EPR · Datenschutz im Fokus.",
     "stats": [
       {
         "value": "8",
-        "label": "Identifizierte Pflichten"
+        "label": "Mögliche Anforderungen erkannt"
       },
       {
         "value": "4",
-        "label": "Mit Frist in 30 Tagen"
+        "label": "Maßnahmen fällig in 30 Tagen"
       },
       {
         "value": "14 Tage",
-        "label": "Mittlere Frist"
+        "label": "Bis zu Ihrer nächsten wichtigen Frist"
       },
       {
         "value": "3",
-        "label": "Verified Provider bereit"
+        "label": "Passende Verified Provider"
       }
     ],
     "rows": [
@@ -981,7 +981,7 @@
     ],
     "partnersEyebrow": "3 Verified Provider gematcht",
     "partnersTitle": "Wir haben gefunden, wer das umsetzen kann.",
-    "unlock": "Meine besten Matches mit kostenlosem Konto ansehen",
+    "unlock": "Kostenloses Konto anlegen und Ihre besten Matches sehen",
     "save": {
       "title": "Diese Map speichern. Treffer behalten.",
       "subtitle": "Kostenloses Konto. Keine Kreditkarte. Ihre Karte und Ihre Treffer bleiben gespeichert.",
@@ -990,29 +990,29 @@
     "statsCompact": [
       {
         "value": "8",
-        "label": "Identifizierte Pflichten"
+        "label": "Mögliche Anforderungen erkannt"
       },
       {
         "value": "4",
-        "label": "Mit Frist in 30 Tagen"
+        "label": "Maßnahmen fällig in 30 Tagen"
       },
       {
         "value": "14",
-        "label": "Tage mittlere Frist"
+        "label": "Tage bis zu Ihrer nächsten wichtigen Frist"
       },
       {
         "value": "3",
-        "label": "Verified Provider"
+        "label": "Passende Verified Provider"
       }
     ]
   },
   "matchmaking": {
-    "eyebrow": "Der Unterschied",
+    "eyebrow": "Vom Verstehen zum Handeln",
     "title": {
-      "line1": "Eine Liste von Regeln ist kein Plan.",
-      "pre": "Wir ",
-      "gold": "verbinden",
-      "post": " Sie mit denen, die es lösen."
+      "line1": "Zu verstehen, was Sie brauchen, ist erst der Anfang.",
+      "pre": "Finden Sie die richtige ",
+      "gold": "Fachperson",
+      "post": ", die es erledigt."
     },
     "matches": [
       {
@@ -1022,7 +1022,7 @@
           "UStG §18i (OSS)",
           "DE · NL · FR"
         ],
-        "covers": "deckt Ihre 2 kritischen Prioritäten ab",
+        "covers": "deckt Ihre 2 Sofort-Prioritäten ab",
         "response": "Antwort in 24h",
         "engagements": "142 bisherige Mandate"
       },
@@ -1094,8 +1094,8 @@
     },
     "row1": [
       {
-        "title": "Nach Risiko priorisiert, nicht erschöpfend",
-        "desc": "Von Kritisch bis Niedrig. Vier bis zwölf Punkte zu jedem Zeitpunkt. Keine 200-Seiten-Checklisten."
+        "title": "Das Wichtigste zuerst",
+        "desc": "Sehen Sie Prioritäten und nächste Schritte ohne erschlagende Checkliste."
       },
       {
         "title": "Direkt von den Regulierungsbehörden bezogen",
@@ -1106,13 +1106,13 @@
         "desc": "Regeln ändern sich. Wir prüfen unsere Einträge und datieren jede Quelle, damit Sie sehen, wie aktuell sie ist."
       },
       {
-        "title": "Klare Sprache als Standard",
-        "desc": "Wenn eine Klausel einen Absatz zur Erklärung braucht, sehen Sie den Absatz — nicht die Klausel."
+        "title": "Klare Sprache, präzise Begriffe",
+        "desc": "Das Thema verstehen, ohne die Fachbegriffe der Behörden zu verlieren."
       }
     ],
     "row2": [
       {
-        "title": "Von uns verifiziert, nicht selbst eingetragen",
+        "title": "Anbieter werden vor der Aufnahme geprüft",
         "desc": "Jeder Verified Provider wird für jede Leistung und jeden Markt anhand dokumentierter Nachweise geprüft, bevor er vermittelt werden kann."
       },
       {
@@ -1124,50 +1124,50 @@
     "row2Lead": "Verzeichnisse listen alle. Wir prüfen jeden Verified Provider anhand dokumentierter Nachweise, bevor er gematcht werden kann."
   },
   "domains": {
-    "eyebrow": "Was wir wissen",
+    "eyebrow": "Bereiche, die wir abdecken",
     "title": {
-      "pre": "Ihre Bereiche, ",
-      "gold": "eine",
-      "post": " Karte."
+      "pre": "Unterschiedliche Anforderungen. ",
+      "gold": "Ein klarer Blick",
+      "post": "."
     },
-    "subtitle": "Wählen Sie einen Bereich, um die Märkte zu sehen, in denen wir seine Regeln hinterlegt haben, und die Pflichten, die daraus folgen.",
+    "subtitle": "Von Steuer- und Produktanforderungen über Datenschutz und Zoll bis zu Unternehmensmeldungen und rechtlicher Unterstützung: CompliHub360 bündelt Ihren Bedarf und verbindet Sie über Märkte hinweg mit den richtigen Fachleuten.",
     "cardCta": "Für Details klicken",
     "drawerEyebrow": "Bereich",
     "drawerAria": "Details zu {{domain}}",
-    "activeIn": "Aktiv in:",
+    "activeIn": "Verfügbar in:",
     "items": [
       {
         "title": "Steuern & USt",
         "desc": "Wissen, welches Umsatzsteuerregime in jedem Markt gilt, in den Sie verkaufen, und wann eine Registrierung fällig wird.",
-        "intro": "Grenzüberschreitende USt, OSS/IOSS, innergemeinschaftliche Lieferungen, Versandhandelsschwellen. Sechs Märkte bedeuten sechs USt-Regime, sechs Registrierungsschwellen, sechs Meldezyklen. Wir verfolgen jeden davon.",
+        "intro": "Verstehen Sie, welche Registrierungen, Erklärungen und Meldepflichten gelten können — je nachdem, wo Ihr Unternehmen sitzt, wo Waren lagern, was Sie verkaufen und wer Ihre Kunden sind.",
         "cover": [
-          "OSS-/IOSS-Quartalsmeldungen",
-          "Überwachung der Versandhandelsschwellen",
-          "USt auf innergemeinschaftliche Lieferungen",
-          "Reverse-Charge-Verfahren",
-          "USt-Registrierungen je Markt",
-          "Auswirkungen bilateraler DBA"
+          "Länderspezifische USt-Registrierungen",
+          "USt-Voranmeldungen und Meldepflichten",
+          "OSS- und IOSS-Registrierung und -Meldungen",
+          "Überwachung von Lieferschwellen",
+          "Innergemeinschaftliche Umsätze",
+          "Reverse-Charge-Pflichten"
         ],
         "matters": [
-          "Sie verkaufen erstmals B2C in einen anderen EU-Markt",
-          "Sie überschreiten €10,000 grenzüberschreitenden B2C-Umsatz",
-          "Sie ändern Ihr Fulfilment-Modell (z. B. neues UK-Lager)"
+          "Sie verkaufen Waren oder Dienstleistungen in ein anderes Land.",
+          "Sie lagern Ware außerhalb Ihres Heimatlands.",
+          "Sie gehen in einen neuen Markt."
         ]
       },
       {
         "title": "EPR & Verpackung",
         "desc": "Wissen, ob Sie in einem Markt als Hersteller gelten — und was Sie vor der ersten Sendung registrieren müssen.",
-        "intro": "Erweiterte Herstellerverantwortung für Verpackungen, Batterien und Elektronik. Jeder Markt führt sein eigenes Register mit eigenen Gebühren und Meldezyklen. Wir kartieren, wo und wann Sie sich registrieren.",
+        "intro": "Sie verkaufen physische Produkte online? Dann können EPR- und Verpackungspflichten gelten — auch wenn Sie die Produkte nicht selbst hergestellt haben. Finden Sie heraus, welche Registrierungen und weiteren Schritte in jedem Markt nötig sein können.\n\nDie erweiterte Herstellerverantwortung (Extended Producer Responsibility, EPR) und Verpackungsregeln können greifen, wenn Sie physische Produkte in ein Land verkaufen oder liefern — auch über einen Online-Marktplatz oder Ihren eigenen Shop. Je nach Markt und Produktkategorie müssen Sie sich registrieren, Mengen melden, sich an Recyclingkosten beteiligen, Rücknahmepflichten erfüllen oder einen Bevollmächtigten benennen.",
         "cover": [
-          "LUCID / nationale Verpackungsregister",
-          "Rücknahme- & Recyclingpflichten",
-          "Ökomodulations-Gebührenstufen",
-          "WEEE- & Batterieregistrierung",
-          "Jährliche Mengenmeldungen",
-          "Anforderungen an Bevollmächtigte"
+          "Verpackungs-EPR, einschließlich LUCID",
+          "Pflichten für Elektrogeräte (WEEE) und Batterien",
+          "Mengenmeldungen",
+          "Rücknahme- und Recyclingpflichten",
+          "Ökomodulierte Gebühren",
+          "Bevollmächtigte für die Herstellerverantwortung"
         ],
         "matters": [
-          "Sie versenden physische Waren in einen neuen EU-Markt",
+          "Sie verkaufen oder liefern physische Produkte über einen Marktplatz, Ihren eigenen Shop oder einen anderen Vertriebsweg.",
           "Sie verkaufen verpackte Produkte an EU-Verbraucher",
           "Sie nehmen eine Produktkategorie hinzu (z. B. Elektronik)"
         ],
@@ -1189,18 +1189,18 @@
       {
         "title": "Daten & Datenschutz",
         "desc": "Wissen, was Sie erheben dürfen, auf welcher Grundlage, und was Sie belegen können müssen.",
-        "intro": "Datenschutz in der EU und im UK nach dem Brexit. Vom Verarbeitungsverzeichnis bis zu internationalen Übermittlungen zeigen wir die Pflichten auf, die Ihren Daten folgen — nicht nur Ihrem Hauptsitz.",
+        "intro": "Verstehen Sie, welche personenbezogenen Daten Ihr Unternehmen erhebt, auf welcher Grundlage Sie sie nutzen dürfen und welche Dokumentation oder Schutzmaßnahmen nötig sein können. Datenschutzpflichten unterscheiden sich nach Land, US-Bundesstaat, Branche und Tätigkeit. Sie betreffen, wie Sie personenbezogene Daten erheben, nutzen, speichern, teilen, übermitteln und schützen.",
         "cover": [
-          "DSFA für risikoreiche Verarbeitung",
+          "Datenschutz-Einschätzungen für Länder und US-Bundesstaaten",
+          "DSFA und vergleichbare Risikobewertungen",
           "Verzeichnis von Verarbeitungstätigkeiten (VVT)",
-          "AV- / Sub-AV-Verträge",
-          "Mechanismen für internationale Übermittlungen",
-          "Auskunfts- & Löschprozesse",
-          "Fristen für Meldungen von Verletzungen",
+          "Datenschutzhinweise und Auftragsverarbeitungsverträge",
+          "Garantien für internationale Übermittlungen",
+          "Anfragen zu Betroffenenrechten",
           "Bewertung und Meldung von Datenschutzverletzungen"
         ],
         "matters": [
-          "Sie verarbeiten personenbezogene Daten von EU-/UK-Ansässigen",
+          "Sie verarbeiten Informationen zu Kunden, Beschäftigten, Website-Besuchern, App-Nutzern oder anderen Personen in einem oder mehreren Märkten.",
           "Sie führen ein neues Tracking- oder Analysetool ein",
           "Sie übermitteln Daten außerhalb der EU/des UK"
         ],
@@ -1230,18 +1230,18 @@
       {
         "title": "Marketing-Compliance",
         "desc": "Wissen, was Sie versprechen dürfen, wie Sie Menschen erreichen dürfen und wie Einwilligung aussehen muss.",
-        "intro": "Einwilligungs- und Lauterkeitsregeln unter ePrivacy und Verbraucherrecht. Cookie-Walls, Opt-ins und Dark-Pattern-Prüfungen variieren je Markt — wir verfolgen, was jede Behörde tatsächlich durchsetzt.",
+        "intro": "Verstehen Sie die Regeln dafür, wie Sie Kunden erreichen, Cookies und Tracking einsetzen, Einwilligungen einholen und Werbeaussagen treffen.",
         "cover": [
-          "Gültigkeit von Cookie-Einwilligungsbannern",
-          "Einwilligungsnachweise & Belege",
-          "Opt-in-Regeln für E-Mail / SMS",
-          "Dark-Pattern-Audits",
-          "Kennzeichnung von Influencer- & Werbeinhalten",
-          "Abmelde- & Sperrlistenprozesse",
+          "Cookie-Banner und Prüfung von Tracking",
+          "Einwilligungs- und Präferenzverwaltung",
+          "Marketing per E-Mail, SMS, Telefon und Direktnachricht",
+          "Werbeaussagen und Pflichtangaben in der Werbung",
+          "Kennzeichnung bei Influencer- und Affiliate-Marketing",
+          "Prüfung von Nutzerentscheidungen und Dark Patterns",
           "Abmelde- und Sperrlistenprozesse"
         ],
         "matters": [
-          "Sie schalten bezahlte Akquise in der EU",
+          "Sie nutzen Analyse-Tools oder Cookies, versenden Marketing-Nachrichten, bewerben Produkte oder Dienstleistungen oder arbeiten mit Influencern und Affiliates.",
           "Sie starten ein E-Mail- oder SMS-Programm",
           "Sie gestalten Ihren Einwilligungs-Flow neu"
         ],
@@ -1267,20 +1267,20 @@
       {
         "title": "Gründung & Meldungen",
         "desc": "Wissen, wo Ihre Aufstellung Pflichten auslöst — Betriebsstätte, Meldungen, wirtschaftlich Berechtigte.",
-        "intro": "Pflichten auf Unternehmensebene in jedem Markt, den wir prüfen. Jahresabschlüsse, Transparenz über wirtschaftlich Berechtigte und konzerninterne Verträge haben jeweils eigene Fristen und Sanktionen.",
+        "intro": "Verstehen Sie, was für Gründung, Eintragung und laufenden Betrieb eines Unternehmens nötig sein kann. Die Anforderungen hängen vom Land oder der örtlichen Zuständigkeit, der Rechtsform, den Eigentumsverhältnissen und der Tätigkeit ab.",
         "cover": [
-          "Jahresabschlüsse",
-          "Transparenz- / UBO-Registermeldungen",
-          "Aktualisierungen wirtschaftlich Berechtigter",
-          "Dokumentation konzerninterner Verträge",
-          "Anforderungen an lokale Vertretung",
-          "Nachverfolgung von Meldefristen",
+          "Gründung und Struktur von Gesellschaften",
+          "Auslandsregistrierung und lokale Eintragung",
+          "Jahresabschlüsse und Offenlegung",
+          "Wirtschaftlich Berechtigte und Transparenzmeldungen",
+          "Änderungen bei Geschäftsführung und Organen",
+          "Registered Agent, Geschäftsanschrift und lokale Vertretung",
           "Niederlassungen, Tochtergesellschaften und Konzernstrukturen",
           "Umstrukturierung und Schließung",
           "Laufende Fristen und Pflege der Gesellschaft"
         ],
         "matters": [
-          "Sie betreiben eine lokale Gesellschaft oder Niederlassung",
+          "Sie gründen ein Unternehmen, gehen in einen neuen Markt, eröffnen eine Niederlassung, ändern die Eigentümerstruktur oder kümmern sich um laufende Meldungen der Gesellschaft.",
           "Ihre Eigentümerstruktur ändert sich",
           "Sie überschreiten eine lokale Prüfungsschwelle"
         ],
@@ -1306,19 +1306,19 @@
       {
         "title": "Produkt-Compliance",
         "desc": "Wissen, ob Ihr Produkt in Verkehr gebracht werden darf und welche Nachweise Sie vorhalten müssen.",
-        "intro": "Ob ein Produkt überhaupt in Verkehr gebracht werden darf und welcher Nachweis dahintersteht. Getrennt von der Verpackung: hier geht es um das Produkt selbst — Sicherheit, Konformität, Dokumentation, und wer innerhalb der EU dafür einsteht.",
+        "intro": "Verstehen Sie, was Ihr Produkt brauchen kann, bevor es rechtssicher und sicher verkauft werden darf. Dazu können Prüfungen, Zertifizierung, Kennzeichnung, Dokumentation und eine lokale Vertretung gehören. Das hängt vom Produkt, vom Zielmarkt, vom Verwendungszweck, von der Kundengruppe und von Ihrer Rolle in der Lieferkette ab.",
         "cover": [
-          "Produktsicherheitsverordnung (EU) 2023/988",
-          "CE-Kennzeichnung und Konformitätserklärung",
-          "Technische Dokumentation und ihre Aufbewahrung",
-          "In der EU niedergelassene verantwortliche Person",
-          "Meldung von Vorfällen und Rückrufe",
-          "UKCA-Kennzeichnung für Großbritannien",
+          "Produkteinstufung und anwendbare Normen",
+          "Allgemeine Produktsicherheitsverordnung (GPSR)",
+          "Prüfung, Zertifizierung und Konformitätsbewertung",
+          "CE, UKCA und weitere Marktkennzeichnungen",
+          "Etiketten, Warnhinweise und Anleitungen",
+          "Technische Dokumentation und Aufbewahrung",
           "Verantwortliche Person, Bevollmächtigter oder lokaler Vertreter",
           "Vorfallmeldungen, Korrekturmaßnahmen und Rückrufe"
         ],
         "matters": [
-          "Sie bringen erstmals ein physisches Produkt auf den EU-Markt",
+          "Sie stellen ein physisches Produkt her, führen es ein, vertreiben oder verkaufen es.",
           "Sie nehmen eine Produktkategorie mit eigenen Konformitätsregeln auf",
           "Sie verkaufen in die EU, ohne dort niedergelassen zu sein"
         ],
@@ -1348,14 +1348,14 @@
       {
         "title": "Logistik & Zoll",
         "desc": "Wissen, was Ihre Ware für den Grenzübertritt braucht und wer dabei haftet.",
-        "intro": "Was Ware für den Grenzübertritt braucht und wer haftet, sobald sie ihn macht. Zollidentität, Anmeldungen, Statistik und die Lieferbedingungen, die entscheiden, wer zahlt und wer einsteht.",
+        "intro": "Verstehen Sie, was an der Grenze verlangt werden kann, was eine Sendung kosten kann und wer in welcher Phase verantwortlich ist. Grenzüberschreitender Warenverkehr kann Registrierungen, Einreihung, Anmeldungen, Zölle und Steuern, Genehmigungen, Dokumentation und Statistikmeldungen umfassen.",
         "cover": [
-          "EORI-Registrierung",
-          "Ein- und Ausfuhranmeldungen",
-          "Intrastat-Meldung ab Überschreiten der Schwelle",
-          "Incoterms und wo die Haftung liegt",
-          "Einfuhrumsatzsteuer und Aufschub",
-          "GB ↔ EU-Warenverkehr nach dem Brexit",
+          "Vermittlung von Zollagenten und Spediteuren",
+          "Pflichten für Importeure und Exporteure, EORI",
+          "HS- und Zolltarifierung",
+          "Zollwert und Ursprung",
+          "Anmeldungen und Versandpapiere",
+          "Zölle und Einfuhrabgaben",
           "Ein- und Ausfuhrgenehmigungen",
           "Incoterms und Lieferverantwortung",
           "Intrastat-Meldungen",
@@ -1363,7 +1363,7 @@
           "Unterstützung für bestimmte Routen"
         ],
         "matters": [
-          "Sie versenden erstmals über eine Zollgrenze",
+          "Sie führen physische Waren ein oder aus, lagern sie oder liefern sie über Grenzen.",
           "Ihr Handelsvolumen überschreitet eine Intrastat-Schwelle",
           "Sie ändern Incoterms oder Ihren Fulfilment-Partner"
         ],
@@ -1397,21 +1397,21 @@
       {
         "title": "Rechtliche Unterstützung",
         "desc": "Wissen, wann eine Frage wirklich eine Anwältin braucht — und jemanden erreichen, der Ihren Fall schon kennt.",
-        "intro": "Die Fragen, die eine qualifizierte Antwort brauchen statt einer Checkliste: Verträge, AGB, Verbraucherrechte, Streitfälle. CompliHub360 ist keine Kanzlei — Verified Provider beraten unter eigener Berufshaftung, und wir sorgen dafür, dass die Person, die Sie erreichen, Ihren Fall bereits kennt.",
+        "intro": "Verstehen Sie, wann qualifizierte rechtliche Unterstützung nötig sein kann, und finden Sie eine Fachperson, die zur Sache passt. CompliHub360 benennt die Art der Unterstützung und vermittelt Anbieter; wir sind keine Kanzlei und leisten keine Rechtsberatung.",
         "cover": [
-          "AGB und verbraucherrechtliche Informationspflichten",
-          "Lieferanten- und Plattformverträge",
-          "Widerruf, Rückgabe und Gewährleistung",
-          "Haftung und ihre Grenzen",
-          "Streitfälle über Grenzen hinweg",
-          "Welches Recht tatsächlich gilt",
+          "Handelsverträge",
+          "Website-AGB und Verbraucherrichtlinien",
+          "Rückgabe, Gewährleistung und Verbraucherrechte",
+          "Haftungsfragen",
+          "Gesellschafts- und Handelsrecht",
+          "Arbeitsrecht und freie Mitarbeit",
           "Geistiges Eigentum und Marken",
           "Streitigkeiten",
           "Anwendbares Recht und Gerichtsstand",
           "Lokale Rechtsgutachten und regulatorische Beratung"
         ],
         "matters": [
-          "Sie schließen erstmals einen Vertragstyp ab, den Sie nicht kennen",
+          "Ein Vertrag, eine geschäftliche Entscheidung, ein Verbraucherthema, eine rechtliche Meldung, ein Streitfall oder eine länderspezifische Frage braucht qualifizierte rechtliche Unterstützung.",
           "Ein Streitfall betrifft eine Kundin in einem anderen Land",
           "Sie erhalten eine förmliche Beschwerde oder eine behördliche Anfrage"
         ],
@@ -1461,11 +1461,11 @@
     "euWide": "EU-weit"
   },
   "howItActs": {
-    "eyebrow": "Ein Mandat von innen",
+    "eyebrow": "Nachdem Sie gewählt haben",
     "title": {
-      "pre": "Was ",
-      "gold": "zwischen",
-      "post": " Match und Lösung passiert."
+      "pre": "Von der Wahl des Anbieters bis zur erledigten Arbeit — ",
+      "gold": "klar",
+      "post": " bei jedem Schritt."
     },
     "cards": [
       {
@@ -1473,18 +1473,18 @@
         "desc": "Eine erwartete Preisspanne steht da, bevor Sie wählen. Nach dem Termin bestätigt der Anbieter den endgültigen Umfang und die Schätzung. Keine fachliche Arbeit beginnt, bevor Sie zustimmen."
       },
       {
-        "title": "Antwort, mit laufender Uhr.",
+        "title": "Klarer Zeitplan von Anfang an",
         "desc": "Verpasst ein Anbieter die vereinbarte Antwortzeit, sagen wir es Ihnen und können Ihnen ein anderes Match zeigen. Mit einem neuen Anbieter wird nichts geteilt, bevor Sie ihn wählen und buchen."
       },
       {
-        "title": "Ein Verlauf, der Ihnen gehört.",
+        "title": "Ihr vollständiger Mandatsverlauf",
         "desc": "Jeder Schritt steht in einem privaten Verlauf — Anfrage, Antwort, vereinbarter Umfang, Ergebnisse. Er gehört Ihnen."
       }
     ],
     "panel1": {
-      "scope": "Umfang",
-      "scopeValue": "OSS-Quartalsmeldungen · DE + NL + FR",
-      "approval": "Freigabe",
+      "scope": "Enthaltene Leistungen",
+      "scopeValue": "OSS-Quartalsmeldungen · Deutschland · Niederlande · Frankreich",
+      "approval": "Ihre Freigabe",
       "estCost": "Erwartete Preisspanne",
       "estValue": "2.400–3.800 €",
       "timeline": "Geschätzte Bearbeitungsdauer",
@@ -1492,14 +1492,14 @@
       "approvalValue": "Nötig, bevor die fachliche Arbeit beginnt"
     },
     "panel2": {
-      "label": "SLA für die Erstantwort",
+      "label": "Erwartete Antwortzeit",
       "note": "Wird sie verpasst, sagen wir es Ihnen und können Ihnen ein anderes Match zeigen."
     },
     "panel3": {
       "timeline": [
         {
           "date": "24. Apr",
-          "label": "Anfrage gesendet"
+          "label": "Termin gebucht"
         },
         {
           "date": "25. Apr",
@@ -1507,11 +1507,11 @@
         },
         {
           "date": "28. Apr",
-          "label": "Angebot erhalten"
+          "label": "Umfang und Schätzung"
         },
         {
-          "date": "02. Mai",
-          "label": "Umfang vereinbart"
+          "date": "29. Apr",
+          "label": "Freigabe durch Sie"
         },
         {
           "date": "06. Mai",
@@ -1558,16 +1558,16 @@
     }
   },
   "beyond": {
-    "eyebrow": "Über das Assessment hinaus",
+    "eyebrow": "Ihr CompliHub360-Workspace",
     "title": {
-      "pre": "Vom einmaligen Check zur ",
-      "gold": "Homebase",
-      "post": " für alles rund um Compliance."
+      "pre": "Ihre Compliance-Arbeit, ",
+      "gold": "geordnet",
+      "post": " an einem Ort."
     },
     "subtitle": "Speichern Sie Ihre Risk Maps, Matches, Termine, Fristen, Dokumente und den Verlauf Ihrer Mandate.",
     "pills": {
-      "live": "Heute verfügbar",
-      "beta": "Startet mit der Beta"
+      "live": "Jetzt verfügbar",
+      "beta": "Kommt in der Beta"
     },
     "stats": [
       {
@@ -1598,17 +1598,17 @@
       }
     ],
     "workspace": {
-      "title": "Ihre Karte. Ihre Anbieter. Ihr Verlauf. Dauerhaft.",
-      "desc": "Das Assessment wird zum gespeicherten Dossier. Ihre Mandats-Chronik lebt in Ihrem Dashboard. Anbieterbeziehungen, Compliance-Verlauf, Risk Map — alles an einem Ort, alles Ihres."
+      "title": "Alles bleibt geordnet und griffbereit",
+      "desc": "Starten Sie ein neues Assessment, machen Sie dort weiter, wo Sie aufgehört haben, verfolgen Sie Ihre laufenden Termine und Mandate und kehren Sie zu Ihren gespeicherten Risk Maps zurück."
     },
     "newsCard": {
-      "title": "Neuigkeiten, die Sie betreffen.",
-      "desc": "Hinweise, wenn Behörden sich in Ihren Märkten bewegen — nach Bereich kuratiert, auf Ihre Tätigkeit zugeschnitten."
+      "title": "Regulatorische Updates, die Ihr Unternehmen betreffen",
+      "desc": "Jedes Update nennt Behörde, Markt, Anforderung, Stichtag und amtliche Quelle — und warum es für Ihr Unternehmensprofil zählt."
     },
     "learn": {
       "meta": "Webinar · 24 Min.",
       "video": "Grenzüberschreitende USt für D2C",
-      "title": "Lernen Sie von Profis.",
+      "title": "Von vertrauenswürdigen Fachleuten lernen",
       "desc": "Praxisleitfäden, Webinare und Tutorials von qualifizierten Fachleuten."
     },
     "mock": {
@@ -1670,7 +1670,7 @@
           },
           {
             "q": "Was bedeuten die Status in der Risk Map?",
-            "a": "„Bestätigt“ heißt: Die Anforderung gilt aufgrund Ihrer Antworten. „Wahrscheinlich“ heißt: Sie gilt vermutlich, es können aber weitere Informationen oder eine fachliche Bestätigung nötig sein. „Offen“ heißt: Für eine genauere Einschätzung brauchen wir zusätzliche Antworten."
+            "a": "„Bestätigt“ heißt: Die Anforderung gilt aufgrund Ihrer Antworten. „Gilt wahrscheinlich“ heißt: Sie gilt vermutlich, es können aber weitere Informationen oder eine fachliche Bestätigung nötig sein. „Weitere Angaben nötig“ heißt: Für eine genauere Einschätzung brauchen wir zusätzliche Antworten."
           },
           {
             "q": "Woher stammen die Informationen?",
@@ -1794,10 +1794,10 @@
       "Registrieren",
       "Workspace"
     ],
-    "eyebrow": "Hier beginnen",
+    "eyebrow": "Mit einem kostenlosen Assessment beginnen",
     "title": {
-      "pre": "Ein Assessment. Ein Ergebnis. Der Weg wird ",
-      "highlight": "lesbar",
+      "pre": "Erzählen Sie uns von Ihrem Unternehmen. Sehen Sie, was ",
+      "highlight": "für Sie gilt",
       "post": "."
     },
     "subtitle": "Beantworten Sie ein paar Fragen dazu, wo und wie Ihr Unternehmen tätig ist. In etwa sechs Minuten erhalten Sie eine persönliche Risk Map. Ein Konto ist nicht nötig.",
@@ -1809,19 +1809,19 @@
   },
   "newsletter": {
     "eyebrow": "Auf dem Laufenden bleiben",
-    "title": "Wenn sich eine Vorschrift bewegt, wissen Sie es.",
-    "desc": "Ein Briefing pro Monat. Neue Schwellenwerte, Fristen und verlässliche Quellenlinks — für die Märkte, in denen Sie tätig sind. Keine Werbung.",
+    "title": "Wenn sich Anforderungen ändern, wissen Sie, was zählt.",
+    "desc": "Einmal im Monat ein klares Update mit wichtigen regulatorischen Änderungen, anstehenden Fristen und Links zu den amtlichen Quellen — für die Märkte und Compliance-Bereiche, denen Sie folgen. Keine Werbemails.",
     "placeholder": "sie@ihrunternehmen.de",
     "emailAria": "E-Mail-Adresse",
     "subscribe": "Abonnieren",
-    "privacy": "Wir nutzen Ihre E-Mail nur für das Briefing. Abmeldung mit einem Klick. Siehe unsere Datenschutzerklärung.",
-    "accountLink": "Oder erstellen Sie ein kostenloses Konto und behalten Sie Ihre Risk Map",
-    "cardTitle": "Das monatliche Briefing",
+    "privacy": "Wir nutzen Ihre E-Mail-Adresse nur für das monatliche Briefing. Sie können sich jederzeit abmelden. Lesen Sie unsere <policy>Datenschutzerklärung</policy>.",
+    "accountLink": "Kostenloses Konto für persönliche regulatorische Hinweise anlegen",
+    "cardTitle": "Ihr monatliches Compliance-Briefing",
     "betaNote": "Die Anmeldung zum monatlichen Briefing ist noch nicht geöffnet."
   },
   "footer": {
-    "tagline": "Wir helfen Ihnen zu verstehen, was für Ihr Unternehmen gilt — und die richtige Person zu erreichen, wenn es eine braucht.",
-    "notLawFirm": "Keine Kanzlei. Wir orchestrieren verifizierte Spezialisten.",
+    "tagline": "Verstehen, was gilt. Die richtige Unterstützung finden.",
+    "notLawFirm": "Klare Compliance-Informationen und faire Vermittlung an geprüfte, unabhängige Anbieter.",
     "beta": "Beta",
     "columns": {
       "platform": {
@@ -1829,13 +1829,13 @@
         "links": {
           "howItWorks": "So funktioniert es",
           "forWhom": "Für wen",
-          "startAssessment": "Assessment starten",
+          "startAssessment": "Bedarf ermitteln",
           "askQuestion": "Frage stellen",
           "signIn": "Anmelden"
         }
       },
       "areas": {
-        "title": "Compliance-Bereiche",
+        "title": "Unterstützungsbereiche",
         "links": {
           "areasOverview": "Alle Bereiche",
           "taxVat": "Steuern & USt",
@@ -1851,7 +1851,7 @@
       "company": {
         "title": "Unternehmen",
         "links": {
-          "about": "Über uns",
+          "about": "Über CompliHub360",
           "trustSecurity": "Vertrauen & Sicherheit",
           "contact": "Kontakt",
           "support": "Support"
@@ -1870,14 +1870,14 @@
       "pre": "Märkte, die wir heute abdecken: ",
       "post": ". Weitere Länder folgen im Lauf des Jahres 2026."
     },
-    "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform — keine Kanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Provider in eigener beruflicher Haftung. Wir erbringen keine Rechtsberatung im Sinne der §§ RDG / StBerG.",
-    "copyright": "© 2026 CompliHub360.",
+    "disclaimer": "CompliHub360 bietet Compliance-Informationen und technologiegestützte Vermittlung. Wir sind keine Kanzlei, keine Wirtschaftsprüfungsgesellschaft, keine Steuerberatung, kein Zollagent und keine Behörde, und wir leisten keine Rechts-, Steuer-, Buchhaltungs-, Zoll- oder sonstige regulierte Fachberatung. Fachliche Leistungen erbringen unabhängige Dienstleister in eigener Verantwortung und zu eigenen Bedingungen.",
+    "copyright": "© 2026 CompliHub360. Alle Rechte vorbehalten.",
     "legal": {
       "privacy": "Datenschutzerklärung",
       "terms": "Beta-Vereinbarung",
       "imprint": "Impressum",
       "cookies": "Cookie-Richtlinie",
-      "subProcessors": "Unterauftragsverarbeiter"
+      "subProcessors": "Liste der Unterauftragsverarbeiter"
     },
     "coverageNote": "Ob ein Service verfügbar ist, hängt vom Land, von der Compliance-Anforderung und von der Abdeckung in unserem Netzwerk geprüfter Anbieter ab.",
     "coverageLink": "Märkte und Abdeckung ansehen"
@@ -1895,7 +1895,7 @@
   "tips": {
     "label": "Wichtige Begriffe",
     "verifiedProvider": "Ein Anbieter, den CompliHub360 anhand der jeweils geltenden Kriterien zu Unternehmen, Erfahrung, Abdeckung und Qualität geprüft hat.",
-    "matchScore": "Zeigt, wie gut die verifizierten Fähigkeiten des Anbieters zu dem Bedarf passen, der in Ihrer Analyse ermittelt wurde.",
+    "matchScore": "Zeigt, wie gut die verifizierten Fähigkeiten des Anbieters zu dem Bedarf passen, der in Ihrem Assessment ermittelt wurde.",
     "responseTime": "Die übliche oder erwartete Zeit, in der der Anbieter auf eine Beratungsanfrage antwortet.",
     "completedEngagements": "Mandate, die über CompliHub360 als abgeschlossen erfasst wurden.",
     "identity": "Name und vollständiges Profil des Anbieters sehen Sie, sobald Sie ihn auswählen und einen Beratungstermin buchen.",

@@ -13,7 +13,7 @@ const load = (lng: string) => JSON.parse(readFileSync(join(LOCALES, lng, 'result
 
 const EXPECTED: Record<string, [string, string]> = {
   en: ['Based on your assessment. 1 area in scope.', 'Based on your assessment. 2 areas in scope.'],
-  de: ['Basierend auf Ihrer Einschätzung. 1 Bereich im Fokus.', 'Basierend auf Ihrer Einschätzung. 2 Bereiche im Fokus.'],
+  de: ['Basierend auf Ihrem Assessment. 1 Bereich im Fokus.', 'Basierend auf Ihrem Assessment. 2 Bereiche im Fokus.'],
   es: ['Basado en su evaluación. 1 ámbito en alcance.', 'Basado en su evaluación. 2 ámbitos en alcance.'],
   // Turkish keeps the noun singular after a numeral.
   tr: ['Değerlendirmenize dayanmaktadır. Kapsamda 1 alan bulunuyor.', 'Değerlendirmenize dayanmaktadır. Kapsamda 2 alan bulunuyor.'],
