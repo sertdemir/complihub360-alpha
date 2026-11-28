@@ -100,7 +100,7 @@
     "domainTaxVat": "Steuern & USt."
   },
   "pdf": {
-    "title": "Ihre Compliance-Risikokarte.",
+    "title": "Ihre Compliance-Risk-Map.",
     "generated": "Erstellt am {{date}} · Staging-Vorschau",
     "profile": {
       "anonymousScope": "Anonyme Einschätzung · Beispielumfang",
@@ -140,9 +140,9 @@
     "errorBody": "Bitte versuchen Sie es in einem Moment erneut.",
     "crumbProviders": "Anbieter",
     "backToArea": "Zur Bereichsseite",
-    "backToRiskMap": "Zur Sitzung",
+    "backToRiskMap": "Zurück zur Risk Map",
     "lageAreasArea": "Deckt {{matched}} von {{total}} Bereichen ab ({{area}})",
-    "lageAreasRiskMap": "Passt zu {{matched}} von {{total}} Bereichen Ihrer Sitzung „{{riskMap}}“",
+    "lageAreasRiskMap": "Passt zu {{matched}} von {{total}} Bereichen Ihrer Risk Map „{{riskMap}}“",
     "lageMarketsAll_one": "{{count}} Markt abgedeckt",
     "lageMarketsAll_other": "alle {{count}} Märkte abgedeckt",
     "lageMarketsPartial_one": "{{covered}} von {{total}} Markt abgedeckt · {{missing}} nicht",
@@ -156,12 +156,12 @@
     "matrixTitle": "Ihre Pflichten und die Märkte dieses Anbieters",
     "matrixCovered_one": "{{covered}} von {{total}} Markt",
     "matrixCovered_other": "{{covered}} von {{total}} Märkten",
-    "matrixRiskMap": "Sitzung",
+    "matrixRiskMap": "Risk Map",
     "matrixNone": "In diesem Bezug ist gerade nichts offen.",
     "matrixNotCovered": "Diesen Markt deckt der Anbieter nicht ab.",
     "matrixEuWide": "EU-weit",
     "matrixFoot": "Durchgestrichene Märkte deckt dieser Anbieter nicht ab. Die Matrix zeigt Märkte, nicht Fachgebiete — welche Bereiche er abdeckt, steht im Dossier.",
-    "matrixNoContext": "Öffnen Sie einen Anbieter aus einem Bereich oder einer Sitzung heraus, dann steht hier, welche Ihrer offenen Pflichten er in welchem Markt übernehmen kann.",
+    "matrixNoContext": "Öffnen Sie einen Anbieter aus einem Bereich oder einer Risk Map heraus, dann steht hier, welche Ihrer offenen Pflichten er in welchem Markt übernehmen kann.",
     "dossierTitle": "Dossier",
     "servicesTitle": "Leistungen",
     "servicesCoarse": "Der Anbieter hat seine Leistungen noch nicht im Einzelnen hinterlegt — das sind die Fachgebiete aus seiner Anmeldung.",
@@ -223,7 +223,7 @@
     "toAppointments": "Zu Ihren Terminen",
     "pickSlotDrawer": "Wählen Sie oben einen Termin.",
     "messageLabel": "Ihr Anliegen",
-    "messageFromRiskMap": "Es geht um meine Sitzung „{{riskMap}}“.",
+    "messageFromRiskMap": "Es geht um meine Risk Map „{{riskMap}}“.",
     "duration": "30 Min",
     "noSlots": "Dieser Anbieter hat gerade keine freien Termine. Versuchen Sie es in ein paar Tagen erneut.",
     "failed": "Der Termin konnte nicht gebucht werden. Bitte versuchen Sie es in einem Moment erneut.",
@@ -350,14 +350,14 @@
       "later_one": "{{count}} Pflicht",
       "later_other": "{{count}} Pflichten"
     },
-    "historyTitle": "Verlauf dieser Sitzung",
+    "historyTitle": "Verlauf dieser Risk Map",
     "historyCurrent": "Aktueller Stand",
-    "historyStart": "Sitzung angelegt",
+    "historyStart": "Risk Map angelegt",
     "historyCreated": "Ausgangsstand Ihrer Antworten",
     "copyVariant": "Als Variante kopieren",
     "copyHint": "Legt eine Kopie an — Varianten durchspielen, ohne das Original zu verlieren.",
     "copyDone": "Kopie angelegt",
-    "copyOpenList": "In den Sitzungen öffnen",
+    "copyOpenList": "Unter Risk Maps öffnen",
     "copyError": "Die Kopie konnte nicht angelegt werden.",
     "copyUnavailable": "Erst speichern, dann lässt sich eine Variante anlegen.",
     "verifiedPartner": "Verified Provider",
@@ -426,7 +426,7 @@
   },
   "reveal": {
     "was": "war {{title}}",
-    "wasInRiskMap": "war {{title}} in Ihrer Sitzung „{{riskMap}}“"
+    "wasInRiskMap": "war {{title}} in Ihrer Risk Map „{{riskMap}}“"
   },
   "dueLive": "Kein fester Termin",
   "clusters": {

@@ -561,7 +561,7 @@
     "header": "Märkte",
     "title": "Weitere Märkte",
     "count": "{{selected}} ausgewählt · {{total}} verfügbar",
-    "desc": "Außerhalb der Hauptauswahl. Wählen Sie die Märkte, in denen Sie tätig sind — wir kartieren deren Vorschriften und leiten an den passenden Verified Provider weiter.",
+    "desc": "Diese Märkte bewerten wir noch nicht. Fügen Sie die hinzu, in denen Sie tätig sind: Ihre Risk Map markiert sie als noch nicht abgedeckt, und Sie können dort die Abdeckung anfragen.",
     "searchPlaceholder": "Nach Name oder Ländercode suchen",
     "european": "Europäische Märkte",
     "expanding": "Abdeckung im Ausbau",
@@ -1564,7 +1564,7 @@
       "gold": "Homebase",
       "post": " für alles rund um Compliance."
     },
-    "subtitle": "Das Assessment ist kostenlos. Was danach kommt — Ihr Workspace, Live-News, Expertenwissen, Ihre Anbieter — macht CompliHub360 zu dem Ort, an den Sie zurückkehren.",
+    "subtitle": "Speichern Sie Ihre Risk Maps, Matches, Termine, Fristen, Dokumente und den Verlauf Ihrer Mandate.",
     "pills": {
       "live": "Heute verfügbar",
       "beta": "Startet mit der Beta"
@@ -1800,7 +1800,7 @@
       "highlight": "lesbar",
       "post": "."
     },
-    "subtitle": "Sechs Minuten. Kein Konto erforderlich. Wir gleichen Ihre Tätigkeit mit den Vorschriften ab, die tatsächlich gelten, und zeigen Ihnen, was als Nächstes zu tun ist.",
+    "subtitle": "Beantworten Sie ein paar Fragen dazu, wo und wie Ihr Unternehmen tätig ist. In etwa sechs Minuten erhalten Sie eine persönliche Risk Map. Ein Konto ist nicht nötig.",
     "cta": "Meinen Bedarf ermitteln",
     "demo": {
       "pause": "Demo pausieren",

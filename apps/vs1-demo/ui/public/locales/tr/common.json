@@ -64,12 +64,12 @@
       "card1Problem": "Reklam kısıtlamaları, EPR ve vergi mevzuatına ilişkin bilgiler, yapılandırılmamış devlet siteleri genelinde dağınıktır.",
       "card1Solution": "Pazarlar ve Uyumluluk Alanları sayfaları, kontrol ettiğimiz yükümlülükleri her biri kendi yasasıyla içerir. Rehberler ve öğreticiler okunmaya değer olduklarında gelecek.",
       "card2Title": "Süreklilik kaybı",
-      "card2Problem": "Sağlayıcı taleplerini, kaydedilmiş oturumları ve hukuki güncellemeleri birleşik bir sistem olmadan takip etmek kaotiktir.",
-      "card2Solution": "Kontrol Paneli Merkezi, oturumları kaydetmenizi, engagement durumlarını gerçek zamanlı takip etmenizi ve görevleri izlemenizi sağlar.",
+      "card2Problem": "Sağlayıcı taleplerini, kaydedilen Risk Map'leri ve hukuki güncellemeleri birleşik bir sistem olmadan takip etmek kaotiktir.",
+      "card2Solution": "Kontrol Paneli Merkezi, Risk Map'leri kaydetmenizi, işlerinizin durumunu gerçek zamanlı takip etmenizi ve görevleri izlemenizi sağlar.",
       "card3Title": "Raporlama yükü",
       "card3Problem": "Paydaşlar için mevzuat maruziyetinin özetlenmesi manuel ve zaman alıcı bir iştir.",
       "card3Solution": "Tek tıkla PDF dışa aktarma: Risk Özeti, Eylem Planı ve Kaynak Dizini — iç dolaşım için hazır.",
-      "panel1Title": "Oturum Tablosu",
+      "panel1Title": "Risk Map görünümü",
       "panel1Desc": "Ülkeye göre kaydedilmiş risk profilleri",
       "panel2Title": "Aktif Talepler",
       "panel2Desc": "Sağlayıcı engagement durumu",
@@ -83,7 +83,7 @@
       "item3": "Kaynak Dizini",
       "stat1Label": "Engagement yaşam döngüsü görünürlüğü",
       "stat2Label": "PDF raporu dışa aktarma",
-      "stat3Label": "Kaydedilmiş uyumluluk oturumları",
+      "stat3Label": "Kaydedilen Risk Map'ler",
       "railSub": "E-posta zincirleri yerine tek kontrol merkezi"
     },
     "counsel": {
@@ -842,7 +842,7 @@
       "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır.",
       "ceiling": {
         "unproven": "Henüz belgelenmedi",
-        "unprovenNote": "Risk haritasının hesapladığı tutar devralınmış bir değerdir; kanun metninden okunmuş değildir.",
+        "unprovenNote": "Risk Map'in hesapladığı tutar devralınmış bir değerdir; kanun metninden okunmuş değildir.",
         "perUnit": "{{per}} başına {{amount}}",
         "proportional": "{{of}} tutarının %{{percent}} kadarı",
         "turnover": "Dünya genelindeki yıllık cironun %{{percent}} kadarı",
@@ -1208,7 +1208,7 @@
       {
         "kicker": "Değerlendirin",
         "title": "Size gerçekte neyin geçerli olduğunu görün.",
-        "body": "Bize pazarlarınızı, iş modelinizi ve destek almak istediğiniz alanları anlatın. Risk haritanız, işletmeniz için geçerli yükümlülükleri her birini önceliğiyle ve varsa resmi kaynağı ve süresiyle gösterir. Bunlar bir sohbet botundan değil, kendi uyum motorumuzdan gelir.",
+        "body": "Bize pazarlarınızı, iş modelinizi ve destek almak istediğiniz alanları anlatın. Risk Map'iniz, işletmeniz için geçerli yükümlülükleri her birini önceliğiyle ve varsa resmi kaynağı ve süresiyle gösterir. Bunlar bir sohbet botundan değil, kendi uyum motorumuzdan gelir.",
         "short": "Wizard dört şey sorar ve Risk Map’inizi oluşturur — her yükümlülük yasal dayanağı ve süresiyle."
       },
       {
@@ -1226,7 +1226,7 @@
       {
         "kicker": "Harekete geçin",
         "title": "Danışmanlık randevusu alın.",
-        "body": "Bir sağlayıcı seçin ve takviminden bir saat belirleyin. Randevu almadan önce neyin paylaşılacağını tam olarak görürsünüz. Sağlayıcının kimliği randevu anında açılır ve yalnızca talebinizin işlenmesi için gereken bilgiler paylaşılır. Sonrasında randevuyu değerlendirebilirsiniz; yükümlülükleriniz süreleriyle birlikte risk haritanızda kalır.",
+        "body": "Bir sağlayıcı seçin ve takviminden bir saat belirleyin. Randevu almadan önce neyin paylaşılacağını tam olarak görürsünüz. Sağlayıcının kimliği randevu anında açılır ve yalnızca talebinizin işlenmesi için gereken bilgiler paylaşılır. Sonrasında randevuyu değerlendirebilirsiniz; yükümlülükleriniz süreleriyle birlikte Risk Map'inizde kalır.",
         "short": "Randevu seçin — dosyanız sizinle gelir, işinizi altıncı kez anlatmazsınız."
       }
     ],
@@ -1321,7 +1321,7 @@
     "cost": {
       "kicker": "Bunun size maliyeti",
       "title": "Sağlayıcı bulmak ve randevu almak ücretsiz.",
-      "body": "Değerlendirme, risk haritanız, eşleştirme ve randevu sizin için ücretsizdir. Bize, gerçekten bir randevu gerçekleştiğinde sağlayıcılar öder. Sıralamanın satılık olmamasının nedeni de budur: ücretli bir konum, eşleşmeyi her iki taraf için de değersiz kılardı. Yalnızca çalışma alanınızdaki yapay zekâ asistanının, günde daha fazla soru için isteğe bağlı ücretli bir planı vardır."
+      "body": "Değerlendirme, Risk Map'iniz, eşleştirme ve randevu sizin için ücretsizdir. Bize, gerçekten bir randevu gerçekleştiğinde sağlayıcılar öder. Sıralamanın satılık olmamasının nedeni de budur: ücretli bir konum, eşleşmeyi her iki taraf için de değersiz kılardı. Yalnızca çalışma alanınızdaki yapay zekâ asistanının, günde daha fazla soru için isteğe bağlı ücretli bir planı vardır."
     },
     "privacy": {
       "kicker": "Verilerinize ne olur",
@@ -1631,7 +1631,7 @@
       "items": [
         {
           "q": "Değerlendirme gerçekten ücretsiz mi?",
-          "a": "Evet — değerlendirme ve risk haritası ücretsizdir ve hesap istemez; sağlayıcıları karşılaştırmak için ücretsiz bir hesap yeterlidir. Ücretli olan danışmanlığın kendisidir; doğrudan sağlayıcıya, önceden yayımladığı tahmine göre ödenir."
+          "a": "Evet — değerlendirme ve Risk Map ücretsizdir ve hesap istemez; sağlayıcıları karşılaştırmak için ücretsiz bir hesap yeterlidir. Ücretli olan danışmanlığın kendisidir; doğrudan sağlayıcıya, önceden yayımladığı tahmine göre ödenir."
         },
         {
           "q": "Hesap açmam gerekiyor mu?",
@@ -1712,11 +1712,11 @@
   "seo": {
     "home": {
       "title": "CompliHub360 · Uyumu anlayın ve uygulayın",
-      "description": "Pazarlarınızın kuralları tek bir risk haritasında, her yükümlülüğün arkasında kaynağıyla — ve doğrulanmış uzmanlara giden yol. Ücretsiz, hesapsız."
+      "description": "Pazarlarınızın kuralları tek bir Risk Map'te, her yükümlülüğün arkasında kaynağıyla — ve doğrulanmış uzmanlara giden yol. Ücretsiz, hesapsız."
     },
     "howItWorks": {
       "title": "Nasıl çalışır · CompliHub360",
-      "description": "Bir sorudan risk haritasına ve doğru uzmana. Beş adım, satış görüşmesi yok, yükümlülük yok."
+      "description": "Bir sorudan Risk Map'e ve doğru uzmana. Beş adım, satış görüşmesi yok, yükümlülük yok."
     },
     "compliance": {
       "title": "Uyum alanları · CompliHub360",
@@ -1728,7 +1728,7 @@
     },
     "pricing": {
       "title": "Fiyatlar · CompliHub360",
-      "description": "Değerlendirme, risk haritası ve eşleştirme size hiçbir şeye mal olmaz. Uzmanlar öder, o da yalnızca randevu kesinleştiğinde."
+      "description": "Değerlendirme, Risk Map ve eşleştirme size hiçbir şeye mal olmaz. Uzmanlar öder, o da yalnızca randevu kesinleştiğinde."
     },
     "resources": {
       "title": "Kaynaklar · CompliHub360",
@@ -1740,7 +1740,7 @@
     },
     "platform": {
       "title": "Platform · CompliHub360",
-      "description": "İş bağlamınız nasıl yapılandırılmış bir risk haritasına dönüşür: gizlilik kapısı, kaynağa bağlı analiz ve arkasındaki eşleştirme."
+      "description": "İş bağlamınız nasıl yapılandırılmış bir Risk Map'e dönüşür: gizlilik kapısı, kaynağa bağlı analiz ve arkasındaki eşleştirme."
     },
     "solutions": {
       "title": "Role göre · CompliHub360",

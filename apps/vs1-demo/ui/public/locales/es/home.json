@@ -561,7 +561,7 @@
     "header": "Mercados",
     "title": "Otros mercados",
     "count": "{{selected}} seleccionados · {{total}} disponibles",
-    "desc": "Fuera de la selección principal. Elija los mercados en los que opera: mapeamos su normativa y le derivamos al Verified Provider adecuado.",
+    "desc": "Todavía no evaluamos estos mercados. Añada aquellos en los que opera: su Risk Map los marca como aún no cubiertos y desde ahí puede solicitar la cobertura.",
     "searchPlaceholder": "Buscar por nombre o código de país",
     "european": "Mercados europeos",
     "expanding": "Cobertura en expansión",
@@ -1564,7 +1564,7 @@
       "gold": "base",
       "post": " de todo su compliance."
     },
-    "subtitle": "La evaluación es gratuita. Lo que viene después — su espacio de trabajo, noticias en vivo, contenido experto, sus proveedores — es lo que convierte a CompliHub360 en el lugar al que usted vuelve.",
+    "subtitle": "Guarde sus Risk Maps, coincidencias, citas, plazos, documentos y el historial de sus encargos.",
     "pills": {
       "live": "Disponible hoy",
       "beta": "Llega con la Beta"
@@ -1800,7 +1800,7 @@
       "highlight": "legible",
       "post": "."
     },
-    "subtitle": "Seis minutos. Sin necesidad de cuenta. Contrastamos sus operaciones con la normativa que realmente aplica y le mostramos qué hacer a continuación.",
+    "subtitle": "Responda unas pocas preguntas sobre dónde y cómo opera su empresa. En unos seis minutos recibirá una Risk Map personalizada. No necesita cuenta.",
     "cta": "Evaluar mis necesidades",
     "demo": {
       "pause": "Pausar la demo",
