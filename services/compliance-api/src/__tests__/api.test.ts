@@ -2457,6 +2457,21 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         expect(r2.status).toBe(200);
     });
 
+    // user_metadata gehoert dem Nutzer: jedes angemeldete Konto kann es mit
+    // supabase.auth.updateUser({ data: { role: 'admin' } }) selbst schreiben,
+    // und der Wert steht danach im JWT. Eine Rolle zaehlt deshalb nur aus
+    // app_metadata, das allein der Server setzt.
+    it('macht niemanden zum Admin, der sich die Rolle selbst in user_metadata schreibt', async () => {
+        seedProvider();
+        const selbsternannt = signJwt({ sub: randomUUID(), email: 'x@y.example', user_metadata: { role: 'admin' } });
+        const auth = { headers: { authorization: `Bearer ${selbsternannt}` } };
+        // Fremder Anbieter: kein Mitglied, also 404 wie fuer jeden Fremden.
+        expect((await fetch(`${BASE}/api/v1/provider/test-kanzlei/billing/preview`, auth)).status).toBe(404);
+        // Admin-Routen bleiben zu.
+        expect((await fetch(`${BASE}/api/v1/admin/readiness`, auth)).status).toBe(403);
+        expect((await fetch(`${BASE}/api/v1/admin/provider-applications`, auth)).status).toBe(403);
+    });
+
     it('laesst die Nutzer-Routen eines Anbieters offen — ueber den Ref, nie ueber den Schluessel', async () => {
         seedProvider();
         const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/reviews`, { auth: 'jwt' });

@@ -31,9 +31,8 @@ export function AuthCallbackPage() {
         const go = (session: Session | null) => {
             if (done || !session) return;
             done = true;
-            const claimed =
-                (session.user?.app_metadata?.role as string | undefined) ??
-                (session.user?.user_metadata?.role as string | undefined);
+            // Nur app_metadata: user_metadata schreibt der Nutzer selbst.
+            const claimed = session.user?.app_metadata?.role as string | undefined;
             const target = claimed === "partner" ? "provider-dashboard" : "dashboard";
             // G2: nach einem Ablauf zurueck auf die Seite, auf der es passierte.
             clearExpired();
