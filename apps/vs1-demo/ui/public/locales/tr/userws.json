@@ -7,7 +7,8 @@
     "send": "Gönder",
     "save": "Kaydet",
     "done": "Tamam",
-    "loading": "Yükleniyor…"
+    "loading": "Yükleniyor…",
+    "pickSlotError": "Lütfen bir saat seçin."
   },
   "status": {
     "awaitingConfirmation": "Onay bekleniyor",
@@ -456,7 +457,8 @@
     "archiveDesc": "Risk haritasını listeden gizler · her zaman geri yüklenebilir.",
     "archived": "Arşivlendi ✓",
     "actionError": "İşlem başarısız — lütfen birazdan tekrar deneyin.",
-    "archiveQuestion": "Bu oturum arşivlensin mi?"
+    "archiveQuestion": "Bu oturum arşivlensin mi?",
+    "nameTooShort": "Lütfen en az 2 karakterlik bir ad girin."
   },
   "userSearch": {
     "eyebrow": "ÇALIŞMA ALANI",
@@ -512,7 +514,8 @@
     "sendFailed": {
       "heading": "Mesajınızı gönderemedik",
       "message": "Mesajınız hâlâ burada. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
-    }
+    },
+    "messageTooShort": "Lütfen en az {{min}} karakterlik bir mesaj yazın."
   },
   "assistant": {
     "title": "KDV Asistanı",
@@ -613,23 +616,24 @@
       "disputeConfirmBack": "Geri",
       "disputeFailed": "İtiraz gönderilemedi. Lütfen tekrar deneyin veya bizimle konuşun.",
       "rebookedFrom": "Önceki bir rezervasyon için yeni randevu"
-    }
+    },
+    "icsSummary": "{{provider}} ile görüşme · CompliHub360"
   },
   "review": {
     "eyebrow": "DEĞERLENDİRME",
     "cancel": "İptal",
     "submit": "Değerlendirmeyi gönder",
     "done": "✓ Gönderildi",
-    "ratingLabel": "Puanın",
+    "ratingLabel": "Puanınız",
     "categoriesLabel": "Ne öne çıktı?",
     "cat": {
       "expertise": "Uzmanlık",
       "responsiveness": "Yanıt hızı",
       "value": "Fiyat-performans"
     },
-    "bodyLabel": "Deneyimin (isteğe bağlı)",
+    "bodyLabel": "Deneyiminiz (isteğe bağlı)",
     "bodyPh": "İlk görüşme nasıl geçti?",
-    "note": "Doğrulanmış değerlendirmeler yalnızca gerçek randevulardan gelir ve sağlayıcı profilinde anonim görünür. Adın gizli kalır.",
+    "note": "Doğrulanmış değerlendirmeler yalnızca gerçek randevulardan gelir ve sağlayıcı profilinde anonim görünür. Adınız gizli kalır.",
     "close": "Kapat",
     "sendFailed": {
       "heading": "Değerlendirmenizi gönderemedik",
@@ -646,7 +650,8 @@
     "notHeld": {
       "heading": "Bu randevu değerlendirilemez",
       "message": "Yalnızca gerçekleşen randevular değerlendirilebilir."
-    }
+    },
+    "ratingRequired": "Lütfen 1 ile 5 yıldız arasında bir puan seçin."
   },
   "reschedule": {
     "eyebrow": "Randevuyu ertele",
@@ -700,5 +705,21 @@
       "stock": "Kaydettiğinizde stok yanıtınız da ({{answer}}) silinir — yalnızca fiziksel ürünler için geçerlidir.",
       "epr": "Kaydettiğinizde EPR yanıtlarınız da ({{answer}}) silinir — yalnızca EPR ve Ambalaj ile geçerlidir."
     }
+  },
+  "savedProviders": {
+    "title": "Kaydedilen Sağlayıcılar",
+    "sub": "Bir Risk Map'ten seçiminize eklediğiniz sağlayıcılar. Randevu alana kadar anonim kalırlar ve onları kaydettiğinizden haberleri olmaz.",
+    "loading": "Seçiminiz yükleniyor …",
+    "loadFailedTitle": "Seçiminiz yüklenemedi",
+    "loadFailedBody": "Bu, sağlayıcılar hakkında bir şey söylemez. Lütfen tekrar deneyin.",
+    "retry": "Tekrar dene",
+    "emptyTitle": "Henüz kaydedilen sağlayıcı yok",
+    "emptyBody": "Bir Risk Map açın ve daha sonra karşılaştırmak ya da randevu almak istediğiniz bir sağlayıcıda “Seçime ekle”yi seçin.",
+    "emptyCta": "Risk Map'lerimi aç",
+    "savedOn": "{{date}} tarihinde kaydedildi",
+    "response": "Olağan yanıt süresi",
+    "remove": "Kaldır",
+    "removeFailed": "Bu işe yaramadı. Lütfen tekrar deneyin.",
+    "unavailable": "Bu sağlayıcı artık CompliHub360'ta yer almıyor."
   }
 }

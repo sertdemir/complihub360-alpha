@@ -53,7 +53,8 @@
       "stat1Label": "Risk profili için adımlar",
       "stat2Label": "Maks. onay süresi",
       "stat3Label": "Maks. yanıt penceresi",
-      "railSub": "Mütalaa yerine hız ve netlik"
+      "railSub": "Mütalaa yerine hız ve netlik",
+      "pain3Desc": "Değerlendirme, bağlamınızı dört adımda toplar, pazarlarınızda geçerli riskleri haritalar ve sizi 24 saat içinde onaylayan, 48 saat içinde yanıt veren Verified Provider'larla buluşturur."
     },
     "operations": {
       "overline": "Operasyon Ekipleri için",
@@ -316,7 +317,8 @@
         "body": "4–5 net soru, durumunuzu yapılandırılmış bir arama profiline dönüştürür."
       },
       "match": {
-        "title": "Eşleşin"
+        "title": "Eşleşin",
+        "body": "Verified Provider'lar uyuma, doğrulanmış uzmanlığa ve hizmet kalitesine göre sıralanır — asla ne ödediklerine göre değil."
       },
       "engage": {
         "title": "Harekete Geçin",
@@ -1045,7 +1047,8 @@
         "DE": "geçersiz maddeler; dava riski",
         "default": "uygulanamaz maddeler; uyuşmazlık riski"
       }
-    }
+    },
+    "heroBody": "Her uyum alanı, size özel bir değerlendirmeye açılır. Konunuzu belirleyin, risklerinizi yaklaşık altı dakikada anlayın, ardından size uyan uzmanları görün."
   },
   "resources": {
     "meta": {
@@ -1146,7 +1149,9 @@
     "dimEyebrow": "Yönetişim",
     "dimCounter": "{{total}} boyuttan {{num}}.",
     "featEyebrow": "Kullanımda",
-    "ctaBody": "Aynı kurallar, aynı yapay zekâ: değerlendirme yaklaşık altı dakikada sizin için geçerli olanı daraltır — her ifade kaynağıyla."
+    "ctaBody": "Aynı kurallar, aynı yapay zekâ: değerlendirme yaklaşık altı dakikada sizin için geçerli olanı daraltır — her ifade kaynağıyla.",
+    "dimEthicsDesc": "Yapay zekâ özelliklerimiz insanların özerkliğine saygı gösterir; uzmanların yerini almak için değil, onları desteklemek için tasarlanmıştır.",
+    "featPrivacyDesc": "İşletme bağlamı bir yapay zekâ modeline ulaşmadan önce sabit kalıp kuralları e-posta adreslerini, telefon numaralarını ve diğer tanımlayıcıları maskeler. Her ismi yakalayamazlar; bu yüzden lütfen kişisel bilgileri serbest metne yazmayın."
   },
   "header": {
     "nav": {
@@ -1331,7 +1336,9 @@
       "title": "Nereden mantıklıysa oradan başlayın.",
       "lead": "Birkaç soru, yaklaşık altı dakika, hesap gerekmez."
     },
-    "seeAll": "Her adımın nasıl işlediğini görün"
+    "seeAll": "Her adımın nasıl işlediğini görün",
+    "ctaAsk": "Soru sor",
+    "ctaAssess": "İhtiyaçlarımı değerlendir"
   },
   "markets": {
     "meta": {
@@ -1496,10 +1503,49 @@
       "title": "Neredeyiz — ve yol nereye gidiyor",
       "items": {
         "eu": {
-          "name": "Avrupa Birliği"
+          "name": "Avrupa Birliği",
+          "focus": [
+            "GDPR",
+            "EPR ve ambalaj (PPWR)",
+            "AB genelinde KDV",
+            "Ürün güvenliği (GPSR)"
+          ]
         },
-        "uk": {},
-        "us": {}
+        "uk": {
+          "name": "Birleşik Krallık",
+          "focus": [
+            "UK GDPR",
+            "HMRC KDV",
+            "Ambalaj EPR (PackUK)",
+            "Ürün güvenliği"
+          ]
+        },
+        "us": {
+          "name": "Amerika Birleşik Devletleri",
+          "focus": [
+            "Eyalet satış vergisi",
+            "CCPA/CPRA ve eyalet gizlilik yasaları",
+            "FTC reklam kuralları",
+            "Gümrük tarife sınıflandırması"
+          ]
+        },
+        "tr": {
+          "name": "Türkiye",
+          "focus": [
+            "KDV",
+            "KVKK",
+            "E-ticarette onay (ETK)",
+            "Gümrük ve EORI"
+          ]
+        }
+      },
+      "lead": "Her kayıt, dayandığı hukuku belirtir: elimizde olan yerde ulusal hukuku, geçerli olan buysa AB hukukunu.",
+      "note": "Bugün {{markets}} pazar: {{marketList}}. Henüz ulusal bir metnimiz olmayan yerde pazar sayfası bunu belirtir.",
+      "scope": {
+        "eu": "Almanya · Fransa · İtalya · İspanya · Hollanda + AB hukuku",
+        "uk": "Ulusal hukuk",
+        "us": "Federal + CA, TX, NY, FL",
+        "tr": "Ulusal hukuk"
       }
     },
     "obligationsByMarket": {
@@ -1551,7 +1597,9 @@
       "body": "Sıralamadaki yerler hiçbir zaman satılık değildir. Ücretli bir yer, eşleşmeyi her iki taraf için de değersiz kılardı: siz en çok ödeyenle tanışırdınız, uzman ise vakasıyla ilgilenemeyeceği biriyle tanışırdı. Tek ölçüt uygunluktur."
     },
     "specialist": {
-      "kicker": "Uzmanın ücreti"
+      "kicker": "Uzmanın ücreti",
+      "title": "Ücretleri — siz karar vermeden önce konuşulur.",
+      "body": "Danışmanlığın kendisi ücretsiz değildir ve öyleymiş gibi yapmayacağız. Her Verified Provider kendi ücretini belirler; kapsamı ve fiyatı, herhangi bir taahhütte bulunmadan önce görüşmede konuşursunuz."
     },
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
@@ -1598,7 +1646,8 @@
           "a": "Hayır. Sıralar satılık değildir — parayla alınmış bir sıra eşleşmeyi iki taraf için de değersiz kılardı. Uygunluk tek ölçüttür."
         },
         {
-          "q": "Uzmanın danışmanlığı ne kadar tutar?"
+          "q": "Uzmanın danışmanlığı ne kadar tutar?",
+          "a": "Ücreti uzman belirler. Kapsamı ve fiyatı, herhangi bir taahhütte bulunmadan önce görüşmede konuşursunuz."
         },
         {
           "q": "Uzman, rezervasyondan önce bilgilerimi görür mü?",

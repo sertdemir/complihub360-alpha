@@ -268,7 +268,8 @@
         "noBooking": "Rezervasyon oluşturulmadı",
         "nothingShared": "Sağlayıcıyla hiçbir şey paylaşılmadı",
         "kept": "Seçiminiz ve mesajınız korunur"
-      }
+      },
+      "reasonProvider": "Bu sizden kaynaklanmıyor: Sağlayıcı tarafında şu anda bir gereklilik eksik. Sağlayıcı bilgilendirildi."
     },
     "slotsFailed": "Uygun saatler yüklenemedi. Bu, sağlayıcının müsaitliği hakkında bir şey söylemez.",
     "slotsRetry": "Tekrar dene"
@@ -560,5 +561,55 @@
         "established_in_eu": "işletmenizin AB’de kurulu olup olmadığı"
       }
     }
+  },
+  "matchStates": {
+    "factExpertise": "Uzmanlık",
+    "factCoverage": "Kapsam",
+    "factPrice": "Beklenen fiyat aralığı",
+    "factAvailability": "Müsaitlik",
+    "priceFrom": "en az {{price}}",
+    "priceUpTo": "en fazla {{price}}",
+    "nextSlot": "Sonraki boş saat: {{when}}",
+    "guestCaption": "Ücretsiz bir hesapla. Ad ve iletişim bilgileri randevudan sonra görünür.",
+    "matrixLabel": "Alan ve pazara göre kapsam",
+    "legendCovered": "doğrulanmış bir eşleşme kapsıyor",
+    "legendGap": "henüz eşleşme yok"
+  },
+  "sharing": {
+    "fields": {
+      "company_name": "Şirket adı",
+      "email": "E-posta adresi",
+      "message": "Mesajınız",
+      "topic": "Talebinizin konusu"
+    },
+    "notProvided": "Belirtilmedi",
+    "noMessage": "Mesaj yok",
+    "sharedTitle": "Sağlayıcıyla paylaşılan",
+    "notOthers": "Başka hiçbir sağlayıcıyla paylaşılmaz.",
+    "confirmRequired": "Lütfen bu randevuyla devam etmek istediğinizi onaylayın.",
+    "termsTitle": "Randevu koşulları (sürüm {{version}})",
+    "topicUnspecified": "Bu talebin alanı ve pazarları"
+  },
+  "delayed": {
+    "yourAnswers": "Yanıtlarınız",
+    "saved": "Kaydedildi"
+  },
+  "providerCoverage": {
+    "notifyLabel": "Doğrulanmış bir sağlayıcı bunu kapsadığında bana e-posta gönder",
+    "notifyHelp": "Size {{email}} adresinden yazacağız. Yalnızca bu talep için."
+  },
+  "card": {
+    "book": "Randevu al",
+    "markets": "Pazarlar",
+    "priorities": "Kapsanan öncelikler",
+    "timeline": "Tahmini hizmet süresi",
+    "completed": "Tamamlanan işler",
+    "days_one": "{{count}} gün",
+    "days_other": "{{count}} gün",
+    "daysRange": "{{min}}–{{max}} gün",
+    "addToSelection": "Seçime ekle",
+    "inSelection": "Seçiminizde",
+    "saveFailed": "Bu işe yaramadı. Lütfen tekrar deneyin.",
+    "saveFull": "Seçiminiz en fazla 200 sağlayıcı alır. Bir başkasını eklemek için “Kaydedilen Sağlayıcılar” bölümünden birini kaldırın."
   }
 }
