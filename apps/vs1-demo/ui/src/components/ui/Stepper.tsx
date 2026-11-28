@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, X } from 'lucide-react';
+import { AlertCircle, Check, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 // ─── Stepper ──────────────────────────────────────────────────────────────────
@@ -7,6 +7,12 @@ import { cn } from '../../lib/utils';
 // Wizard (5 steps) and Onboarding (6 steps). Completed = petrol + check, active =
 // petrol + number (white) + ring, upcoming = neutral outline + muted number.
 // Light + dark.
+//
+// variant="inline" (Compass "Step Inline", 2273:276, Canvas-Wahl 1A vom
+// 2026-11-28): die Textzeile fuer kurze Ablaeufe ueber einem Blatt oder
+// Formular — "1 ANMELDUNG ✓ › 2 BETA-VEREINBARUNG › 3 IHRE RISK MAP". Ohne
+// Kreise und Verbinder, bricht auf schmalen Flaechen um. Der Stand haengt nie
+// allein an der Farbe: erledigt traegt einen Haken, aktiv aria-current="step".
 
 export type StepperSize = 'sm' | 'md' | 'lg';
 type StepState = 'done' | 'active' | 'upcoming' | 'error' | 'disabled';
@@ -23,8 +29,16 @@ export interface StepperProps {
   /** Zero-based index of the active step. Earlier steps render as completed. */
   current: number;
   orientation?: 'horizontal' | 'vertical';
-  /** Indicator scale. Default = md. */
+  /** Indicator scale. Default = md. Ohne Wirkung bei variant="inline". */
   size?: StepperSize;
+  /** circles = Kreise mit Verbindern (Standard) · inline = eine Textzeile. */
+  variant?: 'circles' | 'inline';
+  /** Nur inline: Schrittnummer vor dem Label. Aus, wenn das Label sie schon traegt. */
+  numbered?: boolean;
+  /** Name der Liste fuer Screenreader. */
+  'aria-label'?: string;
+  /** Nur inline: Name des Hakens ("erledigt"). Ohne ihn ist der Haken reine Zier. */
+  doneLabel?: string;
   className?: string;
 }
 
@@ -63,13 +77,64 @@ function Indicator({ state, n, size }: { state: StepState; n: number; size: Step
   );
 }
 
-export function Stepper({ steps, current, orientation = 'horizontal', size = 'md', className }: StepperProps) {
+export function Stepper({
+  steps,
+  current,
+  orientation = 'horizontal',
+  size = 'md',
+  variant = 'circles',
+  numbered = true,
+  'aria-label': ariaLabel,
+  doneLabel,
+  className,
+}: StepperProps) {
   const stateOf = (i: number): StepState => {
     const override = steps[i]?.state;
     if (override) return override;
     return i < current ? 'done' : i === current ? 'active' : 'upcoming';
   };
   const sz = SIZE[size];
+
+  if (variant === 'inline') {
+    return (
+      <ol
+        aria-label={ariaLabel}
+        className={cn(
+          'flex flex-wrap items-center gap-x-2 gap-y-1 text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-tertiary',
+          className,
+        )}
+      >
+        {steps.map((s, i) => {
+          const state = stateOf(i);
+          const last = i === steps.length - 1;
+          return (
+            <React.Fragment key={i}>
+              <li
+                aria-current={state === 'active' ? 'step' : undefined}
+                className={cn(
+                  'flex items-center gap-1',
+                  state === 'active' && 'text-brand',
+                  state === 'error' && 'text-red-700 dark:text-red-400',
+                  state === 'disabled' && 'opacity-60',
+                )}
+              >
+                {numbered && <span>{i + 1}</span>}
+                <span>{s.label}</span>
+                {state === 'done' &&
+                  (doneLabel ? (
+                    <Check size={12} strokeWidth={3} role="img" aria-label={doneLabel} />
+                  ) : (
+                    <Check size={12} strokeWidth={3} aria-hidden />
+                  ))}
+                {state === 'error' && <AlertCircle size={12} strokeWidth={2.5} aria-hidden />}
+              </li>
+              {!last && <li aria-hidden>›</li>}
+            </React.Fragment>
+          );
+        })}
+      </ol>
+    );
+  }
 
   if (orientation === 'vertical') {
     return (

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 import { Banner } from "../../components/ui/Banner";
 import { Button } from "../../components/ui/Button";
+import { ScrollBox } from "../../components/ui/ScrollBox";
+import { Stepper } from "../../components/ui/Stepper";
 import { FieldError, errorAria } from "../../components/ui/FieldError";
 import { focusField } from "../../components/ui/FormErrorSummary";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -130,13 +132,19 @@ export function BetaAgreementStepPage() {
             {/* RECHTS · die Karte; auf dem Desktop so hoch wie der Viewport, das Blatt scrollt im Kasten */}
             <div className="flex flex-1 flex-col justify-center border-stroke-subtle px-6 pb-10 pt-8 lg:h-screen lg:min-h-0 lg:border-l lg:px-16 lg:py-10">
                 <form noValidate onSubmit={submit} className="mx-auto flex w-full max-w-[440px] flex-col lg:min-h-0 lg:max-h-full" aria-labelledby="beta-step-title">
-                    <ol className="mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-tertiary" aria-label={t("betaStep.listLabel", { version })}>
-                        <li className="flex items-center gap-1">{t("betaStep.steps.login")} <Check size={12} strokeWidth={3} aria-hidden /></li>
-                        <li aria-hidden>›</li>
-                        <li className="text-brand" aria-current="step">{t("betaStep.steps.agreement")}</li>
-                        <li aria-hidden>›</li>
-                        <li>{toRiskMap ? t("betaStep.steps.riskMap") : t("betaStep.steps.workspace")}</li>
-                    </ol>
+                    {/* Die Labels tragen ihre Nummer schon ("1 Anmeldung"), deshalb numbered={false}. */}
+                    <Stepper
+                        variant="inline"
+                        numbered={false}
+                        current={1}
+                        className="mb-6"
+                        aria-label={t("betaStep.listLabel", { version })}
+                        steps={[
+                            { label: t("betaStep.steps.login") },
+                            { label: t("betaStep.steps.agreement") },
+                            { label: toRiskMap ? t("betaStep.steps.riskMap") : t("betaStep.steps.workspace") },
+                        ]}
+                    />
 
                     <h2 id="beta-step-title" className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("betaStep.cardTitle")}</h2>
                     <p className="mt-2 text-body-md leading-relaxed text-fg-secondary">{t("betaStep.cardLead")}</p>
@@ -149,7 +157,7 @@ export function BetaAgreementStepPage() {
                     )}
 
                     <p className="mt-7 text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary">{t("betaStep.listLabel", { version })}</p>
-                    <div className="mt-2 max-h-[40vh] overflow-y-auto rounded-xl border border-stroke bg-surface-secondary px-4 py-3.5 lg:max-h-none lg:min-h-[160px] lg:flex-1" tabIndex={0} aria-label={t("betaStep.listLabel", { version })}>
+                    <ScrollBox label={t("betaStep.listLabel", { version })} className="mt-2 max-h-[40vh] lg:max-h-none lg:min-h-[160px] lg:flex-1">
                         {loadError ? (
                             <div role="status" className="text-body-xs text-fg-secondary">
                                 <p>{t("beta.error")}</p>
@@ -167,7 +175,7 @@ export function BetaAgreementStepPage() {
                                 ))}
                             </ol>
                         )}
-                    </div>
+                    </ScrollBox>
 
                     <label className="mt-6 flex cursor-pointer items-start gap-3 text-body-xs leading-relaxed text-fg">
                         <input
