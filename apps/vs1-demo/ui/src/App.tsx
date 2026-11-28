@@ -1,6 +1,6 @@
 import { SessionExpiryWatcher } from "./components/auth/SessionExpiryWatcher";
 import { LegacyPartnerRedirect } from "./components/routing/LegacyPartnerRedirect";
-import { lazy, useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { trackPageview, trackScrollDepth } from "./lib/analytics";
 import { useSeo } from "./hooks/useSeo";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams, Navigate, Outlet } from "react-router-dom";
@@ -56,6 +56,10 @@ const AdminProviderReviewPage = lazy(() => import("./pages/admin/AdminProviderRe
 const AdminApplicationsPage = lazy(() => import("./pages/admin/AdminApplicationsPage").then((m) => ({ default: m.AdminApplicationsPage })));
 const ProviderInvitePage = lazy(() => import("./pages/onboarding/ProviderInvitePage").then((m) => ({ default: m.ProviderInvitePage })));
 const AdminApiAccessPage = lazy(() => import("./pages/admin/AdminApiAccessPage").then((m) => ({ default: m.AdminApiAccessPage })));
+// Canvas-Wahl L3-A (28.11.2026): Konten ohne Passwort bekommen im
+// Unternehmens-Bereich das Angebot, eins festzulegen. Lazy, weil es fuer
+// fast alle Besuche nichts zeigt.
+const SetPasswordPrompt = lazy(() => import("./components/user/SetPasswordPrompt").then((m) => ({ default: m.SetPasswordPrompt })));
 const UserHomePage = lazy(() => import("./pages/user/UserHomePage").then((m) => ({ default: m.UserHomePage })));
 const SessionsPage = lazy(() => import("./pages/user/SessionsPage").then((m) => ({ default: m.SessionsPage })));
 const TerminePage = lazy(() => import("./pages/user/TerminePage").then((m) => ({ default: m.TerminePage })));
@@ -248,7 +252,7 @@ function AppContent() {
                     {/* Wizard-Schublade fuer den ganzen Arbeitsbereich (2026-09-05):
                         die Seiten rendern die Shell selbst, deshalb sitzt der
                         Kontext hier, eine Ebene ueber ihnen. */}
-                    <Route element={<WizardDrawerProvider><AuthGuard requiredRole="user" /></WizardDrawerProvider>}>
+                    <Route element={<WizardDrawerProvider><AuthGuard requiredRole="user" /><Suspense fallback={null}><SetPasswordPrompt /></Suspense></WizardDrawerProvider>}>
                         <Route path="dashboard" element={<UserHomePage />} />
                         <Route path="dashboard/sessions" element={<SessionsPage />} />
                         {/* Anfragen ist seit 2026-09-01 ein Reiter der Termine-Seite
