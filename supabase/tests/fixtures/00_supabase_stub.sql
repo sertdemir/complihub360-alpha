@@ -35,6 +35,11 @@ ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
 -- gibt nur bestaetigte Adressen heraus.
 ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS email_confirmed_at timestamptz;
 
+-- `encrypted_password` ebenso: `current_user_has_password` aus 20261128000000
+-- liest, ob dort ein Hash steht. Supabase legt die Spalte als leeren Text an,
+-- wenn ein Konto per Anmeldelink oder Google entsteht.
+ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS encrypted_password varchar(255);
+
 CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid
   LANGUAGE sql STABLE AS $$ SELECT NULL::uuid $$;
 

@@ -26,7 +26,8 @@ import { authFailureFrom, type AuthFailure } from "../../lib/serverErrors";
 // Weiss. So weiss man an der Form schon, ob man etwas tun muss.
 //
 // Die Zustandsmaschine ist unveraendert:
-//   form        → user magic-link  ·  partner email+password
+//   form        → user + partner email+password (user seit 28.11.2026,
+//                 Anmeldelink als zweiter Knopf, Reset-Link direkt am Feld)
 //   magic-sent  → "Postfach pruefen" (user)
 //   forgot      → partner password reset request
 //   reset-sent  → "Reset-Link unterwegs" (partner)
@@ -194,10 +195,19 @@ export function LoginPage() {
     // dem ersten Versuch laufen die Meldungen mit; jeder Ansichtswechsel
     // beginnt ohne Meldung.
     const [tried, setTried] = useState(false);
-    useEffect(() => { setTried(false); }, [view, mode]);
+    // Unternehmen haben seit 28.11.2026 dasselbe Passwortfeld wie Anbieter
+    // (Canvas-Wahl L1-A). Wer dort den Anmeldelink anfordert oder „Passwort
+    // vergessen?“ drueckt, soll keine Meldung am leeren Passwortfeld sehen —
+    // die gilt nur fuer den Versuch, sich mit Passwort anzumelden.
+    const [pwAttempt, setPwAttempt] = useState(false);
+    // L2-B: „Passwort vergessen?“ sendet direkt am Feld; die Bestaetigung
+    // steht unter dem Passwortfeld, bis sich die Adresse aendert.
+    const [inlineReset, setInlineReset] = useState(false);
+    useEffect(() => { setTried(false); setPwAttempt(false); setInlineReset(false); }, [view, mode]);
+    useEffect(() => { setInlineReset(false); }, [email]);
     const emailValid = /.+@.+\..+/.test(email);
     const emailError = tried && !emailValid ? t("login.validation.invalidEmail") : null;
-    const passwordError = tried && view === "form" && mode === "partner" && !password ? t("login.validation.passwordRequired") : null;
+    const passwordError = tried && pwAttempt && view === "form" && !password ? t("login.validation.passwordRequired") : null;
 
     const redirectTarget = params.get("redirect") || expired?.returnTo || null;
     const finishLogin = (role: "user" | "partner") => {
@@ -243,6 +253,7 @@ export function LoginPage() {
     const handleMagicLink = async () => {
         setAuthError(null);
         setTried(true);
+        setPwAttempt(false);
         if (!emailValid) { focusField("login-email"); return; }
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { setView("magic-sent"); return; }
@@ -257,14 +268,36 @@ export function LoginPage() {
     const handlePasswordSignIn = async () => {
         setAuthError(null);
         setTried(true);
+        setPwAttempt(true);
         if (!emailValid) { focusField("login-email"); return; }
         if (!password) { focusField("login-password"); return; }
         const sb = isSupabaseConfigured ? await getSupabase() : null;
-        if (!sb) { finishLogin("partner"); return; }
-        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (!sb) { finishLogin(mode); return; }
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if (error) { setAuthError(readableError(error)); return; }
         clearExpired();
-        navigate(redirectTarget || `/${lang}/provider-dashboard`);
+        // Ziel nach der Rolle des Kontos, nicht nach dem Reiter: Wer als
+        // Anbieter im Unternehmens-Reiter landet, gehoert trotzdem in seinen
+        // Workspace (dieselbe Regel wie AuthCallbackPage).
+        const claimed =
+            (data.user?.app_metadata?.role as string | undefined) ??
+            (data.user?.user_metadata?.role as string | undefined);
+        navigate(redirectTarget || `/${lang}/${claimed === "partner" ? "provider-dashboard" : "dashboard"}`);
+    };
+
+    // L2-B (Unternehmen): der Reset-Link geht an die Adresse im Feld, ohne
+    // Seitenwechsel. Dieselbe Bestaetigung, egal ob es das Konto gibt.
+    const handleForgotInline = async () => {
+        setAuthError(null);
+        setTried(true);
+        setPwAttempt(false);
+        if (!emailValid) { focusField("login-email"); return; }
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (sb) {
+            const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: resetUrl });
+            if (error && authFailureFrom(error) === "rateLimit") { setAuthError("rateLimit"); return; }
+        }
+        setInlineReset(true);
     };
 
     // Dieselbe Bestaetigung, egal ob es das Konto gibt — sonst verraet die Seite,
@@ -272,6 +305,7 @@ export function LoginPage() {
     const handleForgot = async () => {
         setAuthError(null);
         setTried(true);
+        setPwAttempt(false);
         if (!emailValid) { focusField("login-email"); return; }
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (sb) {
@@ -399,21 +433,86 @@ export function LoginPage() {
                             <BackToSignIn onClick={() => setView("form")} />
                         </form>
                     ) : mode === "user" ? (
-                        <form noValidate onSubmit={(e) => { e.preventDefault(); handleMagicLink(); }}>
+                        // L1-A (Canvas 28.11.2026): Unternehmen melden sich mit dem
+                        // Passwort aus ihrer Registrierung an; der Anmeldelink bleibt
+                        // als zweiter Weg. Bis dahin gab es hier NUR den Link — wer
+                        // sich mit Passwort registriert hatte, bekam trotzdem bei
+                        // jeder Anmeldung eine Mail.
+                        <form noValidate onSubmit={(e) => { e.preventDefault(); handlePasswordSignIn(); }}>
                             <h2 className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("login.user.title")}</h2>
+                            <p className="mt-2 text-body-md leading-relaxed text-fg-secondary">{t("login.user.subtitle")}</p>
                             <label htmlFor="login-email" className={"mt-7 block " + LABEL}>{t("login.emailLabel")}</label>
                             <input
                                 id="login-email"
                                 type="email"
+                                autoComplete="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder={t("login.placeholders.business")}
                                 className={FIELD + (emailError ? FIELD_ERROR_CLASS : "")}
                                 {...errorAria("login-email", !!emailError)}
                             />
-                            <FieldError id="login-email" message={emailError} alert />
+                            {/* Regel V2: Geht es nur um die Adresse (Anmeldelink,
+                                Passwort vergessen), steht der Satz allein am Feld;
+                                die Zusammenfassung gehoert zum Passwort-Versuch. */}
+                            <FieldError id="login-email" message={emailError} alert={!pwAttempt} />
+                            <div className="mt-5 flex items-center justify-between">
+                                <label htmlFor="login-password" className={LABEL}>{t("login.partner.passwordLabel")}</label>
+                                {inlineReset ? (
+                                    <span className="text-body-2xs font-semibold text-fg-tertiary">{t("login.user.resetInline.sent")}</span>
+                                ) : (
+                                    <button type="button" onClick={handleForgotInline} className="text-body-2xs font-semibold text-brand transition-colors hover:text-brand-700">
+                                        {t("login.user.forgotLink")}
+                                    </button>
+                                )}
+                            </div>
+                            <div className="relative">
+                                <input
+                                    id="login-password"
+                                    type={showPw ? "text" : "password"}
+                                    autoComplete="current-password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••••"
+                                    className={FIELD + " pr-16" + (passwordError ? FIELD_ERROR_CLASS : "")}
+                                    {...errorAria("login-password", !!passwordError)}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPw((v) => !v)}
+                                    className="absolute right-4 top-1/2 mt-1 -translate-y-1/2 text-body-2xs font-semibold text-fg-tertiary transition-colors hover:text-fg"
+                                >
+                                    {showPw ? t("login.hide") : t("login.show")}
+                                </button>
+                            </div>
+                            <FieldError id="login-password" message={passwordError} />
+                            {inlineReset && (
+                                <div role="status" className="mt-3 flex items-start gap-2.5 rounded-lg border border-stroke-brand/40 bg-brand-light px-4 py-3 text-body-xs leading-relaxed text-fg">
+                                    <Mail size={15} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
+                                    <span>
+                                        <Trans t={t} i18nKey="login.user.resetInline.body" values={{ email }} components={{ em: <strong className="font-semibold" /> }} />
+                                    </span>
+                                </div>
+                            )}
+                            <FormErrorSummary
+                                className="mt-5"
+                                errors={pwAttempt ? [
+                                    ...(emailError ? [{ id: "login-email", label: t("login.emailLabel"), message: emailError }] : []),
+                                    ...(passwordError ? [{ id: "login-password", label: t("login.partner.passwordLabel"), message: passwordError }] : []),
+                                ] : []}
+                            />
                             <button type="submit" className={CTA}>
-                                {t("login.user.send")} <ArrowRight size={16} />
+                                {t("login.user.signIn")} <ArrowRight size={16} />
+                            </button>
+                            <div className="my-5 flex items-center gap-3 text-body-4xs font-bold uppercase tracking-[0.12em] text-fg-tertiary">
+                                <span className="h-px flex-1 bg-stroke-subtle" /> {t("login.or")} <span className="h-px flex-1 bg-stroke-subtle" />
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleMagicLink}
+                                className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-stroke bg-surface px-5 py-3 text-body-sm font-semibold text-fg transition-colors hover:bg-surface-secondary"
+                            >
+                                <Mail size={16} aria-hidden /> {t("login.user.sendLinkInstead")}
                             </button>
                             {isGoogleLoginEnabled && <GoogleButton onClick={() => handleOAuth("user")} />}
                             {isDemoLoginEnabled && <DemoLoginRow role="user" onEnter={finishLogin} />}
