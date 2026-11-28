@@ -100,7 +100,7 @@
     "domainTaxVat": "Vergi & KDV"
   },
   "pdf": {
-    "title": "Uyum risk haritanız.",
+    "title": "Uyum Risk Map'iniz.",
     "generated": "Oluşturulma: {{date}} · staging önizlemesi",
     "profile": {
       "anonymousScope": "Anonim değerlendirme · örnek kapsam",
@@ -140,9 +140,9 @@
     "errorBody": "Lütfen birazdan tekrar deneyin.",
     "crumbProviders": "Sağlayıcılar",
     "backToArea": "Alana dön",
-    "backToRiskMap": "Oturuma dön",
+    "backToRiskMap": "Risk Map'e dön",
     "lageAreasArea": "{{total}} alanın {{matched}} tanesini kapsıyor ({{area}})",
-    "lageAreasRiskMap": "„{{riskMap}}“ oturumunuzdaki {{total}} alanın {{matched}} tanesine uyuyor",
+    "lageAreasRiskMap": "“{{riskMap}}” Risk Map'inizdeki {{total}} alanın {{matched}} tanesine uyuyor",
     "lageMarketsAll_one": "{{count}} pazar kapsanıyor",
     "lageMarketsAll_other": "{{count}} pazarın tamamı kapsanıyor",
     "lageMarketsPartial_one": "{{total}} pazarın {{covered}} tanesi kapsanıyor · {{missing}} kapsanmıyor",
@@ -156,12 +156,12 @@
     "matrixTitle": "Yükümlülükleriniz ve bu sağlayıcının pazarları",
     "matrixCovered_one": "{{total}} pazarın {{covered}} tanesi",
     "matrixCovered_other": "{{total}} pazarın {{covered}} tanesi",
-    "matrixRiskMap": "Oturum",
+    "matrixRiskMap": "Risk Map",
     "matrixNone": "Bu bağlamda şu anda açık bir şey yok.",
     "matrixNotCovered": "Bu sağlayıcı bu pazarı kapsamıyor.",
     "matrixEuWide": "AB genelinde",
     "matrixFoot": "Üzeri çizili pazarları bu sağlayıcı kapsamıyor. Matris pazarları gösterir, uzmanlık alanlarını değil — hangi alanları kapsadığı dosyada yazıyor.",
-    "matrixNoContext": "Bir sağlayıcıyı bir alandan veya oturumdan açın; burada açık yükümlülüklerinizden hangisini hangi pazarda üstlenebileceği görünür.",
+    "matrixNoContext": "Bir sağlayıcıyı bir alandan veya bir Risk Map'ten açın; burada açık yükümlülüklerinizden hangisini hangi pazarda üstlenebileceği görünür.",
     "dossierTitle": "Dosya",
     "servicesTitle": "Hizmetler",
     "servicesCoarse": "Sağlayıcı hizmetlerini henüz ayrıntılandırmadı — bunlar başvurusundaki uzmanlık alanları.",
@@ -223,7 +223,7 @@
     "toAppointments": "Randevularınıza",
     "pickSlotDrawer": "Yukarıdan bir saat seçin.",
     "messageLabel": "Konunuz",
-    "messageFromRiskMap": "Konu: „{{riskMap}}“ oturumum.",
+    "messageFromRiskMap": "Konu: “{{riskMap}}” Risk Map'im.",
     "duration": "30 dk",
     "noSlots": "Bu sağlayıcının şu anda boş randevusu yok. Birkaç gün sonra tekrar deneyin.",
     "failed": "Randevu alınamadı. Lütfen birazdan tekrar deneyin.",
@@ -282,7 +282,7 @@
     "guidesTitle": "Nereden devam edebilirsiniz",
     "guideRead": "Aç",
     "bridgeTitle": "İşletmeniz için neyin geçerli olduğunu görmek ister misiniz?",
-    "bridgeBody": "Risk haritanız pazarlarınıza ve iş modelinize göre eşleştirilir ve gerçek ihtiyacınıza uyan Verified Provider'ları gösterir.",
+    "bridgeBody": "Risk Map'iniz pazarlarınıza ve iş modelinize göre eşleştirilir ve gerçek ihtiyacınıza uyan Verified Provider'ları gösterir.",
     "bridgeCta": "İhtiyaçlarımı değerlendir",
     "entries": {
       "markets": "Pazarlar ve orada geçerli olanlar",
@@ -322,7 +322,7 @@
     "groupFit": "Talebinize uyuyor"
   },
   "snapshot": {
-    "fallbackTitle": "Risk haritanız",
+    "fallbackTitle": "Risk Map'iniz",
     "areas_one": "{{count}} alan",
     "areas_other": "{{count}} alan",
     "exportPdf": "PDF olarak dışa aktar",
@@ -350,14 +350,14 @@
       "later_one": "{{count}} yükümlülük",
       "later_other": "{{count}} yükümlülük"
     },
-    "historyTitle": "Bu oturumun geçmişi",
+    "historyTitle": "Bu Risk Map'in geçmişi",
     "historyCurrent": "Güncel durum",
-    "historyStart": "Oturum oluşturuldu",
+    "historyStart": "Risk Map oluşturuldu",
     "historyCreated": "İlk verdiğiniz yanıtlar",
     "copyVariant": "Varyant olarak kopyala",
     "copyHint": "Bir kopya oluşturur — orijinali kaybetmeden varyantları deneyin.",
     "copyDone": "Kopya oluşturuldu",
-    "copyOpenList": "Oturumlarda aç",
+    "copyOpenList": "Risk Map'lerde aç",
     "copyError": "Kopya oluşturulamadı.",
     "copyUnavailable": "Önce kaydedin, sonra varyant oluşturabilirsiniz.",
     "verifiedPartner": "Verified Provider",
@@ -426,7 +426,7 @@
   },
   "reveal": {
     "was": "{{title}} idi",
-    "wasInRiskMap": "„{{riskMap}}“ oturumunuzda {{title}} idi"
+    "wasInRiskMap": "“{{riskMap}}” Risk Map'inizde {{title}} idi"
   },
   "dueLive": "Sabit tarih yok",
   "clusters": {
@@ -493,7 +493,7 @@
     }
   },
   "hint": {
-    "title": "Tek bir yanıt risk haritanızı netleştirir",
+    "title": "Tek bir yanıt Risk Map'inizi netleştirir",
     "message_one": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
     "message_other": "Geçerliliği henüz açık olan {{count}} yükümlülüğü netleştirir. Birkaç saniye sürer.",
     "cta": "Yanıt ekle",

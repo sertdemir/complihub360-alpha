@@ -64,12 +64,12 @@
       "card1Problem": "La información sobre restricciones publicitarias, EPR y leyes fiscales está fragmentada en sitios gubernamentales no estructurados.",
       "card1Solution": "Las páginas de Mercados y Áreas de cumplimiento recogen las obligaciones que comprobamos, cada una con su norma. Las guías y tutoriales llegarán cuando merezcan la lectura.",
       "card2Title": "Pérdida de continuidad",
-      "card2Problem": "Rastrear solicitudes de proveedores, sesiones guardadas y actualizaciones legales es caótico sin un sistema unificado.",
-      "card2Solution": "El Centro de Control del Panel le permite guardar sesiones, rastrear estados de engagement en tiempo real y monitorear tareas.",
+      "card2Problem": "Hacer seguimiento de solicitudes a proveedores, Risk Maps guardadas y actualizaciones legales es caótico sin un sistema unificado.",
+      "card2Solution": "El Centro de Control del Panel le permite guardar Risk Maps, seguir el estado de sus encargos en tiempo real y controlar tareas.",
       "card3Title": "Fricción en los informes",
       "card3Problem": "Resumir la exposición regulatoria para las partes interesadas es un trabajo manual y que consume mucho tiempo.",
       "card3Solution": "Exportación PDF de un clic: Instantánea de Riesgo, Plan de Acción e Índice de Fuentes — listo para circulación interna.",
-      "panel1Title": "Cuadrícula de Sesiones",
+      "panel1Title": "Vista de Risk Maps",
       "panel1Desc": "Perfiles de riesgo guardados por país",
       "panel2Title": "Solicitudes Activas",
       "panel2Desc": "Estado del engagement con proveedores",
@@ -83,7 +83,7 @@
       "item3": "Índice de Fuentes",
       "stat1Label": "Visibilidad del ciclo de vida del engagement",
       "stat2Label": "Exportación de informes PDF",
-      "stat3Label": "Sesiones de cumplimiento guardadas",
+      "stat3Label": "Risk Maps guardadas",
       "railSub": "Un centro de control en lugar de hilos de correo"
     },
     "counsel": {
@@ -842,7 +842,7 @@
       "checkFoot": "Si uno aplica, esta área conlleva deberes para usted — el assessment los acota a su caso.",
       "ceiling": {
         "unproven": "Aún sin acreditar",
-        "unprovenNote": "La cifra con la que calcula el mapa de riesgo es un valor heredado: no la hemos leído en el texto legal.",
+        "unprovenNote": "La cifra con la que calcula la Risk Map es un valor heredado: no la hemos leído en el texto legal.",
         "perUnit": "{{amount}} por {{per}}",
         "proportional": "{{percent}} % {{of}}",
         "turnover": "{{percent}} % del volumen de negocios anual mundial",
@@ -1208,7 +1208,7 @@
       {
         "kicker": "Evaluar",
         "title": "Vea qué se aplica realmente a su caso.",
-        "body": "Cuéntenos sobre sus mercados, su modelo de negocio y las áreas en las que necesita apoyo. Su risk map muestra entonces las obligaciones que se aplican a su empresa, cada una con su prioridad y, cuando existe, su fuente oficial y su plazo. Provienen de nuestro motor de compliance, no de un chatbot.",
+        "body": "Cuéntenos sobre sus mercados, su modelo de negocio y las áreas en las que necesita apoyo. Su Risk Map muestra entonces las obligaciones que se aplican a su empresa, cada una con su prioridad y, cuando existe, su fuente oficial y su plazo. Provienen de nuestro motor de compliance, no de un chatbot.",
         "short": "El wizard pregunta cuatro cosas y crea su Risk Map — cada obligación con base legal y plazo."
       },
       {
@@ -1226,7 +1226,7 @@
       {
         "kicker": "Actuar",
         "title": "Reserve una consulta.",
-        "body": "Elija un proveedor y una hora en su calendario. Antes de reservar, ve exactamente qué se compartirá. La identidad del proveedor se revela al reservar, y solo se comparte la información necesaria para tramitar su solicitud. Después puede valorar la cita, y sus obligaciones siguen en su risk map con sus plazos.",
+        "body": "Elija un proveedor y una hora en su calendario. Antes de reservar, ve exactamente qué se compartirá. La identidad del proveedor se revela al reservar, y solo se comparte la información necesaria para tramitar su solicitud. Después puede valorar la cita, y sus obligaciones siguen en su Risk Map con sus plazos.",
         "short": "Elija una cita — su dossier viaja con usted, no explicará su negocio una sexta vez."
       }
     ],
@@ -1321,7 +1321,7 @@
     "cost": {
       "kicker": "Lo que esto le cuesta",
       "title": "Gratis para encontrar y reservar un proveedor.",
-      "body": "La evaluación, su risk map, el matching y la reserva son gratuitos para usted. Nos pagan los proveedores cuando una reserva llega a producirse. Por eso mismo el orden no está en venta: una posición pagada dejaría el match sin valor para ambas partes. Solo el asistente de IA de su espacio de trabajo tiene un plan de pago opcional para más preguntas al día."
+      "body": "La evaluación, su Risk Map, el matching y la reserva son gratuitos para usted. Nos pagan los proveedores cuando una reserva llega a producirse. Por eso mismo el orden no está en venta: una posición pagada dejaría el match sin valor para ambas partes. Solo el asistente de IA de su espacio de trabajo tiene un plan de pago opcional para más preguntas al día."
     },
     "privacy": {
       "kicker": "Qué ocurre con sus datos",
@@ -1631,7 +1631,7 @@
       "items": [
         {
           "q": "¿La evaluación es realmente gratuita?",
-          "a": "Sí: la evaluación y el mapa de riesgos no cuestan nada y no requieren cuenta; para comparar proveedores basta una cuenta gratuita. Lo que se paga es el asesoramiento en sí, directamente al proveedor, según la estimación que publica de antemano."
+          "a": "Sí: la evaluación y la Risk Map no cuestan nada y no requieren cuenta; para comparar proveedores basta una cuenta gratuita. Lo que se paga es el asesoramiento en sí, directamente al proveedor, según la estimación que publica de antemano."
         },
         {
           "q": "¿Necesito una cuenta?",
@@ -1712,11 +1712,11 @@
   "seo": {
     "home": {
       "title": "CompliHub360 · Entender y cumplir",
-      "description": "Las normas de sus mercados en un mapa de riesgo, con la fuente detrás de cada obligación, y el camino hacia especialistas verificados. Gratis, sin cuenta."
+      "description": "Las normas de sus mercados en una Risk Map, con la fuente detrás de cada obligación, y el camino hacia especialistas verificados. Gratis, sin cuenta."
     },
     "howItWorks": {
       "title": "Cómo funciona · CompliHub360",
-      "description": "De una pregunta al mapa de riesgo y al profesional adecuado. Cinco pasos, sin llamada comercial y sin compromiso."
+      "description": "De una pregunta a la Risk Map y al profesional adecuado. Cinco pasos, sin llamada comercial y sin compromiso."
     },
     "compliance": {
       "title": "Áreas de compliance · CompliHub360",
@@ -1728,7 +1728,7 @@
     },
     "pricing": {
       "title": "Precios · CompliHub360",
-      "description": "El análisis, el mapa de riesgo y el matching no le cuestan nada. Pagan los profesionales, y solo cuando se confirma una cita."
+      "description": "La evaluación, la Risk Map y el matching no le cuestan nada. Pagan los profesionales, y solo cuando se confirma una cita."
     },
     "resources": {
       "title": "Recursos · CompliHub360",
@@ -1740,7 +1740,7 @@
     },
     "platform": {
       "title": "La plataforma · CompliHub360",
-      "description": "Cómo su contexto de negocio se convierte en un mapa de riesgo estructurado: la puerta de privacidad, el análisis con fuentes y el matching."
+      "description": "Cómo su contexto de negocio se convierte en una Risk Map estructurada: la puerta de privacidad, el análisis con fuentes y el matching."
     },
     "solutions": {
       "title": "Por rol · CompliHub360",

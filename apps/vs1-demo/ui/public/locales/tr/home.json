@@ -561,7 +561,7 @@
     "header": "Pazarlar",
     "title": "Diğer pazarlar",
     "count": "{{selected}} seçildi · {{total}} mevcut",
-    "desc": "Ana listenin dışında. Faaliyet gösterdiğiniz pazarları seçin — mevzuatlarını haritalar ve sizi doğru Verified Provider'a yönlendiririz.",
+    "desc": "Bu pazarları henüz değerlendirmiyoruz. Faaliyet gösterdiğiniz pazarları ekleyin: Risk Map'iniz onları henüz kapsanmıyor olarak işaretler ve oradan kapsam talep edebilirsiniz.",
     "searchPlaceholder": "Ada veya ülke koduna göre arayın",
     "european": "Avrupa pazarları",
     "expanding": "Kapsam genişliyor",
@@ -1564,7 +1564,7 @@
       "gold": "ana üssüne",
       "post": "."
     },
-    "subtitle": "Değerlendirme ücretsizdir. Sonrasında gelenler — çalışma alanınız, canlı haberler, uzman içeriği, sağlayıcılarınız — CompliHub360'ı geri döndüğünüz yer yapar.",
+    "subtitle": "Risk Map'lerinizi, eşleşmelerinizi, görüşmelerinizi, son tarihlerinizi, belgelerinizi ve iş geçmişinizi kaydedin.",
     "pills": {
       "live": "Bugün kullanılabilir",
       "beta": "Beta ile geliyor"
@@ -1800,7 +1800,7 @@
       "highlight": "okunur",
       "post": " hâle gelir."
     },
-    "subtitle": "Altı dakika. Hesap gerekmez. Operasyonlarınızı fiilen geçerli olan mevzuatla eşleştirir ve bir sonraki adımınızı gösteririz.",
+    "subtitle": "İşletmenizin nerede ve nasıl faaliyet gösterdiğine dair birkaç soruyu yanıtlayın. Yaklaşık altı dakikada size özel bir Risk Map alırsınız. Hesap gerekmez.",
     "cta": "İhtiyaçlarımı değerlendir",
     "demo": {
       "pause": "Demoyu duraklat",

@@ -64,12 +64,12 @@
       "card1Problem": "Informationen zu Werbebeschränkungen, EPR und Steuerrecht sind über unstrukturierte Behördenwebseiten verstreut.",
       "card1Solution": "Die Seiten Märkte und Compliance-Bereiche führen die Pflichten, gegen die wir prüfen, jede mit ihrer Norm. Leitfäden und Tutorials folgen, sobald sie das Lesen wert sind.",
       "card2Title": "Verlust der Kontinuität",
-      "card2Problem": "Das Verfolgen von Anbieteranfragen, gespeicherten Sitzungen und rechtlichen Updates ist ohne ein einheitliches System chaotisch.",
-      "card2Solution": "Das Dashboard-Kontrollzentrum ermöglicht es Ihnen, Sitzungen zu speichern, Engagement-Status in Echtzeit zu verfolgen und Aufgaben zu überwachen.",
+      "card2Problem": "Anbieteranfragen, gespeicherte Risk Maps und rechtliche Updates im Blick zu behalten, ist ohne ein einheitliches System chaotisch.",
+      "card2Solution": "Im Kontrollzentrum des Dashboards speichern Sie Risk Maps, verfolgen den Stand Ihrer Mandate in Echtzeit und behalten Aufgaben im Blick.",
       "card3Title": "Berichterstattungsaufwand",
       "card3Problem": "Das Zusammenfassen der regulatorischen Belastung für Stakeholder ist manuelle, zeitaufwändige Arbeit.",
       "card3Solution": "Ein-Klick-PDF-Export: Risiko-Snapshot, Aktionsplan und Quellenindex – bereit für die interne Zirkulation.",
-      "panel1Title": "Sitzungsraster",
+      "panel1Title": "Risk-Map-Übersicht",
       "panel1Desc": "Gespeicherte Risikoprofile nach Land",
       "panel2Title": "Aktive Anfragen",
       "panel2Desc": "Status der Anbieter-Engagements",
@@ -83,7 +83,7 @@
       "item3": "Quellenindex",
       "stat1Label": "Sichtbarkeit des Engagement-Lebenszyklus",
       "stat2Label": "PDF-Berichtsexport",
-      "stat3Label": "Gespeicherte Compliance-Sitzungen",
+      "stat3Label": "Gespeicherte Risk Maps",
       "railSub": "Ein Kontrollzentrum statt E-Mail-Threads"
     },
     "counsel": {
@@ -842,7 +842,7 @@
       "checkFoot": "Trifft eines zu, trägt dieser Bereich Pflichten für Sie — das Assessment grenzt sie auf Ihren Fall ein.",
       "ceiling": {
         "unproven": "Noch nicht belegt",
-        "unprovenNote": "Die Zahl, mit der die Risikokarte rechnet, ist Bestand — wir haben sie nicht am Gesetzestext gelesen.",
+        "unprovenNote": "Die Zahl, mit der die Risk Map rechnet, ist Bestand — wir haben sie nicht am Gesetzestext gelesen.",
         "perUnit": "{{amount}} je {{per}}",
         "proportional": "{{percent}} % {{of}}",
         "turnover": "{{percent}} % des weltweiten Jahresumsatzes",

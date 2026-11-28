@@ -100,7 +100,7 @@
     "domainTaxVat": "Impuestos e IVA"
   },
   "pdf": {
-    "title": "Su mapa de riesgos de cumplimiento.",
+    "title": "Su Risk Map de cumplimiento.",
     "generated": "Generado el {{date}} · vista previa de staging",
     "profile": {
       "anonymousScope": "Evaluación anónima · alcance de ejemplo",
@@ -140,9 +140,9 @@
     "errorBody": "Inténtelo de nuevo en un momento.",
     "crumbProviders": "Proveedores",
     "backToArea": "Volver al área",
-    "backToRiskMap": "Volver a la sesión",
+    "backToRiskMap": "Volver a la Risk Map",
     "lageAreasArea": "Cubre {{matched}} de {{total}} áreas ({{area}})",
-    "lageAreasRiskMap": "Coincide con {{matched}} de {{total}} áreas de su sesión «{{riskMap}}»",
+    "lageAreasRiskMap": "Coincide con {{matched}} de {{total}} áreas de su Risk Map «{{riskMap}}»",
     "lageMarketsAll_one": "{{count}} mercado cubierto",
     "lageMarketsAll_other": "los {{count}} mercados cubiertos",
     "lageMarketsPartial_one": "{{covered}} de {{total}} mercado cubierto · {{missing}} no",
@@ -156,12 +156,12 @@
     "matrixTitle": "Sus obligaciones y los mercados de este proveedor",
     "matrixCovered_one": "{{covered}} de {{total}} mercado",
     "matrixCovered_other": "{{covered}} de {{total}} mercados",
-    "matrixRiskMap": "Sesión",
+    "matrixRiskMap": "Risk Map",
     "matrixNone": "En este contexto no hay nada abierto ahora mismo.",
     "matrixNotCovered": "Este proveedor no cubre este mercado.",
     "matrixEuWide": "toda la UE",
     "matrixFoot": "Los mercados tachados no están cubiertos por este proveedor. La matriz muestra mercados, no especialidades — el dosier indica qué áreas cubre.",
-    "matrixNoContext": "Abra un proveedor desde un área o una sesión y aquí verá qué obligaciones abiertas puede asumir y en qué mercado.",
+    "matrixNoContext": "Abra un proveedor desde un área o una Risk Map y aquí verá qué obligaciones abiertas puede asumir y en qué mercado.",
     "dossierTitle": "Dosier",
     "servicesTitle": "Servicios",
     "servicesCoarse": "El proveedor todavía no ha detallado sus servicios — estas son las especialidades de su solicitud.",
@@ -223,7 +223,7 @@
     "toAppointments": "A sus citas",
     "pickSlotDrawer": "Elija una hora arriba.",
     "messageLabel": "Su consulta",
-    "messageFromRiskMap": "Se trata de mi sesión «{{riskMap}}».",
+    "messageFromRiskMap": "Se trata de mi Risk Map «{{riskMap}}».",
     "duration": "30 min",
     "noSlots": "Este proveedor no tiene horas libres ahora mismo. Inténtelo de nuevo en unos días.",
     "failed": "No se pudo reservar la cita. Inténtelo de nuevo en un momento.",
@@ -282,7 +282,7 @@
     "guidesTitle": "Dónde seguir leyendo",
     "guideRead": "Abrir",
     "bridgeTitle": "¿Quiere ver qué se aplica a su empresa?",
-    "bridgeBody": "Su risk map se ajusta a sus mercados y a su modelo de negocio, y muestra los Verified Providers que encajan con lo que realmente necesita.",
+    "bridgeBody": "Su Risk Map se ajusta a sus mercados y a su modelo de negocio, y muestra los Verified Providers que encajan con lo que realmente necesita.",
     "bridgeCta": "Evaluar mis necesidades",
     "entries": {
       "markets": "Mercados y qué se aplica en ellos",
@@ -322,7 +322,7 @@
     "groupFit": "Encaja con su solicitud"
   },
   "snapshot": {
-    "fallbackTitle": "Su mapa de riesgos",
+    "fallbackTitle": "Su Risk Map",
     "areas_one": "{{count}} área",
     "areas_other": "{{count}} áreas",
     "exportPdf": "Exportar PDF",
@@ -350,14 +350,14 @@
       "later_one": "{{count}} obligación",
       "later_other": "{{count}} obligaciones"
     },
-    "historyTitle": "Historial de esta sesión",
+    "historyTitle": "Historial de esta Risk Map",
     "historyCurrent": "Estado actual",
-    "historyStart": "Sesión creada",
+    "historyStart": "Risk Map creada",
     "historyCreated": "Sus respuestas iniciales",
     "copyVariant": "Copiar como variante",
     "copyHint": "Cree una copia: pruebe variantes sin perder el original.",
     "copyDone": "Copia creada",
-    "copyOpenList": "Abrir en sesiones",
+    "copyOpenList": "Abrir en Risk Maps",
     "copyError": "No se pudo crear la copia.",
     "copyUnavailable": "Guarde primero y podrá crear una variante.",
     "verifiedPartner": "Verified Provider",
@@ -426,7 +426,7 @@
   },
   "reveal": {
     "was": "era {{title}}",
-    "wasInRiskMap": "era {{title}} en su sesión «{{riskMap}}»"
+    "wasInRiskMap": "era {{title}} en su Risk Map «{{riskMap}}»"
   },
   "dueLive": "Sin fecha fija",
   "clusters": {
@@ -493,7 +493,7 @@
     }
   },
   "hint": {
-    "title": "Una respuesta hace su mapa de riesgos más preciso",
+    "title": "Una respuesta hace su Risk Map más precisa",
     "message_one": "Aclara {{count}} obligación cuya relevancia aún está abierta. Solo unos segundos.",
     "message_other": "Aclara {{count}} obligaciones cuya relevancia aún está abierta. Solo unos segundos.",
     "cta": "Añadir respuesta",
