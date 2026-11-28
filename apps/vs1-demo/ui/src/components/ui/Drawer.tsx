@@ -1,5 +1,6 @@
 import React, { useEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
@@ -54,11 +55,15 @@ export interface DrawerProps {
   onBack?: () => void;
   /** Name des Rueckwegs fuer Screenreader ("Zurueck zum Profil"). Pflicht, wenn `onBack` gesetzt ist. */
   backLabel?: string;
-  /** Name des Schliessen-Knopfs fuer Screenreader. Standard "Close". */
+  /** Name des Schliessen-Knopfs fuer Screenreader. Standard: common:a11y.close in der Sprache der Seite. */
   closeLabel?: string;
 }
 
-export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className, fixedHeight = false, header = 'default', onBack, backLabel, closeLabel = 'Close' }: DrawerProps) {
+export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className, fixedHeight = false, header = 'default', onBack, backLabel, closeLabel: closeLabelProp }: DrawerProps) {
+  // Der Knopf hiess bis 2026-11-28 fest "Close", auch auf deutschen, spanischen
+  // und tuerkischen Seiten. defaultValue traegt, wo i18n nicht laeuft (Tests, Storybook).
+  const { t } = useTranslation('common');
+  const closeLabel = closeLabelProp ?? t('a11y.close', { defaultValue: 'Close' });
   const titleId = useId();
   const compact = header === 'compact';
   // Escape und Scroll-Lock gab es hier schon; der FOKUS fehlte. Ohne ihn blieb
