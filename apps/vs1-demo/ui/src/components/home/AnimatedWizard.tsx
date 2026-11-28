@@ -689,9 +689,9 @@ function StepRail({ current, spacious = false }: { current: number; spacious?: b
                   (spacious ? 'h-3 w-3 ' : 'h-3.5 w-3.5 ') +
                   'rounded-full ' +
                   (state === 'done'
-                    ? 'bg-brand'
+                    ? 'bg-selected'
                     : state === 'active'
-                    ? 'bg-brand ring-4 ring-brand-light'
+                    ? 'bg-selected ring-4 ring-selected/15'
                     : 'border border-stroke bg-surface')
                 }
               />
@@ -1245,7 +1245,7 @@ export function AnimatedWizard({
                         'rounded-xl border transition-colors duration-200 ' +
                         (sp ? 'p-[18px] ' : 'p-3.5 ') +
                         (interactive ? 'cursor-pointer hover:border-stroke-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ' : '') +
-                        (on ? 'border-stroke-brand bg-brand-light/50 ring-1 ring-stroke-brand' : 'border-stroke bg-surface')
+                        (on ? 'border-selected bg-selected/10 ring-1 ring-selected/30' : 'border-stroke bg-surface')
                       }
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -1440,9 +1440,9 @@ export function AnimatedWizard({
               disabled={blocked}
               aria-describedby={blocked ? 'wizard-needs-market' : undefined}
               className={
-                'order-2 inline-flex items-center gap-1.5 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40 ' +
+                'order-2 inline-flex items-center gap-1.5 rounded-xl font-semibold transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40 ' +
                 (sp ? 'px-6 py-3 text-body-md' : 'px-5 py-2.5 text-body-xs') +
-                ' bg-brand text-fg-on-brand'
+                ' btn-action-edge bg-action text-fg-on-action'
               }
             >
               {isReview ? t('wizard.generate') : t('wizard.footer.next')} <ArrowRight size={sp ? 16 : 14} />
@@ -1455,7 +1455,7 @@ export function AnimatedWizard({
             </span>
             <span
               ref={setTarget(FOOTER)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-body-xs font-semibold text-fg-on-brand"
+              className="inline-flex items-center gap-1.5 rounded-xl btn-action-edge bg-action px-4 py-2 text-body-xs font-semibold text-fg-on-action"
             >
               {t(`wizard.footer.${step.footerKey}`)} <ArrowRight size={14} />
             </span>

@@ -233,7 +233,7 @@ export function MobileNav({ open, onClose, lang, logo, actions, id }: MobileNavP
                             type="button"
                             onClick={() => setLevel(link.sheet === 'areas' ? 'areas' : 'markets')}
                             aria-expanded={false}
-                            className={`${ROW} ${active ? 'bg-brand-light' : 'hover:bg-surface-secondary'}`}
+                            className={`${ROW} ${active ? 'bg-selected/10' : 'hover:bg-surface-secondary'}`}
                           >
                             <span className={`${ROW_LABEL} ${active ? 'text-fg-brand' : 'text-fg'}`}>{label}</span>
                             <span className="text-body-xs font-medium text-fg-tertiary">{count}</span>
@@ -247,7 +247,7 @@ export function MobileNav({ open, onClose, lang, logo, actions, id }: MobileNavP
                           to={href(`/${link.to}`)}
                           onClick={onClose}
                           aria-current={active ? 'page' : undefined}
-                          className={`${ROW} ${active ? 'bg-brand-light' : 'hover:bg-surface-secondary'}`}
+                          className={`${ROW} ${active ? 'bg-selected/10' : 'hover:bg-surface-secondary'}`}
                         >
                           <span className={`${ROW_LABEL} ${active ? 'text-fg-brand' : 'text-fg'}`}>{label}</span>
                           <ChevronRight size={18} aria-hidden className={active ? 'text-fg-brand' : 'text-fg-tertiary'} />

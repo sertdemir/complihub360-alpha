@@ -51,7 +51,7 @@ export function TR({ selected, className, children, ...rest }: TRProps) {
     <tr
       className={cn(
         'border-b border-stroke transition-colors last:border-b-0 hover:bg-neutral-50 dark:hover:bg-white/[0.04]',
-        selected && 'bg-brand-light dark:bg-white/10',
+        selected && 'bg-selected/10 dark:bg-white/10',
         className,
       )}
       {...rest}

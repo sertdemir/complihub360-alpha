@@ -162,7 +162,7 @@ export function DomainAssistant({ slug, areaLabel, sessions, markets, openDuties
           type="submit"
           aria-label={t('domainPage.askButton')}
           disabled={busy || value.trim().length < 3}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand text-white transition-colors hover:bg-brand-700 disabled:opacity-40"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-xl btn-action-edge bg-action text-fg-on-action transition-colors hover:bg-action-hover disabled:opacity-40"
         >
           <SendHorizonal size={15} />
         </button>

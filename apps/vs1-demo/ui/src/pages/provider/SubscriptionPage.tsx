@@ -500,7 +500,7 @@ export function SubscriptionPage() {
                 onClick={() => setCadence(c)}
                 className={[
                   'rounded-md px-4 py-1.5 text-[13px] font-semibold transition-colors',
-                  cadence === c ? 'bg-brand text-fg-on-brand' : 'text-fg-secondary hover:text-fg',
+                  cadence === c ? 'bg-selected text-fg-on-selected' : 'text-fg-secondary hover:text-fg',
                 ].join(' ')}
               >
                 {t(c === 'annual' ? 'subscription.cadenceAnnual' : 'subscription.cadenceMonthly')}

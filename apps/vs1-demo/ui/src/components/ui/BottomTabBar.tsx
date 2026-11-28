@@ -39,7 +39,7 @@ export function BottomTabBar({ tabs, active, onChange, className, embedded }: Bo
             aria-current={isActive ? 'page' : undefined}
             className={cn(
               'relative flex flex-1 flex-col items-center gap-0.5 rounded-lg py-1.5 text-[11px] font-medium transition-colors',
-              isActive ? 'text-fg-brand' : 'text-fg-tertiary hover:text-fg-secondary',
+              isActive ? 'text-selected' : 'text-fg-tertiary hover:text-fg-secondary',
             )}
           >
             <span className="relative">

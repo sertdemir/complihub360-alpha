@@ -160,7 +160,7 @@ export function MatchmakingDifference() {
                   className={
                     'grid h-[40px] w-[40px] place-items-center rounded-full text-body-md font-semibold ' +
                     (s.tone === 'brand'
-                      ? 'bg-brand text-fg-on-brand'
+                      ? 'bg-selected text-fg-on-selected'
                       : s.tone === 'gold'
                       ? 'bg-accent-500 text-fg-on-accent'
                       : 'bg-surface-tertiary/80 text-fg-secondary')

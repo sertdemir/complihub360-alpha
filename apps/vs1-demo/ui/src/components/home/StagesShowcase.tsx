@@ -117,7 +117,7 @@ function AskDemo({ inView }: { inView: boolean }) {
           <motion.span
             animate={phase === 'click' ? { scale: [1, 0.9, 1] } : {}}
             transition={{ duration: 0.35 }}
-            className="inline-flex shrink-0 items-center rounded-lg bg-brand px-3.5 py-1.5 text-body-2xs font-semibold text-fg-on-brand"
+            className="inline-flex shrink-0 items-center rounded-xl btn-action-edge bg-action px-3.5 py-1.5 text-body-2xs font-semibold text-fg-on-action"
           >
             {t('howItWorks.demos.ask.cta')}
           </motion.span>
@@ -282,7 +282,7 @@ function BookDemo({ inView }: { inView: boolean }) {
               key={i}
               variants={item}
               className={`grid h-8 place-items-center rounded-lg text-body-3xs font-semibold transition-colors duration-300 ${
-                i === 1 && picked ? 'bg-brand text-fg-on-brand' : 'border border-stroke text-fg-secondary'
+                i === 1 && picked ? 'bg-selected text-fg-on-selected' : 'border border-stroke text-fg-secondary'
               }`}
             >
               {t(`howItWorks.demos.book.slots.${i}`)}
@@ -319,7 +319,7 @@ function StageNode({ n, active, className = '' }: { n: number; active: boolean; 
       transition={{ duration: 0.45, ease: 'easeOut', delay: 0.15 }}
       className={`grid shrink-0 place-items-center rounded-full border font-bold tabular-nums transition-colors duration-300 ${
         active
-          ? 'border-brand bg-brand text-fg-on-brand'
+          ? 'border-selected bg-selected text-fg-on-selected'
           : 'border-stroke-brand bg-surface text-fg-brand dark:bg-surface-secondary'
       } ${className}`}
     >

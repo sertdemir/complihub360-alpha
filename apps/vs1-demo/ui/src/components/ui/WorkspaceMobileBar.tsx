@@ -231,7 +231,7 @@ function PanelRow({ item, onPick }: { item: WorkspaceNavItem; onPick: () => void
       )}
     </>
   );
-  const cls = cn(ROW, item.active ? 'bg-brand-light' : 'hover:bg-surface-secondary');
+  const cls = cn(ROW, item.active ? 'bg-selected/10' : 'hover:bg-surface-secondary');
 
   // An entry that opens a drawer is a button; everything else is a destination
   // and stays a link — the same rule the headers follow.

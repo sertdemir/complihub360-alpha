@@ -226,7 +226,7 @@ export function ApplicationPage() {
                     const isActive = active === k;
                     return (
                       <li key={k}>
-                        <button type="button" onClick={() => jump(k)} className={cn('flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13px] transition-colors', isActive ? 'bg-brand/10 font-medium text-fg' : 'text-fg-secondary hover:bg-surface-secondary')}>
+                        <button type="button" onClick={() => jump(k)} className={cn('flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13px] transition-colors', isActive ? 'bg-selected/10 font-medium text-fg' : 'text-fg-secondary hover:bg-surface-secondary')}>
                           <span className={cn('grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold', done ? 'bg-success-500 text-white' : isActive ? 'bg-brand text-fg-on-brand' : 'border border-stroke text-fg-tertiary')}>
                             {done ? <CheckCircle2 size={14} /> : i + 1}
                           </span>

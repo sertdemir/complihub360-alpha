@@ -15,14 +15,14 @@ Every Compass component must pass these checks before being considered productio
 | UI components (icons, borders, focus rings) | 3 : 1 | Aim 4.5:1 |
 | Disabled element contrast | exempt — but still readable | Use opacity/muted tokens consistently |
 
-When defining semantic color tokens, **verify contrast in every theme** (Light, Dark, High Contrast). A dark-mode token that passes in one combination may fail in another. Petrol-on-light passes; Petrol-on-dark must use the lighter petrol `#3FA3A3` per v1 Dark Mode Spec.
+When defining semantic color tokens, **verify contrast in every theme** (Light, Dark, High Contrast). A dark-mode token that passes in one combination may fail in another. Petrol-on-light passes; Petrol-on-dark must use the teal `#14A89A` (4,96:1 on slate `#1F2937`); Petrol `#004D40` there is only 1,49:1.
 
 ### Focus visibility
 
 Every interactive element must show a clearly visible focus state when reached via keyboard. Compass focus standard (matches the v1 Border + Elevation Specs):
 
-- **`border.medium` (2px outline)** + **`color.border.focus` (Petrol-500)** at the element edge
-- **`shadow.focus`** (a 3px Petrol halo at 0.2 opacity) extending the visual focus ring beyond the border
+- **`border.medium` (2px outline)** + **`color.border.focus` (Ink, dark Parchment — since 2026-11-28)** at the element edge
+- **`shadow.focus`** (a 3px Ink halo at 0.2 opacity) extending the visual focus ring beyond the border
 - **Offset 2px from the element edge** so it's not absorbed by the element's own border
 - **High-contrast against any expected background** — at least 3:1 against the focused element AND 3:1 against the surrounding surface
 - **Never** removed in favor of hover-only feedback
@@ -51,7 +51,7 @@ Build accessibility into the token layer, not into individual components.
 
 Define and use these:
 
-- `color.focus.ring` — the focus outline color (Petrol-500 in light; lighter petrol `#3FA3A3` in dark)
+- `color.focus.ring` — the focus outline color (Ink `#1B2A41` in light — 14,44:1; Parchment `#E9E4D3` in dark — 11,54:1 on slate; since 2026-11-28)
 - `color.text.disabled` — muted but still meeting 3:1 against its background
 - `color.feedback.error.foreground` — red `#B55353` (and a darker variant for AA-compliant text)
 - `color.feedback.warning.foreground` — amber `#C59E38` that does **NOT** rely on color alone (always paired with icon)
@@ -161,6 +161,6 @@ Typical content:
 
 ## When accessibility conflicts with brand
 
-It rarely does, but when it does: **accessibility wins**. The Petrol may need a darker variant for use as text color on light backgrounds; the Petrol on dark mode must shift to `#3FA3A3` for contrast (already encoded in v1 Dark Mode Spec). The Accent-Gold may need a higher-contrast partner color for AAA contexts. These adaptations are how a brand survives contact with reality. Document them.
+It rarely does, but when it does: **accessibility wins**. The Petrol may need a darker variant for use as text color on light backgrounds; the Petrol on dark mode must shift to teal `#14A89A` for contrast (already encoded as `primary/accent-dark`). The Accent-Gold may need a higher-contrast partner color for AAA contexts. These adaptations are how a brand survives contact with reality. Document them.
 
 The CompliHub brand promise is *trust*. Accessibility is part of trust — a beautifully branded CTA that excludes a Compliance Officer with low vision violates the brand more than a less-elegant accessible alternative.

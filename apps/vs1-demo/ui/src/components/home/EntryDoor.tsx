@@ -34,7 +34,7 @@ function JourneyStepper() {
                 // primary-500, not bg-brand: the backdrop below is fixed-light in both
                 // themes, so a flipping token turns this dot into bright teal on a pale
                 // gold ground (1.78:1). Every sibling here is already a fixed primitive.
-                (s.done ? 'bg-primary-500' : 'border-2 border-primary-950/35 bg-transparent')
+                (s.done ? 'bg-selected' : 'border-2 border-primary-950/35 bg-transparent')
               }
             />
             {i < JOURNEY.length - 1 && <span className="h-px flex-1 bg-primary-950/25" />}

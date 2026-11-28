@@ -30,8 +30,8 @@ function Dot({ status, icon }: { status: EngagementStatus; icon?: React.ReactNod
     <span
       className={cn(
         'grid h-[28px] w-[28px] shrink-0 place-items-center rounded-full transition-colors',
-        status === 'done' && 'bg-brand text-fg-on-brand',
-        status === 'current' && 'bg-brand text-fg-on-brand ring-4 ring-brand-light',
+        status === 'done' && 'bg-selected text-fg-on-selected',
+        status === 'current' && 'bg-selected text-fg-on-selected ring-4 ring-selected/15',
         status === 'upcoming' && 'border border-stroke bg-surface text-fg-tertiary',
       )}
     >

@@ -74,7 +74,7 @@ export function Pagination({
             aria-current={p === page ? 'page' : undefined}
             className={cn(
               'h-2.5 w-2.5 rounded-full transition-colors',
-              p === page ? 'bg-brand' : 'bg-neutral-300 hover:bg-neutral-400 dark:bg-white/20 dark:hover:bg-white/30',
+              p === page ? 'bg-selected' : 'bg-neutral-300 hover:bg-neutral-400 dark:bg-white/20 dark:hover:bg-white/30',
             )}
           />
         ))}
@@ -113,7 +113,7 @@ export function Pagination({
             type="button"
             onClick={() => go(it)}
             aria-current={it === page ? 'page' : undefined}
-            className={cn(cell, it === page ? 'bg-brand text-fg-on-brand' : 'text-fg-secondary hover:bg-surface-secondary hover:text-fg')}
+            className={cn(cell, it === page ? 'bg-selected text-fg-on-selected' : 'text-fg-secondary hover:bg-surface-secondary hover:text-fg')}
           >
             {it}
           </button>

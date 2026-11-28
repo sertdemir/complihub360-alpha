@@ -59,7 +59,7 @@ export function OperationsStep() {
               key={band}
               className={cn(
                 'rounded-full border px-3.5 py-1.5 text-[13px] font-medium',
-                on ? 'border-stroke-brand bg-brand-light/60 text-fg-brand' : 'border-stroke text-fg-secondary',
+                on ? 'border-selected bg-selected/10 text-selected' : 'border-stroke text-fg-secondary',
               )}
             >
               {band}

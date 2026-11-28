@@ -87,7 +87,8 @@ function DashboardWindow() {
         <p className="font-serif text-[17px] font-bold text-[#f5f6f8]">
           <Trans t={t} i18nKey="home.title" values={{ name: 'Alex' }} components={{ accent: <span /> }} />
         </p>
-        <span className="rounded-lg bg-[#14a89a] px-3 py-1.5 text-body-3xs font-semibold text-[#000b09]">
+        {/* Immer-dunkles Mock-Panel: "dark" am Knopf selbst, damit die Aktions-Tokens auf Pergament kippen. */}
+        <span className="dark btn-action-edge rounded-xl bg-action px-3 py-1.5 text-body-3xs font-semibold text-fg-on-action">
           {th('beyond.tile1.start')}
         </span>
       </motion.div>

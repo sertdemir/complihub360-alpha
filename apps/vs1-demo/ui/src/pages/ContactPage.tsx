@@ -242,7 +242,7 @@ export function ContactPage() {
                               <span
                                 aria-hidden
                                 className={'grid h-5 w-5 shrink-0 place-items-center rounded-full text-body-4xs font-bold '
-                                  + (i === 0 ? 'bg-brand text-fg-on-brand' : 'border border-stroke bg-surface text-fg-tertiary')}
+                                  + (i === 0 ? 'bg-selected text-fg-on-selected' : 'border border-stroke bg-surface text-fg-tertiary')}
                               >
                                 {i === 0 ? '✓' : i + 1}
                               </span>

@@ -55,7 +55,7 @@ export class AppErrorBoundary extends React.Component<{ children: React.ReactNod
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="rounded-lg bg-brand px-4 py-2.5 text-body-sm font-semibold text-fg-on-brand transition-colors hover:brightness-95"
+              className="rounded-xl btn-action-edge bg-action px-4 py-2.5 text-body-sm font-semibold text-fg-on-action transition-colors hover:brightness-95"
             >
               {t('reload')}
             </button>

@@ -71,7 +71,7 @@ function WizardPreview({ className = '' }: { className?: string }) {
             <span
               className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-body-3xs font-semibold ${
                 s.state === 'done'
-                  ? 'bg-brand text-fg-on-brand'
+                  ? 'bg-selected text-fg-on-selected'
                   : s.state === 'active'
                   ? 'bg-accent-500 text-fg-on-accent'
                   : 'border border-stroke text-fg-tertiary'
@@ -96,7 +96,7 @@ function WizardPreview({ className = '' }: { className?: string }) {
             <span
               key={dm.index}
               className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-body-xs font-medium ${
-                dm.on ? 'border-transparent bg-brand text-fg-on-brand' : 'border-stroke text-fg-secondary'
+                dm.on ? 'border-transparent bg-selected text-fg-on-selected' : 'border-stroke text-fg-secondary'
               }`}
             >
               {dm.on ? <Check size={15} strokeWidth={2.5} /> : <dm.icon size={15} />}
@@ -110,7 +110,7 @@ function WizardPreview({ className = '' }: { className?: string }) {
         <span className="text-body-2xs text-fg-tertiary">{t('hero.preview.selectedCount')}</span>
         <span className="flex items-center gap-3">
           <span className="text-body-xs font-medium text-fg-secondary">{t('hero.preview.back')}</span>
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-1.5 text-body-xs font-semibold text-fg-on-brand">
+          <span className="inline-flex items-center gap-1.5 rounded-xl btn-action-edge bg-action px-3.5 py-1.5 text-body-xs font-semibold text-fg-on-action">
             {t('hero.preview.continue')} <ArrowRight size={14} />
           </span>
         </span>

@@ -233,7 +233,7 @@ export function NavMenuTrigger({
         'inline-flex items-center gap-1.5 whitespace-nowrap rounded-md text-body-sm font-medium transition-colors',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2',
         iconOnly ? 'h-9 w-9 justify-center' : 'px-2.5 py-2',
-        open || isActive ? 'bg-brand-light text-fg-brand' : 'text-fg-secondary hover:text-fg',
+        open || isActive ? 'bg-selected/10 text-selected' : 'text-fg-secondary hover:text-fg',
         className,
       )}
       {...rest}
@@ -400,7 +400,7 @@ export function NavMenuItem({
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-1',
           // 44px minimum hit target, per the Compass accessibility standard.
           dense ? 'min-h-[44px] items-center px-3 py-2.5' : 'min-h-[44px] p-2 pr-3',
-          isCurrent ? 'bg-brand-light/60' : 'hover:bg-surface-secondary',
+          isCurrent ? 'bg-selected/10' : 'hover:bg-surface-secondary',
           className,
         )}
         {...rest}

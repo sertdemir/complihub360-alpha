@@ -22,11 +22,18 @@ This file is the foundational context for the Compass design system. Read it fir
 
 ## Brand
 
+**Festlegung 2026-11-28 — Aktion, Fokus, Auswahl tragen Tinte, nicht Petrol.** Petrol/Teal ist die Knopffarbe fast jeder KI- und SaaS-Seite; CompliHub soll unverwechselbar sein.
+- **Hauptknopf (Primary)**: Tinte `#1B2A41` mit weißem Label (14,44:1), im Dark Mode Pergament `#E9E4D3` mit Tinten-Label (11,35:1). Unten eine 3px **Messing-Kante** (`#C5913B`, dunkel `#8C672A`) mit einem Lichtreflex („Glint“): zwei Durchläufe beim Erscheinen, danach nur bei Hover/Fokus, keine Dauerschleife, `prefers-reduced-motion` statisch, Disabled ohne Kante. Radius: App 10px, Marketing-CTA 14px (`radius/cta`).
+- **Fokus-Ring**: Tinte / Pergament (`color/border/focus`), nicht Petrol.
+- **Auswahlzustände** (Checkbox/Toggle/Radio an, gewählter Chip, aktiver/erledigter Schritt, aktive Tabs und Navigation, gewählte Option, Pagination, gewählter Kalendertag): `color/selected/default`, `…/on`, `…/subtle` — Tinte / Pergament.
+- **Petrol bleibt** Markenfarbe: Logo, Flächen, Gradient, Icons, Headlines, Datengrafik, Fortschritt. Gold bleibt Akzent und Kante, nie Knopffläche (Festlegung 2026-09-20).
+- Code: `bg-action`, `text-fg-on-action`, `.btn-action-edge`, `bg-selected`, `text-selected`, `ring-stroke-focus` in `apps/vs1-demo/ui`. Figma: `color/action/*`, `color/selected/*`, `ink/*`, `parchment/*`, `brass/*`.
+
 **Identity colors (from the v1 Color Specification):**
-- **Petrol — Trust & Authority**: `#097070` (`primary-500`). The signature brand color. Used for primary CTAs (e.g. "Engagement Request senden") and structural authority. **Do not dilute** by using it for decoration.
-- **Accent Gold — Premium / Verified Partner**: `#D3B454` (`accent-500`). Reserved **exclusively** for Verified-Partner badges and monetization-signal elements (Featured Partner cards may use the gold as border-color). **Never use as a UI status color.**
-- **Warm Neutrals**: `#FAF9F9` (secondary bg), `#EFE8E8` (main canvas — `neutral-100`), `#CFC7C7` (borders/dividers), `#2B2B2B` (primary typography). Warm-leaning to harmonize with the gold and reduce screen fatigue in long sessions.
-- **Surface Muted**: `#BFD6D5` for Wizard panels and Filter sidebars — a desaturated petrol surface that anchors high-intent input zones without competing with the primary CTA.
+- **Petrol — Trust & Authority**: `#004D40` (`primary-500`). The signature brand color. Brand identity and structural authority (logo, surfaces, headlines, data viz). **Not** the primary CTA, focus or selection color since 2026-11-28 — those are Ink (see above). **Do not dilute** by using it for decoration.
+- **Accent Gold — Premium / Verified Partner**: `#D4AF37` (`accent-500`; brand gold `#C5913B` for the logo "360", gold text and the brass edge). Reserved **exclusively** for Verified-Partner badges and monetization-signal elements (Featured Partner cards may use the gold as border-color). **Never use as a UI status color.**
+- **Neutrals** (as shipped, cool slate/gray): white / `#FAFAFA` (surfaces), `#F4F4F5` (`neutral-100`, subtle fills), `#E5E7EB` (borders), `#0F172A` (primary text), `#5F5B5B` (secondary text). Dark mode is slate `#1F2937`. The warm v1 neutrals (`#EFE8E8`, `#2B2B2B` …) were never shipped.
+- **Tinted surfaces**: the "Gradient" `linear-gradient(165deg, #EAF3F1 0%, #DDECE8 55%, #E9E4D3 100%)` (CLAUDE.md) — the v1 Surface Muted `#BFD6D5` was never shipped.
 - **Status semantics (separate from brand)**: success `#3C8C7A`, warning `#C59E38`, error `#B55353`. These have their own scales — they are **not** the accent gold.
 
 **Typography character (from the v1 Typography Strategy):**
@@ -43,7 +50,7 @@ This file is the foundational context for the Compass design system. Read it fir
 - **References sources** wherever it makes claims
 
 **What Compass must preserve:**
-- Petrol as the **Trust-Anchor** — concentrated on primary CTAs and brand moments
+- Petrol as the **Trust-Anchor** — concentrated on brand moments; actions, focus and selection speak **Ink + Brass edge**
 - Accent-Gold strictly as **Premium / Verified-Partner marker** — distinct from semantic UI tokens
 - Calm, restrained visual language with controlled accent usage — Compass is not a flashy consumer system
 - Excellent multi-language support (German is verbose; layouts must breathe)
@@ -106,7 +113,7 @@ When relevant, the `figma-code-connect` skill maps Figma components to existing 
 ## What to remember at all times
 
 1. CompliHub360 is **enterprise B2B marketplace + workflow**, not consumer.
-2. **Petrol = Trust-Anchor**, **Accent-Gold = Verified-Partner only**, **never the same thing**.
+2. **Petrol = Trust-Anchor (brand)**, **Ink = action, focus, selection**, **Accent-Gold = Verified-Partner only + brass edge on primary buttons, never a button fill**.
 3. **German text is long** — layouts must breathe.
 4. **Trust through restraint** — the brand whispers, doesn't shout. Never alarmist, never legal-advice tone.
 5. Compass ships to Figma **and** to `apps/vs1-demo/ui/` Storybook (React + shadcn) — design with both in mind.

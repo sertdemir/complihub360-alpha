@@ -11,17 +11,17 @@ Component designers should never have to think about themes. They reference sema
 ## Required themes
 
 ### Light (default)
-The primary mode. Most CompliHub users default to light — Compliance Officers reviewing regulatory text on monitors, sales/finance teams in well-lit offices, audit-prep work in bright environments. The v1 Color Spec is light-mode anchored: `neutral.100 #EFE8E8` canvas, `neutral.900 #2B2B2B` text.
+The primary mode. Most CompliHub users default to light — Compliance Officers reviewing regulatory text on monitors, sales/finance teams in well-lit offices, audit-prep work in bright environments. Shipped light mode: white / `#FAFAFA` surfaces, `neutral.900 #0F172A` text (the warm v1 canvas `#EFE8E8` was never shipped).
 
 ### Dark
 Increasingly expected. Especially valuable for power users in long sessions (Compliance Officers reviewing late, provider-side specialists working across time zones). Per the v1 Dark Mode Architecture:
 
-- Background: `#121616`
-- Surface: `#1B2222`
-- Text (primary): `#E7EFEF`
-- Primary accent: `#3FA3A3` (a lighter petrol — adequate contrast on dark surfaces)
+- Background / card: slate `#1F2937`
+- Deeper fills: `#0F172A`
+- Text (primary): `#F5F6F8`
+- Brand accent: `#14A89A` (teal — adequate contrast on dark surfaces; actions, focus and selection are Parchment `#E9E4D3` since 2026-11-28)
 
-Must not be a naive inversion — backgrounds are warm-dark (not pure black) to harmonize with the Accent-Gold and reduce eye strain.
+Must not be a naive inversion — backgrounds are slate (not pure black) to reduce eye strain (dark = slate decision 2026-06-25).
 
 ### High Contrast (recommended for Compass)
 For accessibility — users with low vision, EU public-sector buyers required to meet AAA standards in their procurement, Compliance Officers in regulated industries (Life Sciences, finance) with mandated contrast settings. Increases contrast ratios beyond WCAG AA, simplifies surfaces, strengthens borders.
@@ -38,13 +38,15 @@ The `02 — Semantic` collection has modes:
 Each semantic token has a value defined per mode. Each value is an alias to a primitive.
 
 Example for `color.text.primary`:
-- Light mode → `color.neutral.900` (`#2B2B2B`)
-- Dark mode → `color.neutral.50` or `#E7EFEF` (per v1 Dark Mode Spec)
+- Light mode → `color.neutral.900` (`#0F172A`)
+- Dark mode → `#F5F6F8`
 - High Contrast → pure white/black for max contrast
 
-Example for `color.action.primary.background.default`:
-- Light mode → `color.petrol.500` (`#097070`)
-- Dark mode → `color.petrol.300` aliased to `#3FA3A3` (per v1 Dark Mode Spec)
+Example for `color.bg.brand`:
+- Light mode → `color.petrol.500` (`#004D40`)
+- Dark mode → `primary/accent-dark` (`#14A89A`)
+
+(And for `color.action.primary.background.default` since 2026-11-28: Light → `ink/500` `#1B2A41`, Dark → `parchment/100` `#E9E4D3`.)
 - High Contrast → a token that meets ≥7:1 against its expected foreground
 
 **Primitives have no modes.** They are constants. Modes only live on semantic tokens.
@@ -93,17 +95,17 @@ Option B is cleaner for true multi-brand. Option A is simpler if "brand" is most
 
 **Recommendation for Compass:** Start with Option A (brand baked into modes) for simplicity. Migrate to Option B only when actual co-branded provider surfaces become a real requirement. Premature abstraction is more painful than late refactoring here.
 
-Important guardrail: even in co-branded mode, the **CompliHub Petrol primary CTA** and the **Verified-Partner Gold badge** should remain recognizable. A co-branded surface that hides the platform's identity undermines the marketplace's accountability promise.
+Important guardrail: even in co-branded mode, the **CompliHub Ink primary CTA with brass edge** and the **Verified-Partner Gold badge** should remain recognizable. A co-branded surface that hides the platform's identity undermines the marketplace's accountability promise.
 
 ### Petrol & Accent-Gold across themes
 
-`#097070` (Petrol) and `#D3B454` (Accent-Gold) are CompliHub's brand identity colors. They need special handling:
+`#004D40` (Petrol) and `#D4AF37` (Accent-Gold; brand gold for text and the brass edge is `#C5913B`) are CompliHub's brand identity colors. They need special handling:
 
 - **Light mode**:
-  - Petrol — use as-is for primary CTAs (Engagement Request) and brand accents
+  - Petrol — use as-is for brand accents (primary CTAs are Ink since 2026-11-28)
   - Accent-Gold — use as-is on light surfaces for Verified-Partner badges
 - **Dark mode**:
-  - Petrol — shift to `#3FA3A3` (the lighter petrol from v1 Dark Mode Spec) for adequate contrast on dark surfaces
+  - Petrol — shift to teal `#14A89A` (`primary/accent-dark`) for adequate contrast on dark surfaces
   - Accent-Gold — shift to a slightly lighter gold (e.g. `gold.400` if the scale supports it) so badges remain legible without "glowing"
 - **High Contrast**:
   - Petrol — keep saturated, ensure ≥7:1 against text foregrounds

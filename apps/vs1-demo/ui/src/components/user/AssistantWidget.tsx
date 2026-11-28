@@ -164,7 +164,7 @@ export function AssistantWidget({ country }: { country?: string }) {
                   type="button"
                   onClick={startUpgrade}
                   disabled={upgrade === 'redirecting'}
-                  className="mt-3 w-full rounded-lg bg-brand px-3 py-2 text-[13px] font-semibold text-fg-on-brand transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="mt-3 w-full rounded-xl btn-action-edge bg-action px-3 py-2 text-[13px] font-semibold text-fg-on-action transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
                   {upgrade === 'redirecting' ? '…' : t('assistant.upgradeCta')}
                 </button>
@@ -196,7 +196,7 @@ export function AssistantWidget({ country }: { country?: string }) {
                 aria-label={t('assistant.send')}
                 onClick={send}
                 disabled={busy || draft.trim().length < 3}
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand text-fg-on-brand transition-opacity disabled:opacity-40"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-xl btn-action-edge bg-action text-fg-on-action transition-opacity disabled:opacity-40"
               >
                 <SendHorizonal size={15} />
               </button>
@@ -211,7 +211,7 @@ export function AssistantWidget({ country }: { country?: string }) {
         aria-label={open ? t('assistant.close') : t('assistant.open')}
         onClick={() => setOpen((o) => !o)}
         onMouseEnter={() => setOrbit((o) => o ?? { id: Date.now(), runs: 1 })}
-        className="relative grid h-[48px] w-[48px] place-items-center rounded-full bg-brand text-fg-on-brand shadow-[0_10px_24px_rgba(0,46,38,0.28)] ring-1 ring-brand-accent/35 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 dark:shadow-[0_12px_32px_rgba(0,0,0,0.45)]"
+        className="relative grid h-[48px] w-[48px] place-items-center rounded-full bg-action text-fg-on-action shadow-[0_10px_24px_rgba(0,46,38,0.28)] ring-1 ring-brand-accent/35 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 dark:shadow-[0_12px_32px_rgba(0,0,0,0.45)]"
       >
         {!open && (
           <span

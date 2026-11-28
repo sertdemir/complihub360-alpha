@@ -209,8 +209,8 @@ export function MarketingHeader({
               </a>
               <a
                 href={signupHref}
-                className={`inline-flex h-[40px] items-center whitespace-nowrap rounded-md px-4 text-body-sm font-semibold ${
-                  inverse ? 'bg-white text-fg' : 'bg-brand text-fg-on-brand'
+                className={`inline-flex h-[40px] items-center whitespace-nowrap rounded-xl px-4 text-body-sm font-semibold ${
+                  inverse ? 'bg-white text-fg' : 'btn-action-edge bg-action text-fg-on-action'
                 }`}
               >
                 {t('nav.signup')}

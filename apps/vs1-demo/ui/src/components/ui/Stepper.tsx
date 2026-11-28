@@ -59,8 +59,8 @@ function Indicator({ state, n, size }: { state: StepState; n: number; size: Step
       className={cn(
         'grid shrink-0 place-items-center rounded-full font-semibold transition-colors',
         sz.box,
-        state === 'done' && 'bg-brand text-fg-on-brand',
-        state === 'active' && cn('bg-brand text-fg-on-brand ring-brand-light', sz.ring),
+        state === 'done' && 'bg-selected text-fg-on-selected',
+        state === 'active' && cn('bg-selected text-fg-on-selected ring-selected/15', sz.ring),
         state === 'upcoming' && 'border border-stroke text-fg-tertiary',
         state === 'error' && 'bg-red-500 text-white dark:bg-red-400',
         state === 'disabled' && 'border border-stroke text-fg-tertiary opacity-50',
@@ -146,7 +146,7 @@ export function Stepper({
             <li key={i} className="flex gap-3">
               <div className="flex flex-col items-center">
                 <Indicator state={state} n={i + 1} size={size} />
-                {!last && <span className={cn('my-1 w-0.5 flex-1 rounded', i < current ? 'bg-brand' : 'bg-stroke')} />}
+                {!last && <span className={cn('my-1 w-0.5 flex-1 rounded', i < current ? 'bg-selected' : 'bg-stroke')} />}
               </div>
               <div className={cn('pb-6', last && 'pb-0')}>
                 <p
@@ -192,7 +192,7 @@ export function Stepper({
                 {s.label}
               </span>
             </div>
-            {!last && <span className={cn('mt-4 h-0.5 flex-1 rounded', i < current ? 'bg-brand' : 'bg-stroke')} />}
+            {!last && <span className={cn('mt-4 h-0.5 flex-1 rounded', i < current ? 'bg-selected' : 'bg-stroke')} />}
           </li>
         );
       })}

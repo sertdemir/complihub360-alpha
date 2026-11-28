@@ -143,7 +143,7 @@ export function Combobox({
           'flex w-full items-center gap-2 border bg-surface transition-colors',
           TRIGGER_SIZE[inputSize],
           'border-stroke',
-          open && 'border-stroke-focus ring-2 ring-inset ring-primary-500/35 dark:ring-emerald-500/40',
+          open && 'border-stroke-focus ring-2 ring-inset ring-stroke-focus/35',
           disabled && 'cursor-not-allowed bg-neutral-100 opacity-60 dark:bg-white/[0.04]',
         )}
       >
@@ -210,8 +210,8 @@ export function Combobox({
                 className={cn(
                   'flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-[14px]',
                   opt.disabled && 'cursor-not-allowed opacity-50',
-                  isActive && !opt.disabled && 'bg-brand-light',
-                  isSelected ? 'text-fg-brand' : 'text-fg',
+                  isActive && !opt.disabled && 'bg-selected/10',
+                  isSelected ? 'text-selected' : 'text-fg',
                 )}
               >
                 <span className="min-w-0 flex-1">
@@ -220,7 +220,7 @@ export function Combobox({
                     <span className="block truncate text-[12px] text-fg-tertiary">{opt.description}</span>
                   )}
                 </span>
-                {isSelected && <Check size={16} strokeWidth={2.5} className="shrink-0 text-fg-brand" />}
+                {isSelected && <Check size={16} strokeWidth={2.5} className="shrink-0 text-selected" />}
               </li>
             );
           })}

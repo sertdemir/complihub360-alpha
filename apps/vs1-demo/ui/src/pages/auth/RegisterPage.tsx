@@ -83,7 +83,7 @@ const INTENT_DEFS = [
 ] as const;
 
 const FIELD =
-    "mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35";
+    "mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-stroke-focus/35";
 const LABEL = "block text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary";
 
 function Field({ id, label, type = "text", value, onChange, placeholder, minLength, autoComplete, error }: {
@@ -165,9 +165,9 @@ function StepDots({ current }: { current: number }) {
                         className={
                             "grid h-6 w-6 shrink-0 place-items-center rounded-full text-body-3xs font-bold " +
                             (i < current
-                                ? "bg-brand text-fg-on-brand"
+                                ? "bg-selected text-fg-on-selected"
                                 : i === current
-                                  ? "bg-brand text-fg-on-brand"
+                                  ? "bg-selected text-fg-on-selected"
                                   : "border border-stroke text-fg-tertiary")
                         }
                         aria-hidden
@@ -355,7 +355,7 @@ export function RegisterPage() {
                             <button
                                 type="button"
                                 onClick={() => navigate(`/${lang}/provider-apply`)}
-                                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3.5 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+                                className="mt-6 flex w-full items-center justify-center gap-2 rounded-cta btn-action-edge bg-action px-5 py-3.5 text-body-md font-semibold text-fg-on-action transition-transform duration-200 hover:-translate-y-0.5"
                             >
                                 {t("register.partnerGate.cta")} <ArrowRight size={16} />
                             </button>
@@ -466,7 +466,7 @@ export function RegisterPage() {
                                                     onClick={() => patch({ intent: opt.value })}
                                                     className={
                                                         "flex items-start gap-3 rounded-lg border px-4 py-3 text-left transition-colors " +
-                                                        (active ? "border-brand bg-brand/5" : "border-stroke bg-surface hover:border-stroke-strong")
+                                                        (active ? "border-selected bg-selected/5" : "border-stroke bg-surface hover:border-stroke-strong")
                                                     }
                                                 >
                                                     <span
@@ -510,7 +510,7 @@ export function RegisterPage() {
                             type="button"
                             disabled={loading}
                             onClick={next}
-                            className="flex items-center gap-2 rounded-lg bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 enabled:hover:-translate-y-0.5 disabled:opacity-50"
+                            className="flex items-center gap-2 rounded-cta btn-action-edge bg-action px-5 py-3 text-body-md font-semibold text-fg-on-action transition-transform duration-200 enabled:hover:-translate-y-0.5 disabled:opacity-50"
                         >
                             {loading ? t("register.creating") : isLast ? t("register.createAccount") : t("register.next")}
                             {!loading && <ArrowRight size={16} />}

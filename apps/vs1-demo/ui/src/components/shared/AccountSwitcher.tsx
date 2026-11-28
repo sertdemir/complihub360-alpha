@@ -88,7 +88,7 @@ function Switcher() {
                     type="button"
                     disabled={active || busy !== null}
                     onClick={() => switchTo(a)}
-                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left ${active ? 'bg-brand-light' : 'hover:bg-surface-secondary'} disabled:cursor-default`}
+                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left ${active ? 'bg-selected/10' : 'hover:bg-surface-secondary'} disabled:cursor-default`}
                   >
                     <span className="w-[58px] shrink-0 rounded-md border border-stroke px-1.5 py-[1px] text-center text-[11px] font-semibold text-fg-secondary">{ROLE_LABEL[a.role]}</span>
                     <span className="min-w-0 flex-1 truncate text-fg">{label(a)}</span>

@@ -84,11 +84,11 @@ export function Tab({ value, children, icon, badge, disabled, className }: TabPr
 
   let style = '';
   if (variant === 'underline') {
-    style = cn('-mb-px border-b-2', isActive ? 'border-fg-brand text-fg-brand' : 'border-transparent text-fg-secondary hover:text-fg');
+    style = cn('-mb-px border-b-2', isActive ? 'border-selected text-selected' : 'border-transparent text-fg-secondary hover:text-fg');
   } else if (variant === 'filled') {
-    style = cn('rounded-md', isActive ? 'bg-brand-light text-fg-brand dark:bg-white/10' : 'text-fg-secondary hover:bg-surface-secondary hover:text-fg');
+    style = cn('rounded-md', isActive ? 'bg-selected/10 text-selected dark:bg-white/10' : 'text-fg-secondary hover:bg-surface-secondary hover:text-fg');
   } else {
-    style = cn('rounded-md', isActive ? 'bg-surface text-fg-brand shadow-sm' : 'text-fg-secondary hover:text-fg');
+    style = cn('rounded-md', isActive ? 'bg-surface text-selected shadow-sm' : 'text-fg-secondary hover:text-fg');
   }
 
   return (

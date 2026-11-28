@@ -167,7 +167,7 @@ export function FilterChip({ selected = false, size = 'md', className, children,
         'inline-flex items-center justify-center whitespace-nowrap rounded-full font-sans font-semibold leading-none transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2',
         CHIP_SIZE[size],
         selected
-          ? 'bg-brand text-fg-on-brand'
+          ? 'bg-selected text-fg-on-selected'
           : 'bg-surface-secondary text-fg hover:bg-surface-tertiary',
         className,
       )}

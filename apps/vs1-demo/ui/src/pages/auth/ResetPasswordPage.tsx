@@ -125,7 +125,7 @@ export function ResetPasswordPage() {
 
                             <button
                                 type="submit"
-                                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
+                                className="mt-6 flex w-full items-center justify-center gap-2 rounded-cta btn-action-edge bg-action px-5 py-3.5 text-[15px] font-semibold text-fg-on-action transition-transform duration-200 hover:-translate-y-0.5"
                             >
                                 {t("reset.submit")} <ArrowRight size={16} />
                             </button>

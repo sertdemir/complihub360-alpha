@@ -101,7 +101,7 @@ CompliHub is paid by providers via Verified-Partner placements and Engagement Re
 
 - **Verified-Partner badges** are visually distinct (Accent-Gold, never confused with status semantics)
 - **Featured Partner** cards may use Gold border-color (`accent-500`) per the Border Spec, but must remain identifiable as paid placements
-- **Engagement Requests** (the primary monetized action) use the Petrol primary CTA — clearly the most prominent action on a Provider profile, no ambiguity
+- **Engagement Requests** (the primary monetized action) use the Ink primary CTA with brass edge (since 2026-11-28, was Petrol) — clearly the most prominent action on a Provider profile, no ambiguity
 - **Information vs commercial** layers must remain visually distinguishable — the user should never confuse a regulatory excerpt with a paid recommendation
 
 This is doctrine because regulatory transparency is non-negotiable in a compliance product. Misleading design here is reputational risk.

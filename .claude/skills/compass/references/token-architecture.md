@@ -31,12 +31,12 @@ Primitives describe **values**. They're the only layer that knows about hex code
 - Build the full scale even if you only need a few values now — completeness avoids one-offs later
 
 **CompliHub-specific primitives (v1 anchored):**
-- **Petrol scale** anchored on Petrol-500 `#097070`: `petrol.500 #097070`, `petrol.600 #075C5C`, `petrol.700 #054848`. Extend with `petrol.50/100/300/400` as the system matures (Dark mode primary uses a lighter petrol `#3FA3A3` — encode it as `petrol.300` or similar).
-- **Gold scale** anchored on Gold-500 `#D3B454`: `gold.500 #D3B454`, `gold.600 #B89B3E`, `gold.700 #9C8434`.
-- **Neutral scale** (warm-leaning, harmonizes with Gold): `neutral.50 #FAF9F9`, `neutral.100 #EFE8E8`, `neutral.200 #E2DADA`, `neutral.300 #CFC7C7`, `neutral.900 #2B2B2B`. Fill `neutral.400/500/600/700/800` as needed.
-- **Surface-Muted**: `surface.muted #BFD6D5` — desaturated petrol, used for Wizard shells and Filter sidebars.
+- **Petrol scale** anchored on Petrol-500 `#004D40` (as shipped in `apps/vs1-demo/ui/src/index.css`, `--petrol-*`; Figma `primary/*`): `petrol.50 #EBF1F0`, `petrol.100 #D1DFDD`, `petrol.200 #A8C2BE`, `petrol.300 #7AA29C`, `petrol.400 #427B72`, `petrol.500 #004D40`, `petrol.600 #002E26`, `petrol.700 #00231D`, `petrol.800 #001612`, `petrol.900 #000B09`. Dark mode brand uses teal `#14A89A` (Figma `primary/accent-dark`).
+- **Gold scale** anchored on Gold-500 `#D4AF37` (as shipped, `--gold-*`; Figma `accent/*`): `gold.50 #FDF8E6`, `gold.100 #FBEBBA`, `gold.200 #F8D882`, `gold.300 #F4C44A`, `gold.400 #E6A514`, `gold.500 #D4AF37`, `gold.600 #BCA033`, `gold.700 #96802A`, `gold.800 #6A5B1E`, `gold.900 #3D3411`. **Brand gold** (logo "360", gold text, brass edge): `#C5913B` (`--gold-brand`), small-text variant `#8C672A` (`--gold-brand-deep`).
+- **Neutral scale** (as shipped, cool slate/gray — the v1 warm neutrals were never shipped): `neutral.50 #FAFAFA`, `neutral.100 #F4F4F5`, `neutral.200 #E5E7EB`, `neutral.300 #D1D5DA`, `neutral.400 #9CA3AF`, `neutral.500 #6B7280`, `neutral.600 #5F5B5B`, `neutral.700 #374151`, `neutral.800 #1F2937`, `neutral.900 #0F172A`, `neutral.950 #030712`.
+- **Surface-Muted** `#BFD6D5` (v1 spec) is **not shipped**. Tinted surfaces use the "Gradient" `linear-gradient(165deg, #EAF3F1 0%, #DDECE8 55%, #E9E4D3 100%)` (CLAUDE.md) or `petrol.50`.
 - **Status scales** — typically green (success `#3C8C7A`), amber (warning `#C59E38`), red (error `#B55353`). Build each as a 50–900 scale; the v1 anchor is the `-500` step.
-- **Dark Mode primitives**: `bg.dark #121616`, `surface.dark #1B2222`, `text.dark.primary #E7EFEF`, `petrol.dark #3FA3A3`. (See `references/theming.md` for how these are wired into modes.)
+- **Dark Mode primitives** (as shipped, slate): page/card `#1F2937` (`neutral.800`), deeper fills `#0F172A`, one step up `#2A3340`, text primary `#F5F6F8`, text secondary `#9AA7AD`, border `#374151`, `petrol.dark #14A89A` (teal, `primary/accent-dark`). (See `references/theming.md` for how these are wired into modes.)
 
 ### Layer 2 — Semantic tokens (the purpose layer)
 
@@ -51,19 +51,21 @@ Examples:
 - `color.text.primary`, `color.text.secondary`, `color.text.tertiary`, `color.text.disabled`
 - `color.text.brand` (Petrol-bound headlines)
 - `color.text.danger`, `color.text.success`, `color.text.warning`
-- `color.border.default` → `neutral.200 #E2DADA` (per Border Spec)
-- `color.border.muted` → `neutral.100 #EFE8E8`
-- `color.border.strong` → `neutral.300 #CFC7C7`
-- `color.border.focus` → `petrol.500 #097070` (Petrol focus ring per Border Spec)
-- `color.action.primary.background.default` → Petrol-500 (the Engagement Request CTA)
-- `color.action.primary.background.hover` → Petrol-600
-- `color.action.primary.background.pressed` → Petrol-700
+- `color.border.default` → `neutral.200 #E5E7EB`
+- `color.border.muted` → `neutral.100 #F4F4F5`
+- `color.border.strong` → `neutral.300 #D1D5DA`
+- `color.border.focus` → Ink `#1B2A41` / dark Parchment `#E9E4D3` (since 2026-11-28, was Petrol)
+- `color.action.primary.background.default` → Ink-500 `#1B2A41` / dark Parchment-100 `#E9E4D3` (since 2026-11-28; Figma `color/action/primary`)
+- `color.action.primary.background.hover` → Ink-600 / Parchment-200
+- `color.action.primary.background.pressed` → Ink-700 / Parchment-300
+- `color.action.edge` / `color.action.edge-glint` → Brass `#C5913B` / `#FFF1C9` (dark `#8C672A` / `#D9AE62`) — 3px bottom edge of the primary button
+- `color.selected.default` / `.on` / `.subtle` → Ink / white / Ink 10 % (dark Parchment / Ink / Parchment 10 %) — every selected/active/checked state
 - `color.action.primary.foreground.default` → `neutral.50` (white-ish)
 - `color.action.danger.background.default` → `error.500` — destructive actions
 - `color.feedback.success.background`, `.foreground`, `.border` — for status messages
 - `color.brand.partnerBadge` → Gold-500 (Verified-Partner exclusive — see doctrine)
 - `color.brand.partnerBadge.hover` → Gold-600
-- `color.focus.ring` → Petrol-500 with 3px outline + 0.2 opacity halo (per Elevation Spec `shadow-focus`)
+- `color.focus.ring` → Ink (dark Parchment) — since 2026-11-28, was Petrol-500
 
 **Rules:**
 - Always describe what the token is **for**, never what it **looks like**
@@ -190,10 +192,10 @@ CompliHub's brand is restrained — `radius.md` is the default for actions, `rad
 - `border.thick` — 3px (heavy structural dividers, rare)
 
 **Semantic border colors:**
-- `color.border.default` → `neutral.200 #E2DADA`
-- `color.border.muted` → `neutral.100 #EFE8E8`
-- `color.border.strong` → `neutral.300 #CFC7C7`
-- `color.border.focus` → `petrol.500 #097070`
+- `color.border.default` → `neutral.200 #E5E7EB`
+- `color.border.muted` → `neutral.100 #F4F4F5`
+- `color.border.strong` → `neutral.300 #D1D5DA`
+- `color.border.focus` → Ink `#1B2A41` / dark Parchment `#E9E4D3` (since 2026-11-28)
 
 ## Effect / Elevation tokens (per v1 Elevation Spec)
 
@@ -201,12 +203,12 @@ CompliHub uses a **"Flat-Plus"** approach — most surfaces stay flat with layer
 
 | Token | Value | Use |
 |-------|-------|-----|
-| `shadow.sm` | `0 1px 2px 0 rgba(43,43,43,0.05)` | standard Result Cards, inputs |
-| `shadow.md` | `0 4px 6px -1px rgba(43,43,43,0.1)` | hovered cards, sidebar panels |
-| `shadow.lg` | `0 10px 15px -3px rgba(43,43,43,0.1)` | **Compliance Wizard shell**, modals |
-| `shadow.xl` | `0 20px 25px -5px rgba(43,43,43,0.1)` | rare — high-overlay use |
-| `shadow.inner` | `inset 0 2px 4px 0 rgba(43,43,43,0.06)` | search fields, active progress bars |
-| `shadow.focus` | `0 0 0 3px rgba(9,112,112,0.2)` | Petrol focus halo (paired with `border.medium` + `color.border.focus`) |
+| `shadow.sm` | `0 1px 3px 0 rgba(15,23,42,0.06)` | standard Result Cards, inputs |
+| `shadow.md` | `0 4px 6px -1px rgba(15,23,42,0.08)` | hovered cards, sidebar panels |
+| `shadow.lg` | `0 10px 15px -3px rgba(15,23,42,0.10)` | **Compliance Wizard shell**, modals |
+| `shadow.xl` | `0 20px 25px -5px rgba(15,23,42,0.12), 0 8px 10px -5px rgba(15,23,42,0.06)` | rare — high-overlay use |
+| `shadow.inner` | `inset 0 2px 4px 0 rgba(15,23,42,0.08)` | search fields, active progress bars |
+| `shadow.focus` | `0 0 0 3px rgba(27,42,65,0.2)` | Ink focus halo (was Petrol until 2026-11-28) (paired with `border.medium` + `color.border.focus`) |
 
 **Dark Mode rule:** shadows are replaced by **Elevation Borders** (1px lighter strokes) — the Elevation Spec is explicit that light-source-shadows do not work in dark environments. See `references/theming.md`.
 
