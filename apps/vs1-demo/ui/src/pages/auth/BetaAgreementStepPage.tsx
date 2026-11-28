@@ -5,6 +5,8 @@ import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 import { Banner } from "../../components/ui/Banner";
 import { Button } from "../../components/ui/Button";
+import { FieldError, errorAria } from "../../components/ui/FieldError";
+import { focusField } from "../../components/ui/FormErrorSummary";
 import { useAuthStore } from "../../store/useAuthStore";
 import { acceptAgreement, fetchAgreement, type UserAgreement } from "../../api/agreements";
 import { ApiError } from "../../api/client";
@@ -66,7 +68,10 @@ export function BetaAgreementStepPage() {
     const submit = async (e: React.FormEvent) => {
         e.preventDefault();
         setTried(true);
-        if (!agreement || !checked || saving) return;
+        // Regel V2 (11.10.2026): ein einziges Feld, also keine Zusammenfassung —
+        // der Satz am Haken meldet sich selbst, und der Fokus geht dorthin.
+        if (agreement && !checked) { focusField("beta-check"); return; }
+        if (!agreement || saving) return;
         setSaving(true);
         setNotice(null);
         try {
@@ -166,17 +171,17 @@ export function BetaAgreementStepPage() {
 
                     <label className="mt-6 flex cursor-pointer items-start gap-3 text-body-xs leading-relaxed text-fg">
                         <input
+                            id="beta-check"
                             type="checkbox"
                             checked={checked}
                             onChange={(e) => setChecked(e.target.checked)}
                             disabled={!agreement}
-                            aria-invalid={needCheck || undefined}
-                            aria-describedby={needCheck ? "beta-check-error" : undefined}
+                            {...errorAria("beta-check", needCheck)}
                             className="mt-[3px] h-4 w-4 shrink-0 accent-[var(--color-bg-brand)]"
                         />
                         <span>{t("betaStep.checkbox", { version })}</span>
                     </label>
-                    {needCheck && <p id="beta-check-error" role="alert" className="mt-2 text-body-2xs text-fg-secondary">{t("betaStep.needCheck")}</p>}
+                    <FieldError id="beta-check" alert message={needCheck ? t("betaStep.needCheck") : null} className="mt-2 pl-7" />
 
                     <Button type="submit" variant="primary" size="lg" fullWidth className="mt-6" disabled={!agreement || saving} loading={saving} iconRight={<ArrowRight size={16} aria-hidden />}>
                         {saving ? t("betaStep.saving") : toRiskMap ? t("betaStep.ctaRiskMap") : t("betaStep.cta")}
