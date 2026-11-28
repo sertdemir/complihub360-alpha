@@ -55,6 +55,12 @@ describe('BetaAgreementStepPage', () => {
     await screen.findByText('Satz 1.');
     fireEvent.click(screen.getByRole('button', { name: /betaStep.cta/ }));
     expect(screen.getByRole('alert')).toHaveTextContent('betaStep.needCheck');
+    // Regel V2: ein Feld, keine Zusammenfassung — der Satz haengt am Haken, der Fokus steht dort.
+    const box = screen.getByRole('checkbox');
+    expect(box).toHaveFocus();
+    expect(box).toHaveAttribute('aria-invalid', 'true');
+    expect(box).toHaveAttribute('aria-describedby', 'beta-check-error');
+    expect(screen.getByRole('alert')).toHaveAttribute('id', 'beta-check-error');
     expect(acceptAgreement).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: /betaStep.cta/ }));
