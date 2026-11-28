@@ -11,9 +11,11 @@
 #          bei Absage nicht erstattet) und verschickt die Mails einer Buchung
 #          an dessen Kontaktadresse. Einmal am Tag und von Hand.
 #
-# Eingeschaltet wird der Lauf mit der Repository-Variable E2E_ENABLED=true,
-# sobald die Testkonten stehen (docs/runbooks/e2e-scenarios.md). Vorher sind
-# die Jobs uebersprungen, nicht gruen. Danach ist ein fehlendes Secret rot.
+# Eingeschaltet wird je Umgebung mit einer Repository-Variable, sobald deren
+# Testkonten stehen (docs/runbooks/e2e-scenarios.md): E2E_ENABLED=true fuer
+# Staging, E2E_BETA_ENABLED=true fuer die Beta. Zwei Schalter, damit Staging
+# laufen kann, bevor die Beta-Konten eingerichtet sind. Vorher ist der Job
+# uebersprungen, nicht gruen. Danach ist ein fehlendes Secret rot.
 #
 # Secrets (Settings → Secrets → Actions):
 #   STAGING_API_URL, STAGING_API_KEY, BETA_API_URL, BETA_API_KEY   (bestehen)
@@ -22,7 +24,8 @@
 #   E2E_BETA_USER_EMAIL, E2E_BETA_USER_PASSWORD
 #   E2E_BETA_PROVIDER_EMAIL, E2E_BETA_PROVIDER_PASSWORD
 # Variablen: BETA_SUPABASE_URL, BETA_SUPABASE_ANON_KEY (bestehen),
-#   E2E_BETA_PROVIDER_REF (public_ref des Test-Anbieters, optional).
+#   E2E_BETA_PROVIDER_REF (public_ref des Test-Anbieters, optional),
+#   E2E_ENABLED, E2E_BETA_ENABLED (die beiden Schalter).
 #
 # Der Lauf holt den Code von main und laeuft auf ubuntu-latest, nie auf dem
 # self-hosted Runner. `workflow_run` startet ihn im Kontext von main mit dem
@@ -87,7 +90,7 @@ jobs:
   beta:
     name: Szenarien auf der Beta (nur lesend)
     # Die Beta bekommt nie eine Buchung aus diesem Lauf, auch nicht von Hand.
-    if: vars.E2E_ENABLED == 'true' && github.event_name != 'workflow_run'
+    if: vars.E2E_BETA_ENABLED == 'true' && github.event_name != 'workflow_run'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

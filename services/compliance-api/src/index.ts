@@ -299,8 +299,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     let authCompany: string | null = null;
     // True only for the server-to-server API key — gates admin-only routes.
     let authViaApiKey = false;
-    // True when the verified JWT carries the app-level admin role (app_metadata
-    // wins over user_metadata, mirroring the frontend's roleFromUser()).
+    // True when the verified JWT carries the app-level admin role in
+    // app_metadata. NUR app_metadata: user_metadata schreibt der Nutzer selbst
+    // (supabase.auth.updateUser), eine Rolle von dort waere selbst verliehen.
     let authIsAdmin = false;
 
     // Public routes (audit P1 #4): guest-usable by DESIGN — the funnel runs
@@ -353,10 +354,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     if (typeof payload.sub === 'string') authUserId = payload.sub;
                     if (typeof payload.email === 'string') authEmail = payload.email;
                     if (payload.user_metadata && typeof payload.user_metadata.company_name === 'string') authCompany = payload.user_metadata.company_name;
-                    // App-level role lives in app_metadata.role (authoritative),
-                    // user_metadata.role as fallback — same precedence as the FE.
-                    const appRole = (payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined)
-                        ?? (payload.user_metadata && typeof payload.user_metadata.role === 'string' ? payload.user_metadata.role : undefined);
+                    // Die Rolle steht in app_metadata.role und nur dort. Bis
+                    // 2026-11-28 galt user_metadata.role als Rueckfall — damit
+                    // konnte sich jedes angemeldete Konto selbst zum Admin
+                    // machen. user_metadata ist Profil, keine Berechtigung.
+                    const appRole = payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined;
                     if (appRole === 'admin') authIsAdmin = true;
                 } else {
                     rejected = !notExpired ? 'expired' : !active ? 'not_yet_valid' : 'role';
@@ -1178,6 +1180,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             // Belegung — der Generator oben liefert nur noch die Kandidaten.
             // Faellt Nylas aus, bleiben die Kandidaten stehen: lieber ein Slot
             // zu viel (der Anbieter sagt ab) als eine leere Buchungsseite.
+            // `calendar_checked` sagt dann aber die Wahrheit: true nur, wenn
+            // der Kalender geantwortet hat. Dem Anbieter sagen wir "Mandanten
+            // sehen nur Zeiten, an denen Sie frei sind" — gilt das gerade
+            // nicht, steht es als Fehler im Log statt als Zusicherung im JSON.
             let out = slots;
             let calendarChecked = false;
             const grant = (prov as any).nylas_grant_id as string | undefined;
@@ -1185,8 +1191,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const from = Math.floor(Date.now() / 1000);
                 const to = from + 21 * 24 * 3600;
                 const busy = await fetchBusy(grant, ((prov as any).nylas_calendar_id as string) || '', from, to);
-                out = subtractBusy(slots, busy);
-                calendarChecked = true;
+                if (busy) {
+                    out = subtractBusy(slots, busy);
+                    calendarChecked = true;
+                } else {
+                    structuredLog('error', 'Calendar busy lookup failed — slots shown without the provider calendar', { correlationId, errorCode: 'ERR_CALENDAR_BUSY', severity: 'error', route: '/api/v1/p/:ref/slots', providerKey } as any);
+                }
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, public_ref: ref, slots: out, calendar_checked: calendarChecked, booking_open: true, reason: null, correlationId }));

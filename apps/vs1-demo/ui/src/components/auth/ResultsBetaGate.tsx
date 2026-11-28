@@ -1,7 +1,7 @@
 import { type ReactNode, useState } from 'react';
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Info, X } from 'lucide-react';
+import { Banner, BannerLink } from '../ui/Banner';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useBetaAgreementGate } from '../../lib/agreementGate';
 
@@ -72,26 +72,21 @@ function DeclinedNotice({ lang, returnTo }: { lang: string; returnTo: string }) 
   if (!show) return null;
   const close = () => { clearDeclined(); setShow(false); };
   return (
-    <div role="status" className="border-b border-stroke-brand-soft bg-brand-light">
-      <div className="mx-auto flex max-w-[1320px] items-start gap-3 px-6 py-3.5 lg:px-10">
-        <Info size={18} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
-        <div className="min-w-0 flex-1 text-body-xs leading-relaxed text-fg">
-          <p className="font-semibold">{t('betaStep.declined.title')}</p>
-          <p className="mt-0.5 text-fg-secondary">{t('betaStep.declined.body')}</p>
-          <p className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
-            <Link to={`/${lang}/terms`} className="font-semibold text-fg-brand underline underline-offset-2">{t('betaStep.declined.read')}</Link>
-            <Link to={`/${lang}/login?redirect=${encodeURIComponent(returnTo)}`} className="font-semibold text-fg-brand underline underline-offset-2">{t('betaStep.declined.signIn')}</Link>
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={close}
-          aria-label={t('betaStep.declined.close')}
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-fg-secondary hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus"
-        >
-          <X size={18} aria-hidden />
-        </button>
-      </div>
-    </div>
+    <Banner
+      status="brand"
+      variant="strip"
+      title={t('betaStep.declined.title')}
+      innerClassName="mx-auto max-w-[1320px] px-6 lg:px-10"
+      onClose={close}
+      closeLabel={t('betaStep.declined.close')}
+      actions={
+        <>
+          <BannerLink as={Link} to={`/${lang}/terms`}>{t('betaStep.declined.read')}</BannerLink>
+          <BannerLink as={Link} to={`/${lang}/login?redirect=${encodeURIComponent(returnTo)}`}>{t('betaStep.declined.signIn')}</BannerLink>
+        </>
+      }
+    >
+      {t('betaStep.declined.body')}
+    </Banner>
   );
 }

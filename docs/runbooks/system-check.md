@@ -66,17 +66,27 @@ Auf der Beta gehören alle vier dazu (`scripts/vps/beta.env.example`), auf
 Staging alles, was dort eingerichtet ist. **Ohne diese Zeile fällt ein
 verschwundener Schlüssel nicht auf:** Er steht dann als `not_configured` da,
 und der Bericht bleibt grün. Ein Name, den es nicht gibt (`resend` statt
-`mail`), macht den Bericht rot und steht unter `unknownRequired`. Nach dem
-Ändern der `.env` den API-Container neu starten.
+`mail`), macht den Bericht rot und steht unter `unknownRequired`.
+
+Die Zeile wirkt erst, wenn der Container **neu angelegt** ist. Ein bloßer
+Neustart reicht nicht: `docker compose restart` (und damit der Wrapper
+`complihub-api-restart`) behält die Umgebung, mit der der Container angelegt
+wurde. Auf dem VPS, je Umgebung im Ordner der API:
+
+```bash
+cd /docker/complihub-api      && docker compose up -d --force-recreate api   # Staging
+cd /docker/complihub-beta-api && docker compose up -d --force-recreate api   # Beta
+docker compose exec api printenv READINESS_REQUIRED                          # Gegenprobe
+```
 
 ## Wenn etwas rot ist
 
 | Befund | Bedeutung | Was tun |
 |---|---|---|
-| `stripe: rejected` | Schlüssel widerrufen oder abgelaufen | neuen Restricted Key anlegen (`docs/stripe-setup.md`), in die `.env`, Container neu starten |
+| `stripe: rejected` | Schlüssel widerrufen oder abgelaufen | neuen Restricted Key anlegen (`docs/stripe-setup.md`), in die `.env`, Container neu anlegen (siehe oben) |
 | `stripe … mode_live` auf der Beta | die Beta-Vereinbarung verspricht Testmodus | sofort auf den Testschlüssel zurück |
 | `mail: rejected` / `not_configured` | Anmeldelinks und Benachrichtigungen kommen nicht an | Schlüssel in Resend prüfen, Domain verifiziert? |
-| `calendar_grants: rejected` | mindestens eine Kalenderfreigabe ist abgelaufen. Buchen geht weiter, aber die belegten Zeiten dieses Anbieters werden nicht mehr abgezogen (Doppelbuchung möglich), und neue Termine landen nicht in seinem Kalender (`calendar_event_failed` im `event_log`) | der Anbieter verbindet seinen Kalender im Arbeitsbereich neu („Kalender verbinden") |
+| `calendar_grants: rejected` | mindestens eine Kalenderfreigabe ist abgelaufen. Buchen geht weiter, aber die belegten Zeiten dieses Anbieters werden nicht mehr abgezogen (Doppelbuchung möglich; die Slot-Route meldet dann `calendar_checked: false` und schreibt `ERR_CALENDAR_BUSY` ins Log), und neue Termine landen nicht in seinem Kalender (`calendar_event_failed` im `event_log`) | der Anbieter verbindet seinen Kalender im Arbeitsbereich neu („Kalender verbinden") |
 | `llm: rejected` | der Assistent antwortet mit 503 | Schlüssel in der Scaleway-Konsole prüfen (`llm-scaleway-umstellung.md`) |
 | `unreachable` bei einer Gegenseite | deren Ausfall oder unser Netz | Statusseite der Gegenseite; hält es an, Watchdog-Log ansehen |
 | `database: rejected` | der Server-Schlüssel gilt nicht mehr | in Supabase unter API-Schlüssel prüfen; ohne ihn läuft nichts |

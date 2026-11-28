@@ -21,7 +21,7 @@
       "detailsLabel": "Detalles Adicionales",
       "optional": "Opcional",
       "detailsPlaceholder": "Añade requisitos específicos, plazos o contexto para el proveedor...",
-      "privacyNotice": "Protegido por AI Privacy Gate. Tu solicitud es anónima hasta que elijas revelar tu identidad al proveedor.",
+      "privacyNotice": "Protegido por AI Privacy Gate. Su solicitud es anónima hasta que usted decida revelar su identidad al proveedor.",
       "cancel": "Cancelar",
       "submit": "Enviar Solicitud",
       "sent": "¡Enviado!"
@@ -53,22 +53,23 @@
       "stat1Label": "Pasos para el perfil de riesgo",
       "stat2Label": "Tiempo máximo de confirmación",
       "stat3Label": "Ventana máxima de respuesta",
-      "railSub": "Velocidad y claridad en lugar de dictámenes"
+      "railSub": "Velocidad y claridad en lugar de dictámenes",
+      "pain3Desc": "La evaluación recoge su contexto en cuatro pasos, traza los riesgos que aplican en sus mercados y le conecta con Verified Providers que confirman en 24 horas y responden en 48."
     },
     "operations": {
       "overline": "Para Equipos de Operaciones",
       "title": "Centraliza, rastrea y domina las operaciones de cumplimiento",
-      "body": "Los gerentes de operaciones y operadores de agencias necesitan conocimiento estructurado y un sistema unificado, no sitios gubernamentales dispersos y caóticos hilos de correo. CompliHub360 te da un único centro de control para el cumplimiento transfronterizo.",
+      "body": "Los gerentes de operaciones y operadores de agencias necesitan conocimiento estructurado y un sistema unificado, no sitios gubernamentales dispersos y caóticos hilos de correo. CompliHub360 le da un único centro de control para el cumplimiento transfronterizo.",
       "card1Title": "Investigación dispersa",
       "card1Problem": "La información sobre restricciones publicitarias, EPR y leyes fiscales está fragmentada en sitios gubernamentales no estructurados.",
       "card1Solution": "Las páginas de Mercados y Áreas de cumplimiento recogen las obligaciones que comprobamos, cada una con su norma. Las guías y tutoriales llegarán cuando merezcan la lectura.",
       "card2Title": "Pérdida de continuidad",
-      "card2Problem": "Rastrear solicitudes de proveedores, sesiones guardadas y actualizaciones legales es caótico sin un sistema unificado.",
-      "card2Solution": "El Centro de Control del Panel te permite guardar sesiones, rastrear estados de engagement en tiempo real y monitorear tareas.",
+      "card2Problem": "Hacer seguimiento de solicitudes a proveedores, Risk Maps guardadas y actualizaciones legales es caótico sin un sistema unificado.",
+      "card2Solution": "El Centro de Control del Panel le permite guardar Risk Maps, seguir el estado de sus encargos en tiempo real y controlar tareas.",
       "card3Title": "Fricción en los informes",
       "card3Problem": "Resumir la exposición regulatoria para las partes interesadas es un trabajo manual y que consume mucho tiempo.",
       "card3Solution": "Exportación PDF de un clic: Instantánea de Riesgo, Plan de Acción e Índice de Fuentes — listo para circulación interna.",
-      "panel1Title": "Cuadrícula de Sesiones",
+      "panel1Title": "Vista de Risk Maps",
       "panel1Desc": "Perfiles de riesgo guardados por país",
       "panel2Title": "Solicitudes Activas",
       "panel2Desc": "Estado del engagement con proveedores",
@@ -82,7 +83,7 @@
       "item3": "Índice de Fuentes",
       "stat1Label": "Visibilidad del ciclo de vida del engagement",
       "stat2Label": "Exportación de informes PDF",
-      "stat3Label": "Sesiones de cumplimiento guardadas",
+      "stat3Label": "Risk Maps guardadas",
       "railSub": "Un centro de control en lugar de hilos de correo"
     },
     "counsel": {
@@ -112,8 +113,8 @@
       "railSub": "Afirmaciones con fuente, datos enmascarados"
     },
     "cta": {
-      "title": "¿Qué rol te describe mejor?",
-      "body": "Sin importar tu función, nuestra plataforma se adapta a tu realidad de cumplimiento.",
+      "title": "¿Qué rol le describe mejor?",
+      "body": "Sea cual sea su función, nuestra plataforma se adapta a su realidad de cumplimiento.",
       "btnAssessment": "Iniciar evaluación gratuita",
       "btnPlatform": "Explorar plataforma"
     },
@@ -256,8 +257,8 @@
   },
   "compliance": {
     "heroOverline": "Áreas de Cumplimiento",
-    "heroTitlePre": "Encuentra tu desafío regulatorio.",
-    "heroTitleGold": "Empieza aquí.",
+    "heroTitlePre": "Encuentre su desafío regulatorio.",
+    "heroTitleGold": "Empiece aquí.",
     "whoAffected": "A quién afecta",
     "startAssessment": "Iniciar evaluación de {{title}}",
     "riskPanel": {
@@ -316,7 +317,8 @@
         "body": "4–5 preguntas precisas traducen su situación en un perfil de búsqueda estructurado."
       },
       "match": {
-        "title": "Emparejar"
+        "title": "Emparejar",
+        "body": "Los Verified Providers se ordenan por encaje, experiencia verificada y calidad de servicio — nunca por lo que pagan."
       },
       "engage": {
         "title": "Contratar",
@@ -783,8 +785,8 @@
       "sharedTriggers_one": "{{count}} disparador compartido",
       "sharedTriggers_other": "{{count}} disparadores compartidos",
       "allAreasLink": "Las nueve áreas de un vistazo",
-      "coverageNoteEu_one": "El motor recoge {{count}} obligación para este ámbito, con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional.",
-      "coverageNoteEu_other": "El motor recoge {{count}} obligaciones para este ámbito, todas con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional.",
+      "coverageNoteEu_one": "El motor recoge {{count}} obligación para este ámbito, con una fuente a nivel de la UE. Elija un mercado para ver dónde se añade una fuente nacional.",
+      "coverageNoteEu_other": "El motor recoge {{count}} obligaciones para este ámbito, todas con una fuente a nivel de la UE. Elija un mercado para ver dónde se añade una fuente nacional.",
       "startShort": "Iniciar la evaluación",
       "sourcePromise": "Cada obligación remite a una base jurídica citada — ninguna valoración sin fuente.",
       "facts": {
@@ -840,7 +842,7 @@
       "checkFoot": "Si uno aplica, esta área conlleva deberes para usted — el assessment los acota a su caso.",
       "ceiling": {
         "unproven": "Aún sin acreditar",
-        "unprovenNote": "La cifra con la que calcula el mapa de riesgo es un valor heredado: no la hemos leído en el texto legal.",
+        "unprovenNote": "La cifra con la que calcula la Risk Map es un valor heredado: no la hemos leído en el texto legal.",
         "perUnit": "{{amount}} por {{per}}",
         "proportional": "{{percent}} % {{of}}",
         "turnover": "{{percent}} % del volumen de negocios anual mundial",
@@ -1045,7 +1047,8 @@
         "DE": "cláusulas ineficaces; riesgo de litigio",
         "default": "cláusulas inaplicables; riesgo de litigio"
       }
-    }
+    },
+    "heroBody": "Cada área de cumplimiento lleva a su propia evaluación. Identifique su tema, entienda sus riesgos en unos seis minutos y vea después a los especialistas que encajan con usted."
   },
   "resources": {
     "meta": {
@@ -1146,7 +1149,9 @@
     "dimEyebrow": "Gobernanza",
     "dimCounter": "Dimensión {{num}} de {{total}}",
     "featEyebrow": "En uso",
-    "ctaBody": "Las mismas reglas, la misma IA: la evaluación acota en unos seis minutos lo que se le aplica, con la fuente de cada afirmación."
+    "ctaBody": "Las mismas reglas, la misma IA: la evaluación acota en unos seis minutos lo que se le aplica, con la fuente de cada afirmación.",
+    "dimEthicsDesc": "Nuestras funciones de IA respetan la autonomía de las personas y están pensadas para apoyar a los profesionales, no para sustituirlos.",
+    "featPrivacyDesc": "Antes de que el contexto de su negocio llegue a un modelo de IA, reglas de patrones fijas enmascaran direcciones de correo electrónico, números de teléfono y otros identificadores. No detectan todos los nombres, así que le rogamos que no incluya datos personales en el texto libre."
   },
   "header": {
     "nav": {
@@ -1203,7 +1208,7 @@
       {
         "kicker": "Evaluar",
         "title": "Vea qué se aplica realmente a su caso.",
-        "body": "Cuéntenos sobre sus mercados, su modelo de negocio y las áreas en las que necesita apoyo. Su risk map muestra entonces las obligaciones que se aplican a su empresa, cada una con su prioridad y, cuando existe, su fuente oficial y su plazo. Provienen de nuestro motor de compliance, no de un chatbot.",
+        "body": "Cuéntenos sobre sus mercados, su modelo de negocio y las áreas en las que necesita apoyo. Su Risk Map muestra entonces las obligaciones que se aplican a su empresa, cada una con su prioridad y, cuando existe, su fuente oficial y su plazo. Provienen de nuestro motor de compliance, no de un chatbot.",
         "short": "El wizard pregunta cuatro cosas y crea su Risk Map — cada obligación con base legal y plazo."
       },
       {
@@ -1221,7 +1226,7 @@
       {
         "kicker": "Actuar",
         "title": "Reserve una consulta.",
-        "body": "Elija un proveedor y una hora en su calendario. Antes de reservar, ve exactamente qué se compartirá. La identidad del proveedor se revela al reservar, y solo se comparte la información necesaria para tramitar su solicitud. Después puede valorar la cita, y sus obligaciones siguen en su risk map con sus plazos.",
+        "body": "Elija un proveedor y una hora en su calendario. Antes de reservar, ve exactamente qué se compartirá. La identidad del proveedor se revela al reservar, y solo se comparte la información necesaria para tramitar su solicitud. Después puede valorar la cita, y sus obligaciones siguen en su Risk Map con sus plazos.",
         "short": "Elija una cita — su dossier viaja con usted, no explicará su negocio una sexta vez."
       }
     ],
@@ -1316,7 +1321,7 @@
     "cost": {
       "kicker": "Lo que esto le cuesta",
       "title": "Gratis para encontrar y reservar un proveedor.",
-      "body": "La evaluación, su risk map, el matching y la reserva son gratuitos para usted. Nos pagan los proveedores cuando una reserva llega a producirse. Por eso mismo el orden no está en venta: una posición pagada dejaría el match sin valor para ambas partes. Solo el asistente de IA de su espacio de trabajo tiene un plan de pago opcional para más preguntas al día."
+      "body": "La evaluación, su Risk Map, el matching y la reserva son gratuitos para usted. Nos pagan los proveedores cuando una reserva llega a producirse. Por eso mismo el orden no está en venta: una posición pagada dejaría el match sin valor para ambas partes. Solo el asistente de IA de su espacio de trabajo tiene un plan de pago opcional para más preguntas al día."
     },
     "privacy": {
       "kicker": "Qué ocurre con sus datos",
@@ -1331,7 +1336,9 @@
       "title": "Empiece por donde tenga sentido.",
       "lead": "Unas pocas preguntas, unos seis minutos, sin necesidad de cuenta."
     },
-    "seeAll": "Ver cómo funciona cada paso"
+    "seeAll": "Ver cómo funciona cada paso",
+    "ctaAsk": "Hacer una pregunta",
+    "ctaAssess": "Evaluar mis necesidades"
   },
   "markets": {
     "meta": {
@@ -1496,10 +1503,49 @@
       "title": "Dónde estamos — y hacia dónde vamos",
       "items": {
         "eu": {
-          "name": "Unión Europea"
+          "name": "Unión Europea",
+          "focus": [
+            "RGPD",
+            "RAP y envases (PPWR)",
+            "IVA en toda la UE",
+            "Seguridad de productos (GPSR)"
+          ]
         },
-        "uk": {},
-        "us": {}
+        "uk": {
+          "name": "Reino Unido",
+          "focus": [
+            "UK GDPR",
+            "IVA de HMRC",
+            "RAP de envases (PackUK)",
+            "Seguridad de productos"
+          ]
+        },
+        "us": {
+          "name": "Estados Unidos",
+          "focus": [
+            "Sales tax estatal",
+            "CCPA/CPRA y privacidad estatal",
+            "Normas publicitarias de la FTC",
+            "Clasificación arancelaria"
+          ]
+        },
+        "tr": {
+          "name": "Turquía",
+          "focus": [
+            "KDV (IVA)",
+            "Privacidad KVKK",
+            "Consentimiento en comercio electrónico (ETK)",
+            "Aduanas y EORI"
+          ]
+        }
+      },
+      "lead": "Cada entrada indica la norma de la que procede: nacional donde la tenemos, de la UE donde esa es la norma aplicable.",
+      "note": "{{markets}} mercados hoy: {{marketList}}. Donde aún no tenemos un texto nacional, la página del mercado lo indica.",
+      "scope": {
+        "eu": "Alemania · Francia · Italia · España · Países Bajos + Derecho de la UE",
+        "uk": "Derecho nacional",
+        "us": "Federal + CA, TX, NY, FL",
+        "tr": "Derecho nacional"
       }
     },
     "obligationsByMarket": {
@@ -1551,7 +1597,9 @@
       "body": "La posición en la lista nunca está a la venta. Un puesto pagado dejaría el match sin valor para ambas partes: usted conocería a quien más hubiera pagado, y el especialista conocería a alguien cuyo caso no podría atender. La idoneidad es el único criterio."
     },
     "specialist": {
-      "kicker": "Lo que cuesta el especialista"
+      "kicker": "Lo que cuesta el especialista",
+      "title": "Sus honorarios — hablados antes de comprometerse.",
+      "body": "El asesoramiento en sí no es gratuito, y no vamos a fingir lo contrario. Cada Verified Provider fija sus propios honorarios; el alcance y el precio se hablan en la cita, antes de que usted se comprometa a nada."
     },
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
@@ -1583,7 +1631,7 @@
       "items": [
         {
           "q": "¿La evaluación es realmente gratuita?",
-          "a": "Sí: la evaluación y el mapa de riesgos no cuestan nada y no requieren cuenta; para comparar proveedores basta una cuenta gratuita. Lo que se paga es el asesoramiento en sí, directamente al proveedor, según la estimación que publica de antemano."
+          "a": "Sí: la evaluación y la Risk Map no cuestan nada y no requieren cuenta; para comparar proveedores basta una cuenta gratuita. Lo que se paga es el asesoramiento en sí, directamente al proveedor, según la estimación que publica de antemano."
         },
         {
           "q": "¿Necesito una cuenta?",
@@ -1598,7 +1646,8 @@
           "a": "No. Los puestos no están en venta: una posición pagada haría que el match perdiera su valor para ambas partes. La idoneidad es el único criterio."
         },
         {
-          "q": "¿Cuánto cuesta el asesoramiento del especialista?"
+          "q": "¿Cuánto cuesta el asesoramiento del especialista?",
+          "a": "Los honorarios los fija el especialista. El alcance y el precio se hablan en la cita, antes de que usted se comprometa a nada."
         },
         {
           "q": "¿Ve el especialista mis datos antes de la reserva?",
@@ -1663,11 +1712,11 @@
   "seo": {
     "home": {
       "title": "CompliHub360 · Entender y cumplir",
-      "description": "Las normas de sus mercados en un mapa de riesgo, con la fuente detrás de cada obligación, y el camino hacia especialistas verificados. Gratis, sin cuenta."
+      "description": "Las normas de sus mercados en una Risk Map, con la fuente detrás de cada obligación, y el camino hacia especialistas verificados. Gratis, sin cuenta."
     },
     "howItWorks": {
       "title": "Cómo funciona · CompliHub360",
-      "description": "De una pregunta al mapa de riesgo y al profesional adecuado. Cinco pasos, sin llamada comercial y sin compromiso."
+      "description": "De una pregunta a la Risk Map y al profesional adecuado. Cinco pasos, sin llamada comercial y sin compromiso."
     },
     "compliance": {
       "title": "Áreas de compliance · CompliHub360",
@@ -1679,7 +1728,7 @@
     },
     "pricing": {
       "title": "Precios · CompliHub360",
-      "description": "El análisis, el mapa de riesgo y el matching no le cuestan nada. Pagan los profesionales, y solo cuando se confirma una cita."
+      "description": "La evaluación, la Risk Map y el matching no le cuestan nada. Pagan los profesionales, y solo cuando se confirma una cita."
     },
     "resources": {
       "title": "Recursos · CompliHub360",
@@ -1691,7 +1740,7 @@
     },
     "platform": {
       "title": "La plataforma · CompliHub360",
-      "description": "Cómo su contexto de negocio se convierte en un mapa de riesgo estructurado: la puerta de privacidad, el análisis con fuentes y el matching."
+      "description": "Cómo su contexto de negocio se convierte en una Risk Map estructurada: la puerta de privacidad, el análisis con fuentes y el matching."
     },
     "solutions": {
       "title": "Por rol · CompliHub360",

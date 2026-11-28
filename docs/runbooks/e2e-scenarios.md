@@ -76,13 +76,15 @@ Deshalb läuft `full` nur einmal am Tag und von Hand, nie auf der Beta.
    `E2E_STAGING_PROVIDER_EMAIL`, `E2E_STAGING_PROVIDER_PASSWORD`, für die Beta
    dieselben vier mit `E2E_BETA_…`. Passwörter gehören nicht in den Chat und
    nicht ins Repo.
-4. **Variable** `E2E_ENABLED=true` setzen (Settings → Variables). Für die Beta
-   optional `E2E_BETA_PROVIDER_REF` (der `public_ref` eines Test-Anbieters);
-   ohne ihn entfällt dort die Prüfung der Zeitfenster.
+4. **Schalter** setzen (Settings → Variables), je Umgebung einer:
+   `E2E_ENABLED=true` für Staging, `E2E_BETA_ENABLED=true` für die Beta. So
+   kann Staging laufen, bevor die Beta-Konten stehen. Für die Beta optional
+   `E2E_BETA_PROVIDER_REF` (der `public_ref` eines Test-Anbieters); ohne ihn
+   entfällt dort die Prüfung der Zeitfenster.
 5. Von Hand mit `smoke` auslösen und das Ergebnis lesen.
 
-Vor `E2E_ENABLED=true` sind die Jobs übersprungen. Danach ist ein fehlendes
-Secret rot: Es wurde nichts geprüft.
+Ohne ihren Schalter ist eine Umgebung übersprungen. Mit Schalter ist ein
+fehlendes Secret rot: Es wurde nichts geprüft.
 
 ## Lokal oder gegen einen eigenen Stand
 

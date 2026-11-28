@@ -164,8 +164,22 @@ export interface BannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   icon?: React.ReactNode | false;
   /** Trailing action (e.g. a link or button). */
   action?: React.ReactNode;
+  /**
+   * Aktionen UNTER dem Text, in einer Reihe mit Umbruch (Compass "Alert Strip",
+   * Canvas-Wahl 3A vom 2026-11-28). Fuer zwei oder mehr Links: deutsche
+   * Linktexte sind lang, unter dem Text brechen sie sauber um, rechts daneben
+   * (`action`) nicht. Links mit `BannerLink` bauen.
+   */
+  actions?: React.ReactNode;
   /** Show a dismiss ✕ that calls this. */
   onClose?: () => void;
+  /** Name des Schliessen-Knopfs fuer Screenreader. Standard "Dismiss". */
+  closeLabel?: string;
+  /**
+   * Nur strip: Klassen fuer den inneren Container, damit der Inhalt des
+   * Streifens mit dem Raster der Seite fluchtet (max-w-…, mx-auto, px-…).
+   */
+  innerClassName?: string;
   /** card = rounded (inline alert) · strip = square full-bleed (sticky top banner). */
   variant?: 'card' | 'strip';
   /** Tint intensity: light (soft) · medium · strong · solid (filled, inverse text). */
@@ -178,25 +192,20 @@ export function Banner({
   children,
   icon,
   action,
+  actions,
   onClose,
+  closeLabel = 'Dismiss',
   variant = 'card',
   surface = 'light',
   className,
+  innerClassName,
   ...rest
 }: BannerProps) {
   const s = SURFACES[status][surface];
   const Icon = ICONS[status];
-  return (
-    <div
-      role="status"
-      className={cn(
-        'flex items-start gap-3 border px-4 py-3',
-        variant === 'card' ? 'rounded-lg' : 'rounded-none border-x-0',
-        s.surface,
-        className,
-      )}
-      {...rest}
-    >
+  const strip = variant === 'strip';
+  const body = (
+    <>
       {icon !== false && (
         <span className={cn('mt-0.5 shrink-0', s.accent)}>{icon ?? <Icon size={20} strokeWidth={2} />}</span>
       )}
@@ -204,6 +213,14 @@ export function Banner({
         <div className="min-w-0">
           <p className="text-body-sm font-semibold leading-snug">{title}</p>
           {children && <div className="mt-0.5 text-body-sm leading-relaxed opacity-85">{children}</div>}
+          {actions && (
+            // Die Links erben die Textfarbe des Banners, nicht `s.accent`: die
+            // Akzentfarbe ist fuer Icons gemacht und liegt als Schrift auf den
+            // hellen Toenen unter 4.5:1 (Brand hell: 3.4:1).
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm font-semibold">
+              {actions}
+            </div>
+          )}
         </div>
         {action && (
           <div className={cn('shrink-0 text-body-sm font-semibold underline-offset-2', s.accent)}>{action}</div>
@@ -213,12 +230,56 @@ export function Banner({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Dismiss"
-          className="-mr-1 ml-1 shrink-0 rounded p-0.5 opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-current"
+          aria-label={closeLabel}
+          className={cn(
+            'shrink-0 opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-current',
+            // Im Streifen ist das Schliessen die einzige Bedienung am Rand: volle
+            // 44 px Trefferflaeche. In der Karte bleibt es beim kleinen Knopf.
+            strip ? '-my-2 -mr-2 grid h-11 w-11 place-items-center rounded-lg' : '-mr-1 ml-1 rounded p-0.5',
+          )}
         >
-          <X size={18} />
+          <X size={18} aria-hidden />
         </button>
       )}
+    </>
+  );
+  return (
+    <div
+      role="status"
+      className={cn(
+        'border',
+        strip ? 'rounded-none border-x-0 border-t-0' : 'rounded-lg',
+        // Ohne inneren Container traegt die Huelle selbst Reihe und Abstand.
+        !(strip && innerClassName) && 'flex items-start gap-3 px-4 py-3',
+        s.surface,
+        className,
+      )}
+      {...rest}
+    >
+      {strip && innerClassName ? <div className={cn('flex items-start gap-3 py-3', innerClassName)}>{body}</div> : body}
     </div>
+  );
+}
+
+/**
+ * Ein Link in `actions`. Immer unterstrichen — der Link haengt nie allein an
+ * der Farbe; die Farbe erbt er vom Status des Banners. Rendert <a> oder, mit
+ * `as`, eine andere Komponente (react-router `Link`).
+ */
+type BannerLinkProps<C extends React.ElementType> = { as?: C; className?: string; children: React.ReactNode } &
+  Omit<React.ComponentPropsWithoutRef<C>, 'as' | 'className' | 'children'>;
+
+export function BannerLink<C extends React.ElementType = 'a'>({ as, className, children, ...rest }: BannerLinkProps<C>) {
+  const Tag: React.ElementType = as ?? 'a';
+  return (
+    <Tag
+      className={cn(
+        'rounded-sm py-0.5 underline underline-offset-[3px] focus:outline-none focus-visible:ring-2 focus-visible:ring-current',
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </Tag>
   );
 }

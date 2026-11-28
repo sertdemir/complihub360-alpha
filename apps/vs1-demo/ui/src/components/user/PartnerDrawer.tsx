@@ -2,10 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRequestContext } from '../../lib/requestContext';
-import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { AnonNotice, Monogram, OriginLine, RankBasis } from './PartnerCard';
 import { AcknowledgementList, BookingFailureCard } from './BookingAcknowledgement';
-import { BetaSheetBody, BetaSheetFooter, BetaSheetHeader, useBetaSheet } from './BetaSheet';
+import { BetaSheetBody, BetaSheetFooter, useBetaSheet } from './BetaSheet';
 import { SharingReviewDialog, useSharedRows, type SharingTopic } from './SharingReview';
 import { goToBookingConfirmed } from '../../lib/bookingConfirmed';
 import { Drawer } from '../ui/Drawer';
@@ -317,20 +317,16 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
             {!booking && <AnonNotice className="mt-3" />}
           </div>
         ) : step === 'termin' ? (
-          <div>
-            <button
-              type="button"
-              onClick={() => setStep('profil')}
-              className="inline-flex items-center gap-1.5 text-body-3xs font-bold text-brand underline underline-offset-2 hover:text-brand-700"
-            >
-              <ArrowLeft size={13} aria-hidden /> {t('schedule.back')}
-            </button>
-            <p className="mt-1.5 text-body-3xs text-fg-tertiary">{provider.title} · {t('schedule.sub')}</p>
-          </div>
-        ) : step === 'blatt' ? (
-          <BetaSheetHeader onBack={() => setStep('termin')} />
+          // Kompakter Kopf (Canvas-Wahl 4B): der Rueckweg sitzt als Icon neben
+          // dem Titel, diese Zeile steht als erster Absatz im Inhalt.
+          <>{provider.title} · {t('schedule.sub')}</>
         ) : undefined
       }
+      // Termin und Blatt erledigen eine Aufgabe: kompakter Kopf, eine Ebene zurueck.
+      header={step === 'profil' ? 'default' : 'compact'}
+      onBack={step === 'termin' ? () => setStep('profil') : step === 'blatt' ? () => setStep('termin') : undefined}
+      backLabel={step === 'termin' ? t('schedule.back') : step === 'blatt' ? tLegal('betaStep.drawer.back') : undefined}
+      closeLabel={tw('review.close')}
       footer={
         step === 'profil' && d?.bookable_chargeable === false ? (
           // Wie die Detailseite (Nutzer-Entscheidung 2026-10-01): kein Knopf

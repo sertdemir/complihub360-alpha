@@ -18,6 +18,10 @@ import { useAuthStore } from '../../store/useAuthStore';
 // wo Unternehmensdaten und Nachweise stehen. Dasselbe Split-Muster wie
 // /provider-apply: links der Weg, rechts die eine Eingabe.
 //
+// Befund aus dem Nachtest (28.11.2026): E-Mail plus "Password" las sich wie
+// eine Anmeldung. Feld, Hinweis und Einleitung sagen deshalb selbst, dass hier
+// ein neues Passwort gewaehlt wird; es stand vorher nur links in Schritt 01.
+//
 // Die Seite sagt, was der Schritt ist und was nicht: eingeladen heisst nicht
 // verifiziert. Ohne gueltigen Link gibt es kein Formular, sondern den Grund.
 

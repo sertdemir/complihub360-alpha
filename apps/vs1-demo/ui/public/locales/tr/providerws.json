@@ -50,7 +50,8 @@
     "cancel": "İptal",
     "confirm": "Onayla",
     "typePrefix": "Onaylamak için ",
-    "typeSuffix": " yazın:"
+    "typeSuffix": " yazın:",
+    "keywordHint": "Devam etmek için yukarıya {{keyword}} yazın."
   },
   "changeEmail": {
     "eyebrow": "AYARLAR",
@@ -150,7 +151,8 @@
       "network": "Bağlantı yok. Hesabınızda hiçbir şey değişmedi; lütfen tekrar deneyin.",
       "rateLimit": "Kısa sürede çok fazla mesaj. Lütfen biraz bekleyin."
     },
-    "scope": "Desteğin kapsamı dışında: müşterilerle ücret pazarlığınız ve mesleki danışmanlık — uzman sizsiniz, biz platformuz. Bir lead ücreti, bant veya alacak hakkındaki sorular ise buraya ait, Faturalama altında."
+    "scope": "Desteğin kapsamı dışında: müşterilerle ücret pazarlığınız ve mesleki danışmanlık — uzman sizsiniz, biz platformuz. Bir lead ücreti, bant veya alacak hakkındaki sorular ise buraya ait, Faturalama altında.",
+    "messageTooShort": "Lütfen ne olduğunu en az 10 karakterle açıklayın."
   },
   "billing": {
     "title": "Faturalama",
@@ -351,7 +353,8 @@
       "cancelled": "iptal"
     },
     "trendsNote": "Aylık seyir Growth’tan itibaren; alan ve ülke de öyle. Essential yukarıdaki verileri seyir olmadan gösterir; CSV dışa aktarma Global’den itibaren. Her planda aynı veriler.",
-    "bySelf": "sizin tarafınızdan"
+    "bySelf": "sizin tarafınızdan",
+    "appealTooShort": "Lütfen itirazınızı en az 10 karakterle gerekçelendirin."
   },
   "magicAction": {
     "partnerBadge": "Sağlayıcı",
@@ -381,7 +384,23 @@
     "doneTitle": "Tamamlandı ✓",
     "dossierUnlocked": "🔓 Dosya kilidi açıldı",
     "contactInDashboard": "Talep sahibinin iletişim bilgileri sağlayıcı panonuzdaki mesaj dizisinde görünecektir.",
-    "closeNote": "Bu pencereyi kapatabilir veya sağlayıcı panonuzu açabilirsiniz."
+    "closeNote": "Bu pencereyi kapatabilir veya sağlayıcı panonuzu açabilirsiniz.",
+    "fields": {
+      "country": "Ülke",
+      "markets": "Pazarlar",
+      "categories": "Alanlar",
+      "businessType": "İşletme türü",
+      "businessTypeNote": "İşletme bilgileri",
+      "marketScope": "Pazar kapsamı",
+      "riskSignals": "Risk sinyalleri",
+      "revenueBand": "Ciro aralığı",
+      "intent": "Amaç",
+      "urgency": "Aciliyet",
+      "note": "Not",
+      "existingProvider": "Mevcut sağlayıcı",
+      "domain": "Alan",
+      "timeline": "Zaman çizelgesi"
+    }
   },
   "settings": {
     "title": "Ayarlar",
@@ -595,14 +614,15 @@
         "reason": "Rezervasyon, iletişim bilgileri paylaşılmadan önce iptal edildi.",
         "context": "Paylaşılmadı."
       }
-    }
+    },
+    "attChoiceRequired": "Lütfen randevunun nasıl geçtiğini seçin."
   },
   "intake": {
     "inviteOnlyTitle": "Sağlayıcı kaydı yalnızca davetle.",
     "inviteOnlyBody": "CompliHub360 sağlayıcıları doğrudan ekibimiz tarafından bulunur ve kişisel bir kayıt bağlantısıyla alınır. Herkese açık kayıt yoktur — her sağlayıcı, aktivasyondan önce yönergelerimize ve tüzüğümüze göre manuel incelemeden geçer.",
-    "inviteOnlyContact": "Şirketlere uyum danışmanlığı veriyor ve sağlayıcı olmak mı istiyorsun? Bize yaz: partners@complihub360.com",
+    "inviteOnlyContact": "Şirketlere uyum danışmanlığı veriyor ve sağlayıcı olmak mı istiyorsunuz? Bize yazın: partners@complihub360.com",
     "title": "Sağlayıcı kaydı",
-    "sub": "Firma paketini gönder — manuel olarak inceleyip doğrulamadan sonra çalışma alanını aktive ederiz.",
+    "sub": "Büro paketinizi gönderin — manuel olarak inceler ve doğrulamadan sonra çalışma alanınızı etkinleştiririz.",
     "secFirm": "Firma ve kapsam",
     "name": "Firma adı *",
     "website": "Web sitesi",
@@ -616,13 +636,19 @@
     "statutes": "Firmamızın CompliHub360 sağlayıcı yönergelerine ve tüzüğüne uyduğunu onaylıyor, gönderilen bilgilerin manuel incelenmesini kabul ediyorum.",
     "submit": "Paketi incelemeye gönder",
     "sending": "Gönderiliyor…",
-    "vettingNote": "İncelemeden sonra çalışma alanı erişimini alırsın — genellikle 3 iş günü içinde.",
+    "vettingNote": "İncelemeden sonra çalışma alanı erişiminizi alırsınız — genellikle 3 iş günü içinde.",
     "doneTitle": "Paket alındı — incelemede.",
-    "doneBody": "Teşekkürler! Ekibimiz bilgilerini sağlayıcı yönergelerine göre inceliyor. Genellikle 3 iş günü içinde haber alırsın. Çalışma alanın aktivasyona kadar pasif kalır.",
+    "doneBody": "Teşekkürler! Ekibimiz bilgilerinizi sağlayıcı yönergelerine göre inceliyor. Genellikle 3 iş günü içinde bizden haber alırsınız. Çalışma alanınız etkinleştirilene kadar pasif kalır.",
     "doneNote": "Sorular? partners@complihub360.com",
     "errorTitle": "Gönderim başarısız",
-    "errorBody": "Paket gönderilemedi. Kayıt bağlantını kontrol et veya tekrar dene — ya da partners@complihub360.com ile iletişime geç.",
-    "titleNote": "Rezervasyondan önce kullanıcılar sizi onaylı alanlarınız ve bölgenizle „Verified Provider A/B/C“ olarak görür; bu başlığı CompliHub360 oluşturur, sizin yazmanız gerekmez."
+    "errorBody": "Paket gönderilemedi. Kayıt bağlantınızı kontrol edin veya tekrar deneyin — ya da partners@complihub360.com adresine yazın.",
+    "titleNote": "Rezervasyondan önce kullanıcılar sizi onaylı alanlarınız ve bölgenizle „Verified Provider A/B/C“ olarak görür; bu başlığı CompliHub360 oluşturur, sizin yazmanız gerekmez.",
+    "nameShort": "Büro adı",
+    "statutesShort": "Sağlayıcı yönergeleri ve tüzüğü",
+    "errors": {
+      "name": "Lütfen büronuzun adını girin (en az 2 karakter).",
+      "statutes": "Paketinizi göndermek için lütfen sağlayıcı yönergelerini ve tüzüğü onaylayın."
+    }
   },
   "application": {
     "title": "Başvuru",
@@ -748,7 +774,8 @@
       "registryUnavailable": "Sicile şu anda ulaşılamıyor. İnceleme ekibi belge üzerinden karar verecek.",
       "reviewerHint": "İnceleme ekibi sicil kaydı üzerinden karar verir — yükleme gerekmez.",
       "licenceHint": "Göndermeden önce değil, aktivasyondan önce gerekli.",
-      "uploadedOn": "{{date}} tarihinde yüklendi"
+      "uploadedOn": "{{date}} tarihinde yüklendi",
+      "vatTooShort": "Lütfen KDV numaranızın tamamını girin, örneğin DE123456789."
     },
     "agreements": {
       "intro": "Her onay sürüm, dil, ad ve görevle kaydedilir. Yeni bir sürüm eskisinin yerini alır ama onu silmez — bir rezervasyon anındaki durum kanıtlanabilir kalır.",
@@ -857,7 +884,8 @@
         "services": "{{countries}} ülkede {{services}} hizmet",
         "evidence": "Sicil kaydı, sigorta, KDV numarası",
         "agreements": "{{total}} onaydan {{done}} tanesi"
-      }
+      },
+      "lockedHint": "“Hâlâ eksik” altındaki her şey tamamlandığında gönderebilirsiniz. Oraya gitmek için bir maddeyi seçin."
     },
     "missing": {
       "account": {
@@ -957,12 +985,18 @@
       "approvedFrom": "onaylandı, {{date}} tarihinden itibaren",
       "plannedFrom": "{{date}} tarihinden itibaren planlandı",
       "plannedShort": "Değişiklik planlandı",
-      "withdrawFields": "Geri çek: {{fields}}"
+      "withdrawFields": "Geri çek: {{fields}}",
+      "numberInvalid": "Lütfen 0 veya daha büyük bir sayı girin ya da alanı boş bırakın."
     },
     "errors": {
       "serviceExists": "Bu hizmet zaten listenizde.",
       "serviceCodeFixed": "Bir hizmetin kategorisi değiştirilemez. Bu hizmeti sonlandırın ve yerine yeni bir hizmet ekleyin.",
-      "serviceRetired": "Bu hizmet sonlandırıldı ve artık düzenlenemez."
+      "serviceRetired": "Bu hizmet sonlandırıldı ve artık düzenlenemez.",
+      "serviceCode": "Lütfen bir hizmet kodu girin, örneğin tax-vat.returns.",
+      "serviceCodeUnknown": "Bu hizmet kodu listemizde yok. Lütfen yazımı kontrol edin, örneğin tax-vat.returns.",
+      "countryCode": "Lütfen iki harfli bir ülke kodu girin, örneğin AT.",
+      "countryListed": "{{country}} bu hizmet için zaten listede. Lütfen başka bir ülke girin.",
+      "agreementName": "Kabul etmek için lütfen adınızı girin."
     },
     "saveFailed": {
       "heading": "Değişikliklerinizi kaydedemedik",
@@ -1101,7 +1135,8 @@
       "sendFailed": {
         "heading": "Değişikliği bildiremedik",
         "message": "Girdiğiniz bilgiler hâlâ burada. Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
-      }
+      },
+      "dateInvalid": "Lütfen olayın gerçekleştiği tarihi seçin — bugün veya daha önce."
     }
   },
   "identity": {
@@ -1218,7 +1253,8 @@
       "errAllowance": "Bu plan {{allowance}} ana kategori kapsar, hesabınızda ise {{used}} kategori yayına alınmış.",
       "errAlready": "Hâlihazırda planlanmış bir işlem var. Önce onu geri alın.",
       "errSame": "Bu zaten mevcut planınız.",
-      "errFailed": "Bu şu anda işe yaramadı. Lütfen tekrar deneyin."
+      "errFailed": "Bu şu anda işe yaramadı. Lütfen tekrar deneyin.",
+      "pickTargetRequired": "Lütfen geçmek istediğiniz planı seçin."
     }
   },
   "overview": {
@@ -1458,7 +1494,14 @@
     "eventsNote": "Olaylar gönderilmez, çekilir; 90 gün saklarız.",
     "calls": "Son çağrılar",
     "noCalls": "Henüz çağrı yok.",
-    "callsNote": "Bugün: {{count}} çağrı · {{limited}} × 429 · {{failed}} × 5xx. Günlük 90 gün tutulur; içerik ve anahtar içermez."
+    "callsNote": "Bugün: {{count}} çağrı · {{limited}} × 429 · {{failed}} × 5xx. Günlük 90 gün tutulur; içerik ve anahtar içermez.",
+    "errors": {
+      "name": "Lütfen entegrasyon için bir ad girin.",
+      "useCase": "Lütfen entegrasyona ne için ihtiyaç duyduğunuzu açıklayın.",
+      "scopes": "Lütfen en az bir veri alanı seçin.",
+      "termsLabel": "API ve entegrasyon koşulları",
+      "terms": "Talebi göndermek için lütfen API ve entegrasyon koşullarını kabul edin."
+    }
   },
   "invite": {
     "eyebrow": "Sağlayıcı onboarding",
@@ -1482,11 +1525,11 @@
     "notVerified": "Davet edilmiş olmak, şirketinizin doğrulandığı anlamına gelmez. Şirketiniz ancak bu incelemeden sonra doğrulanmış olarak gösterilir.",
     "hello": "Hoş geldiniz",
     "helloName": "Merhaba {{name}}",
-    "lead": "Onboarding sürecine devam etmek için {{firm}} hesabını oluşturun.",
+    "lead": "{{firm}} hesabını oluşturmak için bir şifre seçin. Girilecek mevcut bir şifre yok.",
     "email": "E-posta",
-    "emailHint": "Bu, başvurunuzdaki adrestir. Onunla oturum açarsınız.",
-    "password": "Şifre",
-    "passwordHint": "En az {{min}} karakter.",
+    "emailHint": "Bu, başvurunuzdaki adrestir. Bundan sonra onunla oturum açacaksınız.",
+    "password": "Bir şifre seçin",
+    "passwordHint": "Hesabınızı şimdi oluşturuyorsunuz. En az {{min}} karakter.",
     "passwordShort": "Lütfen en az {{min}} karakterli bir şifre seçin.",
     "passwordWeak": "Bu şifre tahmin edilmesi çok kolay olduğu için reddedildi. Lütfen başka bir şifre seçin.",
     "show": "Göster",

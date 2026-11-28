@@ -13,7 +13,10 @@
 //
 // Fehlerhaltung: Dieses Modul wirft NICHT. Ein Kalender, der nicht antwortet,
 // darf weder die Slot-Anzeige noch eine bezahlte Buchung kippen. Alle Aufrufe
-// liefern null/[] und protokollieren; der Aufrufer entscheidet, was das heisst.
+// liefern bei einem Fehlschlag null; der Aufrufer entscheidet, was das heisst,
+// und protokolliert es. "Keine Antwort" (null) ist nie dasselbe wie "nichts
+// belegt" ([]): wer beides gleich behandelt, meldet einen ungeprueften
+// Kalender als geprueft.
 
 const API_URI = process.env.NYLAS_API_URI || 'https://api.eu.nylas.com';
 const API_KEY = process.env.NYLAS_API_KEY || '';
@@ -57,15 +60,26 @@ async function call<T>(path: string, init: RequestInit = {}): Promise<T | null> 
  * Belegte Zeitfenster eines Kalenders. Bewusst aus Free/Busy, nicht aus der
  * Terminliste: abgesagte Termine behalten bei Google `busy: true` und wuerden
  * Slots blockieren, die laengst frei sind (geprueft 2026-10-05).
+ *
+ * `null` heisst: Der Kalender hat die Frage nicht beantwortet. Das ist der
+ * Fall, wenn Nylas nicht erreichbar ist oder ablehnt (abgelaufener Grant),
+ * wenn die Antwort nicht die erwartete Form hat, und wenn Nylas fuer die
+ * angefragte Adresse eine Fehlerzeile statt einer Belegung liefert
+ * (`object: "error"`, etwa ein Kalender, den der Grant nicht lesen darf).
+ * `[]` heisst dagegen: beantwortet, im Zeitraum ist nichts belegt.
  */
-export async function fetchBusy(grantId: string, email: string, startSec: number, endSec: number): Promise<BusyWindow[]> {
+export async function fetchBusy(grantId: string, email: string, startSec: number, endSec: number): Promise<BusyWindow[] | null> {
     const body = JSON.stringify({ start_time: startSec, end_time: endSec, emails: [email] });
     const out = await call<{ data?: any }>(`/v3/grants/${encodeURIComponent(grantId)}/calendars/free-busy`, { method: 'POST', body });
-    if (!out) return [];
-    const rows = Array.isArray(out.data) ? out.data : Array.isArray(out) ? (out as any) : [];
+    if (!out) return null;
+    const rows = Array.isArray(out.data) ? out.data : Array.isArray(out) ? (out as any) : null;
+    // Eine Adresse gefragt, also mindestens eine Zeile erwartet. Ohne Zeile
+    // hat niemand etwas ueber diesen Kalender gesagt.
+    if (!rows || rows.length === 0) return null;
     const windows: BusyWindow[] = [];
     for (const row of rows) {
-        for (const slot of row?.time_slots ?? []) {
+        if (!row || row.object === 'error' || !Array.isArray(row.time_slots)) return null;
+        for (const slot of row.time_slots) {
             if (typeof slot?.start_time === 'number' && typeof slot?.end_time === 'number') {
                 windows.push({ start: slot.start_time, end: slot.end_time });
             }

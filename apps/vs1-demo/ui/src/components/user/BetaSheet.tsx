@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Info, Loader2 } from 'lucide-react';
+import { ArrowRight, Info, Loader2 } from 'lucide-react';
 import { Banner } from '../ui/Banner';
 import { Button } from '../ui/Button';
+import { FieldError, errorAria } from '../ui/FieldError';
+import { focusField } from '../ui/FormErrorSummary';
 import { acceptAgreement, fetchAgreement, type UserAgreement } from '../../api/agreements';
 import { ApiError } from '../../api/client';
 import { markBetaAccepted } from '../../lib/agreementGate';
@@ -79,20 +81,6 @@ export function useBetaSheet(lang: string, active: boolean): BetaSheetState {
   return { agreement, loadError, retry: () => setAttempt((n) => n + 1), checked, setChecked, needCheck: tried && !checked, saving, notice, submit };
 }
 
-/** Kopfzeile unter dem Titel: zurueck zum Termin. */
-export function BetaSheetHeader({ onBack }: { onBack: () => void }) {
-  const { t } = useTranslation('legal');
-  return (
-    <button
-      type="button"
-      onClick={onBack}
-      className="inline-flex items-center gap-1.5 text-body-3xs font-bold text-brand underline underline-offset-2 hover:text-brand-700"
-    >
-      <ArrowLeft size={13} aria-hidden /> {t('betaStep.drawer.back')}
-    </button>
-  );
-}
-
 export function BetaSheetBody({ sheet }: { sheet: BetaSheetState }) {
   const { t } = useTranslation('legal');
   const version = sheet.agreement?.version ?? '';
@@ -143,20 +131,26 @@ export function BetaSheetFooter({ sheet, onAccepted }: { sheet: BetaSheetState; 
   const { t } = useTranslation('legal');
   const version = sheet.agreement?.version ?? '';
   return (
-    <form noValidate onSubmit={(e) => { e.preventDefault(); void sheet.submit(onAccepted); }}>
+    <form noValidate onSubmit={(e) => {
+      e.preventDefault();
+      // Ohne Haken geht der Fokus auf den Haken (Checklist v1.0: first invalid field).
+      if (sheet.agreement && !sheet.checked) focusField('beta-sheet-check');
+      void sheet.submit(onAccepted);
+    }}>
       <label className="flex cursor-pointer items-start gap-3 text-body-xs leading-relaxed text-fg">
         <input
+          id="beta-sheet-check"
           type="checkbox"
           checked={sheet.checked}
           onChange={(e) => sheet.setChecked(e.target.checked)}
           disabled={!sheet.agreement}
-          aria-invalid={sheet.needCheck || undefined}
-          aria-describedby={sheet.needCheck ? 'beta-sheet-check-error' : undefined}
+          {...errorAria('beta-sheet-check', sheet.needCheck)}
           className="mt-[3px] h-4 w-4 shrink-0 accent-[var(--color-bg-brand)]"
         />
         <span>{t('betaStep.checkbox', { version })}</span>
       </label>
-      {sheet.needCheck && <p id="beta-sheet-check-error" role="alert" className="mt-2 text-body-2xs text-fg-secondary">{t('betaStep.needCheck')}</p>}
+      {/* Regel V2 (11.10.2026): ein Feld, keine Zusammenfassung — der Satz am Haken meldet sich selbst. */}
+      <FieldError id="beta-sheet-check" alert message={sheet.needCheck ? t('betaStep.needCheck') : null} className="mt-2 pl-7" />
       <Button type="submit" size="lg" shape="soft" fullWidth className="mt-4" disabled={!sheet.agreement || sheet.saving} loading={sheet.saving} iconRight={<ArrowRight size={15} aria-hidden />}>
         {sheet.saving ? t('betaStep.saving') : t('betaStep.drawer.cta')}
       </Button>

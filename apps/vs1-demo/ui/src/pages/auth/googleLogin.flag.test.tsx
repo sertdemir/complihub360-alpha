@@ -33,7 +33,9 @@ describe('Google-Login · Schalter', () => {
   it('ohne Schalter: weder Login noch Registrierung zeigen Google', () => {
     renderAt('/en/login', <LoginPage />);
     expect(screen.queryByText(/login\.continueWithGoogle/)).not.toBeInTheDocument();
-    expect(screen.queryByText('login.or')).not.toBeInTheDocument();
+    // Seit 28.11.2026 trennt ein „oder“ Passwort und Anmeldelink (L1-A);
+    // ein zweites gehoerte zum Google-Knopf und darf ohne Schalter fehlen.
+    expect(screen.getAllByText('login.or')).toHaveLength(1);
 
     renderAt('/en/register', <RegisterPage />);
     expect(screen.queryByText(/register\.googleSignup/)).not.toBeInTheDocument();

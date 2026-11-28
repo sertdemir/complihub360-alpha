@@ -83,7 +83,7 @@ test('Alter Tab: der Server lehnt ab, die Schublade zeigt Grund und Blatt, Termi
   await expect(drawer.getByTestId('beta-points')).toContainText('Providers are test accounts.');
   // Ohne Haken geht es nicht weiter.
   await drawer.getByRole('button', { name: /Agree and return to the booking/ }).click();
-  await expect(drawer.getByRole('alert')).toContainText('Please tick the box');
+  await expect(drawer.getByRole('alert')).toContainText('Please check the box');
   await drawer.getByRole('checkbox').check();
   await drawer.getByRole('button', { name: /Agree and return to the booking/ }).click();
 

@@ -8,12 +8,11 @@ import { markIntentionalLogout, noteSessionExpired, resetIntentionalLogout } fro
 export type UserRole = 'user' | 'partner' | 'admin';
 
 // ─── Identity derivation ──────────────────────────────────────────────────────
-// Role is a server-controlled claim. We set it in user_metadata at sign-up and
-// (authoritatively) in app_metadata server-side; app_metadata wins when present.
+// Die Rolle steht in app_metadata und nur dort: Das setzt allein der Server.
+// user_metadata schreibt der Nutzer selbst, eine Rolle von dort waere selbst
+// verliehen. Die API haelt es genauso (index.ts, authIsAdmin).
 function roleFromUser(user: User | null | undefined): UserRole {
-  const r =
-    (user?.app_metadata?.role as string | undefined) ??
-    (user?.user_metadata?.role as string | undefined);
+  const r = user?.app_metadata?.role as string | undefined;
   // 'admin' fiel bis 2026-08-29 durch: der Typ kennt die Rolle und
   // App.tsx gated das Control Center mit requiredRole="admin", aber diese
   // Ableitung gab fuer alles ausser 'partner' 'user' zurueck. Eine als

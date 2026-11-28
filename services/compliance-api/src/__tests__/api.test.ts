@@ -189,6 +189,19 @@ vi.mock('../nylasAuth.js', async (importOriginal) => {
     const real = await importOriginal<typeof import('../nylasAuth.js')>();
     return { ...real, exchangeCode: (...a: any[]) => nylasAuthMock.exchangeCode(...a), revokeGrant: (...a: any[]) => nylasAuthMock.revokeGrant(...a) };
 });
+// Kalender-Belegung: echt, ausser ein Test schaltet `nylasMock.on` ein — dann
+// gilt Nylas als eingerichtet und `fetchBusy` antwortet aus dem Test. Der Key
+// wird in nylas.ts beim Laden gelesen; ohne diesen Schalter liesse sich der
+// Weg "Kalender verbunden" in der Slot-Route gar nicht betreten.
+const { nylasMock } = vi.hoisted(() => ({ nylasMock: { on: false, fetchBusy: vi.fn() } }));
+vi.mock('../nylas.js', async (importOriginal) => {
+    const real = await importOriginal<typeof import('../nylas.js')>();
+    return {
+        ...real,
+        nylasConfigured: () => nylasMock.on || real.nylasConfigured(),
+        fetchBusy: (...a: Parameters<typeof real.fetchBusy>) => (nylasMock.on ? nylasMock.fetchBusy(...a) : real.fetchBusy(...a)),
+    };
+});
 // Engine: echt, ausser ein Test setzt `engineFault.error` — dann wirft sie,
 // wie bei einem Fehler im Laenderprofil.
 const { engineFault } = vi.hoisted(() => ({ engineFault: { error: null as Error | null } }));
@@ -2442,6 +2455,21 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         expect(r1.status).toBe(200);
         const r2 = await api('/api/v1/provider/test-kanzlei/billing/preview');
         expect(r2.status).toBe(200);
+    });
+
+    // user_metadata gehoert dem Nutzer: jedes angemeldete Konto kann es mit
+    // supabase.auth.updateUser({ data: { role: 'admin' } }) selbst schreiben,
+    // und der Wert steht danach im JWT. Eine Rolle zaehlt deshalb nur aus
+    // app_metadata, das allein der Server setzt.
+    it('macht niemanden zum Admin, der sich die Rolle selbst in user_metadata schreibt', async () => {
+        seedProvider();
+        const selbsternannt = signJwt({ sub: randomUUID(), email: 'x@y.example', user_metadata: { role: 'admin' } });
+        const auth = { headers: { authorization: `Bearer ${selbsternannt}` } };
+        // Fremder Anbieter: kein Mitglied, also 404 wie fuer jeden Fremden.
+        expect((await fetch(`${BASE}/api/v1/provider/test-kanzlei/billing/preview`, auth)).status).toBe(404);
+        // Admin-Routen bleiben zu.
+        expect((await fetch(`${BASE}/api/v1/admin/readiness`, auth)).status).toBe(403);
+        expect((await fetch(`${BASE}/api/v1/admin/provider-applications`, auth)).status).toBe(403);
     });
 
     it('laesst die Nutzer-Routen eines Anbieters offen — ueber den Ref, nie ueber den Schluessel', async () => {
@@ -6093,6 +6121,59 @@ describe('Kalender: Nylas Hosted Auth', () => {
 // Bis hierher versprach die Oberflaeche „umgeleitet, Ranking eingefroren",
 // der Server liess den Anbieter sichtbar und buchbar und halbierte seinen Rang.
 // Jetzt gilt das Versprechen: raus aus Suche, Slots und Buchung — ohne Abzug.
+describe('Slots: `calendar_checked` sagt, ob der Kalender geantwortet hat', () => {
+    const slots = () => api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' });
+    const sec = (iso: string) => Math.floor(Date.parse(iso) / 1000);
+
+    beforeEach(() => { nylasMock.on = true; nylasMock.fetchBusy.mockReset(); });
+    afterEach(() => { nylasMock.on = false; vi.restoreAllMocks(); });
+
+    it('zieht die Belegung ab und meldet true, wenn der Kalender antwortet', async () => {
+        seedProvider({ nylas_grant_id: 'grant-1', nylas_calendar_id: 'k@x.de' });
+        nylasMock.fetchBusy.mockResolvedValue([]);
+        const frei = await slots();
+        expect(frei.body.calendar_checked).toBe(true);
+        expect(frei.body.slots.length).toBeGreaterThan(1);
+        expect(nylasMock.fetchBusy).toHaveBeenCalledWith('grant-1', 'k@x.de', expect.any(Number), expect.any(Number));
+
+        // Ein Termin quer zum Raster macht genau den ersten Slot unbuchbar.
+        const erster = frei.body.slots[0];
+        nylasMock.fetchBusy.mockResolvedValue([{ start: sec(erster) + 300, end: sec(erster) + 900 }]);
+        const belegt = await slots();
+        expect(belegt.body.calendar_checked).toBe(true);
+        expect(belegt.body.slots).toEqual(frei.body.slots.slice(1));
+    });
+
+    it('meldet false und schreibt einen Fehler ins Log, wenn der Kalender nicht antwortet — die Slots bleiben stehen', async () => {
+        seedProvider({ nylas_grant_id: 'grant-1', nylas_calendar_id: 'k@x.de' });
+        nylasMock.fetchBusy.mockResolvedValue([]);
+        const mitKalender = await slots();
+
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        nylasMock.fetchBusy.mockResolvedValue(null);
+        const r = await slots();
+        expect(r.status).toBe(200);
+        expect(r.body.calendar_checked).toBe(false);
+        expect(r.body.booking_open).toBe(true);
+        // Lieber ein Slot zu viel als eine leere Buchungsseite.
+        expect(r.body.slots).toEqual(mitKalender.body.slots);
+        const zeile = log.mock.calls.map((c) => String(c[0])).find((l) => l.includes('ERR_CALENDAR_BUSY'));
+        expect(zeile).toBeDefined();
+        expect(JSON.parse(zeile!)).toMatchObject({ level: 'error', errorCode: 'ERR_CALENDAR_BUSY', providerKey: 'test-kanzlei' });
+    });
+
+    it('meldet false ohne verbundenen Kalender und fragt Nylas dann nicht', async () => {
+        seedProvider();
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const r = await slots();
+        expect(r.body.calendar_checked).toBe(false);
+        expect(r.body.slots.length).toBeGreaterThan(0);
+        expect(nylasMock.fetchBusy).not.toHaveBeenCalled();
+        // Kein Kalender ist kein Fehler.
+        expect(log.mock.calls.some((c) => String(c[0]).includes('ERR_CALENDAR_BUSY'))).toBe(false);
+    });
+});
+
 describe('availability = ooo — pausiert', () => {
     const suche = () => api('/api/v1/search', {
         method: 'POST',

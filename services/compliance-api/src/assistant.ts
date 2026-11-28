@@ -102,9 +102,13 @@ Rules — follow ALL of them:
 8. Penalties are context, not the headline: lead with what applies and by when; mention a penalty only when the user asks or when it changes the priority, and then as one factual sentence.${SHARED_RULES}`;
 }
 
-// Kalibriert am 23.10.2026 mit Qwen3-Embedding-8B auf Staging (12 Prüffragen):
-// passende Treffer 0,656–0,761, unpassende 0,567–0,646. 0,6 ist vorläufig.
-const MATCH_THRESHOLD = 0.6;
+// Kalibriert mit Qwen3-Embedding-8B auf Staging. 23.10.2026 (12 Prüffragen):
+// 0,6 vorläufig. 27.11.2026 (30 Prüffragen, Zuordnung über correlation_id):
+// passende Treffer 0,656–0,843, unpassende 0,529–0,670. Mit 0,64 bleiben alle
+// 21 passenden Fragen drin, 6 von 9 unpassenden fallen raus. Trennscharf ist
+// keine Schwelle (Smalltalk 0,670, Körperschaftsteuer 0,669); TR- und ES-Fragen
+// liegen am unteren Rand, eine höhere Schwelle träfe sie zuerst.
+const MATCH_THRESHOLD = 0.64;
 const MATCH_COUNT = 6;
 
 // Ergebnis-Ereignis nach dem Aufruf (Ausgang, Abdeckung, Kalibrierung), ohne

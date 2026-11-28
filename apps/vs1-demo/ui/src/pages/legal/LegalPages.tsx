@@ -502,6 +502,10 @@ const STORAGE_KEYS: { name: string; scope: 'local' | 'session'; en: string; de: 
   { name: 'ch360_session_expired', scope: 'session',
     en: 'A note that your session has expired, with your e-mail address, so the sign-in page can say so and fill in the address. Cleared when you close the tab.',
     de: 'Ein Hinweis, dass Ihre Sitzung abgelaufen ist, mit Ihrer E-Mail-Adresse, damit die Anmeldeseite das sagen und die Adresse vorbelegen kann. Wird beim Schließen des Tabs verworfen.' },
+  // components/user/SetPasswordPrompt.tsx (Canvas-Wahl L3-A, 28.11.2026).
+  { name: 'ch360_pw_prompt_later', scope: 'local',
+    en: 'A note that you chose “Later” when asked to set a password, with your account ID and the time of that sign-in, so the window stays closed until your next sign-in.',
+    de: 'Ein Hinweis, dass Sie beim Festlegen eines Passworts „Später“ gewählt haben, mit Ihrer Kontokennung und dem Zeitpunkt dieser Anmeldung, damit das Fenster bis zur nächsten Anmeldung geschlossen bleibt.' },
   { name: 'ch360_beta_declined', scope: 'session',
     en: 'A note that you declined the beta agreement, so the Risk Map can explain what works without it. Cleared when you dismiss the notice or close the tab.',
     de: 'Ein Hinweis, dass Sie die Beta-Vereinbarung abgelehnt haben, damit die Risk Map sagen kann, was ohne sie geht. Wird verworfen, wenn Sie den Hinweis oder den Tab schließen.' },

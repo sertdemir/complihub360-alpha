@@ -65,6 +65,9 @@ jobs:
           esac
           # Je Anbindung eine Zeile: Name, Zustand, Hinweis, Dauer.
           jq -r '.checks[]? | "\(.name)\t\(.state)\t\(.note // "-")\t\(.ms) ms"' "$body" 2>/dev/null || true
+          # Was verlangt ist (READINESS_REQUIRED). Ohne diese Zeile saehe ein Lauf
+          # gleich aus, ob die Einstellung im Container angekommen ist oder nicht.
+          jq -r '"verlangt: \((.required // []) | join(", "))"' "$body" 2>/dev/null || true
           # Ein Bericht ist nur, was wie einer aussieht. Eine 200 mit HTML (falsche
           # URL, Wand, Ersatzseite) ist kein "alles gut".
           if ! jq -e '(.ok | type) == "boolean" and (.checks | type) == "array" and (.checks | length) >= 6' "$body" >/dev/null 2>&1; then
@@ -118,6 +121,9 @@ jobs:
           esac
           # Je Anbindung eine Zeile: Name, Zustand, Hinweis, Dauer.
           jq -r '.checks[]? | "\(.name)\t\(.state)\t\(.note // "-")\t\(.ms) ms"' "$body" 2>/dev/null || true
+          # Was verlangt ist (READINESS_REQUIRED). Ohne diese Zeile saehe ein Lauf
+          # gleich aus, ob die Einstellung im Container angekommen ist oder nicht.
+          jq -r '"verlangt: \((.required // []) | join(", "))"' "$body" 2>/dev/null || true
           # Ein Bericht ist nur, was wie einer aussieht. Eine 200 mit HTML (falsche
           # URL, Wand, Ersatzseite) ist kein "alles gut".
           if ! jq -e '(.ok | type) == "boolean" and (.checks | type) == "array" and (.checks | length) >= 6' "$body" >/dev/null 2>&1; then

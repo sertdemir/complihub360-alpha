@@ -46,7 +46,8 @@ export interface SessionLike {
 }
 
 function roleOf(s: SessionLike): SavedAccount['role'] {
-  const r = (s.user.app_metadata?.role ?? s.user.user_metadata?.role) as string | undefined;
+  // Nur app_metadata: user_metadata schreibt der Nutzer selbst.
+  const r = s.user.app_metadata?.role as string | undefined;
   return r === 'partner' || r === 'admin' ? r : 'user';
 }
 

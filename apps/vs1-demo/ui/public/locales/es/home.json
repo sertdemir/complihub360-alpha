@@ -88,7 +88,8 @@
     "ask": {
       "placeholder": "Describa su caso",
       "send": "Enviar",
-      "note": "En la beta, su pregunta lleva al área adecuada y a la evaluación — todavía no a una respuesta directa."
+      "note": "En la beta, su pregunta lleva al área adecuada y a la evaluación — todavía no a una respuesta directa.",
+      "lead": "O haga una pregunta con sus propias palabras."
     },
     "promises": [
       {
@@ -104,7 +105,8 @@
         "desc": "Conectar, colaborar, completar."
       },
       {
-        "title": "Always on your side"
+        "title": "Always on your side",
+        "desc": "Tecnología inteligente para ir rápido, y personas reales cuando las necesite."
       }
     ],
     "proofs": [
@@ -559,7 +561,7 @@
     "header": "Mercados",
     "title": "Otros mercados",
     "count": "{{selected}} seleccionados · {{total}} disponibles",
-    "desc": "Fuera de la selección principal. Elija los mercados en los que opera: mapeamos su normativa y le derivamos al Verified Provider adecuado.",
+    "desc": "Todavía no evaluamos estos mercados. Añada aquellos en los que opera: su Risk Map los marca como aún no cubiertos y desde ahí puede solicitar la cobertura.",
     "searchPlaceholder": "Buscar por nombre o código de país",
     "european": "Mercados europeos",
     "expanding": "Cobertura en expansión",
@@ -1068,7 +1070,11 @@
         "title": "Reciba traspasos estructurados",
         "desc": "El proveedor responde vía Magic-Link en 24–48h. Sin discovery call."
       }
-    ]
+    ],
+    "subtitle": "Sus mejores coincidencias se basan en experiencia relevante, cobertura de mercado, calidad de servicio, tiempo de respuesta, disponibilidad y encaje. Los nombres de los proveedores permanecen ocultos en la primera comparación para que pueda centrarse en lo importante, no en la notoriedad de una marca.",
+    "exampleLabel": "Coincidencias de ejemplo · anonimizadas",
+    "identityLabel": "La identidad se muestra después de que usted elija.",
+    "supporting": "Elija uno o varios proveedores. Sus nombres y perfiles completos se muestran cuando reserva citas."
   },
   "twoReflexes": {
     "eyebrow": "Por qué persiste esta brecha",
@@ -1113,7 +1119,9 @@
         "title": "Profesionales independientes",
         "desc": "Los Verified Providers prestan sus servicios de forma independiente y bajo su propia responsabilidad profesional."
       }
-    ]
+    ],
+    "row1Lead": "La mayoría de los resúmenes le dicen qué dicen las normas. La Risk Map muestra lo que está en juego para su operación, por orden de prioridad y siempre con la fuente.",
+    "row2Lead": "Los directorios incluyen a todo el mundo. Nosotros comprobamos cada Verified Provider con pruebas documentadas antes de que pueda aparecer en una coincidencia."
   },
   "domains": {
     "eyebrow": "Lo que sabemos",
@@ -1188,7 +1196,8 @@
           "Contratos de encargo / subencargo",
           "Mecanismos de transferencia internacional",
           "Gestión de acceso y supresión",
-          "Plazos de notificación de brechas"
+          "Plazos de notificación de brechas",
+          "Evaluación y notificación de brechas de datos"
         ],
         "matters": [
           "Trata datos personales de residentes en la UE/UK",
@@ -1228,7 +1237,8 @@
           "Reglas de opt-in para e-mail / SMS",
           "Auditorías de dark patterns",
           "Divulgación de influencers y publicidad",
-          "Gestión de bajas y listas de supresión"
+          "Gestión de bajas y listas de supresión",
+          "Procesos de baja y listas de supresión"
         ],
         "matters": [
           "Ejecuta adquisición de pago en la UE",
@@ -1264,7 +1274,10 @@
           "Actualizaciones de titulares reales",
           "Documentación de contratos intragrupo",
           "Requisitos de representación local",
-          "Seguimiento de plazos de presentación"
+          "Seguimiento de plazos de presentación",
+          "Sucursales, filiales y estructuras de grupo",
+          "Reestructuración y cierre",
+          "Plazos recurrentes y mantenimiento societario"
         ],
         "matters": [
           "Opera una entidad o sucursal local",
@@ -1300,7 +1313,9 @@
           "Documentación técnica y su conservación",
           "Persona responsable establecida en la UE",
           "Notificación de incidentes y retiradas",
-          "Marcado UKCA para Gran Bretaña"
+          "Marcado UKCA para Gran Bretaña",
+          "Servicios de persona responsable, representante autorizado o representante local",
+          "Notificación de incidentes, medidas correctivas y retiradas"
         ],
         "matters": [
           "Comercializa por primera vez un producto físico en la UE",
@@ -1340,7 +1355,12 @@
           "Declaración Intrastat al superar el umbral",
           "Incoterms y dónde recae la responsabilidad",
           "IVA de importación y su aplazamiento",
-          "Movimientos GB ↔ UE tras el Brexit"
+          "Movimientos GB ↔ UE tras el Brexit",
+          "Licencias de importación y exportación",
+          "Incoterms y responsabilidades de entrega",
+          "Declaraciones Intrastat",
+          "Almacenaje, fulfillment y servicios 3PL",
+          "Apoyo para rutas concretas"
         ],
         "matters": [
           "Envía por primera vez a través de una frontera aduanera",
@@ -1384,7 +1404,11 @@
           "Desistimiento, devoluciones y garantía",
           "Responsabilidad y sus límites",
           "Litigios que cruzan fronteras",
-          "Qué jurisdicción se aplica realmente"
+          "Qué jurisdicción se aplica realmente",
+          "Propiedad intelectual y marcas",
+          "Litigios",
+          "Ley aplicable y jurisdicción",
+          "Dictámenes jurídicos locales y asesoramiento regulatorio"
         ],
         "matters": [
           "Firma un tipo de contrato que no ha usado antes",
@@ -1433,7 +1457,8 @@
         ]
       }
     ],
-    "learnMore": "Más información"
+    "learnMore": "Más información",
+    "euWide": "En toda la UE"
   },
   "howItActs": {
     "eyebrow": "Dentro de un encargo",
@@ -1443,21 +1468,32 @@
       "post": " el match y la resolución."
     },
     "cards": [
-      {},
       {
-        "title": "La respuesta, con el reloj en marcha."
+        "title": "Vea el precio antes de comprometerse",
+        "desc": "Antes de elegir se muestra un rango de precio esperado. Tras la cita, el proveedor confirma el alcance final y el presupuesto. Ningún trabajo profesional empieza hasta que usted lo aprueba."
       },
       {
-        "title": "Un historial que usted conserva."
+        "title": "La respuesta, con el reloj en marcha.",
+        "desc": "Si un proveedor no cumple el tiempo de respuesta acordado, se lo decimos y podemos mostrarle otra coincidencia. No se comparte nada con un nuevo proveedor hasta que usted lo elige y lo reserva."
+      },
+      {
+        "title": "Un historial que usted conserva.",
+        "desc": "Cada paso queda en un historial privado — solicitud, respuesta, alcance acordado, entregables. Es suyo."
       }
     ],
     "panel1": {
       "scope": "Alcance",
       "scopeValue": "Declaraciones trimestrales OSS · DE + NL + FR",
-      "approval": "Aprobación"
+      "approval": "Aprobación",
+      "estCost": "Rango de precio esperado",
+      "estValue": "2.400–3.800 €",
+      "timeline": "Plazo estimado del servicio",
+      "timelineValue": "De media 10–15 días laborables una vez recibida toda la información y documentación necesaria",
+      "approvalValue": "Necesaria antes de que empiece el trabajo profesional"
     },
     "panel2": {
-      "label": "SLA de primera respuesta"
+      "label": "SLA de primera respuesta",
+      "note": "Si no se cumple, se lo decimos y podemos mostrarle otra coincidencia."
     },
     "panel3": {
       "timeline": [
@@ -1466,7 +1502,8 @@
           "label": "Solicitud enviada"
         },
         {
-          "date": "25 abr"
+          "date": "25 abr",
+          "label": "Confirmación del proveedor"
         },
         {
           "date": "28 abr",
@@ -1475,10 +1512,19 @@
         {
           "date": "02 may",
           "label": "Alcance acordado"
+        },
+        {
+          "date": "06 may",
+          "label": "Trabajo y documentos"
+        },
+        {
+          "date": "12 may",
+          "label": "Finalización"
         }
       ],
       "export": "Exportaciones previstas"
-    }
+    },
+    "subtitle": "Elija y reserve una cita. Se muestra la identidad del proveedor y se comparte la información que usted aprueba. Precio, plazos, alcance, comunicación y avance siguen visibles durante todo el encargo."
   },
   "brandCode": {
     "eyebrow": "Cómo nos comunicamos",
@@ -1518,7 +1564,7 @@
       "gold": "base",
       "post": " de todo su compliance."
     },
-    "subtitle": "La evaluación es gratuita. Lo que viene después — su espacio de trabajo, noticias en vivo, contenido experto, sus proveedores — es lo que convierte a CompliHub360 en el lugar al que usted vuelve.",
+    "subtitle": "Guarde sus Risk Maps, coincidencias, citas, plazos, documentos y el historial de sus encargos.",
     "pills": {
       "live": "Disponible hoy",
       "beta": "Llega con la Beta"
@@ -1562,7 +1608,8 @@
     "learn": {
       "meta": "Webinar · 24 min",
       "video": "IVA transfronterizo para D2C",
-      "title": "Aprenda de los profesionales."
+      "title": "Aprenda de los profesionales.",
+      "desc": "Guías prácticas, webinars y tutoriales de profesionales cualificados."
     },
     "mock": {
       "vatItaly": "Registro de IVA · Italia",
@@ -1591,6 +1638,12 @@
       "libOssSource": "CompliHub360 Live · 90 min",
       "libItVat": "Registro de IVA en Italia: paso a paso",
       "libItVatSource": "CompliHub360 Redacción · 8 min"
+    },
+    "tile1": {
+      "start": "Iniciar nueva evaluación",
+      "resume": "Continuar donde lo dejó",
+      "active": "Citas y encargos activos",
+      "saved": "Risk Maps guardadas"
     }
   },
   "faq": {
@@ -1747,7 +1800,7 @@
       "highlight": "legible",
       "post": "."
     },
-    "subtitle": "Seis minutos. Sin necesidad de cuenta. Contrastamos sus operaciones con la normativa que realmente aplica y le mostramos qué hacer a continuación.",
+    "subtitle": "Responda unas pocas preguntas sobre dónde y cómo opera su empresa. En unos seis minutos recibirá una Risk Map personalizada. No necesita cuenta.",
     "cta": "Evaluar mis necesidades",
     "demo": {
       "pause": "Pausar la demo",
@@ -1776,7 +1829,9 @@
         "links": {
           "howItWorks": "Cómo funciona",
           "forWhom": "Para quién",
-          "startAssessment": "Iniciar evaluación"
+          "startAssessment": "Iniciar evaluación",
+          "askQuestion": "Hacer una pregunta",
+          "signIn": "Iniciar sesión"
         }
       },
       "areas": {
@@ -1801,6 +1856,14 @@
           "contact": "Contacto",
           "support": "Soporte"
         }
+      },
+      "providers": {
+        "title": "Para proveedores",
+        "links": {
+          "join": "Unirse a nuestra red de proveedores",
+          "matching": "Cómo funciona el matching de proveedores",
+          "providerSignIn": "Acceso para proveedores"
+        }
       }
     },
     "markets": {
@@ -1815,7 +1878,9 @@
       "imprint": "Aviso legal (Impressum)",
       "cookies": "Política de cookies",
       "subProcessors": "Subencargados"
-    }
+    },
+    "coverageNote": "La disponibilidad del servicio depende del país, del requisito de cumplimiento y de la cobertura de nuestra red de proveedores verificados.",
+    "coverageLink": "Ver mercados y cobertura"
   },
   "trustBand": {
     "eyebrow": "Por qué CompliHub360 reúne ambas cosas",
