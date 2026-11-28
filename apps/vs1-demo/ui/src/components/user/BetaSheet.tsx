@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Info, Loader2 } from 'lucide-react';
+import { ArrowRight, Info, Loader2 } from 'lucide-react';
 import { Banner } from '../ui/Banner';
 import { Button } from '../ui/Button';
 import { FieldError, errorAria } from '../ui/FieldError';
@@ -79,20 +79,6 @@ export function useBetaSheet(lang: string, active: boolean): BetaSheetState {
   };
 
   return { agreement, loadError, retry: () => setAttempt((n) => n + 1), checked, setChecked, needCheck: tried && !checked, saving, notice, submit };
-}
-
-/** Kopfzeile unter dem Titel: zurueck zum Termin. */
-export function BetaSheetHeader({ onBack }: { onBack: () => void }) {
-  const { t } = useTranslation('legal');
-  return (
-    <button
-      type="button"
-      onClick={onBack}
-      className="inline-flex items-center gap-1.5 text-body-3xs font-bold text-brand underline underline-offset-2 hover:text-brand-700"
-    >
-      <ArrowLeft size={13} aria-hidden /> {t('betaStep.drawer.back')}
-    </button>
-  );
 }
 
 export function BetaSheetBody({ sheet }: { sheet: BetaSheetState }) {

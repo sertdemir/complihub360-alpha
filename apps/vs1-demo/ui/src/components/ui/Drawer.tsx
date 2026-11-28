@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 
@@ -13,6 +13,12 @@ import { useFocusTrap } from '../../hooks/useFocusTrap';
 // (400 / 1000); beyond max the body scrolls while header + footer stay pinned.
 // Dimmed backdrop, Escape + backdrop-click close, scroll-lock. Portal on <body> →
 // inherits the app `dark` class. Light + dark — never forced.
+//
+// header="compact" (Compass "Drawer Header" Layout=Compact, 2281:275, Canvas-Wahl
+// 4B vom 2026-11-28): Rueckweg, Titel und Schliessen in EINER Zeile, ohne Linie
+// darunter. Fuer Schubladen, die eine Aufgabe erledigen und den Platz fuer den
+// Inhalt brauchen (Termin buchen). `eyebrow` entfaellt dort; `headerExtra`
+// steht als erster Absatz im Inhalt.
 
 export type DrawerSize = 'sm' | 'md' | 'lg' | 'xl';
 export type DrawerSide = 'right' | 'left';
@@ -42,9 +48,19 @@ export interface DrawerProps {
    *  Nutzer-Vorgabe 2026-09-05: "die Hoehe des Sidesheets darf sich nicht
    *  aendern". */
   fixedHeight?: boolean;
+  /** default = Eyebrow, Titel, Zusatzzeile, Linie · compact = eine Zeile, ohne Linie. */
+  header?: 'default' | 'compact';
+  /** Nur compact: zeigt den Rueckweg links vom Titel. Fuehrt eine Ebene zurueck, schliesst nicht. */
+  onBack?: () => void;
+  /** Name des Rueckwegs fuer Screenreader ("Zurueck zum Profil"). Pflicht, wenn `onBack` gesetzt ist. */
+  backLabel?: string;
+  /** Name des Schliessen-Knopfs fuer Screenreader. Standard "Close". */
+  closeLabel?: string;
 }
 
-export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className, fixedHeight = false }: DrawerProps) {
+export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className, fixedHeight = false, header = 'default', onBack, backLabel, closeLabel = 'Close' }: DrawerProps) {
+  const titleId = useId();
+  const compact = header === 'compact';
   // Escape und Scroll-Lock gab es hier schon; der FOKUS fehlte. Ohne ihn blieb
   // er beim Ausloeser stehen, der erste Tab landete HINTER dem Panel, und beim
   // Schliessen kam er nicht zurueck. Zehn Komponenten haengen an diesem Drawer.
@@ -93,6 +109,7 @@ export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyeb
               tabIndex={-1}
               role="dialog"
               aria-modal="true"
+              aria-labelledby={title ? titleId : undefined}
               className={cn(
                 // Helles Milchglas (4C): Weiss zu 78 % + Unschaerfe, heller Rand,
                 // weicher Schatten; im Dark Mode Slate-Glas mit dunklem Rand.
@@ -109,23 +126,54 @@ export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyeb
               exit={{ x: offX }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
             >
-              <div className="flex shrink-0 items-start justify-between gap-4 border-b border-stroke px-6 py-5">
-                <div className="min-w-0">
-                  {eyebrow && <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{eyebrow}</p>}
-                  {title && <h2 className="mt-1.5 font-serif text-[26px] font-bold leading-tight text-fg">{title}</h2>}
-                  {headerExtra && <div className="mt-2 text-body-sm text-fg-secondary">{headerExtra}</div>}
+              {compact ? (
+                <div className="flex shrink-0 items-center gap-2 px-4 pb-1 pt-3">
+                  {onBack && (
+                    <button
+                      type="button"
+                      onClick={onBack}
+                      aria-label={backLabel}
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-fg-secondary transition-colors hover:bg-surface-secondary hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus"
+                    >
+                      <ArrowLeft size={20} aria-hidden />
+                    </button>
+                  )}
+                  {title && (
+                    <h2 id={titleId} className={cn('min-w-0 flex-1 font-serif text-[20px] font-bold leading-tight text-fg', !onBack && 'pl-2')}>
+                      {title}
+                    </h2>
+                  )}
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    aria-label={closeLabel}
+                    className="ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-lg text-fg-secondary transition-colors hover:bg-surface-secondary hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus"
+                  >
+                    <X size={20} aria-hidden />
+                  </button>
                 </div>
-                <button
-                  onClick={onClose}
-                  aria-label="Close"
-                  className="-mr-2 shrink-0 rounded-md p-1.5 text-fg-tertiary transition-colors hover:bg-surface-secondary hover:text-fg"
-                >
-                  <X size={20} />
-                </button>
-              </div>
+              ) : (
+                <div className="flex shrink-0 items-start justify-between gap-4 border-b border-stroke px-6 py-5">
+                  <div className="min-w-0">
+                    {eyebrow && <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{eyebrow}</p>}
+                    {title && <h2 id={titleId} className="mt-1.5 font-serif text-[26px] font-bold leading-tight text-fg">{title}</h2>}
+                    {headerExtra && <div className="mt-2 text-body-sm text-fg-secondary">{headerExtra}</div>}
+                  </div>
+                  <button
+                    onClick={onClose}
+                    aria-label={closeLabel}
+                    className="-mr-2 shrink-0 rounded-md p-1.5 text-fg-tertiary transition-colors hover:bg-surface-secondary hover:text-fg"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              )}
               {/* Body fills the space between header + pinned footer; content stays
                   top-aligned so the footer sits at the bottom with breathing room. */}
-              <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-5 pb-7">{children}</div>
+              <div className={cn('min-h-0 flex-1 overflow-y-auto px-6 pb-7', compact ? 'pt-2' : 'pt-5')}>
+                {compact && headerExtra && <div className="mb-4 text-body-xs text-fg-secondary">{headerExtra}</div>}
+                {children}
+              </div>
               {footer && <div className="shrink-0 border-t border-stroke px-6 py-6">{footer}</div>}
             </motion.div>
           </div>

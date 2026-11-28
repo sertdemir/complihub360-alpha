@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Banner } from './Banner';
+import { Banner, BannerLink } from './Banner';
 import { Button } from './Button';
 
 const DESCRIPTION = `
@@ -153,6 +153,35 @@ export const BrandAccentDark: Story = {
         }
       >
         14 customers ran Risk Maps last month with DE + CST coverage gaps · only 4 partners cover both.
+      </Banner>
+    </div>
+  ),
+};
+
+// Compass "Alert Strip" (2277:198): Aktionen UNTER dem Text, in einer Reihe mit
+// Umbruch. Der Inhalt fluchtet ueber innerClassName mit dem Raster der Seite.
+export const StripWithActions: Story = {
+  name: 'Strip mit zwei Links (Beta-Hinweis)',
+  args: { title: 'Molecules/Banner' },
+  parameters: { layout: 'fullscreen', controls: { disable: true } },
+  render: () => (
+    <div className="min-h-[260px] bg-neutral-50">
+      <Banner
+        variant="strip"
+        status="brand"
+        title="Sie sind abgemeldet. Ihre Risk Map bleibt auf diesem Gerät sichtbar."
+        innerClassName="mx-auto max-w-[1320px] px-6 lg:px-10"
+        onClose={() => {}}
+        closeLabel="Hinweis schließen"
+        actions={
+          <>
+            <BannerLink href="#">Beta-Vereinbarung lesen</BannerLink>
+            <BannerLink href="#">Wieder anmelden</BannerLink>
+          </>
+        }
+      >
+        Buchen, Merken und Nachrichten gehen in der Beta erst, wenn Sie die Beta-Vereinbarung angenommen haben. Das können
+        Sie jederzeit nachholen.
       </Banner>
     </div>
   ),
