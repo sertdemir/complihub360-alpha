@@ -58,6 +58,28 @@ describe('Banner', () => {
     expect(innen!.parentElement).toBe(screen.getByRole('status'));
   });
 
+  // Die Akzentfarbe ist fuer das Icon gemacht. Als Schrift der Aktion lag sie
+  // auf den hellen Toenen unter 4.5:1 (nachgemessen 2026-11-28); die Aktion
+  // nimmt dort die naechstdunklere Stufe, das Icon behaelt seine Farbe.
+  it.each([
+    ['info', 'text-sky-700', 'text-sky-600'],
+    ['success', 'text-emerald-700', 'text-emerald-600'],
+    ['warning', 'text-amber-700', 'text-amber-600'],
+    ['error', 'text-red-700', 'text-red-600'],
+    ['brand', 'text-[#004d40]', 'text-[#258d78]'],
+  ] as const)('%s hell: die Aktion traegt %s, das Icon bleibt bei %s', (status, actionClass, iconClass) => {
+    const { container } = render(<Banner status={status} title="T" action={<a href="/x">Mehr</a>} />);
+    const aktion = container.querySelector('[data-banner-action]')!;
+    expect(aktion).toHaveClass(actionClass);
+    expect(aktion).not.toHaveClass(iconClass);
+    expect(container.querySelector('svg')!.parentElement).toHaveClass(iconClass);
+  });
+
+  it('wo die Akzentfarbe als Schrift reicht, bleibt sie (strong, solid)', () => {
+    const { container } = render(<Banner status="info" surface="strong" title="T" action={<a href="/x">Mehr</a>} />);
+    expect(container.querySelector('[data-banner-action]')).toHaveClass('text-sky-800');
+  });
+
   it('die bisherige einzelne action rechts bleibt, wie sie war', () => {
     render(<Banner title="T" action={<a href="/x">Mehr</a>} />);
     expect(screen.getByRole('link', { name: 'Mehr' })).toBeInTheDocument();

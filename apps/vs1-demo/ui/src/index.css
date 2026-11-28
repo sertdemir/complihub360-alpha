@@ -533,12 +533,12 @@ footer[id] {
 }
 
 /* USt-Assistent (Redesign 28.11.2026). Goldbogen um den Launcher: eine Runde
-   in 7 s; wie oft er läuft, setzt AssistantWidget über animation-iteration-count
+   in 3,5 s (vorher 7 s, auf Wunsch des Nutzers schneller); wie oft er läuft, setzt AssistantWidget über animation-iteration-count
    (drei nach dem Laden, eine je Hover). Beim Denken tippen drei Punkte.
    Reduced motion: der globale Block oben friert beides ein, den Bogen blendet
    das Widget zusätzlich aus. */
 .assistant-orbit {
-  animation: assistant-orbit 7s linear;
+  animation: assistant-orbit 3.5s linear;
 }
 @keyframes assistant-orbit {
   to {

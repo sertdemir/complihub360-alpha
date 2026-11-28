@@ -1707,7 +1707,9 @@
     }
   },
   "a11y": {
-    "skipToContent": "Saltar al contenido"
+    "skipToContent": "Saltar al contenido",
+    "close": "Cerrar",
+    "dismissNotice": "Cerrar aviso"
   },
   "seo": {
     "home": {

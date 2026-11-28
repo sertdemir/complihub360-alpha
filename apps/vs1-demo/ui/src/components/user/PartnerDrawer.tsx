@@ -326,7 +326,6 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
       header={step === 'profil' ? 'default' : 'compact'}
       onBack={step === 'termin' ? () => setStep('profil') : step === 'blatt' ? () => setStep('termin') : undefined}
       backLabel={step === 'termin' ? t('schedule.back') : step === 'blatt' ? tLegal('betaStep.drawer.back') : undefined}
-      closeLabel={tw('review.close')}
       footer={
         step === 'profil' && d?.bookable_chargeable === false ? (
           // Wie die Detailseite (Nutzer-Entscheidung 2026-10-01): kein Knopf

@@ -1707,7 +1707,9 @@
     }
   },
   "a11y": {
-    "skipToContent": "İçeriğe geç"
+    "skipToContent": "İçeriğe geç",
+    "close": "Kapat",
+    "dismissNotice": "Bildirimi kapat"
   },
   "seo": {
     "home": {
