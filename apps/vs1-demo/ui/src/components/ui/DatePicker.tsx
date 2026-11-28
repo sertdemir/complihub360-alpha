@@ -250,7 +250,10 @@ export function DatePicker({
                       'flex h-[36px] w-[36px] items-center justify-center rounded-full text-[13px] transition-colors focus:outline-none',
                       !inMonth && !isSelected && 'text-fg-tertiary',
                       inMonth && !isSelected && 'text-fg',
-                      isSelected && 'bg-brand text-fg-on-brand',
+                      // Gewaehlter Tag seit 2026-11-28 in der Aktionsfarbe (Tinte /
+                      // Pergament) wie der Hauptknopf — ohne Messing-Kante, die
+                      // gehoert nur an Knoepfe.
+                      isSelected && 'bg-action text-fg-on-action',
                       // Tastatur-Cursor (startet auf heute): Toenung aus dem Fokus-Token,
                       // seit 2026-11-28 Tinte/Pergament statt Petrol — er ist ein
                       // Fokus-Signal, kein Auswahlzustand.
