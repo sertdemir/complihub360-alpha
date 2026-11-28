@@ -162,9 +162,9 @@ color.border.default
 color.border.muted
 color.border.strong
 color.border.focus
-color.action.primary.background.default               (→ Petrol-500)
-color.action.primary.background.hover                 (→ Petrol-600)
-color.action.primary.background.pressed               (→ Petrol-700)
+color.action.primary.background.default               (→ Ink-500, dark Parchment-100)
+color.action.primary.background.hover                 (→ Ink-600, dark Parchment-200)
+color.action.primary.background.pressed               (→ Ink-700, dark Parchment-300)
 color.action.primary.foreground.default
 color.action.danger.background.default                (→ Error-500)
 color.feedback.success.background
@@ -174,7 +174,7 @@ color.feedback.error.foreground
 color.brand.partnerBadge.background                   (→ Gold-500, Verified-Partner only)
 color.brand.partnerBadge.foreground
 color.brand.partnerBadge.hover
-color.focus.ring                                      (→ Petrol-500 + 0.2 alpha halo)
+color.focus.ring                                      (→ Ink, dark Parchment + 0.2 alpha halo)
 effect.elevation.01                                   (resolves to shadow.sm in light, border.thin in dark)
 effect.elevation.02
 effect.elevation.03

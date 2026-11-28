@@ -105,7 +105,7 @@ Every interactive component must define these states explicitly (as variants or 
 
 - **Hover**: subtle background shift, no movement of content (e.g. ProviderCard transitions `shadow.sm` → `shadow.md`)
 - **Focus-visible**: clear outline (`border.medium` + `color.border.focus` per Border Spec), uses `color.focus.ring` semantic token, never replaced with hover only
-- **Pressed**: slightly darker than hover (e.g. `petrol.700` for primary buttons), no translation (CompliHub brand is restrained — no bouncy press animations)
+- **Pressed**: slightly darker than hover (e.g. `ink.700` for primary buttons, `parchment.300` in dark), no translation (CompliHub brand is restrained — no bouncy press animations)
 - **Disabled**: reduced opacity (typically 50%) OR muted color tokens, plus `cursor: not-allowed`. Cannot be the only signal — still readable.
 - **Loading**: spinner replaces icon position, button text dims slightly, button stays same size (no layout shift)
 - **Error/Invalid (inputs)**: border switches to `color.feedback.error.border`, icon + helper-text-as-error message persist below the field
@@ -205,7 +205,7 @@ Before considering a component "done":
 **States in Figma:** Default, Hover, Focus-visible, Pressed, Disabled, Loading
 
 **Tokens consumed:**
-- `color.action.{style}.background.{state}` — primary maps to Petrol scale
+- `color.action.{style}.background.{state}` — primary maps to the Ink scale (dark: Parchment), plus the brass edge `color.action.edge`
 - `color.action.{style}.foreground.{state}`
 - `color.action.{style}.border.{state}`
 - `space.button.padding.x.{size}` (md = `space.4` 16px), `space.button.padding.y.{size}` (md = `space.2` 8px)

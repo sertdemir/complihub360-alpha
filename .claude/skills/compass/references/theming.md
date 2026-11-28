@@ -93,14 +93,14 @@ Option B is cleaner for true multi-brand. Option A is simpler if "brand" is most
 
 **Recommendation for Compass:** Start with Option A (brand baked into modes) for simplicity. Migrate to Option B only when actual co-branded provider surfaces become a real requirement. Premature abstraction is more painful than late refactoring here.
 
-Important guardrail: even in co-branded mode, the **CompliHub Petrol primary CTA** and the **Verified-Partner Gold badge** should remain recognizable. A co-branded surface that hides the platform's identity undermines the marketplace's accountability promise.
+Important guardrail: even in co-branded mode, the **CompliHub Ink primary CTA with brass edge** and the **Verified-Partner Gold badge** should remain recognizable. A co-branded surface that hides the platform's identity undermines the marketplace's accountability promise.
 
 ### Petrol & Accent-Gold across themes
 
 `#097070` (Petrol) and `#D3B454` (Accent-Gold) are CompliHub's brand identity colors. They need special handling:
 
 - **Light mode**:
-  - Petrol — use as-is for primary CTAs (Engagement Request) and brand accents
+  - Petrol — use as-is for brand accents (primary CTAs are Ink since 2026-11-28)
   - Accent-Gold — use as-is on light surfaces for Verified-Partner badges
 - **Dark mode**:
   - Petrol — shift to `#3FA3A3` (the lighter petrol from v1 Dark Mode Spec) for adequate contrast on dark surfaces

@@ -76,7 +76,7 @@ Properties
 
 Accessibility
 - Hit target ≥44×44px in all sizes
-- Visible focus ring (border.medium 2px Petrol + shadow.focus halo per v1 Border + Elevation specs)
+- Visible focus ring (border.medium 2px Ink / dark Parchment + shadow.focus halo — since 2026-11-28)
 - Disabled state: cursor not-allowed; in code, aria-disabled rather than disabled attribute when label communicates state
 - Loading state: in code, aria-busy="true"; label remains readable; spinner replaces left icon position
 
@@ -137,7 +137,7 @@ Place at the top of the collection's page in the C360 Design System file.
 
 For Compass specifically, surface the doctrine constraints in the documentation:
 - The Accent-Gold collection must explicitly state "Reserved for Verified-Partner / Featured-Partner contexts. Not a status color."
-- The Petrol collection must state "Primary brand identity color. Used for primary CTAs and brand authority moments. Don't dilute by using as decorative accent."
+- The Petrol collection must state "Primary brand identity color. Used for brand authority moments — not for buttons, focus or selection (Ink since 2026-11-28). Don't dilute by using as decorative accent."
 
 ## Documentation pages — when to add them
 

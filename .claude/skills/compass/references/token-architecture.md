@@ -54,16 +54,18 @@ Examples:
 - `color.border.default` → `neutral.200 #E2DADA` (per Border Spec)
 - `color.border.muted` → `neutral.100 #EFE8E8`
 - `color.border.strong` → `neutral.300 #CFC7C7`
-- `color.border.focus` → `petrol.500 #097070` (Petrol focus ring per Border Spec)
-- `color.action.primary.background.default` → Petrol-500 (the Engagement Request CTA)
-- `color.action.primary.background.hover` → Petrol-600
-- `color.action.primary.background.pressed` → Petrol-700
+- `color.border.focus` → Ink `#1B2A41` / dark Parchment `#E9E4D3` (since 2026-11-28, was Petrol)
+- `color.action.primary.background.default` → Ink-500 `#1B2A41` / dark Parchment-100 `#E9E4D3` (since 2026-11-28; Figma `color/action/primary`)
+- `color.action.primary.background.hover` → Ink-600 / Parchment-200
+- `color.action.primary.background.pressed` → Ink-700 / Parchment-300
+- `color.action.edge` / `color.action.edge-glint` → Brass `#C5913B` / `#FFF1C9` (dark `#8C672A` / `#D9AE62`) — 3px bottom edge of the primary button
+- `color.selected.default` / `.on` / `.subtle` → Ink / white / Ink 10 % (dark Parchment / Ink / Parchment 10 %) — every selected/active/checked state
 - `color.action.primary.foreground.default` → `neutral.50` (white-ish)
 - `color.action.danger.background.default` → `error.500` — destructive actions
 - `color.feedback.success.background`, `.foreground`, `.border` — for status messages
 - `color.brand.partnerBadge` → Gold-500 (Verified-Partner exclusive — see doctrine)
 - `color.brand.partnerBadge.hover` → Gold-600
-- `color.focus.ring` → Petrol-500 with 3px outline + 0.2 opacity halo (per Elevation Spec `shadow-focus`)
+- `color.focus.ring` → Ink (dark Parchment) — since 2026-11-28, was Petrol-500
 
 **Rules:**
 - Always describe what the token is **for**, never what it **looks like**
@@ -193,7 +195,7 @@ CompliHub's brand is restrained — `radius.md` is the default for actions, `rad
 - `color.border.default` → `neutral.200 #E2DADA`
 - `color.border.muted` → `neutral.100 #EFE8E8`
 - `color.border.strong` → `neutral.300 #CFC7C7`
-- `color.border.focus` → `petrol.500 #097070`
+- `color.border.focus` → Ink `#1B2A41` / dark Parchment `#E9E4D3` (since 2026-11-28)
 
 ## Effect / Elevation tokens (per v1 Elevation Spec)
 
@@ -206,7 +208,7 @@ CompliHub uses a **"Flat-Plus"** approach — most surfaces stay flat with layer
 | `shadow.lg` | `0 10px 15px -3px rgba(43,43,43,0.1)` | **Compliance Wizard shell**, modals |
 | `shadow.xl` | `0 20px 25px -5px rgba(43,43,43,0.1)` | rare — high-overlay use |
 | `shadow.inner` | `inset 0 2px 4px 0 rgba(43,43,43,0.06)` | search fields, active progress bars |
-| `shadow.focus` | `0 0 0 3px rgba(9,112,112,0.2)` | Petrol focus halo (paired with `border.medium` + `color.border.focus`) |
+| `shadow.focus` | `0 0 0 3px rgba(27,42,65,0.2)` | Ink focus halo (was Petrol until 2026-11-28) (paired with `border.medium` + `color.border.focus`) |
 
 **Dark Mode rule:** shadows are replaced by **Elevation Borders** (1px lighter strokes) — the Elevation Spec is explicit that light-source-shadows do not work in dark environments. See `references/theming.md`.
 

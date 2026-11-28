@@ -21,8 +21,8 @@ When defining semantic color tokens, **verify contrast in every theme** (Light, 
 
 Every interactive element must show a clearly visible focus state when reached via keyboard. Compass focus standard (matches the v1 Border + Elevation Specs):
 
-- **`border.medium` (2px outline)** + **`color.border.focus` (Petrol-500)** at the element edge
-- **`shadow.focus`** (a 3px Petrol halo at 0.2 opacity) extending the visual focus ring beyond the border
+- **`border.medium` (2px outline)** + **`color.border.focus` (Ink, dark Parchment — since 2026-11-28)** at the element edge
+- **`shadow.focus`** (a 3px Ink halo at 0.2 opacity) extending the visual focus ring beyond the border
 - **Offset 2px from the element edge** so it's not absorbed by the element's own border
 - **High-contrast against any expected background** — at least 3:1 against the focused element AND 3:1 against the surrounding surface
 - **Never** removed in favor of hover-only feedback
@@ -51,7 +51,7 @@ Build accessibility into the token layer, not into individual components.
 
 Define and use these:
 
-- `color.focus.ring` — the focus outline color (Petrol-500 in light; lighter petrol `#3FA3A3` in dark)
+- `color.focus.ring` — the focus outline color (Ink `#1B2A41` in light — 14,44:1; Parchment `#E9E4D3` in dark — 11,54:1 on slate; since 2026-11-28)
 - `color.text.disabled` — muted but still meeting 3:1 against its background
 - `color.feedback.error.foreground` — red `#B55353` (and a darker variant for AA-compliant text)
 - `color.feedback.warning.foreground` — amber `#C59E38` that does **NOT** rely on color alone (always paired with icon)
