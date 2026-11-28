@@ -44,7 +44,7 @@ export function StateCell({ kind }: { kind: StateKind }) {
   const label = t(`risk.state.${kind}`);
   if (kind === 'action') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-body-2xs font-semibold text-fg-on-brand">
+      <span className="inline-flex items-center gap-1.5 rounded-xl btn-action-edge bg-action px-3 py-1.5 text-body-2xs font-semibold text-fg-on-action">
         {label} <ArrowRight size={13} />
       </span>
     );

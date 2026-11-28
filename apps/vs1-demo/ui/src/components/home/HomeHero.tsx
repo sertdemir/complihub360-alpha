@@ -110,7 +110,7 @@ function WizardPreview({ className = '' }: { className?: string }) {
         <span className="text-body-2xs text-fg-tertiary">{t('hero.preview.selectedCount')}</span>
         <span className="flex items-center gap-3">
           <span className="text-body-xs font-medium text-fg-secondary">{t('hero.preview.back')}</span>
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-1.5 text-body-xs font-semibold text-fg-on-brand">
+          <span className="inline-flex items-center gap-1.5 rounded-xl btn-action-edge bg-action px-3.5 py-1.5 text-body-xs font-semibold text-fg-on-action">
             {t('hero.preview.continue')} <ArrowRight size={14} />
           </span>
         </span>

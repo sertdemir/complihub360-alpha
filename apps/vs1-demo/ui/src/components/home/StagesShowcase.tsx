@@ -117,7 +117,7 @@ function AskDemo({ inView }: { inView: boolean }) {
           <motion.span
             animate={phase === 'click' ? { scale: [1, 0.9, 1] } : {}}
             transition={{ duration: 0.35 }}
-            className="inline-flex shrink-0 items-center rounded-lg bg-brand px-3.5 py-1.5 text-body-2xs font-semibold text-fg-on-brand"
+            className="inline-flex shrink-0 items-center rounded-xl btn-action-edge bg-action px-3.5 py-1.5 text-body-2xs font-semibold text-fg-on-action"
           >
             {t('howItWorks.demos.ask.cta')}
           </motion.span>

@@ -66,6 +66,12 @@ export default {
                 },
 
                 /* ── Compass semantic (CSS-variable backed, theme-aware) ── */
+                /* Hauptknopf — Tinte hell / Pergament dunkel (2026-11-28). */
+                action: {
+                    DEFAULT: 'rgb(var(--color-bg-action) / <alpha-value>)',
+                    hover: 'rgb(var(--color-bg-action-hover) / <alpha-value>)',
+                    active: 'rgb(var(--color-bg-action-active) / <alpha-value>)',
+                },
                 brand: {
                     DEFAULT: 'rgb(var(--color-bg-brand) / <alpha-value>)',
                     light: 'rgb(var(--color-bg-brand-light) / <alpha-value>)',
@@ -104,6 +110,7 @@ export default {
                     'accent-emphasis': 'rgb(var(--color-text-accent-emphasis) / <alpha-value>)',
                     'accent-strong': 'rgb(var(--color-text-accent-strong) / <alpha-value>)',
                     'on-brand': 'rgb(var(--color-text-on-brand) / <alpha-value>)',
+                    'on-action': 'rgb(var(--color-text-on-action) / <alpha-value>)',
                     'on-brand-fixed': 'rgb(var(--color-text-on-brand-fixed) / <alpha-value>)',
                     'on-brand-accent': 'rgb(var(--color-text-on-brand-accent) / <alpha-value>)',
                     'on-accent': 'rgb(var(--color-text-on-accent) / <alpha-value>)',
@@ -278,6 +285,9 @@ export default {
                 'lg': '8px',
                 'xl': '10px',
                 '2xl': '12px',
+                /* Marketing-CTA-Ecke (Button shape="soft"), Festlegung 2026-11-28:
+                   alle Knoepfe +4px runder — App 6->10 (xl), Marketing 10->14. */
+                'cta': '14px',
                 '3xl': '16px',
                 'pill': '9999px',
                 'full': '9999px',

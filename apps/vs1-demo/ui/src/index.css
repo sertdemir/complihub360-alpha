@@ -62,6 +62,18 @@
     --gold-brand: 197 145 59;      /* #C5913B — Logo "360" */
     --gold-brand-deep: 140 103 42; /* #8C672A — gleicher Farbton, AA fuer Kleintext */
 
+    /* Tinte + Pergament — die Aktionsfarbe des Hauptknopfs (Festlegung 2026-11-28,
+       Canvas "Button-Farbe" Variante A). Petrol bleibt Markenfarbe; die Rolle
+       "Hauptknopf" traegt ab jetzt Tinte (hell) bzw. Pergament (dunkel), damit
+       der Knopf nicht wie die Allerwelts-Teal-CTA jeder KI-/SaaS-Seite aussieht.
+       Figma: Primitives ink/*, parchment/*. */
+    --ink-500: 27 42 65;           /* #1B2A41 — 14,44:1 gegen Weiss */
+    --ink-600: 36 54 79;           /* #24364F — hover */
+    --ink-700: 18 29 46;           /* #121D2E — pressed */
+    --parchment-100: 233 228 211;  /* #E9E4D3 — Gold-Ende des "Gradient"; 11,54:1 auf Slate */
+    --parchment-200: 222 215 193;  /* #DED7C1 — hover */
+    --parchment-300: 210 201 174;  /* #D2C9AE — pressed */
+
     /* Neutral — warm-leaning */
     --neutral-50: 250 250 250;
     --neutral-100: 244 244 245;
@@ -93,6 +105,15 @@
     --color-bg-tertiary: var(--neutral-100);
     --color-bg-inverse: var(--petrol-900);
     --color-bg-brand: var(--petrol-500);
+    /* Hauptknopf (Button variant="primary"). Gold nur als 3px-Kante, nie als
+       Flaeche (Festlegung 2026-09-20 bleibt). Kante 4,04:1 bzw. 5,15:1 — ueber
+       den 3:1 fuer Nicht-Text. Figma: color/action/*. */
+    --color-bg-action: var(--ink-500);
+    --color-bg-action-hover: var(--ink-600);
+    --color-bg-action-active: var(--ink-700);
+    --color-text-on-action: 255 255 255;        /* 14,44:1 */
+    --color-action-edge: var(--gold-brand);     /* #C5913B */
+    --color-action-edge-glint: 255 241 201;     /* #FFF1C9 — Lichtreflex */
     --color-bg-brand-light: var(--petrol-50);
     /* Large brand panels that carry copy, as opposed to the small accent fills
        (dots, bars, rings, active states) that --color-bg-brand serves. The two
@@ -339,6 +360,14 @@
     --color-bg-inverse: 255 255 255;
     --drawer-glass-bg: rgba(31, 41, 55, 0.50);  /* slate #1f2937 @ 50% — floating glass drawer */
     --color-bg-brand: 20 168 154;
+    /* Hauptknopf dunkel: Pergament-Platte mit Tinten-Label (11,35:1) und
+       tieferem Messing an der Kante (4,04:1 gegen das Pergament). */
+    --color-bg-action: var(--parchment-100);
+    --color-bg-action-hover: var(--parchment-200);
+    --color-bg-action-active: var(--parchment-300);
+    --color-text-on-action: var(--ink-500);
+    --color-action-edge: var(--gold-brand-deep); /* #8C672A */
+    --color-action-edge-glint: 217 174 98;       /* #D9AE62 */
     /* Was unmapped and stayed petrol-500 — 1.49:1 against the slate surface,
        which is no border at all. Follows --color-bg-brand to the lighter
        dark-mode teal: 4.96:1, clearing the 3:1 that non-text contrast needs. */
@@ -530,4 +559,46 @@ footer[id] {
   to {
     background-position: 100% 100%;
   }
+}
+
+/* ── Messing-Kante mit Glint am Hauptknopf (Festlegung 2026-11-28) ─────────
+   3px Kante unten. Ein Lichtreflex laeuft beim Erscheinen zweimal darueber
+   (2 x 1,6 s = unter den 5 s aus WCAG 2.2.2, also keine Pause-Steuerung noetig),
+   danach nur bei Hover und Tastaturfokus. Keine Dauerschleife: ein Knopf, der
+   staendig glaenzt, zieht dauerhaft Aufmerksamkeit — gerade auf CTAs mit Geld
+   dahinter widerspricht das der DNA. prefers-reduced-motion: Kante steht still.
+   Disabled: keine Kante (wie in Figma); Loading behaelt sie. */
+/* In @layer components, damit Utilities am Aufrufer (fixed, absolute …) gewinnen. */
+@layer components {
+  .btn-action-edge { position: relative; overflow: hidden; }
+}
+.btn-action-edge::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    rgb(var(--color-action-edge)) 0%,
+    rgb(var(--color-action-edge)) 38%,
+    rgb(var(--color-action-edge-glint)) 50%,
+    rgb(var(--color-action-edge)) 62%,
+    rgb(var(--color-action-edge)) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  animation: action-glint-in 1.6s cubic-bezier(0.45, 0.05, 0.35, 1) 0.4s 2 both;
+}
+.btn-action-edge:hover::after,
+.btn-action-edge:focus-visible::after {
+  animation: action-glint-hover 1.2s cubic-bezier(0.45, 0.05, 0.35, 1) 1 both;
+}
+.btn-action-edge:disabled:not([aria-busy="true"])::after { display: none; }
+/* Zwei gleiche Keyframes, damit Hover die Animation neu startet statt sie
+   fortzusetzen. */
+@keyframes action-glint-in { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+@keyframes action-glint-hover { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .btn-action-edge::after { animation: none !important; background: rgb(var(--color-action-edge)); }
 }

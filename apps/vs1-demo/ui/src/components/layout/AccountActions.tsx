@@ -51,8 +51,8 @@ export function AccountActions({ lang, onNavigate }: AccountActionsProps) {
   // ueberschrieben, 12 steht dort auf 96 px (siehe Button.tsx, das aus demselben
   // Grund ueberall Pixel setzt). Mit h-12 war der Knopf doppelt so hoch.
   const BASE =
-    'inline-flex h-[48px] items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-body-sm font-semibold transition-colors';
-  const PRIMARY = `${BASE} bg-brand text-fg-on-brand hover:bg-brand/90`;
+    'inline-flex h-[48px] items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 text-body-sm font-semibold transition-colors';
+  const PRIMARY = `${BASE} btn-action-edge bg-action text-fg-on-action hover:bg-action-hover`;
   const SECONDARY = `${BASE} border-thin border-stroke-brand text-fg-brand hover:bg-brand-light`;
 
   if (isLoggedIn) {

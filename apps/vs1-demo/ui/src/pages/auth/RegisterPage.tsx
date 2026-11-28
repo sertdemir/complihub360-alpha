@@ -355,7 +355,7 @@ export function RegisterPage() {
                             <button
                                 type="button"
                                 onClick={() => navigate(`/${lang}/provider-apply`)}
-                                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3.5 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+                                className="mt-6 flex w-full items-center justify-center gap-2 rounded-cta btn-action-edge bg-action px-5 py-3.5 text-body-md font-semibold text-fg-on-action transition-transform duration-200 hover:-translate-y-0.5"
                             >
                                 {t("register.partnerGate.cta")} <ArrowRight size={16} />
                             </button>
@@ -510,7 +510,7 @@ export function RegisterPage() {
                             type="button"
                             disabled={loading}
                             onClick={next}
-                            className="flex items-center gap-2 rounded-lg bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 enabled:hover:-translate-y-0.5 disabled:opacity-50"
+                            className="flex items-center gap-2 rounded-cta btn-action-edge bg-action px-5 py-3 text-body-md font-semibold text-fg-on-action transition-transform duration-200 enabled:hover:-translate-y-0.5 disabled:opacity-50"
                         >
                             {loading ? t("register.creating") : isLast ? t("register.createAccount") : t("register.next")}
                             {!loading && <ArrowRight size={16} />}

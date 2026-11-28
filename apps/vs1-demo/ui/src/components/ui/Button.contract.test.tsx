@@ -10,9 +10,10 @@ import { Button } from './Button';
 // and, just as importantly, that the app surfaces did not move.
 
 describe('Button — the app-surface contract must not drift', () => {
-  it('still defaults to the 6px corner every existing call site renders', () => {
+  // 2026-11-28: alle Knoepfe +4px runder (Nutzer-Festlegung) — App 6->10px.
+  it('defaults to the 10px app corner every existing call site renders', () => {
     render(<Button>Speichern</Button>);
-    expect(screen.getByRole('button').className).toContain('rounded-md');
+    expect(screen.getByRole('button').className).toContain('rounded-xl');
   });
 
   it('still defaults to a single line at a fixed height', () => {
@@ -25,11 +26,11 @@ describe('Button — the app-surface contract must not drift', () => {
 });
 
 describe('Button — what the marketing surface needs', () => {
-  it('speaks the 10px marketing corner on request', () => {
+  it('speaks the 14px marketing corner on request', () => {
     render(<Button shape="soft">Jetzt starten</Button>);
     const c = screen.getByRole('button').className;
-    expect(c).toContain('rounded-xl');
-    expect(c).not.toContain('rounded-md');
+    expect(c).toContain('rounded-cta');
+    expect(c).not.toContain('rounded-xl');
   });
 
   it('offers the 56px hero size the section CTAs are built at', () => {

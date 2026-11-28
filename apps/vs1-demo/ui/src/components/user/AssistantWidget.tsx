@@ -129,7 +129,7 @@ export function AssistantWidget({ country }: { country?: string }) {
                   type="button"
                   onClick={startUpgrade}
                   disabled={upgrade === 'redirecting'}
-                  className="mt-3 w-full rounded-lg bg-brand px-3 py-2 text-[13px] font-semibold text-fg-on-brand transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="mt-3 w-full rounded-xl btn-action-edge bg-action px-3 py-2 text-[13px] font-semibold text-fg-on-action transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
                   {upgrade === 'redirecting' ? '…' : t('assistant.upgradeCta')}
                 </button>
@@ -153,7 +153,7 @@ export function AssistantWidget({ country }: { country?: string }) {
                 aria-label={t('assistant.send')}
                 onClick={send}
                 disabled={busy || draft.trim().length < 3}
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand text-fg-on-brand transition-opacity disabled:opacity-40"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-xl btn-action-edge bg-action text-fg-on-action transition-opacity disabled:opacity-40"
               >
                 <SendHorizonal size={15} />
               </button>
@@ -167,7 +167,7 @@ export function AssistantWidget({ country }: { country?: string }) {
         type="button"
         aria-label={open ? t('assistant.close') : t('assistant.open')}
         onClick={() => setOpen((o) => !o)}
-        className="grid h-12 w-12 place-items-center rounded-full bg-brand text-fg-on-brand shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition-transform hover:scale-105"
+        className="grid h-12 w-12 place-items-center rounded-full btn-action-edge bg-action text-fg-on-action shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition-transform hover:scale-105"
       >
         {open ? <X size={19} /> : <Sparkles size={19} />}
       </button>

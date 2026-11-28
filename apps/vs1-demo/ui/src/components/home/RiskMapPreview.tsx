@@ -33,7 +33,7 @@ function StateCell({ kind }: { kind: StateKind }) {
   const label = t(`risk.state.${kind}`);
   if (kind === 'action') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-md bg-brand px-2 py-1 text-body-4xs font-semibold text-fg-on-brand">
+      <span className="inline-flex items-center gap-1 rounded-xl btn-action-edge bg-action px-2 py-1 text-body-4xs font-semibold text-fg-on-action">
         {label} <ArrowRight size={11} />
       </span>
     );

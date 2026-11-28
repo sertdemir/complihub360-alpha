@@ -8,16 +8,17 @@ export type ButtonVariant =
   // in light would vanish there. These variants stay fixed on purpose.
   | 'inverse' | 'inverseOutline';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
-/** Corner language. `md` = 6px (app surfaces), `soft` = 12px (marketing CTAs). */
+/** Corner language. `md` = 10px (app surfaces), `soft` = 14px (marketing CTAs).
+ *  Bis 2026-11-28: 6px / 10px — der Nutzer wollte alle Knoepfe runder. */
 export type ButtonShape = 'md' | 'soft';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   /**
-   * Corner radius language. Defaults to `md` (6px) so every existing app
-   * surface is untouched. The marketing pages speak `soft` (12px) — that
-   * difference is why they hand-built their CTAs instead of using this.
+   * Corner radius language. Defaults to `md` (10px, bis 2026-11-28: 6px) for
+   * app surfaces. The marketing pages speak `soft` (14px, vorher 10px) — that
+   * difference is why they once hand-built their CTAs instead of using this.
    */
   shape?: ButtonShape;
   fullWidth?: boolean;
@@ -79,8 +80,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'inline-flex items-center justify-center gap-2 font-sans font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
 
       const shapeClasses: Record<ButtonShape, string> = {
-        md: 'rounded-md',
-        soft: 'rounded-xl',
+        md: 'rounded-xl', // 10px
+        soft: 'rounded-cta', // 14px
       };
 
     // NOTE: explicit px heights — the project's custom spacing scale maps
@@ -114,6 +115,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const variantClasses: Record<ButtonVariant, string> = {
+      // Stand bis 2026-11-28 (Begruendung der Kontrastwerte bleibt lehrreich):
       // The primary CTA follows the brand token, so it is petrol #004d40 in light
       // and teal #14a89a in dark. It used to be that teal pinned in BOTH modes,
       // which put a colour on light pages that exists in no light token — and at
@@ -123,7 +125,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       // Grounds that do NOT flip (the auth and onboarding pages paint a dark hex
       // without a .dark class) must use bg-brand-fixed instead — this token would
       // resolve to petrol there and vanish.
-      primary: 'bg-brand text-fg-on-brand hover:brightness-95 active:brightness-90 focus:ring-stroke-focus',
+      // 2026-11-28: Der Hauptknopf traegt nicht mehr die Markenfarbe, sondern
+      // Tinte (hell, Label weiss 14,44:1) bzw. Pergament (dunkel, Label Tinte
+      // 11,35:1) mit einer 3px Messing-Kante samt Glint — siehe .btn-action-edge
+      // in index.css. Petrol/Teal war die Knopffarbe fast jeder KI-/SaaS-Seite.
+      primary:
+        'btn-action-edge bg-action text-fg-on-action hover:bg-action-hover active:bg-action-active focus:ring-stroke-focus',
       secondary:
         'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:bg-neutral-300 focus:ring-neutral-500 dark:bg-white/10 dark:text-white dark:hover:bg-white/[0.16] dark:active:bg-white/20',
       outline:

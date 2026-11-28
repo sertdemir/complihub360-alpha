@@ -1440,9 +1440,9 @@ export function AnimatedWizard({
               disabled={blocked}
               aria-describedby={blocked ? 'wizard-needs-market' : undefined}
               className={
-                'order-2 inline-flex items-center gap-1.5 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40 ' +
+                'order-2 inline-flex items-center gap-1.5 rounded-xl font-semibold transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40 ' +
                 (sp ? 'px-6 py-3 text-body-md' : 'px-5 py-2.5 text-body-xs') +
-                ' bg-brand text-fg-on-brand'
+                ' btn-action-edge bg-action text-fg-on-action'
               }
             >
               {isReview ? t('wizard.generate') : t('wizard.footer.next')} <ArrowRight size={sp ? 16 : 14} />
@@ -1455,7 +1455,7 @@ export function AnimatedWizard({
             </span>
             <span
               ref={setTarget(FOOTER)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-body-xs font-semibold text-fg-on-brand"
+              className="inline-flex items-center gap-1.5 rounded-xl btn-action-edge bg-action px-4 py-2 text-body-xs font-semibold text-fg-on-action"
             >
               {t(`wizard.footer.${step.footerKey}`)} <ArrowRight size={14} />
             </span>
