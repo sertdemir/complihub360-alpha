@@ -59,6 +59,13 @@ jobs:
         # Reads the locale files only — no DeepL call, so no API key needed.
         run: npm run i18n:check
 
+      - name: Check translations are not older than their English source
+        # Die Paritaet oben prueft nur, ob ein Schluessel existiert. Wird ein
+        # EN-Text umgeschrieben, bleibt die alte Uebersetzung sonst still stehen
+        # (28.11.2026: 222 Schluessel, PR #478). Vergleicht die Locales mit den
+        # Hashes in scripts/i18n-stamps.json — keine Git-Historie, kein Netz.
+        run: npm run i18n:stale
+
       - name: Check token export against the shipped CSS
         # tokens.json liest kein Build — genau deshalb kann er still veralten,
         # und genau deshalb steht er hier. Er ist das, was Figma und die Doku

@@ -156,7 +156,8 @@ npm run lint         # eslint (.ts/.tsx)
 npm run build        # Build über alle Workspaces
 npm run dev:ui       # UI (@vs1-demo/ui)
 npm run dev:service  # API (@complihub/compliance-api)
-npm run i18n:check   # Übersetzungen prüfen
+npm run i18n:check   # Übersetzungen prüfen (Schlüsselparität)
+npm run i18n:stale   # Übersetzungen älter als ihr EN-Text? Nach jeder Copy-Änderung: npm run i18n:stamp
 npm run terminology:check  # verbotene Begriffe in den Sprachdateien
 npm run db:test      # Migrationen + pgTAP gegen eine Wegwerf-Datenbank
 npm run hooks:test   # Tests der Guard-Hooks unter .claude/hooks/
