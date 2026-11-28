@@ -199,7 +199,9 @@
     --color-border-input: var(--neutral-400);    /* AA, mandatory for inputs */
     --color-border-brand: var(--petrol-500);
     --color-border-accent: var(--gold-500);
-    --color-border-focus: var(--petrol-500);     /* mandatory, >=2px */
+    /* Fokus-Ring seit 2026-11-28 in Tinte (vorher petrol-500), passend zum
+       Hauptknopf: 14,44:1 gegen Weiss. Global — ein Fokus-Signal fuer alles. */
+    --color-border-focus: var(--ink-500);        /* mandatory, >=2px */
 
     /* Icon */
     --color-icon-default: var(--neutral-600);
@@ -428,7 +430,9 @@
     --color-text-accent-strong: var(--gold-brand);
     --color-border-default: 55 65 81;
     --color-border-subtle: 42 51 64;
-    --color-border-focus: 20 168 154;
+    /* Dunkel: Pergament statt Teal — Tinte waere auf Slate unsichtbar (1,02:1);
+       Pergament haelt 11,54:1. */
+    --color-border-focus: var(--parchment-100);
     --color-icon-default: 154 167 173;
     /* Risk on dark — same traffic light, different tones. The light values sit at
        L* 28-47 and would land at 1.2-2.5:1 on slate, so the scale moves up to the
