@@ -115,6 +115,27 @@ unset STAGING_KEY
 
 `--on-limit` startet den API-Container bei der Gratis-Grenze neu (der Zähler lebt im Speicher) und stellt dieselbe Frage noch einmal. So läuft der ganze Bogen in einem Durchgang. Die Schwelle passt, wenn möglichst alle `match`-Fragen darüber und alle `no-match`-Fragen darunter liegen.
 
+**Lauf vom 27.11.2026 (30 Fragen, Staging):**
+
+| | Bereich |
+|---|---|
+| `match` (21) | 0,656–0,843 |
+| `no-match` (9) | 0,529–0,670 |
+
+- Die schwächsten `match`-Fragen sind TR (0,656), ES (0,661) und Kleinunternehmer (0,664).
+- Die stärksten `no-match`-Fragen sind Smalltalk (0,670) und Körperschaftsteuer (0,669).
+- Trennscharf ist keine Schwelle. Gewählt ist **0,64**: Alle `match`-Fragen bleiben, 6 von 9 `no-match`-Fragen fallen raus.
+- Alle 9 `no-match`-Fragen hat das Modell trotzdem richtig abgelehnt. Was durchrutscht, zeigt nur fremde Quellen an.
+
+Höher als 0,65 geht nicht, ohne TR- und ES-Fragen zu verlieren. Nachprüfen, sobald es echte Nutzung gibt.
+
+Im selben Lauf kamen 4 Antworten in der falschen Sprache: kurze englische Fragen auf Deutsch, die türkische Frage auf Spanisch. Ursache war `detectLang`. Korrigiert ist das mit zwei Änderungen:
+
+- Schriftzeichen entscheiden vor den Wortlisten.
+- Endungen nach einem Apostroph zählen nicht mit.
+
+Seitdem werden 29 der 30 Prüffragen erkannt und keine falsch. Offen bleibt „Is e-invoicing mandatory in France?“, dort greift „Sprache der Frage“.
+
 ## 7. Aufräumen im Code
 
 Erledigt: `geminiLegacy` und `gemini_embed_batch` sind entfernt, `GEMINI_API_KEY` steht in keiner `.env.example` mehr. Ein übrig gebliebener `GEMINI_API_KEY` wird ignoriert; ohne `LLM_API_KEY` antwortet der Assistent 503. `LEGACY_EMBED_MODEL` bleibt nur, damit Chunks ohne `embed_model`-Feld nie als Treffer gelten.

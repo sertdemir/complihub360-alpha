@@ -32,6 +32,20 @@ describe('guessLang / leakReply', () => {
     it('fällt ohne Signal auf Englisch zurück', () => {
         expect(guessLang('???')).toBe('en');
     });
+    // Kalibrierlauf 27.11.2026: diese vier kamen in der falschen Sprache zurück.
+    it('erkennt kurze englische Fragen und türkische Endungen nach Apostroph', () => {
+        expect(detectLang('By when must monthly VAT be paid in Italy?')).toBe('en');
+        expect(detectLang('How does a foreign company get an Italian VAT number?')).toBe('en');
+        expect(detectLang('Hi, who are you?')).toBe('en');
+        expect(detectLang("Türkiye'de yabancı şirketler KDV iadesi alabilir mi?")).toBe('tr');
+        expect(guessLang("Türkiye'de yabancı şirketler KDV iadesi alabilir mi?")).toBe('tr');
+        expect(answerCheck('Hi, who are you?')).toMatch(/Language: English/);
+    });
+    it('lässt Spanisch und Deutsch, wo sie eindeutig sind', () => {
+        expect(detectLang('¿Cuál es el umbral para mi empresa?')).toBe('es');
+        expect(detectLang('Gibt es eine Kleinunternehmerregelung für mich?')).toBe('de');
+        expect(detectLang('Ich schreibe an das Finanzamt, was muss ich angeben?')).toBe('de');
+    });
 });
 
 describe('SHARED_RULES', () => {
