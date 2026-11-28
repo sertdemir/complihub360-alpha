@@ -33,8 +33,9 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
           style={{ width: t.w, height: t.h }}
           className={cn(
             'relative shrink-0 rounded-full transition-colors',
-            error ? 'bg-error-500' : 'bg-stroke peer-checked:bg-brand',
-            'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-primary-500',
+            // Daumen an: Gegenfarbe der Auswahl (weiss auf Tinte, Tinte auf Pergament).
+            error ? 'bg-error-500' : 'bg-stroke peer-checked:bg-selected peer-checked:[&_.thumb]:bg-fg-on-selected',
+            'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-stroke-focus',
             t.on,
           )}
         >

@@ -17,7 +17,7 @@ import { HEADER_NAV_LINKS } from './navLinks';
 
 const menuItemClass = (active: boolean) =>
   `flex items-center gap-1 px-2 desktop-l:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
-    active ? 'text-fg-brand bg-brand-light' : 'text-fg-secondary hover:text-fg hover:bg-surface-secondary'
+    active ? 'text-selected bg-selected/10' : 'text-fg-secondary hover:text-fg hover:bg-surface-secondary'
   }`;
 
 const HIDDEN_PATHS = ['/login', '/register', '/provider-apply', '/provider-invite', '/verify-email', '/beta-agreement'];

@@ -210,7 +210,7 @@ export function LeadsPage() {
       disabled={disabled}
       onClick={onClick}
       className={'rounded-full border px-2.5 py-[3px] text-[11px] font-semibold transition-colors disabled:opacity-60 '
-        + (on ? 'border-brand bg-brand text-fg-on-brand' : 'border-stroke bg-surface text-fg-secondary hover:border-brand hover:text-fg-brand')}
+        + (on ? 'border-selected bg-selected text-fg-on-selected' : 'border-stroke bg-surface text-fg-secondary hover:border-brand hover:text-fg-brand')}
     >
       {label}
     </button>
@@ -294,7 +294,7 @@ export function LeadsPage() {
                 key={o.key} type="button" role="radio" aria-checked={on} disabled={busy}
                 onClick={() => { setAttChoice((m) => ({ ...m, [r.id]: o.key })); if (attMissing === r.id) setAttMissing(null); }}
                 className={'flex w-full items-start gap-3 rounded-lg border px-3.5 py-3 text-left transition-colors disabled:opacity-60 '
-                  + (on ? 'border-brand bg-brand-light' : 'border-stroke bg-surface hover:border-brand/50')}
+                  + (on ? 'border-selected bg-selected/10' : 'border-stroke bg-surface hover:border-brand/50')}
               >
                 <span aria-hidden className={'mt-[2px] inline-block h-4 w-4 shrink-0 rounded-full border ' + (on ? 'border-[5px] border-brand bg-surface' : 'border-stroke-strong bg-surface')} />
                 <span className="min-w-0">

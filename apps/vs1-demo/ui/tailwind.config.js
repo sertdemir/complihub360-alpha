@@ -66,6 +66,8 @@ export default {
                 },
 
                 /* ── Compass semantic (CSS-variable backed, theme-aware) ── */
+                /* Auswahlzustand — Tinte hell / Pergament dunkel (2026-11-28). */
+                selected: 'rgb(var(--color-selected) / <alpha-value>)',
                 /* Hauptknopf — Tinte hell / Pergament dunkel (2026-11-28). */
                 action: {
                     DEFAULT: 'rgb(var(--color-bg-action) / <alpha-value>)',
@@ -111,6 +113,7 @@ export default {
                     'accent-strong': 'rgb(var(--color-text-accent-strong) / <alpha-value>)',
                     'on-brand': 'rgb(var(--color-text-on-brand) / <alpha-value>)',
                     'on-action': 'rgb(var(--color-text-on-action) / <alpha-value>)',
+                    'on-selected': 'rgb(var(--color-on-selected) / <alpha-value>)',
                     'on-brand-fixed': 'rgb(var(--color-text-on-brand-fixed) / <alpha-value>)',
                     'on-brand-accent': 'rgb(var(--color-text-on-brand-accent) / <alpha-value>)',
                     'on-accent': 'rgb(var(--color-text-on-accent) / <alpha-value>)',

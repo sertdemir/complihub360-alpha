@@ -114,6 +114,13 @@
     --color-text-on-action: 255 255 255;        /* 14,44:1 */
     --color-action-edge: var(--gold-brand);     /* #C5913B */
     --color-action-edge-glint: 255 241 201;     /* #FFF1C9 — Lichtreflex */
+    /* Auswahlzustand (gewaehlter Chip, aktiver Schritt, aktive Navigation,
+       Checkbox/Toggle an, gewaehlte Option) — seit 2026-11-28 in der
+       Aktionsfarbe statt Petrol. Volle Flaeche: bg-selected + text-fg-on-selected;
+       getoent: bg-selected/10 + text-selected. Petrol bleibt Marke, Flaechen
+       und Datengrafik. */
+    --color-selected: var(--ink-500);
+    --color-on-selected: 255 255 255;
     --color-bg-brand-light: var(--petrol-50);
     /* Large brand panels that carry copy, as opposed to the small accent fills
        (dots, bars, rings, active states) that --color-bg-brand serves. The two
@@ -370,6 +377,8 @@
     --color-text-on-action: var(--ink-500);
     --color-action-edge: var(--gold-brand-deep); /* #8C672A */
     --color-action-edge-glint: 217 174 98;       /* #D9AE62 */
+    --color-selected: var(--parchment-100);
+    --color-on-selected: var(--ink-500);
     /* Was unmapped and stayed petrol-500 — 1.49:1 against the slate surface,
        which is no border at all. Follows --color-bg-brand to the lighter
        dark-mode teal: 4.96:1, clearing the 3:1 that non-text contrast needs. */

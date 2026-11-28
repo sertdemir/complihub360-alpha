@@ -8,7 +8,7 @@ import type { InboxLead, PartnerRequest } from './types';
 
 function LeadRow({ lead, highlighted }: { lead: InboxLead; highlighted?: boolean }) {
   return (
-    <div className={cn('rounded-lg p-3', highlighted ? 'border border-primary-500 bg-primary-50/40 dark:bg-primary-500/10' : 'border border-transparent')}>
+    <div className={cn('rounded-lg p-3', highlighted ? 'border border-selected bg-selected/5' : 'border border-transparent')}>
       <div className="flex items-start justify-between gap-2">
         <span className="flex items-center gap-1.5 text-[13px] font-semibold text-fg">
           {highlighted && lead.dimmed === false && (

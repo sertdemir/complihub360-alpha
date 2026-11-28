@@ -103,7 +103,7 @@ export function SlidableTabbar({ tabs, active, onChange, className }: SlidableTa
                 className={cn(
                   'ml-0.5 inline-flex min-w-[20px] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none',
                   isActive
-                    ? 'bg-brand text-fg-on-brand'
+                    ? 'bg-selected text-fg-on-selected'
                     : 'bg-surface-secondary text-fg-secondary',
                 )}
               >

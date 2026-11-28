@@ -43,8 +43,8 @@ function StepRail({ steps, current = 0 }: { steps: WizardStep[]; current?: numbe
               <span
                 className={cn(
                   'grid h-4 w-4 place-items-center rounded-full',
-                  state === 'done' && 'bg-brand text-fg-on-brand',
-                  state === 'active' && 'bg-brand text-fg-on-brand ring-4 ring-brand-light',
+                  state === 'done' && 'bg-selected text-fg-on-selected',
+                  state === 'active' && 'bg-selected text-fg-on-selected ring-4 ring-selected/15',
                   state === 'upcoming' && 'border border-stroke bg-surface',
                 )}
               >

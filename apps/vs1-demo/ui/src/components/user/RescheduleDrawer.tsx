@@ -128,7 +128,7 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
                   <button key={iso} type="button" aria-pressed={selected === iso} onClick={() => setSelected(iso)}
                     className={`rounded-lg border px-3 py-1.5 text-[13px] transition-colors ${
                       selected === iso
-                        ? 'border-brand bg-brand/15 font-semibold text-fg-brand'
+                        ? 'border-selected bg-selected/10 font-semibold text-selected'
                         : 'border-stroke text-fg-secondary hover:border-brand/50 hover:text-fg'
                     }`}>
                     {tf.format(new Date(iso))}

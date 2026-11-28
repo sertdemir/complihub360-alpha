@@ -210,8 +210,8 @@ export function Combobox({
                 className={cn(
                   'flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-[14px]',
                   opt.disabled && 'cursor-not-allowed opacity-50',
-                  isActive && !opt.disabled && 'bg-brand-light',
-                  isSelected ? 'text-fg-brand' : 'text-fg',
+                  isActive && !opt.disabled && 'bg-selected/10',
+                  isSelected ? 'text-selected' : 'text-fg',
                 )}
               >
                 <span className="min-w-0 flex-1">
@@ -220,7 +220,7 @@ export function Combobox({
                     <span className="block truncate text-[12px] text-fg-tertiary">{opt.description}</span>
                   )}
                 </span>
-                {isSelected && <Check size={16} strokeWidth={2.5} className="shrink-0 text-fg-brand" />}
+                {isSelected && <Check size={16} strokeWidth={2.5} className="shrink-0 text-selected" />}
               </li>
             );
           })}

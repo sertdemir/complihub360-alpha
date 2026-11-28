@@ -58,7 +58,7 @@ export function MobileSortBar({
             )}
           >
             {opt.label}
-            {isActive && <DirIcon size={14} strokeWidth={2.5} className="text-fg-brand" />}
+            {isActive && <DirIcon size={14} strokeWidth={2.5} className="text-selected" />}
           </button>
         );
       })}

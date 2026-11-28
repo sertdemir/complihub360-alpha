@@ -165,9 +165,9 @@ function StepDots({ current }: { current: number }) {
                         className={
                             "grid h-6 w-6 shrink-0 place-items-center rounded-full text-body-3xs font-bold " +
                             (i < current
-                                ? "bg-brand text-fg-on-brand"
+                                ? "bg-selected text-fg-on-selected"
                                 : i === current
-                                  ? "bg-brand text-fg-on-brand"
+                                  ? "bg-selected text-fg-on-selected"
                                   : "border border-stroke text-fg-tertiary")
                         }
                         aria-hidden
@@ -466,7 +466,7 @@ export function RegisterPage() {
                                                     onClick={() => patch({ intent: opt.value })}
                                                     className={
                                                         "flex items-start gap-3 rounded-lg border px-4 py-3 text-left transition-colors " +
-                                                        (active ? "border-brand bg-brand/5" : "border-stroke bg-surface hover:border-stroke-strong")
+                                                        (active ? "border-selected bg-selected/5" : "border-stroke bg-surface hover:border-stroke-strong")
                                                     }
                                                 >
                                                     <span

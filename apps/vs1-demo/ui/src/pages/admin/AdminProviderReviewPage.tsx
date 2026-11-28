@@ -260,7 +260,7 @@ export function AdminProviderReviewPage() {
                   <div className="flex items-center justify-between"><h2 className="text-[15px] font-semibold text-fg">Evidence</h2><Badge tone={d.checklist.every((c) => c.state === 'reviewed') ? 'success' : 'warning'} size="sm">{d.checklist.filter((c) => c.state === 'reviewed').length} of {d.checklist.length}</Badge></div>
                   <div className="divide-y divide-stroke-subtle overflow-hidden rounded-md border border-stroke-subtle">
                     {d.evidence.map((e) => (
-                      <button key={e.id} type="button" onClick={() => setSelected(e.id)} className={cn('flex w-full items-center gap-2 px-3 py-2.5 text-left text-[13px]', selected === e.id ? 'bg-brand/10' : 'hover:bg-surface-secondary')}>
+                      <button key={e.id} type="button" onClick={() => setSelected(e.id)} className={cn('flex w-full items-center gap-2 px-3 py-2.5 text-left text-[13px]', selected === e.id ? 'bg-selected/10' : 'hover:bg-surface-secondary')}>
                         <FileText size={14} className="shrink-0 text-fg-tertiary" />
                         <span className="min-w-0 flex-1 truncate text-fg">{EVIDENCE_LABEL[e.evidence_type] ?? e.evidence_type}{e.supports_countries?.length ? ` · ${e.supports_countries.join(', ')}` : ''}{e.original_name ? ` · ${e.original_name}` : ''}</span>
                         <Badge tone={RESULT[e.result].tone} size="sm">{RESULT[e.result].label}</Badge>

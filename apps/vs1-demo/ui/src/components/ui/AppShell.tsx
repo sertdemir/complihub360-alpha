@@ -57,14 +57,14 @@ export function NavItem({ icon, label, count, active, onClick, className }: NavI
       className={cn(
         'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors',
         active
-          ? 'bg-brand-light text-fg-brand ring-1 ring-inset ring-stroke-brand'
+          ? 'bg-selected/10 text-selected ring-1 ring-inset ring-selected/30'
           : 'text-fg-secondary hover:bg-black/[0.04] hover:text-fg dark:hover:bg-white/[0.05]',
         className,
       )}
     >
-      {icon && <span className={cn('shrink-0', active ? 'text-fg-brand' : 'text-fg-tertiary')}>{icon}</span>}
+      {icon && <span className={cn('shrink-0', active ? 'text-selected' : 'text-fg-tertiary')}>{icon}</span>}
       <span className="flex-1 text-left">{label}</span>
-      {count != null && <span className={cn('text-[12px] font-semibold tabular-nums', active ? 'text-fg-brand' : 'text-fg-tertiary')}>{count}</span>}
+      {count != null && <span className={cn('text-[12px] font-semibold tabular-nums', active ? 'text-selected' : 'text-fg-tertiary')}>{count}</span>}
     </button>
   );
 }
@@ -105,7 +105,7 @@ export function DomainTab({ icon, label, dot, active, onClick }: DomainTabProps)
         </span>
       )}
       {label}
-      {active && <span className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-fg-brand" />}
+      {active && <span className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-selected" />}
     </button>
   );
 }

@@ -30,11 +30,11 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
           className={cn(
             'relative grid shrink-0 place-items-center rounded-full border bg-surface transition-colors',
             '[&>.dot]:scale-0 peer-checked:[&>.dot]:scale-100',
-            'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-primary-500',
-            error ? 'border-error-500' : 'border-stroke peer-checked:border-brand',
+            'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-stroke-focus',
+            error ? 'border-error-500' : 'border-stroke peer-checked:border-selected',
           )}
         >
-          <span className="dot rounded-full bg-brand transition-transform" style={{ width: Math.round(s * 0.5), height: Math.round(s * 0.5) }} />
+          <span className="dot rounded-full bg-selected transition-transform" style={{ width: Math.round(s * 0.5), height: Math.round(s * 0.5) }} />
         </span>
         {label && <span className={cn('select-none text-fg', TXT[size])}>{label}</span>}
       </label>

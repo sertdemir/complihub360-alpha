@@ -29,7 +29,7 @@ export const ProgressSidebar = React.forwardRef<HTMLDivElement, ProgressSidebarP
               {!isLast && (
                 <div 
                   className={`absolute left-4 top-8 -ml-px h-full w-0.5 ${
-                    step.status === 'completed' ? 'bg-primary-500' : 'bg-neutral-200'
+                    step.status === 'completed' ? 'bg-selected' : 'bg-neutral-200'
                   }`} 
                   aria-hidden="true" 
                 />
@@ -38,7 +38,7 @@ export const ProgressSidebar = React.forwardRef<HTMLDivElement, ProgressSidebarP
               {/* Status Icon Indicator */}
               <div 
                 className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-medium 
-                  ${step.status === 'completed' ? 'bg-primary-500 border-primary-500 text-white' : ''}
+                  ${step.status === 'completed' ? 'bg-selected border-selected text-fg-on-selected' : ''}
                   ${step.status === 'current' ? 'bg-white border-primary-500 ring-4 ring-primary-50' : ''}
                   ${step.status === 'upcoming' ? 'bg-white border-neutral-300' : ''}
                 `}

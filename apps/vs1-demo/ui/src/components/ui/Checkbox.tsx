@@ -36,12 +36,12 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         <span
           style={{ width: s, height: s }}
           className={cn(
-            'relative grid shrink-0 place-items-center rounded-[4px] border bg-surface text-white transition-colors',
+            'relative grid shrink-0 place-items-center rounded-[4px] border bg-surface text-fg-on-selected transition-colors',
             '[&_svg]:absolute [&_.chk]:opacity-0 peer-checked:[&_.chk]:opacity-100 [&_.ind]:opacity-0 peer-indeterminate:[&_.ind]:opacity-100',
-            'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-primary-500',
+            'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-stroke-focus',
             error
               ? 'border-error-500'
-              : 'border-stroke peer-checked:border-brand peer-checked:bg-brand peer-indeterminate:border-brand peer-indeterminate:bg-brand',
+              : 'border-stroke peer-checked:border-selected peer-checked:bg-selected peer-indeterminate:border-selected peer-indeterminate:bg-selected',
           )}
         >
           <Check className="chk" size={ic} strokeWidth={3} />

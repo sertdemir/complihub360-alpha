@@ -271,7 +271,7 @@ export function AnswersDrawer({ open, onClose, sessionId, sessionLabel, profile,
 
   const chipClass = (on: boolean) =>
     'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-[7px] text-[12px] font-semibold transition-colors '
-    + (on ? 'border-brand bg-brand text-fg-on-brand' : 'border-stroke bg-surface text-fg hover:border-stroke-brand');
+    + (on ? 'border-selected bg-selected text-fg-on-selected' : 'border-stroke bg-surface text-fg hover:border-stroke-brand');
 
   let number = 0;
   return (

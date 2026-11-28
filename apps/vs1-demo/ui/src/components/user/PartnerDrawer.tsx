@@ -440,7 +440,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
                       onClick={() => setSelected(iso)}
                       className={'rounded-lg border px-3 py-1.5 text-body-3xs font-bold transition-colors '
                         + (selected === iso
-                          ? 'border-brand bg-brand text-white'
+                          ? 'border-selected bg-selected text-fg-on-selected'
                           : 'border-stroke text-fg hover:border-brand hover:text-fg-brand')}
                     >
                       {tf.format(new Date(iso))}

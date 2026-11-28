@@ -689,9 +689,9 @@ function StepRail({ current, spacious = false }: { current: number; spacious?: b
                   (spacious ? 'h-3 w-3 ' : 'h-3.5 w-3.5 ') +
                   'rounded-full ' +
                   (state === 'done'
-                    ? 'bg-brand'
+                    ? 'bg-selected'
                     : state === 'active'
-                    ? 'bg-brand ring-4 ring-brand-light'
+                    ? 'bg-selected ring-4 ring-selected/15'
                     : 'border border-stroke bg-surface')
                 }
               />
@@ -1245,7 +1245,7 @@ export function AnimatedWizard({
                         'rounded-xl border transition-colors duration-200 ' +
                         (sp ? 'p-[18px] ' : 'p-3.5 ') +
                         (interactive ? 'cursor-pointer hover:border-stroke-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus ' : '') +
-                        (on ? 'border-stroke-brand bg-brand-light/50 ring-1 ring-stroke-brand' : 'border-stroke bg-surface')
+                        (on ? 'border-selected bg-selected/10 ring-1 ring-selected/30' : 'border-stroke bg-surface')
                       }
                     >
                       <div className="flex items-start justify-between gap-2">
