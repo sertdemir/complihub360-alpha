@@ -185,7 +185,11 @@ export interface BannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   actions?: React.ReactNode;
   /** Show a dismiss ✕ that calls this. */
   onClose?: () => void;
+<<<<<<< HEAD
   /** Name des Schliessen-Knopfs fuer Screenreader. Standard: common:a11y.dismissNotice in der Sprache der Seite. */
+=======
+  /** Name des Schliessen-Knopfs fuer Screenreader. Standard "Dismiss". */
+>>>>>>> origin/claude/sharp-hamilton-iyn3sp
   closeLabel?: string;
   /**
    * Nur strip: Klassen fuer den inneren Container, damit der Inhalt des
@@ -206,7 +210,11 @@ export function Banner({
   action,
   actions,
   onClose,
+<<<<<<< HEAD
   closeLabel: closeLabelProp,
+=======
+  closeLabel = 'Dismiss',
+>>>>>>> origin/claude/sharp-hamilton-iyn3sp
   variant = 'card',
   surface = 'light',
   className,
@@ -216,9 +224,12 @@ export function Banner({
   const s = SURFACES[status][surface];
   const Icon = ICONS[status];
   const strip = variant === 'strip';
+<<<<<<< HEAD
   // Der Knopf hiess bis 2026-11-28 fest "Dismiss", in jeder Sprache.
   const { t } = useTranslation('common');
   const closeLabel = closeLabelProp ?? t('a11y.dismissNotice', { defaultValue: 'Dismiss' });
+=======
+>>>>>>> origin/claude/sharp-hamilton-iyn3sp
   const body = (
     <>
       {icon !== false && (

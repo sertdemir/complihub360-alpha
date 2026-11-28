@@ -55,6 +55,7 @@ export interface DrawerProps {
   onBack?: () => void;
   /** Name des Rueckwegs fuer Screenreader ("Zurueck zum Profil"). Pflicht, wenn `onBack` gesetzt ist. */
   backLabel?: string;
+<<<<<<< HEAD
   /** Name des Schliessen-Knopfs fuer Screenreader. Standard: common:a11y.close in der Sprache der Seite. */
   closeLabel?: string;
 }
@@ -64,6 +65,13 @@ export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyeb
   // und tuerkischen Seiten. defaultValue traegt, wo i18n nicht laeuft (Tests, Storybook).
   const { t } = useTranslation('common');
   const closeLabel = closeLabelProp ?? t('a11y.close', { defaultValue: 'Close' });
+=======
+  /** Name des Schliessen-Knopfs fuer Screenreader. Standard "Close". */
+  closeLabel?: string;
+}
+
+export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className, fixedHeight = false, header = 'default', onBack, backLabel, closeLabel = 'Close' }: DrawerProps) {
+>>>>>>> origin/claude/sharp-hamilton-iyn3sp
   const titleId = useId();
   const compact = header === 'compact';
   // Escape und Scroll-Lock gab es hier schon; der FOKUS fehlte. Ohne ihn blieb
