@@ -156,3 +156,53 @@ export const TallScroll: Story = {
     return <Demo />;
   },
 };
+
+// header="compact" — Compass "Drawer Header" Layout=Compact (2281:275): Rueckweg,
+// Titel und Schliessen in einer Zeile; die Zusatzzeile steht im Inhalt.
+function CompactDemo() {
+  const [open, setOpen] = useState(true);
+  const [picked, setPicked] = useState('10:00');
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Termin buchen</Button>
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        size="md"
+        header="compact"
+        title="Termin buchen"
+        onBack={() => setOpen(false)}
+        backLabel="Zurück zum Profil"
+        closeLabel="Schließen"
+        headerExtra="Verified Provider C · kostenloses Erstgespräch · 30 Min · unverbindlich"
+        footer={<Button fullWidth size="lg">Termin buchen</Button>}
+      >
+        <div className="space-y-4">
+          {['Dienstag, 24. November', 'Mittwoch, 25. November'].map((day) => (
+            <div key={day}>
+              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-brand">{day}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {['09:00', '10:00', '11:00', '14:00', '15:30'].map((time) => {
+                  const on = day.startsWith('Dienstag') && time === picked;
+                  return (
+                    <button
+                      key={time}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => setPicked(time)}
+                      className={on ? 'min-h-[44px] rounded-lg border border-brand bg-brand px-3.5 text-[13px] font-semibold text-fg-on-brand' : 'min-h-[44px] rounded-lg border border-stroke bg-surface px-3.5 text-[13px] font-semibold text-fg'}
+                    >
+                      {time}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Drawer>
+    </>
+  );
+}
+
+export const CompactHeader: Story = { name: 'Kompakter Kopf (Termin buchen)', parameters: { layout: 'fullscreen' }, render: () => <LightScope><CompactDemo /></LightScope> };

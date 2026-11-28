@@ -62,3 +62,38 @@ export const Dark: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => <div className="dark min-h-screen bg-[#1F2937] p-8">{Demo()}</div>,
 };
+
+// variant="inline" — Compass "Step Inline" (2273:276). Die Textzeile fuer kurze
+// Ablaeufe ueber einem Blatt oder Formular.
+const INLINE = [{ label: 'Anmeldung' }, { label: 'Beta-Vereinbarung' }, { label: 'Ihre Risk Map' }];
+const InlineDemo = () => (
+  <div className="max-w-2xl space-y-8">
+    {[0, 1, 2].map((current) => (
+      <div key={current}>
+        <p className="mb-2 text-[11px] font-semibold text-fg-tertiary">Schritt {current + 1} aktiv</p>
+        <Stepper variant="inline" steps={INLINE} current={current} aria-label="Schritte" doneLabel="erledigt" />
+      </div>
+    ))}
+    <div className="w-[300px]">
+      <p className="mb-2 text-[11px] font-semibold text-fg-tertiary">Schmal, 300 px: bricht um</p>
+      <Stepper variant="inline" steps={INLINE} current={1} aria-label="Schritte" doneLabel="erledigt" />
+    </div>
+    <div>
+      <p className="mb-2 text-[11px] font-semibold text-fg-tertiary">Fehler und gesperrt</p>
+      <Stepper
+        variant="inline"
+        steps={[{ label: 'Anmeldung' }, { label: 'Beta-Vereinbarung', state: 'error' }, { label: 'Ihre Risk Map', state: 'disabled' }]}
+        current={1}
+        aria-label="Schritte"
+        doneLabel="erledigt"
+      />
+    </div>
+  </div>
+);
+
+export const Inline: Story = { name: 'Inline (Textzeile)', render: () => <div className="bg-white p-6">{InlineDemo()}</div> };
+export const InlineDark: Story = {
+  name: 'Inline (dark)',
+  parameters: { layout: 'fullscreen' },
+  render: () => <div className="dark min-h-screen bg-[#1F2937] p-8">{InlineDemo()}</div>,
+};
