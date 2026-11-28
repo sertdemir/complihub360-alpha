@@ -47,23 +47,47 @@ export type ReplyLang = 'de' | 'en' | 'es' | 'tr';
 // Wörter wie "qué" oder "için" (gefunden am 23.10.2026: "¿Qué me pasa? Tengo
 // miedo." wurde als Englisch erkannt).
 const words = (list: string) => new RegExp(`(?<![\\p{L}])(?:${list})(?![\\p{L}])`, 'giu');
+// Kalibrierlauf 27.11.2026: 4 von 30 Antworten kamen in der falschen Sprache.
+// Kurze englische Fragen trafen kein Wort der Liste ("Hi, who are you?"), und
+// "Türkiye'de … mi?" zählte "de" und "mi" als Spanisch. Deshalb: mehr englische
+// Füllwörter, "mi" nicht mehr spanisch (auch türkische Fragepartikel), keine
+// Endungen nach Apostroph, Schriftzeichen vor den Wortlisten. 29/30 Prüffragen
+// erkannt, keine falsch; "Is e-invoicing mandatory in France?" bleibt offen.
 const STOPWORDS: Record<ReplyLang, RegExp> = {
-    de: words('und|die|der|das|nicht|ist|ich|wie|was|muss|bitte|für|mit|habe|mich|mir'),
-    en: words('the|and|is|of|to|for|with|what|how|my|please|your|am|me'),
-    es: words('el|la|los|las|y|de|para|con|qué|cuál|cómo|mi|me|tengo|que|es|una?'),
+    de: words('und|die|der|das|nicht|ist|ich|wie|was|muss|bitte|für|mit|habe|mich|mir|ein|eine|einen|welche|brauche'),
+    en: words('the|and|is|of|to|for|with|what|how|my|please|your|am|me|by|who|are|does|do|can|when|you|i|it|this|get|need|which|have|be'),
+    es: words('el|la|los|las|y|de|para|con|qué|cuál|cómo|me|tengo|que|es|una?'),
     tr: words('ve|bir|için|ile|bu|nedir|nasıl|ne|mi|mı|benim'),
 };
+// Zeichen, die unter den vier Sprachen nur eine hat. ö, ü und ç teilen sich
+// Deutsch und Türkisch und entscheiden deshalb nichts.
+const SCRIPT: ReadonlyArray<readonly [ReplyLang, RegExp]> = [
+    ['tr', /[şŞğĞıİ]/],
+    ['es', /[¿¡ñÑ]/],
+];
+// Türkische Endungen hinter Eigennamen ("Türkiye'de", "AB'ye") sind keine Wörter.
+const stripSuffixes = (text: string) => text.replace(/(?<=\p{L})['’]\p{L}+/gu, '');
+
+function scriptLang(text: string): ReplyLang | null {
+    const found = SCRIPT.filter(([, re]) => re.test(text));
+    return found.length === 1 ? found[0][0] : null;
+}
+
+/** Treffer je Sprache, absteigend sortiert. */
+function stopwordHits(text: string): Array<readonly [ReplyLang, number]> {
+    const cleaned = stripSuffixes(text);
+    return (Object.keys(STOPWORDS) as ReplyLang[])
+        .map((lang) => [lang, (cleaned.match(STOPWORDS[lang]) || []).length] as const)
+        .sort((a, b) => b[1] - a[1]);
+}
 
 /** Grobe Sprachwahl für feste Systemantworten; im Zweifel Englisch. */
 export function guessLang(text: string): ReplyLang {
-    let best: ReplyLang = 'en';
-    let bestHits = 0;
-    for (const lang of Object.keys(STOPWORDS) as ReplyLang[]) {
-        const hits = (text.match(STOPWORDS[lang]) || []).length;
-        if (hits > bestHits) { best = lang; bestHits = hits; }
-    }
+    const byScript = scriptLang(text);
+    if (byScript) return byScript;
+    const [[best, bestHits]] = stopwordHits(text);
     if (bestHits === 0 && /[çğışöü]/i.test(text)) return 'tr';
-    return best;
+    return bestHits > 0 ? best : 'en';
 }
 
 const LEAK_REPLY: Record<ReplyLang, string> = {
@@ -108,11 +132,11 @@ const LANG_NAME: Record<ReplyLang, string> = { de: 'German', en: 'English', es: 
 const WORRIED = /(?:\b(?:angst|sorge|sorgen|besorgt|beunruhigt|nervös|panik|mahnung|afraid|scared|worr(?:y|ied|ying)|concerned|nervous|anxious|panic|miedo|preocupad[oa]|asustad[oa]|nervios[oa]|angustia|korku|korkuyorum|endişe)|ängst)/i;
 const ASKS_CONSEQUENCES = /\b(strafe|strafen|bußgeld|säumnis|was passiert|konsequenz|penalt|fine[sd]?\b|what happens|consequence|multa|sanci|recargo|qué (me )?pasa|ceza|ne olur)/i;
 
-/** Sprache nur, wenn die Stoppwörter eindeutig sind; sonst null. */
+/** Sprache nur, wenn Schriftzeichen oder Stoppwörter eindeutig sind; sonst null. */
 export function detectLang(text: string): ReplyLang | null {
-    const hits = (Object.keys(STOPWORDS) as ReplyLang[])
-        .map((lang) => [lang, (text.match(STOPWORDS[lang]) || []).length] as const)
-        .sort((a, b) => b[1] - a[1]);
+    const byScript = scriptLang(text);
+    if (byScript) return byScript;
+    const hits = stopwordHits(text);
     return hits[0][1] >= 2 && hits[0][1] > hits[1][1] ? hits[0][0] : null;
 }
 
