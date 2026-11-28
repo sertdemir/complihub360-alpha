@@ -88,7 +88,8 @@
     "ask": {
       "placeholder": "Talebinizi kısaca anlatın",
       "send": "Gönder",
-      "note": "Betada sorunuz doğru alana ve değerlendirmeye yönlendirir — henüz doğrudan bir yanıta değil."
+      "note": "Betada sorunuz doğru alana ve değerlendirmeye yönlendirir — henüz doğrudan bir yanıta değil.",
+      "lead": "Ya da sorunuzu kendi kelimelerinizle sorun."
     },
     "promises": [
       {
@@ -104,7 +105,8 @@
         "desc": "Bağlanın, birlikte çalışın, tamamlayın."
       },
       {
-        "title": "Always on your side"
+        "title": "Always on your side",
+        "desc": "Hız için akıllı teknoloji, ihtiyaç duyduğunuzda gerçek insanlar."
       }
     ],
     "proofs": [
@@ -1068,7 +1070,11 @@
         "title": "Yapılandırılmış devirler alın",
         "desc": "Sağlayıcı 24–48 saat içinde Magic-Link ile yanıt verir. Discovery call yok."
       }
-    ]
+    ],
+    "subtitle": "En iyi eşleşmeleriniz ilgili uzmanlığa, pazar kapsamına, hizmet kalitesine, yanıt süresine, müsaitliğe ve uyuma dayanır. İlk karşılaştırmada sağlayıcı adları gizli kalır; böylece marka bilinirliğine değil, önemli olana odaklanırsınız.",
+    "exampleLabel": "Örnek eşleşmeler · anonim",
+    "identityLabel": "Kimlik, siz seçtikten sonra görünür.",
+    "supporting": "Bir veya birkaç sağlayıcı seçin. Adları ve tam profilleri, randevu aldığınızda görünür."
   },
   "twoReflexes": {
     "eyebrow": "Bu boşluk neden sürüyor",
@@ -1113,7 +1119,9 @@
         "title": "Bağımsız uzmanlar",
         "desc": "Verified Provider'lar hizmetlerini bağımsız olarak ve kendi mesleki sorumlulukları altında sunar."
       }
-    ]
+    ],
+    "row1Lead": "Çoğu özet size kuralların ne dediğini söyler. Risk Map ise işiniz için neyin söz konusu olduğunu öncelik sırasıyla ve kaynağıyla birlikte gösterir.",
+    "row2Lead": "Rehberler herkesi listeler. Biz her Verified Provider'ı eşleşmeye girmeden önce belgelenmiş kanıtlarla kontrol ederiz."
   },
   "domains": {
     "eyebrow": "Neleri biliyoruz",
@@ -1188,7 +1196,8 @@
           "Veri işleyen / alt işleyen sözleşmeleri",
           "Uluslararası aktarım mekanizmaları",
           "Erişim ve silme taleplerinin yönetimi",
-          "İhlal bildirim süreleri"
+          "İhlal bildirim süreleri",
+          "İhlal değerlendirmesi ve bildirimi"
         ],
         "matters": [
           "AB/UK'de yerleşik kişilerin kişisel verilerini işliyorsunuz",
@@ -1228,7 +1237,8 @@
           "E-posta / SMS opt-in kuralları",
           "Dark pattern denetimleri",
           "Influencer ve reklam beyanı",
-          "Abonelikten çıkma ve bastırma listesi yönetimi"
+          "Abonelikten çıkma ve bastırma listesi yönetimi",
+          "Abonelikten çıkma ve engelleme listesi süreçleri"
         ],
         "matters": [
           "AB'ye ücretli pazarlama yürütüyorsunuz",
@@ -1264,7 +1274,10 @@
           "Gerçek faydalanıcı güncellemeleri",
           "Grup içi sözleşme dokümantasyonu",
           "Yerel temsil gereklilikleri",
-          "Bildirim vadelerinin takibi"
+          "Bildirim vadelerinin takibi",
+          "Şube, iştirak ve grup yapıları",
+          "Yeniden yapılanma ve kapanış",
+          "Süregelen son tarihler ve şirket bakımı"
         ],
         "matters": [
           "Yerel bir şirket veya şube işletiyorsunuz",
@@ -1300,7 +1313,9 @@
           "Teknik dosya ve saklama süresi",
           "AB’de yerleşik sorumlu kişi",
           "Olay bildirimi ve geri çağırmalar",
-          "Büyük Britanya için UKCA işareti"
+          "Büyük Britanya için UKCA işareti",
+          "Sorumlu kişi, yetkili temsilci veya yerel temsilci hizmetleri",
+          "Olay bildirimi, düzeltici önlemler ve geri çağırmalar"
         ],
         "matters": [
           "AB pazarına ilk kez fiziksel bir ürün sunuyorsunuz",
@@ -1340,7 +1355,12 @@
           "Eşik aşıldığında Intrastat bildirimi",
           "Incoterms ve sorumluluğun nerede olduğu",
           "İthalat KDV’si ve erteleme",
-          "Brexit sonrası GB ↔ AB hareketleri"
+          "Brexit sonrası GB ↔ AB hareketleri",
+          "İthalat ve ihracat lisansları",
+          "Incoterms ve teslimat sorumlulukları",
+          "Intrastat beyanları",
+          "Depolama, fulfillment ve 3PL hizmetleri",
+          "Belirli rotalara özel destek"
         ],
         "matters": [
           "İlk kez bir gümrük sınırının ötesine sevkiyat yapıyorsunuz",
@@ -1384,7 +1404,11 @@
           "Cayma, iade ve garanti",
           "Sorumluluk ve sınırları",
           "Sınır ötesi uyuşmazlıkların yürütülmesi",
-          "Hangi hukukun gerçekten uygulandığı"
+          "Hangi hukukun gerçekten uygulandığı",
+          "Fikri mülkiyet ve markalar",
+          "Uyuşmazlıklar",
+          "Uygulanacak hukuk ve yetkili mahkeme",
+          "Yerel hukuki görüşler ve düzenleyici danışmanlık"
         ],
         "matters": [
           "Daha önce kullanmadığınız bir sözleşme türünü imzalıyorsunuz",
@@ -1433,7 +1457,8 @@
         ]
       }
     ],
-    "learnMore": "Daha fazla bilgi"
+    "learnMore": "Daha fazla bilgi",
+    "euWide": "AB genelinde"
   },
   "howItActs": {
     "eyebrow": "Bir işin içinden",
@@ -1443,21 +1468,32 @@
       "post": " neler olur."
     },
     "cards": [
-      {},
       {
-        "title": "Yanıt, saat işlerken."
+        "title": "Karar vermeden önce fiyatı görün",
+        "desc": "Seçim yapmadan önce beklenen bir fiyat aralığı gösterilir. Görüşmeden sonra sağlayıcı nihai kapsamı ve tahmini teyit eder. Siz onaylamadan hiçbir profesyonel çalışma başlamaz."
       },
       {
-        "title": "Sizde kalan bir kayıt."
+        "title": "Yanıt, saat işlerken.",
+        "desc": "Bir sağlayıcı kararlaştırılan yanıt süresini kaçırırsa size haber veririz ve başka bir eşleşme gösterebiliriz. Siz seçip randevu almadan yeni bir sağlayıcıyla hiçbir şey paylaşılmaz."
+      },
+      {
+        "title": "Sizde kalan bir kayıt.",
+        "desc": "Her adım özel bir zaman çizelgesine kaydedilir — talep, yanıt, kararlaştırılan kapsam, teslimatlar. Sizindir."
       }
     ],
     "panel1": {
       "scope": "Kapsam",
       "scopeValue": "OSS üç aylık beyanları · DE + NL + FR",
-      "approval": "Onay"
+      "approval": "Onay",
+      "estCost": "Beklenen fiyat aralığı",
+      "estValue": "2.400–3.800 €",
+      "timeline": "Tahmini hizmet süresi",
+      "timelineValue": "Gerekli tüm bilgi ve belgeler alındıktan sonra ortalama 10–15 iş günü",
+      "approvalValue": "Profesyonel çalışma başlamadan önce gerekli"
     },
     "panel2": {
-      "label": "İlk yanıt SLA'sı"
+      "label": "İlk yanıt SLA'sı",
+      "note": "Kaçırılırsa size haber veririz ve başka bir eşleşme gösterebiliriz."
     },
     "panel3": {
       "timeline": [
@@ -1466,7 +1502,8 @@
           "label": "Talep gönderildi"
         },
         {
-          "date": "25 Nis"
+          "date": "25 Nis",
+          "label": "Sağlayıcı onayı"
         },
         {
           "date": "28 Nis",
@@ -1475,10 +1512,19 @@
         {
           "date": "02 May",
           "label": "Kapsam üzerinde anlaşıldı"
+        },
+        {
+          "date": "06 May",
+          "label": "Çalışma ve belgeler"
+        },
+        {
+          "date": "12 May",
+          "label": "Tamamlanma"
         }
       ],
       "export": "Planlanan dışa aktarımlar"
-    }
+    },
+    "subtitle": "Bir görüşme seçin ve randevu alın. Sağlayıcının kimliği görünür olur ve onayladığınız bilgiler paylaşılır. Fiyat, zamanlama, kapsam, iletişim ve ilerleme iş boyunca görünür kalır."
   },
   "brandCode": {
     "eyebrow": "İletişim biçimimiz",
@@ -1562,7 +1608,8 @@
     "learn": {
       "meta": "Web semineri · 24 dk",
       "video": "D2C için sınır ötesi KDV",
-      "title": "İşin uzmanlarından öğrenin."
+      "title": "İşin uzmanlarından öğrenin.",
+      "desc": "Nitelikli uzmanlardan pratik rehberler, webinarlar ve eğitimler."
     },
     "mock": {
       "vatItaly": "KDV kaydı · İtalya",
@@ -1591,6 +1638,12 @@
       "libOssSource": "CompliHub360 Live · 90 dk",
       "libItVat": "İtalya’da KDV kaydı: adım adım",
       "libItVatSource": "CompliHub360 Editoryal · 8 dk"
+    },
+    "tile1": {
+      "start": "Yeni değerlendirme başlat",
+      "resume": "Kaldığınız yerden devam edin",
+      "active": "Aktif görüşmeler ve işler",
+      "saved": "Kaydedilen Risk Map'ler"
     }
   },
   "faq": {
@@ -1776,7 +1829,9 @@
         "links": {
           "howItWorks": "Nasıl çalışır",
           "forWhom": "Kimler için",
-          "startAssessment": "Değerlendirmeyi başlat"
+          "startAssessment": "Değerlendirmeyi başlat",
+          "askQuestion": "Soru sor",
+          "signIn": "Giriş yap"
         }
       },
       "areas": {
@@ -1801,6 +1856,14 @@
           "contact": "İletişim",
           "support": "Destek"
         }
+      },
+      "providers": {
+        "title": "Sağlayıcılar için",
+        "links": {
+          "join": "Sağlayıcı ağımıza katılın",
+          "matching": "Sağlayıcı eşleştirmesi nasıl çalışır",
+          "providerSignIn": "Sağlayıcı girişi"
+        }
       }
     },
     "markets": {
@@ -1815,7 +1878,9 @@
       "imprint": "Künye (Impressum)",
       "cookies": "Çerez Politikası",
       "subProcessors": "Alt İşleyenler"
-    }
+    },
+    "coverageNote": "Hizmetin sunulabilirliği ülkeye, uyum gereksinimine ve doğrulanmış sağlayıcı ağımızdaki kapsama bağlıdır.",
+    "coverageLink": "Pazarları ve kapsamı keşfedin"
   },
   "trustBand": {
     "eyebrow": "CompliHub360 neden ikisini bir araya getiriyor",

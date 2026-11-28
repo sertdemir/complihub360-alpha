@@ -885,7 +885,7 @@
         "evidence": "Registerauszug, Versicherung, USt-IdNr.",
         "agreements": "{{done}} von {{total}} Annahmen"
       },
-      "lockedHint": "Einreichen ist möglich, sobald alles unter „Fehlt noch“ erledigt ist. Wählen Sie einen Punkt, um dorthin zu springen."
+      "lockedHint": "Einreichen ist möglich, sobald alles unter „Das fehlt noch“ erledigt ist. Wählen Sie einen Punkt, um dorthin zu springen."
     },
     "missing": {
       "account": {

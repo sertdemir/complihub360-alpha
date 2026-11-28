@@ -268,7 +268,8 @@
         "noBooking": "No se ha creado ninguna reserva",
         "nothingShared": "No se ha compartido nada con el proveedor",
         "kept": "Su selección y su mensaje se conservan"
-      }
+      },
+      "reasonProvider": "No depende de usted: ahora mismo falta un requisito por parte del proveedor. El proveedor ya está informado."
     },
     "slotsFailed": "No hemos podido cargar los horarios disponibles. Esto no dice nada sobre la disponibilidad del proveedor.",
     "slotsRetry": "Intentar de nuevo"
@@ -354,7 +355,7 @@
     "historyStart": "Sesión creada",
     "historyCreated": "Sus respuestas iniciales",
     "copyVariant": "Copiar como variante",
-    "copyHint": "Crea una copia: pruebe variantes sin perder el original.",
+    "copyHint": "Cree una copia: pruebe variantes sin perder el original.",
     "copyDone": "Copia creada",
     "copyOpenList": "Abrir en sesiones",
     "copyError": "No se pudo crear la copia.",
@@ -560,5 +561,55 @@
         "established_in_eu": "si su empresa está establecida en la UE"
       }
     }
+  },
+  "matchStates": {
+    "factExpertise": "Experiencia",
+    "factCoverage": "Cobertura",
+    "factPrice": "Rango de precio esperado",
+    "factAvailability": "Disponibilidad",
+    "priceFrom": "desde {{price}}",
+    "priceUpTo": "hasta {{price}}",
+    "nextSlot": "Próximo hueco libre: {{when}}",
+    "guestCaption": "Con una cuenta gratuita. El nombre y el contacto aparecen después de reservar.",
+    "matrixLabel": "Cobertura por área y mercado",
+    "legendCovered": "lo cubre una coincidencia verificada",
+    "legendGap": "aún sin coincidencia"
+  },
+  "sharing": {
+    "fields": {
+      "company_name": "Nombre de la empresa",
+      "email": "Correo electrónico",
+      "message": "Su mensaje",
+      "topic": "Tema de su solicitud"
+    },
+    "notProvided": "No indicado",
+    "noMessage": "Sin mensaje",
+    "sharedTitle": "Compartido con el proveedor",
+    "notOthers": "No se comparte con ningún otro proveedor.",
+    "confirmRequired": "Confirme que desea continuar con esta reserva.",
+    "termsTitle": "Condiciones de reserva (versión {{version}})",
+    "topicUnspecified": "El área y los mercados de esta solicitud"
+  },
+  "delayed": {
+    "yourAnswers": "Sus respuestas",
+    "saved": "Guardado"
+  },
+  "providerCoverage": {
+    "notifyLabel": "Avisarme por correo cuando un proveedor verificado cubra esto",
+    "notifyHelp": "Le escribiremos a {{email}}. Solo sobre esta solicitud."
+  },
+  "card": {
+    "book": "Reservar cita",
+    "markets": "Mercados",
+    "priorities": "Prioridades cubiertas",
+    "timeline": "Plazo estimado del servicio",
+    "completed": "Encargos completados",
+    "days_one": "{{count}} día",
+    "days_other": "{{count}} días",
+    "daysRange": "{{min}}–{{max}} días",
+    "addToSelection": "Añadir a la selección",
+    "inSelection": "En su selección",
+    "saveFailed": "No ha funcionado. Inténtelo de nuevo.",
+    "saveFull": "Su selección admite hasta 200 proveedores. Quite uno en «Proveedores guardados» para añadir otro."
   }
 }

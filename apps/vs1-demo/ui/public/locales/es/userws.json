@@ -7,7 +7,8 @@
     "send": "Enviar",
     "save": "Guardar",
     "done": "Listo",
-    "loading": "Cargando…"
+    "loading": "Cargando…",
+    "pickSlotError": "Elija un horario."
   },
   "status": {
     "awaitingConfirmation": "Pendiente de confirmación",
@@ -456,7 +457,8 @@
     "archiveDesc": "Oculta el risk map de la lista · restaurable en cualquier momento.",
     "archived": "Archivada ✓",
     "actionError": "La acción falló — inténtelo de nuevo en un momento.",
-    "archiveQuestion": "¿Archivar esta sesión?"
+    "archiveQuestion": "¿Archivar esta sesión?",
+    "nameTooShort": "Introduzca un nombre de al menos 2 caracteres."
   },
   "userSearch": {
     "eyebrow": "ESPACIO DE TRABAJO",
@@ -512,7 +514,8 @@
     "sendFailed": {
       "heading": "No pudimos enviar su mensaje",
       "message": "Su mensaje sigue aquí. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
-    }
+    },
+    "messageTooShort": "Escriba un mensaje de al menos {{min}} caracteres."
   },
   "assistant": {
     "title": "Asistente de IVA",
@@ -613,23 +616,24 @@
       "disputeConfirmBack": "Volver",
       "disputeFailed": "No se pudo enviar la impugnación. Inténtelo de nuevo o hable con nosotros.",
       "rebookedFrom": "Nueva cita de una reserva anterior"
-    }
+    },
+    "icsSummary": "Cita con {{provider}} · CompliHub360"
   },
   "review": {
     "eyebrow": "VALORACIÓN",
     "cancel": "Cancelar",
     "submit": "Enviar valoración",
     "done": "✓ Enviada",
-    "ratingLabel": "Tu valoración",
+    "ratingLabel": "Su valoración",
     "categoriesLabel": "¿Qué destacarías?",
     "cat": {
       "expertise": "Competencia",
       "responsiveness": "Capacidad de respuesta",
       "value": "Relación calidad-precio"
     },
-    "bodyLabel": "Tu experiencia (opcional)",
+    "bodyLabel": "Su experiencia (opcional)",
     "bodyPh": "¿Cómo fue la primera llamada?",
-    "note": "Las valoraciones verificadas provienen solo de citas reales y aparecen anonimizadas en el perfil del proveedor. Tu nombre permanece privado.",
+    "note": "Las valoraciones verificadas provienen solo de citas reales y aparecen anonimizadas en el perfil del proveedor. Su nombre permanece privado.",
     "close": "Cerrar",
     "sendFailed": {
       "heading": "No pudimos enviar su valoración",
@@ -646,12 +650,13 @@
     "notHeld": {
       "heading": "Esta cita no se puede valorar",
       "message": "Solo se pueden valorar las citas que han tenido lugar."
-    }
+    },
+    "ratingRequired": "Elija una valoración de 1 a 5 estrellas."
   },
   "reschedule": {
     "eyebrow": "Reprogramar cita",
     "currentLabel": "Cita actual",
-    "pickLabel": "Elige un nuevo horario",
+    "pickLabel": "Elija un nuevo horario",
     "noSlots": "No hay horarios libres — cancela y reserva de nuevo.",
     "confirm": "Mover cita",
     "cancel": "Cancelar",
@@ -700,5 +705,21 @@
       "stock": "Al guardar también se elimina su respuesta sobre existencias ({{answer}}) — solo aplica a productos físicos.",
       "epr": "Al guardar también se eliminan sus respuestas de EPR ({{answer}}) — solo aplican con EPR y envases."
     }
+  },
+  "savedProviders": {
+    "title": "Proveedores guardados",
+    "sub": "Los proveedores que añadió a su selección desde una Risk Map. Siguen siendo anónimos hasta que reserve una cita, y no saben que usted los ha guardado.",
+    "loading": "Cargando su selección …",
+    "loadFailedTitle": "No se ha podido cargar su selección",
+    "loadFailedBody": "Esto no dice nada de los proveedores. Inténtelo de nuevo.",
+    "retry": "Reintentar",
+    "emptyTitle": "Aún no hay proveedores guardados",
+    "emptyBody": "Abra una Risk Map y elija «Añadir a la selección» en un proveedor que quiera comparar o reservar más adelante.",
+    "emptyCta": "Abrir mis Risk Maps",
+    "savedOn": "Guardado el {{date}}",
+    "response": "Tiempo de respuesta habitual",
+    "remove": "Quitar",
+    "removeFailed": "No ha funcionado. Inténtelo de nuevo.",
+    "unavailable": "Este proveedor ya no está disponible en CompliHub360."
   }
 }

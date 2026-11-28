@@ -50,7 +50,8 @@
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "typePrefix": "Escriba ",
-    "typeSuffix": " para confirmar:"
+    "typeSuffix": " para confirmar:",
+    "keywordHint": "Escriba {{keyword}} arriba para continuar."
   },
   "changeEmail": {
     "eyebrow": "CONFIGURACIÓN",
@@ -150,7 +151,8 @@
       "network": "Sin conexión. Nada ha cambiado en su cuenta; inténtelo de nuevo.",
       "rateLimit": "Demasiados mensajes en poco tiempo. Espere un momento."
     },
-    "scope": "No forma parte del soporte: sus negociaciones de honorarios con clientes y el asesoramiento profesional; usted es el profesional, nosotros la plataforma. Las preguntas sobre una tarifa de lead, una banda o un abono sí van aquí, en Facturación."
+    "scope": "No forma parte del soporte: sus negociaciones de honorarios con clientes y el asesoramiento profesional; usted es el profesional, nosotros la plataforma. Las preguntas sobre una tarifa de lead, una banda o un abono sí van aquí, en Facturación.",
+    "messageTooShort": "Describa lo ocurrido en al menos 10 caracteres."
   },
   "billing": {
     "title": "Facturación",
@@ -351,7 +353,8 @@
       "cancelled": "canceladas"
     },
     "trendsNote": "Evolución mensual a partir de Growth; área y país también. Essential muestra los hechos de arriba sin evolución; exportación CSV a partir de Global. Los mismos hechos en todos los planes.",
-    "bySelf": "por usted"
+    "bySelf": "por usted",
+    "appealTooShort": "Explique su recurso en al menos 10 caracteres."
   },
   "magicAction": {
     "partnerBadge": "Proveedor",
@@ -381,7 +384,23 @@
     "doneTitle": "Hecho ✓",
     "dossierUnlocked": "🔓 Dosier desbloqueado",
     "contactInDashboard": "El contacto del solicitante aparecerá en el hilo de su dashboard de proveedor.",
-    "closeNote": "Puede cerrar esta ventana o abrir su dashboard de proveedor."
+    "closeNote": "Puede cerrar esta ventana o abrir su dashboard de proveedor.",
+    "fields": {
+      "country": "País",
+      "markets": "Mercados",
+      "categories": "Áreas",
+      "businessType": "Tipo de empresa",
+      "businessTypeNote": "Datos de la empresa",
+      "marketScope": "Alcance de mercado",
+      "riskSignals": "Señales de riesgo",
+      "revenueBand": "Tramo de facturación",
+      "intent": "Intención",
+      "urgency": "Urgencia",
+      "note": "Nota",
+      "existingProvider": "Proveedor actual",
+      "domain": "Área",
+      "timeline": "Plazo"
+    }
   },
   "settings": {
     "title": "Configuración",
@@ -595,14 +614,15 @@
         "reason": "La reserva se canceló antes de que se liberaran los datos de contacto.",
         "context": "No liberado."
       }
-    }
+    },
+    "attChoiceRequired": "Indique cómo fue la cita."
   },
   "intake": {
     "inviteOnlyTitle": "El alta de proveedores es solo por invitación.",
     "inviteOnlyBody": "Los proveedores de CompliHub360 son captados directamente por nuestro equipo e incorporados mediante un enlace personal de alta. No hay autorregistro público: cada proveedor pasa una verificación manual según nuestras directrices y estatutos antes de la activación.",
-    "inviteOnlyContact": "¿Asesoras a empresas en compliance y quieres ser proveedor? Escríbenos: partners@complihub360.com",
+    "inviteOnlyContact": "¿Asesora a empresas en compliance y quiere ser proveedor? Escríbanos: partners@complihub360.com",
     "title": "Alta de proveedor",
-    "sub": "Envía el paquete de tu despacho — lo revisamos manualmente y activamos tu workspace tras la verificación.",
+    "sub": "Envíe el paquete de su despacho — lo revisamos manualmente y activamos su workspace tras la verificación.",
     "secFirm": "Despacho y cobertura",
     "name": "Nombre del despacho *",
     "website": "Sitio web",
@@ -616,13 +636,19 @@
     "statutes": "Confirmo que nuestro despacho cumple las directrices y estatutos de proveedor de CompliHub360 y acepto la verificación manual de la información enviada.",
     "submit": "Enviar paquete para revisión",
     "sending": "Enviando…",
-    "vettingNote": "Tras la revisión recibirás el acceso a tu workspace — normalmente en 3 días laborables.",
+    "vettingNote": "Tras la revisión recibirá el acceso a su workspace — normalmente en 3 días laborables.",
     "doneTitle": "Paquete recibido — en revisión.",
-    "doneBody": "¡Gracias! Nuestro equipo verifica ahora tu información según las directrices de proveedor. Tendrás noticias — normalmente en 3 días laborables. Tu workspace permanece inactivo hasta la activación.",
+    "doneBody": "¡Gracias! Nuestro equipo verifica ahora su información según las directrices de proveedor. Tendrá noticias nuestras — normalmente en 3 días laborables. Su workspace permanece inactivo hasta la activación.",
     "doneNote": "¿Preguntas? partners@complihub360.com",
     "errorTitle": "Error al enviar",
-    "errorBody": "No se pudo enviar el paquete. Comprueba tu enlace de alta o inténtalo de nuevo — o contacta con partners@complihub360.com.",
-    "titleNote": "Antes de la reserva, los usuarios le ven como «Verified Provider A/B/C» con sus áreas aprobadas y su región; ese título lo forma CompliHub360, no tiene que escribirlo."
+    "errorBody": "No se pudo enviar el paquete. Compruebe su enlace de alta o inténtelo de nuevo — o escriba a partners@complihub360.com.",
+    "titleNote": "Antes de la reserva, los usuarios le ven como «Verified Provider A/B/C» con sus áreas aprobadas y su región; ese título lo forma CompliHub360, no tiene que escribirlo.",
+    "nameShort": "Nombre del despacho",
+    "statutesShort": "Directrices y estatutos para proveedores",
+    "errors": {
+      "name": "Introduzca el nombre de su despacho (al menos 2 caracteres).",
+      "statutes": "Confirme las directrices y estatutos para proveedores para enviar su paquete."
+    }
   },
   "application": {
     "title": "Solicitud",
@@ -748,7 +774,8 @@
       "registryUnavailable": "El registro no está disponible ahora. El equipo de revisión decidirá con el documento.",
       "reviewerHint": "El equipo de revisión lo decide con el extracto del registro — no hace falta subir nada.",
       "licenceHint": "Necesario antes de la activación, no antes del envío.",
-      "uploadedOn": "subido el {{date}}"
+      "uploadedOn": "subido el {{date}}",
+      "vatTooShort": "Introduzca su NIF-IVA completo, por ejemplo DE123456789."
     },
     "agreements": {
       "intro": "Cada aceptación se registra con versión, idioma, nombre y cargo. Una versión nueva sustituye a la anterior pero no la borra — el estado en el momento de una reserva sigue siendo verificable.",
@@ -857,7 +884,8 @@
         "services": "{{services}} servicios en {{countries}} países",
         "evidence": "Extracto del registro, seguro, NIF-IVA",
         "agreements": "{{done}} de {{total}} aceptaciones"
-      }
+      },
+      "lockedHint": "Podrá enviar en cuanto esté completo todo lo que figura en «Aún falta». Seleccione un punto para ir a él."
     },
     "missing": {
       "account": {
@@ -957,12 +985,18 @@
       "approvedFrom": "aprobado, a partir del {{date}}",
       "plannedFrom": "programado a partir del {{date}}",
       "plannedShort": "Cambio programado",
-      "withdrawFields": "Retirar: {{fields}}"
+      "withdrawFields": "Retirar: {{fields}}",
+      "numberInvalid": "Introduzca un número de 0 o más, o deje el campo vacío."
     },
     "errors": {
       "serviceExists": "Este servicio ya está en su lista.",
       "serviceCodeFixed": "La categoría de un servicio no se puede cambiar. Retire este servicio y añada uno nuevo.",
-      "serviceRetired": "Este servicio se ha retirado y ya no se puede editar."
+      "serviceRetired": "Este servicio se ha retirado y ya no se puede editar.",
+      "serviceCode": "Introduzca un código de servicio, por ejemplo tax-vat.returns.",
+      "serviceCodeUnknown": "Este código de servicio no está en nuestra lista. Revise la escritura, por ejemplo tax-vat.returns.",
+      "countryCode": "Introduzca un código de país de dos letras, por ejemplo AT.",
+      "countryListed": "{{country}} ya figura para este servicio. Introduzca otro país.",
+      "agreementName": "Introduzca su nombre para aceptar."
     },
     "saveFailed": {
       "heading": "No pudimos guardar sus cambios",
@@ -1101,7 +1135,8 @@
       "sendFailed": {
         "heading": "No pudimos notificar el cambio",
         "message": "Sus datos siguen aquí. Inténtelo de nuevo. Si el problema persiste, contacte con soporte."
-      }
+      },
+      "dateInvalid": "Elija la fecha en que ocurrió — hoy o antes."
     }
   },
   "identity": {
@@ -1218,7 +1253,8 @@
       "errAllowance": "Este plan cubre {{allowance}} categorías principales, pero su cuenta tiene {{used}} liberadas.",
       "errAlready": "Ya hay algo programado. Retírelo primero.",
       "errSame": "Ese ya es su plan actual.",
-      "errFailed": "Esto no ha funcionado ahora mismo. Inténtelo de nuevo."
+      "errFailed": "Esto no ha funcionado ahora mismo. Inténtelo de nuevo.",
+      "pickTargetRequired": "Elija el plan al que quiere cambiar."
     }
   },
   "overview": {
@@ -1458,7 +1494,14 @@
     "eventsNote": "Los eventos se recogen, no se envían; los conservamos 90 días.",
     "calls": "Últimas llamadas",
     "noCalls": "Todavía no hay llamadas.",
-    "callsNote": "Hoy: {{count}} llamadas · {{limited}} × 429 · {{failed}} × 5xx. El registro conserva 90 días, sin contenidos y sin claves."
+    "callsNote": "Hoy: {{count}} llamadas · {{limited}} × 429 · {{failed}} × 5xx. El registro conserva 90 días, sin contenidos y sin claves.",
+    "errors": {
+      "name": "Introduzca un nombre para la integración.",
+      "useCase": "Describa para qué necesita la integración.",
+      "scopes": "Elija al menos un área de datos.",
+      "termsLabel": "Condiciones de API e integración",
+      "terms": "Acepte las condiciones de API e integración para enviar la solicitud."
+    }
   },
   "invite": {
     "eyebrow": "Onboarding de proveedores",
