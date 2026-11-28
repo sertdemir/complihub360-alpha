@@ -7,7 +7,8 @@
     "send": "Senden",
     "save": "Speichern",
     "done": "Fertig",
-    "loading": "Wird geladen…"
+    "loading": "Wird geladen…",
+    "pickSlotError": "Bitte wählen Sie einen Termin."
   },
   "status": {
     "awaitingConfirmation": "Bestätigung ausstehend",
@@ -456,7 +457,8 @@
     "archiveDesc": "Blendet die Risk Map aus der Liste aus · jederzeit wiederherstellbar.",
     "archived": "Archiviert ✓",
     "actionError": "Aktion fehlgeschlagen — versuchen Sie es gleich erneut.",
-    "archiveQuestion": "Diese Sitzung archivieren?"
+    "archiveQuestion": "Diese Sitzung archivieren?",
+    "nameTooShort": "Bitte geben Sie einen Namen mit mindestens 2 Zeichen ein."
   },
   "userSearch": {
     "eyebrow": "ARBEITSBEREICH",
@@ -512,7 +514,8 @@
     "sendFailed": {
       "heading": "Wir konnten Ihre Nachricht nicht senden",
       "message": "Ihre Nachricht ist noch da. Bitte versuchen Sie es erneut. Wenn das Problem bleibt, wenden Sie sich an den Support."
-    }
+    },
+    "messageTooShort": "Bitte schreiben Sie eine Nachricht mit mindestens {{min}} Zeichen."
   },
   "assistant": {
     "title": "USt-Assistent",
@@ -621,16 +624,16 @@
     "cancel": "Abbrechen",
     "submit": "Bewertung senden",
     "done": "✓ Gesendet",
-    "ratingLabel": "Deine Bewertung",
+    "ratingLabel": "Ihre Bewertung",
     "categoriesLabel": "Was ist aufgefallen?",
     "cat": {
       "expertise": "Fachkompetenz",
       "responsiveness": "Reaktionszeit",
       "value": "Preis-Leistung"
     },
-    "bodyLabel": "Deine Erfahrung (optional)",
+    "bodyLabel": "Ihre Erfahrung (optional)",
     "bodyPh": "Wie lief das Erstgespräch?",
-    "note": "Verifizierte Bewertungen stammen nur aus echten Terminen und erscheinen anonymisiert auf dem Anbieter-Profil. Dein Name bleibt privat.",
+    "note": "Verifizierte Bewertungen stammen nur aus echten Terminen und erscheinen anonymisiert auf dem Anbieter-Profil. Ihr Name bleibt privat.",
     "close": "Schließen",
     "sendFailed": {
       "heading": "Wir konnten Ihre Bewertung nicht senden",
@@ -647,7 +650,8 @@
     "notHeld": {
       "heading": "Dieser Termin kann nicht bewertet werden",
       "message": "Bewertungen sind nur für Termine möglich, die stattgefunden haben."
-    }
+    },
+    "ratingRequired": "Bitte wählen Sie eine Bewertung von 1 bis 5 Sternen."
   },
   "reschedule": {
     "eyebrow": "Termin verschieben",
@@ -701,5 +705,21 @@
       "stock": "Beim Speichern entfällt auch Ihre Lager-Angabe ({{answer}}) — sie gilt nur für physische Produkte.",
       "epr": "Beim Speichern entfallen auch Ihre EPR-Angaben ({{answer}}) — sie gelten nur mit EPR & Verpackung."
     }
+  },
+  "savedProviders": {
+    "title": "Gespeicherte Anbieter",
+    "sub": "Die Anbieter, die Sie aus einer Risk Map zu Ihrer Auswahl hinzugefügt haben. Sie bleiben anonym, bis Sie einen Termin buchen, und sie erfahren nicht, dass Sie sie gespeichert haben.",
+    "loading": "Ihre Auswahl wird geladen …",
+    "loadFailedTitle": "Ihre Auswahl konnte nicht geladen werden",
+    "loadFailedBody": "Über die Anbieter sagt das nichts. Bitte versuchen Sie es erneut.",
+    "retry": "Erneut versuchen",
+    "emptyTitle": "Noch keine gespeicherten Anbieter",
+    "emptyBody": "Öffnen Sie eine Risk Map und wählen Sie „Zur Auswahl hinzufügen“ bei einem Anbieter, den Sie später vergleichen oder buchen möchten.",
+    "emptyCta": "Meine Risk Maps öffnen",
+    "savedOn": "Gespeichert am {{date}}",
+    "response": "Typische Antwortzeit",
+    "remove": "Entfernen",
+    "removeFailed": "Das hat nicht geklappt. Bitte versuchen Sie es erneut.",
+    "unavailable": "Dieser Anbieter ist auf CompliHub360 nicht mehr verfügbar."
   }
 }
