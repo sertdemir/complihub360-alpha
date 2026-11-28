@@ -82,6 +82,11 @@ describe('Das Blatt in der Schublade', () => {
     await screen.findByText('Satz 1.');
     fireEvent.click(screen.getByRole('button', { name: /betaStep.drawer.cta/ }));
     expect(screen.getByRole('alert')).toHaveTextContent('betaStep.needCheck');
+    // Regel V2: der Satz haengt am Haken, der Fokus steht dort.
+    const box = screen.getByRole('checkbox');
+    expect(box).toHaveFocus();
+    expect(box).toHaveAttribute('aria-describedby', 'beta-sheet-check-error');
+    expect(screen.getByRole('alert')).toHaveAttribute('id', 'beta-sheet-check-error');
     expect(acceptAgreement).not.toHaveBeenCalled();
     expect(onAccepted).not.toHaveBeenCalled();
   });
