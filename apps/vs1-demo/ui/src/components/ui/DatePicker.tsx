@@ -251,7 +251,10 @@ export function DatePicker({
                       !inMonth && !isSelected && 'text-fg-tertiary',
                       inMonth && !isSelected && 'text-fg',
                       isSelected && 'bg-brand text-fg-on-brand',
-                      !isSelected && isActive && !dayDisabled && 'bg-brand-light',
+                      // Tastatur-Cursor (startet auf heute): Toenung aus dem Fokus-Token,
+                      // seit 2026-11-28 Tinte/Pergament statt Petrol — er ist ein
+                      // Fokus-Signal, kein Auswahlzustand.
+                      !isSelected && isActive && !dayDisabled && 'bg-stroke-focus/10',
                       !isSelected && isToday && 'ring-1 ring-stroke-focus',
                       dayDisabled && 'cursor-not-allowed opacity-40',
                     )}
