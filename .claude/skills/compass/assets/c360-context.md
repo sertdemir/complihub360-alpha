@@ -30,7 +30,7 @@ This file is the foundational context for the Compass design system. Read it fir
 - Code: `bg-action`, `text-fg-on-action`, `.btn-action-edge`, `bg-selected`, `text-selected`, `ring-stroke-focus` in `apps/vs1-demo/ui`. Figma: `color/action/*`, `color/selected/*`, `ink/*`, `parchment/*`, `brass/*`.
 
 **Identity colors (from the v1 Color Specification):**
-- **Petrol — Trust & Authority**: `#097070` (`primary-500`). The signature brand color. Brand identity and structural authority (logo, surfaces, headlines, data viz). **Not** the primary CTA, focus or selection color since 2026-11-28 — those are Ink (see above). **Do not dilute** by using it for decoration.
+- **Petrol — Trust & Authority**: `#004D40` (`primary-500`). The signature brand color. Brand identity and structural authority (logo, surfaces, headlines, data viz). **Not** the primary CTA, focus or selection color since 2026-11-28 — those are Ink (see above). **Do not dilute** by using it for decoration.
 - **Accent Gold — Premium / Verified Partner**: `#D3B454` (`accent-500`). Reserved **exclusively** for Verified-Partner badges and monetization-signal elements (Featured Partner cards may use the gold as border-color). **Never use as a UI status color.**
 - **Warm Neutrals**: `#FAF9F9` (secondary bg), `#EFE8E8` (main canvas — `neutral-100`), `#CFC7C7` (borders/dividers), `#2B2B2B` (primary typography). Warm-leaning to harmonize with the gold and reduce screen fatigue in long sessions.
 - **Surface Muted**: `#BFD6D5` for Wizard panels and Filter sidebars — a desaturated petrol surface that anchors high-intent input zones without competing with the primary (Ink) CTA.

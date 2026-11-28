@@ -15,7 +15,7 @@ Every Compass component must pass these checks before being considered productio
 | UI components (icons, borders, focus rings) | 3 : 1 | Aim 4.5:1 |
 | Disabled element contrast | exempt — but still readable | Use opacity/muted tokens consistently |
 
-When defining semantic color tokens, **verify contrast in every theme** (Light, Dark, High Contrast). A dark-mode token that passes in one combination may fail in another. Petrol-on-light passes; Petrol-on-dark must use the lighter petrol `#3FA3A3` per v1 Dark Mode Spec.
+When defining semantic color tokens, **verify contrast in every theme** (Light, Dark, High Contrast). A dark-mode token that passes in one combination may fail in another. Petrol-on-light passes; Petrol-on-dark must use the teal `#14A89A` (4,96:1 on slate `#1F2937`); Petrol `#004D40` there is only 1,49:1.
 
 ### Focus visibility
 
@@ -161,6 +161,6 @@ Typical content:
 
 ## When accessibility conflicts with brand
 
-It rarely does, but when it does: **accessibility wins**. The Petrol may need a darker variant for use as text color on light backgrounds; the Petrol on dark mode must shift to `#3FA3A3` for contrast (already encoded in v1 Dark Mode Spec). The Accent-Gold may need a higher-contrast partner color for AAA contexts. These adaptations are how a brand survives contact with reality. Document them.
+It rarely does, but when it does: **accessibility wins**. The Petrol may need a darker variant for use as text color on light backgrounds; the Petrol on dark mode must shift to teal `#14A89A` for contrast (already encoded as `primary/accent-dark`). The Accent-Gold may need a higher-contrast partner color for AAA contexts. These adaptations are how a brand survives contact with reality. Document them.
 
 The CompliHub brand promise is *trust*. Accessibility is part of trust — a beautifully branded CTA that excludes a Compliance Officer with low vision violates the brand more than a less-elegant accessible alternative.

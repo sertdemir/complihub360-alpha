@@ -31,12 +31,12 @@ Primitives describe **values**. They're the only layer that knows about hex code
 - Build the full scale even if you only need a few values now — completeness avoids one-offs later
 
 **CompliHub-specific primitives (v1 anchored):**
-- **Petrol scale** anchored on Petrol-500 `#097070`: `petrol.500 #097070`, `petrol.600 #075C5C`, `petrol.700 #054848`. Extend with `petrol.50/100/300/400` as the system matures (Dark mode primary uses a lighter petrol `#3FA3A3` — encode it as `petrol.300` or similar).
+- **Petrol scale** anchored on Petrol-500 `#004D40` (as shipped in `apps/vs1-demo/ui/src/index.css`, `--petrol-*`; Figma `primary/*`): `petrol.50 #EBF1F0`, `petrol.100 #D1DFDD`, `petrol.200 #A8C2BE`, `petrol.300 #7AA29C`, `petrol.400 #427B72`, `petrol.500 #004D40`, `petrol.600 #002E26`, `petrol.700 #00231D`, `petrol.800 #001612`, `petrol.900 #000B09`. Dark mode brand uses teal `#14A89A` (Figma `primary/accent-dark`).
 - **Gold scale** anchored on Gold-500 `#D3B454`: `gold.500 #D3B454`, `gold.600 #B89B3E`, `gold.700 #9C8434`.
 - **Neutral scale** (warm-leaning, harmonizes with Gold): `neutral.50 #FAF9F9`, `neutral.100 #EFE8E8`, `neutral.200 #E2DADA`, `neutral.300 #CFC7C7`, `neutral.900 #2B2B2B`. Fill `neutral.400/500/600/700/800` as needed.
 - **Surface-Muted**: `surface.muted #BFD6D5` — desaturated petrol, used for Wizard shells and Filter sidebars.
 - **Status scales** — typically green (success `#3C8C7A`), amber (warning `#C59E38`), red (error `#B55353`). Build each as a 50–900 scale; the v1 anchor is the `-500` step.
-- **Dark Mode primitives**: `bg.dark #121616`, `surface.dark #1B2222`, `text.dark.primary #E7EFEF`, `petrol.dark #3FA3A3`. (See `references/theming.md` for how these are wired into modes.)
+- **Dark Mode primitives**: `bg.dark #121616`, `surface.dark #1B2222`, `text.dark.primary #E7EFEF`, `petrol.dark #14A89A` (teal, `primary/accent-dark`). (See `references/theming.md` for how these are wired into modes.)
 
 ### Layer 2 — Semantic tokens (the purpose layer)
 

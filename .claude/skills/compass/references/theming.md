@@ -19,7 +19,7 @@ Increasingly expected. Especially valuable for power users in long sessions (Com
 - Background: `#121616`
 - Surface: `#1B2222`
 - Text (primary): `#E7EFEF`
-- Primary accent: `#3FA3A3` (a lighter petrol — adequate contrast on dark surfaces)
+- Brand accent: `#14A89A` (teal — adequate contrast on dark surfaces; actions, focus and selection are Parchment `#E9E4D3` since 2026-11-28)
 
 Must not be a naive inversion — backgrounds are warm-dark (not pure black) to harmonize with the Accent-Gold and reduce eye strain.
 
@@ -42,9 +42,11 @@ Example for `color.text.primary`:
 - Dark mode → `color.neutral.50` or `#E7EFEF` (per v1 Dark Mode Spec)
 - High Contrast → pure white/black for max contrast
 
-Example for `color.action.primary.background.default`:
-- Light mode → `color.petrol.500` (`#097070`)
-- Dark mode → `color.petrol.300` aliased to `#3FA3A3` (per v1 Dark Mode Spec)
+Example for `color.bg.brand`:
+- Light mode → `color.petrol.500` (`#004D40`)
+- Dark mode → `primary/accent-dark` (`#14A89A`)
+
+(And for `color.action.primary.background.default` since 2026-11-28: Light → `ink/500` `#1B2A41`, Dark → `parchment/100` `#E9E4D3`.)
 - High Contrast → a token that meets ≥7:1 against its expected foreground
 
 **Primitives have no modes.** They are constants. Modes only live on semantic tokens.
@@ -97,13 +99,13 @@ Important guardrail: even in co-branded mode, the **CompliHub Ink primary CTA wi
 
 ### Petrol & Accent-Gold across themes
 
-`#097070` (Petrol) and `#D3B454` (Accent-Gold) are CompliHub's brand identity colors. They need special handling:
+`#004D40` (Petrol) and `#D3B454` (Accent-Gold) are CompliHub's brand identity colors. They need special handling:
 
 - **Light mode**:
   - Petrol — use as-is for brand accents (primary CTAs are Ink since 2026-11-28)
   - Accent-Gold — use as-is on light surfaces for Verified-Partner badges
 - **Dark mode**:
-  - Petrol — shift to `#3FA3A3` (the lighter petrol from v1 Dark Mode Spec) for adequate contrast on dark surfaces
+  - Petrol — shift to teal `#14A89A` (`primary/accent-dark`) for adequate contrast on dark surfaces
   - Accent-Gold — shift to a slightly lighter gold (e.g. `gold.400` if the scale supports it) so badges remain legible without "glowing"
 - **High Contrast**:
   - Petrol — keep saturated, ensure ≥7:1 against text foregrounds
