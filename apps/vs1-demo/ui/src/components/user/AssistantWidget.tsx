@@ -35,11 +35,13 @@ function BubbleIcon({ size = 16, className }: { size?: number; className?: strin
   );
 }
 
-// Goldbogen um den Launcher: ein konischer Verlauf, auf einen 2-px-Ring maskiert.
+// Goldbogen um den Launcher: ein konischer Verlauf, auf einen 3-px-Ring maskiert.
+// Nachschärfung 28.11.2026 (Nutzer: schneller und deutlicher): 3 statt 2 px,
+// längerer Bogen mit voller Spitze, Runde 3,5 s statt 7 s (index.css).
 const ORBIT_STYLE = {
-  background: 'conic-gradient(from 0deg, transparent 0 62%, rgb(var(--color-border-accent)) 82%, transparent 100%)',
-  WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))',
-  mask: 'radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))',
+  background: 'conic-gradient(from 0deg, transparent 0 40%, rgb(var(--color-border-accent) / 0.35) 58%, rgb(var(--color-border-accent)) 94%, transparent 100%)',
+  WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px))',
+  mask: 'radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px))',
 };
 
 export function AssistantWidget({ country }: { country?: string }) {
