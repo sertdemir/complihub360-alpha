@@ -58,7 +58,6 @@ describe('Banner', () => {
     expect(innen!.parentElement).toBe(screen.getByRole('status'));
   });
 
-<<<<<<< HEAD
   // Die Akzentfarbe ist fuer das Icon gemacht. Als Schrift der Aktion lag sie
   // auf den hellen Toenen unter 4.5:1 (nachgemessen 2026-11-28); die Aktion
   // nimmt dort die naechstdunklere Stufe, das Icon behaelt seine Farbe.
@@ -81,8 +80,6 @@ describe('Banner', () => {
     expect(container.querySelector('[data-banner-action]')).toHaveClass('text-sky-800');
   });
 
-=======
->>>>>>> origin/claude/sharp-hamilton-iyn3sp
   it('die bisherige einzelne action rechts bleibt, wie sie war', () => {
     render(<Banner title="T" action={<a href="/x">Mehr</a>} />);
     expect(screen.getByRole('link', { name: 'Mehr' })).toBeInTheDocument();
