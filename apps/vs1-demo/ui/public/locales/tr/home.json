@@ -11,11 +11,11 @@
     },
     "state": {
       "confirmed": "Onaylandı",
-      "likely": "Muhtemel",
+      "likely": "Muhtemelen geçerli",
       "action": "2 soruyu yanıtlayın"
     },
     "table": {
-      "priority": "Önem",
+      "priority": "Öncelik",
       "obligation": "Yükümlülük",
       "market": "Pazar",
       "due": "Vade",
@@ -25,8 +25,8 @@
   },
   "drawer": {
     "close": "Kapat",
-    "whatWeCover": "Neleri kapsıyoruz",
-    "whenThisMatters": "Ne zaman önemli",
+    "whatWeCover": "Sunulan destek",
+    "whenThisMatters": "Buna şu durumlarda ihtiyaç duyabilirsiniz",
     "continues": "6 dakikalık değerlendirmede devam eder.",
     "seeIfApplies": "Bunun size uygulanıp uygulanmadığını görün"
   },
@@ -83,26 +83,26 @@
       "line2": "Sonraki adımı bilin.",
       "line1": "İşletmeniz için neyin geçerli olduğunu anlayın."
     },
-    "lead": "{{markets}} pazardaki yükümlülükleriniz, her biri kaynağıyla. İhtiyaç duyduğunuzda doğru uzman.",
+    "lead": "Bize nerede ve nasıl faaliyet gösterdiğinizi anlatın. Neyin geçerli olduğunu anlamanıza, bir sonraki adıma karar vermenize ve ihtiyaçlarınıza uyan doğrulanmış uzmanları bulmanıza yardımcı oluruz.",
     "ctaRiskMap": "İhtiyacımı değerlendir",
     "ask": {
-      "placeholder": "Talebinizi kısaca anlatın",
-      "send": "Gönder",
+      "placeholder": "Neyle ilgili yardıma ihtiyacınız var?",
+      "send": "CompliHub360'a sor",
       "note": "Betada sorunuz doğru alana ve değerlendirmeye yönlendirir — henüz doğrudan bir yanıta değil.",
       "lead": "Ya da sorunuzu kendi kelimelerinizle sorun."
     },
     "promises": [
       {
-        "title": "Yükümlülüklerinizi bilin",
-        "desc": "İşletmeniz için nelerin geçerli olduğunu net görün."
+        "title": "Neyin geçerli olduğunu anlayın",
+        "desc": "İşletmenizi hangi gerekliliklerin etkileyebileceğini görün."
       },
       {
-        "title": "Doğru uzmanlar",
-        "desc": "Sizi durumunuza uygun Verified Provider'larla eşleştiriyoruz."
+        "title": "Doğru uzmanları bulun",
+        "desc": "İhtiyaçlarınıza uyan doğrulanmış sağlayıcılarla eşleşin."
       },
       {
-        "title": "Harekete geçin",
-        "desc": "Bağlanın, birlikte çalışın, tamamlayın."
+        "title": "Güvenle ilerleyin",
+        "desc": "Doğru sağlayıcıyla bağlantı kurun ve işi tek bir yerden yönetin."
       },
       {
         "title": "Always on your side",
@@ -112,53 +112,53 @@
     "proofs": [
       {
         "title": "360° kapsam",
-        "desc": "Ülkeler, konular ve düzenlemeler genelinde."
+        "desc": "Ülkeler, uyum alanları ve işletme hizmetleri genelinde."
       },
       {
-        "title": "Uzman ağı",
-        "desc": "Her hizmet ve pazar için kanıtlarla doğrulanmış uzmanlar."
+        "title": "Doğrulanmış sağlayıcı ağı",
+        "desc": "Uzmanlık, hizmet kalitesi ve güvenilirlik açısından incelenmiş uzmanlar."
       },
       {
-        "title": "Akıllı teknoloji",
-        "desc": "İnsan uzmanlığıyla birleşen yapay zekâ rehberliği."
+        "title": "Teknoloji ve insan uzmanlığı",
+        "desc": "Deneyimli uzmanların desteklediği akıllı yönlendirme."
       },
       {
-        "title": "Human first",
-        "desc": "Gerçek insanlar. Gerçek destek."
+        "title": "İnsan desteği",
+        "desc": "Gerektiğinde gerçek insanlar."
       },
       {
         "title": "Verileriniz güvende",
-        "desc": "Anonim değerlendirme. Herhangi bir yapay zeka metninizi görmeden önce tanımlayıcılar maskelenir."
+        "desc": "Baştan yerleşik güçlü güvenlik ve gizlilik."
       }
     ]
   },
   "problemRecognition": {
-    "eyebrow": "Bu neden zor",
+    "eyebrow": "Uyum neden karmaşık geliyor",
     "title": {
-      "pre": "",
-      "gold": "Net",
-      "post": " bir yanıt almak, işin zor kısmı."
+      "pre": "Uyum karmaşıktır. Doğru yanıtı bulmak ",
+      "gold": "zor olmamalı",
+      "post": "."
     },
-    "lead": "Konuştuğumuz çoğu kişi bunu zaten denemiş. Sorun nadiren çabadır — yanıtlar birbirini tutmaz ve hangisinin sizin durumunuza uyduğunu anlamanın bir yolu yoktur.",
+    "lead": "İnternette aramış, farklı sağlayıcılarla konuşmuş ve farklı yanıtlar almış olabilirsiniz. Asıl zorluk, işletmeniz için neyin geçerli olduğunu ve sonra ne yapmanız gerektiğini bilmektir.",
     "items": [
       {
-        "title": "İki danışman, iki yanıt.",
-        "desc": "Aynı soruyu iki kez sorun, iki savunulabilir yanıt alırsınız. Arkasındaki kaynak olmadan hangisinin sizin için geçerli olduğunu söyleyemezsiniz."
+        "title": "Farklı yanıtların hepsi doğru gelebilir.",
+        "desc": ""
       },
       {
-        "title": "İhtiyacınızdan fazlası satılır.",
-        "desc": "Teşvik genellikle en geniş kapsamı ödüllendirir. Çok az kişiye bir işin küçük olduğunu ya da zaten halledildiğini söylemesi için para ödenir."
+        "title": "Gerçekte neye ihtiyacınız olduğunu bilmek zor olabilir.",
+        "desc": ""
       },
       {
-        "title": "Kapsam belirlemede kaybolan haftalar.",
-        "desc": "Asıl iş başlamadan önce işinizi beş kez anlatmış ve farklı şeyleri ölçen teklifleri karşılaştırmış olursunuz."
+        "title": "Doğru yardımı bulmak zaman alır.",
+        "desc": ""
       },
       {
-        "title": "Karşılaştırma zemini yok.",
-        "desc": "Her teklif farklı kurgulanmıştır. Karşılaştırmak, hangisinde neyin atlandığını tahmin etmek demektir."
+        "title": "Sağlayıcıları karşılaştırmak zor olabilir.",
+        "desc": ""
       }
     ],
-    "note": "Bunların hiçbiri bir sorununuz olduğu anlamına gelmez. Henüz net bir resminiz olmadığı anlamına gelir — ve bu çözülebilir."
+    "note": "Sorun denememiş olmanız değil. Sadece neyin geçerli olduğuna, önce neyin önemli olduğuna ve doğru desteği nerede bulacağınıza dair net bir görünüme ihtiyacınız var."
   },
   "heroWizard": {
     "mobileAlt": "CompliHub360 uyum sihirbazı — «Alanlar» adımı (mobil)"
@@ -166,8 +166,8 @@
   "wizard": {
     "rail": {
       "markets": "Pazarlar",
-      "operations": "Faaliyet",
-      "domains": "Alanlar",
+      "operations": "İş modeli",
+      "domains": "Destek alanları",
       "review": "Özet",
       "business": "İşletme"
     },
@@ -276,23 +276,23 @@
         "desc": "Ülke listesini açın →"
       },
       "d2cEcommerce": {
-        "title": "D2C e-ticaret",
+        "title": "Tüketicilere çevrimiçi satış (D2C)",
         "desc": "Tüketiciye doğrudan çevrimiçi satış"
       },
       "b2bWholesale": {
-        "title": "B2B / toptan",
+        "title": "İşletmelere satış (B2B veya toptan)",
         "desc": "İşletmelere veya distribütörlere satış"
       },
       "marketplace": {
-        "title": "Pazar yeri",
+        "title": "Pazaryeri işletmecisi",
         "desc": "Alıcılar ile satıcıları buluşturuyorsunuz"
       },
       "saasDigital": {
-        "title": "SaaS / dijital",
+        "title": "Yazılım veya dijital hizmetler",
         "desc": "Yazılım, fiziksel sevkiyat yok"
       },
       "hybrid": {
-        "title": "Hibrit",
+        "title": "Birden fazla kanal",
         "desc": "B2B ve B2C kanallarının karışımı"
       },
       "other": {
@@ -484,16 +484,16 @@
       }
     },
     "footer": {
-      "next": "İleri"
+      "next": "Devam"
     },
     "review": {
       "title": "Durumunuz, özetlendi.",
-      "subtitle": "Kullanacağımız bilgiler bunlar. Gerekirse düzenleyin, ardından Risk Map'inizi oluşturun.",
+      "subtitle": "Yanıtlarınızı gözden geçirin. Risk Map'iniz oluşturulmadan önce değişmesi gerekenleri düzenleyin.",
       "markets": "Pazarlar",
       "operations": "Faaliyet",
-      "domains": "Uyum alanları",
+      "domains": "Destek alanları",
       "edit": "Düzenle",
-      "trust": "Anonim · Risk Map'inizi görmek için hesap gerekmez · ~4 saniyede işlenir",
+      "trust": "Anonim · Hesap gerekmez · Risk Map'iniz saniyeler içinde hazır olur",
       "business": "İşletmeniz",
       "offering": "Sattıklarınız",
       "marketsStock": "Pazarlar · stok",
@@ -896,29 +896,29 @@
     ]
   },
   "riskMap": {
-    "eyebrow": "Bir Risk Map böyle görünür · anonimleştirilmiş örnek",
+    "eyebrow": "Örnek bir Risk Map görün",
     "title": {
-      "pre": "Size ",
-      "gold": "uygulananlar",
-      "post": " bunlar."
+      "pre": "Neyin ",
+      "gold": "geçerli olabileceğini",
+      "post": " ve önce ne yapacağınızı görün."
     },
     "subtitle": "Almanya · Birleşik Krallık · Hollanda temel alınmıştır. D2C e-ticaret, €2M—€5M ciro. Kapsamda KDV · EPR · Gizlilik.",
     "stats": [
       {
         "value": "8",
-        "label": "Tespit edilen yükümlülük"
+        "label": "Belirlenen olası gereklilikler"
       },
       {
         "value": "4",
-        "label": "30 gün içinde süresi dolan"
+        "label": "30 gün içinde yapılması gerekenler"
       },
       {
         "value": "14 gün",
-        "label": "Medyan vade"
+        "label": "Bir sonraki önemli son tarihinize kalan"
       },
       {
         "value": "3",
-        "label": "Verified Provider hazır"
+        "label": "Uyan Verified Provider'lar"
       }
     ],
     "rows": [
@@ -981,7 +981,7 @@
     ],
     "partnersEyebrow": "3 Verified Provider eşleşti",
     "partnersTitle": "Bunu kimin çözebileceğini bulduk.",
-    "unlock": "En iyi eşleşmelerinizi ücretsiz hesapla görün",
+    "unlock": "En iyi eşleşmelerinizi görmek için ücretsiz hesap oluşturun",
     "save": {
       "title": "Bu haritayı kaydedin. Eşleşmelerinizi saklayın.",
       "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Haritanız ve eşleşmeleriniz kayıtlı kalır.",
@@ -990,29 +990,29 @@
     "statsCompact": [
       {
         "value": "8",
-        "label": "Tespit edilen yükümlülük"
+        "label": "Belirlenen olası gereklilikler"
       },
       {
         "value": "4",
-        "label": "30 gün içinde süresi dolan"
+        "label": "30 gün içinde yapılması gerekenler"
       },
       {
         "value": "14",
-        "label": "Gün medyan vade"
+        "label": "Bir sonraki önemli son tarihinize kalan gün"
       },
       {
         "value": "3",
-        "label": "Verified Provider"
+        "label": "Uyan Verified Provider'lar"
       }
     ]
   },
   "matchmaking": {
-    "eyebrow": "Fark",
+    "eyebrow": "Anlamaktan harekete",
     "title": {
-      "line1": "Bir kural listesi bir plan değildir.",
-      "pre": "Biz sizi çözecek kişiyle ",
-      "gold": "buluştururuz",
-      "post": "."
+      "line1": "Neye ihtiyacınız olduğunu anlamak sadece başlangıçtır.",
+      "pre": "Bunu halledecek doğru ",
+      "gold": "uzmanı",
+      "post": " bulun."
     },
     "matches": [
       {
@@ -1022,7 +1022,7 @@
           "UStG §18i (OSS)",
           "DE · NL · FR"
         ],
-        "covers": "2 kritik önceliğinizi kapsıyor",
+        "covers": "2 acil önceliğinizi kapsıyor",
         "response": "24 saatte yanıt",
         "engagements": "142 önceki iş"
       },
@@ -1094,8 +1094,8 @@
     },
     "row1": [
       {
-        "title": "Riske göre önceliklendirilmiş, kapsamlı değil",
-        "desc": "Kritikten düşüğe. Her an dört ila on iki madde. 200 sayfalık kontrol listeleri yok."
+        "title": "Önce en önemli olana odaklı",
+        "desc": "Önceliklerinizi ve sonraki adımları bunaltıcı bir kontrol listesi olmadan görün."
       },
       {
         "title": "Kaynağı doğrudan düzenleyiciler",
@@ -1106,13 +1106,13 @@
         "desc": "Kurallar değişir. Kayıtlarımızı inceler ve her kaynağı tarihleriz; böylece ne kadar güncel olduğunu görürsünüz."
       },
       {
-        "title": "Varsayılan olarak yalın dil",
-        "desc": "Bir madde açıklanmak için bir paragraf gerektiriyorsa, gördüğünüz paragraftır — madde değil."
+        "title": "Açık dil, kesin terimler",
+        "desc": "Konuyu, otoritelerin kullandığı terimleri kaybetmeden anlayın."
       }
     ],
     "row2": [
       {
-        "title": "Kendi kaydıyla değil, bizim doğrulamamızla",
+        "title": "Sağlayıcılar katılmadan önce incelenir",
         "desc": "Her Verified Provider, eşleştirilebilmeden önce her hizmet ve her pazar için belgelenmiş kanıtlara göre incelenir."
       },
       {
@@ -1124,50 +1124,50 @@
     "row2Lead": "Rehberler herkesi listeler. Biz her Verified Provider'ı eşleşmeye girmeden önce belgelenmiş kanıtlarla kontrol ederiz."
   },
   "domains": {
-    "eyebrow": "Neleri biliyoruz",
+    "eyebrow": "Kapsadığımız alanlar",
     "title": {
-      "pre": "Alanlarınız, ",
-      "gold": "tek",
-      "post": " harita."
+      "pre": "Farklı gereklilikler. ",
+      "gold": "Tek ve net bir görünüm",
+      "post": "."
     },
-    "subtitle": "Kurallarını tuttuğumuz pazarları ve bunlardan doğan yükümlülükleri görmek için bir alan seçin.",
+    "subtitle": "Vergi ve ürün gerekliliklerinden gizliliğe, gümrüğe, şirket bildirimlerine ve hukuki desteğe kadar: CompliHub360 ihtiyaçlarınızı bir araya getirir ve sizi pazarlar arasında doğru uzmanlarla buluşturur.",
     "cardCta": "Ayrıntı için tıklayın",
     "drawerEyebrow": "Alan",
     "drawerAria": "{{domain}} ayrıntısı",
-    "activeIn": "Geçerli olduğu pazarlar:",
+    "activeIn": "Şu pazarlarda:",
     "items": [
       {
         "title": "Vergi ve KDV",
         "desc": "Sattığınız her pazarda hangi KDV rejiminin geçerli olduğunu ve kaydın ne zaman gerektiğini bilin.",
-        "intro": "Sınır ötesi KDV, OSS/IOSS, topluluk içi teslimat, uzaktan satış eşikleri. Altı pazar; altı KDV rejimi, altı kayıt eşiği, altı beyan takvimi demektir. Her birini izleriz.",
+        "intro": "İşletmenizin nerede kurulu olduğuna, malların nerede depolandığına, ne sattığınıza ve müşterilerinizin kim olduğuna göre hangi kayıtların, beyannamelerin ve raporlama yükümlülüklerinin geçerli olabileceğini anlayın.",
         "cover": [
-          "OSS / IOSS üç aylık beyanları",
-          "Uzaktan satış eşiği takibi",
-          "Topluluk içi teslimat KDV'si",
-          "Ters vergilendirme mekanizması",
-          "Pazar bazında KDV kayıtları",
-          "İkili ÇVÖ anlaşmalarının etkileri"
+          "Ülkeye özel KDV kayıtları",
+          "KDV beyannameleri ve raporlama",
+          "OSS ve IOSS kaydı ve beyanları",
+          "Eşik takibi",
+          "AB içi işlemler",
+          "Sorumlu sıfatıyla KDV (reverse charge) gereklilikleri"
         ],
         "matters": [
-          "İlk kez başka bir AB pazarına B2C satış yapıyorsunuz",
-          "Sınır ötesi B2C satışlarda €10,000 eşiğini aşıyorsunuz",
-          "Lojistik modelinizi değiştiriyorsunuz (ör. UK deposu ekliyorsunuz)"
+          "Başka bir ülkeye mal veya hizmet satıyorsunuz.",
+          "Stoklarınızı kendi ülkeniz dışında tutuyorsunuz.",
+          "Yeni bir pazara giriyorsunuz."
         ]
       },
       {
         "title": "EPR ve Ambalaj",
         "desc": "Bir pazarda üretici sayılıp sayılmadığınızı ve ilk sevkiyattan önce neyi kaydettirmeniz gerektiğini bilin.",
-        "intro": "Ambalaj, pil ve elektronikte genişletilmiş üretici sorumluluğu. Her pazar kendi sicilini, ücret tarifesini ve raporlama takvimini işletir. Nereye ve ne zaman kaydolacağınızı haritalarız.",
+        "intro": "Fiziksel ürünleri çevrimiçi mi satıyorsunuz? Ürünleri siz üretmemiş olsanız bile EPR ve ambalaj gereklilikleri geçerli olabilir. Her pazarda hangi kayıtların ve diğer adımların gerekebileceğini öğrenin.\n\nGenişletilmiş Üretici Sorumluluğu (EPR) ve ambalaj kuralları, bir ülkeye fiziksel ürün sattığınızda veya gönderdiğinizde — bir çevrimiçi pazaryeri ya da kendi web siteniz üzerinden de olsa — geçerli olabilir. Pazara ve ürün kategorisine bağlı olarak kayıt yaptırmanız, miktar bildirmeniz, geri dönüşüm maliyetlerine katkıda bulunmanız, geri alma yükümlülüklerini yerine getirmeniz veya yetkili bir temsilci atamanız gerekebilir.",
         "cover": [
-          "LUCID / ulusal ambalaj sicilleri",
+          "LUCID dahil ambalaj EPR'si",
+          "AEEE ve pil gereklilikleri",
+          "Miktar bildirimi",
           "Geri alma ve geri dönüşüm yükümlülükleri",
-          "Ekomodülasyon ücret kademeleri",
-          "WEEE ve pil kaydı",
-          "Yıllık raporlama hacimleri",
-          "Yetkili temsilci gereklilikleri"
+          "Ekomodülasyonlu ücretler",
+          "Yetkili temsilci hizmetleri"
         ],
         "matters": [
-          "Yeni bir AB pazarına fiziksel ürün gönderiyorsunuz",
+          "Fiziksel ürünleri bir pazaryeri, kendi web siteniz veya başka bir satış kanalı üzerinden satıyor ya da gönderiyorsunuz.",
           "AB tüketicilerine ambalajlı ürün satıyorsunuz",
           "Yeni bir ürün kategorisi ekliyorsunuz (ör. elektronik)"
         ],
@@ -1189,18 +1189,18 @@
       {
         "title": "Veri ve Gizlilik",
         "desc": "Neyi, hangi hukuki dayanakla toplayabileceğinizi ve neyi belgeleyebilmeniz gerektiğini bilin.",
-        "intro": "AB'de ve Brexit sonrası Birleşik Krallık'ta veri koruma. İşleme kayıtlarından uluslararası aktarımlara kadar, yalnızca merkezinizi değil, verinizi izleyen yükümlülükleri ortaya koyarız.",
+        "intro": "İşletmenizin hangi kişisel verileri topladığını, bunları neden kullanabileceğinizi ve hangi belgelerin veya güvencelerin gerekebileceğini anlayın. Gizlilik gereklilikleri ülkelere, ABD eyaletlerine, sektörlere ve faaliyetlere göre değişir. Kişisel verileri nasıl topladığınızı, kullandığınızı, sakladığınızı, paylaştığınızı, aktardığınızı ve koruduğunuzu etkileyebilir.",
         "cover": [
-          "Yüksek riskli işleme için DPIA'lar",
-          "İşleme faaliyetleri kaydı (RoPA)",
-          "Veri işleyen / alt işleyen sözleşmeleri",
-          "Uluslararası aktarım mekanizmaları",
-          "Erişim ve silme taleplerinin yönetimi",
-          "İhlal bildirim süreleri",
+          "Ülkeler ve ABD eyaletleri için gizlilik değerlendirmeleri",
+          "VKED ve benzeri risk değerlendirmeleri",
+          "İşleme faaliyetleri kayıtları (RoPA)",
+          "Aydınlatma metinleri ve veri işleme sözleşmeleri",
+          "Uluslararası aktarım güvenceleri",
+          "İlgili kişi hakları talepleri",
           "İhlal değerlendirmesi ve bildirimi"
         ],
         "matters": [
-          "AB/UK'de yerleşik kişilerin kişisel verilerini işliyorsunuz",
+          "Bir veya birden fazla pazarda müşterilerle, çalışanlarla, web sitesi ziyaretçileriyle, uygulama kullanıcılarıyla veya başka kişilerle ilgili bilgileri işliyorsunuz.",
           "Yeni bir izleme veya analitik aracı ekliyorsunuz",
           "AB/UK dışına veri aktarıyorsunuz"
         ],
@@ -1230,18 +1230,18 @@
       {
         "title": "Pazarlama Uyumu",
         "desc": "Ne iddia edebileceğinizi, insanlara nasıl ulaşabileceğinizi ve rızanın nasıl görünmesi gerektiğini bilin.",
-        "intro": "ePrivacy ve tüketici hukuku kapsamında onay ve dürüst pazarlama kuralları. Çerez duvarları, opt-in'ler ve dark pattern incelemeleri pazara göre değişir — her düzenleyicinin fiilen neyi uyguladığını izleriz.",
+        "intro": "Müşterilere nasıl ulaştığınızı, çerezleri ve izleme teknolojilerini nasıl kullandığınızı, onayı nasıl aldığınızı ve reklam iddialarını nasıl dile getirdiğinizi etkileyebilecek kuralları anlayın.",
         "cover": [
-          "Çerez onay bandının geçerliliği",
-          "Onay kayıtları ve kanıtları",
-          "E-posta / SMS opt-in kuralları",
-          "Dark pattern denetimleri",
-          "Influencer ve reklam beyanı",
-          "Abonelikten çıkma ve bastırma listesi yönetimi",
+          "Çerez banner'ları ve izleme incelemeleri",
+          "Onay ve tercih yönetimi",
+          "E-posta, SMS, telefon ve doğrudan mesajla pazarlama",
+          "Reklam iddiaları ve tanıtım açıklamaları",
+          "Influencer ve affiliate açıklamaları",
+          "Kullanıcı tercihi ve karanlık desen (dark pattern) incelemeleri",
           "Abonelikten çıkma ve engelleme listesi süreçleri"
         ],
         "matters": [
-          "AB'ye ücretli pazarlama yürütüyorsunuz",
+          "Analiz araçları veya çerezler kullanıyor, pazarlama mesajları gönderiyor, ürün ya da hizmet reklamı yapıyor veya influencer ve affiliate'lerle çalışıyorsunuz.",
           "Bir e-posta veya SMS programı başlatıyorsunuz",
           "Onay akışınızı yeniden tasarlıyorsunuz"
         ],
@@ -1267,20 +1267,20 @@
       {
         "title": "Şirket Kuruluşu ve Bildirimler",
         "desc": "Yapınızın nerede yükümlülük doğurduğunu bilin — işyeri, beyanlar, gerçek faydalanıcılar.",
-        "intro": "Değerlendirdiğimiz her pazarda şirket düzeyindeki yükümlülükler. Yıllık beyanlar, gerçek faydalanıcı şeffaflığı ve grup içi sözleşmelerin her birinin kendi vadeleri ve yaptırımları vardır.",
+        "intro": "Bir işletmeyi kurmak, tescil ettirmek ve sürdürmek için nelerin gerekebileceğini anlayın. Gereklilikler ülkeye veya yerel yetki alanına, şirket türüne, ortaklık yapısına ve faaliyete bağlıdır.",
         "cover": [
-          "Yıllık finansal tablolar",
-          "Şeffaflık / UBO sicil bildirimleri",
-          "Gerçek faydalanıcı güncellemeleri",
-          "Grup içi sözleşme dokümantasyonu",
-          "Yerel temsil gereklilikleri",
-          "Bildirim vadelerinin takibi",
+          "Şirket kuruluşu ve yapısı",
+          "Yurt dışı tescil ve yerel kayıt",
+          "Yıllık raporlar ve hesaplar",
+          "Gerçek faydalanıcı ve şeffaflık bildirimleri",
+          "Yönetici ve yetkili değişiklikleri",
+          "Kayıtlı temsilci, kayıtlı ofis ve yerel temsil hizmetleri",
           "Şube, iştirak ve grup yapıları",
           "Yeniden yapılanma ve kapanış",
           "Süregelen son tarihler ve şirket bakımı"
         ],
         "matters": [
-          "Yerel bir şirket veya şube işletiyorsunuz",
+          "Şirket kuruyor, yeni bir pazara giriyor, şube açıyor, ortaklık yapısını değiştiriyor veya şirketin süregelen bildirimlerini yönetiyorsunuz.",
           "Ortaklık yapınız değişiyor",
           "Yerel bir denetim eşiğini aşıyorsunuz"
         ],
@@ -1306,19 +1306,19 @@
       {
         "title": "Ürün Uygunluğu",
         "desc": "Ürününüzün piyasaya arz edilip edilemeyeceğini ve hangi kanıtları saklamanız gerektiğini bilin.",
-        "intro": "Bir ürünün piyasaya arz edilip edilemeyeceği ve bunun arkasında hangi kanıtın durduğu. Ambalajdan ayrı: burada ürünün kendisi söz konusu — güvenlik, uygunluk, dokümantasyon ve AB içinde bunun sorumluluğunu kimin üstlendiği.",
+        "intro": "Ürününüzün yasal ve güvenli şekilde satılabilmesi için nelere ihtiyaç duyabileceğini anlayın. Bu; test, sertifikasyon, etiketleme, dokümantasyon ve yerel temsili kapsayabilir. Ürüne, hedef pazara, kullanım amacına, müşteri grubuna ve tedarik zincirindeki rolünüze bağlıdır.",
         "cover": [
-          "Genel Ürün Güvenliği Tüzüğü (AB) 2023/988",
-          "CE işareti ve uygunluk beyanı",
-          "Teknik dosya ve saklama süresi",
-          "AB’de yerleşik sorumlu kişi",
-          "Olay bildirimi ve geri çağırmalar",
-          "Büyük Britanya için UKCA işareti",
+          "Ürün sınıflandırması ve geçerli standartlar",
+          "Genel Ürün Güvenliği Yönetmeliği (GPSR)",
+          "Test, sertifikasyon ve uygunluk değerlendirmesi",
+          "CE, UKCA ve diğer pazar işaretleri",
+          "Etiketler, uyarılar ve talimatlar",
+          "Teknik dokümantasyon ve saklama",
           "Sorumlu kişi, yetkili temsilci veya yerel temsilci hizmetleri",
           "Olay bildirimi, düzeltici önlemler ve geri çağırmalar"
         ],
         "matters": [
-          "AB pazarına ilk kez fiziksel bir ürün sunuyorsunuz",
+          "Fiziksel bir ürünü üretiyor, ithal ediyor, dağıtıyor veya satıyorsunuz.",
           "Kendi uygunluk kuralları olan bir ürün kategorisi ekliyorsunuz",
           "AB’de yerleşik olmadan AB’ye satış yapıyorsunuz"
         ],
@@ -1348,14 +1348,14 @@
       {
         "title": "Lojistik ve Gümrük",
         "desc": "Malınızın sınırı geçmek için neye ihtiyaç duyduğunu ve bunun sorumluluğunu kimin taşıdığını bilin.",
-        "intro": "Malın sınırı geçmek için neye ihtiyaç duyduğu ve geçtikten sonra sorumluluğu kimin taşıdığı. Gümrük kimliği, beyannameler, istatistik ve kimin ödeyeceğini, kimin sorumlu olacağını belirleyen teslim şartları.",
+        "intro": "Sınırda nelerin istenebileceğini, bir sevkiyatın neye mal olabileceğini ve her aşamada kimin sorumlu olduğunu anlayın. Sınır ötesi mal hareketleri kayıtları, sınıflandırmayı, beyannameleri, vergi ve harçları, lisansları, belgeleri ve ticari raporlamayı içerebilir.",
         "cover": [
-          "EORI kaydı",
-          "İthalat ve ihracat beyannameleri",
-          "Eşik aşıldığında Intrastat bildirimi",
-          "Incoterms ve sorumluluğun nerede olduğu",
-          "İthalat KDV’si ve erteleme",
-          "Brexit sonrası GB ↔ AB hareketleri",
+          "Gümrük müşaviri ve nakliye komisyoncusu eşleştirmesi",
+          "İthalatçı, ihracatçı ve EORI gereklilikleri",
+          "GTİP ve tarife sınıflandırması",
+          "Gümrük kıymeti ve menşe",
+          "Beyannameler ve sevkiyat belgeleri",
+          "Gümrük vergileri ve ithalat vergileri",
           "İthalat ve ihracat lisansları",
           "Incoterms ve teslimat sorumlulukları",
           "Intrastat beyanları",
@@ -1363,7 +1363,7 @@
           "Belirli rotalara özel destek"
         ],
         "matters": [
-          "İlk kez bir gümrük sınırının ötesine sevkiyat yapıyorsunuz",
+          "Fiziksel malları sınır ötesine ithal ediyor, ihraç ediyor, depoluyor veya teslim ediyorsunuz.",
           "Ticaret hacminiz bir Intrastat eşiğini aşıyor",
           "Incoterms’i ya da lojistik ortağınızı değiştiriyorsunuz"
         ],
@@ -1397,21 +1397,21 @@
       {
         "title": "Hukuki Destek",
         "desc": "Bir sorunun gerçekten avukat gerektirip gerektirmediğini bilin — ve dosyanızı zaten bilen birine ulaşın.",
-        "intro": "Kontrol listesi değil, nitelikli yanıt gerektiren sorular: sözleşmeler, koşullar, tüketici hakları, uyuşmazlıklar. CompliHub360 bir hukuk bürosu değildir — Verified Provider’lar kendi mesleki sorumlulukları altında danışmanlık verir ve biz ulaştığınız kişinin dosyanızı zaten bilmesini sağlarız.",
+        "intro": "Ne zaman nitelikli hukuki desteğe ihtiyaç duyabileceğinizi anlayın ve konuya uygun bir uzman bulun. CompliHub360 desteğin türünü belirler ve sağlayıcılarla eşleştirir; bir hukuk bürosu değildir ve hukuki danışmanlık vermez.",
         "cover": [
-          "Koşullar ve tüketiciyi bilgilendirme yükümlülükleri",
-          "Tedarikçi ve platform sözleşmeleri",
-          "Cayma, iade ve garanti",
-          "Sorumluluk ve sınırları",
-          "Sınır ötesi uyuşmazlıkların yürütülmesi",
-          "Hangi hukukun gerçekten uygulandığı",
+          "Ticari sözleşmeler",
+          "Web sitesi koşulları ve tüketici politikaları",
+          "İadeler, garantiler ve tüketici hakları",
+          "Sorumluluk konuları",
+          "Şirketler ve ticaret hukuku",
+          "İş hukuku ve serbest çalışan konuları",
           "Fikri mülkiyet ve markalar",
           "Uyuşmazlıklar",
           "Uygulanacak hukuk ve yetkili mahkeme",
           "Yerel hukuki görüşler ve düzenleyici danışmanlık"
         ],
         "matters": [
-          "Daha önce kullanmadığınız bir sözleşme türünü imzalıyorsunuz",
+          "Bir sözleşme, iş kararı, tüketici meselesi, hukuki başvuru, uyuşmazlık veya belirli bir yetki alanına özgü bir konu nitelikli hukuki destek gerektiriyor.",
           "Bir uyuşmazlık başka ülkedeki bir müşteriyi ilgilendiriyor",
           "Resmi bir şikâyet ya da bir kurumdan sorgu alıyorsunuz"
         ],
@@ -1461,11 +1461,11 @@
     "euWide": "AB genelinde"
   },
   "howItActs": {
-    "eyebrow": "Bir işin içinden",
+    "eyebrow": "Seçiminizden sonra",
     "title": {
-      "pre": "Eşleşme ile çözüm ",
-      "gold": "arasında",
-      "post": " neler olur."
+      "pre": "Sağlayıcı seçiminizden tamamlanan işe kadar her adım ",
+      "gold": "net",
+      "post": "."
     },
     "cards": [
       {
@@ -1473,18 +1473,18 @@
         "desc": "Seçim yapmadan önce beklenen bir fiyat aralığı gösterilir. Görüşmeden sonra sağlayıcı nihai kapsamı ve tahmini teyit eder. Siz onaylamadan hiçbir profesyonel çalışma başlamaz."
       },
       {
-        "title": "Yanıt, saat işlerken.",
+        "title": "Baştan net zamanlama",
         "desc": "Bir sağlayıcı kararlaştırılan yanıt süresini kaçırırsa size haber veririz ve başka bir eşleşme gösterebiliriz. Siz seçip randevu almadan yeni bir sağlayıcıyla hiçbir şey paylaşılmaz."
       },
       {
-        "title": "Sizde kalan bir kayıt.",
+        "title": "İşinizin eksiksiz kaydı",
         "desc": "Her adım özel bir zaman çizelgesine kaydedilir — talep, yanıt, kararlaştırılan kapsam, teslimatlar. Sizindir."
       }
     ],
     "panel1": {
-      "scope": "Kapsam",
-      "scopeValue": "OSS üç aylık beyanları · DE + NL + FR",
-      "approval": "Onay",
+      "scope": "Dahil olan hizmetler",
+      "scopeValue": "OSS üç aylık beyanları · Almanya · Hollanda · Fransa",
+      "approval": "Onayınız",
       "estCost": "Beklenen fiyat aralığı",
       "estValue": "2.400–3.800 €",
       "timeline": "Tahmini hizmet süresi",
@@ -1492,14 +1492,14 @@
       "approvalValue": "Profesyonel çalışma başlamadan önce gerekli"
     },
     "panel2": {
-      "label": "İlk yanıt SLA'sı",
+      "label": "Beklenen yanıt süresi",
       "note": "Kaçırılırsa size haber veririz ve başka bir eşleşme gösterebiliriz."
     },
     "panel3": {
       "timeline": [
         {
           "date": "24 Nis",
-          "label": "Talep gönderildi"
+          "label": "Görüşme planlandı"
         },
         {
           "date": "25 Nis",
@@ -1507,11 +1507,11 @@
         },
         {
           "date": "28 Nis",
-          "label": "Teklif alındı"
+          "label": "Kapsam ve tahmin"
         },
         {
-          "date": "02 May",
-          "label": "Kapsam üzerinde anlaşıldı"
+          "date": "29 Nis",
+          "label": "Kullanıcı onayı"
         },
         {
           "date": "06 May",
@@ -1558,15 +1558,15 @@
     }
   },
   "beyond": {
-    "eyebrow": "Değerlendirmenin ötesinde",
+    "eyebrow": "CompliHub360 çalışma alanınız",
     "title": {
-      "pre": "Tek seferlik kontrolden, uyumla ilgili her şeyin ",
-      "gold": "ana üssüne",
-      "post": "."
+      "pre": "Uyum çalışmalarınız ",
+      "gold": "düzenli",
+      "post": ", tek bir yerde."
     },
     "subtitle": "Risk Map'lerinizi, eşleşmelerinizi, görüşmelerinizi, son tarihlerinizi, belgelerinizi ve iş geçmişinizi kaydedin.",
     "pills": {
-      "live": "Bugün kullanılabilir",
+      "live": "Şimdi kullanılabilir",
       "beta": "Beta ile geliyor"
     },
     "stats": [
@@ -1598,17 +1598,17 @@
       }
     ],
     "workspace": {
-      "title": "Haritanız. Sağlayıcılarınız. Kaydınız. Kalıcı.",
-      "desc": "Değerlendirme, kaydedilmiş bir dosyaya dönüşür. İş zaman çizelgeniz panonuzda yaşar. Sağlayıcı ilişkileri, uyum kaydı, Risk Map — hepsi tek yerde, hepsi sizin."
+      "title": "Her şey düzenli ve elinizin altında kalır",
+      "desc": "Yeni bir değerlendirme başlatın, kaldığınız yerden devam edin, aktif görüşmelerinizi ve işlerinizi takip edin ve kaydedilen Risk Map'lerinize geri dönün."
     },
     "newsCard": {
-      "title": "Sizi etkileyen gelişmeler.",
-      "desc": "Düzenleyiciler faaliyet gösterdiğiniz pazarlarda harekete geçtiğinde bildirimler — alana göre derlenmiş, operasyonunuza göre daraltılmış."
+      "title": "İşletmenizle ilgili mevzuat güncellemeleri",
+      "desc": "Her güncelleme otoriteyi, pazarı, gerekliliği, yürürlük tarihini ve resmi kaynağı belirtir — ve işletme profiliniz için neden önemli olduğunu açıklar."
     },
     "learn": {
       "meta": "Web semineri · 24 dk",
       "video": "D2C için sınır ötesi KDV",
-      "title": "İşin uzmanlarından öğrenin.",
+      "title": "Güvenilir uzmanlardan öğrenin",
       "desc": "Nitelikli uzmanlardan pratik rehberler, webinarlar ve eğitimler."
     },
     "mock": {
@@ -1670,7 +1670,7 @@
           },
           {
             "q": "Risk Map’teki durumlar ne anlama geliyor?",
-            "a": "“Onaylandı”, yanıtlarınıza göre gerekliliğin geçerli olduğu anlamına gelir. “Muhtemel”, gerekliliğin büyük olasılıkla geçerli olduğu, ancak daha fazla bilgi veya profesyonel doğrulama gerekebileceği anlamına gelir. “Açık”, daha doğru bir değerlendirme için ek yanıtlara ihtiyaç olduğu anlamına gelir."
+            "a": "“Onaylandı”, yanıtlarınıza göre gerekliliğin geçerli olduğu anlamına gelir. “Muhtemelen geçerli”, gerekliliğin büyük olasılıkla geçerli olduğu, ancak daha fazla bilgi veya profesyonel doğrulama gerekebileceği anlamına gelir. “Daha fazla bilgi gerekiyor”, daha doğru bir değerlendirme için ek yanıtlara ihtiyaç olduğu anlamına gelir."
           },
           {
             "q": "Bilgiler nereden geliyor?",
@@ -1794,11 +1794,11 @@
       "Kayıt",
       "Çalışma alanı"
     ],
-    "eyebrow": "Buradan başlayın",
+    "eyebrow": "Ücretsiz bir değerlendirmeyle başlayın",
     "title": {
-      "pre": "Tek değerlendirme. Tek sonuç. Yol ",
-      "highlight": "okunur",
-      "post": " hâle gelir."
+      "pre": "Bize işletmenizi anlatın. Neyin ",
+      "highlight": "sizin için geçerli olduğunu",
+      "post": " görün."
     },
     "subtitle": "İşletmenizin nerede ve nasıl faaliyet gösterdiğine dair birkaç soruyu yanıtlayın. Yaklaşık altı dakikada size özel bir Risk Map alırsınız. Hesap gerekmez.",
     "cta": "İhtiyaçlarımı değerlendir",
@@ -1808,20 +1808,20 @@
     }
   },
   "newsletter": {
-    "eyebrow": "Güncel kalın",
-    "title": "Bir mevzuat değiştiğinde haberiniz olur.",
-    "desc": "Ayda bir bülten. Yeni eşikler, vadeler ve güvenilir kaynak bağlantıları — faaliyet gösterdiğiniz pazarlar için. Tanıtım içeriği yok.",
+    "eyebrow": "Haberdar olun",
+    "title": "Gereklilikler değiştiğinde neyin önemli olduğunu bilirsiniz.",
+    "desc": "Her ay, takip ettiğiniz pazarlar ve uyum alanları için önemli mevzuat değişikliklerini, yaklaşan son tarihleri ve resmi kaynak bağlantılarını içeren net bir güncelleme alın. Tanıtım e-postası yok.",
     "placeholder": "siz@sirketiniz.com",
     "emailAria": "E-posta adresi",
     "subscribe": "Abone olun",
-    "privacy": "E-postanızı yalnızca bülten için kullanırız. Tek tıkla abonelikten çıkabilirsiniz. Gizlilik politikamıza bakın.",
-    "accountLink": "Veya Risk Map'inizi saklamak için ücretsiz hesap oluşturun",
-    "cardTitle": "Aylık briefing",
+    "privacy": "E-posta adresinizi yalnızca aylık bülteni göndermek için kullanırız. İstediğiniz zaman abonelikten çıkabilirsiniz. <policy>Gizlilik Politikamızı</policy> okuyun.",
+    "accountLink": "Kişiselleştirilmiş mevzuat uyarıları için ücretsiz hesap oluşturun",
+    "cardTitle": "Aylık uyum bülteniniz",
     "betaNote": "Aylık bültene kayıt henüz açık değil."
   },
   "footer": {
-    "tagline": "İşletmeniz için neyin geçerli olduğunu anlamanıza — ve gerektiğinde doğru kişiye ulaşmanıza yardımcı oluyoruz.",
-    "notLawFirm": "Bir hukuk bürosu değiliz. Doğrulanmış uzmanları orkestre ederiz.",
+    "tagline": "Neyin geçerli olduğunu anlayın. Doğru desteği bulun.",
+    "notLawFirm": "Net uyum bilgileri ve doğrulanmış bağımsız sağlayıcılarla adil eşleştirme.",
     "beta": "Beta",
     "columns": {
       "platform": {
@@ -1829,13 +1829,13 @@
         "links": {
           "howItWorks": "Nasıl çalışır",
           "forWhom": "Kimler için",
-          "startAssessment": "Değerlendirmeyi başlat",
+          "startAssessment": "İhtiyaçlarımı değerlendir",
           "askQuestion": "Soru sor",
           "signIn": "Giriş yap"
         }
       },
       "areas": {
-        "title": "Uyum alanları",
+        "title": "Destek alanları",
         "links": {
           "areasOverview": "Tüm alanlar",
           "taxVat": "Vergi ve KDV",
@@ -1851,7 +1851,7 @@
       "company": {
         "title": "Şirket",
         "links": {
-          "about": "Hakkımızda",
+          "about": "CompliHub360 hakkında",
           "trustSecurity": "Güven ve Güvenlik",
           "contact": "İletişim",
           "support": "Destek"
@@ -1870,14 +1870,14 @@
       "pre": "Bugün kapsadığımız pazarlar: ",
       "post": ". 2026 boyunca daha fazla ülke ekleniyor."
     },
-    "disclaimer": "CompliHub360 bir orkestrasyon platformudur — hukuk bürosu değildir. Hukuki, vergisel ve mevzuata ilişkin danışmanlık, kendi mesleki sorumlulukları altında Verified Provider'lar tarafından verilir. §§ RDG / StBerG anlamında Rechtsberatung sunmuyoruz.",
-    "copyright": "© 2026 CompliHub360.",
+    "disclaimer": "CompliHub360 uyum bilgileri ve teknoloji tabanlı eşleştirme hizmetleri sunar. Bir hukuk bürosu, muhasebe firması, vergi danışmanı, gümrük müşaviri veya düzenleyici otorite değiliz; hukuki, vergisel, muhasebe, gümrük veya diğer düzenlenmiş mesleki danışmanlık vermeyiz. Mesleki hizmetler, kendi sorumlulukları ve koşulları altında bağımsız hizmet sağlayıcılar tarafından sunulur.",
+    "copyright": "© 2026 CompliHub360. Tüm hakları saklıdır.",
     "legal": {
       "privacy": "Gizlilik Politikası",
       "terms": "Beta sözleşmesi",
-      "imprint": "Künye (Impressum)",
+      "imprint": "Yasal bilgiler",
       "cookies": "Çerez Politikası",
-      "subProcessors": "Alt İşleyenler"
+      "subProcessors": "Alt işleyen listesi"
     },
     "coverageNote": "Hizmetin sunulabilirliği ülkeye, uyum gereksinimine ve doğrulanmış sağlayıcı ağımızdaki kapsama bağlıdır.",
     "coverageLink": "Pazarları ve kapsamı keşfedin"

@@ -7,10 +7,10 @@
   "header": {
     "eyebrow": "Ihre Risk Map",
     "title": "Das gilt für Sie.",
-    "subtitleProfile_one": "Basierend auf Ihrer Einschätzung. {{count}} Bereich im Fokus.",
-    "subtitleProfile_other": "Basierend auf Ihrer Einschätzung. {{count}} Bereiche im Fokus.",
-    "subtitleChosen_one": "Basierend auf Ihrer Einschätzung. {{count}} von Ihnen gewählter Bereich, {{extra}} weitere für Ihre Märkte geprüft.",
-    "subtitleChosen_other": "Basierend auf Ihrer Einschätzung. {{count}} von Ihnen gewählte Bereiche, {{extra}} weitere für Ihre Märkte geprüft.",
+    "subtitleProfile_one": "Basierend auf Ihrem Assessment. {{count}} Bereich im Fokus.",
+    "subtitleProfile_other": "Basierend auf Ihrem Assessment. {{count}} Bereiche im Fokus.",
+    "subtitleChosen_one": "Basierend auf Ihrem Assessment. {{count}} von Ihnen gewählter Bereich, {{extra}} weitere für Ihre Märkte geprüft.",
+    "subtitleChosen_other": "Basierend auf Ihrem Assessment. {{count}} von Ihnen gewählte Bereiche, {{extra}} weitere für Ihre Märkte geprüft.",
     "titleConfirmed_one": "{{count}} Pflicht gilt für Sie.",
     "titleConfirmed_other": "{{count}} Pflichten gelten für Sie.",
     "titleMore_one": "{{count}} weitere lohnt einen genauen Blick.",
@@ -76,10 +76,10 @@
   },
   "state": {
     "confirmed": "Bestätigt",
-    "likely": "Wahrscheinlich",
+    "likely": "Gilt wahrscheinlich",
     "answer_one": "{{total}} Frage beantworten",
     "answer_other": "{{total}} Fragen beantworten",
-    "open": "Offen"
+    "open": "Weitere Angaben nötig"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider gefunden",
@@ -103,8 +103,8 @@
     "title": "Ihre Compliance-Risk-Map.",
     "generated": "Erstellt am {{date}} · Staging-Vorschau",
     "profile": {
-      "anonymousScope": "Anonyme Einschätzung · Beispielumfang",
-      "anonymous": "Anonyme Einschätzung",
+      "anonymousScope": "Anonymes Assessment · Beispielumfang",
+      "anonymous": "Anonymes Assessment",
       "markets": "Märkte",
       "domains": "Bereiche",
       "operations": "Geschäftstätigkeit"

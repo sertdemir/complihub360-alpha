@@ -76,10 +76,10 @@
   },
   "state": {
     "confirmed": "Onaylandı",
-    "likely": "Muhtemel",
+    "likely": "Muhtemelen geçerli",
     "answer_one": "{{total}} soruyu yanıtlayın",
     "answer_other": "{{total}} soruyu yanıtlayın",
-    "open": "Açık"
+    "open": "Daha fazla bilgi gerekiyor"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider eşleşti",

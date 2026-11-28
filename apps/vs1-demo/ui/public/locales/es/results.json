@@ -76,10 +76,10 @@
   },
   "state": {
     "confirmed": "Confirmada",
-    "likely": "Probable",
+    "likely": "Probablemente aplica",
     "answer_one": "Responder {{total}} pregunta",
     "answer_other": "Responder {{total}} preguntas",
-    "open": "Abierta"
+    "open": "Se necesita más información"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider encontrado",

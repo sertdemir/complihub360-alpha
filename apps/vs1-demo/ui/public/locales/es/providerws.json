@@ -523,7 +523,7 @@
   },
   "termine": {
     "title": "Citas y <accent>leads</accent>.",
-    "sub": "Llamadas iniciales reservadas. El dossier con identidad y solicitud es suyo desde la reserva. Cada reserva es un lead facturado.",
+    "sub": "Citas reservadas. El dossier con la identidad y la solicitud es suyo desde el momento de la reserva. Cada reserva es un lead facturado.",
     "upcoming": "PRÓXIMAS",
     "past": "PASADAS",
     "leadCharged": "Lead facturado",
@@ -1338,19 +1338,19 @@
     "goTo": "Abrir",
     "booking_created": {
       "title": "Nueva reserva",
-      "body": "Un cliente ha reservado una primera consulta para el {{slot}}. El expediente está listo."
+      "body": "Un cliente ha reservado una cita para el {{slot}}. El dossier está listo."
     },
     "booking_cancelled": {
       "title": "Reserva cancelada",
-      "body": "El cliente ha cancelado la primera consulta del {{slot}}."
+      "body": "El cliente canceló la cita del {{slot}}."
     },
     "booking_rescheduled": {
       "title": "Reserva aplazada",
-      "body": "El cliente ha movido la primera consulta del {{from}} al {{slot}}."
+      "body": "El cliente movió la cita del {{from}} al {{slot}}."
     },
     "appointment_reminder": {
       "title": "Cita en {{offset}}",
-      "body": "Primera consulta el {{slot}}."
+      "body": "Cita el {{slot}}."
     },
     "dispute_opened": {
       "title": "Un cliente discrepa de su informe",
