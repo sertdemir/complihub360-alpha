@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, X, SendHorizonal, Crown } from 'lucide-react';
+import { X, SendHorizonal, Crown, FileText } from 'lucide-react';
 import {
   askAssistant, assistantEnabled, createAssistantCheckout, verifyAssistantSubscription,
   type AssistantMessage, type AssistantSource,
@@ -10,11 +10,37 @@ import { useAuthStore } from '../../store/useAuthStore';
 
 // ─── Assistant widget (chatbot plan phase ②) ──────────────────────────────────
 // Floating VAT assistant, bottom-right of the User App-Workspace. Behind the
-// ?assistant=1 flag until the subscription gate (phase ③) ships. Panel follows
-// the drawer spec: slate #1f2937, teal accents, strong lift; the gold Beta tag
-// marks it as the upgrade/monetization surface. Copy lives in 'userws'.
+// ?assistant=1 flag until the subscription gate (phase ③) ships. Copy lives in
+// 'userws'.
+//
+// Redesign 28.11.2026 (Canvas-Wahl, Figma: Screens-Datei, „Assistant / Panel"
+// 4412:1022 und „Assistant / Launcher" 4411:846): Das Panel folgt dem Theme —
+// vorher erzwang der Container `dark`, dazu text-white und #0e6450, und im
+// Light Mode stand ein dunkler Block auf heller Seite. Aufbau aus Variante A,
+// Launcher mit Goldrand und Quellen-Chips aus B, die AI-Bubble als Icon.
+// Bewegung: in Ruhe kreist ein Goldbogen um den Launcher (drei Runden nach dem
+// Laden, danach einmal je Hover, dann still — ein dauernd bewegter Button
+// würde Aufmerksamkeit erzwingen); beim Denken tippen drei Punkte. Der
+// Launcher ist 48 px (h-[48px]): h-12 ist in dieser Skala 96 px.
 
 type Turn = AssistantMessage & { sources?: AssistantSource[]; failed?: boolean };
+
+/** AI-Bubble: Sprechblase mit Funke (Figma „Assistant / Icon / Bubble"). */
+function BubbleIcon({ size = 16, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+      <path d="M6 4.5h12a2.5 2.5 0 0 1 2.5 2.5v8a2.5 2.5 0 0 1-2.5 2.5h-6.2l-4.3 3.2v-3.2H6A2.5 2.5 0 0 1 3.5 15V7A2.5 2.5 0 0 1 6 4.5z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+      <path d="M12 7.3l1.05 2.65 2.65 1.05-2.65 1.05L12 14.7l-1.05-2.65L8.3 11l2.65-1.05z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Goldbogen um den Launcher: ein konischer Verlauf, auf einen 2-px-Ring maskiert.
+const ORBIT_STYLE = {
+  background: 'conic-gradient(from 0deg, transparent 0 62%, rgb(var(--color-border-accent)) 82%, transparent 100%)',
+  WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))',
+  mask: 'radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))',
+};
 
 export function AssistantWidget({ country }: { country?: string }) {
   const { t } = useTranslation('userws');
@@ -26,6 +52,8 @@ export function AssistantWidget({ country }: { country?: string }) {
   // Phase ③: 402 from the api flips the panel into the upgrade state; after
   // Stripe Checkout the success_url returns with ?sub=success&session_id=….
   const [upgrade, setUpgrade] = useState<'none' | 'required' | 'redirecting' | 'active'>('none');
+  // Ruhe-Animation: drei Runden nach dem Laden, danach eine je Hover.
+  const [orbit, setOrbit] = useState<{ id: number; runs: number } | null>({ id: 0, runs: 3 });
   const { user } = useAuthStore();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -81,48 +109,53 @@ export function AssistantWidget({ country }: { country?: string }) {
   };
 
   return (
-    <div className="dark fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {open && (
-        <div className="flex h-[540px] w-[380px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-elevate/10 bg-surface text-fg shadow-[0_24px_64px_rgba(0,0,0,0.55)]">
-          <div className="flex items-center gap-2 border-b border-elevate/10 px-4 py-3">
-            <Sparkles size={15} className="text-fg-brand" />
-            <p className="text-[13px] font-semibold text-white">{t('assistant.title')}</p>
-            <span className="rounded-full border border-brand-accent/50 bg-brand-accent/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-fg-accent">
+        <div className="flex h-[540px] w-[380px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-stroke bg-surface text-fg shadow-[0_24px_56px_rgba(15,23,42,0.16),0_2px_6px_rgba(15,23,42,0.06)] dark:shadow-[0_24px_64px_rgba(0,0,0,0.55)]">
+          <div className="flex items-center gap-2 border-b border-stroke px-4 py-3">
+            <BubbleIcon size={16} className="text-fg-brand" />
+            <p className="text-[13px] font-semibold text-fg">{t('assistant.title')}</p>
+            <span className="rounded-full border border-brand-accent/35 bg-brand-accent/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-fg-accent">
               {t('assistant.beta')}
             </span>
-            <button type="button" aria-label={t('assistant.close')} onClick={() => setOpen(false)} className="ml-auto text-fg-tertiary transition-colors hover:text-fg">
+            <button type="button" aria-label={t('assistant.close')} onClick={() => setOpen(false)} className="ml-auto rounded text-fg-tertiary transition-colors hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus">
               <X size={15} />
             </button>
           </div>
 
           <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
-            <div className="rounded-xl bg-elevate/[0.06] px-3.5 py-2.5 text-[13px] leading-relaxed text-fg-secondary">
+            <div className="rounded-xl bg-surface-tertiary px-3.5 py-2.5 text-[13px] leading-relaxed text-fg-secondary">
               {t('assistant.intro')}
             </div>
             {turns.map((m, i) => (
               <div key={i} className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
                 <div className={
                   'max-w-[88%] rounded-xl px-3.5 py-2.5 text-[13px] leading-relaxed whitespace-pre-wrap ' +
-                  (m.role === 'user' ? 'bg-[#0e6450]/60 text-fg' : m.failed ? 'border border-error-500/30 bg-error-500/10 text-error-500' : 'bg-elevate/[0.06] text-fg-secondary')
+                  (m.role === 'user' ? 'bg-brand-light text-fg' : m.failed ? 'border border-error-500/30 bg-error-500/10 text-fg' : 'bg-surface-tertiary text-fg-secondary')
                 }>
                   {m.content}
                   {!!m.sources?.length && (
-                    <p className="mt-2 border-t border-elevate/10 pt-1.5 text-[10px] leading-relaxed text-fg-tertiary">
-                      {t('assistant.sources')}: {m.sources.map((s) => s.label).join(' · ')}
-                    </p>
+                    <ul aria-label={t('assistant.sources')} className="mt-2 flex flex-wrap gap-1.5">
+                      {m.sources.map((s, j) => (
+                        <li key={j} className="inline-flex items-center gap-1 rounded-full border border-stroke bg-surface py-0.5 pl-1.5 pr-2 text-[10.5px] font-medium leading-tight text-fg-secondary">
+                          <FileText size={11} aria-hidden="true" className="shrink-0 text-gold-500" />
+                          {s.label}
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </div>
               </div>
             ))}
             {upgrade === 'active' && (
-              <div className="rounded-xl border border-brand/40 bg-[#0e6450]/25 px-3.5 py-2.5 text-[13px] leading-relaxed text-fg">
+              <div className="rounded-xl border border-stroke-brand/40 bg-brand-light px-3.5 py-2.5 text-[13px] leading-relaxed text-fg">
                 {t('assistant.upgradeSuccess')}
               </div>
             )}
             {(upgrade === 'required' || upgrade === 'redirecting') && (
-              <div className="rounded-xl border border-brand-accent/45 bg-brand-accent/[0.08] px-4 py-3.5">
-                <p className="flex items-center gap-1.5 text-[13px] font-semibold text-fg-accent">
-                  <Crown size={14} /> {t('assistant.upgradeTitle')}
+              <div className="rounded-xl border border-brand-accent/35 bg-brand-accent/10 px-4 py-3.5">
+                <p className="flex items-center gap-1.5 text-[13px] font-semibold text-fg">
+                  <Crown size={14} aria-hidden="true" className="text-gold-500" /> {t('assistant.upgradeTitle')}
                 </p>
                 <p className="mt-1.5 text-[12.5px] leading-relaxed text-fg-secondary">{t('assistant.upgradeBody')}</p>
                 <button
@@ -135,10 +168,18 @@ export function AssistantWidget({ country }: { country?: string }) {
                 </button>
               </div>
             )}
-            {busy && <p className="text-[12px] text-fg-tertiary">{t('assistant.thinking')}</p>}
+            {busy && (
+              <div className="flex justify-start">
+                <div role="status" aria-label={t('assistant.thinking')} className="inline-flex items-center gap-1 rounded-xl rounded-bl-[4px] bg-surface-tertiary px-3 py-2.5 text-fg-tertiary">
+                  {[0, 0.15, 0.3].map((delay) => (
+                    <span key={delay} aria-hidden="true" className="assistant-typing-dot h-1.5 w-1.5 rounded-full bg-current" style={{ animationDelay: `${delay}s` }} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="border-t border-elevate/10 px-4 py-3">
+          <div className="border-t border-stroke px-4 py-3">
             <div className="flex items-end gap-2">
               <textarea
                 rows={2}
@@ -146,7 +187,7 @@ export function AssistantWidget({ country }: { country?: string }) {
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
                 placeholder={t('assistant.placeholder')}
-                className="flex-1 resize-none rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-brand/60 focus:outline-none"
+                className="flex-1 resize-none rounded-lg border border-stroke bg-elevate/5 px-3 py-2 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-stroke-brand focus:outline-none"
               />
               <button
                 type="button"
@@ -167,9 +208,20 @@ export function AssistantWidget({ country }: { country?: string }) {
         type="button"
         aria-label={open ? t('assistant.close') : t('assistant.open')}
         onClick={() => setOpen((o) => !o)}
-        className="grid h-12 w-12 place-items-center rounded-full bg-brand text-fg-on-brand shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition-transform hover:scale-105"
+        onMouseEnter={() => setOrbit((o) => o ?? { id: Date.now(), runs: 1 })}
+        className="relative grid h-[48px] w-[48px] place-items-center rounded-full bg-brand text-fg-on-brand shadow-[0_10px_24px_rgba(0,46,38,0.28)] ring-1 ring-brand-accent/35 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 dark:shadow-[0_12px_32px_rgba(0,0,0,0.45)]"
       >
-        {open ? <X size={19} /> : <Sparkles size={19} />}
+        {!open && (
+          <span
+            key={orbit?.id ?? 'rest'}
+            aria-hidden="true"
+            data-testid="assistant-orbit"
+            className={'pointer-events-none absolute -inset-1 rounded-full motion-reduce:hidden' + (orbit ? ' assistant-orbit' : '')}
+            style={{ ...ORBIT_STYLE, animationIterationCount: orbit?.runs }}
+            onAnimationEnd={() => setOrbit(null)}
+          />
+        )}
+        {open ? <X size={19} /> : <BubbleIcon size={21} />}
       </button>
     </div>
   );
