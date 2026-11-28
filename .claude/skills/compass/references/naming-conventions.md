@@ -134,7 +134,7 @@ color.neutral.900
 color.success.500
 color.warning.500
 color.error.500
-color.surface.muted        (= #BFD6D5, the Wizard/Filter teal-tinted neutral)
+color.surface.muted        (v1 #BFD6D5 — not shipped; tinted surfaces use the "Gradient")
 space.1                    (= 4px, micro)
 space.2                    (= 8px)
 space.6                    (= 24px, default Card padding)

@@ -129,7 +129,7 @@ Flag once with reasoning, then defer to the user. The default mode is "Inspirati
 - Don't import patterns wholesale from other systems (Material, Atlassian, Carbon, shadcn) — adapt to the CompliHub brand
 - Don't create components without checking what exists already
 - Don't skip the `figma-use` skill before `use_figma` calls
-- **Don't use the Accent-Gold `#D3B454` as a UI status color** (success/warning/error) — it is reserved exclusively for **Verified-Partner** elements (Brand-Identity / monetization signal). Status semantics use the dedicated success/warning/error scales.
+- **Don't use the Accent-Gold `#D4AF37` as a UI status color** (success/warning/error) — it is reserved exclusively for **Verified-Partner** elements (Brand-Identity / monetization signal). Status semantics use the dedicated success/warning/error scales.
 - **Don't use Petrol `#004D40` as a "decorative" color** — it carries Trust & Authority for brand-identity moments. Don't dilute it.
 - **Don't propose Petrol/Teal for primary buttons, focus rings or selected states** (Festlegung 2026-11-28): these are Ink `#1B2A41` / Parchment `#E9E4D3` (dark), primary buttons with a 3px brass edge + glint. Details in `assets/c360-context.md` → Brand.
 - **Don't generate placeholder content** in production components ("Lorem ipsum", "Button text") — use realistic CompliHub-context content (e.g. "Engagement Request senden", "Verified Partner", "VAT-Schwelle prüfen", "Provider kontaktieren")
