@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Info, CheckCircle2, AlertTriangle, AlertCircle, Sparkles, type LucideIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -24,13 +25,18 @@ export type BannerSurface = 'light' | 'medium' | 'strong' | 'solid';
 //   solid  = filled status color, inverse (white) text
 // Note: opacity on CSS-var colors is broken in this DS, so we use STATIC tailwind
 // colors (emerald/amber/red/sky -500, dark -400) for everything below.
-type SurfaceStyle = { surface: string; accent: string };
+// `action` = Schriftfarbe der einzelnen Aktion rechts, wo `accent` als TEXT auf
+// dem hellen Ton unter 4.5:1 liegt (nachgemessen 2026-11-28: info 3.84,
+// success 3.58, warning 3.07, error 4.41, brand 3.43 / 3.65, accent-medium
+// 4.46). `accent` selbst bleibt fuer das Icon: dort reichen 3:1.
+type SurfaceStyle = { surface: string; accent: string; action?: string };
 
 const SURFACES: Record<BannerStatus, Record<BannerSurface, SurfaceStyle>> = {
   info: {
     light: {
       surface: 'bg-sky-50 border-sky-200 text-sky-900 dark:bg-sky-500/15 dark:border-sky-500/40 dark:text-white',
       accent: 'text-sky-600 dark:text-sky-300',
+      action: 'text-sky-700 dark:text-sky-300',
     },
     medium: {
       surface: 'bg-sky-100 border-sky-300 text-sky-900 dark:bg-sky-500/25 dark:border-sky-500/55 dark:text-white',
@@ -49,6 +55,7 @@ const SURFACES: Record<BannerStatus, Record<BannerSurface, SurfaceStyle>> = {
     light: {
       surface: 'bg-emerald-50 border-emerald-200 text-emerald-900 dark:bg-emerald-500/15 dark:border-emerald-500/40 dark:text-white',
       accent: 'text-emerald-600 dark:text-emerald-300',
+      action: 'text-emerald-700 dark:text-emerald-300',
     },
     medium: {
       surface: 'bg-emerald-100 border-emerald-300 text-emerald-900 dark:bg-emerald-500/25 dark:border-emerald-500/55 dark:text-white',
@@ -67,6 +74,7 @@ const SURFACES: Record<BannerStatus, Record<BannerSurface, SurfaceStyle>> = {
     light: {
       surface: 'bg-amber-50 border-amber-300 text-amber-900 dark:bg-amber-500/15 dark:border-amber-500/45 dark:text-white',
       accent: 'text-amber-600 dark:text-amber-300',
+      action: 'text-amber-700 dark:text-amber-300',
     },
     medium: {
       surface: 'bg-amber-100 border-amber-400 text-amber-900 dark:bg-amber-500/25 dark:border-amber-500/55 dark:text-white',
@@ -85,6 +93,7 @@ const SURFACES: Record<BannerStatus, Record<BannerSurface, SurfaceStyle>> = {
     light: {
       surface: 'bg-red-50 border-red-200 text-red-900 dark:bg-red-500/15 dark:border-red-500/40 dark:text-white',
       accent: 'text-red-600 dark:text-red-300',
+      action: 'text-red-700 dark:text-red-300',
     },
     medium: {
       surface: 'bg-red-100 border-red-300 text-red-900 dark:bg-red-500/25 dark:border-red-500/55 dark:text-white',
@@ -105,10 +114,12 @@ const SURFACES: Record<BannerStatus, Record<BannerSurface, SurfaceStyle>> = {
     light: {
       surface: 'bg-[#004d40]/10 border-[#258d78]/35 text-[#0b3d34] dark:bg-[#004d40]/25 dark:border-[#258d78]/40 dark:text-white',
       accent: 'text-[#258d78] dark:text-[#2cc0ad]',
+      action: 'text-[#004d40] dark:text-[#2cc0ad]',
     },
     medium: {
       surface: 'bg-[#004d40]/20 border-[#258d78]/55 text-[#0b3d34] dark:bg-[#004d40]/40 dark:border-[#258d78]/55 dark:text-white',
       accent: 'text-[#1d7a67] dark:text-[#2cc0ad]',
+      action: 'text-[#004d40] dark:text-[#2cc0ad]',
     },
     strong: {
       surface: 'bg-[#004d40]/30 border-[#258d78] text-[#07281f] dark:bg-[#004d40]/60 dark:border-[#258d78] dark:text-white',
@@ -134,6 +145,7 @@ const SURFACES: Record<BannerStatus, Record<BannerSurface, SurfaceStyle>> = {
     medium: {
       surface: 'bg-[#d4af37]/20 border-[#d4af37]/55 text-[#6a5b1e] dark:bg-[#d4af37]/25 dark:border-[#d4af37]/55 dark:text-white',
       accent: 'text-[#8c672a] dark:text-[#e6c964]',
+      action: 'text-[#6b4e1f] dark:text-[#e6c964]',
     },
     strong: {
       surface: 'bg-[#d4af37]/35 border-[#d4af37] text-[#3d3411] dark:bg-[#d4af37]/40 dark:border-[#d4af37] dark:text-white',
@@ -173,7 +185,7 @@ export interface BannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   actions?: React.ReactNode;
   /** Show a dismiss ✕ that calls this. */
   onClose?: () => void;
-  /** Name des Schliessen-Knopfs fuer Screenreader. Standard "Dismiss". */
+  /** Name des Schliessen-Knopfs fuer Screenreader. Standard: common:a11y.dismissNotice in der Sprache der Seite. */
   closeLabel?: string;
   /**
    * Nur strip: Klassen fuer den inneren Container, damit der Inhalt des
@@ -194,7 +206,7 @@ export function Banner({
   action,
   actions,
   onClose,
-  closeLabel = 'Dismiss',
+  closeLabel: closeLabelProp,
   variant = 'card',
   surface = 'light',
   className,
@@ -204,6 +216,9 @@ export function Banner({
   const s = SURFACES[status][surface];
   const Icon = ICONS[status];
   const strip = variant === 'strip';
+  // Der Knopf hiess bis 2026-11-28 fest "Dismiss", in jeder Sprache.
+  const { t } = useTranslation('common');
+  const closeLabel = closeLabelProp ?? t('a11y.dismissNotice', { defaultValue: 'Dismiss' });
   const body = (
     <>
       {icon !== false && (
@@ -223,7 +238,7 @@ export function Banner({
           )}
         </div>
         {action && (
-          <div className={cn('shrink-0 text-body-sm font-semibold underline-offset-2', s.accent)}>{action}</div>
+          <div data-banner-action className={cn('shrink-0 text-body-sm font-semibold underline-offset-2', s.action ?? s.accent)}>{action}</div>
         )}
       </div>
       {onClose && (
